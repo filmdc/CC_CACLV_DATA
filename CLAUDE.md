@@ -26,7 +26,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Architecture Overview
 
 ### Framework Stack
-- **Laravel 12** with **Livewire** as the primary frontend framework
+- **Laravel 11** with **Livewire** as the primary frontend framework
 - **Livewire Volt** for simplified component creation
 - **Livewire Flux** for UI components
 - **TailwindCSS v4** for styling
@@ -71,3 +71,28 @@ This is **CAP TRACK** - a comprehensive data management platform for Community A
 ### Single Test Execution
 - `php artisan test --filter TestName` - Run specific test class
 - `php artisan test tests/Feature/specific_test.php` - Run specific test file
+
+## CAP TRACK Database Schema
+
+### Core Models Implemented
+- **Program** - Programs with services, contracts, and work plans
+- **Service** - Program-specific services with start/end dates
+- **Contract** - Funding contracts with documents and terms
+- **Participant** - Individual records with CSBG Module 4 Section C compliance
+- **Household** - Family units with income tracking and poverty level calculations
+- **WorkPlan** - Annual work plans per program
+- **WorkPlanGoal** - Goals mapped to services with target vs actual tracking
+- **PovertyGuideline** - Federal poverty guidelines for 2025 (monthly/annual)
+
+### Role-Based Access Control
+- **Role** - User roles (admin, program manager, staff, etc.)
+- **Permission** - Granular permissions by category
+- **UserRole** - Many-to-many user role assignments
+- **UserProgram** - Program-specific access control
+
+### Key Features
+- Automatic household code generation (7-digit alphanumeric)
+- CSBG compliance with all required demographic fields
+- Poverty level calculations using 2025 federal guidelines
+- JSON fields for complex data (income sources, benefits, documents)
+- Full Eloquent relationships between all models
