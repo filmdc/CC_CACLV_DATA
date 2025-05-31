@@ -18,14 +18,21 @@
 
                 <flux:navlist.group :heading="__('Participants')" class="grid">
                     <flux:navlist.item icon="user-plus" :href="route('participant.intake')" :current="request()->routeIs('participant.intake')" wire:navigate>{{ __('Participant Intake') }}</flux:navlist.item>
+                    <flux:navlist.item icon="user" :href="route('participant.management')" :current="request()->routeIs('participant.management')" wire:navigate>{{ __('Participant Management') }}</flux:navlist.item>
                     <flux:navlist.item icon="users" :href="route('household.management')" :current="request()->routeIs('household.management')" wire:navigate>{{ __('Household Management') }}</flux:navlist.item>
                 </flux:navlist.group>
 
                 <flux:navlist.group :heading="__('Programs')" class="grid">
+                    <flux:navlist.item icon="folder" :href="route('program.management')" :current="request()->routeIs('program.management')" wire:navigate>{{ __('Program Management') }}</flux:navlist.item>
                     <flux:navlist.item icon="briefcase" :href="route('service.management')" :current="request()->routeIs('service.management')" wire:navigate>{{ __('Service Management') }}</flux:navlist.item>
+                    <flux:navlist.item icon="document-text" :href="route('contract.management')" :current="request()->routeIs('contract.management')" wire:navigate>{{ __('Contract Management') }}</flux:navlist.item>
+                    <flux:navlist.item icon="calendar" :href="route('work-plan.management')" :current="request()->routeIs('work-plan.management')" wire:navigate>{{ __('Work Plans') }}</flux:navlist.item>
+                    <flux:navlist.item icon="flag" :href="route('work-plan-goal.management')" :current="request()->routeIs('work-plan-goal.management')" wire:navigate>{{ __('Work Plan Goals') }}</flux:navlist.item>
                 </flux:navlist.group>
 
                 <flux:navlist.group :heading="__('Administration')" class="grid">
+                    <flux:navlist.item icon="shield-check" :href="route('role-permission.management')" :current="request()->routeIs('role-permission.management')" wire:navigate>{{ __('Roles & Permissions') }}</flux:navlist.item>
+                    <flux:navlist.item icon="currency-dollar" :href="route('poverty-guideline.management')" :current="request()->routeIs('poverty-guideline.management')" wire:navigate>{{ __('Poverty Guidelines') }}</flux:navlist.item>
                     <flux:navlist.item icon="cog-6-tooth" :href="route('admin.panel')" :current="request()->routeIs('admin.panel')" wire:navigate>{{ __('Admin Panel') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
