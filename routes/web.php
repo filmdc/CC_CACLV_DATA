@@ -21,6 +21,7 @@ Route::middleware(['auth'])->group(function () {
     // CAP TRACK Routes
     Route::get('participant-intake', App\Livewire\ParticipantIntake::class)->name('participant.intake');
     Route::get('household-management', App\Livewire\HouseholdManagement::class)->name('household.management');
+    Route::get('service-management', App\Livewire\ServiceManagement::class)->name('service.management');
     Route::get('admin-panel', App\Livewire\AdminPanel::class)->name('admin.panel');
 });
 

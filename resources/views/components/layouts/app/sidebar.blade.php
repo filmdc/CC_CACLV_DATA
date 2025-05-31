@@ -15,6 +15,19 @@
                 <flux:navlist.group :heading="__('Platform')" class="grid">
                     <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
                 </flux:navlist.group>
+
+                <flux:navlist.group :heading="__('Participants')" class="grid">
+                    <flux:navlist.item icon="user-plus" :href="route('participant.intake')" :current="request()->routeIs('participant.intake')" wire:navigate>{{ __('Participant Intake') }}</flux:navlist.item>
+                    <flux:navlist.item icon="users" :href="route('household.management')" :current="request()->routeIs('household.management')" wire:navigate>{{ __('Household Management') }}</flux:navlist.item>
+                </flux:navlist.group>
+
+                <flux:navlist.group :heading="__('Programs')" class="grid">
+                    <flux:navlist.item icon="briefcase" :href="route('service.management')" :current="request()->routeIs('service.management')" wire:navigate>{{ __('Service Management') }}</flux:navlist.item>
+                </flux:navlist.group>
+
+                <flux:navlist.group :heading="__('Administration')" class="grid">
+                    <flux:navlist.item icon="cog-6-tooth" :href="route('admin.panel')" :current="request()->routeIs('admin.panel')" wire:navigate>{{ __('Admin Panel') }}</flux:navlist.item>
+                </flux:navlist.group>
             </flux:navlist>
 
             <flux:spacer />
