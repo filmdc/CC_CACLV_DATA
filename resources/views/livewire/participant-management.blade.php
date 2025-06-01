@@ -80,7 +80,7 @@
                             <label for="date_of_birth" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 Date of Birth <span class="text-red-500">*</span>
                             </label>
-                            <input type="date" wire:model="date_of_birth" id="date_of_birth" 
+                            <input type="date" wire:model.blur="date_of_birth" id="date_of_birth" 
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                             @error('date_of_birth') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
@@ -92,11 +92,9 @@
                             <select wire:model="gender" id="gender" 
                                     class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="">Select Gender</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                                <option value="Non-binary">Non-binary</option>
-                                <option value="Other">Other</option>
-                                <option value="Prefer not to say">Prefer not to say</option>
+                                @foreach($genderOptions as $option)
+                                    <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                @endforeach
                             </select>
                             @error('gender') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
@@ -120,11 +118,9 @@
                             <select wire:model="education_level" id="education_level" 
                                     class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="">Select Education Level</option>
-                                <option value="Less than high school">Less than high school</option>
-                                <option value="High school graduate">High school graduate</option>
-                                <option value="Some college">Some college</option>
-                                <option value="Bachelor's degree">Bachelor's degree</option>
-                                <option value="Graduate degree">Graduate degree</option>
+                                @foreach($educationLevels as $option)
+                                    <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                @endforeach
                             </select>
                             @error('education_level') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
@@ -134,27 +130,23 @@
                             <select wire:model="ethnicity" id="ethnicity" 
                                     class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="">Select Ethnicity</option>
-                                <option value="Hispanic or Latino">Hispanic or Latino</option>
-                                <option value="Not Hispanic or Latino">Not Hispanic or Latino</option>
-                                <option value="Unknown/not reported">Unknown/not reported</option>
+                                @foreach($ethnicityOptions as $option)
+                                    <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                @endforeach
                             </select>
                             @error('ethnicity') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 
                         <div>
-                            <label for="race" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Race</label>
-                            <select wire:model="race" id="race" 
-                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="">Select Race</option>
-                                <option value="American Indian or Alaska Native">American Indian or Alaska Native</option>
-                                <option value="Asian">Asian</option>
-                                <option value="Black or African American">Black or African American</option>
-                                <option value="Native Hawaiian or Other Pacific Islander">Native Hawaiian or Other Pacific Islander</option>
-                                <option value="White">White</option>
-                                <option value="More than one race">More than one race</option>
-                                <option value="Unknown/not reported">Unknown/not reported</option>
+                            <label for="race" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Race (Select all that apply)</label>
+                            <select wire:model="race" id="race" multiple
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[100px]">
+                                @foreach($raceOptions as $option)
+                                    <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                @endforeach
                             </select>
                             @error('race') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Hold Ctrl (Cmd on Mac) to select multiple options</p>
                         </div>
 
                         <div>
@@ -162,12 +154,47 @@
                             <select wire:model="military_status" id="military_status" 
                                     class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="">Select Status</option>
-                                <option value="Never served">Never served</option>
-                                <option value="Currently serving">Currently serving</option>
-                                <option value="Veteran">Veteran</option>
-                                <option value="Unknown/not reported">Unknown/not reported</option>
+                                @foreach($militaryStatuses as $option)
+                                    <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                @endforeach
                             </select>
                             @error('military_status') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="disability_status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Disability Status</label>
+                            <select wire:model="disability_status" id="disability_status" 
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Select Status</option>
+                                @foreach($disabilityStatuses as $option)
+                                    <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                @endforeach
+                            </select>
+                            @error('disability_status') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="health_insurance_status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Health Insurance Status</label>
+                            <select wire:model="health_insurance_status" id="health_insurance_status" 
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Select Status</option>
+                                @foreach($healthInsuranceStatuses as $option)
+                                    <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                @endforeach
+                            </select>
+                            @error('health_insurance_status') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="work_status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Work Status</label>
+                            <select wire:model="work_status" id="work_status" 
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Select Status</option>
+                                @foreach($workStatuses as $option)
+                                    <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                @endforeach
+                            </select>
+                            @error('work_status') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
                     </div>
 

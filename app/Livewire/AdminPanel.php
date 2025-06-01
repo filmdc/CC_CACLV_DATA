@@ -19,6 +19,7 @@ class AdminPanel extends Component
     public $activeTab = 'overview';
     public $search = '';
     public $showCreateForm = false;
+    public $showCreateUserForm = false;
     
     // Program Form
     public $program_name = '';
@@ -26,6 +27,12 @@ class AdminPanel extends Component
     public $program_start_date = '';
     public $program_end_date = '';
     public $active = true;
+
+    // User Form
+    public $user_name = '';
+    public $user_email = '';
+    public $user_password = '';
+    public $user_password_confirmation = '';
 
     public function setActiveTab($tab)
     {
@@ -36,7 +43,15 @@ class AdminPanel extends Component
     public function showCreateProgram()
     {
         $this->showCreateForm = true;
+        $this->showCreateUserForm = false;
         $this->resetProgramForm();
+    }
+
+    public function showCreateUser()
+    {
+        $this->showCreateUserForm = true;
+        $this->showCreateForm = false;
+        $this->resetUserForm();
     }
 
     public function resetProgramForm()
@@ -46,6 +61,14 @@ class AdminPanel extends Component
         $this->program_start_date = '';
         $this->program_end_date = '';
         $this->active = true;
+    }
+
+    public function resetUserForm()
+    {
+        $this->user_name = '';
+        $this->user_email = '';
+        $this->user_password = '';
+        $this->user_password_confirmation = '';
     }
 
     public function updatedProgramStartDate()
@@ -126,6 +149,32 @@ class AdminPanel extends Component
             session()->flash('success', 'Program created successfully.');
             $this->showCreateForm = false;
             $this->resetProgramForm();
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+        }
+    }
+
+    public function createUser()
+    {
+        $this->validate([
+            'user_name' => 'required|string|max:255',
+            'user_email' => 'required|string|email|max:255|unique:users,email',
+            'user_password' => 'required|string|min:8',
+            'user_password_confirmation' => 'required|same:user_password',
+        ]);
+
+        try {
+            User::create([
+                'name' => $this->user_name,
+                'email' => $this->user_email,
+                'password' => bcrypt($this->user_password),
+                'email_verified_at' => now(),
+            ]);
+
+            session()->flash('success', 'User created successfully.');
+            $this->showCreateUserForm = false;
+            $this->resetUserForm();
             
         } catch (\Exception $e) {
             session()->flash('error', 'An error occurred: ' . $e->getMessage());

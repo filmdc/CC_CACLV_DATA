@@ -10,6 +10,7 @@ class Participant extends Model
 {
     protected $fillable = [
         'household_id',
+        'reference_data_set_id',
         'is_head_of_household',
         'first_name',
         'middle_name',
@@ -49,6 +50,11 @@ class Participant extends Model
     public function household(): BelongsTo
     {
         return $this->belongsTo(Household::class);
+    }
+
+    public function referenceDataSet(): BelongsTo
+    {
+        return $this->belongsTo(ReferenceDataSet::class);
     }
 
     public function getFullNameAttribute(): string

@@ -33,6 +33,8 @@
                 <flux:navlist.group :heading="__('Administration')" class="grid">
                     <flux:navlist.item icon="shield-check" :href="route('role-permission.management')" :current="request()->routeIs('role-permission.management')" wire:navigate>{{ __('Roles & Permissions') }}</flux:navlist.item>
                     <flux:navlist.item icon="currency-dollar" :href="route('poverty-guideline.management')" :current="request()->routeIs('poverty-guideline.management')" wire:navigate>{{ __('Poverty Guidelines') }}</flux:navlist.item>
+                    <flux:navlist.item icon="table-cells" :href="route('reference-data.management')" :current="request()->routeIs('reference-data.management')" wire:navigate>{{ __('Reference Data') }}</flux:navlist.item>
+                    <flux:navlist.item icon="folder-git-2" :href="route('reference-data-set.management')" :current="request()->routeIs('reference-data-set.management')" wire:navigate>{{ __('Reference Data Sets') }}</flux:navlist.item>
                     <flux:navlist.item icon="cog-6-tooth" :href="route('admin.panel')" :current="request()->routeIs('admin.panel')" wire:navigate>{{ __('Admin Panel') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>

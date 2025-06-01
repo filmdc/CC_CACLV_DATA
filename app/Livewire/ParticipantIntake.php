@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\Household;
 use App\Models\Participant;
 use App\Models\PovertyGuideline;
+use App\Models\ReferenceData;
 use Livewire\Component;
 use Livewire\Attributes\Validate;
 
@@ -14,13 +15,13 @@ class ParticipantIntake extends Component
     public $totalSteps = 4;
 
     // Household Information
-    #[Validate('required|string|in:Single Person,Two Adults NO Children,Single Parent Female,Single Parent Male,Two Parent Household,Non-related Adults with Children,Multigenerational Household,Other,Unknown/not reported')]
+    #[Validate('required|string')]
     public $household_type = '';
     
     #[Validate('required|integer|min:1')]
     public $household_size = 1;
     
-    #[Validate('required|string|in:Own,Rent,Other permanent housing,Homeless,Other,Unknown/not reported')]
+    #[Validate('required|string')]
     public $housing_status = '';
     
     #[Validate('nullable|numeric|min:0')]
@@ -54,7 +55,7 @@ class ParticipantIntake extends Component
     #[Validate('required|date|before:today')]
     public $date_of_birth = '';
     
-    #[Validate('required|string|in:Male,Female,Non-binary,Other,Prefer not to say')]
+    #[Validate('required|string')]
     public $gender = '';
     
     #[Validate('nullable|string|max:20')]
@@ -74,7 +75,6 @@ class ParticipantIntake extends Component
     public $work_status = '';
 
     // Financial Information
-    public $employment_income = '';
     public $income_sources = [];
     public $other_income_sources = [];
     public $non_cash_benefits = [];
@@ -114,7 +114,6 @@ class ParticipantIntake extends Component
         $this->race = [];
         $this->military_status = '';
         $this->work_status = '';
-        $this->employment_income = '';
         $this->income_sources = [];
         $this->other_income_sources = [];
         $this->non_cash_benefits = [];
@@ -142,17 +141,17 @@ class ParticipantIntake extends Component
         switch ($this->step) {
             case 1:
                 $this->validate([
-                    'household_type' => 'required',
-                    'household_size' => 'required|integer|min:1',
-                    'housing_status' => 'required',
-                ]);
-                break;
-            case 2:
-                $this->validate([
                     'first_name' => 'required|string|max:255',
                     'last_name' => 'required|string|max:255',
                     'date_of_birth' => 'required|date|before:today',
                     'gender' => 'required',
+                ]);
+                break;
+            case 2:
+                $this->validate([
+                    'household_type' => 'required',
+                    'household_size' => 'required|integer|min:1',
+                    'housing_status' => 'required',
                 ]);
                 break;
             case 3:
@@ -198,9 +197,13 @@ class ParticipantIntake extends Component
                 }
             }
 
+            // Get the active reference data set
+            $activeDataSet = \App\Models\ReferenceDataSet::getActive();
+
             // Create head of household participant
             Participant::create([
                 'household_id' => $household->id,
+                'reference_data_set_id' => $activeDataSet?->id,
                 'is_head_of_household' => true,
                 'first_name' => $this->first_name,
                 'middle_name' => $this->middle_name,
@@ -218,7 +221,6 @@ class ParticipantIntake extends Component
                 'race' => $this->race,
                 'military_status' => $this->military_status ?: null,
                 'work_status' => $this->work_status ?: null,
-                'employment_income' => $this->employment_income ?: null,
                 'income_sources' => $this->income_sources,
                 'other_income_sources' => $this->other_income_sources,
                 'non_cash_benefits' => $this->non_cash_benefits,
@@ -235,6 +237,22 @@ class ParticipantIntake extends Component
 
     public function render()
     {
-        return view('livewire.participant-intake')->layout('components.layouts.app');
+        return view('livewire.participant-intake', [
+            'genderOptions' => ReferenceData::getOptions('gender'),
+            'educationLevels' => ReferenceData::getOptions('education_level'),
+            'ethnicityOptions' => ReferenceData::getOptions('ethnicity'),
+            'raceOptions' => ReferenceData::getOptions('race'),
+            'disabilityStatuses' => ReferenceData::getOptions('disability_status'),
+            'healthInsuranceStatuses' => ReferenceData::getOptions('health_insurance_status'),
+            'healthInsuranceSources' => ReferenceData::getOptions('health_insurance_sources'),
+            'militaryStatuses' => ReferenceData::getOptions('military_status'),
+            'workStatuses' => ReferenceData::getOptions('work_status'),
+            'incomeSources' => ReferenceData::getOptions('income_sources'),
+            'otherIncomeSources' => ReferenceData::getOptions('other_income_sources'),
+            'nonCashBenefits' => ReferenceData::getOptions('non_cash_benefits'),
+            'housingStatuses' => ReferenceData::getOptions('housing_status'),
+            'housingTypes' => ReferenceData::getOptions('housing_type'),
+            'householdTypes' => ReferenceData::getOptions('household_type'),
+        ])->layout('components.layouts.app');
     }
 }

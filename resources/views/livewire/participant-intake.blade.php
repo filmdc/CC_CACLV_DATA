@@ -40,8 +40,86 @@
         @endif
 
         <form wire:submit="submit" class="p-6">
-            <!-- Step 1: Household Information -->
+            <!-- Step 1: Head of Household Personal Information -->
             @if ($step === 1)
+                <div class="space-y-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Head of Household Information</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="first_name" class="block text-sm font-medium text-gray-700 mb-2">
+                                First Name <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" wire:model="first_name" id="first_name" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            @error('first_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="middle_name" class="block text-sm font-medium text-gray-700 mb-2">Middle Name</label>
+                            <input type="text" wire:model="middle_name" id="middle_name" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            @error('middle_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="last_name" class="block text-sm font-medium text-gray-700 mb-2">
+                                Last Name <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" wire:model="last_name" id="last_name" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            @error('last_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="suffix" class="block text-sm font-medium text-gray-700 mb-2">Suffix</label>
+                            <input type="text" wire:model="suffix" id="suffix" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            @error('suffix') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="date_of_birth" class="block text-sm font-medium text-gray-700 mb-2">
+                                Date of Birth <span class="text-red-500">*</span>
+                            </label>
+                            <input type="date" wire:model.blur="date_of_birth" id="date_of_birth" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            @error('date_of_birth') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="gender" class="block text-sm font-medium text-gray-700 mb-2">
+                                Gender <span class="text-red-500">*</span>
+                            </label>
+                            <select wire:model="gender" id="gender" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Select gender...</option>
+                                @foreach($genderOptions as $option)
+                                    <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                @endforeach
+                            </select>
+                            @error('gender') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="telephone" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                            <input type="tel" wire:model="telephone" id="telephone" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            @error('telephone') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                            <input type="email" wire:model="email" id="email" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            @error('email') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Step 2: Household Information -->
+            @if ($step === 2)
                 <div class="space-y-6">
                     <h2 class="text-xl font-semibold text-gray-900 mb-4">Household Information</h2>
                     
@@ -50,17 +128,11 @@
                             <label for="household_type" class="block text-sm font-medium text-gray-700 mb-2">
                                 Household Type <span class="text-red-500">*</span>
                             </label>
-                            <select wire:model="household_type" id="household_type" >
+                            <select wire:model="household_type" id="household_type" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="">Select household type...</option>
-                                <option value="Single Person">Single Person</option>
-                                <option value="Two Adults NO Children">Two Adults NO Children</option>
-                                <option value="Single Parent Female">Single Parent Female</option>
-                                <option value="Single Parent Male">Single Parent Male</option>
-                                <option value="Two Parent Household">Two Parent Household</option>
-                                <option value="Non-related Adults with Children">Non-related Adults with Children</option>
-                                <option value="Multigenerational Household">Multigenerational Household</option>
-                                <option value="Other">Other</option>
-                                <option value="Unknown/not reported">Unknown/not reported</option>
+                                @foreach($householdTypes as $option)
+                                    <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                @endforeach
                             </select>
                             @error('household_type') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
@@ -81,12 +153,9 @@
                             <select wire:model="housing_status" id="housing_status" 
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="">Select housing status...</option>
-                                <option value="Own">Own</option>
-                                <option value="Rent">Rent</option>
-                                <option value="Other permanent housing">Other permanent housing</option>
-                                <option value="Homeless">Homeless</option>
-                                <option value="Other">Other</option>
-                                <option value="Unknown/not reported">Unknown/not reported</option>
+                                @foreach($housingStatuses as $option)
+                                    <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                @endforeach
                             </select>
                             @error('housing_status') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
@@ -139,86 +208,6 @@
                 </div>
             @endif
 
-            <!-- Step 2: Head of Household Personal Information -->
-            @if ($step === 2)
-                <div class="space-y-6">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Head of Household Information</h2>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label for="first_name" class="block text-sm font-medium text-gray-700 mb-2">
-                                First Name <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" wire:model="first_name" id="first_name" 
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            @error('first_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div>
-                            <label for="middle_name" class="block text-sm font-medium text-gray-700 mb-2">Middle Name</label>
-                            <input type="text" wire:model="middle_name" id="middle_name" 
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            @error('middle_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div>
-                            <label for="last_name" class="block text-sm font-medium text-gray-700 mb-2">
-                                Last Name <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" wire:model="last_name" id="last_name" 
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            @error('last_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div>
-                            <label for="suffix" class="block text-sm font-medium text-gray-700 mb-2">Suffix</label>
-                            <input type="text" wire:model="suffix" id="suffix" 
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            @error('suffix') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div>
-                            <label for="date_of_birth" class="block text-sm font-medium text-gray-700 mb-2">
-                                Date of Birth <span class="text-red-500">*</span>
-                            </label>
-                            <input type="date" wire:model="date_of_birth" id="date_of_birth" 
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            @error('date_of_birth') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div>
-                            <label for="gender" class="block text-sm font-medium text-gray-700 mb-2">
-                                Gender <span class="text-red-500">*</span>
-                            </label>
-                            <select wire:model="gender" id="gender" 
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="">Select gender...</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                                <option value="Non-binary">Non-binary</option>
-                                <option value="Other">Other</option>
-                                <option value="Prefer not to say">Prefer not to say</option>
-                            </select>
-                            @error('gender') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div>
-                            <label for="telephone" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-                            <input type="tel" wire:model="telephone" id="telephone" 
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            @error('telephone') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-                            <input type="email" wire:model="email" id="email" 
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            @error('email') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                        </div>
-                    </div>
-                </div>
-            @endif
-
             <!-- Step 3: Demographics -->
             @if ($step === 3)
                 <div class="space-y-6">
@@ -230,13 +219,9 @@
                             <select wire:model="education_level" id="education_level" 
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="">Select education level...</option>
-                                <option value="Less than high school">Less than high school</option>
-                                <option value="High school diploma/GED">High school diploma/GED</option>
-                                <option value="Some college">Some college</option>
-                                <option value="Associate degree">Associate degree</option>
-                                <option value="Bachelor degree">Bachelor degree</option>
-                                <option value="Graduate degree">Graduate degree</option>
-                                <option value="Unknown/not reported">Unknown/not reported</option>
+                                @foreach($educationLevels as $option)
+                                    <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                @endforeach
                             </select>
                         </div>
 
@@ -245,9 +230,9 @@
                             <select wire:model="disability_status" id="disability_status" 
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="">Select status...</option>
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                                <option value="Unknown/not reported">Unknown/not reported</option>
+                                @foreach($disabilityStatuses as $option)
+                                    <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                @endforeach
                             </select>
                         </div>
 
@@ -256,9 +241,9 @@
                             <select wire:model="ethnicity" id="ethnicity" 
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="">Select ethnicity...</option>
-                                <option value="Hispanic or Latino">Hispanic or Latino</option>
-                                <option value="Not Hispanic or Latino">Not Hispanic or Latino</option>
-                                <option value="Unknown/not reported">Unknown/not reported</option>
+                                @foreach($ethnicityOptions as $option)
+                                    <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                @endforeach
                             </select>
                         </div>
 
@@ -267,10 +252,9 @@
                             <select wire:model="military_status" id="military_status" 
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="">Select status...</option>
-                                <option value="Currently serving">Currently serving</option>
-                                <option value="Veteran">Veteran</option>
-                                <option value="Not applicable">Not applicable</option>
-                                <option value="Unknown/not reported">Unknown/not reported</option>
+                                @foreach($militaryStatuses as $option)
+                                    <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                @endforeach
                             </select>
                         </div>
 
@@ -279,11 +263,9 @@
                             <select wire:model="work_status" id="work_status" 
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="">Select status...</option>
-                                <option value="Employed full-time">Employed full-time</option>
-                                <option value="Employed part-time">Employed part-time</option>
-                                <option value="Unemployed">Unemployed</option>
-                                <option value="Not in labor force">Not in labor force</option>
-                                <option value="Unknown/not reported">Unknown/not reported</option>
+                                @foreach($workStatuses as $option)
+                                    <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                @endforeach
                             </select>
                         </div>
 
@@ -292,10 +274,56 @@
                             <select wire:model="health_insurance_status" id="health_insurance_status" 
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="">Select status...</option>
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                                <option value="Unknown/not reported">Unknown/not reported</option>
+                                @foreach($healthInsuranceStatuses as $option)
+                                    <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                @endforeach
                             </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="race" class="block text-sm font-medium text-gray-700 mb-2">Race (Select all that apply)</label>
+                            <select wire:model="race" id="race" multiple 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[100px]">
+                                @foreach($raceOptions as $option)
+                                    <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                @endforeach
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">Hold Ctrl (Cmd on Mac) to select multiple options</p>
+                        </div>
+
+                        <div>
+                            <label for="health_insurance_sources" class="block text-sm font-medium text-gray-700 mb-2">Health Insurance Sources (Select all that apply)</label>
+                            <select wire:model="health_insurance_sources" id="health_insurance_sources" multiple 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[100px]">
+                                @foreach($healthInsuranceSources as $option)
+                                    <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                @endforeach
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">Hold Ctrl (Cmd on Mac) to select multiple options</p>
+                        </div>
+
+                        <div>
+                            <label for="income_sources" class="block text-sm font-medium text-gray-700 mb-2">Income Sources (Select all that apply)</label>
+                            <select wire:model="income_sources" id="income_sources" multiple 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[100px]">
+                                @foreach($incomeSources as $option)
+                                    <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                @endforeach
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">Hold Ctrl (Cmd on Mac) to select multiple options</p>
+                        </div>
+
+                        <div>
+                            <label for="non_cash_benefits" class="block text-sm font-medium text-gray-700 mb-2">Non-Cash Benefits (Select all that apply)</label>
+                            <select wire:model="non_cash_benefits" id="non_cash_benefits" multiple 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[100px]">
+                                @foreach($nonCashBenefits as $option)
+                                    <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                @endforeach
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">Hold Ctrl (Cmd on Mac) to select multiple options</p>
                         </div>
                     </div>
                 </div>
@@ -308,11 +336,14 @@
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label for="employment_income" class="block text-sm font-medium text-gray-700 mb-2">
-                                Monthly Employment Income
-                            </label>
-                            <input type="number" wire:model="employment_income" id="employment_income" min="0" step="0.01" 
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <label for="other_income_sources" class="block text-sm font-medium text-gray-700 mb-2">Other Income Sources (Select all that apply)</label>
+                            <select wire:model="other_income_sources" id="other_income_sources" multiple 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[100px]">
+                                @foreach($otherIncomeSources as $option)
+                                    <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                @endforeach
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">Hold Ctrl (Cmd on Mac) to select multiple options</p>
                         </div>
                     </div>
 

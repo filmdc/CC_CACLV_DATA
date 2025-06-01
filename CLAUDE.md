@@ -28,8 +28,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Framework Stack
 - **Laravel 11** with **Livewire** as the primary frontend framework
 - **Livewire Volt** for simplified component creation
-- **Livewire Flux** for UI components
-- **TailwindCSS v4** for styling
+- **TailwindCSS v4** for styling (NOT Flux - uses standard HTML/Tailwind patterns)
 - **Vite** for asset bundling
 
 ### Key Architectural Patterns
@@ -55,8 +54,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Project Structure Notes
 - Controllers are minimal - most logic in Livewire components
 - Views follow Livewire/Volt patterns with Blade templates
-- Flux UI components provide consistent interface elements
+- Standard HTML/Tailwind patterns for UI (NO Flux components)
 - TailwindCSS v4 with Vite plugin for styling
+- Dark mode support implemented across all interfaces
 
 ### Development Workflow
 - Use `composer dev` for full development stack
@@ -96,3 +96,34 @@ This is **CAP TRACK** - a comprehensive data management platform for Community A
 - Poverty level calculations using 2025 federal guidelines
 - JSON fields for complex data (income sources, benefits, documents)
 - Full Eloquent relationships between all models
+
+## Management Interface Architecture
+
+### Complete Interface Suite
+All core models have dedicated management interfaces accessible via sidebar navigation:
+- **Participant Management** (`/participant-management`) - CRUD operations with CSBG demographic fields
+- **Household Management** (`/household-management`) - Family composition and member management
+- **Program Management** (`/program-management`) - Program lifecycle and manager assignment
+- **Service Management** (`/service-management`) - Service CRUD with program association
+- **Contract Management** (`/contract-management`) - Funding contract administration
+- **Work Plan Management** (`/work-plan-management`) - Annual work plan creation
+- **Work Plan Goal Management** (`/work-plan-goal-management`) - Goal tracking with progress visualization
+- **Role & Permission Management** (`/role-permission-management`) - RBAC system with tabbed interface
+- **Poverty Guidelines Management** (`/poverty-guideline-management`) - Federal poverty level data
+
+### UI/UX Patterns
+- **Standard HTML/Tailwind** - NO Flux components, uses consistent HTML patterns
+- **Dark Mode Support** - All interfaces support `dark:` Tailwind variants
+- **Responsive Design** - Mobile-friendly with proper breakpoints
+- **Form Structure** - Consistent validation, error handling, and success messaging
+- **Table Patterns** - Standardized data tables with search, pagination, and actions
+- **Navigation Integration** - Organized sidebar with logical groupings
+
+### Interface Standards
+- Use `max-w-7xl mx-auto p-6` wrapper for all management interfaces
+- Include colored headers with descriptive subtitles
+- Implement proper dark mode variants for all elements:
+  - `bg-white dark:bg-zinc-800` for main containers
+  - `text-gray-900 dark:text-white` for primary text
+  - `border-gray-300 dark:border-zinc-600` for form elements
+- Follow existing service-management.blade.php as the template pattern

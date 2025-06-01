@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Participant;
 use App\Models\Household;
+use App\Models\ReferenceData;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -28,7 +29,7 @@ class ParticipantManagement extends Component
     public $disability_status = '';
     public $health_insurance_status = '';
     public $ethnicity = '';
-    public $race = '';
+    public $race = [];
     public $military_status = '';
     public $work_status = '';
 
@@ -61,7 +62,7 @@ class ParticipantManagement extends Component
             $this->disability_status = $this->selectedParticipant->disability_status;
             $this->health_insurance_status = $this->selectedParticipant->health_insurance_status;
             $this->ethnicity = $this->selectedParticipant->ethnicity;
-            $this->race = $this->selectedParticipant->race;
+            $this->race = is_string($this->selectedParticipant->race) ? json_decode($this->selectedParticipant->race, true) ?? [] : ($this->selectedParticipant->race ?? []);
             $this->military_status = $this->selectedParticipant->military_status;
             $this->work_status = $this->selectedParticipant->work_status;
         }
@@ -76,10 +77,21 @@ class ParticipantManagement extends Component
             'gender' => 'required|string',
             'telephone' => 'nullable|string|max:20',
             'email' => 'nullable|email|max:255',
+            'education_level' => 'nullable|string',
+            'disability_status' => 'nullable|string',
+            'health_insurance_status' => 'nullable|string',
+            'ethnicity' => 'nullable|string',
+            'race' => 'nullable|array',
+            'military_status' => 'nullable|string',
+            'work_status' => 'nullable|string',
         ]);
 
         try {
+            // Get the active reference data set for updated data
+            $activeDataSet = \App\Models\ReferenceDataSet::getActive();
+            
             $this->selectedParticipant->update([
+                'reference_data_set_id' => $activeDataSet?->id,
                 'first_name' => $this->first_name,
                 'middle_name' => $this->middle_name,
                 'last_name' => $this->last_name,
@@ -92,18 +104,43 @@ class ParticipantManagement extends Component
                 'disability_status' => $this->disability_status,
                 'health_insurance_status' => $this->health_insurance_status,
                 'ethnicity' => $this->ethnicity,
-                'race' => $this->race,
+                'race' => is_array($this->race) ? json_encode($this->race) : $this->race,
                 'military_status' => $this->military_status,
                 'work_status' => $this->work_status,
             ]);
 
             session()->flash('success', 'Participant updated successfully.');
-            $this->showEditForm = false;
-            $this->selectedParticipant = null;
+            $this->resetForm();
             
         } catch (\Exception $e) {
             session()->flash('error', 'An error occurred: ' . $e->getMessage());
         }
+    }
+
+    public function resetForm()
+    {
+        $this->first_name = '';
+        $this->middle_name = '';
+        $this->last_name = '';
+        $this->suffix = '';
+        $this->date_of_birth = '';
+        $this->gender = '';
+        $this->telephone = '';
+        $this->email = '';
+        $this->education_level = '';
+        $this->disability_status = '';
+        $this->health_insurance_status = '';
+        $this->ethnicity = '';
+        $this->race = [];
+        $this->military_status = '';
+        $this->work_status = '';
+        $this->showEditForm = false;
+        $this->selectedParticipant = null;
+    }
+
+    public function cancelEdit()
+    {
+        $this->resetForm();
     }
 
     public function deleteParticipant($participantId)
@@ -138,8 +175,19 @@ class ParticipantManagement extends Component
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
+        // Use the selected participant's reference data set if editing, otherwise use active set
+        $dataSetId = $this->selectedParticipant ? $this->selectedParticipant->reference_data_set_id : null;
+
         return view('livewire.participant-management', [
             'participants' => $participants,
+            'genderOptions' => ReferenceData::getOptions('gender', true, $dataSetId),
+            'educationLevels' => ReferenceData::getOptions('education_level', true, $dataSetId),
+            'ethnicityOptions' => ReferenceData::getOptions('ethnicity', true, $dataSetId),
+            'raceOptions' => ReferenceData::getOptions('race', true, $dataSetId),
+            'disabilityStatuses' => ReferenceData::getOptions('disability_status', true, $dataSetId),
+            'healthInsuranceStatuses' => ReferenceData::getOptions('health_insurance_status', true, $dataSetId),
+            'militaryStatuses' => ReferenceData::getOptions('military_status', true, $dataSetId),
+            'workStatuses' => ReferenceData::getOptions('work_status', true, $dataSetId),
         ])->layout('components.layouts.app');
     }
 }

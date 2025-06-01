@@ -55,6 +55,8 @@ The system helps organizations:
 - ✅ **Work Plan Goal Management** - Goal setting with target vs actual progress monitoring
 - ✅ **Role & Permission Management** - Complete RBAC system with role-permission assignment
 - ✅ **Poverty Guidelines Management** - Federal poverty level data management with year/region support
+- ✅ **Reference Data Management** - Configurable dropdown options and system values (NEW)
+- ✅ **Reference Data Set Management** - Organized collections of reference data with categories (NEW)
 - ✅ **Dark Mode Support** - All interfaces fully compatible with light and dark themes
 - ✅ **Responsive Design** - Mobile-friendly layouts across all management interfaces
 - ✅ **Consistent UI/UX** - Unified design language using HTML/Tailwind/Livewire patterns
@@ -202,6 +204,39 @@ Built-in system for managing federal poverty guidelines.
 - Automatic poverty level calculation
 - Calendar year configurations
 - Monthly and annual income support
+
+### Reference Data Management System (NEW)
+Comprehensive system for managing configurable system values and dropdown options.
+
+**Reference Data Sets:**
+- Organized collections of related reference data
+- Category-based organization for easy management
+- Bulk operations for efficient data management
+- Hierarchical structure support
+
+**Reference Data:**
+- Individual configurable values within sets
+- Display name and value differentiation
+- Sort order customization
+- Active/inactive status management
+- Association with specific reference data sets
+
+**Key Features:**
+- ✅ **Complete CRUD Operations** - Create, read, update, delete for both sets and individual data
+- ✅ **Category Organization** - Logical grouping of reference data by purpose/context
+- ✅ **Search and Filtering** - Real-time search across data sets and individual values
+- ✅ **Status Management** - Active/inactive toggles for dynamic content control
+- ✅ **Sort Order Control** - Custom ordering for dropdown and display purposes
+- ✅ **Relationship Management** - Proper linking between sets and individual data items
+- ✅ **Dark Mode Compatible** - Full support for light/dark theme switching
+- ✅ **Mobile Responsive** - Optimized for all device sizes
+
+**Use Cases:**
+- Dropdown options for participant forms
+- System configuration values
+- Custom field choices by program
+- Compliance reporting categories
+- Service classification systems
 
 ## Federal Poverty Guidelines (2025)
 
@@ -367,6 +402,8 @@ A specialized system for managing housing rehabilitation projects including:
 - ✅ **Work Plan Goal Management** - Goal CRUD, target vs actual tracking, progress visualization, service mapping
 - ✅ **Role & Permission Management** - Complete RBAC system, role creation, permission assignment, tabbed interface
 - ✅ **Poverty Guidelines Management** - Federal poverty level data, year/region filtering, comprehensive percentage matrix
+- ✅ **Reference Data Management** - Configurable system values, dropdown options, form choices with CRUD operations
+- ✅ **Reference Data Set Management** - Organized collections with categories, hierarchical organization, bulk management
 
 #### Interface Features
 - ✅ **Dark Mode Compatibility** - All interfaces support light/dark theme switching

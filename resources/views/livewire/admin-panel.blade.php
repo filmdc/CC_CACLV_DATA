@@ -271,7 +271,89 @@
                 <div class="space-y-6">
                     <div class="flex justify-between items-center">
                         <h2 class="text-xl font-semibold text-gray-900">User Management</h2>
+                        <button wire:click="showCreateUser" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            Create User
+                        </button>
                     </div>
+
+                    <!-- Success/Error Messages -->
+                    @if (session()->has('success'))
+                        <div class="p-4 bg-green-50 border-l-4 border-green-400">
+                            <div class="flex">
+                                <div class="ml-3">
+                                    <p class="text-sm text-green-700">{{ session('success') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    @if (session()->has('error'))
+                        <div class="p-4 bg-red-50 border-l-4 border-red-400">
+                            <div class="flex">
+                                <div class="ml-3">
+                                    <p class="text-sm text-red-700">{{ session('error') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Create User Form -->
+                    @if($showCreateUserForm)
+                        <div class="bg-purple-50 border border-purple-200 rounded-lg p-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Create New User</h3>
+                            
+                            <form wire:submit="createUser" class="space-y-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="user_name" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Full Name <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text" wire:model.defer="user_name" id="user_name" 
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                        @error('user_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                    </div>
+
+                                    <div>
+                                        <label for="user_email" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Email Address <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="email" wire:model.defer="user_email" id="user_email" 
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                        @error('user_email') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                    </div>
+
+                                    <div>
+                                        <label for="user_password" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Password <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="password" wire:model.defer="user_password" id="user_password" 
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                        @error('user_password') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                    </div>
+
+                                    <div>
+                                        <label for="user_password_confirmation" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Confirm Password <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="password" wire:model.defer="user_password_confirmation" id="user_password_confirmation" 
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                        @error('user_password_confirmation') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-end space-x-3">
+                                    <button type="button" wire:click="$set('showCreateUserForm', false)" 
+                                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 border border-gray-300 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                                        Cancel
+                                    </button>
+                                    <button type="submit" 
+                                            class="px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                        Create User
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    @endif
 
                     <!-- Search -->
                     <div class="max-w-md">
