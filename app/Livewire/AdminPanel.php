@@ -22,6 +22,7 @@ class AdminPanel extends Component
     public $search = '';
     public $showCreateForm = false;
     public $showCreateUserForm = false;
+    public $reportType = 'overview';
     
     // Program Form
     public $program_name = '';
@@ -246,6 +247,315 @@ class AdminPanel extends Component
         }
     }
 
+    private function getCSBGData()
+    {
+        $data = [];
+        $totalParticipants = Participant::count();
+        $totalHouseholds = Household::count();
+
+        // Helper function to safely get array from JSON field
+        $getArrayField = function($field) {
+            if (is_array($field)) return $field;
+            if (is_string($field)) return json_decode($field, true) ?? [];
+            return [];
+        };
+
+        // A. & B. Totals
+        $data['total_individuals'] = $totalParticipants;
+        $data['total_households'] = $totalHouseholds;
+
+        // 1. Gender data
+        $data['gender'] = [
+            'Male' => Participant::where('gender', 'Male')->count(),
+            'Female' => Participant::where('gender', 'Female')->count(),
+            'Other' => Participant::where('gender', 'Other')->count(),
+            'Unknown/not reported' => Participant::whereNull('gender')->orWhere('gender', 'Unknown/not reported')->count(),
+        ];
+        $data['gender']['total'] = array_sum($data['gender']);
+
+        // 2. Age groups using calculated age
+        $participants = Participant::get();
+        $data['age_groups'] = [
+            '0-5' => $participants->filter(fn($p) => $p->age >= 0 && $p->age <= 5)->count(),
+            '6-13' => $participants->filter(fn($p) => $p->age >= 6 && $p->age <= 13)->count(),
+            '14-17' => $participants->filter(fn($p) => $p->age >= 14 && $p->age <= 17)->count(),
+            '18-24' => $participants->filter(fn($p) => $p->age >= 18 && $p->age <= 24)->count(),
+            '25-44' => $participants->filter(fn($p) => $p->age >= 25 && $p->age <= 44)->count(),
+            '45-54' => $participants->filter(fn($p) => $p->age >= 45 && $p->age <= 54)->count(),
+            '55-59' => $participants->filter(fn($p) => $p->age >= 55 && $p->age <= 59)->count(),
+            '60-64' => $participants->filter(fn($p) => $p->age >= 60 && $p->age <= 64)->count(),
+            '65-74' => $participants->filter(fn($p) => $p->age >= 65 && $p->age <= 74)->count(),
+            '75+' => $participants->filter(fn($p) => $p->age >= 75)->count(),
+            'Unknown/not reported' => $participants->filter(fn($p) => !$p->date_of_birth)->count(),
+        ];
+        $data['age']['total'] = array_sum($data['age_groups']);
+
+        // 3. Education Levels
+        $data['education'] = [
+            'Grades 0-8' => Participant::where('education_level', 'Grades 0-8')->count(),
+            'Grades 9-12/Non-Graduate' => Participant::where('education_level', 'Grades 9-12/Non-Graduate')->count(),
+            'High School Graduate' => Participant::where('education_level', 'High School Graduate')->count(),
+            'GED/Equivalency Diploma' => Participant::where('education_level', 'GED/Equivalency Diploma')->count(),
+            '12 grade + Some Post-Secondary' => Participant::where('education_level', '12 grade + Some Post-Secondary')->count(),
+            '2 or 4 years College Graduate' => Participant::where('education_level', '2 or 4 years College Graduate')->count(),
+            'Graduate of other post-secondary school' => Participant::where('education_level', 'Graduate of other post-secondary school')->count(),
+            'Unknown/not reported' => Participant::whereNull('education_level')->orWhere('education_level', 'Unknown/not reported')->count(),
+        ];
+        $data['education']['total'] = array_sum($data['education']);
+
+        // 4. Disconnected Youth
+        $data['disconnected_youth'] = [
+            'Youth ages 14-24 who are neither working or in school' => $participants->filter(function($p) {
+                return $p->age >= 14 && $p->age <= 24 && 
+                       (!in_array('Employed Full-Time', $p->work_status ?? []) && 
+                        !in_array('Employed Part-Time', $p->work_status ?? []) &&
+                        !in_array('In School', $p->education_level ?? []));
+            })->count(),
+        ];
+        $data['disconnected_youth']['total'] = array_sum($data['disconnected_youth']);
+
+        // 5. Health
+        $data['health'] = [
+            'disabling_condition' => [
+                'Yes' => Participant::where('disability_status', 'Yes')->count(),
+                'No' => Participant::where('disability_status', 'No')->count(),
+                'Unknown' => Participant::whereNull('disability_status')->orWhere('disability_status', 'Unknown')->count(),
+            ],
+            'health_insurance' => [
+                'Yes' => Participant::where('health_insurance_status', 'Yes')->count(),
+                'No' => Participant::where('health_insurance_status', 'No')->count(),
+                'Unknown' => Participant::whereNull('health_insurance_status')->orWhere('health_insurance_status', 'Unknown')->count(),
+            ]
+        ];
+
+        // Health Insurance Sources
+        $data['health_insurance_sources'] = [
+            'Medicaid' => $participants->filter(fn($p) => in_array('Medicaid', $p->health_insurance_sources ?? []))->count(),
+            'Medicare' => $participants->filter(fn($p) => in_array('Medicare', $p->health_insurance_sources ?? []))->count(),
+            'State Children\'s Health Insurance Program' => $participants->filter(fn($p) => in_array('State Children\'s Health Insurance Program', $p->health_insurance_sources ?? []))->count(),
+            'State Health Insurance for Adults' => $participants->filter(fn($p) => in_array('State Health Insurance for Adults', $p->health_insurance_sources ?? []))->count(),
+            'Military Health Care' => $participants->filter(fn($p) => in_array('Military Health Care', $p->health_insurance_sources ?? []))->count(),
+            'Direct-Purchase' => $participants->filter(fn($p) => in_array('Direct-Purchase', $p->health_insurance_sources ?? []))->count(),
+            'Employment Based' => $participants->filter(fn($p) => in_array('Employment Based', $p->health_insurance_sources ?? []))->count(),
+            'Unknown/not reported' => $participants->filter(fn($p) => empty($p->health_insurance_sources))->count(),
+        ];
+        $data['health_insurance_sources']['total'] = array_sum($data['health_insurance_sources']);
+
+        // 6. Ethnicity/Race
+        $data['ethnicity'] = [
+            'Hispanic, Latino or Spanish Origins' => Participant::where('ethnicity', 'Hispanic, Latino or Spanish Origins')->count(),
+            'Not Hispanic, Latino or Spanish Origins' => Participant::where('ethnicity', 'Not Hispanic, Latino or Spanish Origins')->count(),
+            'Unknown/not reported' => Participant::whereNull('ethnicity')->orWhere('ethnicity', 'Unknown/not reported')->count(),
+        ];
+        $data['ethnicity']['total'] = array_sum($data['ethnicity']);
+
+        // Race (stored as JSON array)
+        $data['race'] = [
+            'American Indian or Alaska Native' => $participants->filter(fn($p) => in_array('American Indian or Alaska Native', $getArrayField($p->race)))->count(),
+            'Asian' => $participants->filter(fn($p) => in_array('Asian', $getArrayField($p->race)))->count(),
+            'Black or African American' => $participants->filter(fn($p) => in_array('Black or African American', $getArrayField($p->race)))->count(),
+            'Native Hawaiian and Other Pacific Islander' => $participants->filter(fn($p) => in_array('Native Hawaiian and Other Pacific Islander', $getArrayField($p->race)))->count(),
+            'White' => $participants->filter(fn($p) => in_array('White', $getArrayField($p->race)))->count(),
+            'Other' => $participants->filter(fn($p) => in_array('Other', $getArrayField($p->race)))->count(),
+            'Multi-race (two or more of the above)' => $participants->filter(fn($p) => count($getArrayField($p->race)) > 1)->count(),
+            'Unknown/not reported' => $participants->filter(function($p) use ($getArrayField) {
+                $race = $getArrayField($p->race);
+                return empty($race) || in_array('Unknown/not reported', $race);
+            })->count(),
+        ];
+        $data['race']['total'] = $totalParticipants;
+
+        // 7. Military Status
+        $data['military_status'] = [
+            'Veteran' => Participant::where('military_status', 'Veteran')->count(),
+            'Active Military' => Participant::where('military_status', 'Active Military')->count(),
+            'Never Served in the Military' => Participant::where('military_status', 'Never Served in the Military')->count(),
+            'Unknown/not reported' => Participant::whereNull('military_status')->orWhere('military_status', 'Unknown/not reported')->count(),
+        ];
+        $data['military_status']['total'] = array_sum($data['military_status']);
+
+        // 8. Work Status (Individuals 18+)
+        $adults = $participants->filter(fn($p) => $p->age >= 18);
+        $data['work_status'] = [
+            'Employed Full-Time' => $adults->filter(fn($p) => $p->work_status === 'Employed Full-Time')->count(),
+            'Employed Part-Time' => $adults->filter(fn($p) => $p->work_status === 'Employed Part-Time')->count(),
+            'Migrant Seasonal Farm Worker' => $adults->filter(fn($p) => $p->work_status === 'Migrant Seasonal Farm Worker')->count(),
+            'Unemployed (Short-Term, 6 months or less)' => $adults->filter(fn($p) => $p->work_status === 'Unemployed (Short-Term, 6 months or less)')->count(),
+            'Unemployed (Long-Term, more than 6 months)' => $adults->filter(fn($p) => $p->work_status === 'Unemployed (Long-Term, more than 6 months)')->count(),
+            'Unemployed (Not in Labor Force)' => $adults->filter(fn($p) => $p->work_status === 'Unemployed (Not in Labor Force)')->count(),
+            'Retired' => $adults->filter(fn($p) => $p->work_status === 'Retired')->count(),
+            'Unknown/not reported' => $adults->filter(fn($p) => !$p->work_status || $p->work_status === 'Unknown/not reported')->count(),
+        ];
+        $data['work_status']['total'] = $adults->count();
+
+        // HOUSEHOLD LEVEL CHARACTERISTICS
+
+        // 9. Household Type
+        $data['household_type'] = [
+            'Single Person' => Household::where('household_type', 'Single Person')->count(),
+            'Two Adults NO Children' => Household::where('household_type', 'Two Adults NO Children')->count(),
+            'Single Parent Female' => Household::where('household_type', 'Single Parent Female')->count(),
+            'Single Parent Male' => Household::where('household_type', 'Single Parent Male')->count(),
+            'Two Parent Household' => Household::where('household_type', 'Two Parent Household')->count(),
+            'Non-related Adults with Children' => Household::where('household_type', 'Non-related Adults with Children')->count(),
+            'Multigenerational Household' => Household::where('household_type', 'Multigenerational Household')->count(),
+            'Other' => Household::where('household_type', 'Other')->count(),
+            'Unknown/not reported' => Household::whereNull('household_type')->orWhere('household_type', 'Unknown/not reported')->count(),
+        ];
+        $data['household_type']['total'] = array_sum($data['household_type']);
+
+        // 10. Household Size
+        $data['household_size'] = [
+            'Single Person' => Household::where('household_size', 1)->count(),
+            'Two' => Household::where('household_size', 2)->count(),
+            'Three' => Household::where('household_size', 3)->count(),
+            'Four' => Household::where('household_size', 4)->count(),
+            'Five' => Household::where('household_size', 5)->count(),
+            'Six or more' => Household::where('household_size', '>=', 6)->count(),
+            'Unknown/not reported' => Household::whereNull('household_size')->count(),
+        ];
+        $data['household_size']['total'] = array_sum($data['household_size']);
+
+        // 11. Housing
+        $data['housing'] = [
+            'Own' => Household::where('housing_status', 'Own')->count(),
+            'Rent' => Household::where('housing_status', 'Rent')->count(),
+            'Other permanent housing' => Household::where('housing_status', 'Other permanent housing')->count(),
+            'Homeless' => Household::where('housing_status', 'Homeless')->count(),
+            'Other' => Household::where('housing_status', 'Other')->count(),
+            'Unknown/not reported' => Household::whereNull('housing_status')->orWhere('housing_status', 'Unknown/not reported')->count(),
+        ];
+        $data['housing']['total'] = array_sum($data['housing']);
+
+        // 12. Level of Household Income (% of HHS Guideline)
+        $data['income_level'] = [
+            'Up to 50%' => Household::where('hhs_poverty_percentage', '<=', 50)->count(),
+            '51% to 75%' => Household::whereBetween('hhs_poverty_percentage', [51, 75])->count(),
+            '76% to 100%' => Household::whereBetween('hhs_poverty_percentage', [76, 100])->count(),
+            '101% to 125%' => Household::whereBetween('hhs_poverty_percentage', [101, 125])->count(),
+            '126% to 150%' => Household::whereBetween('hhs_poverty_percentage', [126, 150])->count(),
+            '151% to 175%' => Household::whereBetween('hhs_poverty_percentage', [151, 175])->count(),
+            '176% to 200%' => Household::whereBetween('hhs_poverty_percentage', [176, 200])->count(),
+            '201% to 250%' => Household::whereBetween('hhs_poverty_percentage', [201, 250])->count(),
+            '250% and over' => Household::where('hhs_poverty_percentage', '>', 250)->count(),
+            'Unknown/not reported' => Household::whereNull('hhs_poverty_percentage')->count(),
+        ];
+        $data['income_level']['total'] = array_sum($data['income_level']);
+
+        // 13. Sources of Household Income (from participants' income_sources)
+        $households = Household::with('participants')->get();
+        $data['income_sources'] = [
+            'Income from Employment Only' => $households->filter(function($h) use ($getArrayField) {
+                return $h->participants->some(function($p) use ($getArrayField) {
+                    $income = $getArrayField($p->income_sources);
+                    return in_array('Employment', $income) && count($income) == 1;
+                });
+            })->count(),
+            'Income from Employment and Other Income Source' => $households->filter(function($h) use ($getArrayField) {
+                return $h->participants->some(function($p) use ($getArrayField) {
+                    $income = $getArrayField($p->income_sources);
+                    $other = $getArrayField($p->other_income_sources);
+                    return in_array('Employment', $income) && !empty($other);
+                });
+            })->count(),
+            'Income from Employment, Other Income Source, and Non-Cash Benefits' => $households->filter(function($h) use ($getArrayField) {
+                return $h->participants->some(function($p) use ($getArrayField) {
+                    $income = $getArrayField($p->income_sources);
+                    $other = $getArrayField($p->other_income_sources);
+                    $benefits = $getArrayField($p->non_cash_benefits);
+                    return in_array('Employment', $income) && !empty($other) && !empty($benefits);
+                });
+            })->count(),
+            'Income from Employment and Non-Cash Benefits' => $households->filter(function($h) use ($getArrayField) {
+                return $h->participants->some(function($p) use ($getArrayField) {
+                    $income = $getArrayField($p->income_sources);
+                    $benefits = $getArrayField($p->non_cash_benefits);
+                    return in_array('Employment', $income) && !empty($benefits);
+                });
+            })->count(),
+            'Other Income Source Only' => $households->filter(function($h) use ($getArrayField) {
+                return $h->participants->some(function($p) use ($getArrayField) {
+                    $income = $getArrayField($p->income_sources);
+                    $other = $getArrayField($p->other_income_sources);
+                    return !empty($other) && !in_array('Employment', $income);
+                });
+            })->count(),
+            'Other Income Source and Non-Cash Benefits' => $households->filter(function($h) use ($getArrayField) {
+                return $h->participants->some(function($p) use ($getArrayField) {
+                    $other = $getArrayField($p->other_income_sources);
+                    $benefits = $getArrayField($p->non_cash_benefits);
+                    return !empty($other) && !empty($benefits);
+                });
+            })->count(),
+            'No Income' => $households->filter(function($h) use ($getArrayField) {
+                return $h->participants->every(function($p) use ($getArrayField) {
+                    $income = $getArrayField($p->income_sources);
+                    $other = $getArrayField($p->other_income_sources);
+                    return empty($income) && empty($other);
+                });
+            })->count(),
+            'Non-Cash Benefits Only' => $households->filter(function($h) use ($getArrayField) {
+                return $h->participants->some(function($p) use ($getArrayField) {
+                    $income = $getArrayField($p->income_sources);
+                    $other = $getArrayField($p->other_income_sources);
+                    $benefits = $getArrayField($p->non_cash_benefits);
+                    return !empty($benefits) && empty($income) && empty($other);
+                });
+            })->count(),
+            'Unknown/not reported' => $households->filter(function($h) use ($getArrayField) {
+                return $h->participants->every(function($p) use ($getArrayField) {
+                    $income = $getArrayField($p->income_sources);
+                    $other = $getArrayField($p->other_income_sources);
+                    $benefits = $getArrayField($p->non_cash_benefits);
+                    return empty($income) && empty($other) && empty($benefits);
+                });
+            })->count(),
+        ];
+        $data['income_sources']['total'] = array_sum($data['income_sources']);
+
+        // 14. Other Income Source
+        $data['other_income_sources'] = [
+            'TANF' => $participants->filter(fn($p) => in_array('TANF', $getArrayField($p->other_income_sources)))->count(),
+            'Supplemental Security Income (SSI)' => $participants->filter(fn($p) => in_array('Supplemental Security Income (SSI)', $getArrayField($p->other_income_sources)))->count(),
+            'Social Security Disability Income (SSDI)' => $participants->filter(fn($p) => in_array('Social Security Disability Income (SSDI)', $getArrayField($p->other_income_sources)))->count(),
+            'VA Service-Connected Disability Compensation' => $participants->filter(fn($p) => in_array('VA Service-Connected Disability Compensation', $getArrayField($p->other_income_sources)))->count(),
+            'VA Non-Service Connected Disability Pension' => $participants->filter(fn($p) => in_array('VA Non-Service Connected Disability Pension', $getArrayField($p->other_income_sources)))->count(),
+            'Private Disability Insurance' => $participants->filter(fn($p) => in_array('Private Disability Insurance', $getArrayField($p->other_income_sources)))->count(),
+            'Worker\'s Compensation' => $participants->filter(fn($p) => in_array('Worker\'s Compensation', $getArrayField($p->other_income_sources)))->count(),
+            'Retirement Income from Social Security' => $participants->filter(fn($p) => in_array('Retirement Income from Social Security', $getArrayField($p->other_income_sources)))->count(),
+            'Pension' => $participants->filter(fn($p) => in_array('Pension', $getArrayField($p->other_income_sources)))->count(),
+            'Child Support' => $participants->filter(fn($p) => in_array('Child Support', $getArrayField($p->other_income_sources)))->count(),
+            'Alimony or other Spousal Support' => $participants->filter(fn($p) => in_array('Alimony or other Spousal Support', $getArrayField($p->other_income_sources)))->count(),
+            'Unemployment Insurance' => $participants->filter(fn($p) => in_array('Unemployment Insurance', $getArrayField($p->other_income_sources)))->count(),
+            'EITC' => $participants->filter(fn($p) => in_array('EITC', $getArrayField($p->other_income_sources)))->count(),
+            'Other' => $participants->filter(fn($p) => in_array('Other', $getArrayField($p->other_income_sources)))->count(),
+            'Unknown/not reported' => $participants->filter(fn($p) => empty($getArrayField($p->other_income_sources)))->count(),
+        ];
+
+        // 15. Non-Cash Benefits
+        $data['non_cash_benefits'] = [
+            'SNAP' => $participants->filter(fn($p) => in_array('SNAP', $getArrayField($p->non_cash_benefits)))->count(),
+            'WIC' => $participants->filter(fn($p) => in_array('WIC', $getArrayField($p->non_cash_benefits)))->count(),
+            'LIHEAP' => $participants->filter(fn($p) => in_array('LIHEAP', $getArrayField($p->non_cash_benefits)))->count(),
+            'Housing Choice Voucher' => $participants->filter(fn($p) => in_array('Housing Choice Voucher', $getArrayField($p->non_cash_benefits)))->count(),
+            'Public Housing' => $participants->filter(fn($p) => in_array('Public Housing', $getArrayField($p->non_cash_benefits)))->count(),
+            'Permanent Supportive Housing' => $participants->filter(fn($p) => in_array('Permanent Supportive Housing', $getArrayField($p->non_cash_benefits)))->count(),
+            'HUD-VASH' => $participants->filter(fn($p) => in_array('HUD-VASH', $getArrayField($p->non_cash_benefits)))->count(),
+            'Childcare Voucher' => $participants->filter(fn($p) => in_array('Childcare Voucher', $getArrayField($p->non_cash_benefits)))->count(),
+            'Affordable Care Act Subsidy' => $participants->filter(fn($p) => in_array('Affordable Care Act Subsidy', $getArrayField($p->non_cash_benefits)))->count(),
+            'Other' => $participants->filter(fn($p) => in_array('Other', $getArrayField($p->non_cash_benefits)))->count(),
+            'Unknown/not reported' => $participants->filter(fn($p) => empty($getArrayField($p->non_cash_benefits)))->count(),
+        ];
+
+        return $data;
+    }
+
+    public function exportCSBGReport()
+    {
+        // TODO: Implement CSV/PDF export functionality
+        session()->flash('success', 'CSBG Report export functionality coming soon.');
+    }
+
     public function render()
     {
         $data = [];
@@ -304,6 +614,11 @@ class AdminPanel extends Component
                         ->groupBy('poverty_range')
                         ->get(),
                 ];
+                
+                // Add CSBG data if report type is CSBG
+                if ($this->reportType === 'csbg') {
+                    $data['csbgData'] = $this->getCSBGData();
+                }
                 break;
 
             case 'settings':

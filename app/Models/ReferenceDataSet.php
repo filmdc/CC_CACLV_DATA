@@ -76,7 +76,7 @@ class ReferenceDataSet extends Model
         return true;
     }
 
-    public function duplicate(string $newVersion, string $newName = null): self
+    public function duplicate(string $newVersion, ?string $newName = null): self
     {
         $duplicate = self::create([
             'name' => $newName ?? ($this->name . ' (Copy)'),
