@@ -144,6 +144,38 @@ class WorkPlanGoalManagement extends Component
         }
     }
 
+    public function syncGoalWithServiceData($goalId)
+    {
+        try {
+            $goal = WorkPlanGoal::find($goalId);
+            if ($goal && $goal->updateActualFromServiceData()) {
+                session()->flash('success', 'Goal synced with current service data successfully.');
+            } else {
+                session()->flash('error', 'Unable to sync goal - no service linked or data unavailable.');
+            }
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error syncing goal: ' . $e->getMessage());
+        }
+    }
+
+    public function syncAllGoalsWithServiceData()
+    {
+        try {
+            $goals = WorkPlanGoal::with('service')->get();
+            $syncedCount = 0;
+            
+            foreach ($goals as $goal) {
+                if ($goal->updateActualFromServiceData()) {
+                    $syncedCount++;
+                }
+            }
+            
+            session()->flash('success', "Successfully synced {$syncedCount} goals with current service data.");
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error syncing goals: ' . $e->getMessage());
+        }
+    }
+
     public function render()
     {
         $goals = WorkPlanGoal::with(['workPlan.program', 'service'])

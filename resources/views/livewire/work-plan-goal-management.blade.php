@@ -12,7 +12,12 @@
                 <div class="flex-1 max-w-md">
                     <input wire:model.live="search" placeholder="Search goals..." class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500" />
                 </div>
-                <button wire:click="showCreateGoal" class="ml-4 px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500">Create Goal</button>
+                <div class="flex space-x-2">
+                    <button wire:click="syncAllGoalsWithServiceData" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500" title="Sync all goals with current service enrollment data">
+                        Sync All Goals
+                    </button>
+                    <button wire:click="showCreateGoal" class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500">Create Goal</button>
+                </div>
             </div>
         </div>
 
@@ -110,6 +115,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Goal</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Work Plan</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Service</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Service Metrics</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Progress</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Target vs Actual</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
@@ -135,6 +141,25 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ $goal->service->name ?? 'Not Associated' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if($goal->service)
+                                    <div class="text-sm">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-blue-600 dark:text-blue-400">Enrolled:</span>
+                                            <span class="font-medium">{{ $goal->service_enrollment_count }}</span>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-green-600 dark:text-green-400">Completed:</span>
+                                            <span class="font-medium">{{ $goal->service_completion_count }}</span>
+                                        </div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                            Total Activity: {{ $goal->total_service_activity }}
+                                        </div>
+                                    </div>
+                                @else
+                                    <span class="text-gray-400">No service linked</span>
+                                @endif
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center gap-2">
                                     <div class="flex-1 bg-gray-200 dark:bg-zinc-600 rounded-full h-2">
@@ -162,6 +187,11 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex gap-2">
+                                    @if($goal->service)
+                                        <button wire:click="syncGoalWithServiceData({{ $goal->id }})" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300" title="Sync with current service data">
+                                            Sync
+                                        </button>
+                                    @endif
                                     <button wire:click="showEditGoal({{ $goal->id }})" class="text-orange-600 dark:text-orange-400 hover:text-orange-900 dark:hover:text-orange-300">
                                         Edit
                                     </button>
@@ -177,7 +207,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                                 No goals found.
                             </td>
                         </tr>

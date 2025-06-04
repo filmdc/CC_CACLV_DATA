@@ -154,6 +154,28 @@ class WorkPlanManagement extends Component
         }
     }
 
+    public function syncWorkPlanGoals($workPlanId)
+    {
+        try {
+            $workPlan = WorkPlan::with('goals.service')->find($workPlanId);
+            if (!$workPlan) {
+                session()->flash('error', 'Work plan not found.');
+                return;
+            }
+
+            $syncedCount = 0;
+            foreach ($workPlan->goals as $goal) {
+                if ($goal->updateActualFromServiceData()) {
+                    $syncedCount++;
+                }
+            }
+
+            session()->flash('success', "Successfully synced {$syncedCount} goals in {$workPlan->name} with current service data.");
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error syncing work plan goals: ' . $e->getMessage());
+        }
+    }
+
     public function render()
     {
         $workPlans = WorkPlan::with(['program', 'goals'])

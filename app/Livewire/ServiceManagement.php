@@ -159,7 +159,7 @@ class ServiceManagement extends Component
 
     public function render()
     {
-        $services = Service::with('program')
+        $services = Service::with(['program', 'workPlanGoals', 'serviceEnrollments'])
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
                       ->orWhere('description', 'like', '%' . $this->search . '%')

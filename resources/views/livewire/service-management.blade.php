@@ -219,6 +219,12 @@
                                             <span>End: {{ $service->end_date->format('M j, Y') }}</span>
                                         @endif
                                         <span>Goals: {{ $service->workPlanGoals->count() }}</span>
+                                        <span class="font-medium {{ $service->getEnrolledParticipantsCount() > 0 ? 'text-blue-600' : 'text-gray-500' }}">
+                                            Enrolled: {{ $service->getEnrolledParticipantsCount() }}
+                                        </span>
+                                        <span class="text-green-600">
+                                            Completed: {{ $service->getCompletedEnrollmentsCount() }}
+                                        </span>
                                     </div>
                                 </div>
                                 <div class="flex items-center space-x-2">
