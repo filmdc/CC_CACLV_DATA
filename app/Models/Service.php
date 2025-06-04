@@ -35,4 +35,24 @@ class Service extends Model
     {
         return $this->hasMany(WorkPlanGoal::class);
     }
+
+    public function serviceEnrollments(): HasMany
+    {
+        return $this->hasMany(ServiceEnrollment::class);
+    }
+
+    public function activeEnrollments()
+    {
+        return $this->serviceEnrollments()->active()->with('participant');
+    }
+
+    public function getEnrolledParticipantsCount(): int
+    {
+        return $this->activeEnrollments()->count();
+    }
+
+    public function getCompletedEnrollmentsCount(): int
+    {
+        return $this->serviceEnrollments()->completed()->count();
+    }
 }

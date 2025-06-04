@@ -25,6 +25,7 @@
                 <flux:navlist.group :heading="__('Programs')" class="grid">
                     <flux:navlist.item icon="folder" :href="route('program.management')" :current="request()->routeIs('program.management')" wire:navigate>{{ __('Program Management') }}</flux:navlist.item>
                     <flux:navlist.item icon="briefcase" :href="route('service.management')" :current="request()->routeIs('service.management')" wire:navigate>{{ __('Service Management') }}</flux:navlist.item>
+                    <flux:navlist.item icon="user-group" :href="route('enrollment.management')" :current="request()->routeIs('enrollment.management')" wire:navigate>{{ __('Enrollment Management') }}</flux:navlist.item>
                     <flux:navlist.item icon="document-text" :href="route('contract.management')" :current="request()->routeIs('contract.management')" wire:navigate>{{ __('Contract Management') }}</flux:navlist.item>
                     <flux:navlist.item icon="calendar" :href="route('work-plan.management')" :current="request()->routeIs('work-plan.management')" wire:navigate>{{ __('Work Plans') }}</flux:navlist.item>
                     <flux:navlist.item icon="flag" :href="route('work-plan-goal.management')" :current="request()->routeIs('work-plan-goal.management')" wire:navigate>{{ __('Work Plan Goals') }}</flux:navlist.item>

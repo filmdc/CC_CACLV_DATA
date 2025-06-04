@@ -5,8 +5,13 @@ namespace App\Livewire;
 use App\Models\Participant;
 use App\Models\Household;
 use App\Models\ReferenceData;
+use App\Models\Program;
+use App\Models\Service;
+use App\Models\ProgramEnrollment;
+use App\Models\ServiceEnrollment;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Carbon\Carbon;
 
 class ParticipantManagement extends Component
 {
@@ -33,6 +38,16 @@ class ParticipantManagement extends Component
     public $military_status = '';
     public $work_status = '';
 
+    // Enrollment Management
+    public $showEnrollmentSection = false;
+    public $program_id = '';
+    public $enrollment_date = '';
+    public $enrollment_notes = '';
+    public $service_id = '';
+    public $service_enrollment_date = '';
+    public $service_notes = '';
+    public $selectedEnrollment = null;
+
     public function updatedSearch()
     {
         $this->resetPage();
@@ -43,7 +58,9 @@ class ParticipantManagement extends Component
         $this->selectedParticipant = Participant::with('household')->find($participantId);
         if ($this->selectedParticipant) {
             $this->showEditForm = true;
+            $this->showEnrollmentSection = false;
             $this->fillParticipantForm();
+            $this->resetEnrollmentForm();
         }
     }
 
@@ -136,6 +153,109 @@ class ParticipantManagement extends Component
         $this->work_status = '';
         $this->showEditForm = false;
         $this->selectedParticipant = null;
+        $this->showEnrollmentSection = false;
+        $this->resetEnrollmentForm();
+    }
+
+    public function resetEnrollmentForm()
+    {
+        $this->program_id = '';
+        $this->enrollment_date = Carbon::today()->format('Y-m-d');
+        $this->enrollment_notes = '';
+        $this->service_id = '';
+        $this->service_enrollment_date = Carbon::today()->format('Y-m-d');
+        $this->service_notes = '';
+        $this->selectedEnrollment = null;
+    }
+
+    public function toggleEnrollmentSection()
+    {
+        $this->showEnrollmentSection = !$this->showEnrollmentSection;
+        if ($this->showEnrollmentSection) {
+            $this->resetEnrollmentForm();
+        }
+    }
+
+    public function createProgramEnrollment()
+    {
+        if (!$this->selectedParticipant) {
+            session()->flash('error', 'No participant selected.');
+            return;
+        }
+
+        $this->validate([
+            'program_id' => 'required|exists:programs,id',
+            'enrollment_date' => 'required|date',
+        ]);
+
+        try {
+            // Check for existing active enrollment
+            $existingEnrollment = ProgramEnrollment::where('participant_id', $this->selectedParticipant->id)
+                ->where('program_id', $this->program_id)
+                ->where('status', 'active')
+                ->first();
+
+            if ($existingEnrollment) {
+                session()->flash('error', 'Participant is already actively enrolled in this program.');
+                return;
+            }
+
+            ProgramEnrollment::create([
+                'participant_id' => $this->selectedParticipant->id,
+                'program_id' => $this->program_id,
+                'enrollment_date' => $this->enrollment_date,
+                'status' => 'active',
+                'notes' => $this->enrollment_notes,
+            ]);
+
+            session()->flash('success', 'Program enrollment created successfully.');
+            $this->resetEnrollmentForm();
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+        }
+    }
+
+    public function createServiceEnrollment()
+    {
+        if (!$this->selectedParticipant) {
+            session()->flash('error', 'No participant selected.');
+            return;
+        }
+
+        $this->validate([
+            'program_id' => 'required|exists:programs,id',
+            'service_id' => 'required|exists:services,id',
+            'service_enrollment_date' => 'required|date',
+        ]);
+
+        try {
+            // Find active program enrollment
+            $programEnrollment = ProgramEnrollment::where('participant_id', $this->selectedParticipant->id)
+                ->where('program_id', $this->program_id)
+                ->where('status', 'active')
+                ->first();
+
+            if (!$programEnrollment) {
+                session()->flash('error', 'Participant must be enrolled in the program first.');
+                return;
+            }
+
+            ServiceEnrollment::create([
+                'participant_id' => $this->selectedParticipant->id,
+                'service_id' => $this->service_id,
+                'program_enrollment_id' => $programEnrollment->id,
+                'enrollment_date' => $this->service_enrollment_date,
+                'status' => 'enrolled',
+                'notes' => $this->service_notes,
+            ]);
+
+            session()->flash('success', 'Service enrollment created successfully.');
+            $this->resetEnrollmentForm();
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+        }
     }
 
     public function cancelEdit()
@@ -163,7 +283,7 @@ class ParticipantManagement extends Component
 
     public function render()
     {
-        $participants = Participant::with(['household'])
+        $participants = Participant::with(['household', 'programEnrollments.program', 'serviceEnrollments.service'])
             ->when($this->search, function ($query) {
                 $query->where('first_name', 'like', '%' . $this->search . '%')
                       ->orWhere('last_name', 'like', '%' . $this->search . '%')
@@ -178,6 +298,17 @@ class ParticipantManagement extends Component
         // Use the selected participant's reference data set if editing, otherwise use active set
         $dataSetId = $this->selectedParticipant ? $this->selectedParticipant->reference_data_set_id : null;
 
+        // Get programs and services for enrollment
+        $programs = Program::where('active', true)->orderBy('name')->get();
+        $services = collect();
+        
+        if ($this->program_id) {
+            $services = Service::where('program_id', $this->program_id)
+                ->where('active', true)
+                ->orderBy('name')
+                ->get();
+        }
+
         return view('livewire.participant-management', [
             'participants' => $participants,
             'genderOptions' => ReferenceData::getOptions('gender', true, $dataSetId),
@@ -188,6 +319,8 @@ class ParticipantManagement extends Component
             'healthInsuranceStatuses' => ReferenceData::getOptions('health_insurance_status', true, $dataSetId),
             'militaryStatuses' => ReferenceData::getOptions('military_status', true, $dataSetId),
             'workStatuses' => ReferenceData::getOptions('work_status', true, $dataSetId),
+            'programs' => $programs,
+            'services' => $services,
         ])->layout('components.layouts.app');
     }
 }

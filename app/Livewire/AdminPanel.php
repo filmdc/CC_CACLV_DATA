@@ -9,12 +9,14 @@ use App\Models\Service;
 use App\Models\Contract;
 use App\Models\WorkPlan;
 use App\Models\User;
+use App\Models\SiteSetting;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\WithFileUploads;
 
 class AdminPanel extends Component
 {
-    use WithPagination;
+    use WithPagination, WithFileUploads;
 
     public $activeTab = 'overview';
     public $search = '';
@@ -33,6 +35,13 @@ class AdminPanel extends Component
     public $user_email = '';
     public $user_password = '';
     public $user_password_confirmation = '';
+
+    // Site Settings
+    public $site_name = '';
+    public $site_logo = null;
+    public $site_favicon = null;
+    public $current_logo_path = null;
+    public $current_favicon_path = null;
 
     public function setActiveTab($tab)
     {
@@ -190,6 +199,53 @@ class AdminPanel extends Component
         }
     }
 
+    public function mount()
+    {
+        $this->site_name = SiteSetting::get('site_name', 'CAP TRACK');
+        $this->current_logo_path = SiteSetting::get('site_logo');
+        $this->current_favicon_path = SiteSetting::get('site_favicon');
+    }
+
+    public function updateSiteSettings()
+    {
+        $this->validate([
+            'site_name' => 'required|string|max:255',
+            'site_logo' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
+            'site_favicon' => 'nullable|image|mimes:ico,png,jpg|max:512',
+        ]);
+
+        try {
+            // Update site name
+            SiteSetting::set('site_name', $this->site_name);
+
+            // Handle logo upload
+            if ($this->site_logo) {
+                $logoPath = $this->site_logo->store('site', 'public');
+                SiteSetting::set('site_logo', $logoPath, 'file');
+                $this->current_logo_path = $logoPath;
+            }
+
+            // Handle favicon upload
+            if ($this->site_favicon) {
+                $faviconPath = $this->site_favicon->store('site', 'public');
+                SiteSetting::set('site_favicon', $faviconPath, 'file');
+                $this->current_favicon_path = $faviconPath;
+            }
+
+            // Clear cache to ensure changes are reflected immediately
+            SiteSetting::clearCache();
+
+            session()->flash('success', 'Site settings updated successfully.');
+            
+            // Reset file inputs
+            $this->site_logo = null;
+            $this->site_favicon = null;
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+        }
+    }
+
     public function render()
     {
         $data = [];
@@ -229,7 +285,7 @@ class AdminPanel extends Component
 
             case 'reports':
                 $data['reportData'] = [
-                    'participants_by_month' => Participant::selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, COUNT(*) as count')
+                    'participants_by_month' => Participant::selectRaw('strftime("%Y-%m", created_at) as month, COUNT(*) as count')
                         ->groupBy('month')
                         ->orderBy('month', 'desc')
                         ->limit(12)
@@ -248,6 +304,10 @@ class AdminPanel extends Component
                         ->groupBy('poverty_range')
                         ->get(),
                 ];
+                break;
+
+            case 'settings':
+                // Site settings data is already loaded in mount()
                 break;
         }
 

@@ -25,6 +25,10 @@
                         class="py-4 px-1 border-b-2 font-medium text-sm {{ $activeTab === 'reports' ? 'border-purple-500 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
                     Reports
                 </button>
+                <button wire:click="setActiveTab('settings')" 
+                        class="py-4 px-1 border-b-2 font-medium text-sm {{ $activeTab === 'settings' ? 'border-purple-500 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+                    Site Settings
+                </button>
             </nav>
         </div>
 
@@ -429,6 +433,77 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            @elseif ($activeTab === 'settings')
+                <!-- Site Settings -->
+                <div class="space-y-6">
+                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Site Settings</h2>
+                    
+                    <form wire:submit.prevent="updateSiteSettings" class="space-y-6">
+                        <!-- Site Name -->
+                        <div>
+                            <label for="site_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Site Name</label>
+                            <input type="text" wire:model="site_name" id="site_name" 
+                                   class="mt-1 block w-full border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                            @error('site_name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
+
+                        <!-- Site Logo -->
+                        <div>
+                            <label for="site_logo" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Site Logo</label>
+                            <div class="mt-1 flex items-center space-x-5">
+                                @if($current_logo_path)
+                                    <div class="flex-shrink-0">
+                                        <img class="h-16 w-auto" src="{{ Storage::url($current_logo_path) }}" alt="Current Logo">
+                                    </div>
+                                @endif
+                                <div class="flex-grow">
+                                    <input type="file" wire:model="site_logo" id="site_logo" accept="image/*"
+                                           class="block w-full text-sm text-gray-500 dark:text-gray-400
+                                                  file:mr-4 file:py-2 file:px-4
+                                                  file:rounded-md file:border-0
+                                                  file:text-sm file:font-semibold
+                                                  file:bg-purple-50 file:text-purple-700
+                                                  hover:file:bg-purple-100
+                                                  dark:file:bg-zinc-700 dark:file:text-purple-400">
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">PNG, JPG, JPEG, SVG up to 2MB</p>
+                                </div>
+                            </div>
+                            @error('site_logo') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
+
+                        <!-- Site Favicon -->
+                        <div>
+                            <label for="site_favicon" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Site Favicon</label>
+                            <div class="mt-1 flex items-center space-x-5">
+                                @if($current_favicon_path)
+                                    <div class="flex-shrink-0">
+                                        <img class="h-8 w-8" src="{{ Storage::url($current_favicon_path) }}" alt="Current Favicon">
+                                    </div>
+                                @endif
+                                <div class="flex-grow">
+                                    <input type="file" wire:model="site_favicon" id="site_favicon" accept="image/x-icon,image/png,image/jpeg"
+                                           class="block w-full text-sm text-gray-500 dark:text-gray-400
+                                                  file:mr-4 file:py-2 file:px-4
+                                                  file:rounded-md file:border-0
+                                                  file:text-sm file:font-semibold
+                                                  file:bg-purple-50 file:text-purple-700
+                                                  hover:file:bg-purple-100
+                                                  dark:file:bg-zinc-700 dark:file:text-purple-400">
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">ICO, PNG, JPG up to 512KB</p>
+                                </div>
+                            </div>
+                            @error('site_favicon') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="flex justify-end">
+                            <button type="submit" 
+                                    class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition duration-150 ease-in-out">
+                                Update Settings
+                            </button>
+                        </div>
+                    </form>
                 </div>
             @endif
         </div>

@@ -31,6 +31,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('poverty-guideline-management', App\Livewire\PovertyGuidelineManagement::class)->name('poverty-guideline.management');
     Route::get('reference-data-management', App\Livewire\ReferenceDataManagement::class)->name('reference-data.management');
     Route::get('reference-data-set-management', App\Livewire\ReferenceDataSetManagement::class)->name('reference-data-set.management');
+    Route::get('enrollment-management', App\Livewire\EnrollmentManagement::class)->name('enrollment.management');
     Route::get('admin-panel', App\Livewire\AdminPanel::class)->name('admin.panel');
 });
 

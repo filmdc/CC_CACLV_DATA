@@ -45,4 +45,24 @@ class Program extends Model
     {
         return $this->hasMany(WorkPlan::class);
     }
+
+    public function programEnrollments(): HasMany
+    {
+        return $this->hasMany(ProgramEnrollment::class);
+    }
+
+    public function activeEnrollments()
+    {
+        return $this->programEnrollments()->active()->with('participant');
+    }
+
+    public function getEnrolledParticipantsCount(): int
+    {
+        return $this->activeEnrollments()->count();
+    }
+
+    public function getTotalEnrollmentsCount(): int
+    {
+        return $this->programEnrollments()->count();
+    }
 }

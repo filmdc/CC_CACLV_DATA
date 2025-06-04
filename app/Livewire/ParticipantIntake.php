@@ -6,13 +6,18 @@ use App\Models\Household;
 use App\Models\Participant;
 use App\Models\PovertyGuideline;
 use App\Models\ReferenceData;
+use App\Models\Program;
+use App\Models\Service;
+use App\Models\ProgramEnrollment;
+use App\Models\ServiceEnrollment;
 use Livewire\Component;
 use Livewire\Attributes\Validate;
+use Carbon\Carbon;
 
 class ParticipantIntake extends Component
 {
     public $step = 1;
-    public $totalSteps = 4;
+    public $totalSteps = 5;
 
     // Household Information
     #[Validate('required|string')]
@@ -82,9 +87,25 @@ class ParticipantIntake extends Component
     // System
     public $notes = '';
 
+    // Step 5: Program Enrollment
+    public $program_id = '';
+    public $enrollment_date = '';
+    public $enrollment_notes = '';
+    
+    // Optional Service Enrollment
+    public $enroll_in_service = false;
+    public $service_id = '';
+    public $service_enrollment_date = '';
+    public $service_notes = '';
+
+    // Created participant for step 5
+    public $createdParticipant = null;
+
     public function mount()
     {
         $this->resetForm();
+        $this->enrollment_date = Carbon::today()->format('Y-m-d');
+        $this->service_enrollment_date = Carbon::today()->format('Y-m-d');
     }
 
     public function resetForm()
@@ -118,11 +139,24 @@ class ParticipantIntake extends Component
         $this->other_income_sources = [];
         $this->non_cash_benefits = [];
         $this->notes = '';
+        $this->program_id = '';
+        $this->enrollment_date = Carbon::today()->format('Y-m-d');
+        $this->enrollment_notes = '';
+        $this->enroll_in_service = false;
+        $this->service_id = '';
+        $this->service_enrollment_date = Carbon::today()->format('Y-m-d');
+        $this->service_notes = '';
+        $this->createdParticipant = null;
     }
 
     public function nextStep()
     {
         $this->validateCurrentStep();
+        
+        // If moving from step 4 to 5, create the participant and household first
+        if ($this->step == 4 && !$this->createdParticipant) {
+            $this->createParticipantAndHousehold();
+        }
         
         if ($this->step < $this->totalSteps) {
             $this->step++;
@@ -160,13 +194,24 @@ class ParticipantIntake extends Component
             case 4:
                 // Financial information is mostly optional
                 break;
+            case 5:
+                $this->validate([
+                    'program_id' => 'required|exists:programs,id',
+                    'enrollment_date' => 'required|date',
+                ]);
+                
+                if ($this->enroll_in_service) {
+                    $this->validate([
+                        'service_id' => 'required|exists:services,id',
+                        'service_enrollment_date' => 'required|date',
+                    ]);
+                }
+                break;
         }
     }
 
-    public function submit()
+    public function createParticipantAndHousehold()
     {
-        $this->validateCurrentStep();
-        
         try {
             // Calculate annual income if monthly is provided
             $annual_income = $this->monthly_income ? $this->monthly_income * 12 : null;
@@ -201,7 +246,7 @@ class ParticipantIntake extends Component
             $activeDataSet = \App\Models\ReferenceDataSet::getActive();
 
             // Create head of household participant
-            Participant::create([
+            $this->createdParticipant = Participant::create([
                 'household_id' => $household->id,
                 'reference_data_set_id' => $activeDataSet?->id,
                 'is_head_of_household' => true,
@@ -227,16 +272,71 @@ class ParticipantIntake extends Component
                 'notes' => $this->notes,
             ]);
 
-            session()->flash('success', 'Participant and household successfully registered with ID: ' . $household->household_code);
-            $this->resetForm();
+            session()->flash('success', 'Participant and household created successfully! Now let\'s enroll them in a program.');
             
         } catch (\Exception $e) {
             session()->flash('error', 'An error occurred during registration: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    public function submit()
+    {
+        $this->validateCurrentStep();
+        
+        try {
+            // Ensure participant was created
+            if (!$this->createdParticipant) {
+                throw new \Exception('Participant must be created before enrollment.');
+            }
+
+            // Create program enrollment
+            $programEnrollment = ProgramEnrollment::create([
+                'participant_id' => $this->createdParticipant->id,
+                'program_id' => $this->program_id,
+                'enrollment_date' => $this->enrollment_date,
+                'status' => 'active',
+                'notes' => $this->enrollment_notes,
+            ]);
+
+            // Create service enrollment if requested
+            if ($this->enroll_in_service && $this->service_id) {
+                ServiceEnrollment::create([
+                    'participant_id' => $this->createdParticipant->id,
+                    'service_id' => $this->service_id,
+                    'program_enrollment_id' => $programEnrollment->id,
+                    'enrollment_date' => $this->service_enrollment_date,
+                    'status' => 'enrolled',
+                    'notes' => $this->service_notes,
+                ]);
+                
+                $message = 'Participant successfully enrolled in program and service!';
+            } else {
+                $message = 'Participant successfully enrolled in program!';
+            }
+
+            $household = $this->createdParticipant->household;
+            session()->flash('success', $message . ' Household ID: ' . $household->household_code);
+            $this->resetForm();
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'An error occurred during enrollment: ' . $e->getMessage());
         }
     }
 
     public function render()
     {
+        $programs = Program::where('active', true)->orderBy('name')->get();
+        $services = collect();
+        
+        // Get services for selected program
+        if ($this->program_id) {
+            $services = Service::where('program_id', $this->program_id)
+                ->where('active', true)
+                ->orderBy('name')
+                ->get();
+        }
+
         return view('livewire.participant-intake', [
             'genderOptions' => ReferenceData::getOptions('gender'),
             'educationLevels' => ReferenceData::getOptions('education_level'),
@@ -253,6 +353,8 @@ class ParticipantIntake extends Component
             'housingStatuses' => ReferenceData::getOptions('housing_status'),
             'housingTypes' => ReferenceData::getOptions('housing_type'),
             'householdTypes' => ReferenceData::getOptions('household_type'),
+            'programs' => $programs,
+            'services' => $services,
         ])->layout('components.layouts.app');
     }
 }

@@ -4,24 +4,35 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development Commands
 
+### Quick Start
+- `composer install` - Install PHP dependencies
+- `npm install` - Install Node.js dependencies
+- `composer dev` - Start complete development environment (server, queue, logs, vite)
+
 ### Testing
 - `composer test` - Run full test suite with config clearing
 - `php artisan test` - Run tests directly via Artisan
+- `php artisan test --filter TestName` - Run specific test class
+- `php artisan test tests/Feature/specific_test.php` - Run specific test file
 - Tests use Pest PHP framework with PHPUnit as the base
 - Test database is configured to use SQLite in-memory for speed
 
 ### Development Server
-- `composer dev` - Start complete development environment (server, queue, logs, vite)
+- `composer dev` - Start complete development environment (server, queue, logs, vite) using concurrently
 - `php artisan serve` - Start Laravel development server only
 - `npm run dev` - Start Vite development server for asset compilation
 - `npm run build` - Build production assets
 
 ### Code Quality
 - `php artisan pint` - Format PHP code using Laravel Pint (available via composer require-dev)
+- `laravel/pail` included for real-time log monitoring in dev environment
 
 ### Database
 - `php artisan migrate` - Run database migrations
+- `php artisan migrate:fresh` - Drop all tables and re-run migrations
+- `php artisan db:seed` - Run database seeders (PovertyGuidelines, ReferenceData)
 - Uses SQLite database located at `database/database.sqlite`
+- Database auto-created on project setup via composer scripts
 
 ## Architecture Overview
 
@@ -64,6 +75,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Vite handles hot module replacement for CSS/JS
 - Queue processing and logging included in dev command
 
+### Livewire Component Patterns
+- All management interfaces use full-page Livewire components
+- Components located in `app/Livewire/` with corresponding views in `resources/views/livewire/`
+- Standard CRUD operations with real-time validation
+- Modal dialogs for create/edit operations
+- Wire:model for form binding with live validation
+- Public properties for component state management
+- Protected/private methods for internal logic
+
+### Model Relationships
+- Program hasMany Services, WorkPlans, ProgramEnrollments
+- Service belongsTo Program, hasMany ServiceEnrollments
+- Participant hasMany ProgramEnrollments, ServiceEnrollments, belongsTo Household
+- Household hasMany Participants with automatic member count tracking
+- WorkPlan hasMany WorkPlanGoals, belongsTo Program
+- User belongsToMany Roles through pivot table
+- ReferenceData grouped by ReferenceDataSet for organized management
+
 ## Project Context
 
 This is **CAP TRACK** - a comprehensive data management platform for Community Action Partnership agencies. The system handles participant/household data, program services, and CSBG reporting requirements.
@@ -83,6 +112,8 @@ This is **CAP TRACK** - a comprehensive data management platform for Community A
 - **WorkPlan** - Annual work plans per program
 - **WorkPlanGoal** - Goals mapped to services with target vs actual tracking
 - **PovertyGuideline** - Federal poverty guidelines for 2025 (monthly/annual)
+- **ProgramEnrollment** - Tracks participant enrollment in programs with dates
+- **ServiceEnrollment** - Records service delivery to participants with completion tracking
 
 ### Role-Based Access Control
 - **Role** - User roles (admin, program manager, staff, etc.)
@@ -110,6 +141,10 @@ All core models have dedicated management interfaces accessible via sidebar navi
 - **Work Plan Goal Management** (`/work-plan-goal-management`) - Goal tracking with progress visualization
 - **Role & Permission Management** (`/role-permission-management`) - RBAC system with tabbed interface
 - **Poverty Guidelines Management** (`/poverty-guideline-management`) - Federal poverty level data
+- **Reference Data Management** (`/reference-data-management`) - Configurable dropdown options
+- **Reference Data Set Management** (`/reference-data-set-management`) - Organized data collections
+- **Enrollment Management** (`/enrollment-management`) - Program and service enrollment tracking
+- **Participant Intake** (`/participant-intake`) - Streamlined participant registration workflow
 
 ### UI/UX Patterns
 - **Standard HTML/Tailwind** - NO Flux components, uses consistent HTML patterns
@@ -127,3 +162,8 @@ All core models have dedicated management interfaces accessible via sidebar navi
   - `text-gray-900 dark:text-white` for primary text
   - `border-gray-300 dark:border-zinc-600` for form elements
 - Follow existing service-management.blade.php as the template pattern
+
+### System Prompt - Identity
+-You are an expert AI Coder, Laravel programmer, and system engineer working on the "CAP TRACK" system built with Laravel 11, Livewire, and Volt. Your expertise includes deep code analysis and producing production-ready code. 
+
+

@@ -355,6 +355,119 @@
                 </div>
             @endif
 
+            <!-- Step 5: Program Enrollment -->
+            @if ($step === 5)
+                <div class="space-y-6">
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-green-800">Participant Created Successfully!</h3>
+                                <p class="text-sm text-green-700 mt-1">
+                                    @if($createdParticipant)
+                                        {{ $createdParticipant->full_name }} has been registered. 
+                                        Household ID: {{ $createdParticipant->household->household_code }}
+                                    @endif
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Program Enrollment</h2>
+                    <p class="text-gray-600 mb-6">Enroll the participant in a program to begin service delivery.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Program Selection -->
+                        <div>
+                            <label for="program_id" class="block text-sm font-medium text-gray-700 mb-2">
+                                Program <span class="text-red-500">*</span>
+                            </label>
+                            <select wire:model.live="program_id" id="program_id" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Select a program...</option>
+                                @foreach($programs as $program)
+                                    <option value="{{ $program->id }}">{{ $program->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('program_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <!-- Enrollment Date -->
+                        <div>
+                            <label for="enrollment_date" class="block text-sm font-medium text-gray-700 mb-2">
+                                Enrollment Date <span class="text-red-500">*</span>
+                            </label>
+                            <input type="date" wire:model="enrollment_date" id="enrollment_date" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            @error('enrollment_date') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
+
+                    <!-- Enrollment Notes -->
+                    <div>
+                        <label for="enrollment_notes" class="block text-sm font-medium text-gray-700 mb-2">Enrollment Notes</label>
+                        <textarea wire:model="enrollment_notes" id="enrollment_notes" rows="3" 
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  placeholder="Any notes about this enrollment..."></textarea>
+                    </div>
+
+                    <!-- Optional Service Enrollment -->
+                    <div class="border-t pt-6">
+                        <div class="flex items-center mb-4">
+                            <input type="checkbox" wire:model.live="enroll_in_service" id="enroll_in_service" 
+                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <label for="enroll_in_service" class="ml-2 block text-sm font-medium text-gray-700">
+                                Also enroll in a specific service (optional)
+                            </label>
+                        </div>
+
+                        @if($enroll_in_service)
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 p-4 rounded-lg">
+                                <!-- Service Selection -->
+                                <div>
+                                    <label for="service_id" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Service <span class="text-red-500">*</span>
+                                    </label>
+                                    <select wire:model="service_id" id="service_id" 
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">Select a service...</option>
+                                        @foreach($services as $service)
+                                            <option value="{{ $service->id }}">{{ $service->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('service_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                    @if($program_id && $services->isEmpty())
+                                        <p class="text-sm text-gray-500 mt-1">No services available for this program.</p>
+                                    @endif
+                                </div>
+
+                                <!-- Service Enrollment Date -->
+                                <div>
+                                    <label for="service_enrollment_date" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Service Start Date <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="date" wire:model="service_enrollment_date" id="service_enrollment_date" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    @error('service_enrollment_date') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+
+                                <!-- Service Notes -->
+                                <div class="md:col-span-2">
+                                    <label for="service_notes" class="block text-sm font-medium text-gray-700 mb-2">Service Notes</label>
+                                    <textarea wire:model="service_notes" id="service_notes" rows="2" 
+                                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                              placeholder="Any notes about this service enrollment..."></textarea>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            @endif
+
             <!-- Navigation Buttons -->
             <div class="flex justify-between pt-6 border-t">
                 <button type="button" wire:click="previousStep" 
@@ -371,7 +484,7 @@
                     @else
                         <button type="submit" 
                                 class="px-6 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
-                            Complete Registration
+                            Complete Enrollment
                         </button>
                     @endif
                 </div>

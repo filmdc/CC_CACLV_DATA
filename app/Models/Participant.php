@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Carbon\Carbon;
 
 class Participant extends Model
@@ -66,5 +67,35 @@ class Participant extends Model
     public function getAgeAttribute(): int
     {
         return $this->date_of_birth ? $this->date_of_birth->diffInYears(Carbon::now()) : 0;
+    }
+
+    public function programEnrollments(): HasMany
+    {
+        return $this->hasMany(ProgramEnrollment::class);
+    }
+
+    public function serviceEnrollments(): HasMany
+    {
+        return $this->hasMany(ServiceEnrollment::class);
+    }
+
+    public function activeProgramEnrollments()
+    {
+        return $this->programEnrollments()->active()->with('program');
+    }
+
+    public function activeServiceEnrollments()
+    {
+        return $this->serviceEnrollments()->active()->with('service');
+    }
+
+    public function getActivePrograms()
+    {
+        return $this->activeProgramEnrollments()->get()->pluck('program');
+    }
+
+    public function getActiveServices()
+    {
+        return $this->activeServiceEnrollments()->get()->pluck('service');
     }
 }

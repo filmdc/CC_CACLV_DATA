@@ -198,17 +198,147 @@
                         </div>
                     </div>
 
-                    <div class="flex justify-end space-x-3 pt-4">
-                        <button type="button" wire:click="$set('showEditForm', false)" 
-                                class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-gray-500">
-                            Cancel
+                    <div class="flex justify-between items-center pt-4">
+                        <button type="button" wire:click="toggleEnrollmentSection" 
+                                class="px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-600 rounded-md hover:bg-indigo-100 dark:hover:bg-indigo-900/40 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            {{ $showEnrollmentSection ? 'Hide' : 'Show' }} Enrollments
                         </button>
-                        <button type="submit" 
-                                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            Update Participant
-                        </button>
+                        
+                        <div class="flex space-x-3">
+                            <button type="button" wire:click="$set('showEditForm', false)" 
+                                    class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                                Cancel
+                            </button>
+                            <button type="submit" 
+                                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                Update Participant
+                            </button>
+                        </div>
                     </div>
                 </form>
+
+                <!-- Enrollment Management Section -->
+                @if($showEnrollmentSection)
+                    <div class="mt-6 pt-6 border-t border-gray-200 dark:border-zinc-600">
+                        <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Enrollment Management</h4>
+                        
+                        <!-- Current Enrollments -->
+                        <div class="mb-6">
+                            <h5 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Current Enrollments</h5>
+                            
+                            @if($selectedParticipant && $selectedParticipant->programEnrollments->where('status', 'active')->count() > 0)
+                                <div class="space-y-2">
+                                    @foreach($selectedParticipant->programEnrollments->where('status', 'active') as $enrollment)
+                                        <div class="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-600 rounded-lg">
+                                            <div>
+                                                <div class="text-sm font-medium text-green-800 dark:text-green-200">
+                                                    {{ $enrollment->program->name }}
+                                                </div>
+                                                <div class="text-xs text-green-600 dark:text-green-400">
+                                                    Enrolled: {{ $enrollment->enrollment_date->format('M d, Y') }}
+                                                    ({{ $enrollment->days_enrolled }} days)
+                                                </div>
+                                            </div>
+                                            <div class="text-xs text-green-600 dark:text-green-400">
+                                                Active Services: {{ $enrollment->serviceEnrollments->where('status', 'enrolled')->count() }}
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <p class="text-sm text-gray-500 dark:text-gray-400">No active program enrollments.</p>
+                            @endif
+                        </div>
+
+                        <!-- New Program Enrollment -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Program Enrollment Form -->
+                            <div class="bg-gray-50 dark:bg-zinc-700/50 p-4 rounded-lg">
+                                <h6 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Enroll in Program</h6>
+                                
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Program</label>
+                                        <select wire:model.live="program_id" 
+                                                class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white">
+                                            <option value="">Select Program</option>
+                                            @foreach($programs as $program)
+                                                <option value="{{ $program->id }}">{{ $program->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('program_id') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Enrollment Date</label>
+                                        <input type="date" wire:model="enrollment_date" 
+                                               class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white">
+                                        @error('enrollment_date') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Notes</label>
+                                        <textarea wire:model="enrollment_notes" rows="2"
+                                                  class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white"></textarea>
+                                    </div>
+
+                                    <button type="button" wire:click="createProgramEnrollment" 
+                                            class="w-full px-3 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+                                        Enroll in Program
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Service Enrollment Form -->
+                            <div class="bg-gray-50 dark:bg-zinc-700/50 p-4 rounded-lg">
+                                <h6 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Record Service</h6>
+                                
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Program</label>
+                                        <select wire:model.live="program_id" 
+                                                class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white">
+                                            <option value="">Select Program First</option>
+                                            @foreach($programs as $program)
+                                                <option value="{{ $program->id }}">{{ $program->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Service</label>
+                                        <select wire:model="service_id" 
+                                                class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white">
+                                            <option value="">Select Service</option>
+                                            @foreach($services as $service)
+                                                <option value="{{ $service->id }}">{{ $service->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('service_id') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Service Date</label>
+                                        <input type="date" wire:model="service_enrollment_date" 
+                                               class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white">
+                                        @error('service_enrollment_date') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Service Notes</label>
+                                        <textarea wire:model="service_notes" rows="2"
+                                                  class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white"></textarea>
+                                    </div>
+
+                                    <button type="button" wire:click="createServiceEnrollment" 
+                                            class="w-full px-3 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        Record Service
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
             </div>
         @endif
 
