@@ -394,9 +394,11 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
-                                    <button wire:click="showEditParticipant({{ $participant->id }})" 
-                                            class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">Edit</button>
-                                    @if(!$participant->is_head_of_household)
+                                    @if($this->can('participants.edit'))
+                                        <button wire:click="showEditParticipant({{ $participant->id }})" 
+                                                class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">Edit</button>
+                                    @endif
+                                    @if(!$participant->is_head_of_household && $this->can('participants.delete'))
                                         <button wire:click="deleteParticipant({{ $participant->id }})" 
                                                 onclick="return confirm('Are you sure you want to delete this participant?')"
                                                 class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">Delete</button>

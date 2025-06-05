@@ -9,13 +9,20 @@ use App\Models\Program;
 use App\Models\Service;
 use App\Models\ProgramEnrollment;
 use App\Models\ServiceEnrollment;
+use App\Traits\WithPermissionChecks;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
 
 class ParticipantManagement extends Component
 {
-    use WithPagination;
+    use WithPagination, WithPermissionChecks;
+
+    public function mount()
+    {
+        // Check if user has permission to view participants
+        $this->authorizeAction('participants.view', 'You do not have permission to view participants.');
+    }
 
     public $search = '';
     public $selectedParticipant = null;
@@ -87,6 +94,8 @@ class ParticipantManagement extends Component
 
     public function updateParticipant()
     {
+        $this->authorizeAction('participants.edit', 'You do not have permission to edit participants.');
+        
         $this->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -265,6 +274,8 @@ class ParticipantManagement extends Component
 
     public function deleteParticipant($participantId)
     {
+        $this->authorizeAction('participants.delete', 'You do not have permission to delete participants.');
+        
         try {
             $participant = Participant::find($participantId);
             if ($participant) {

@@ -28,6 +28,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('work-plan-management', App\Livewire\WorkPlanManagement::class)->name('work-plan.management');
     Route::get('work-plan-goal-management', App\Livewire\WorkPlanGoalManagement::class)->name('work-plan-goal.management');
     Route::get('role-permission-management', App\Livewire\RolePermissionManagement::class)->name('role-permission.management');
+    Route::get('user-management', App\Livewire\UserManagement::class)->name('user.management');
     Route::get('poverty-guideline-management', App\Livewire\PovertyGuidelineManagement::class)->name('poverty-guideline.management');
     Route::get('reference-data-management', App\Livewire\ReferenceDataManagement::class)->name('reference-data.management');
     Route::get('reference-data-set-management', App\Livewire\ReferenceDataSetManagement::class)->name('reference-data-set.management');

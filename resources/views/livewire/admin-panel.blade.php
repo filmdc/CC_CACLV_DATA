@@ -406,6 +406,19 @@
                 <div class="space-y-6">
                     <h2 class="text-xl font-semibold text-gray-900">System Reports</h2>
                     
+                    <!-- Report Type Selection -->
+                    <div class="flex space-x-4 mb-6">
+                        <button wire:click="$set('reportType', 'overview')" 
+                                class="px-4 py-2 rounded-md {{ $reportType === 'overview' ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
+                            Overview Reports
+                        </button>
+                        <button wire:click="$set('reportType', 'csbg')" 
+                                class="px-4 py-2 rounded-md {{ $reportType === 'csbg' ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
+                            CSBG Demographics Report
+                        </button>
+                    </div>
+
+                    @if ($reportType === 'overview')
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <!-- Participant Registration Trends -->
                         <div class="bg-white p-6 rounded-lg border">
@@ -433,6 +446,362 @@
                             </div>
                         </div>
                     </div>
+                    
+                    @elseif ($reportType === 'csbg')
+                    <!-- CSBG Demographics Report -->
+                    <div class="bg-white p-6 rounded-lg border dark:bg-zinc-800 dark:border-zinc-700">
+                        <div class="mb-6">
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Module 4, Section C: All Characteristics Report - Data Entry Form</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Goal 1: Individuals and Families with low-incomes are stable and achieve economic security.</p>
+                        </div>
+
+                        <!-- CALV Program Reporting Totals -->
+                        <div class="mb-6 bg-yellow-50 dark:bg-yellow-900 p-4 rounded">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <span class="font-semibold">A. Total unduplicated number of all INDIVIDUALS:</span>
+                                    <span class="ml-2 text-lg font-bold">{{ $csbgData['total_individuals'] ?? 0 }}</span>
+                                </div>
+                                <div>
+                                    <span class="font-semibold">B. Total unduplicated number of all HOUSEHOLDS:</span>
+                                    <span class="ml-2 text-lg font-bold">{{ $csbgData['total_households'] ?? 0 }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Individual Level Characteristics -->
+                        <div class="mb-8">
+                            <h4 class="text-md font-semibold text-gray-900 dark:text-white mb-4 bg-blue-100 dark:bg-blue-900 p-2">C. INDIVIDUAL LEVEL CHARACTERISTICS</h4>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <!-- 1. Gender -->
+                                <div>
+                                    <h5 class="font-medium text-gray-700 dark:text-gray-300 mb-2">1. Gender</h5>
+                                    <div class="space-y-1 text-sm">
+                                        @foreach($csbgData['gender'] ?? [] as $key => $count)
+                                            @if($key !== 'total')
+                                            <div class="flex justify-between">
+                                                <span>{{ $key === 'Unknown/not reported' ? 'Unknown/not reported' : ucfirst($key) }}</span>
+                                                <span class="font-medium">{{ $count }}</span>
+                                            </div>
+                                            @endif
+                                        @endforeach
+                                        <div class="flex justify-between border-t pt-1">
+                                            <span class="font-semibold">TOTAL</span>
+                                            <span class="font-bold">{{ $csbgData['gender']['total'] ?? 0 }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 2. Age -->
+                                <div>
+                                    <h5 class="font-medium text-gray-700 dark:text-gray-300 mb-2">2. Age</h5>
+                                    <div class="space-y-1 text-sm">
+                                        @foreach($csbgData['age_groups'] ?? [] as $ageGroup => $count)
+                                        <div class="flex justify-between">
+                                            <span>{{ $ageGroup }}</span>
+                                            <span class="font-medium">{{ $count }}</span>
+                                        </div>
+                                        @endforeach
+                                        <div class="flex justify-between border-t pt-1">
+                                            <span class="font-semibold">TOTAL</span>
+                                            <span class="font-bold">{{ $csbgData['age']['total'] ?? 0 }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 3. Education Levels -->
+                                <div>
+                                    <h5 class="font-medium text-gray-700 dark:text-gray-300 mb-2">3. Education Levels</h5>
+                                    <div class="space-y-1 text-sm">
+                                        @foreach($csbgData['education'] ?? [] as $level => $count)
+                                            @if($level !== 'total')
+                                            <div class="flex justify-between">
+                                                <span>{{ $level }}</span>
+                                                <span class="font-medium">{{ $count }}</span>
+                                            </div>
+                                            @endif
+                                        @endforeach
+                                        <div class="flex justify-between border-t pt-1">
+                                            <span class="font-semibold">TOTAL</span>
+                                            <span class="font-bold">{{ $csbgData['education']['total'] ?? 0 }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Second Row -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                                <!-- 4. Disconnected Youth -->
+                                <div>
+                                    <h5 class="font-medium text-gray-700 dark:text-gray-300 mb-2">4. Disconnected Youth</h5>
+                                    <div class="space-y-1 text-sm">
+                                        @foreach($csbgData['disconnected_youth'] ?? [] as $type => $count)
+                                            @if($type !== 'total')
+                                            <div class="flex justify-between">
+                                                <span>{{ $type }}</span>
+                                                <span class="font-medium">{{ $count }}</span>
+                                            </div>
+                                            @endif
+                                        @endforeach
+                                        <div class="flex justify-between border-t pt-1">
+                                            <span class="font-semibold">TOTAL</span>
+                                            <span class="font-bold">{{ $csbgData['disconnected_youth']['total'] ?? 0 }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 5. Health -->
+                                <div>
+                                    <h5 class="font-medium text-gray-700 dark:text-gray-300 mb-2">5. Health</h5>
+                                    <div class="space-y-1 text-sm">
+                                        <div class="font-semibold mb-1">a. Disabling Condition</div>
+                                        @foreach($csbgData['health']['disabling_condition'] ?? [] as $status => $count)
+                                        <div class="flex justify-between">
+                                            <span class="ml-3">{{ $status }}</span>
+                                            <span class="font-medium">{{ $count }}</span>
+                                        </div>
+                                        @endforeach
+                                        <div class="font-semibold mb-1 mt-2">b. Health Insurance</div>
+                                        @foreach($csbgData['health']['health_insurance'] ?? [] as $status => $count)
+                                        <div class="flex justify-between">
+                                            <span class="ml-3">{{ $status }}</span>
+                                            <span class="font-medium">{{ $count }}</span>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                <!-- Health Insurance Sources -->
+                                <div>
+                                    <h5 class="font-medium text-gray-700 dark:text-gray-300 mb-2">Health Insurance Sources</h5>
+                                    <div class="space-y-1 text-sm">
+                                        @foreach($csbgData['health_insurance_sources'] ?? [] as $source => $count)
+                                            @if($source !== 'total')
+                                            <div class="flex justify-between">
+                                                <span>{{ $source }}</span>
+                                                <span class="font-medium">{{ $count }}</span>
+                                            </div>
+                                            @endif
+                                        @endforeach
+                                        <div class="flex justify-between border-t pt-1">
+                                            <span class="font-semibold">TOTAL</span>
+                                            <span class="font-bold">{{ $csbgData['health_insurance_sources']['total'] ?? 0 }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Third Row -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                                <!-- 6. Ethnicity/Race -->
+                                <div>
+                                    <h5 class="font-medium text-gray-700 dark:text-gray-300 mb-2">6. Ethnicity/Race</h5>
+                                    <div class="space-y-1 text-sm">
+                                        <div class="font-semibold mb-1">a. Ethnicity</div>
+                                        @foreach($csbgData['ethnicity'] ?? [] as $ethnicity => $count)
+                                            @if($ethnicity !== 'total')
+                                            <div class="flex justify-between">
+                                                <span class="ml-3">{{ $ethnicity }}</span>
+                                                <span class="font-medium">{{ $count }}</span>
+                                            </div>
+                                            @endif
+                                        @endforeach
+                                        <div class="font-semibold mb-1 mt-2">b. Race</div>
+                                        @foreach($csbgData['race'] ?? [] as $race => $count)
+                                            @if($race !== 'total')
+                                            <div class="flex justify-between">
+                                                <span class="ml-3">{{ $race }}</span>
+                                                <span class="font-medium">{{ $count }}</span>
+                                            </div>
+                                            @endif
+                                        @endforeach
+                                        <div class="flex justify-between border-t pt-1">
+                                            <span class="font-semibold">TOTAL</span>
+                                            <span class="font-bold">{{ $csbgData['race']['total'] ?? 0 }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 7. Military Status -->
+                                <div>
+                                    <h5 class="font-medium text-gray-700 dark:text-gray-300 mb-2">7. Military Status</h5>
+                                    <div class="space-y-1 text-sm">
+                                        @foreach($csbgData['military_status'] ?? [] as $status => $count)
+                                            @if($status !== 'total')
+                                            <div class="flex justify-between">
+                                                <span>{{ $status }}</span>
+                                                <span class="font-medium">{{ $count }}</span>
+                                            </div>
+                                            @endif
+                                        @endforeach
+                                        <div class="flex justify-between border-t pt-1">
+                                            <span class="font-semibold">TOTAL</span>
+                                            <span class="font-bold">{{ $csbgData['military_status']['total'] ?? 0 }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 8. Work Status (Individuals 18+) -->
+                                <div>
+                                    <h5 class="font-medium text-gray-700 dark:text-gray-300 mb-2">8. Work Status (Individuals 18+)</h5>
+                                    <div class="space-y-1 text-sm">
+                                        @foreach($csbgData['work_status'] ?? [] as $status => $count)
+                                            @if($status !== 'total')
+                                            <div class="flex justify-between">
+                                                <span>{{ $status }}</span>
+                                                <span class="font-medium">{{ $count }}</span>
+                                            </div>
+                                            @endif
+                                        @endforeach
+                                        <div class="flex justify-between border-t pt-1">
+                                            <span class="font-semibold">TOTAL</span>
+                                            <span class="font-bold">{{ $csbgData['work_status']['total'] ?? 0 }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Household Level Characteristics -->
+                        <div class="mb-8">
+                            <h4 class="text-md font-semibold text-gray-900 dark:text-white mb-4 bg-blue-100 dark:bg-blue-900 p-2">D. HOUSEHOLD LEVEL CHARACTERISTICS</h4>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <!-- 9. Household Type -->
+                                <div>
+                                    <h5 class="font-medium text-gray-700 dark:text-gray-300 mb-2">9. Household Type</h5>
+                                    <div class="space-y-1 text-sm">
+                                        @foreach($csbgData['household_type'] ?? [] as $type => $count)
+                                            @if($type !== 'total')
+                                            <div class="flex justify-between">
+                                                <span>{{ $type }}</span>
+                                                <span class="font-medium">{{ $count }}</span>
+                                            </div>
+                                            @endif
+                                        @endforeach
+                                        <div class="flex justify-between border-t pt-1">
+                                            <span class="font-semibold">TOTAL</span>
+                                            <span class="font-bold">{{ $csbgData['household_type']['total'] ?? 0 }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 10. Household Size -->
+                                <div>
+                                    <h5 class="font-medium text-gray-700 dark:text-gray-300 mb-2">10. Household Size</h5>
+                                    <div class="space-y-1 text-sm">
+                                        @foreach($csbgData['household_size'] ?? [] as $size => $count)
+                                            @if($size !== 'total')
+                                            <div class="flex justify-between">
+                                                <span>{{ $size }}</span>
+                                                <span class="font-medium">{{ $count }}</span>
+                                            </div>
+                                            @endif
+                                        @endforeach
+                                        <div class="flex justify-between border-t pt-1">
+                                            <span class="font-semibold">TOTAL</span>
+                                            <span class="font-bold">{{ $csbgData['household_size']['total'] ?? 0 }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 11. Housing -->
+                                <div>
+                                    <h5 class="font-medium text-gray-700 dark:text-gray-300 mb-2">11. Housing</h5>
+                                    <div class="space-y-1 text-sm">
+                                        @foreach($csbgData['housing'] ?? [] as $type => $count)
+                                            @if($type !== 'total')
+                                            <div class="flex justify-between">
+                                                <span>{{ $type }}</span>
+                                                <span class="font-medium">{{ $count }}</span>
+                                            </div>
+                                            @endif
+                                        @endforeach
+                                        <div class="flex justify-between border-t pt-1">
+                                            <span class="font-semibold">TOTAL</span>
+                                            <span class="font-bold">{{ $csbgData['housing']['total'] ?? 0 }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Second Row of Household Data -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                                <!-- 12. Level of Household Income -->
+                                <div>
+                                    <h5 class="font-medium text-gray-700 dark:text-gray-300 mb-2">12. Level of Household Income (% of HHS Guideline)</h5>
+                                    <div class="space-y-1 text-sm">
+                                        @foreach($csbgData['income_level'] ?? [] as $level => $count)
+                                            @if($level !== 'total')
+                                            <div class="flex justify-between">
+                                                <span>{{ $level }}</span>
+                                                <span class="font-medium">{{ $count }}</span>
+                                            </div>
+                                            @endif
+                                        @endforeach
+                                        <div class="flex justify-between border-t pt-1">
+                                            <span class="font-semibold">TOTAL</span>
+                                            <span class="font-bold">{{ $csbgData['income_level']['total'] ?? 0 }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 13. Sources of Household Income -->
+                                <div>
+                                    <h5 class="font-medium text-gray-700 dark:text-gray-300 mb-2">13. Sources of Household Income</h5>
+                                    <div class="space-y-1 text-sm">
+                                        @foreach($csbgData['income_sources'] ?? [] as $source => $count)
+                                            @if($source !== 'total')
+                                            <div class="flex justify-between">
+                                                <span>{{ $source }}</span>
+                                                <span class="font-medium">{{ $count }}</span>
+                                            </div>
+                                            @endif
+                                        @endforeach
+                                        <div class="flex justify-between border-t pt-1">
+                                            <span class="font-semibold">TOTAL</span>
+                                            <span class="font-bold">{{ $csbgData['income_sources']['total'] ?? 0 }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 14. Other Income Source -->
+                                <div>
+                                    <h5 class="font-medium text-gray-700 dark:text-gray-300 mb-2">14. Other Income Source</h5>
+                                    <div class="space-y-1 text-sm">
+                                        @foreach($csbgData['other_income_sources'] ?? [] as $source => $count)
+                                        <div class="flex justify-between">
+                                            <span>{{ $source }}</span>
+                                            <span class="font-medium">{{ $count }}</span>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 15. Non-Cash Benefits -->
+                            <div class="mt-6">
+                                <h5 class="font-medium text-gray-700 dark:text-gray-300 mb-2">15. Non-Cash Benefits</h5>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    @foreach($csbgData['non_cash_benefits'] ?? [] as $benefit => $count)
+                                    <div class="flex justify-between text-sm">
+                                        <span>{{ $benefit }}</span>
+                                        <span class="font-medium">{{ $count }}</span>
+                                    </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Print/Export Button -->
+                        <div class="flex justify-end mt-6">
+                            <button wire:click="exportCSBGReport" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition duration-150 ease-in-out">
+                                Export CSBG Report
+                            </button>
+                        </div>
+                    </div>
+                    @endif
                 </div>
             @elseif ($activeTab === 'settings')
                 <!-- Site Settings -->

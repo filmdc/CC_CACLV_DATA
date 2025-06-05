@@ -71,13 +71,21 @@ class ParticipantIntake extends Component
 
     // Demographics
     public $education_level = '';
+    public $currently_enrolled_in_education = '';
+    public $education_enrollment_type = '';
     public $disability_status = '';
+    public $disability_types = [];
+    public $assistance_needs = [];
+    public $has_chronic_health_conditions = '';
     public $health_insurance_status = '';
     public $health_insurance_sources = [];
     public $ethnicity = '';
     public $race = [];
     public $military_status = '';
     public $work_status = '';
+    public $hours_worked_per_week = '';
+    public $is_seeking_employment = '';
+    public $is_underemployed = '';
 
     // Financial Information
     public $income_sources = [];
@@ -128,13 +136,21 @@ class ParticipantIntake extends Component
         $this->telephone = '';
         $this->email = '';
         $this->education_level = '';
+        $this->currently_enrolled_in_education = '';
+        $this->education_enrollment_type = '';
         $this->disability_status = '';
+        $this->disability_types = [];
+        $this->assistance_needs = [];
+        $this->has_chronic_health_conditions = '';
         $this->health_insurance_status = '';
         $this->health_insurance_sources = [];
         $this->ethnicity = '';
         $this->race = [];
         $this->military_status = '';
         $this->work_status = '';
+        $this->hours_worked_per_week = '';
+        $this->is_seeking_employment = '';
+        $this->is_underemployed = '';
         $this->income_sources = [];
         $this->other_income_sources = [];
         $this->non_cash_benefits = [];
@@ -259,16 +275,25 @@ class ParticipantIntake extends Component
                 'telephone' => $this->telephone,
                 'email' => $this->email,
                 'education_level' => $this->education_level ?: null,
+                'currently_enrolled_in_education' => $this->currently_enrolled_in_education === '1' ? true : ($this->currently_enrolled_in_education === '0' ? false : null),
+                'education_enrollment_type' => $this->education_enrollment_type ?: null,
                 'disability_status' => $this->disability_status ?: null,
+                'disability_types' => $this->disability_types,
+                'assistance_needs' => $this->assistance_needs,
+                'has_chronic_health_conditions' => $this->has_chronic_health_conditions === '1' ? true : ($this->has_chronic_health_conditions === '0' ? false : null),
                 'health_insurance_status' => $this->health_insurance_status ?: null,
                 'health_insurance_sources' => $this->health_insurance_sources,
                 'ethnicity' => $this->ethnicity ?: null,
                 'race' => $this->race,
                 'military_status' => $this->military_status ?: null,
                 'work_status' => $this->work_status ?: null,
+                'hours_worked_per_week' => $this->hours_worked_per_week ?: null,
+                'is_seeking_employment' => $this->is_seeking_employment === '1' ? true : ($this->is_seeking_employment === '0' ? false : null),
+                'is_underemployed' => $this->is_underemployed === '1' ? true : ($this->is_underemployed === '0' ? false : null),
                 'income_sources' => $this->income_sources,
                 'other_income_sources' => $this->other_income_sources,
                 'non_cash_benefits' => $this->non_cash_benefits,
+                'intake_date' => Carbon::today(),
                 'notes' => $this->notes,
             ]);
 
