@@ -1,10 +1,19 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<title>{{ $title ?? config('app.name') }}</title>
+@php
+    $siteName = \App\Models\SiteSetting::get('site_name', config('app.name'));
+    $siteFavicon = \App\Models\SiteSetting::get('site_favicon');
+@endphp
 
-<link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<title>{{ $title ?? $siteName }}</title>
+
+@if($siteFavicon)
+    <link rel="icon" href="{{ Storage::url($siteFavicon) }}" sizes="any">
+@else
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+@endif
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
 <link rel="preconnect" href="https://fonts.bunny.net">
