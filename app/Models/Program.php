@@ -15,6 +15,7 @@ class Program extends Model
         'description',
         'program_manager_id',
         'active',
+        'housing_module_enabled',
         'start_date',
         'end_date',
         'notes'
@@ -22,6 +23,7 @@ class Program extends Model
 
     protected $casts = [
         'active' => 'boolean',
+        'housing_module_enabled' => 'boolean',
         'start_date' => 'date',
         'end_date' => 'date'
     ];
@@ -64,5 +66,15 @@ class Program extends Model
     public function getTotalEnrollmentsCount(): int
     {
         return $this->programEnrollments()->count();
+    }
+
+    public function housingJobs(): HasMany
+    {
+        return $this->hasMany(HousingJob::class);
+    }
+
+    public function hasHousingModule(): bool
+    {
+        return $this->housing_module_enabled;
     }
 }

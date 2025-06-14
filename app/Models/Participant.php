@@ -102,6 +102,16 @@ class Participant extends Model
         return $this->hasMany(ServiceEnrollment::class);
     }
 
+    public function properties(): HasMany
+    {
+        return $this->hasMany(Property::class);
+    }
+
+    public function housingJobs(): HasMany
+    {
+        return $this->hasMany(HousingJob::class);
+    }
+
     public function activeProgramEnrollments()
     {
         return $this->programEnrollments()->active()->with('program');

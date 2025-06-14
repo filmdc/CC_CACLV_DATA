@@ -4,11 +4,13 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\ReferenceData;
+use App\Models\ReferenceDataSet;
 
 class ReferenceDataSeeder extends Seeder
 {
     public function run(): void
     {
+        $versionCounter = 1;
         $referenceData = [
             'gender' => [
                 ['value' => 'Male', 'label' => 'Male', 'sort_order' => 1],
@@ -152,13 +154,26 @@ class ReferenceDataSeeder extends Seeder
         ];
 
         foreach ($referenceData as $category => $items) {
+            // Create or get the reference data set for this category
+            $dataSet = ReferenceDataSet::updateOrCreate(
+                ['name' => $category],
+                [
+                    'description' => 'Reference data for ' . ucwords(str_replace('_', ' ', $category)),
+                    'version' => 'v1.' . $versionCounter++,
+                    'is_active' => true,
+                    'is_draft' => false,
+                    'activated_at' => now()
+                ]
+            );
+
             foreach ($items as $item) {
                 ReferenceData::updateOrCreate(
                     ['category' => $category, 'value' => $item['value']],
                     [
                         'label' => $item['label'],
                         'sort_order' => $item['sort_order'],
-                        'active' => true
+                        'active' => true,
+                        'reference_data_set_id' => $dataSet->id
                     ]
                 );
             }

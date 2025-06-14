@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             InitialSetupSeeder::class,
             PovertyGuidelinesSeeder::class,
             ReferenceDataSeeder::class,
+            HousingModuleSeeder::class,
         ]);
     }
 }

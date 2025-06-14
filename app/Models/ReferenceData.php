@@ -93,7 +93,11 @@ class ReferenceData extends Model
             'disability_status' => 'Disability Status',
             'military_status' => 'Military Status',
             'work_status' => 'Work Status',
-            'health_insurance_status' => 'Health Insurance Status'
+            'health_insurance_status' => 'Health Insurance Status',
+            'property_type' => 'Property Type',
+            'housing_job_type' => 'Housing Job Type',
+            'contractor_service' => 'Contractor Service',
+            'contact_type' => 'Contact Type'
         ];
     }
 }

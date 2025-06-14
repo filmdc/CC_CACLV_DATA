@@ -27,10 +27,12 @@ class PovertyGuidelinesSeeder extends Seeder
         ];
 
         foreach ($monthlyData as $data) {
-            \App\Models\PovertyGuideline::create([
+            \App\Models\PovertyGuideline::updateOrCreate([
                 'year' => 2025,
                 'region' => '48_contiguous',
                 'family_size' => $data['family_size'],
+                'period' => 'monthly',
+            ], [
                 'poverty_50' => $data['poverty_50'],
                 'poverty_75' => $data['poverty_75'],
                 'poverty_100' => $data['poverty_100'],
@@ -42,15 +44,16 @@ class PovertyGuidelinesSeeder extends Seeder
                 'poverty_300' => $data['poverty_300'],
                 'poverty_400' => $data['poverty_400'],
                 'poverty_500' => $data['poverty_500'],
-                'period' => 'monthly',
             ]);
         }
 
         foreach ($annualData as $data) {
-            \App\Models\PovertyGuideline::create([
+            \App\Models\PovertyGuideline::updateOrCreate([
                 'year' => 2025,
                 'region' => '48_contiguous',
                 'family_size' => $data['family_size'],
+                'period' => 'annual',
+            ], [
                 'poverty_50' => $data['poverty_50'],
                 'poverty_75' => $data['poverty_75'],
                 'poverty_100' => $data['poverty_100'],
@@ -62,7 +65,6 @@ class PovertyGuidelinesSeeder extends Seeder
                 'poverty_300' => $data['poverty_300'],
                 'poverty_400' => $data['poverty_400'],
                 'poverty_500' => $data['poverty_500'],
-                'period' => 'annual',
             ]);
         }
     }

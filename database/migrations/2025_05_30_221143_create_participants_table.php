@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('participants', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('household_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('household_id');
             $table->boolean('is_head_of_household')->default(false);
             
             // Personal Information

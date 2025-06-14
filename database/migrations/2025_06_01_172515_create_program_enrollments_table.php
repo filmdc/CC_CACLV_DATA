@@ -30,8 +30,8 @@ return new class extends Migration
             $table->text('notes')->nullable();
             $table->timestamps();
             
-            // Ensure participant can only have one active enrollment per program
-            $table->unique(['participant_id', 'program_id', 'status'], 'unique_active_enrollment');
+            // Add index for performance
+            $table->index(['participant_id', 'program_id', 'status']);
         });
     }
 

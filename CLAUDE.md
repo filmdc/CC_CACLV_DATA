@@ -2,168 +2,291 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Project Overview
+
+**CAP TRACK** - A comprehensive data management platform for Community Action Partnership agencies. The system handles participant/household data, program services, and CSBG (Community Services Block Grant) reporting requirements.
+
 ## Development Commands
 
-### Quick Start
-- `composer install` - Install PHP dependencies
-- `npm install` - Install Node.js dependencies
-- `composer dev` - Start complete development environment (server, queue, logs, vite)
+### Initial Setup
+```bash
+composer install          # Install PHP dependencies
+npm install              # Install Node.js dependencies
+php artisan migrate      # Run database migrations
+php artisan db:seed      # Seed initial data (includes InitialSetupSeeder)
+```
+
+### Development Environment
+```bash
+composer dev             # Start full dev environment (server, queue, logs, vite)
+```
+This runs 4 concurrent processes with color-coded output:
+- **Server** (blue): Laravel development server
+- **Queue** (purple): Queue worker for background jobs
+- **Logs** (pink): Real-time log monitoring with Pail
+- **Vite** (orange): Asset compilation with HMR
 
 ### Testing
-- `composer test` - Run full test suite with config clearing
-- `php artisan test` - Run tests directly via Artisan
-- `php artisan test --filter TestName` - Run specific test class
-- `php artisan test tests/Feature/specific_test.php` - Run specific test file
-- Tests use Pest PHP framework with PHPUnit as the base
-- Test database is configured to use SQLite in-memory for speed
-
-### Development Server
-- `composer dev` - Start complete development environment (server, queue, logs, vite) using concurrently
-- `php artisan serve` - Start Laravel development server only
-- `npm run dev` - Start Vite development server for asset compilation
-- `npm run build` - Build production assets
+```bash
+composer test                              # Run full test suite with config clearing
+php artisan test                          # Run all tests
+php artisan test --filter TestClassName   # Run specific test class
+php artisan test tests/Feature/file.php   # Run specific test file
+```
+- Uses **Pest PHP** testing framework (extends PHPUnit)
+- Tests run against in-memory SQLite database
+- RefreshDatabase trait is commented out in `tests/Pest.php` (uncomment if needed)
 
 ### Code Quality
-- `php artisan pint` - Format PHP code using Laravel Pint (available via composer require-dev)
-- `laravel/pail` included for real-time log monitoring in dev environment
+```bash
+php artisan pint         # Format PHP code using Laravel Pint
+```
 
-### Database
-- `php artisan migrate` - Run database migrations
-- `php artisan migrate:fresh` - Drop all tables and re-run migrations
-- `php artisan db:seed` - Run database seeders (PovertyGuidelines, ReferenceData)
-- Uses SQLite database located at `database/database.sqlite`
-- Database auto-created on project setup via composer scripts
+### Database Management
+```bash
+php artisan migrate              # Run pending migrations
+php artisan migrate:fresh        # Drop all tables and re-migrate
+php artisan migrate:fresh --seed # Fresh migration with seeding
+php artisan db:seed             # Run all seeders
+php artisan db:seed --class=InitialSetupSeeder  # Run specific seeder
+```
 
-## Architecture Overview
+### Custom Commands
+```bash
+php artisan user:assign-role {email} {role}    # Assign role to user
+php artisan setup:admin-permissions             # Setup admin permissions
+```
 
-### Framework Stack
-- **Laravel 11** with **Livewire** as the primary frontend framework
-- **Livewire Volt** for simplified component creation
-- **TailwindCSS v4** for styling (NOT Flux - uses standard HTML/Tailwind patterns)
-- **Vite** for asset bundling
+## Architecture & Patterns
 
-### Key Architectural Patterns
+### Tech Stack
+- **Laravel 12** (PHP 8.2+)
+- **Livewire 3** for reactive UI components
+- **Livewire Volt** for simplified component syntax
+- **TailwindCSS v4** with Vite plugin
+- **MySQL** as default database
+- **Pest PHP** for testing
 
-#### Livewire Volt Integration
-- Volt components are mounted in two locations via `VoltServiceProvider`:
-  - `resources/views/livewire/` - Standard Livewire components
-  - `resources/views/pages/` - Page-level Volt components
-- Routes use `Volt::route()` for direct component routing (see `routes/web.php`)
+### Key Architectural Decisions
 
-#### Authentication Structure
-- Complete authentication system using Livewire components
-- Email verification, password reset, and registration flows
-- Protected routes use `auth` and `verified` middleware
-- Settings area with profile, password, and appearance management
+#### 1. Database-First Design
+- MySQL is the default connection
+- Database name: `CC_CACLV_DATA`
+- Sessions, cache, and queue all use database drivers
+- Foreign key constraints enabled by default
 
-#### Testing Setup
-- Pest PHP as testing framework with Laravel plugin
-- Feature tests for authentication flows and settings
-- Test configuration automatically uses in-memory SQLite
-- RefreshDatabase trait available but commented out in `tests/Pest.php`
+#### 2. Livewire-Centric Architecture
+- Controllers are minimal - business logic lives in Livewire components
+- All management interfaces are full-page Livewire components
+- Standard component location: `app/Livewire/` with views in `resources/views/livewire/`
+- **IMPORTANT**: Although Flux is installed, DO NOT use Flux components - use standard HTML/Tailwind
 
-### Project Structure Notes
-- Controllers are minimal - most logic in Livewire components
-- Views follow Livewire/Volt patterns with Blade templates
-- Standard HTML/Tailwind patterns for UI (NO Flux components)
-- TailwindCSS v4 with Vite plugin for styling
-- Dark mode support implemented across all interfaces
+#### 3. Role-Based Access Control (RBAC)
+- Complete permission system with roles and granular permissions
+- Custom middleware: `CheckPermission` and `CheckRole`
+- `WithPermissionChecks` trait provides helper methods:
+  ```php
+  $this->can('participants.view')        // Check single permission
+  $this->canAny(['perm1', 'perm2'])    // Check if has any permission
+  $this->canAll(['perm1', 'perm2'])    // Check if has all permissions
+  $this->hasRole('admin')               // Check role
+  $this->isAdmin()                      // Check if admin
+  $this->authorizeAction('permission')  // Abort with 403 if unauthorized
+  ```
 
-### Development Workflow
-- Use `composer dev` for full development stack
-- SQLite database auto-created if missing
-- Vite handles hot module replacement for CSS/JS
-- Queue processing and logging included in dev command
+#### 4. Routing Patterns
+- Management interfaces: Direct Livewire routing
+  ```php
+  Route::get('/path', ComponentClass::class)->middleware(['auth']);
+  ```
+- Settings pages: Volt routing
+  ```php
+  Volt::route('/settings/profile', 'settings.profile');
+  ```
 
-### Livewire Component Patterns
-- All management interfaces use full-page Livewire components
-- Components located in `app/Livewire/` with corresponding views in `resources/views/livewire/`
-- Standard CRUD operations with real-time validation
-- Modal dialogs for create/edit operations
-- Wire:model for form binding with live validation
-- Public properties for component state management
-- Protected/private methods for internal logic
+### Livewire Component Standards
 
-### Model Relationships
-- Program hasMany Services, WorkPlans, ProgramEnrollments
-- Service belongsTo Program, hasMany ServiceEnrollments
-- Participant hasMany ProgramEnrollments, ServiceEnrollments, belongsTo Household
-- Household hasMany Participants with automatic member count tracking
-- WorkPlan hasMany WorkPlanGoals, belongsTo Program
-- User belongsToMany Roles through pivot table
-- ReferenceData grouped by ReferenceDataSet for organized management
+All management components follow this pattern:
 
-## Project Context
+```php
+class ComponentManagement extends Component
+{
+    use WithPagination;
+    
+    // UI State
+    public $showCreateForm = false;
+    public $showEditForm = false;
+    public $search = '';
+    
+    // Form fields as public properties
+    public $name;
+    public $description;
+    
+    // Standard methods
+    public function showCreateForm() { }
+    public function showEditForm($id) { }
+    public function save() { }
+    public function update() { }
+    public function delete($id) { }
+    public function resetForm() { }
+    public function updatedSearch() { } // Real-time search
+}
+```
 
-This is **CAP TRACK** - a comprehensive data management platform for Community Action Partnership agencies. The system handles participant/household data, program services, and CSBG reporting requirements.
+### UI/UX Standards
 
-### Single Test Execution
-- `php artisan test --filter TestName` - Run specific test class
-- `php artisan test tests/Feature/specific_test.php` - Run specific test file
+#### Container Structure
+```blade
+<div class="max-w-7xl mx-auto p-6">
+    <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl p-6">
+        <!-- Content -->
+    </div>
+</div>
+```
 
-## CAP TRACK Database Schema
+#### Dark Mode Support
+- Background: `bg-white dark:bg-zinc-800`
+- Text: `text-gray-900 dark:text-white`
+- Borders: `border-gray-300 dark:border-zinc-600`
+- Secondary text: `text-gray-600 dark:text-gray-300`
 
-### Core Models Implemented
-- **Program** - Programs with services, contracts, and work plans
-- **Service** - Program-specific services with start/end dates
-- **Contract** - Funding contracts with documents and terms
-- **Participant** - Individual records with CSBG Module 4 Section C compliance
-- **Household** - Family units with income tracking and poverty level calculations
-- **WorkPlan** - Annual work plans per program
-- **WorkPlanGoal** - Goals mapped to services with target vs actual tracking
-- **PovertyGuideline** - Federal poverty guidelines for 2025 (monthly/annual)
-- **ProgramEnrollment** - Tracks participant enrollment in programs with dates
-- **ServiceEnrollment** - Records service delivery to participants with completion tracking
+#### Form Elements
+```blade
+<input type="text" 
+       wire:model="fieldName"
+       class="w-full rounded-md border-gray-300 dark:border-zinc-600 
+              dark:bg-zinc-700 dark:text-white focus:border-indigo-500 
+              focus:ring-indigo-500">
+```
 
-### Role-Based Access Control
-- **Role** - User roles (admin, program manager, staff, etc.)
-- **Permission** - Granular permissions by category
-- **UserRole** - Many-to-many user role assignments
-- **UserProgram** - Program-specific access control
+## Database Schema
+
+### Core Models & Relationships
+
+#### Participant/Household System
+- `Participant` → belongsTo → `Household`
+- `Household` → hasMany → `Participants`
+- Automatic household member count tracking
+- CSBG Module 4 Section C compliant fields
+
+#### Program/Service Structure
+- `Program` → hasMany → `Services`, `WorkPlans`, `ProgramEnrollments`
+- `Service` → belongsTo → `Program`
+- `WorkPlan` → hasMany → `WorkPlanGoals`
+
+#### Enrollment Tracking
+- `ProgramEnrollment` → Links `Participant` ↔ `Program`
+- `ServiceEnrollment` → Links `Participant` ↔ `Service`
+
+#### Access Control
+- `User` → belongsToMany → `Role` (via pivot)
+- `Role` → belongsToMany → `Permission` (via pivot)
+- Program-specific access via `UserProgram`
+
+#### Housing Module (Branch: housing-rehab-job-tracking)
+**Status: Database Layer Complete, UI Layer Not Started**
+
+Models & Relationships:
+- `Property` → belongsTo → `Participant`, `Household`, `Program`
+- `Contractor` → hasMany → `HousingJobs`, `ContractorDocuments`
+- `HousingJob` → belongsTo → `Property`, `Contractor`, `Participant`, `Household`
+- `HousingJob` → hasMany → `JobContactLedgers`, `JobDocumentChecklists`, `ServiceEnrollments`
+- `Property` → hasMany → `PropertyNotes`, `PropertyDocuments`, `HousingJobs`
+
+Housing Module Features:
+- Program-level activation flag (`housing_module_enabled`)
+- Property management with types (rental, owner-occupied, facade)
+- Contractor tracking with licensing and insurance
+- Job tracking with auto-generated numbers (format: YYYYMMDD-XXXX)
+- Contact ledger for outreach tracking
+- Document checklist for compliance
+- Integration with existing services and work plan goals
+
+**TODO: Add HousingModuleSeeder to DatabaseSeeder before running migrations**
 
 ### Key Features
-- Automatic household code generation (7-digit alphanumeric)
-- CSBG compliance with all required demographic fields
-- Poverty level calculations using 2025 federal guidelines
-- JSON fields for complex data (income sources, benefits, documents)
-- Full Eloquent relationships between all models
+- 7-digit alphanumeric household codes (auto-generated)
+- 2025 Federal poverty guidelines calculations
+- JSON fields for complex data (income sources, benefits)
+- Comprehensive audit fields (created_by, updated_by)
+- Housing job numbers (YYYYMMDD-XXXX format)
 
-## Management Interface Architecture
+## Development Workflow
 
-### Complete Interface Suite
-All core models have dedicated management interfaces accessible via sidebar navigation:
-- **Participant Management** (`/participant-management`) - CRUD operations with CSBG demographic fields
-- **Household Management** (`/household-management`) - Family composition and member management
-- **Program Management** (`/program-management`) - Program lifecycle and manager assignment
-- **Service Management** (`/service-management`) - Service CRUD with program association
-- **Contract Management** (`/contract-management`) - Funding contract administration
-- **Work Plan Management** (`/work-plan-management`) - Annual work plan creation
-- **Work Plan Goal Management** (`/work-plan-goal-management`) - Goal tracking with progress visualization
-- **Role & Permission Management** (`/role-permission-management`) - RBAC system with tabbed interface
-- **Poverty Guidelines Management** (`/poverty-guideline-management`) - Federal poverty level data
-- **Reference Data Management** (`/reference-data-management`) - Configurable dropdown options
-- **Reference Data Set Management** (`/reference-data-set-management`) - Organized data collections
-- **Enrollment Management** (`/enrollment-management`) - Program and service enrollment tracking
-- **Participant Intake** (`/participant-intake`) - Streamlined participant registration workflow
+### Starting New Feature
+1. Create/update database migration if needed
+2. Create Livewire component: `php artisan make:livewire ComponentName`
+3. Add route in `routes/web.php`
+4. Follow existing component patterns (use `ServiceManagement` as reference)
+5. Add to sidebar navigation if applicable
+6. Write Pest tests for new functionality
 
-### UI/UX Patterns
-- **Standard HTML/Tailwind** - NO Flux components, uses consistent HTML patterns
-- **Dark Mode Support** - All interfaces support `dark:` Tailwind variants
-- **Responsive Design** - Mobile-friendly with proper breakpoints
-- **Form Structure** - Consistent validation, error handling, and success messaging
-- **Table Patterns** - Standardized data tables with search, pagination, and actions
-- **Navigation Integration** - Organized sidebar with logical groupings
+### Testing Approach
+- Feature tests for user flows
+- Unit tests for business logic
+- Use factories for test data generation
+- Test files mirror source structure
 
-### Interface Standards
-- Use `max-w-7xl mx-auto p-6` wrapper for all management interfaces
-- Include colored headers with descriptive subtitles
-- Implement proper dark mode variants for all elements:
-  - `bg-white dark:bg-zinc-800` for main containers
-  - `text-gray-900 dark:text-white` for primary text
-  - `border-gray-300 dark:border-zinc-600` for form elements
-- Follow existing service-management.blade.php as the template pattern
+### Common Patterns
 
-### System Prompt - Identity
--You are an expert AI Coder, Laravel programmer, and system engineer working on the "CAP TRACK" system built with Laravel 11, Livewire, and Volt. Your expertise includes deep code analysis and producing production-ready code. 
+#### Modal Forms
+```blade
+@if($showCreateForm)
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
+        <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-md w-full">
+            <!-- Form content -->
+        </div>
+    </div>
+@endif
+```
 
+#### Data Tables
+```blade
+<table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700">
+    <!-- Standard table structure with dark mode support -->
+</table>
+```
 
+#### Success Messages
+```blade
+@if (session()->has('message'))
+    <div class="rounded-md bg-green-50 dark:bg-green-900 p-4 mb-4">
+        <!-- Message content -->
+    </div>
+@endif
+```
+
+## Important Notes
+
+1. **NO Flux Components**: Despite Flux being installed, use standard HTML/Tailwind patterns
+2. **MySQL by Default**: Database connection configured in `.env` file
+3. **Seeder Data**: InitialSetupSeeder creates admin users and sample data
+4. **Permission Naming**: Follow pattern `resource.action` (e.g., `participants.create`)
+5. **Dark Mode First**: All new UI must include dark mode variants
+6. **CSBG Compliance**: Participant data must maintain CSBG field requirements
+7. **Housing Module**: Currently on `housing-rehab-job-tracking` branch with database layer complete but UI not implemented
+
+## Current Implementation Status
+
+### Apache Configuration
+- DocumentRoot: `/var/www/CC_CAP_TRACK` (not using /public subdirectory)
+- `.htaccess` and `index.php` moved to root directory
+- MySQL database: `CC_CACLV_DATA`
+
+### Pending Tasks
+1. **Housing Module UI Implementation**:
+   - PropertyManagement Livewire component (empty stub exists)
+   - ContractorManagement component (not created)
+   - HousingJobManagement component (not created)
+   - Document upload functionality
+   - Job workflow with phase management
+   - Routes and navigation items
+
+2. **Integration Tasks**:
+   - Add `HousingModuleSeeder::class` to DatabaseSeeder
+   - Add housing navigation items to sidebar (conditional on `housing_module_enabled`)
+   - Implement permission checks in housing components
+
+3. **Testing**:
+   - No tests written for housing module yet
+   - Need feature tests for all housing components

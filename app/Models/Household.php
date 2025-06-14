@@ -63,4 +63,14 @@ class Household extends Model
         
         return $code;
     }
+
+    public function properties(): HasMany
+    {
+        return $this->hasMany(Property::class);
+    }
+
+    public function housingJobs(): HasMany
+    {
+        return $this->hasMany(HousingJob::class);
+    }
 }
