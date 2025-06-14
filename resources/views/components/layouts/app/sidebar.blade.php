@@ -30,25 +30,39 @@
                 </flux:navlist.group>
                 @endif
 
-                @if(auth()->user()->hasAnyPermission(['programs.view', 'services.view', 'enrollments.view', 'contracts.view', 'work_plans.view', 'work_plan_goals.view']))
+                @if(auth()->user()->hasAnyPermission(['programs.view', 'services.view', 'enrollments.view', 'contracts.view', 'work_plans.view', 'work_plan_goals.view']) || auth()->user()->isAdmin())
                 <flux:navlist.group :heading="__('Programs')" class="grid">
-                    @if(auth()->user()->hasPermission('programs.view'))
+                    @if(auth()->user()->hasPermission('programs.view') || auth()->user()->isAdmin())
                         <flux:navlist.item icon="folder" :href="route('program.management')" :current="request()->routeIs('program.management')" wire:navigate>{{ __('Program Management') }}</flux:navlist.item>
                     @endif
-                    @if(auth()->user()->hasPermission('services.view'))
+                    @if(auth()->user()->hasPermission('services.view') || auth()->user()->isAdmin())
                         <flux:navlist.item icon="briefcase" :href="route('service.management')" :current="request()->routeIs('service.management')" wire:navigate>{{ __('Service Management') }}</flux:navlist.item>
                     @endif
-                    @if(auth()->user()->hasPermission('enrollments.view'))
+                    @if(auth()->user()->hasPermission('enrollments.view') || auth()->user()->isAdmin())
                         <flux:navlist.item icon="user-group" :href="route('enrollment.management')" :current="request()->routeIs('enrollment.management')" wire:navigate>{{ __('Enrollment Management') }}</flux:navlist.item>
                     @endif
-                    @if(auth()->user()->hasPermission('contracts.view'))
+                    @if(auth()->user()->hasPermission('contracts.view') || auth()->user()->isAdmin())
                         <flux:navlist.item icon="document-text" :href="route('contract.management')" :current="request()->routeIs('contract.management')" wire:navigate>{{ __('Contract Management') }}</flux:navlist.item>
                     @endif
-                    @if(auth()->user()->hasPermission('work_plans.view'))
+                    @if(auth()->user()->hasPermission('work_plans.view') || auth()->user()->isAdmin())
                         <flux:navlist.item icon="calendar" :href="route('work-plan.management')" :current="request()->routeIs('work-plan.management')" wire:navigate>{{ __('Work Plans') }}</flux:navlist.item>
                     @endif
-                    @if(auth()->user()->hasPermission('work_plan_goals.view'))
+                    @if(auth()->user()->hasPermission('work_plan_goals.view') || auth()->user()->isAdmin())
                         <flux:navlist.item icon="flag" :href="route('work-plan-goal.management')" :current="request()->routeIs('work-plan-goal.management')" wire:navigate>{{ __('Work Plan Goals') }}</flux:navlist.item>
+                    @endif
+                </flux:navlist.group>
+                @endif
+
+                @if(auth()->user()->hasAnyPermission(['properties.view', 'contractors.view', 'housing_jobs.view']))
+                <flux:navlist.group :heading="__('Housing Module')" class="grid">
+                    @if(auth()->user()->hasPermission('properties.view'))
+                        <flux:navlist.item icon="home-modern" :href="route('property.management')" :current="request()->routeIs('property.management')" wire:navigate>{{ __('Property Management') }}</flux:navlist.item>
+                    @endif
+                    @if(auth()->user()->hasPermission('contractors.view'))
+                        <flux:navlist.item icon="wrench-screwdriver" :href="route('contractor.management')" :current="request()->routeIs('contractor.management')" wire:navigate>{{ __('Contractor Management') }}</flux:navlist.item>
+                    @endif
+                    @if(auth()->user()->hasPermission('housing_jobs.view'))
+                        <flux:navlist.item icon="clipboard-document-list" :href="route('housing-job.management')" :current="request()->routeIs('housing-job.management')" wire:navigate>{{ __('Housing Jobs') }}</flux:navlist.item>
                     @endif
                 </flux:navlist.group>
                 @endif
@@ -61,13 +75,13 @@
                     @if(auth()->user()->hasPermission('roles.view') || auth()->user()->isAdmin())
                         <flux:navlist.item icon="shield-check" :href="route('role-permission.management')" :current="request()->routeIs('role-permission.management')" wire:navigate>{{ __('Roles & Permissions') }}</flux:navlist.item>
                     @endif
-                    @if(auth()->user()->hasPermission('poverty_guidelines.view'))
+                    @if(auth()->user()->hasPermission('poverty_guidelines.view') || auth()->user()->isAdmin())
                         <flux:navlist.item icon="currency-dollar" :href="route('poverty-guideline.management')" :current="request()->routeIs('poverty-guideline.management')" wire:navigate>{{ __('Poverty Guidelines') }}</flux:navlist.item>
                     @endif
-                    @if(auth()->user()->hasPermission('reference_data.view'))
+                    @if(auth()->user()->hasPermission('reference_data.view') || auth()->user()->isAdmin())
                         <flux:navlist.item icon="table-cells" :href="route('reference-data.management')" :current="request()->routeIs('reference-data.management')" wire:navigate>{{ __('Reference Data') }}</flux:navlist.item>
                     @endif
-                    @if(auth()->user()->hasPermission('reference_data_sets.view'))
+                    @if(auth()->user()->hasPermission('reference_data_sets.view') || auth()->user()->isAdmin())
                         <flux:navlist.item icon="folder-git-2" :href="route('reference-data-set.management')" :current="request()->routeIs('reference-data-set.management')" wire:navigate>{{ __('Reference Data Sets') }}</flux:navlist.item>
                     @endif
                     @if(auth()->user()->hasPermission('admin.access') || auth()->user()->isAdmin())
@@ -188,5 +202,6 @@
         {{ $slot }}
 
         @fluxScripts
+        @livewireScripts
     </body>
 </html>

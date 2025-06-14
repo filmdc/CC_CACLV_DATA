@@ -4,12 +4,13 @@ namespace App\Livewire;
 
 use App\Models\WorkPlan;
 use App\Models\Program;
+use App\Traits\WithPermissionChecks;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class WorkPlanManagement extends Component
 {
-    use WithPagination;
+    use WithPagination, WithPermissionChecks;
 
     public $search = '';
     public $selectedWorkPlan = null;
@@ -23,6 +24,13 @@ class WorkPlanManagement extends Component
     public $description = '';
     public $active = true;
 
+    public function mount()
+    {
+        if (!$this->can('work_plans.view') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to access this page.');
+        }
+    }
+
     public function updatedSearch()
     {
         $this->resetPage();
@@ -30,6 +38,10 @@ class WorkPlanManagement extends Component
 
     public function showCreateWorkPlan()
     {
+        if (!$this->can('work_plans.create') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to create work plans.');
+        }
+        
         $this->showCreateForm = true;
         $this->showEditForm = false;
         $this->selectedWorkPlan = null;
@@ -38,6 +50,10 @@ class WorkPlanManagement extends Component
 
     public function showEditWorkPlan($workPlanId)
     {
+        if (!$this->can('work_plans.edit') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to edit work plans.');
+        }
+        
         $this->selectedWorkPlan = WorkPlan::with(['program', 'goals'])->find($workPlanId);
         if ($this->selectedWorkPlan) {
             $this->showEditForm = true;
@@ -68,6 +84,10 @@ class WorkPlanManagement extends Component
 
     public function createWorkPlan()
     {
+        if (!$this->can('work_plans.create') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to create work plans.');
+        }
+        
         $this->validate([
             'name' => 'required|string|max:255',
             'program_id' => 'required|exists:programs,id',
@@ -96,6 +116,10 @@ class WorkPlanManagement extends Component
 
     public function updateWorkPlan()
     {
+        if (!$this->can('work_plans.edit') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to edit work plans.');
+        }
+        
         $this->validate([
             'name' => 'required|string|max:255',
             'program_id' => 'required|exists:programs,id',
@@ -125,6 +149,10 @@ class WorkPlanManagement extends Component
 
     public function toggleWorkPlanStatus($workPlanId)
     {
+        if (!$this->can('work_plans.edit') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to edit work plans.');
+        }
+        
         try {
             $workPlan = WorkPlan::find($workPlanId);
             if ($workPlan) {
@@ -138,6 +166,10 @@ class WorkPlanManagement extends Component
 
     public function deleteWorkPlan($workPlanId)
     {
+        if (!$this->can('work_plans.delete') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to delete work plans.');
+        }
+        
         try {
             $workPlan = WorkPlan::find($workPlanId);
             if ($workPlan) {
@@ -156,6 +188,10 @@ class WorkPlanManagement extends Component
 
     public function syncWorkPlanGoals($workPlanId)
     {
+        if (!$this->can('work_plans.edit') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to sync work plan goals.');
+        }
+        
         try {
             $workPlan = WorkPlan::with('goals.service')->find($workPlanId);
             if (!$workPlan) {

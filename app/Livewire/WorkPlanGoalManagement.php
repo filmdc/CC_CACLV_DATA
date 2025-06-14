@@ -5,12 +5,13 @@ namespace App\Livewire;
 use App\Models\WorkPlanGoal;
 use App\Models\WorkPlan;
 use App\Models\Service;
+use App\Traits\WithPermissionChecks;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class WorkPlanGoalManagement extends Component
 {
-    use WithPagination;
+    use WithPagination, WithPermissionChecks;
 
     public $search = '';
     public $selectedGoal = null;
@@ -25,6 +26,13 @@ class WorkPlanGoalManagement extends Component
     public $target_number = '';
     public $actual_number = '';
 
+    public function mount()
+    {
+        if (!$this->can('work_plan_goals.view') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to access this page.');
+        }
+    }
+
     public function updatedSearch()
     {
         $this->resetPage();
@@ -32,6 +40,10 @@ class WorkPlanGoalManagement extends Component
 
     public function showCreateGoal()
     {
+        if (!$this->can('work_plan_goals.create') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to create work plan goals.');
+        }
+        
         $this->showCreateForm = true;
         $this->showEditForm = false;
         $this->selectedGoal = null;
@@ -40,6 +52,10 @@ class WorkPlanGoalManagement extends Component
 
     public function showEditGoal($goalId)
     {
+        if (!$this->can('work_plan_goals.edit') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to edit work plan goals.');
+        }
+        
         $this->selectedGoal = WorkPlanGoal::with(['workPlan', 'service'])->find($goalId);
         if ($this->selectedGoal) {
             $this->showEditForm = true;
@@ -72,6 +88,10 @@ class WorkPlanGoalManagement extends Component
 
     public function createGoal()
     {
+        if (!$this->can('work_plan_goals.create') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to create work plan goals.');
+        }
+        
         $this->validate([
             'work_plan_id' => 'required|exists:work_plans,id',
             'service_id' => 'nullable|exists:services,id',
@@ -102,6 +122,10 @@ class WorkPlanGoalManagement extends Component
 
     public function updateGoal()
     {
+        if (!$this->can('work_plan_goals.edit') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to edit work plan goals.');
+        }
+        
         $this->validate([
             'work_plan_id' => 'required|exists:work_plans,id',
             'service_id' => 'nullable|exists:services,id',
@@ -133,6 +157,10 @@ class WorkPlanGoalManagement extends Component
 
     public function deleteGoal($goalId)
     {
+        if (!$this->can('work_plan_goals.delete') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to delete work plan goals.');
+        }
+        
         try {
             $goal = WorkPlanGoal::find($goalId);
             if ($goal) {
@@ -146,6 +174,10 @@ class WorkPlanGoalManagement extends Component
 
     public function syncGoalWithServiceData($goalId)
     {
+        if (!$this->can('work_plan_goals.edit') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to sync work plan goals.');
+        }
+        
         try {
             $goal = WorkPlanGoal::find($goalId);
             if ($goal && $goal->updateActualFromServiceData()) {
@@ -160,6 +192,10 @@ class WorkPlanGoalManagement extends Component
 
     public function syncAllGoalsWithServiceData()
     {
+        if (!$this->can('work_plan_goals.edit') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to sync work plan goals.');
+        }
+        
         try {
             $goals = WorkPlanGoal::with('service')->get();
             $syncedCount = 0;

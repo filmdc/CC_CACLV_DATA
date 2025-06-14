@@ -3,12 +3,13 @@
 namespace App\Livewire;
 
 use App\Models\PovertyGuideline;
+use App\Traits\WithPermissionChecks;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class PovertyGuidelineManagement extends Component
 {
-    use WithPagination;
+    use WithPagination, WithPermissionChecks;
 
     public $selectedYear = '';
     public $selectedRegion = '48_contiguous';
@@ -36,6 +37,10 @@ class PovertyGuidelineManagement extends Component
 
     public function mount()
     {
+        if (!$this->can('poverty_guidelines.view') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to access this page.');
+        }
+        
         $this->selectedYear = date('Y');
         $this->year = date('Y');
     }
@@ -57,6 +62,10 @@ class PovertyGuidelineManagement extends Component
 
     public function showCreateGuideline()
     {
+        if (!$this->can('poverty_guidelines.create') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to create poverty guidelines.');
+        }
+        
         $this->showCreateForm = true;
         $this->showEditForm = false;
         $this->selectedGuideline = null;
@@ -65,6 +74,10 @@ class PovertyGuidelineManagement extends Component
 
     public function showEditGuideline($guidelineId)
     {
+        if (!$this->can('poverty_guidelines.edit') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to edit poverty guidelines.');
+        }
+        
         $this->selectedGuideline = PovertyGuideline::find($guidelineId);
         if ($this->selectedGuideline) {
             $this->showEditForm = true;
@@ -115,6 +128,10 @@ class PovertyGuidelineManagement extends Component
 
     public function createGuideline()
     {
+        if (!$this->can('poverty_guidelines.create') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to create poverty guidelines.');
+        }
+        
         $this->validate([
             'year' => 'required|integer|min:2020|max:2030',
             'region' => 'required|string',
@@ -165,6 +182,10 @@ class PovertyGuidelineManagement extends Component
 
     public function updateGuideline()
     {
+        if (!$this->can('poverty_guidelines.edit') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to edit poverty guidelines.');
+        }
+        
         $this->validate([
             'year' => 'required|integer|min:2020|max:2030',
             'region' => 'required|string',
@@ -204,6 +225,10 @@ class PovertyGuidelineManagement extends Component
 
     public function deleteGuideline($guidelineId)
     {
+        if (!$this->can('poverty_guidelines.delete') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to delete poverty guidelines.');
+        }
+        
         try {
             $guideline = PovertyGuideline::find($guidelineId);
             if ($guideline) {

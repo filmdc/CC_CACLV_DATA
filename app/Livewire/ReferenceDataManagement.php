@@ -4,12 +4,13 @@ namespace App\Livewire;
 
 use App\Models\ReferenceData;
 use App\Models\ReferenceDataSet;
+use App\Traits\WithPermissionChecks;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class ReferenceDataManagement extends Component
 {
-    use WithPagination;
+    use WithPagination, WithPermissionChecks;
 
     public $search = '';
     public $selectedCategory = '';
@@ -28,6 +29,10 @@ class ReferenceDataManagement extends Component
 
     public function mount()
     {
+        if (!$this->can('reference_data.view') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to access this page.');
+        }
+        
         // Default to active data set
         $activeSet = ReferenceDataSet::getActive();
         $this->selectedDataSetId = $activeSet?->id;
@@ -51,6 +56,10 @@ class ReferenceDataManagement extends Component
 
     public function showCreateItem()
     {
+        if (!$this->can('reference_data.create') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to create reference data.');
+        }
+        
         $this->showCreateForm = true;
         $this->showEditForm = false;
         $this->selectedItem = null;
@@ -63,6 +72,10 @@ class ReferenceDataManagement extends Component
 
     public function showEditItem($itemId)
     {
+        if (!$this->can('reference_data.edit') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to edit reference data.');
+        }
+        
         $this->selectedItem = ReferenceData::find($itemId);
         if ($this->selectedItem) {
             $this->showEditForm = true;
@@ -95,6 +108,10 @@ class ReferenceDataManagement extends Component
 
     public function createItem()
     {
+        if (!$this->can('reference_data.create') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to create reference data.');
+        }
+        
         if (!$this->selectedDataSetId) {
             session()->flash('error', 'Please select a data set first.');
             return;
@@ -136,6 +153,10 @@ class ReferenceDataManagement extends Component
 
     public function updateItem()
     {
+        if (!$this->can('reference_data.edit') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to edit reference data.');
+        }
+        
         if (!$this->selectedItem || !$this->selectedItem->referenceDataSet->is_draft) {
             session()->flash('error', 'Can only edit items in draft data sets.');
             return;
@@ -171,6 +192,10 @@ class ReferenceDataManagement extends Component
 
     public function toggleStatus($itemId)
     {
+        if (!$this->can('reference_data.edit') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to edit reference data.');
+        }
+        
         try {
             $item = ReferenceData::find($itemId);
             if ($item) {
@@ -184,6 +209,10 @@ class ReferenceDataManagement extends Component
 
     public function deleteItem($itemId)
     {
+        if (!$this->can('reference_data.delete') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to delete reference data.');
+        }
+        
         try {
             $item = ReferenceData::find($itemId);
             if ($item) {
@@ -197,6 +226,10 @@ class ReferenceDataManagement extends Component
 
     public function createEditableVersionOfCurrentSet()
     {
+        if (!$this->can('reference_data.create') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to create reference data.');
+        }
+        
         if (!$this->selectedDataSetId) {
             session()->flash('error', 'No data set selected.');
             return;
