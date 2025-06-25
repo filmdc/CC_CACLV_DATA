@@ -22,6 +22,13 @@ class ParticipantManagement extends Component
     {
         // Check if user has permission to view participants
         $this->authorizeAction('participants.view', 'You do not have permission to view participants.');
+        
+        // Check if we were redirected here to edit a specific participant
+        if (session()->has('selectedParticipant')) {
+            $participantId = session()->get('selectedParticipant');
+            session()->forget('selectedParticipant');
+            $this->showEditParticipant($participantId);
+        }
     }
 
     public $search = '';

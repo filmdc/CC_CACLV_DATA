@@ -37,7 +37,7 @@ class Dashboard extends Component
 
     public function viewParticipant($participantId)
     {
-        return redirect()->route('participant.management', ['participant_id' => $participantId]);
+        return redirect()->route('participant.show', ['id' => $participantId]);
     }
 
     public function viewWorkPlan($workPlanId)
