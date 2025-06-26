@@ -59,8 +59,19 @@ Route::middleware(['auth'])->group(function () {
         }
         
         try {
+            // Debug: Check if file exists and get size
+            if (!Storage::disk('local')->exists($downloadData['file_path'])) {
+                Log::error('Download file not found', ['path' => $downloadData['file_path']]);
+                abort(404, 'File not found');
+            }
+            
+            $fileSize = Storage::disk('local')->size($downloadData['file_path']);
+            Log::info('Download file info', ['path' => $downloadData['file_path'], 'size' => $fileSize]);
+            
             // Get file content
             $content = Storage::disk('local')->get($downloadData['file_path']);
+            $contentLength = strlen($content);
+            Log::info('Download content retrieved', ['size' => $contentLength]);
             
             // Clean up
             Cache::forget('download_' . $token);
@@ -72,6 +83,7 @@ Route::middleware(['auth'])->group(function () {
                 ->header('Cache-Control', 'no-cache, must-revalidate');
                 
         } catch (\Exception $e) {
+            Log::error('Download failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             abort(500, 'Download failed: ' . $e->getMessage());
         }
     })->name('secure-download')->middleware(['auth']);
