@@ -1,0 +1,572 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Participant;
+use App\Models\Household;
+use League\Csv\Reader;
+use League\Csv\Statement;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
+
+class ParticipantImportService
+{
+    protected array $requiredHeaders = [
+        'household_code',
+        'participant_type',
+        'first_name',
+        'last_name',
+        'date_of_birth',
+        'gender'
+    ];
+
+    protected array $householdFields = [
+        'household_code',
+        'household_type',
+        'household_size',
+        'housing_status',
+        'monthly_income',
+        'annual_income',
+        'hhs_poverty_percentage',
+        'street_address',
+        'city',
+        'state',
+        'zip_code',
+        'household_notes'
+    ];
+
+    protected array $validEnumValues = [
+        'household_type' => [
+            'Single Person',
+            'Two Adults NO Children',
+            'Single Parent Female',
+            'Single Parent Male',
+            'Two Parent Household',
+            'Non-related Adults with Children',
+            'Multigenerational Household',
+            'Other',
+            'Unknown/not reported'
+        ],
+        'housing_status' => [
+            'Own',
+            'Rent',
+            'Other permanent housing',
+            'Homeless',
+            'Other',
+            'Unknown/not reported'
+        ],
+        'gender' => [
+            'Male',
+            'Female',
+            'Non-binary',
+            'Other',
+            'Prefer not to say'
+        ],
+        'education_level' => [
+            'Less than high school',
+            'High school diploma/GED',
+            'Some college',
+            'Associate degree',
+            'Bachelor degree',
+            'Graduate degree',
+            'Unknown/not reported'
+        ],
+        'disability_status' => [
+            'Yes',
+            'No',
+            'Unknown/not reported'
+        ],
+        'health_insurance_status' => [
+            'Yes',
+            'No',
+            'Unknown/not reported'
+        ],
+        'ethnicity' => [
+            'Hispanic or Latino',
+            'Not Hispanic or Latino',
+            'Unknown/not reported'
+        ],
+        'military_status' => [
+            'Currently serving',
+            'Veteran',
+            'Not applicable',
+            'Unknown/not reported'
+        ],
+        'work_status' => [
+            'Employed full-time',
+            'Employed part-time',
+            'Unemployed',
+            'Not in labor force',
+            'Unknown/not reported'
+        ]
+    ];
+
+    public function validateFile(string $filePath): array
+    {
+        try {
+            $csv = Reader::createFromPath($filePath, 'r');
+            $csv->setHeaderOffset(0);
+            
+            $headers = $csv->getHeader();
+            $records = iterator_to_array($csv->getRecords());
+            
+            $errors = [];
+            $warnings = [];
+            
+            // Validate headers
+            $headerValidation = $this->validateHeaders($headers);
+            if (!empty($headerValidation['errors'])) {
+                $errors = array_merge($errors, $headerValidation['errors']);
+            }
+            if (!empty($headerValidation['warnings'])) {
+                $warnings = array_merge($warnings, $headerValidation['warnings']);
+            }
+            
+            // If header validation failed, return early
+            if (!empty($errors)) {
+                return [
+                    'valid' => false,
+                    'errors' => $errors,
+                    'warnings' => $warnings,
+                    'record_count' => count($records)
+                ];
+            }
+            
+            // Validate records
+            $recordValidation = $this->validateRecords($records);
+            $errors = array_merge($errors, $recordValidation['errors']);
+            $warnings = array_merge($warnings, $recordValidation['warnings']);
+            
+            return [
+                'valid' => empty($errors),
+                'errors' => $errors,
+                'warnings' => $warnings,
+                'record_count' => count($records),
+                'household_count' => $this->countHouseholds($records)
+            ];
+            
+        } catch (\Exception $e) {
+            return [
+                'valid' => false,
+                'errors' => ['File processing error: ' . $e->getMessage()],
+                'warnings' => [],
+                'record_count' => 0
+            ];
+        }
+    }
+
+    public function previewImport(string $filePath, int $limit = 10): array
+    {
+        try {
+            $csv = Reader::createFromPath($filePath, 'r');
+            $csv->setHeaderOffset(0);
+            
+            $stmt = Statement::create()->limit($limit);
+            $records = iterator_to_array($stmt->process($csv));
+            
+            $preview = [];
+            foreach ($records as $index => $record) {
+                $preview[] = [
+                    'row_number' => $index + 2, // +2 because index starts at 0 and we have a header row
+                    'data' => $record,
+                    'parsed' => $this->parseRecord($record),
+                    'validation' => $this->validateSingleRecord($record, $index + 2)
+                ];
+            }
+            
+            return [
+                'success' => true,
+                'preview' => $preview,
+                'total_records' => count(iterator_to_array($csv->getRecords()))
+            ];
+            
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'error' => 'File processing error: ' . $e->getMessage(),
+                'preview' => []
+            ];
+        }
+    }
+
+    public function processImport(string $filePath, array $options = []): array
+    {
+        $updateExisting = $options['update_existing'] ?? false;
+        $skipErrors = $options['skip_errors'] ?? false;
+        
+        try {
+            DB::beginTransaction();
+            
+            $csv = Reader::createFromPath($filePath, 'r');
+            $csv->setHeaderOffset(0);
+            $records = iterator_to_array($csv->getRecords());
+            
+            $results = [
+                'success' => true,
+                'processed_households' => 0,
+                'processed_participants' => 0,
+                'updated_households' => 0,
+                'updated_participants' => 0,
+                'skipped_records' => 0,
+                'errors' => []
+            ];
+            
+            $currentHousehold = null;
+            $householdParticipants = [];
+            
+            foreach ($records as $index => $record) {
+                $rowNumber = $index + 2;
+                
+                try {
+                    $parsedRecord = $this->parseRecord($record);
+                    $validation = $this->validateSingleRecord($record, $rowNumber);
+                    
+                    if (!$validation['valid'] && !$skipErrors) {
+                        throw new \Exception(implode('; ', $validation['errors']));
+                    }
+                    
+                    if (!$validation['valid'] && $skipErrors) {
+                        $results['skipped_records']++;
+                        $results['errors'][] = "Row {$rowNumber}: " . implode('; ', $validation['errors']);
+                        continue;
+                    }
+                    
+                    // Check if this is a new household
+                    if (!empty($record['household_code']) && 
+                        (!$currentHousehold || $currentHousehold->household_code !== $record['household_code'])) {
+                        
+                        // Process previous household participants if any
+                        if ($currentHousehold && !empty($householdParticipants)) {
+                            $this->processHouseholdParticipants($currentHousehold, $householdParticipants, $updateExisting);
+                        }
+                        
+                        // Create or find household
+                        $currentHousehold = $this->processHousehold($parsedRecord, $updateExisting);
+                        $householdParticipants = [];
+                        
+                        if ($updateExisting && $currentHousehold->wasRecentlyCreated === false) {
+                            $results['updated_households']++;
+                        } else {
+                            $results['processed_households']++;
+                        }
+                    }
+                    
+                    // Add participant to current household
+                    if ($currentHousehold) {
+                        $householdParticipants[] = $parsedRecord;
+                    }
+                    
+                } catch (\Exception $e) {
+                    if (!$skipErrors) {
+                        throw $e;
+                    }
+                    
+                    $results['skipped_records']++;
+                    $results['errors'][] = "Row {$rowNumber}: " . $e->getMessage();
+                }
+            }
+            
+            // Process final household participants
+            if ($currentHousehold && !empty($householdParticipants)) {
+                $this->processHouseholdParticipants($currentHousehold, $householdParticipants, $updateExisting);
+            }
+            
+            DB::commit();
+            
+            return $results;
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+                'processed_households' => 0,
+                'processed_participants' => 0,
+                'updated_households' => 0,
+                'updated_participants' => 0,
+                'skipped_records' => 0,
+                'errors' => []
+            ];
+        }
+    }
+
+    protected function validateHeaders(array $headers): array
+    {
+        $errors = [];
+        $warnings = [];
+        
+        // Check for required headers
+        foreach ($this->requiredHeaders as $required) {
+            if (!in_array($required, $headers)) {
+                $errors[] = "Missing required header: {$required}";
+            }
+        }
+        
+        // Check for unknown headers
+        $validHeaders = array_merge(
+            $this->householdFields,
+            array_keys($this->getParticipantFields())
+        );
+        
+        foreach ($headers as $header) {
+            if (!in_array($header, $validHeaders)) {
+                $warnings[] = "Unknown header (will be ignored): {$header}";
+            }
+        }
+        
+        return ['errors' => $errors, 'warnings' => $warnings];
+    }
+
+    protected function validateRecords(array $records): array
+    {
+        $errors = [];
+        $warnings = [];
+        $householdCodes = [];
+        
+        foreach ($records as $index => $record) {
+            $rowNumber = $index + 2;
+            $validation = $this->validateSingleRecord($record, $rowNumber);
+            
+            $errors = array_merge($errors, $validation['errors']);
+            $warnings = array_merge($warnings, $validation['warnings']);
+            
+            // Track household codes for duplicate checking
+            if (!empty($record['household_code'])) {
+                $householdCodes[] = $record['household_code'];
+            }
+        }
+        
+        return ['errors' => $errors, 'warnings' => $warnings];
+    }
+
+    protected function validateSingleRecord(array $record, int $rowNumber): array
+    {
+        $errors = [];
+        $warnings = [];
+        
+        // Required field validation
+        foreach ($this->requiredHeaders as $field) {
+            if (empty($record[$field])) {
+                $errors[] = "Row {$rowNumber}: Missing required field '{$field}'";
+            }
+        }
+        
+        // Participant type validation
+        if (!empty($record['participant_type']) && 
+            !in_array($record['participant_type'], ['HEAD_OF_HOUSEHOLD', 'FAMILY_MEMBER'])) {
+            $errors[] = "Row {$rowNumber}: Invalid participant_type. Must be 'HEAD_OF_HOUSEHOLD' or 'FAMILY_MEMBER'";
+        }
+        
+        // Date validation
+        if (!empty($record['date_of_birth']) && !$this->isValidDate($record['date_of_birth'])) {
+            $errors[] = "Row {$rowNumber}: Invalid date_of_birth format. Use YYYY-MM-DD";
+        }
+        
+        // Enum field validation
+        foreach ($this->validEnumValues as $field => $validValues) {
+            if (!empty($record[$field]) && !in_array($record[$field], $validValues)) {
+                $errors[] = "Row {$rowNumber}: Invalid value for '{$field}': {$record[$field]}";
+            }
+        }
+        
+        // Numeric field validation
+        $numericFields = ['household_size', 'monthly_income', 'annual_income', 'hhs_poverty_percentage', 'employment_income', 'hours_worked_per_week'];
+        foreach ($numericFields as $field) {
+            if (!empty($record[$field]) && !is_numeric($record[$field])) {
+                $errors[] = "Row {$rowNumber}: '{$field}' must be numeric";
+            }
+        }
+        
+        // Boolean field validation
+        $booleanFields = ['currently_enrolled_in_education', 'has_chronic_health_conditions', 'is_seeking_employment', 'is_underemployed'];
+        foreach ($booleanFields as $field) {
+            if (!empty($record[$field]) && !in_array(strtoupper($record[$field]), ['TRUE', 'FALSE', '1', '0'])) {
+                $warnings[] = "Row {$rowNumber}: '{$field}' should be TRUE/FALSE or 1/0";
+            }
+        }
+        
+        return [
+            'valid' => empty($errors),
+            'errors' => $errors,
+            'warnings' => $warnings
+        ];
+    }
+
+    protected function parseRecord(array $record): array
+    {
+        $parsed = [];
+        
+        // Parse household data
+        foreach ($this->householdFields as $field) {
+            $parsed['household'][$field] = $this->parseField($record[$field] ?? '', $field);
+        }
+        
+        // Parse participant data
+        foreach ($this->getParticipantFields() as $field => $type) {
+            $parsed['participant'][$field] = $this->parseField($record[$field] ?? '', $field, $type);
+        }
+        
+        return $parsed;
+    }
+
+    protected function parseField($value, string $field, string $type = 'string')
+    {
+        if (empty($value)) {
+            return null;
+        }
+        
+        switch ($type) {
+            case 'boolean':
+                return in_array(strtoupper($value), ['TRUE', '1']);
+            case 'decimal':
+                return is_numeric($value) ? (float) $value : null;
+            case 'integer':
+                return is_numeric($value) ? (int) $value : null;
+            case 'date':
+                return $this->parseDate($value);
+            case 'array':
+                return $this->parseArray($value);
+            default:
+                return $value;
+        }
+    }
+
+    protected function parseArray(string $value): ?array
+    {
+        if (empty($value)) {
+            return null;
+        }
+        
+        return array_map('trim', explode('|', $value));
+    }
+
+    protected function parseDate(string $value): ?Carbon
+    {
+        try {
+            return Carbon::createFromFormat('Y-m-d', $value);
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    protected function isValidDate(string $date): bool
+    {
+        return $this->parseDate($date) !== null;
+    }
+
+    protected function processHousehold(array $parsedRecord, bool $updateExisting): Household
+    {
+        $householdData = $parsedRecord['household'];
+        $householdCode = $householdData['household_code'];
+        
+        if ($updateExisting) {
+            $household = Household::firstOrNew(['household_code' => $householdCode]);
+        } else {
+            $household = Household::where('household_code', $householdCode)->first();
+            if ($household) {
+                throw new \Exception("Household with code '{$householdCode}' already exists");
+            }
+            $household = new Household();
+        }
+        
+        foreach ($householdData as $field => $value) {
+            if ($value !== null && $field !== 'household_notes') {
+                $household->$field = $value;
+            } elseif ($field === 'household_notes') {
+                $household->notes = $value;
+            }
+        }
+        
+        $household->save();
+        
+        return $household;
+    }
+
+    protected function processHouseholdParticipants(Household $household, array $participantsData, bool $updateExisting): void
+    {
+        foreach ($participantsData as $participantData) {
+            $participant = $participantData['participant'];
+            $participant['household_id'] = $household->id;
+            
+            // Determine if this is head of household
+            $participant['is_head_of_household'] = 
+                ($participantData['participant']['participant_type'] ?? '') === 'HEAD_OF_HOUSEHOLD';
+            
+            // Remove participant_type as it's not a database field
+            unset($participant['participant_type']);
+            
+            if ($updateExisting) {
+                $existingParticipant = Participant::where('household_id', $household->id)
+                    ->where('first_name', $participant['first_name'])
+                    ->where('last_name', $participant['last_name'])
+                    ->where('date_of_birth', $participant['date_of_birth'])
+                    ->first();
+                
+                if ($existingParticipant) {
+                    $existingParticipant->update($participant);
+                } else {
+                    Participant::create($participant);
+                }
+            } else {
+                Participant::create($participant);
+            }
+        }
+        
+        // Update household size based on actual participant count
+        $household->household_size = $household->participants()->count();
+        $household->save();
+    }
+
+    protected function countHouseholds(array $records): int
+    {
+        $householdCodes = [];
+        foreach ($records as $record) {
+            if (!empty($record['household_code']) && !in_array($record['household_code'], $householdCodes)) {
+                $householdCodes[] = $record['household_code'];
+            }
+        }
+        return count($householdCodes);
+    }
+
+    protected function getParticipantFields(): array
+    {
+        return [
+            'participant_type' => 'string',
+            'first_name' => 'string',
+            'middle_name' => 'string',
+            'last_name' => 'string',
+            'suffix' => 'string',
+            'date_of_birth' => 'date',
+            'gender' => 'string',
+            'telephone' => 'string',
+            'email' => 'string',
+            'education_level' => 'string',
+            'currently_enrolled_in_education' => 'boolean',
+            'education_enrollment_type' => 'string',
+            'disability_status' => 'string',
+            'disability_types' => 'array',
+            'assistance_needs' => 'array',
+            'has_chronic_health_conditions' => 'boolean',
+            'health_insurance_sources' => 'array',
+            'health_insurance_status' => 'string',
+            'ethnicity' => 'string',
+            'race' => 'array',
+            'military_status' => 'string',
+            'work_status' => 'string',
+            'hours_worked_per_week' => 'decimal',
+            'is_seeking_employment' => 'boolean',
+            'is_underemployed' => 'boolean',
+            'income_sources' => 'array',
+            'employment_income' => 'decimal',
+            'other_income_sources' => 'array',
+            'non_cash_benefits' => 'array',
+            'intake_date' => 'date',
+            'last_service_date' => 'date',
+            'documentation_notes' => 'string',
+            'participant_notes' => 'string'
+        ];
+    }
+}

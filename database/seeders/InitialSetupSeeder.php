@@ -103,6 +103,8 @@ class InitialSetupSeeder extends Seeder
             'participants.view',
             'participants.create',
             'participants.edit',
+            'participants.export',
+            'participants.import',
             'households.view',
             'households.create',
             'households.edit',
@@ -455,6 +457,8 @@ class InitialSetupSeeder extends Seeder
             ['name' => 'participants.create', 'display_name' => 'Create Participants', 'category' => 'Participants'],
             ['name' => 'participants.edit', 'display_name' => 'Edit Participants', 'category' => 'Participants'],
             ['name' => 'participants.delete', 'display_name' => 'Delete Participants', 'category' => 'Participants'],
+            ['name' => 'participants.export', 'display_name' => 'Export Participants', 'category' => 'Participants'],
+            ['name' => 'participants.import', 'display_name' => 'Import Participants', 'category' => 'Participants'],
             
             // Household permissions
             ['name' => 'households.view', 'display_name' => 'View Households', 'category' => 'Households'],

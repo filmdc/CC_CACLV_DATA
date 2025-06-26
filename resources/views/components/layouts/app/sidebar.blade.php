@@ -24,6 +24,9 @@
                     @if(auth()->user()->hasPermission('participants.view'))
                         <flux:navlist.item icon="user" :href="route('participant.management')" :current="request()->routeIs('participant.management')" wire:navigate>{{ __('Participant Management') }}</flux:navlist.item>
                     @endif
+                    @if(auth()->user()->hasAnyPermission(['participants.export', 'participants.import']))
+                        <flux:navlist.item icon="arrow-up-tray" :href="route('participant.import-export')" :current="request()->routeIs('participant.import-export')" wire:navigate>{{ __('Import/Export Data') }}</flux:navlist.item>
+                    @endif
                     @if(auth()->user()->hasPermission('households.view'))
                         <flux:navlist.item icon="users" :href="route('household.management')" :current="request()->routeIs('household.management')" wire:navigate>{{ __('Household Management') }}</flux:navlist.item>
                     @endif
