@@ -47,7 +47,7 @@ trait WithPermissionChecks
     /**
      * Authorize an action based on permission or abort with 403.
      */
-    public function authorizeAction(string $permission, string $message = null): void
+    public function authorizeAction(string $permission, ?string $message = null): void
     {
         if (!$this->can($permission)) {
             abort(403, $message ?? "You do not have permission to perform this action.");
