@@ -87,7 +87,6 @@
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Export Type</label>
                                 <select wire:model.live="exportType" class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500">
                                     <option value="all">All Participants & Households</option>
-                                    <option value="participant">Specific Participant</option>
                                     <option value="household">Specific Household</option>
                                     <option value="date_range">Date Range</option>
                                     <option value="household_codes">Household Codes</option>
@@ -96,16 +95,6 @@
                             </div>
 
                             <!-- Conditional Fields -->
-                            @if($exportType === 'participant')
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Participant ID</label>
-                                    <input type="number" wire:model="participantId" 
-                                           class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500"
-                                           placeholder="Enter participant ID">
-                                    @error('participantId') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                                </div>
-                            @endif
-
                             @if($exportType === 'household')
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Household ID</label>

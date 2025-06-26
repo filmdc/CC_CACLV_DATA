@@ -16,7 +16,6 @@ class ParticipantImportExport extends Component
     
     // Export properties
     public $exportType = 'all';
-    public $participantId = '';
     public $householdId = '';
     public $startDate = '';
     public $endDate = '';
@@ -290,7 +289,6 @@ class ParticipantImportExport extends Component
     public function resetExportForm()
     {
         $this->exportType = 'all';
-        $this->participantId = '';
         $this->householdId = '';
         $this->startDate = '';
         $this->endDate = '';
@@ -305,7 +303,7 @@ class ParticipantImportExport extends Component
         // Base rules for the component
         return [
             'activeTab' => 'string|in:export,import',
-            'exportType' => 'string|in:all,participant,household,date_range,household_codes',
+            'exportType' => 'string|in:all,household,date_range,household_codes',
             'importFile' => 'nullable|file|mimes:csv,txt|max:10240',
         ];
     }
@@ -315,9 +313,6 @@ class ParticipantImportExport extends Component
         $rules = [];
 
         switch ($this->exportType) {
-            case 'participant':
-                $rules['participantId'] = 'required|integer|exists:participants,id';
-                break;
             case 'household':
                 $rules['householdId'] = 'required|integer|exists:households,id';
                 break;
@@ -338,9 +333,6 @@ class ParticipantImportExport extends Component
         $criteria = ['type' => $this->exportType];
 
         switch ($this->exportType) {
-            case 'participant':
-                $criteria['participant_id'] = $this->participantId;
-                break;
             case 'household':
                 $criteria['household_id'] = $this->householdId;
                 break;
