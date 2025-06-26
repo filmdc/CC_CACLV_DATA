@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Volt\Volt;
 
 Route::get('/', function () {
@@ -40,44 +39,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('reference-data-set-management', App\Livewire\ReferenceDataSetManagement::class)->name('reference-data-set.management');
     Route::get('enrollment-management', App\Livewire\EnrollmentManagement::class)->name('enrollment.management');
     Route::get('participant-import-export', App\Livewire\ParticipantImportExport::class)->name('participant.import-export');
-    Route::get('download/export/{file}', function($file) {
-        try {
-            $filePath = base64_decode($file);
-            
-            // Security checks
-            if (!$filePath || !str_starts_with($filePath, 'exports/')) {
-                abort(403, 'Access denied');
-            }
-            
-            // Check if user has permission
-            if (!auth()->user() || !auth()->user()->hasAnyPermission(['participants.export', 'participants.import'])) {
-                abort(403, 'Access denied');
-            }
-            
-            // Additional security: ensure no directory traversal
-            $filePath = str_replace(['../', '..\\'], '', $filePath);
-            
-            if (!Storage::disk('local')->exists($filePath)) {
-                abort(404, 'File not found');
-            }
-            
-            $filename = basename($filePath);
-            $content = Storage::disk('local')->get($filePath);
-            
-            // Clean up the file after download
-            Storage::disk('local')->delete($filePath);
-            
-            return response($content)
-                ->header('Content-Type', 'text/csv')
-                ->header('Content-Disposition', 'attachment; filename="' . $filename . '"')
-                ->header('Cache-Control', 'no-cache, must-revalidate')
-                ->header('X-Content-Type-Options', 'nosniff');
-                
-        } catch (\Exception $e) {
-            \Log::error('Download failed', ['error' => $e->getMessage(), 'file' => $file]);
-            abort(500, 'Download failed');
-        }
-    })->name('download.export');
     Route::get('admin-panel', App\Livewire\AdminPanel::class)->name('admin.panel');
     
     // Housing Module Routes

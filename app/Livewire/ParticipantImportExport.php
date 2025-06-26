@@ -103,7 +103,18 @@ class ParticipantImportExport extends Component
             $result = $this->importExportService->generateImportTemplate();
 
             if ($result['success']) {
-                return redirect($result['download_url']);
+                // Get file content and return direct download
+                $filePath = $result['file_path'];
+                $content = \Storage::disk('local')->get($filePath);
+                $filename = $result['filename'];
+                
+                // Clean up the file
+                \Storage::disk('local')->delete($filePath);
+                
+                return response($content)
+                    ->header('Content-Type', 'text/csv')
+                    ->header('Content-Disposition', 'attachment; filename="' . $filename . '"')
+                    ->header('Cache-Control', 'no-cache, must-revalidate');
             } else {
                 session()->flash('error', 'Template generation failed: ' . $result['error']);
             }
@@ -114,8 +125,27 @@ class ParticipantImportExport extends Component
 
     public function downloadExport()
     {
-        if ($this->exportResult && isset($this->exportResult['download_url'])) {
-            return redirect($this->exportResult['download_url']);
+        if (!$this->exportResult || !isset($this->exportResult['file_path'])) {
+            session()->flash('error', 'No export file available for download.');
+            return;
+        }
+
+        try {
+            // Get file content and return direct download
+            $filePath = $this->exportResult['file_path'];
+            $content = \Storage::disk('local')->get($filePath);
+            $filename = $this->exportResult['filename'];
+            
+            // Clean up the file
+            \Storage::disk('local')->delete($filePath);
+            
+            return response($content)
+                ->header('Content-Type', 'text/csv')
+                ->header('Content-Disposition', 'attachment; filename="' . $filename . '"')
+                ->header('Cache-Control', 'no-cache, must-revalidate');
+                
+        } catch (\Exception $e) {
+            session()->flash('error', 'Download failed: ' . $e->getMessage());
         }
     }
 

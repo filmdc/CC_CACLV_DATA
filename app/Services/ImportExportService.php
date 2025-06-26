@@ -83,7 +83,6 @@ class ImportExportService
                 'success' => true,
                 'filename' => $filename,
                 'file_path' => $filePath,
-                'download_url' => $this->generateDownloadUrl($filePath),
                 'file_size' => strlen($csvContent),
                 'record_count' => $this->countRecordsInCsv($csvContent)
             ];
@@ -120,8 +119,7 @@ class ImportExportService
                 'filename' => $filename,
                 'file_path' => $filePath,
                 'file_size' => strlen($templateContent),
-                'record_count' => $recordCount,
-                'download_url' => $this->generateDownloadUrl($filePath)
+                'record_count' => $recordCount
             ];
             
         } catch (\Exception $e) {
@@ -361,11 +359,6 @@ class ImportExportService
         return $filePath;
     }
 
-    protected function generateDownloadUrl(string $filePath): string
-    {
-        // Return route that will handle the download
-        return route('download.export', ['file' => base64_encode($filePath)]);
-    }
 
     protected function countRecordsInCsv(string $csvContent): int
     {
