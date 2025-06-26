@@ -67,7 +67,10 @@ class ParticipantImportExport extends Component
             return;
         }
 
-        $this->validate($this->getExportValidationRules());
+        $rules = $this->getExportValidationRules();
+        if (!empty($rules)) {
+            $this->validate($rules);
+        }
         
         $this->isExporting = true;
         $this->exportResult = null;
@@ -254,6 +257,16 @@ class ParticipantImportExport extends Component
     }
 
     // Validation and Helper Methods
+
+    public function rules()
+    {
+        // Base rules for the component
+        return [
+            'activeTab' => 'string|in:export,import',
+            'exportType' => 'string|in:all,participant,household,date_range,household_codes',
+            'importFile' => 'nullable|file|mimes:csv,txt|max:10240',
+        ];
+    }
 
     protected function getExportValidationRules()
     {
