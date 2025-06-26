@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Volt\Volt;
 
 Route::get('/', function () {
@@ -40,6 +42,38 @@ Route::middleware(['auth'])->group(function () {
     Route::get('enrollment-management', App\Livewire\EnrollmentManagement::class)->name('enrollment.management');
     Route::get('participant-import-export', App\Livewire\ParticipantImportExport::class)->name('participant.import-export');
     Route::get('admin-panel', App\Livewire\AdminPanel::class)->name('admin.panel');
+    
+    // Secure download route for import/export files
+    Route::get('secure-download/{token}', function ($token) {
+        $downloadData = Cache::get('download_' . $token);
+        
+        if (!$downloadData) {
+            abort(404, 'Download link expired or invalid');
+        }
+        
+        // Check if expired
+        if (now()->timestamp > $downloadData['expires_at']) {
+            Cache::forget('download_' . $token);
+            abort(404, 'Download link expired');
+        }
+        
+        try {
+            // Get file content
+            $content = Storage::disk('local')->get($downloadData['file_path']);
+            
+            // Clean up
+            Cache::forget('download_' . $token);
+            Storage::disk('local')->delete($downloadData['file_path']);
+            
+            return response($content)
+                ->header('Content-Type', 'text/csv')
+                ->header('Content-Disposition', 'attachment; filename="' . $downloadData['filename'] . '"')
+                ->header('Cache-Control', 'no-cache, must-revalidate');
+                
+        } catch (\Exception $e) {
+            abort(500, 'Download failed');
+        }
+    })->name('secure-download')->middleware(['auth']);
     
     // Housing Module Routes
     Route::get('property-management', App\Livewire\PropertyManagement::class)->name('property.management');

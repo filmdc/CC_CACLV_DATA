@@ -103,18 +103,24 @@ class ParticipantImportExport extends Component
             $result = $this->importExportService->generateImportTemplate();
 
             if ($result['success']) {
-                // Get file content and return direct download
-                $filePath = $result['file_path'];
-                $content = \Storage::disk('local')->get($filePath);
-                $filename = $result['filename'];
+                // Create a secure download token
+                $downloadToken = \Str::random(32);
+                $downloadData = [
+                    'file_path' => $result['file_path'],
+                    'filename' => $result['filename'],
+                    'expires_at' => now()->addMinutes(5)->timestamp
+                ];
                 
-                // Clean up the file
-                \Storage::disk('local')->delete($filePath);
+                // Store in cache for 5 minutes
+                \Cache::put('download_' . $downloadToken, $downloadData, now()->addMinutes(5));
                 
-                return response($content)
-                    ->header('Content-Type', 'text/csv')
-                    ->header('Content-Disposition', 'attachment; filename="' . $filename . '"')
-                    ->header('Cache-Control', 'no-cache, must-revalidate');
+                // Trigger JavaScript download
+                $this->dispatch('triggerDownload', [
+                    'url' => route('secure-download', ['token' => $downloadToken]),
+                    'filename' => $result['filename']
+                ]);
+                
+                session()->flash('success', 'Template download started.');
             } else {
                 session()->flash('error', 'Template generation failed: ' . $result['error']);
             }
@@ -131,18 +137,24 @@ class ParticipantImportExport extends Component
         }
 
         try {
-            // Get file content and return direct download
-            $filePath = $this->exportResult['file_path'];
-            $content = \Storage::disk('local')->get($filePath);
-            $filename = $this->exportResult['filename'];
+            // Create a secure download token
+            $downloadToken = \Str::random(32);
+            $downloadData = [
+                'file_path' => $this->exportResult['file_path'],
+                'filename' => $this->exportResult['filename'],
+                'expires_at' => now()->addMinutes(5)->timestamp
+            ];
             
-            // Clean up the file
-            \Storage::disk('local')->delete($filePath);
+            // Store in cache for 5 minutes
+            \Cache::put('download_' . $downloadToken, $downloadData, now()->addMinutes(5));
             
-            return response($content)
-                ->header('Content-Type', 'text/csv')
-                ->header('Content-Disposition', 'attachment; filename="' . $filename . '"')
-                ->header('Cache-Control', 'no-cache, must-revalidate');
+            // Trigger JavaScript download
+            $this->dispatch('triggerDownload', [
+                'url' => route('secure-download', ['token' => $downloadToken]),
+                'filename' => $this->exportResult['filename']
+            ]);
+            
+            session()->flash('success', 'Export download started.');
                 
         } catch (\Exception $e) {
             session()->flash('error', 'Download failed: ' . $e->getMessage());

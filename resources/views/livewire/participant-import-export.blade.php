@@ -398,3 +398,21 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('livewire:init', () => {
+    Livewire.on('triggerDownload', (event) => {
+        // Extract data from event (Livewire 3 format)
+        const data = event[0] || event;
+        
+        // Create a temporary anchor element and trigger download
+        const link = document.createElement('a');
+        link.href = data.url;
+        link.download = data.filename || '';
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+});
+</script>
