@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Livewire\Volt\Volt;
 
 Route::get('/', function () {
@@ -71,7 +72,7 @@ Route::middleware(['auth'])->group(function () {
                 ->header('Cache-Control', 'no-cache, must-revalidate');
                 
         } catch (\Exception $e) {
-            abort(500, 'Download failed');
+            abort(500, 'Download failed: ' . $e->getMessage());
         }
     })->name('secure-download')->middleware(['auth']);
     
