@@ -3,12 +3,13 @@
 namespace App\Livewire;
 
 use App\Models\ReferenceDataSet;
+use App\Traits\WithPermissionChecks;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class ReferenceDataSetManagement extends Component
 {
-    use WithPagination;
+    use WithPagination, WithPermissionChecks;
 
     public $search = '';
     public $showCreateForm = false;
@@ -29,12 +30,16 @@ class ReferenceDataSetManagement extends Component
 
     public function showCreateDataSet()
     {
+        $this->authorizeAction('reference_data.create', 'You do not have permission to create reference data sets.');
+        
         $this->resetForm();
         $this->showCreateForm = true;
     }
 
     public function showDuplicateDataSet($dataSetId)
     {
+        $this->authorizeAction('reference_data.create', 'You do not have permission to duplicate reference data sets.');
+        
         $this->resetForm();
         $this->selectedDataSet = ReferenceDataSet::find($dataSetId);
         $this->duplicateFromId = $dataSetId;
@@ -44,6 +49,8 @@ class ReferenceDataSetManagement extends Component
 
     public function showEditDataSet($dataSetId)
     {
+        $this->authorizeAction('reference_data.edit', 'You do not have permission to edit reference data sets.');
+        
         $this->resetForm();
         $this->selectedDataSet = ReferenceDataSet::find($dataSetId);
         if ($this->selectedDataSet) {
@@ -56,6 +63,8 @@ class ReferenceDataSetManagement extends Component
 
     public function createEditableVersion($dataSetId)
     {
+        $this->authorizeAction('reference_data.create', 'You do not have permission to create editable versions.');
+        
         try {
             $originalSet = ReferenceDataSet::find($dataSetId);
             if (!$originalSet) {
@@ -94,6 +103,8 @@ class ReferenceDataSetManagement extends Component
 
     public function createDataSet()
     {
+        $this->authorizeAction('reference_data.create', 'You do not have permission to create reference data sets.');
+        
         $this->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -120,6 +131,8 @@ class ReferenceDataSetManagement extends Component
 
     public function duplicateDataSet()
     {
+        $this->authorizeAction('reference_data.create', 'You do not have permission to duplicate reference data sets.');
+        
         $this->validate([
             'name' => 'required|string|max:255',
             'version' => 'required|string|max:20|unique:reference_data_sets,version'
@@ -144,6 +157,8 @@ class ReferenceDataSetManagement extends Component
 
     public function updateDataSet()
     {
+        $this->authorizeAction('reference_data.edit', 'You do not have permission to edit reference data sets.');
+        
         $this->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -172,6 +187,8 @@ class ReferenceDataSetManagement extends Component
 
     public function publishDataSet($dataSetId)
     {
+        $this->authorizeAction('reference_data.publish', 'You do not have permission to publish reference data sets.');
+        
         try {
             $dataSet = ReferenceDataSet::find($dataSetId);
             if ($dataSet && $dataSet->publish()) {
@@ -186,6 +203,8 @@ class ReferenceDataSetManagement extends Component
 
     public function activateDataSet($dataSetId)
     {
+        $this->authorizeAction('reference_data.activate', 'You do not have permission to activate reference data sets.');
+        
         try {
             $dataSet = ReferenceDataSet::find($dataSetId);
             if ($dataSet && $dataSet->activate()) {
@@ -200,6 +219,8 @@ class ReferenceDataSetManagement extends Component
 
     public function deleteDataSet($dataSetId)
     {
+        $this->authorizeAction('reference_data.delete', 'You do not have permission to delete reference data sets.');
+        
         try {
             $dataSet = ReferenceDataSet::find($dataSetId);
             if (!$dataSet) {
@@ -239,6 +260,8 @@ class ReferenceDataSetManagement extends Component
 
     public function render()
     {
+        $this->authorizeAction('reference_data.view', 'You do not have permission to view reference data sets.');
+        
         $dataSets = ReferenceDataSet::with('createdBy')
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')

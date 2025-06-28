@@ -79,25 +79,25 @@ class ReferenceData extends Model
     public static function getCategories()
     {
         return [
+            // CSBG Module 4 Section C - Personal Demographics
             'gender' => 'Gender',
             'education_level' => 'Education Level',
             'ethnicity' => 'Ethnicity',
             'race' => 'Race',
+            'military_status' => 'Military Status',
+            'disability_status' => 'Disability Status',
+            
+            // CSBG Module 4 Section C - Employment & Income
+            'work_status' => 'Work Status',
             'income_sources' => 'Income Sources',
-            'health_insurance_sources' => 'Health Insurance Sources',
             'other_income_sources' => 'Other Income Sources',
             'non_cash_benefits' => 'Non-Cash Benefits',
-            'housing_status' => 'Housing Status',
-            'housing_type' => 'Housing Type',
-            'household_type' => 'Household Type',
-            'disability_status' => 'Disability Status',
-            'military_status' => 'Military Status',
-            'work_status' => 'Work Status',
+            
+            // CSBG Module 4 Section C - Health & Housing
             'health_insurance_status' => 'Health Insurance Status',
-            'property_type' => 'Property Type',
-            'housing_job_type' => 'Housing Job Type',
-            'contractor_service' => 'Contractor Service',
-            'contact_type' => 'Contact Type'
+            'health_insurance_sources' => 'Health Insurance Sources',
+            'housing_status' => 'Housing Status',
+            'household_type' => 'Household Type'
         ];
     }
 }

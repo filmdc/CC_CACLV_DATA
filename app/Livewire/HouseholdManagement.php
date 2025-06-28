@@ -88,8 +88,8 @@ class HouseholdManagement extends Component
                 'email' => $this->email,
             ]);
 
-            // Update household size
-            $this->selectedHousehold->increment('household_size');
+            // Update household size using smart logic
+            $this->selectedHousehold->updateHouseholdSizeLogic();
             $this->selectedHousehold->refresh();
 
             session()->flash('success', 'Family member added successfully.');
@@ -114,7 +114,8 @@ class HouseholdManagement extends Component
                 }
 
                 $participant->delete();
-                $this->selectedHousehold->decrement('household_size');
+                // After removing a participant, always update to actual count
+                $this->selectedHousehold->update(['household_size' => $this->selectedHousehold->getActualHouseholdSize()]);
                 $this->selectedHousehold->refresh();
                 
                 session()->flash('success', 'Family member removed successfully.');

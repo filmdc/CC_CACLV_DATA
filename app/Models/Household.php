@@ -73,4 +73,49 @@ class Household extends Model
     {
         return $this->hasMany(HousingJob::class);
     }
+
+    public function getActualHouseholdSize(): int
+    {
+        return $this->participants()->count();
+    }
+
+    public function updateHouseholdSizeLogic(): void
+    {
+        $actualCount = $this->getActualHouseholdSize();
+        $manualSize = $this->household_size ?? 0;
+        
+        // If actual count is greater than manual entry, update to actual count
+        // Otherwise, keep the manual entry (staff attestation)
+        if ($actualCount > $manualSize) {
+            $this->update(['household_size' => $actualCount]);
+        }
+    }
+
+    public function fixInflatedHouseholdSize(): void
+    {
+        $actualCount = $this->getActualHouseholdSize();
+        
+        // For fixing existing data, we use the actual participant count
+        // This corrects inflated counts from the old increment/decrement logic
+        $this->update(['household_size' => $actualCount]);
+    }
+
+    public static function fixAllInflatedHouseholdSizes(): int
+    {
+        $fixed = 0;
+        $households = self::with('participants')->get();
+        
+        foreach ($households as $household) {
+            $actualCount = $household->getActualHouseholdSize();
+            $recordedSize = $household->household_size ?? 0;
+            
+            // Only fix if recorded size is greater than actual count (indicating inflation)
+            if ($recordedSize > $actualCount) {
+                $household->fixInflatedHouseholdSize();
+                $fixed++;
+            }
+        }
+        
+        return $fixed;
+    }
 }
