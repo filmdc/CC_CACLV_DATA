@@ -179,9 +179,15 @@ class WorkPlanGoalManagement extends Component
         }
         
         try {
-            $goal = WorkPlanGoal::find($goalId);
+            $goal = WorkPlanGoal::with(['service', 'workPlan.program'])->find($goalId);
             if ($goal && $goal->updateActualFromServiceData()) {
-                session()->flash('success', 'Goal synced with current service data successfully.');
+                $message = 'Goal synced successfully. ';
+                if ($goal->service) {
+                    $message .= "Service '{$goal->service->name}' has {$goal->service->getEnrolledParticipantsCount()} active enrollments.";
+                } else {
+                    $message .= "Program-wide count: {$goal->getProgramWideServiceCount()} total enrollments.";
+                }
+                session()->flash('success', $message);
             } else {
                 session()->flash('error', 'Unable to sync goal - no service linked or data unavailable.');
             }
@@ -197,7 +203,7 @@ class WorkPlanGoalManagement extends Component
         }
         
         try {
-            $goals = WorkPlanGoal::with('service')->get();
+            $goals = WorkPlanGoal::with(['service', 'workPlan.program'])->get();
             $syncedCount = 0;
             
             foreach ($goals as $goal) {
@@ -209,6 +215,24 @@ class WorkPlanGoalManagement extends Component
             session()->flash('success', "Successfully synced {$syncedCount} goals with current service data.");
         } catch (\Exception $e) {
             session()->flash('error', 'Error syncing goals: ' . $e->getMessage());
+        }
+    }
+
+    public function makeGoalProgramWide($goalId)
+    {
+        if (!$this->can('work_plan_goals.edit') && !$this->isAdmin()) {
+            abort(403, 'You do not have permission to edit work plan goals.');
+        }
+        
+        try {
+            $goal = WorkPlanGoal::with(['workPlan.program'])->find($goalId);
+            if ($goal) {
+                $goal->update(['service_id' => null]);
+                $goal->updateActualFromServiceData(); // This will now use program-wide counting
+                session()->flash('success', "Goal updated to track all services in the program. New count: {$goal->actual_number}");
+            }
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error updating goal: ' . $e->getMessage());
         }
     }
 

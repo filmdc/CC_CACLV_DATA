@@ -68,6 +68,12 @@ class WorkPlanGoal extends Model
     public function updateActualFromServiceData(): bool
     {
         if (!$this->service) {
+            // If no specific service is linked, try to count all services in the work plan's program
+            if ($this->workPlan && $this->workPlan->program) {
+                $actualCount = $this->getProgramWideServiceCount();
+                $this->update(['actual_number' => $actualCount]);
+                return true;
+            }
             return false;
         }
 
@@ -76,6 +82,40 @@ class WorkPlanGoal extends Model
         
         $this->update(['actual_number' => $actualCount]);
         return true;
+    }
+
+    /**
+     * Get count of all service enrollments across all services in the work plan's program
+     */
+    public function getProgramWideServiceCount(): int
+    {
+        if (!$this->workPlan || !$this->workPlan->program) {
+            return 0;
+        }
+
+        return $this->workPlan->program->services()
+            ->with('serviceEnrollments')
+            ->get()
+            ->sum(function ($service) {
+                return $service->getEnrolledParticipantsCount();
+            });
+    }
+
+    /**
+     * Get count of all completed service enrollments across all services in the work plan's program
+     */
+    public function getProgramWideCompletionCount(): int
+    {
+        if (!$this->workPlan || !$this->workPlan->program) {
+            return 0;
+        }
+
+        return $this->workPlan->program->services()
+            ->with('serviceEnrollments')
+            ->get()
+            ->sum(function ($service) {
+                return $service->getCompletedEnrollmentsCount();
+            });
     }
 
     /**

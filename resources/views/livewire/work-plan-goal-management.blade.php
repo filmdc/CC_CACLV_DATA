@@ -140,10 +140,17 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ $goal->service->name ?? 'Not Associated' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                @if($goal->service)
+                                    {{ $goal->service->name }}
+                                @else
+                                    <span class="text-blue-600 dark:text-blue-400 font-medium">All Program Services</span>
+                                @endif
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($goal->service)
                                     <div class="text-sm">
+                                        <div class="font-medium text-gray-900 dark:text-white mb-1">{{ $goal->service->name }}</div>
                                         <div class="flex items-center justify-between">
                                             <span class="text-blue-600 dark:text-blue-400">Enrolled:</span>
                                             <span class="font-medium">{{ $goal->service_enrollment_count }}</span>
@@ -152,12 +159,19 @@
                                             <span class="text-green-600 dark:text-green-400">Completed:</span>
                                             <span class="font-medium">{{ $goal->service_completion_count }}</span>
                                         </div>
-                                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                            Total Activity: {{ $goal->total_service_activity }}
-                                        </div>
                                     </div>
                                 @else
-                                    <span class="text-gray-400">No service linked</span>
+                                    <div class="text-sm">
+                                        <div class="font-medium text-blue-600 dark:text-blue-400 mb-1">All Program Services</div>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-blue-600 dark:text-blue-400">Total Enrolled:</span>
+                                            <span class="font-medium">{{ $goal->getProgramWideServiceCount() }}</span>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-green-600 dark:text-green-400">Total Completed:</span>
+                                            <span class="font-medium">{{ $goal->getProgramWideCompletionCount() }}</span>
+                                        </div>
+                                    </div>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -186,10 +200,13 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <div class="flex gap-2">
+                                <div class="flex gap-2 flex-wrap">
+                                    <button wire:click="syncGoalWithServiceData({{ $goal->id }})" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300" title="Sync with current service data">
+                                        Sync
+                                    </button>
                                     @if($goal->service)
-                                        <button wire:click="syncGoalWithServiceData({{ $goal->id }})" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300" title="Sync with current service data">
-                                            Sync
+                                        <button wire:click="makeGoalProgramWide({{ $goal->id }})" class="text-purple-600 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300" title="Track all services in program instead of just this one">
+                                            Make Program-Wide
                                         </button>
                                     @endif
                                     <button wire:click="showEditGoal({{ $goal->id }})" class="text-orange-600 dark:text-orange-400 hover:text-orange-900 dark:hover:text-orange-300">

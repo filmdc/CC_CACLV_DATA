@@ -14,10 +14,12 @@ class Service extends Model
         'name',
         'description',
         'program_id',
+        'service_type',
         'start_date',
         'end_date',
         'active',
-        'notes'
+        'notes',
+        'created_by'
     ];
 
     protected $casts = [
