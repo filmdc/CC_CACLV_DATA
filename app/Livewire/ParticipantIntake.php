@@ -10,8 +10,11 @@ use App\Models\Program;
 use App\Models\Service;
 use App\Models\ProgramEnrollment;
 use App\Models\ServiceEnrollment;
+use App\Models\PotentialDuplicate;
+use App\Services\DuplicateDetectionService;
 use Livewire\Component;
 use Livewire\Attributes\Validate;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 class ParticipantIntake extends Component
@@ -108,6 +111,17 @@ class ParticipantIntake extends Component
 
     // Created participant for step 5
     public $createdParticipant = null;
+    
+    // Duplicate detection
+    public $showDuplicateModal = false;
+    public $potentialDuplicates = [];
+    public $bypassDuplicateCheck = false;
+    protected $duplicateDetectionService;
+
+    public function boot(DuplicateDetectionService $duplicateDetectionService)
+    {
+        $this->duplicateDetectionService = $duplicateDetectionService;
+    }
 
     public function mount()
     {
@@ -229,6 +243,21 @@ class ParticipantIntake extends Component
     public function createParticipantAndHousehold()
     {
         try {
+            // Check for duplicates unless bypassed
+            if (!$this->bypassDuplicateCheck) {
+                $proposedData = $this->getProposedParticipantData();
+                $duplicates = $this->duplicateDetectionService->checkForDuplicates(
+                    $proposedData, 
+                    'manual',
+                    session()->getId()
+                );
+
+                if ($duplicates->isNotEmpty()) {
+                    $this->potentialDuplicates = $duplicates->toArray();
+                    $this->showDuplicateModal = true;
+                    return; // Stop here and show modal
+                }
+            }
             // Calculate annual income if monthly is provided
             $annual_income = $this->monthly_income ? $this->monthly_income * 12 : null;
             
@@ -347,6 +376,69 @@ class ParticipantIntake extends Component
         } catch (\Exception $e) {
             session()->flash('error', 'An error occurred during enrollment: ' . $e->getMessage());
         }
+    }
+
+    protected function getProposedParticipantData(): array
+    {
+        return [
+            'first_name' => $this->first_name,
+            'middle_name' => $this->middle_name,
+            'last_name' => $this->last_name,
+            'suffix' => $this->suffix,
+            'date_of_birth' => $this->date_of_birth,
+            'gender' => $this->gender,
+            'telephone' => $this->telephone,
+            'email' => $this->email,
+            'education_level' => $this->education_level,
+            'currently_enrolled_in_education' => $this->currently_enrolled_in_education,
+            'education_enrollment_type' => $this->education_enrollment_type,
+            'disability_status' => $this->disability_status,
+            'disability_types' => $this->disability_types,
+            'assistance_needs' => $this->assistance_needs,
+            'has_chronic_health_conditions' => $this->has_chronic_health_conditions,
+            'health_insurance_status' => $this->health_insurance_status,
+            'health_insurance_sources' => $this->health_insurance_sources,
+            'ethnicity' => $this->ethnicity,
+            'race' => $this->race,
+            'military_status' => $this->military_status,
+            'work_status' => $this->work_status,
+            'hours_worked_per_week' => $this->hours_worked_per_week,
+            'is_seeking_employment' => $this->is_seeking_employment,
+            'is_underemployed' => $this->is_underemployed,
+            'income_sources' => $this->income_sources,
+            'other_income_sources' => $this->other_income_sources,
+            'non_cash_benefits' => $this->non_cash_benefits,
+            'notes' => $this->notes,
+        ];
+    }
+
+    public function proceedWithDuplicate()
+    {
+        // Store potential duplicates for review and proceed with creation
+        if (!empty($this->potentialDuplicates)) {
+            $duplicatesCollection = collect($this->potentialDuplicates);
+            $this->duplicateDetectionService->storePotentialDuplicates(
+                $duplicatesCollection, 
+                Auth::id()
+            );
+        }
+
+        $this->bypassDuplicateCheck = true;
+        $this->showDuplicateModal = false;
+        $this->createParticipantAndHousehold();
+    }
+
+    public function cancelDuplicateCreation()
+    {
+        $this->showDuplicateModal = false;
+        $this->potentialDuplicates = [];
+        $this->bypassDuplicateCheck = false;
+    }
+
+    public function viewExistingParticipant($participantId)
+    {
+        // This could redirect to the participant view page
+        return redirect()->route('participants.show', $participantId);
     }
 
     public function render()

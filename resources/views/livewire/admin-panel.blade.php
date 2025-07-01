@@ -25,6 +25,10 @@
                         class="py-4 px-1 border-b-2 font-medium text-sm {{ $activeTab === 'reports' ? 'border-purple-500 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
                     Reports
                 </button>
+                <button wire:click="setActiveTab('data_management')" 
+                        class="py-4 px-1 border-b-2 font-medium text-sm {{ $activeTab === 'data_management' ? 'border-purple-500 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+                    Data Management
+                </button>
                 <button wire:click="setActiveTab('settings')" 
                         class="py-4 px-1 border-b-2 font-medium text-sm {{ $activeTab === 'settings' ? 'border-purple-500 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
                     Site Settings
@@ -803,6 +807,116 @@
                     </div>
                     @endif
                 </div>
+            @elseif ($activeTab === 'data_management')
+                <!-- Data Management -->
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Data Management</h2>
+                        <div class="text-sm text-gray-500">
+                            Manage test data and bulk operations
+                        </div>
+                    </div>
+                    
+                    <!-- Data Statistics -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg">
+                            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Records</h3>
+                            <div class="mt-2 space-y-1">
+                                <div class="flex justify-between">
+                                    <span class="text-sm">Participants</span>
+                                    <span class="font-semibold">{{ $dataStats['total_participants'] ?? 0 }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm">Households</span>
+                                    <span class="font-semibold">{{ $dataStats['total_households'] ?? 0 }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
+                            <h3 class="text-sm font-medium text-blue-700 dark:text-blue-300">Import Data</h3>
+                            <div class="mt-2 space-y-1">
+                                <div class="flex justify-between">
+                                    <span class="text-sm">Imported Participants</span>
+                                    <span class="font-semibold">{{ $dataStats['imported_participants'] ?? 0 }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm">Import Logs</span>
+                                    <span class="font-semibold">{{ $dataStats['import_logs'] ?? 0 }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-yellow-50 dark:bg-yellow-900 p-4 rounded-lg">
+                            <h3 class="text-sm font-medium text-yellow-700 dark:text-yellow-300">Duplicate Management</h3>
+                            <div class="mt-2 space-y-1">
+                                <div class="flex justify-between">
+                                    <span class="text-sm">Pending Duplicates</span>
+                                    <span class="font-semibold">{{ $dataStats['pending_duplicates'] ?? 0 }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm">Total Duplicates</span>
+                                    <span class="font-semibold">{{ $dataStats['potential_duplicates'] ?? 0 }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bulk Delete Actions -->
+                    <div class="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg p-6">
+                        <h3 class="text-lg font-medium text-red-800 dark:text-red-200 mb-4">
+                            ⚠️ Bulk Delete Operations
+                        </h3>
+                        <p class="text-sm text-red-700 dark:text-red-300 mb-4">
+                            Use these tools to clean up test data. Always backup your database before performing bulk operations.
+                        </p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <button wire:click="showBulkDeleteModal('test_data')" 
+                                    class="bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700 transition duration-150 ease-in-out text-sm">
+                                🧹 Clean Test Data
+                            </button>
+                            
+                            <button wire:click="showBulkDeleteModal('participants')" 
+                                    class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition duration-150 ease-in-out text-sm">
+                                👥 Delete Participants
+                            </button>
+                            
+                            <button wire:click="showBulkDeleteModal('households')" 
+                                    class="bg-red-700 text-white px-4 py-2 rounded-md hover:bg-red-800 transition duration-150 ease-in-out text-sm">
+                                🏠 Delete Households
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Import Activity -->
+                    @if(isset($dataStats['recent_imports']) && $dataStats['recent_imports']->count() > 0)
+                    <div class="bg-gray-50 dark:bg-zinc-700 rounded-lg p-6">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Recent Import Activity</h3>
+                        <div class="space-y-3">
+                            @foreach($dataStats['recent_imports'] as $import)
+                            <div class="flex items-center justify-between p-3 bg-white dark:bg-zinc-600 rounded border">
+                                <div>
+                                    <div class="font-medium text-sm">{{ $import->template->name ?? 'Unknown Template' }}</div>
+                                    <div class="text-xs text-gray-500">
+                                        {{ $import->successful_records ?? 0 }} imported, 
+                                        {{ $import->failed_records ?? 0 }} failed
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-xs font-medium {{ $import->status === 'success' ? 'text-green-600' : 'text-red-600' }}">
+                                        {{ ucfirst($import->status) }}
+                                    </div>
+                                    <div class="text-xs text-gray-500">
+                                        {{ $import->created_at->diffForHumans() }}
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+                </div>
             @elseif ($activeTab === 'settings')
                 <!-- Site Settings -->
                 <div class="space-y-6">
@@ -877,4 +991,153 @@
             @endif
         </div>
     </div>
+
+    <!-- Bulk Delete Modal -->
+    @if($showBulkDeleteModal)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                        @if($bulkDeleteType === 'test_data')
+                            🧹 Clean Test Data
+                        @elseif($bulkDeleteType === 'participants')
+                            👥 Bulk Delete Participants
+                        @elseif($bulkDeleteType === 'households')
+                            🏠 Bulk Delete Households
+                        @endif
+                    </h3>
+                    <button wire:click="closeBulkDeleteModal" class="text-gray-500 hover:text-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="space-y-4">
+                    <!-- Warning -->
+                    <div class="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg p-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
+                                    Warning: This action cannot be undone
+                                </h3>
+                                <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+                                    <p>Make sure you have a database backup before proceeding.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Options -->
+                    <div class="space-y-4">
+                        @if($bulkDeleteType !== 'test_data')
+                        <!-- Test Data Only Option -->
+                        <div>
+                            <label class="flex items-center">
+                                <input type="checkbox" wire:model="deleteTestDataOnly" class="rounded border-gray-300 text-red-600 shadow-sm focus:border-red-300 focus:ring focus:ring-red-200 focus:ring-opacity-50">
+                                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Only delete test/imported data (recommended)</span>
+                            </label>
+                        </div>
+                        @endif
+                        
+                        <!-- Date Range -->
+                        <div>
+                            <label for="dateRange" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date Range</label>
+                            <select wire:model="selectedDateRange" id="dateRange" class="mt-1 block w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white">
+                                <option value="7">Last 7 days</option>
+                                <option value="30">Last 30 days</option>
+                                <option value="90">Last 90 days</option>
+                                <option value="365">Last year</option>
+                                <option value="all">All time</option>
+                            </select>
+                        </div>
+                        
+                        @if($bulkDeleteType === 'participants' || $bulkDeleteType === 'test_data')
+                        <!-- Program Filter -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Programs (leave empty for all)</label>
+                            <div class="mt-2 space-y-2">
+                                @foreach($this->getAvailablePrograms() as $program)
+                                <label class="flex items-center">
+                                    <input type="checkbox" wire:model="selectedPrograms" value="{{ $program->id }}" class="rounded border-gray-300 text-red-600">
+                                    <span class="ml-2 text-sm">{{ $program->name }}</span>
+                                </label>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
+                        
+                        @if($bulkDeleteType === 'test_data')
+                        <!-- Source Filter -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Import Sources</label>
+                            <div class="mt-2 space-y-2">
+                                @foreach($this->getAvailableSources() as $key => $label)
+                                <label class="flex items-center">
+                                    <input type="checkbox" wire:model="selectedSources" value="{{ $key }}" class="rounded border-gray-300 text-red-600">
+                                    <span class="ml-2 text-sm">{{ $label }}</span>
+                                </label>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
+                    </div>
+                    
+                    <!-- Preview -->
+                    <div class="bg-gray-50 dark:bg-zinc-700 rounded-lg p-4">
+                        <h4 class="font-medium text-gray-900 dark:text-white mb-2">Preview</h4>
+                        @if($bulkDeleteType === 'test_data')
+                            @php $preview = $this->getBulkDeletePreview(); @endphp
+                            <div class="text-sm space-y-1">
+                                <div>Participants to delete: <span class="font-semibold">{{ $preview['participants'] ?? 0 }}</span></div>
+                                <div>Households to delete: <span class="font-semibold">{{ $preview['households'] ?? 0 }}</span></div>
+                                <div>Duplicate records to delete: <span class="font-semibold">{{ $preview['duplicates'] ?? 0 }}</span></div>
+                                <div>Import logs to delete: <span class="font-semibold">{{ $preview['import_logs'] ?? 0 }}</span></div>
+                            </div>
+                        @else
+                            <div class="text-sm">
+                                Records to delete: <span class="font-semibold">{{ $this->getBulkDeletePreview() }}</span>
+                            </div>
+                        @endif
+                    </div>
+                    
+                    <!-- Confirmation -->
+                    <div>
+                        <label for="confirmation" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Type 
+                            <span class="font-mono bg-gray-100 dark:bg-zinc-700 px-2 py-1 rounded">
+                                @if($bulkDeleteType === 'test_data')
+                                    DELETE TEST DATA
+                                @else
+                                    DELETE {{ strtoupper($bulkDeleteType) }}
+                                @endif
+                            </span> 
+                            to confirm
+                        </label>
+                        <input type="text" wire:model="deleteConfirmation" id="confirmation" 
+                               class="mt-1 block w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white"
+                               placeholder="Type confirmation text here">
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="flex justify-end space-x-3">
+                        <button wire:click="closeBulkDeleteModal" 
+                                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">
+                            Cancel
+                        </button>
+                        <button wire:click="executeBulkDelete" 
+                                class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+                                @if(empty($deleteConfirmation)) disabled @endif>
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>

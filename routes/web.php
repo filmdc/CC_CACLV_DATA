@@ -42,6 +42,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('reference-data-set-management', App\Livewire\ReferenceDataSetManagement::class)->name('reference-data-set.management');
     Route::get('enrollment-management', App\Livewire\EnrollmentManagement::class)->name('enrollment.management');
     Route::get('participant-import-export', App\Livewire\ParticipantImportExport::class)->name('participant.import-export');
+    Route::get('duplicate-resolution', App\Livewire\DuplicateResolutionManagement::class)->name('duplicate.resolution');
     Route::get('admin-panel', App\Livewire\AdminPanel::class)->name('admin.panel');
     
     // Secure download route for import/export files
@@ -59,19 +60,8 @@ Route::middleware(['auth'])->group(function () {
         }
         
         try {
-            // Debug: Check if file exists and get size
-            if (!Storage::disk('local')->exists($downloadData['file_path'])) {
-                Log::error('Download file not found', ['path' => $downloadData['file_path']]);
-                abort(404, 'File not found');
-            }
-            
-            $fileSize = Storage::disk('local')->size($downloadData['file_path']);
-            Log::info('Download file info', ['path' => $downloadData['file_path'], 'size' => $fileSize]);
-            
             // Get file content
             $content = Storage::disk('local')->get($downloadData['file_path']);
-            $contentLength = strlen($content);
-            Log::info('Download content retrieved', ['size' => $contentLength]);
             
             // Clean up
             Cache::forget('download_' . $token);
@@ -83,7 +73,6 @@ Route::middleware(['auth'])->group(function () {
                 ->header('Cache-Control', 'no-cache, must-revalidate');
                 
         } catch (\Exception $e) {
-            Log::error('Download failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             abort(500, 'Download failed: ' . $e->getMessage());
         }
     })->name('secure-download')->middleware(['auth']);

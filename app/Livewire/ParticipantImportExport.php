@@ -3,16 +3,33 @@
 namespace App\Livewire;
 
 use App\Services\ImportExportService;
+use App\Services\HMISPennsylvaniaImportService;
+use App\Services\RXOfficeHousingImportService;
+use App\Models\CustomImportTemplate;
 use App\Traits\WithPermissionChecks;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class ParticipantImportExport extends Component
 {
     use WithFileUploads, WithPermissionChecks;
 
     public $activeTab = 'export';
+    
+    // Custom Import properties
+    public $selectedCustomTemplate = '';
+    public $selectedCustomTemplateData = null;
+    public $customImportFile = null;
+    public $customValidationResult = null;
+    public $customImportResult = null;
+    public $customUpdateExisting = false;
+    public $customSkipErrors = true;
+    public $customTempFilePath = '';
+    
+    // Import History properties
+    public $expandedErrors = [];
     
     // Export properties
     public $exportType = 'all';
@@ -37,10 +54,17 @@ class ParticipantImportExport extends Component
     public $importResult = null;
 
     protected ImportExportService $importExportService;
+    protected HMISPennsylvaniaImportService $hmisImportService;
+    protected RXOfficeHousingImportService $rxOfficeImportService;
 
-    public function boot(ImportExportService $importExportService)
-    {
+    public function boot(
+        ImportExportService $importExportService,
+        HMISPennsylvaniaImportService $hmisImportService,
+        RXOfficeHousingImportService $rxOfficeImportService
+    ) {
         $this->importExportService = $importExportService;
+        $this->hmisImportService = $hmisImportService;
+        $this->rxOfficeImportService = $rxOfficeImportService;
     }
 
     public function mount()
@@ -170,7 +194,7 @@ class ParticipantImportExport extends Component
         }
 
         $this->validate([
-            'importFile' => 'required|file|mimes:csv,txt|max:10240' // 10MB max
+            'importFile' => 'required|file|mimes:csv,txt|mimetypes:text/csv,text/plain,application/csv,application/excel,application/vnd.ms-excel,application/vnd.msexcel,text/anytext|max:10240' // 10MB max
         ]);
 
         $this->isValidating = true;
@@ -286,6 +310,170 @@ class ParticipantImportExport extends Component
         $this->importResult = null;
     }
 
+    // Custom Import Methods
+
+    public function updatedSelectedCustomTemplate($value)
+    {
+        if ($value) {
+            $template = CustomImportTemplate::find($value);
+            $this->selectedCustomTemplateData = $template ? $template->toArray() : null;
+        } else {
+            $this->selectedCustomTemplateData = null;
+        }
+        
+        // Reset custom import state
+        $this->resetCustomImportForm();
+    }
+
+    public function validateCustomImportFile()
+    {
+        if (!$this->can('participants.import')) {
+            session()->flash('error', 'You do not have permission to import participants.');
+            return;
+        }
+
+        $this->validate([
+            'selectedCustomTemplate' => 'required|exists:custom_import_templates,id',
+            'customImportFile' => 'required|file|mimes:csv,txt|mimetypes:text/csv,text/plain,application/csv,application/excel,application/vnd.ms-excel,application/vnd.msexcel,text/anytext|max:10240'
+        ]);
+
+        $this->customValidationResult = null;
+
+        try {
+            $template = CustomImportTemplate::find($this->selectedCustomTemplate);
+            
+            if (!$template) {
+                session()->flash('error', 'Selected template not found.');
+                return;
+            }
+
+            // Store file temporarily
+            $uniqueFilename = 'custom_import_' . uniqid() . '_' . time() . '.csv';
+            $this->customTempFilePath = $this->customImportFile->storeAs('', $uniqueFilename, 'local');
+            $fullPath = Storage::disk('local')->path($this->customTempFilePath);
+
+            // Use appropriate validation based on template type
+            if ($template->source_system === 'HMIS_Pennsylvania') {
+                $result = $this->hmisImportService->validateFile($fullPath);
+            } elseif ($template->source_system === 'RX_Office_Housing') {
+                $result = $this->rxOfficeImportService->validateFile($fullPath);
+            } else {
+                // For future custom templates, we'd implement generic validation here
+                $result = ['valid' => false, 'errors' => ['Custom template validation not yet implemented'], 'warnings' => []];
+            }
+
+            $this->customValidationResult = $result;
+
+            if ($result['valid']) {
+                session()->flash('success', 
+                    "File validated successfully! {$result['record_count']} records found" .
+                    (isset($result['household_count']) ? ", {$result['household_count']} households." : ".")
+                );
+            } else {
+                session()->flash('error', 'File validation failed. Please check the errors below.');
+            }
+        } catch (\Exception $e) {
+            session()->flash('error', 'File validation failed: ' . $e->getMessage());
+        }
+    }
+
+    public function processCustomImport()
+    {
+        if (!$this->can('participants.import')) {
+            session()->flash('error', 'You do not have permission to import participants.');
+            return;
+        }
+
+        if (!$this->customTempFilePath) {
+            session()->flash('error', 'Please validate the file first.');
+            return;
+        }
+
+        $this->customImportResult = null;
+
+        try {
+            $template = CustomImportTemplate::find($this->selectedCustomTemplate);
+            
+            if (!$template) {
+                session()->flash('error', 'Selected template not found.');
+                return;
+            }
+
+            $fullPath = Storage::disk('local')->path($this->customTempFilePath);
+            $options = [
+                'update_existing' => $this->customUpdateExisting,
+                'skip_errors' => $this->customSkipErrors
+            ];
+
+            // Use appropriate import service based on template type
+            if ($template->source_system === 'HMIS_Pennsylvania') {
+                $result = $this->hmisImportService->processImport($fullPath, $options);
+            } elseif ($template->source_system === 'RX_Office_Housing') {
+                $result = $this->rxOfficeImportService->importFromCsv($fullPath);
+            } else {
+                // For future custom templates, we'd implement generic import here
+                $result = ['success' => false, 'error' => 'Custom template import not yet implemented'];
+            }
+
+            $this->customImportResult = $result;
+
+            if ($result['success']) {
+                $message = "Import completed successfully! ";
+                $message .= "Processed: {$result['processed_participants']} participants";
+                
+                if (isset($result['processed_households']) && $result['processed_households'] > 0) {
+                    $message .= ", {$result['processed_households']} households";
+                }
+                
+                if (isset($result['processed_enrollments']) && $result['processed_enrollments'] > 0) {
+                    $message .= ", {$result['processed_enrollments']} enrollments";
+                }
+                
+                $message .= ".";
+                
+                if (($result['updated_households'] ?? 0) > 0 || $result['updated_participants'] > 0) {
+                    $message .= " Updated: {$result['updated_participants']} participants";
+                    if (($result['updated_households'] ?? 0) > 0) {
+                        $message .= ", {$result['updated_households']} households";
+                    }
+                    $message .= ".";
+                }
+                
+                if ($result['skipped_records'] > 0) {
+                    $message .= " Skipped: {$result['skipped_records']} records with errors.";
+                }
+
+                session()->flash('success', $message);
+                
+                // Reset form
+                $this->resetCustomImportForm();
+            } else {
+                session()->flash('error', 'Import failed: ' . ($result['error'] ?? 'Unknown error'));
+            }
+        } catch (\Exception $e) {
+            session()->flash('error', 'Import failed: ' . $e->getMessage());
+        } finally {
+            // Clean up temp file
+            if ($this->customTempFilePath) {
+                Storage::disk('local')->delete($this->customTempFilePath);
+                $this->customTempFilePath = '';
+            }
+        }
+    }
+
+    public function resetCustomImportForm()
+    {
+        $this->customImportFile = null;
+        $this->customValidationResult = null;
+        $this->customImportResult = null;
+        
+        // Clean up temp file if exists
+        if ($this->customTempFilePath) {
+            Storage::disk('local')->delete($this->customTempFilePath);
+            $this->customTempFilePath = '';
+        }
+    }
+
     public function resetExportForm()
     {
         $this->exportType = 'all';
@@ -302,7 +490,7 @@ class ParticipantImportExport extends Component
     {
         // Base rules for the component
         return [
-            'activeTab' => 'string|in:export,import',
+            'activeTab' => 'string|in:export,import,custom-import,import-history',
             'exportType' => 'string|in:all,household,date_range,household_codes',
             'importFile' => 'nullable|file|mimes:csv,txt|max:10240',
         ];
@@ -381,6 +569,37 @@ class ParticipantImportExport extends Component
     public function getCanImportProperty()
     {
         return $this->can('participants.import');
+    }
+
+    public function getCustomImportTemplatesProperty()
+    {
+        return CustomImportTemplate::active()->orderBy('type')->orderBy('name')->get();
+    }
+    
+    public function getImportHistoryProperty()
+    {
+        return \App\Models\CustomImportLog::with(['template', 'user'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+    }
+    
+    // Import History Methods
+    
+    public function toggleErrorDetails($logId)
+    {
+        if (in_array($logId, $this->expandedErrors)) {
+            $this->expandedErrors = array_diff($this->expandedErrors, [$logId]);
+        } else {
+            $this->expandedErrors[] = $logId;
+        }
+    }
+    
+    public function refreshImportHistory()
+    {
+        // Reset expanded errors and refresh the data
+        $this->expandedErrors = [];
+        $this->dispatch('$refresh');
+        session()->flash('success', 'Import history refreshed.');
     }
 
     public function render()

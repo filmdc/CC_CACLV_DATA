@@ -214,7 +214,7 @@
                                     <p class="text-sm text-gray-600 mt-1">{{ $service->description }}</p>
                                     <div class="mt-2 flex items-center text-sm text-gray-500 space-x-4">
                                         <span>Program: {{ $service->program->name }}</span>
-                                        <span>Start: {{ $service->start_date->format('M j, Y') }}</span>
+                                        <span>Start: {{ $service->start_date ? $service->start_date->format('M j, Y') : 'Not set' }}</span>
                                         @if($service->end_date)
                                             <span>End: {{ $service->end_date->format('M j, Y') }}</span>
                                         @endif

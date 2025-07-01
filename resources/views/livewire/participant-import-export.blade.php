@@ -54,7 +54,15 @@
                     @if($this->canImport)
                         <button wire:click="setActiveTab('import')" 
                                 class="py-2 px-1 border-b-2 font-medium text-sm {{ $activeTab === 'import' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300' }}">
-                            Import Data
+                            System Import
+                        </button>
+                        <button wire:click="setActiveTab('custom-import')" 
+                                class="py-2 px-1 border-b-2 font-medium text-sm {{ $activeTab === 'custom-import' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300' }}">
+                            Custom Import
+                        </button>
+                        <button wire:click="setActiveTab('import-history')" 
+                                class="py-2 px-1 border-b-2 font-medium text-sm {{ $activeTab === 'import-history' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300' }}">
+                            Import History
                         </button>
                     @endif
                 </nav>
@@ -237,7 +245,7 @@
                                 class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
                                 wire:loading.attr="disabled" 
                                 wire:target="validateImportFile"
-                                :disabled="!$importFile">
+                                @if(!$importFile) disabled @endif>
                             <svg wire:loading wire:target="validateImportFile" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -369,6 +377,351 @@
                                     </ul>
                                 </div>
                             @endif
+                        </div>
+                    @endif
+                </div>
+            @endif
+
+            <!-- Custom Import Tab -->
+            @if($activeTab === 'custom-import' && $this->canImport)
+                <div class="space-y-6">
+                    <!-- Template Selection -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Import Template</label>
+                        <select wire:model.live="selectedCustomTemplate" 
+                                class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500">
+                            <option value="">Select an import template...</option>
+                            @foreach($this->customImportTemplates as $template)
+                                <option value="{{ $template->id }}">{{ $template->name }}</option>
+                            @endforeach
+                        </select>
+                        @error('selectedCustomTemplate') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        
+                        @if($selectedCustomTemplateData)
+                            <div class="mt-2 p-3 bg-gray-50 dark:bg-zinc-700 rounded-md">
+                                <p class="text-sm text-gray-600 dark:text-gray-300">
+                                    <strong>{{ $selectedCustomTemplateData['name'] }}</strong>
+                                </p>
+                                @if($selectedCustomTemplateData['description'])
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ $selectedCustomTemplateData['description'] }}</p>
+                                @endif
+                            </div>
+                        @endif
+                    </div>
+
+                    @if($selectedCustomTemplate)
+                        <!-- File Upload -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Select File</label>
+                            <input type="file" wire:model="customImportFile" accept=".csv,.txt" 
+                                   class="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                            @error('customImportFile') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <!-- Import Options -->
+                        <div class="space-y-4">
+                            <div class="flex items-center">
+                                <input type="checkbox" wire:model="customUpdateExisting" id="customUpdateExisting"
+                                       class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                <label for="customUpdateExisting" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                                    Update existing records if found
+                                </label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" wire:model="customSkipErrors" id="customSkipErrors"
+                                       class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                <label for="customSkipErrors" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                                    Skip records with errors and continue
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Validate Button -->
+                        <div>
+                            <button wire:click="validateCustomImportFile" 
+                                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                                    wire:loading.attr="disabled" 
+                                    wire:target="validateCustomImportFile"
+                                    @if(!$customImportFile) disabled @endif>
+                                <svg wire:loading wire:target="validateCustomImportFile" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <span wire:loading.remove wire:target="validateCustomImportFile">Validate File</span>
+                                <span wire:loading wire:target="validateCustomImportFile">Validating...</span>
+                            </button>
+                        </div>
+
+                        <!-- Custom Validation Results -->
+                        @if($customValidationResult)
+                            <div class="space-y-4">
+                                @if($customValidationResult['valid'])
+                                    <div class="bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700 rounded-md p-4">
+                                        <h3 class="text-lg font-medium text-green-800 dark:text-green-200">Validation Successful</h3>
+                                        <p class="text-sm text-green-600 dark:text-green-300">
+                                            Found {{ $customValidationResult['record_count'] }} records 
+                                            @if(isset($customValidationResult['household_count']))
+                                                across {{ $customValidationResult['household_count'] }} households
+                                            @endif
+                                        </p>
+                                    </div>
+
+                                    <!-- Import Button -->
+                                    <div>
+                                        <button wire:click="processCustomImport"
+                                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 disabled:opacity-50"
+                                                wire:loading.attr="disabled" 
+                                                wire:target="processCustomImport">
+                                            <svg wire:loading wire:target="processCustomImport" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                            <span wire:loading.remove wire:target="processCustomImport">Import Data</span>
+                                            <span wire:loading wire:target="processCustomImport">Importing...</span>
+                                        </button>
+                                    </div>
+                                @else
+                                    <div class="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-md p-4">
+                                        <h3 class="text-lg font-medium text-red-800 dark:text-red-200">Validation Failed</h3>
+                                        <div class="mt-2">
+                                            @if(!empty($customValidationResult['errors']))
+                                                <p class="text-sm text-red-600 dark:text-red-300 font-medium">Errors:</p>
+                                                <ul class="mt-1 text-sm text-red-600 dark:text-red-300 list-disc list-inside">
+                                                    @foreach($customValidationResult['errors'] as $error)
+                                                        <li>{{ $error }}</li>
+                                                    @endforeach
+                                                </ul>
+                                            @endif
+                                            @if(!empty($customValidationResult['warnings']))
+                                                <p class="text-sm text-yellow-600 dark:text-yellow-300 font-medium mt-2">Warnings:</p>
+                                                <ul class="mt-1 text-sm text-yellow-600 dark:text-yellow-300 list-disc list-inside">
+                                                    @foreach($customValidationResult['warnings'] as $warning)
+                                                        <li>{{ $warning }}</li>
+                                                    @endforeach
+                                                </ul>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
+
+                        <!-- Custom Import Results -->
+                        @if($customImportResult)
+                            <div class="bg-{{ $customImportResult['success'] ? 'green' : 'red' }}-50 dark:bg-{{ $customImportResult['success'] ? 'green' : 'red' }}-900 border border-{{ $customImportResult['success'] ? 'green' : 'red' }}-200 dark:border-{{ $customImportResult['success'] ? 'green' : 'red' }}-700 rounded-md p-4">
+                                <h3 class="text-lg font-medium text-{{ $customImportResult['success'] ? 'green' : 'red' }}-800 dark:text-{{ $customImportResult['success'] ? 'green' : 'red' }}-200">
+                                    Import {{ $customImportResult['success'] ? 'Completed' : 'Failed' }}
+                                </h3>
+                                @if($customImportResult['success'])
+                                    <div class="mt-2 text-sm text-green-600 dark:text-green-300">
+                                        <p>Processed: {{ $customImportResult['processed_households'] ?? 0 }} households, {{ $customImportResult['processed_participants'] }} participants</p>
+                                        @if(isset($customImportResult['processed_enrollments']) && $customImportResult['processed_enrollments'] > 0)
+                                            <p>Enrollments: {{ $customImportResult['processed_enrollments'] }}</p>
+                                        @endif
+                                        @if(($customImportResult['updated_households'] ?? 0) > 0 || $customImportResult['updated_participants'] > 0)
+                                            <p>Updated: {{ $customImportResult['updated_households'] ?? 0 }} households, {{ $customImportResult['updated_participants'] }} participants</p>
+                                        @endif
+                                        @if($customImportResult['skipped_records'] > 0)
+                                            <p>Skipped: {{ $customImportResult['skipped_records'] }} records with errors</p>
+                                        @endif
+                                    </div>
+                                @endif
+                                @if(!empty($customImportResult['errors']))
+                                    <div class="mt-2">
+                                        <p class="text-sm text-red-600 dark:text-red-300 font-medium">Errors:</p>
+                                        <ul class="mt-1 text-sm text-red-600 dark:text-red-300 list-disc list-inside max-h-40 overflow-y-auto">
+                                            @foreach(array_slice($customImportResult['errors'], 0, 10) as $error)
+                                                <li>{{ $error }}</li>
+                                            @endforeach
+                                            @if(count($customImportResult['errors']) > 10)
+                                                <li>... and {{ count($customImportResult['errors']) - 10 }} more errors</li>
+                                            @endif
+                                        </ul>
+                                    </div>
+                                @endif
+                                @if(!empty($customImportResult['warnings']))
+                                    <div class="mt-2">
+                                        <p class="text-sm text-yellow-600 dark:text-yellow-300 font-medium">Warnings:</p>
+                                        <ul class="mt-1 text-sm text-yellow-600 dark:text-yellow-300 list-disc list-inside max-h-40 overflow-y-auto">
+                                            @foreach(array_slice($customImportResult['warnings'], 0, 10) as $warning)
+                                                <li>{{ $warning }}</li>
+                                            @endforeach
+                                            @if(count($customImportResult['warnings']) > 10)
+                                                <li>... and {{ count($customImportResult['warnings']) - 10 }} more warnings</li>
+                                            @endif
+                                        </ul>
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
+                    @else
+                        <div class="text-center py-8">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">Select Import Template</h3>
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Choose a pre-configured template or create a custom mapping to import third-party data.</p>
+                        </div>
+                    @endif
+                </div>
+            @endif
+
+            <!-- Import History Tab -->
+            @if($activeTab === 'import-history' && $this->canImport)
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-lg font-medium text-gray-900 dark:text-white">Import History</h2>
+                        <button wire:click="refreshImportHistory" 
+                                class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-zinc-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-600">
+                            <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            </svg>
+                            Refresh
+                        </button>
+                    </div>
+
+                    @if($this->importHistory && $this->importHistory->count() > 0)
+                        <div class="bg-white dark:bg-zinc-800 shadow overflow-hidden sm:rounded-md">
+                            <ul class="divide-y divide-gray-200 dark:divide-zinc-700">
+                                @foreach($this->importHistory as $log)
+                                    <li class="px-4 py-4 sm:px-6">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0">
+                                                    @if($log->status === 'success')
+                                                        <div class="h-8 w-8 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                                                            <svg class="h-5 w-5 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                                            </svg>
+                                                        </div>
+                                                    @elseif($log->status === 'partial')
+                                                        <div class="h-8 w-8 rounded-full bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center">
+                                                            <svg class="h-5 w-5 text-yellow-600 dark:text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                                            </svg>
+                                                        </div>
+                                                    @else
+                                                        <div class="h-8 w-8 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center">
+                                                            <svg class="h-5 w-5 text-red-600 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                                                            </svg>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div class="flex items-center">
+                                                        <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                                            {{ $log->template->name ?? 'Unknown Template' }}
+                                                        </p>
+                                                        <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                                            @if($log->status === 'success') bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200
+                                                            @elseif($log->status === 'partial') bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200
+                                                            @else bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 @endif">
+                                                            {{ ucfirst($log->status) }}
+                                                        </span>
+                                                    </div>
+                                                    <div class="mt-1 flex items-center text-sm text-gray-500 dark:text-gray-400">
+                                                        <span>{{ $log->original_filename }}</span>
+                                                        <span class="mx-2">•</span>
+                                                        <span>{{ $log->created_at->format('M j, Y g:i A') }}</span>
+                                                        <span class="mx-2">•</span>
+                                                        <span>{{ $log->user->name ?? 'Unknown User' }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center space-x-4">
+                                                <div class="text-right">
+                                                    <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                                        {{ $log->successful_records }}/{{ $log->total_records }} records
+                                                    </p>
+                                                    @if($log->failed_records > 0)
+                                                        <p class="text-sm text-red-600 dark:text-red-400">
+                                                            {{ $log->failed_records }} failed
+                                                        </p>
+                                                    @endif
+                                                </div>
+                                                @if($log->errors && count($log->errors) > 0)
+                                                    <button wire:click="toggleErrorDetails({{ $log->id }})" 
+                                                            class="inline-flex items-center px-3 py-1.5 border border-red-300 dark:border-red-600 text-xs font-medium rounded text-red-700 dark:text-red-300 bg-white dark:bg-zinc-700 hover:bg-red-50 dark:hover:bg-red-900">
+                                                        @if(in_array($log->id, $this->expandedErrors ?? []))
+                                                            Hide Errors
+                                                        @else
+                                                            View {{ count($log->errors) }} Errors
+                                                        @endif
+                                                    </button>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        
+                                        @if($log->errors && count($log->errors) > 0 && in_array($log->id, $this->expandedErrors ?? []))
+                                            <div class="mt-4 border-t border-gray-200 dark:border-zinc-700 pt-4">
+                                                <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Import Errors:</h4>
+                                                <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-3 max-h-60 overflow-y-auto">
+                                                    <ul class="space-y-2">
+                                                        @foreach($log->errors as $error)
+                                                            <li class="text-sm text-red-800 dark:text-red-200">
+                                                                @if(is_array($error))
+                                                                    <div class="font-medium">
+                                                                        {{ $error['message'] ?? 'Unknown error' }}
+                                                                    </div>
+                                                                    @if(isset($error['row_number']))
+                                                                        <div class="text-xs opacity-75 mt-1">
+                                                                            Row: {{ $error['row_number'] }}
+                                                                        </div>
+                                                                    @endif
+                                                                @else
+                                                                    <div class="font-mono">{{ $error }}</div>
+                                                                @endif
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        @endif
+                                        
+                                        @if($log->warnings && count($log->warnings) > 0 && in_array($log->id, $this->expandedErrors ?? []))
+                                            <div class="mt-4">
+                                                <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Warnings:</h4>
+                                                <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-3 max-h-40 overflow-y-auto">
+                                                    <ul class="space-y-2">
+                                                        @foreach($log->warnings as $warning)
+                                                            <li class="text-sm text-yellow-800 dark:text-yellow-200">
+                                                                @if(is_array($warning))
+                                                                    <div class="font-medium">
+                                                                        {{ $warning['message'] ?? 'Unknown warning' }}
+                                                                    </div>
+                                                                    @if(isset($warning['row_number']))
+                                                                        <div class="text-xs opacity-75 mt-1">
+                                                                            Row: {{ $warning['row_number'] }}
+                                                                        </div>
+                                                                    @endif
+                                                                @else
+                                                                    <div class="font-mono">{{ $warning }}</div>
+                                                                @endif
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                        
+                        <!-- Pagination if needed -->
+                        @if($this->importHistory->hasPages())
+                            <div class="mt-4">
+                                {{ $this->importHistory->links() }}
+                            </div>
+                        @endif
+                    @else
+                        <div class="text-center py-8">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No Import History</h3>
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">No import operations have been performed yet.</p>
                         </div>
                     @endif
                 </div>

@@ -10,9 +10,15 @@ use App\Models\Contract;
 use App\Models\WorkPlan;
 use App\Models\User;
 use App\Models\SiteSetting;
+use App\Models\ProgramEnrollment;
+use App\Models\ServiceEnrollment;
+use App\Models\PotentialDuplicate;
+use App\Models\CustomImportLog;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AdminPanel extends Component
 {
@@ -23,6 +29,15 @@ class AdminPanel extends Component
     public $showCreateForm = false;
     public $showCreateUserForm = false;
     public $reportType = 'overview';
+    
+    // Bulk Delete Properties
+    public $showBulkDeleteModal = false;
+    public $bulkDeleteType = '';
+    public $deleteConfirmation = '';
+    public $deleteTestDataOnly = true;
+    public $selectedDateRange = '30'; // days
+    public $selectedPrograms = [];
+    public $selectedSources = [];
     
     // Program Form
     public $program_name = '';
@@ -245,6 +260,256 @@ class AdminPanel extends Component
         } catch (\Exception $e) {
             session()->flash('error', 'An error occurred: ' . $e->getMessage());
         }
+    }
+
+    // Bulk Delete Methods
+    public function showBulkDeleteModal($type)
+    {
+        $this->bulkDeleteType = $type;
+        $this->showBulkDeleteModal = true;
+        $this->deleteConfirmation = '';
+        $this->resetBulkDeleteOptions();
+    }
+
+    public function closeBulkDeleteModal()
+    {
+        $this->showBulkDeleteModal = false;
+        $this->bulkDeleteType = '';
+        $this->deleteConfirmation = '';
+        $this->resetBulkDeleteOptions();
+    }
+
+    private function resetBulkDeleteOptions()
+    {
+        $this->deleteTestDataOnly = true;
+        $this->selectedDateRange = '30';
+        $this->selectedPrograms = [];
+        $this->selectedSources = [];
+    }
+
+    public function getBulkDeletePreview()
+    {
+        $query = $this->buildBulkDeleteQuery();
+        
+        if ($this->bulkDeleteType === 'participants') {
+            return $query->count();
+        } elseif ($this->bulkDeleteType === 'households') {
+            return $query->count();
+        } elseif ($this->bulkDeleteType === 'test_data') {
+            return [
+                'participants' => $this->buildBulkDeleteQuery('participants')->count(),
+                'households' => $this->buildBulkDeleteQuery('households')->count(),
+                'duplicates' => $this->buildBulkDeleteQuery('duplicates')->count(),
+                'import_logs' => $this->buildBulkDeleteQuery('import_logs')->count(),
+            ];
+        }
+        
+        return 0;
+    }
+
+    public function buildBulkDeleteQuery($type = null)
+    {
+        $targetType = $type ?: $this->bulkDeleteType;
+        
+        switch ($targetType) {
+            case 'participants':
+                $query = Participant::query();
+                
+                if ($this->deleteTestDataOnly) {
+                    // Only delete test/import data, not manually entered participants
+                    $query->where(function ($q) {
+                        $q->whereHas('programEnrollments', function ($pe) {
+                            $pe->whereIn('program_id', $this->selectedPrograms ?: [1]); // Default to Housing program
+                        })->orWhere('notes', 'like', '%import%');
+                    });
+                }
+                
+                if ($this->selectedDateRange && $this->selectedDateRange !== 'all') {
+                    $query->where('created_at', '>=', now()->subDays($this->selectedDateRange));
+                }
+                
+                return $query;
+                
+            case 'households':
+                $query = Household::query();
+                
+                if ($this->deleteTestDataOnly) {
+                    // Only delete households that have no participants or only test participants
+                    $query->where(function ($q) {
+                        $q->whereDoesntHave('participants')
+                          ->orWhereHas('participants', function ($p) {
+                              $p->where('notes', 'like', '%import%');
+                          });
+                    });
+                }
+                
+                if ($this->selectedDateRange && $this->selectedDateRange !== 'all') {
+                    $query->where('created_at', '>=', now()->subDays($this->selectedDateRange));
+                }
+                
+                return $query;
+                
+            case 'duplicates':
+                $query = PotentialDuplicate::query();
+                
+                if ($this->selectedSources) {
+                    $query->whereIn('source_type', $this->selectedSources);
+                } else {
+                    $query->whereIn('source_type', ['rx_office_import', 'hmis_import', 'general_import']);
+                }
+                
+                if ($this->selectedDateRange && $this->selectedDateRange !== 'all') {
+                    $query->where('created_at', '>=', now()->subDays($this->selectedDateRange));
+                }
+                
+                return $query;
+                
+            case 'import_logs':
+                $query = CustomImportLog::query();
+                
+                if ($this->selectedDateRange && $this->selectedDateRange !== 'all') {
+                    $query->where('created_at', '>=', now()->subDays($this->selectedDateRange));
+                }
+                
+                return $query;
+                
+            default:
+                return collect();
+        }
+    }
+
+    public function executeBulkDelete()
+    {
+        // Validate confirmation
+        $expectedConfirmation = strtoupper($this->bulkDeleteType === 'test_data' ? 'DELETE TEST DATA' : 'DELETE ' . strtoupper($this->bulkDeleteType));
+        
+        if (strtoupper($this->deleteConfirmation) !== $expectedConfirmation) {
+            session()->flash('error', 'Confirmation text does not match. Please type exactly: ' . $expectedConfirmation);
+            return;
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $deletedCounts = [];
+
+            if ($this->bulkDeleteType === 'test_data') {
+                // Delete in correct order to avoid foreign key constraints
+                
+                // 1. Delete service enrollments first
+                $serviceEnrollments = ServiceEnrollment::whereHas('participant', function ($q) {
+                    $participantQuery = $this->buildBulkDeleteQuery('participants');
+                    $q->whereIn('id', $participantQuery->pluck('id'));
+                })->get();
+                
+                foreach ($serviceEnrollments as $enrollment) {
+                    $enrollment->delete();
+                }
+                $deletedCounts['service_enrollments'] = $serviceEnrollments->count();
+                
+                // 2. Delete program enrollments
+                $programEnrollments = ProgramEnrollment::whereHas('participant', function ($q) {
+                    $participantQuery = $this->buildBulkDeleteQuery('participants');
+                    $q->whereIn('id', $participantQuery->pluck('id'));
+                })->get();
+                
+                foreach ($programEnrollments as $enrollment) {
+                    $enrollment->delete();
+                }
+                $deletedCounts['program_enrollments'] = $programEnrollments->count();
+                
+                // 3. Delete potential duplicates
+                $duplicates = $this->buildBulkDeleteQuery('duplicates')->get();
+                foreach ($duplicates as $duplicate) {
+                    $duplicate->delete();
+                }
+                $deletedCounts['duplicates'] = $duplicates->count();
+                
+                // 4. Delete participants
+                $participants = $this->buildBulkDeleteQuery('participants')->get();
+                foreach ($participants as $participant) {
+                    $participant->delete();
+                }
+                $deletedCounts['participants'] = $participants->count();
+                
+                // 5. Delete empty households
+                $households = $this->buildBulkDeleteQuery('households')->get();
+                foreach ($households as $household) {
+                    $household->delete();
+                }
+                $deletedCounts['households'] = $households->count();
+                
+                // 6. Delete import logs
+                $importLogs = $this->buildBulkDeleteQuery('import_logs')->get();
+                foreach ($importLogs as $log) {
+                    $log->delete();
+                }
+                $deletedCounts['import_logs'] = $importLogs->count();
+                
+            } else {
+                // Single type deletion
+                $items = $this->buildBulkDeleteQuery()->get();
+                
+                foreach ($items as $item) {
+                    if ($this->bulkDeleteType === 'participants') {
+                        // Delete related enrollments first
+                        $item->serviceEnrollments()->delete();
+                        $item->programEnrollments()->delete();
+                    }
+                    $item->delete();
+                }
+                
+                $deletedCounts[$this->bulkDeleteType] = $items->count();
+            }
+
+            DB::commit();
+
+            // Log the bulk delete operation
+            Log::info('Bulk delete operation completed', [
+                'type' => $this->bulkDeleteType,
+                'user_id' => auth()->id(),
+                'deleted_counts' => $deletedCounts,
+                'options' => [
+                    'test_data_only' => $this->deleteTestDataOnly,
+                    'date_range' => $this->selectedDateRange,
+                    'programs' => $this->selectedPrograms,
+                    'sources' => $this->selectedSources,
+                ]
+            ]);
+
+            $totalDeleted = array_sum($deletedCounts);
+            $summary = collect($deletedCounts)->map(function ($count, $type) {
+                return "{$count} {$type}";
+            })->implode(', ');
+
+            session()->flash('success', "Bulk delete completed successfully. Deleted: {$summary}");
+            $this->closeBulkDeleteModal();
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Bulk delete operation failed', [
+                'type' => $this->bulkDeleteType,
+                'user_id' => auth()->id(),
+                'error' => $e->getMessage(),
+            ]);
+            
+            session()->flash('error', 'Bulk delete failed: ' . $e->getMessage());
+        }
+    }
+
+    public function getAvailablePrograms()
+    {
+        return Program::orderBy('name')->get();
+    }
+
+    public function getAvailableSources()
+    {
+        return [
+            'rx_office_import' => 'RX Office Import',
+            'hmis_import' => 'HMIS Import', 
+            'general_import' => 'General Import',
+            'manual' => 'Manual Entry'
+        ];
     }
 
     private function getCSBGData()
@@ -623,6 +888,21 @@ class AdminPanel extends Component
 
             case 'settings':
                 // Site settings data is already loaded in mount()
+                break;
+                
+            case 'data_management':
+                $data['dataStats'] = [
+                    'total_participants' => Participant::count(),
+                    'total_households' => Household::count(),
+                    'imported_participants' => Participant::where('notes', 'like', '%import%')->count(),
+                    'potential_duplicates' => PotentialDuplicate::count(),
+                    'pending_duplicates' => PotentialDuplicate::pending()->count(),
+                    'import_logs' => CustomImportLog::count(),
+                    'recent_imports' => CustomImportLog::with('template')
+                        ->orderBy('created_at', 'desc')
+                        ->limit(5)
+                        ->get(),
+                ];
                 break;
         }
 
