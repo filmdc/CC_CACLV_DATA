@@ -9,6 +9,7 @@ use League\Csv\Statement;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 class ParticipantImportService
@@ -106,6 +107,7 @@ class ParticipantImportService
     public function validateFile(string $filePath): array
     {
         try {
+            
             $csv = Reader::createFromPath($filePath, 'r');
             $csv->setHeaderOffset(0);
             

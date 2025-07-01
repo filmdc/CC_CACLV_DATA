@@ -283,7 +283,7 @@ class ParticipantExportService
                 'Yes', // health_insurance_status
                 'Not Hispanic or Latino', // ethnicity
                 'White', // race
-                'Never Served in the Military', // military_status
+                'Not applicable', // military_status
                 'Employed full-time', // work_status
                 '40.00', // hours_worked_per_week
                 'FALSE', // is_seeking_employment
@@ -320,7 +320,7 @@ class ParticipantExportService
                 'Yes', // health_insurance_status
                 'Hispanic or Latino', // ethnicity
                 'White|American Indian or Alaska Native', // race (multiple races)
-                'Never Served in the Military', // military_status
+                'Not applicable', // military_status
                 'Employed part-time', // work_status
                 '20.00', // hours_worked_per_week
                 'FALSE', // is_seeking_employment

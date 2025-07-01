@@ -50,6 +50,27 @@ class PovertyGuideline extends Model
             ->where('period', $period)
             ->first();
 
+        // If we don't have exact family size, calculate for larger families
+        if (!$guideline && $familySize > 4) {
+            // Get the guideline for family size 4
+            $baseLine = static::where('year', $year)
+                ->where('region', $region)
+                ->where('family_size', 4)
+                ->where('period', $period)
+                ->first();
+                
+            if ($baseLine) {
+                // For each additional family member over 4, add standard increment
+                // 2025 HHS guidelines: $4,480 annually or $374 monthly per additional person
+                $increment = ($period === 'annual') ? 4480 : 374;
+                $additionalMembers = $familySize - 4;
+                
+                // Calculate poverty level for larger family
+                $povertyLevel = $baseLine->poverty_100 + ($increment * $additionalMembers);
+                return $povertyLevel > 0 ? round(($income / $povertyLevel) * 100, 2) : 0;
+            }
+        }
+
         if (!$guideline) {
             return null;
         }

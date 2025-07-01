@@ -31,7 +31,7 @@ class AdminPanel extends Component
     public $reportType = 'overview';
     
     // Bulk Delete Properties
-    public $showBulkDeleteModal = false;
+    public $bulkDeleteModalVisible = false;
     public $bulkDeleteType = '';
     public $deleteConfirmation = '';
     public $deleteTestDataOnly = true;
@@ -266,14 +266,14 @@ class AdminPanel extends Component
     public function showBulkDeleteModal($type)
     {
         $this->bulkDeleteType = $type;
-        $this->showBulkDeleteModal = true;
+        $this->bulkDeleteModalVisible = true;
         $this->deleteConfirmation = '';
         $this->resetBulkDeleteOptions();
     }
 
     public function closeBulkDeleteModal()
     {
-        $this->showBulkDeleteModal = false;
+        $this->bulkDeleteModalVisible = false;
         $this->bulkDeleteType = '';
         $this->deleteConfirmation = '';
         $this->resetBulkDeleteOptions();

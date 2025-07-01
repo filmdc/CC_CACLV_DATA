@@ -138,11 +138,27 @@ class ImportExportService
     public function validateImportFile(UploadedFile $file): array
     {
         try {
-            // Validate file type
-            if (!in_array($file->getClientMimeType(), ['text/csv', 'text/plain', 'application/csv'])) {
+            // Validate file type - accept various CSV MIME types
+            $allowedMimeTypes = [
+                'text/csv',
+                'text/plain', 
+                'application/csv',
+                'application/excel',
+                'application/vnd.ms-excel',
+                'application/vnd.msexcel',
+                'text/anytext',
+                'text/comma-separated-values',
+                'application/octet-stream' // Sometimes CSV files are detected as this
+            ];
+            
+            $clientMimeType = $file->getClientMimeType();
+            $extension = strtolower($file->getClientOriginalExtension());
+            
+            // Check both MIME type and file extension for CSV validation
+            if (!in_array($clientMimeType, $allowedMimeTypes) && !in_array($extension, ['csv', 'txt'])) {
                 return [
                     'success' => false,
-                    'error' => 'Invalid file type. Please upload a CSV file.'
+                    'error' => 'Invalid file type. Please upload a CSV file. Detected type: ' . $clientMimeType . ', Extension: ' . $extension
                 ];
             }
             
@@ -154,9 +170,11 @@ class ImportExportService
                 ];
             }
             
-            // Store file temporarily
-            $tempPath = $file->store('temp-imports', 'local');
+            // Store file temporarily - use a unique filename in the root private directory
+            $uniqueFilename = 'import_' . uniqid() . '_' . time() . '.csv';
+            $tempPath = $file->storeAs('', $uniqueFilename, 'local');
             $fullPath = Storage::disk('local')->path($tempPath);
+            
             
             // Validate file content
             $validation = $this->importService->validateFile($fullPath);
