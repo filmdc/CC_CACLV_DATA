@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Participant;
 use App\Models\Household;
+use App\Models\PovertyGuideline;
 use League\Csv\Reader;
 use League\Csv\Statement;
 use Carbon\Carbon;
@@ -484,6 +485,10 @@ class ParticipantImportService
         
         $household->save();
         
+        // Calculate poverty percentage after saving household data
+        $this->calculateAndUpdatePovertyLevel($household);
+        $household->save();
+        
         return $household;
     }
 
@@ -519,6 +524,10 @@ class ParticipantImportService
         
         // Update household size based on actual participant count
         $household->household_size = $household->participants()->count();
+        
+        // Calculate and update poverty percentage if we have income data
+        $this->calculateAndUpdatePovertyLevel($household);
+        
         $household->save();
     }
 
@@ -531,6 +540,67 @@ class ParticipantImportService
             }
         }
         return count($householdCodes);
+    }
+
+    protected function calculateAndUpdatePovertyLevel(Household $household): void
+    {
+        $incomeAmount = null;
+        $incomeType = null;
+        
+        // Determine income amount and type (prioritize annual, then monthly)
+        if ($household->annual_income && $household->annual_income > 0) {
+            $incomeAmount = $household->annual_income;
+            $incomeType = 'annual';
+        } elseif ($household->monthly_income && $household->monthly_income > 0) {
+            $incomeAmount = $household->monthly_income;
+            $incomeType = 'monthly';
+        }
+        
+        if ($incomeAmount && $household->household_size > 0) {
+            $povertyPercentage = PovertyGuideline::calculatePovertyPercentage(
+                $incomeAmount,
+                $household->household_size,
+                $incomeType
+            );
+            
+            if ($povertyPercentage !== null) {
+                // Cap poverty percentage at 999.99% to fit database constraints (DECIMAL(5,2))
+                $cappedPovertyPercentage = min($povertyPercentage, 999.99);
+                
+                $household->hhs_poverty_percentage = $cappedPovertyPercentage;
+                
+                // Ensure both annual and monthly income are set
+                if ($incomeType === 'annual') {
+                    $household->annual_income = $incomeAmount;
+                    $household->monthly_income = $incomeAmount / 12;
+                } else {
+                    $household->monthly_income = $incomeAmount;
+                    $household->annual_income = $incomeAmount * 12;
+                }
+                
+                // Log if we had to cap the value
+                if ($povertyPercentage > 999.99) {
+                    Log::warning('General Import: Poverty percentage capped', [
+                        'household_id' => $household->id,
+                        'household_code' => $household->household_code,
+                        'original_percentage' => $povertyPercentage,
+                        'capped_percentage' => $cappedPovertyPercentage,
+                        'income_amount' => $incomeAmount,
+                        'income_type' => $incomeType,
+                        'household_size' => $household->household_size,
+                    ]);
+                }
+                
+                Log::info('General Import: Poverty percentage calculated', [
+                    'household_id' => $household->id,
+                    'household_code' => $household->household_code,
+                    'poverty_percentage' => $cappedPovertyPercentage,
+                    'income_amount' => $incomeAmount,
+                    'income_type' => $incomeType,
+                    'household_size' => $household->household_size,
+                ]);
+            }
+        }
     }
 
     protected function getParticipantFields(): array
