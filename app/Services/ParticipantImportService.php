@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\Participant;
 use App\Models\Household;
 use App\Models\PovertyGuideline;
+use App\Models\ReferenceDataSet;
+use App\Services\ReferenceDataTransformationService;
 use League\Csv\Reader;
 use League\Csv\Statement;
 use Carbon\Carbon;
@@ -15,6 +17,15 @@ use Illuminate\Validation\Rule;
 
 class ParticipantImportService
 {
+    protected ReferenceDataTransformationService $transformer;
+    protected ?ReferenceDataSet $importDefaultSet;
+
+    public function __construct(ReferenceDataTransformationService $transformer)
+    {
+        $this->transformer = $transformer;
+        $this->importDefaultSet = ReferenceDataSet::getImportDefault();
+    }
+
     protected array $requiredHeaders = [
         'household_code',
         'participant_type',
@@ -39,71 +50,95 @@ class ParticipantImportService
         'household_notes'
     ];
 
-    protected array $validEnumValues = [
-        'household_type' => [
-            'Single Person',
-            'Two Adults NO Children',
-            'Single Parent Female',
-            'Single Parent Male',
-            'Two Parent Household',
-            'Non-related Adults with Children',
-            'Multigenerational Household',
-            'Other',
-            'Unknown/not reported'
-        ],
-        'housing_status' => [
-            'Own',
-            'Rent',
-            'Other permanent housing',
-            'Homeless',
-            'Other',
-            'Unknown/not reported'
-        ],
-        'gender' => [
-            'Male',
-            'Female',
-            'Non-binary',
-            'Other',
-            'Prefer not to say'
-        ],
-        'education_level' => [
-            'Less than high school',
-            'High school diploma/GED',
-            'Some college',
-            'Associate degree',
-            'Bachelor degree',
-            'Graduate degree',
-            'Unknown/not reported'
-        ],
-        'disability_status' => [
-            'Yes',
-            'No',
-            'Unknown/not reported'
-        ],
-        'health_insurance_status' => [
-            'Yes',
-            'No',
-            'Unknown/not reported'
-        ],
-        'ethnicity' => [
-            'Hispanic or Latino',
-            'Not Hispanic or Latino',
-            'Unknown/not reported'
-        ],
-        'military_status' => [
-            'Currently serving',
-            'Veteran',
-            'Not applicable',
-            'Unknown/not reported'
-        ],
-        'work_status' => [
-            'Employed full-time',
-            'Employed part-time',
-            'Unemployed',
-            'Not in labor force',
-            'Unknown/not reported'
-        ]
-    ];
+    protected function getValidEnumValues(string $category): array
+    {
+        if (!$this->importDefaultSet) {
+            // Fallback to basic CSBG-compliant values if no import default set
+            return $this->getFallbackValues($category);
+        }
+
+        $referenceData = $this->importDefaultSet->referenceData()
+            ->where('category', $category)
+            ->where('active', true)
+            ->pluck('value')
+            ->toArray();
+
+        return !empty($referenceData) ? $referenceData : $this->getFallbackValues($category);
+    }
+
+    protected function getFallbackValues(string $category): array
+    {
+        $fallbacks = [
+            'household_type' => [
+                'Single Person',
+                'Two Adults NO Children',
+                'Single Parent Female',
+                'Single Parent Male',
+                'Two Parent Household',
+                'Non-related Adults with Children',
+                'Multigenerational Household',
+                'Other',
+                'Unknown/not reported'
+            ],
+            'housing_status' => [
+                'Own',
+                'Rent',
+                'Other permanent housing',
+                'Homeless',
+                'Other',
+                'Unknown/not reported'
+            ],
+            'gender' => [
+                'Male',
+                'Female',
+                'Other',
+                'Unknown/not reported'
+            ],
+            'education_level' => [
+                'Grades 0-8',
+                'Grades 9-12/Non-Graduate',
+                'High School Graduate',
+                'GED/Equivalency Diploma',
+                '12th Grade + Some Post-Secondary',
+                '2 or 4 Year College Graduate',
+                'Graduate of Other Post-Secondary School',
+                'Unknown/not reported'
+            ],
+            'disability_status' => [
+                'Yes',
+                'No',
+                'Unknown/not reported'
+            ],
+            'health_insurance_status' => [
+                'Yes',
+                'No',
+                'Unknown/not reported'
+            ],
+            'ethnicity' => [
+                'Hispanic, Latino or Spanish Origins',
+                'Not Hispanic, Latino or Spanish Origins',
+                'Unknown/not reported'
+            ],
+            'military_status' => [
+                'Veteran',
+                'Active Military',
+                'Never Served in the Military',
+                'Unknown/not reported'
+            ],
+            'work_status' => [
+                'Employed Full-Time',
+                'Employed Part-Time',
+                'Migrant Seasonal Farm Worker',
+                'Unemployed (Short-Term, 6 months or less)',
+                'Unemployed (Long-Term, more than 6 months)',
+                'Unemployed (Not in Labor Force)',
+                'Retired',
+                'Unknown/not reported'
+            ]
+        ];
+
+        return $fallbacks[$category] ?? [];
+    }
 
     public function validateFile(string $filePath): array
     {
@@ -369,9 +404,24 @@ class ParticipantImportService
         }
         
         // Enum field validation
-        foreach ($this->validEnumValues as $field => $validValues) {
-            if (!empty($record[$field]) && !in_array($record[$field], $validValues)) {
-                $errors[] = "Row {$rowNumber}: Invalid value for '{$field}': {$record[$field]}";
+        $enumFields = ['gender', 'ethnicity', 'education_level', 'disability_status', 'health_insurance_status', 'military_status', 'work_status'];
+        foreach ($enumFields as $field) {
+            if (!empty($record[$field])) {
+                $validValues = $this->getValidEnumValues($field);
+                if (!empty($validValues) && !in_array($record[$field], $validValues)) {
+                    $errors[] = "Row {$rowNumber}: Invalid value for '{$field}': {$record[$field]}";
+                }
+            }
+        }
+        
+        // Household field validation
+        $householdEnumFields = ['household_type', 'housing_status'];
+        foreach ($householdEnumFields as $field) {
+            if (!empty($record[$field])) {
+                $validValues = $this->getValidEnumValues($field);
+                if (!empty($validValues) && !in_array($record[$field], $validValues)) {
+                    $errors[] = "Row {$rowNumber}: Invalid value for '{$field}': {$record[$field]}";
+                }
             }
         }
         
@@ -421,17 +471,54 @@ class ParticipantImportService
             return null;
         }
         
+        // Apply transformation for demographic fields
+        $transformedValue = $this->applyTransformation($field, $value);
+        
         switch ($type) {
             case 'boolean':
-                return in_array(strtoupper($value), ['TRUE', '1']);
+                return in_array(strtoupper($transformedValue), ['TRUE', '1']);
             case 'decimal':
-                return is_numeric($value) ? (float) $value : null;
+                return is_numeric($transformedValue) ? (float) $transformedValue : null;
             case 'integer':
-                return is_numeric($value) ? (int) $value : null;
+                return is_numeric($transformedValue) ? (int) $transformedValue : null;
             case 'date':
-                return $this->parseDate($value);
+                return $this->parseDate($transformedValue);
             case 'array':
-                return $this->parseArray($value);
+                return $this->parseArray($transformedValue);
+            default:
+                return $transformedValue;
+        }
+    }
+
+    protected function applyTransformation(string $field, $value)
+    {
+        if (empty($value)) {
+            return $value;
+        }
+
+        // Apply transformation based on field type
+        switch ($field) {
+            case 'gender':
+                return $this->transformer->transformGender($value);
+            case 'ethnicity':
+                return $this->transformer->transformEthnicity($value);
+            case 'education_level':
+                return $this->transformer->transformEducationLevel($value);
+            case 'military_status':
+                return $this->transformer->transformMilitaryStatus($value);
+            case 'disability_status':
+                return $this->transformer->transformDisabilityStatus($value);
+            case 'health_insurance_status':
+                return $this->transformer->transformHealthInsuranceStatus($value);
+            case 'work_status':
+                return $this->transformer->transformWorkStatus($value);
+            case 'household_type':
+                return $this->transformer->transformHouseholdType($value);
+            case 'housing_status':
+                return $this->transformer->transformHousingStatus($value);
+            case 'race':
+                $raceArray = $this->transformer->transformRace($value);
+                return $raceArray; // Return as array for JSON storage
             default:
                 return $value;
         }

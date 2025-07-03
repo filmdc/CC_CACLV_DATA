@@ -70,6 +70,14 @@
                 </flux:navlist.group>
                 @endif
 
+                @if(auth()->user()->hasAnyPermission(['reports.csbg']) || auth()->user()->isAdmin())
+                <flux:navlist.group :heading="__('Reports')" class="grid">
+                    @if(auth()->user()->hasPermission('reports.csbg') || auth()->user()->isAdmin())
+                        <flux:navlist.item icon="chart-bar" :href="route('reports')" :current="request()->routeIs('reports')" wire:navigate>{{ __('Reporting Dashboard') }}</flux:navlist.item>
+                    @endif
+                </flux:navlist.group>
+                @endif
+
                 @if(auth()->user()->hasAnyPermission(['users.view', 'roles.view', 'poverty_guidelines.view', 'reference_data.view', 'reference_data_sets.view', 'admin.access']) || auth()->user()->isAdmin())
                 <flux:navlist.group :heading="__('Administration')" class="grid">
                     @if(auth()->user()->hasPermission('users.view') || auth()->user()->isAdmin())

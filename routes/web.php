@@ -44,6 +44,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('participant-import-export', App\Livewire\ParticipantImportExport::class)->name('participant.import-export');
     Route::get('duplicate-resolution', App\Livewire\DuplicateResolutionManagement::class)->name('duplicate.resolution');
     Route::get('admin-panel', App\Livewire\AdminPanel::class)->name('admin.panel');
+    Route::get('reports', App\Livewire\ReportingManagement::class)->name('reports');
     
     // Secure download route for import/export files
     Route::get('secure-download/{token}', function ($token) {

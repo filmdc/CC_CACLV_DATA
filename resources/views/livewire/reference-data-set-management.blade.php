@@ -200,13 +200,19 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                @if($dataSet->is_active)
-                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">Active</span>
-                                @elseif($dataSet->is_draft)
-                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">Draft</span>
-                                @else
-                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">Published</span>
-                                @endif
+                                <div class="flex flex-col space-y-1">
+                                    @if($dataSet->is_active)
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">Active</span>
+                                    @elseif($dataSet->is_draft)
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">Draft</span>
+                                    @else
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">Published</span>
+                                    @endif
+                                    
+                                    @if($dataSet->is_import_default)
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200">Import Default</span>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                                 <div>{{ $dataSet->getCategoriesCount() }} categories</div>
@@ -235,6 +241,12 @@
                                         <button wire:click="activateDataSet({{ $dataSet->id }})" 
                                                 onclick="return confirm('This will deactivate the current active data set. Are you sure?')"
                                                 class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300">Activate</button>
+                                    @endif
+                                    
+                                    @if(!$dataSet->is_draft && !$dataSet->is_import_default)
+                                        <button wire:click="setAsImportDefault({{ $dataSet->id }})" 
+                                                onclick="return confirm('This will change the default reference data set used for imports. Are you sure?')"
+                                                class="text-orange-600 dark:text-orange-400 hover:text-orange-900 dark:hover:text-orange-300">Set Import Default</button>
                                     @endif
                                     
                                     <button wire:click="showDuplicateDataSet({{ $dataSet->id }})" 

@@ -217,6 +217,22 @@ class ReferenceDataSetManagement extends Component
         }
     }
 
+    public function setAsImportDefault($dataSetId)
+    {
+        $this->authorizeAction('reference_data.activate', 'You do not have permission to set import default reference data sets.');
+        
+        try {
+            $dataSet = ReferenceDataSet::find($dataSetId);
+            if ($dataSet && $dataSet->setAsImportDefault()) {
+                session()->flash('success', 'Data set set as import default successfully.');
+            } else {
+                session()->flash('error', 'Cannot set this data set as import default. It must be published first.');
+            }
+        } catch (\Exception $e) {
+            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+        }
+    }
+
     public function deleteDataSet($dataSetId)
     {
         $this->authorizeAction('reference_data.delete', 'You do not have permission to delete reference data sets.');

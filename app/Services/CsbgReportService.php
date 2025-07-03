@@ -190,6 +190,13 @@ class CsbgReportService
             $referenceDataSet = ReferenceDataSet::getActive();
         }
 
+        // Get program name if program filter is applied
+        $programFilter = 'All Programs';
+        if (isset($filters['program_id'])) {
+            $program = \App\Models\Program::find($filters['program_id']);
+            $programFilter = $program ? $program->name : 'Program ID: ' . $filters['program_id'];
+        }
+
         return [
             'generated_at' => now(),
             'period_start' => $filters['start_date'] ?? null,
@@ -199,8 +206,17 @@ class CsbgReportService
                 'version' => $referenceDataSet->version,
                 'id' => $referenceDataSet->id
             ] : null,
-            'program_filter' => isset($filters['program_id']) ? $filters['program_id'] : 'All Programs',
+            'program_filter' => $programFilter,
             'heads_of_household_only' => $filters['heads_of_household_only'] ?? true,
+            'advanced_filters' => [
+                'gender' => $filters['gender'] ?? [],
+                'ethnicity' => $filters['ethnicity'] ?? [],
+                'education_level' => $filters['education_level'] ?? [],
+                'work_status' => $filters['work_status'] ?? [],
+                'age_min' => $filters['age_min'] ?? null,
+                'age_max' => $filters['age_max'] ?? null,
+                'household_type' => $filters['household_type'] ?? [],
+            ],
         ];
     }
 
@@ -261,16 +277,26 @@ class CsbgReportService
      */
     protected function aggregateByField(Collection $participants, string $field): array
     {
-        $counts = $participants->groupBy($field)->map(function ($group) {
-            return $group->count();
-        })->toArray();
-
-        // Ensure we include "Unknown/not reported" for missing values
-        $unknownCount = $participants->whereNull($field)->count() + 
-                       $participants->where($field, '')->count();
+        $counts = [];
         
-        if ($unknownCount > 0) {
-            $counts['Unknown/not reported'] = $unknownCount;
+        // Group by field value, but handle null/empty specially
+        $grouped = $participants->groupBy(function ($participant) use ($field) {
+            $value = $participant->$field;
+            
+            // Convert null and empty strings to a special marker
+            if ($value === null || $value === '') {
+                return '__UNKNOWN__';
+            }
+            
+            return $value;
+        });
+        
+        foreach ($grouped as $value => $group) {
+            if ($value === '__UNKNOWN__') {
+                $counts['Unknown/not reported'] = $group->count();
+            } else {
+                $counts[$value] = $group->count();
+            }
         }
 
         return $counts;
@@ -421,6 +447,47 @@ class CsbgReportService
         $csv[] = ['Generated: ' . $reportData['report_metadata']['generated_at']];
         $csv[] = ['Total Participants: ' . $reportData['participant_count']];
         $csv[] = [''];
+        
+        // Filter information
+        $csv[] = ['REPORT FILTERS'];
+        $metadata = $reportData['report_metadata'];
+        $csv[] = ['Date Range: ' . ($metadata['period_start'] ? date('M j, Y', strtotime($metadata['period_start'])) : 'Not specified') . ' to ' . ($metadata['period_end'] ? date('M j, Y', strtotime($metadata['period_end'])) : 'Not specified')];
+        
+        if (isset($metadata['reference_data_set']) && $metadata['reference_data_set']) {
+            $csv[] = ['Reference Data Set: ' . $metadata['reference_data_set']['name'] . ' (v' . $metadata['reference_data_set']['version'] . ')'];
+        }
+        
+        $csv[] = ['Program Filter: ' . $metadata['program_filter']];
+        $csv[] = ['Heads of Household Only: ' . ($metadata['heads_of_household_only'] ? 'Yes' : 'No')];
+        
+        // Add advanced filters if they exist
+        if (isset($metadata['advanced_filters'])) {
+            $advancedFilters = $metadata['advanced_filters'];
+            if (!empty($advancedFilters['gender'])) {
+                $csv[] = ['Gender Filter: ' . implode(', ', $advancedFilters['gender'])];
+            }
+            if (!empty($advancedFilters['ethnicity'])) {
+                $csv[] = ['Ethnicity Filter: ' . implode(', ', $advancedFilters['ethnicity'])];
+            }
+            if (!empty($advancedFilters['education_level'])) {
+                $csv[] = ['Education Level Filter: ' . implode(', ', $advancedFilters['education_level'])];
+            }
+            if (!empty($advancedFilters['work_status'])) {
+                $csv[] = ['Work Status Filter: ' . implode(', ', $advancedFilters['work_status'])];
+            }
+            if ($advancedFilters['age_min'] || $advancedFilters['age_max']) {
+                $ageRange = '';
+                if ($advancedFilters['age_min']) $ageRange .= 'Min: ' . $advancedFilters['age_min'];
+                if ($advancedFilters['age_max']) $ageRange .= ($ageRange ? ', ' : '') . 'Max: ' . $advancedFilters['age_max'];
+                $csv[] = ['Age Range Filter: ' . $ageRange];
+            }
+            if (!empty($advancedFilters['household_type'])) {
+                $csv[] = ['Household Type Filter: ' . implode(', ', $advancedFilters['household_type'])];
+            }
+        }
+        
+        $csv[] = [''];
+        $csv[] = [''];
 
         // Demographics section
         $csv[] = ['DEMOGRAPHICS'];
@@ -503,27 +570,60 @@ class CsbgReportService
     }
 
     /**
-     * Create Excel export matching the official CSBG Module 4 Section C format
+     * Create comprehensive Excel export with all report data on a single sheet
      */
     private function exportToOfficialCsbgExcel(array $reportData): string
     {
         $spreadsheet = new Spreadsheet();
+        $worksheet = $spreadsheet->getActiveSheet();
+        $worksheet->setTitle('CSBG Report');
         
-        // Create two worksheets for the two pages
-        $page1 = $spreadsheet->getActiveSheet();
-        $page1->setTitle('CSBG Module 4C Page 1');
+        // Set up the page format
+        $worksheet->getPageSetup()->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_PORTRAIT);
+        $worksheet->getPageSetup()->setPaperSize(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::PAPERSIZE_LETTER);
         
-        $page2 = $spreadsheet->createSheet();
-        $page2->setTitle('CSBG Module 4C Page 2');
+        $row = 1;
         
-        // Build Page 1 - Household Level Characteristics
-        $this->buildCsbgPage1($page1, $reportData);
+        // Main Header
+        $worksheet->mergeCells('A1:D1');
+        $worksheet->setCellValue('A1', 'CSBG Module 4 Section C Report');
+        $worksheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
+        $worksheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $worksheet->getStyle('A1')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('2563EB');
+        $worksheet->getStyle('A1')->getFont()->getColor()->setRGB('FFFFFF');
+        $row += 2;
         
-        // Build Page 2 - Individual Level Characteristics  
-        $this->buildCsbgPage2($page2, $reportData);
+        // Report Summary
+        $worksheet->setCellValue("A{$row}", 'Total Participants:');
+        $worksheet->setCellValue("B{$row}", $reportData['participant_count']);
+        $worksheet->getStyle("A{$row}")->getFont()->setBold(true);
+        $row++;
         
-        // Set the active sheet back to page 1
-        $spreadsheet->setActiveSheetIndex(0);
+        $worksheet->setCellValue("A{$row}", 'Generated:');
+        $worksheet->setCellValue("B{$row}", $reportData['report_metadata']['generated_at']->format('M j, Y g:i A'));
+        $worksheet->getStyle("A{$row}")->getFont()->setBold(true);
+        $row += 2;
+        
+        // Add filter information
+        $this->addFilterInformationToExcel($worksheet, $row, $reportData);
+        $row += $this->getFilterInfoRowCount($reportData) + 2;
+        
+        // Demographics Section
+        $row = $this->addComprehensiveExcelSection($worksheet, $row, 'DEMOGRAPHICS', $reportData['demographics']);
+        
+        // Characteristics Section
+        $row = $this->addComprehensiveExcelSection($worksheet, $row, 'CHARACTERISTICS', $reportData['characteristics']);
+        
+        // Employment & Income Section
+        $row = $this->addComprehensiveExcelSection($worksheet, $row, 'EMPLOYMENT & INCOME', $reportData['employment_income']);
+        
+        // Health & Housing Section
+        $row = $this->addComprehensiveExcelSection($worksheet, $row, 'HEALTH & HOUSING', $reportData['health_housing']);
+        
+        // Auto-size columns
+        foreach (range('A', 'D') as $column) {
+            $worksheet->getColumnDimension($column)->setAutoSize(true);
+        }
         
         // Create writer and return content
         $writer = new Xlsx($spreadsheet);
@@ -532,309 +632,6 @@ class CsbgReportService
         return ob_get_clean();
     }
 
-    /**
-     * Build CSBG Page 1 - Household Level Characteristics
-     */
-    private function buildCsbgPage1($worksheet, array $reportData)
-    {
-        // Set up the page format
-        $worksheet->getPageSetup()->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_PORTRAIT);
-        $worksheet->getPageSetup()->setPaperSize(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::PAPERSIZE_LETTER);
-        
-        $row = 1;
-        
-        // Header
-        $worksheet->mergeCells('A1:H1');
-        $worksheet->setCellValue('A1', 'Module 4, Section C: All Characteristics Report - Data Entry Form');
-        $worksheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
-        $worksheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $row += 2;
-        
-        $worksheet->mergeCells('A3:H3');
-        $worksheet->setCellValue('A3', 'Goal 1: Individuals and Families with low-incomes are stable and achieve economic security.');
-        $worksheet->getStyle('A3')->getFont()->setBold(true)->setSize(12);
-        $row += 2;
-        
-        // CALV Program Reporting field
-        $worksheet->setCellValue('A5', 'CALV Program Reporting:');
-        $worksheet->getStyle('A5')->getFont()->setBold(true);
-        $worksheet->mergeCells('B5:H5');
-        $worksheet->getStyle('B5:H5')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-        $row += 2;
-        
-        // Section A & B headers
-        $worksheet->setCellValue('A7', 'A. Total unduplicated number of all INDIVIDUALS about whom one or more characteristics were obtained:');
-        $worksheet->getStyle('A7')->getFont()->setBold(true);
-        $worksheet->setCellValue('G7', $reportData['participant_count']);
-        $worksheet->getStyle('G7')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-        
-        $worksheet->setCellValue('A8', 'B. Total unduplicated number of all HOUSEHOLDS about whom one or more characteristics were obtained:');
-        $worksheet->getStyle('A8')->getFont()->setBold(true);
-        // Calculate unique households from participants
-        $householdCount = 0; // We'll need to calculate this from the data
-        $worksheet->setCellValue('G8', $householdCount);
-        $worksheet->getStyle('G8')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-        
-        $row = 10;
-        
-        // Section D: HOUSEHOLD LEVEL CHARACTERISTICS
-        $worksheet->mergeCells("A{$row}:H{$row}");
-        $worksheet->setCellValue("A{$row}", 'D. HOUSEHOLD LEVEL CHARACTERISTICS');
-        $worksheet->getStyle("A{$row}")->getFont()->setBold(true)->setSize(12);
-        $worksheet->getStyle("A{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('B3D9FF');
-        $row += 2;
-        
-        // 9. Household Type
-        $row = $this->addHouseholdSection($worksheet, $row, '9. Household Type', [
-            'a. Single Person' => 0,
-            'b. Two Parent with Children' => 0,
-            'c. Single Parent Female' => 0,
-            'd. Single Parent Male' => 0,
-            'e. Two Parent Household' => 0,
-            'f. Non-related Adults with Children' => 0,
-            'g. Multigenerational Household' => 0,
-            'h. Other' => 0,
-            'i. Unknown/not reported' => 0,
-        ]);
-        
-        // 10. Household Size
-        $row = $this->addHouseholdSection($worksheet, $row, '10. Household Size', [
-            'a. Single Person' => 0,
-            'b. Two' => 0,
-            'c. Three' => 0,
-            'd. Four' => 0,
-            'e. Five' => 0,
-            'f. Six or more' => 0,
-            'g. Unknown/not reported' => 0,
-        ]);
-        
-        // 11. Housing
-        $row = $this->addHouseholdSection($worksheet, $row, '11. Housing', [
-            'a. Own' => 0,
-            'b. Rent' => 0,
-            'c. Other permanent housing' => 0,
-            'd. Homeless' => 0,
-            'e. Other' => 0,
-            'f. Unknown/not reported' => 0,
-        ]);
-        
-        // 12. Level of Household Income
-        $povertyData = $reportData['employment_income']['poverty_levels'] ?? [];
-        $row = $this->addHouseholdSection($worksheet, $row, '12. Level of Household Income', [
-            'a. Up to 50%' => $povertyData['0-50% FPL'] ?? 0,
-            'b. 51% to 75%' => 0, // Need to split the 51-100% range
-            'c. 76% to 100%' => 0,
-            'd. 101% to 125%' => $povertyData['101-125% FPL'] ?? 0,
-            'e. 126% to 150%' => $povertyData['126-150% FPL'] ?? 0,
-            'f. 151% to 175%' => 0, // Need to split the 151-200% range  
-            'g. 176% to 200%' => 0,
-            'h. 201% to 250%' => 0, // Need to add this range
-            'i. 250% and over' => $povertyData['Over 200% FPL'] ?? 0,
-            'j. Unknown/not reported' => $povertyData['Unknown/not reported'] ?? 0,
-        ]);
-        
-        // Continue with sections 13, 14, 15, etc. based on the form
-        // This is getting quite long, so I'll implement the core structure first
-    }
-
-    /**
-     * Helper method to add a household section with proper formatting
-     */
-    private function addHouseholdSection($worksheet, int $startRow, string $title, array $data): int
-    {
-        $row = $startRow;
-        
-        // Section title with blue background
-        $worksheet->mergeCells("A{$row}:E{$row}");
-        $worksheet->setCellValue("A{$row}", $title);
-        $worksheet->getStyle("A{$row}")->getFont()->setBold(true);
-        $worksheet->getStyle("A{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('B3D9FF');
-        
-        $worksheet->setCellValue("F{$row}", 'Number of Households');
-        $worksheet->getStyle("F{$row}")->getFont()->setBold(true);
-        $worksheet->getStyle("F{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('B3D9FF');
-        $row++;
-        
-        // Add data rows
-        foreach ($data as $label => $count) {
-            $worksheet->setCellValue("A{$row}", $label);
-            $worksheet->setCellValue("F{$row}", $count);
-            $worksheet->getStyle("F{$row}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-            $row++;
-        }
-        
-        // Total row
-        $worksheet->setCellValue("A{$row}", 'i. TOTAL (auto calculated)');
-        $worksheet->getStyle("A{$row}")->getFont()->setBold(true);
-        $totalCount = array_sum($data);
-        $worksheet->setCellValue("F{$row}", $totalCount);
-        $worksheet->getStyle("F{$row}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-        $worksheet->getStyle("F{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('E0E0E0');
-        
-        return $row + 2; // Add spacing
-    }
-
-    /**
-     * Build CSBG Page 2 - Individual Level Characteristics
-     */
-    private function buildCsbgPage2($worksheet, array $reportData)
-    {
-        // Set up the page format
-        $worksheet->getPageSetup()->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_PORTRAIT);
-        $worksheet->getPageSetup()->setPaperSize(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::PAPERSIZE_LETTER);
-        
-        $row = 1;
-        
-        // Header (same as page 1)
-        $worksheet->mergeCells('A1:H1');
-        $worksheet->setCellValue('A1', 'Module 4, Section C: All Characteristics Report - Data Entry Form');
-        $worksheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
-        $worksheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $row += 2;
-        
-        $worksheet->mergeCells('A3:H3');
-        $worksheet->setCellValue('A3', 'Goal 1: Individuals and Families with low-incomes are stable and achieve economic security.');
-        $worksheet->getStyle('A3')->getFont()->setBold(true)->setSize(12);
-        $row += 2;
-        
-        // CALV Program Reporting field  
-        $worksheet->setCellValue('A5', 'CALV Program Reporting:');
-        $worksheet->getStyle('A5')->getFont()->setBold(true);
-        $worksheet->mergeCells('B5:H5');
-        $worksheet->getStyle('B5:H5')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-        $row += 2;
-        
-        // Section A & B headers (same counts as page 1)
-        $worksheet->setCellValue('A7', 'A. Total unduplicated number of all INDIVIDUALS about whom one or more characteristics were obtained:');
-        $worksheet->getStyle('A7')->getFont()->setBold(true);
-        $worksheet->setCellValue('G7', $reportData['participant_count']);
-        $worksheet->getStyle('G7')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-        
-        $worksheet->setCellValue('A8', 'B. Total unduplicated number of all HOUSEHOLDS about whom one or more characteristics were obtained:');
-        $worksheet->getStyle('A8')->getFont()->setBold(true);
-        $householdCount = 0; // Calculate from data
-        $worksheet->setCellValue('G8', $householdCount);
-        $worksheet->getStyle('G8')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-        
-        $row = 10;
-        
-        // Section C: INDIVIDUAL LEVEL CHARACTERISTICS
-        $worksheet->mergeCells("A{$row}:H{$row}");
-        $worksheet->setCellValue("A{$row}", 'C. INDIVIDUAL LEVEL CHARACTERISTICS');
-        $worksheet->getStyle("A{$row}")->getFont()->setBold(true)->setSize(12);
-        $worksheet->getStyle("A{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('B3D9FF');
-        $row += 2;
-        
-        // 1. Gender
-        $genderData = $reportData['demographics']['gender'] ?? [];
-        $row = $this->addIndividualSection($worksheet, $row, '1. Gender', [
-            'a. Male' => $genderData['Male'] ?? 0,
-            'b. Female' => $genderData['Female'] ?? 0,
-            'c. Other' => $genderData['Other'] ?? 0,
-            'd. Unknown/not reported' => $genderData['Unknown/not reported'] ?? 0,
-        ]);
-        
-        // 2. Age
-        $ageData = $reportData['characteristics']['age_groups'] ?? [];
-        $row = $this->addIndividualSection($worksheet, $row, '2. Age', [
-            'a. 0-5' => $ageData['0-5'] ?? 0,
-            'b. 6-13' => $ageData['6-11'] ?? 0, // Combine 6-11 range
-            'c. 14-17' => $ageData['12-17'] ?? 0, // Use 12-17 as closest
-            'd. 18-24' => $ageData['18-24'] ?? 0,
-            'e. 25-44' => ($ageData['25-34'] ?? 0) + ($ageData['35-44'] ?? 0),
-            'f. 45-54' => $ageData['45-54'] ?? 0,
-            'g. 55-59' => 0, // Need to split 55-64 range
-            'h. 60-64' => $ageData['55-64'] ?? 0,
-            'i. 65-74' => 0, // Need to split 65+ range
-            'j. 75+' => $ageData['65+'] ?? 0,
-            'k. Unknown/not reported' => $ageData['Unknown/not reported'] ?? 0,
-        ]);
-        
-        // Continue with remaining sections...
-    }
-
-    /**
-     * Helper method to add an individual section with proper formatting
-     */
-    private function addIndividualSection($worksheet, int $startRow, string $title, array $data): int
-    {
-        $row = $startRow;
-        
-        // Section title with blue background
-        $worksheet->mergeCells("A{$row}:E{$row}");
-        $worksheet->setCellValue("A{$row}", $title);
-        $worksheet->getStyle("A{$row}")->getFont()->setBold(true);
-        $worksheet->getStyle("A{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('B3D9FF');
-        
-        $worksheet->setCellValue("F{$row}", 'Number of Individuals');
-        $worksheet->getStyle("F{$row}")->getFont()->setBold(true);
-        $worksheet->getStyle("F{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('B3D9FF');
-        $row++;
-        
-        // Add data rows
-        foreach ($data as $label => $count) {
-            $worksheet->setCellValue("A{$row}", $label);
-            $worksheet->setCellValue("F{$row}", $count);
-            $worksheet->getStyle("F{$row}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-            $row++;
-        }
-        
-        // Total row
-        $worksheet->setCellValue("A{$row}", 'l. TOTAL (auto calculated)');
-        $worksheet->getStyle("A{$row}")->getFont()->setBold(true);
-        $totalCount = array_sum($data);
-        $worksheet->setCellValue("F{$row}", $totalCount);
-        $worksheet->getStyle("F{$row}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-        $worksheet->getStyle("F{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('E0E0E0');
-        
-        return $row + 2; // Add spacing
-    }
-
-    /**
-     * Helper method to add a section to Excel worksheet
-     */
-    private function addExcelSection($worksheet, int $startRow, string $title, array $sectionData): int
-    {
-        $row = $startRow;
-        
-        // Section title
-        $worksheet->setCellValue('A' . $row, $title);
-        $worksheet->getStyle('A' . $row)->getFont()->setBold(true)->setSize(14);
-        $worksheet->getStyle('A' . $row)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('E2E8F0');
-        $worksheet->mergeCells('A' . $row . ':D' . $row);
-        $row++;
-        
-        // Headers
-        $worksheet->setCellValue('A' . $row, 'Category');
-        $worksheet->setCellValue('B' . $row, 'Value');
-        $worksheet->setCellValue('C' . $row, 'Count');
-        $worksheet->setCellValue('D' . $row, 'Percentage');
-        
-        $headerStyle = $worksheet->getStyle('A' . $row . ':D' . $row);
-        $headerStyle->getFont()->setBold(true);
-        $headerStyle->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('F1F5F9');
-        $headerStyle->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-        $row++;
-        
-        // Data rows
-        foreach ($sectionData as $category => $data) {
-            $categoryStart = $row;
-            $totalCount = array_sum($data);
-            
-            foreach ($data as $value => $count) {
-                $worksheet->setCellValue('A' . $row, ucfirst(str_replace('_', ' ', $category)));
-                $worksheet->setCellValue('B' . $row, $value);
-                $worksheet->setCellValue('C' . $row, number_format($count));
-                $worksheet->setCellValue('D' . $row, $totalCount > 0 ? number_format(($count / $totalCount) * 100, 1) . '%' : '0%');
-                
-                // Add borders
-                $worksheet->getStyle('A' . $row . ':D' . $row)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-                $row++;
-            }
-        }
-        
-        return $row + 1; // Add extra space between sections
-    }
 
     /**
      * Generate cache key based on filters
@@ -926,19 +723,19 @@ class CsbgReportService
         switch ($category) {
             case 'gender':
                 return $participant->gender === $value || 
-                       ($value === 'Unknown/not reported' && empty($participant->gender));
+                       ($value === 'Unknown/not reported' && ($participant->gender === null || $participant->gender === ''));
                        
             case 'ethnicity':
                 return $participant->ethnicity === $value || 
-                       ($value === 'Unknown/not reported' && empty($participant->ethnicity));
+                       ($value === 'Unknown/not reported' && ($participant->ethnicity === null || $participant->ethnicity === ''));
                        
             case 'education_level':
                 return $participant->education_level === $value || 
-                       ($value === 'Unknown/not reported' && empty($participant->education_level));
+                       ($value === 'Unknown/not reported' && ($participant->education_level === null || $participant->education_level === ''));
                        
             case 'work_status':
                 return $participant->work_status === $value || 
-                       ($value === 'Unknown/not reported' && empty($participant->work_status));
+                       ($value === 'Unknown/not reported' && ($participant->work_status === null || $participant->work_status === ''));
                        
             case 'age_groups':
                 return $this->matchesAgeGroup($participant, $value);
@@ -949,12 +746,12 @@ class CsbgReportService
             case 'housing_status':
                 $housingStatus = $participant->household->housing_status ?? null;
                 return $housingStatus === $value || 
-                       ($value === 'Unknown/not reported' && empty($housingStatus));
+                       ($value === 'Unknown/not reported' && ($housingStatus === null || $housingStatus === ''));
                        
             case 'household_type':
                 $householdType = $participant->household->household_type ?? null;
                 return $householdType === $value || 
-                       ($value === 'Unknown/not reported' && empty($householdType));
+                       ($value === 'Unknown/not reported' && ($householdType === null || $householdType === ''));
                        
             default:
                 return false;
@@ -1014,5 +811,178 @@ class CsbgReportService
             'Over 200% FPL' => $povertyPercentage > 200,
             default => false,
         };
+    }
+
+    /**
+     * Add comprehensive Excel section with proper formatting
+     */
+    private function addComprehensiveExcelSection($worksheet, int $startRow, string $sectionTitle, array $sectionData): int
+    {
+        $row = $startRow;
+        
+        // Section header
+        $worksheet->mergeCells("A{$row}:D{$row}");
+        $worksheet->setCellValue("A{$row}", $sectionTitle);
+        $worksheet->getStyle("A{$row}")->getFont()->setBold(true)->setSize(14);
+        $worksheet->getStyle("A{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $worksheet->getStyle("A{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('E2E8F0');
+        $row += 2;
+        
+        // Table headers
+        $worksheet->setCellValue("A{$row}", 'Category');
+        $worksheet->setCellValue("B{$row}", 'Value');
+        $worksheet->setCellValue("C{$row}", 'Count');
+        $worksheet->setCellValue("D{$row}", 'Percentage');
+        
+        $headerStyle = $worksheet->getStyle("A{$row}:D{$row}");
+        $headerStyle->getFont()->setBold(true);
+        $headerStyle->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('F1F5F9');
+        $headerStyle->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+        $row++;
+        
+        // Data rows
+        foreach ($sectionData as $category => $data) {
+            $categoryStart = $row;
+            $totalCount = array_sum($data);
+            
+            foreach ($data as $value => $count) {
+                $worksheet->setCellValue("A{$row}", ucfirst(str_replace('_', ' ', $category)));
+                $worksheet->setCellValue("B{$row}", $value);
+                $worksheet->setCellValue("C{$row}", number_format($count));
+                $worksheet->setCellValue("D{$row}", $totalCount > 0 ? number_format(($count / $totalCount) * 100, 1) . '%' : '0%');
+                
+                // Add borders and alternating row colors
+                $rowStyle = $worksheet->getStyle("A{$row}:D{$row}");
+                $rowStyle->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+                if ($row % 2 == 0) {
+                    $rowStyle->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('F9FAFB');
+                }
+                $row++;
+            }
+            
+            // Add spacing between categories
+            if ($row < $categoryStart + count($data)) {
+                $row++;
+            }
+        }
+        
+        return $row + 2; // Add extra spacing between sections
+    }
+
+    /**
+     * Add filter information section to Excel worksheet
+     */
+    private function addFilterInformationToExcel($worksheet, int $startRow, array $reportData): void
+    {
+        $row = $startRow;
+        $metadata = $reportData['report_metadata'];
+        
+        // Filter section header
+        $worksheet->mergeCells("A{$row}:D{$row}");
+        $worksheet->setCellValue("A{$row}", 'REPORT FILTERS');
+        $worksheet->getStyle("A{$row}")->getFont()->setBold(true)->setSize(12);
+        $worksheet->getStyle("A{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $worksheet->getStyle("A{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('FFE6CC');
+        $row++;
+        
+        // Date range
+        $dateRange = ($metadata['period_start'] ? date('M j, Y', strtotime($metadata['period_start'])) : 'Not specified') . 
+                    ' to ' . 
+                    ($metadata['period_end'] ? date('M j, Y', strtotime($metadata['period_end'])) : 'Not specified');
+        $worksheet->setCellValue("A{$row}", 'Date Range:');
+        $worksheet->setCellValue("B{$row}", $dateRange);
+        $worksheet->getStyle("A{$row}")->getFont()->setBold(true);
+        $row++;
+        
+        // Reference data set
+        if (isset($metadata['reference_data_set']) && $metadata['reference_data_set']) {
+            $worksheet->setCellValue("A{$row}", 'Reference Data Set:');
+            $worksheet->setCellValue("B{$row}", $metadata['reference_data_set']['name'] . ' (v' . $metadata['reference_data_set']['version'] . ')');
+            $worksheet->getStyle("A{$row}")->getFont()->setBold(true);
+            $row++;
+        }
+        
+        // Program filter
+        $worksheet->setCellValue("A{$row}", 'Program Filter:');
+        $worksheet->setCellValue("B{$row}", $metadata['program_filter']);
+        $worksheet->getStyle("A{$row}")->getFont()->setBold(true);
+        $row++;
+        
+        // Heads of household only
+        $worksheet->setCellValue("A{$row}", 'Heads of Household Only:');
+        $worksheet->setCellValue("B{$row}", $metadata['heads_of_household_only'] ? 'Yes' : 'No');
+        $worksheet->getStyle("A{$row}")->getFont()->setBold(true);
+        $row++;
+        
+        // Advanced filters
+        if (isset($metadata['advanced_filters'])) {
+            $advancedFilters = $metadata['advanced_filters'];
+            
+            if (!empty($advancedFilters['gender'])) {
+                $worksheet->setCellValue("A{$row}", 'Gender Filter:');
+                $worksheet->setCellValue("B{$row}", implode(', ', $advancedFilters['gender']));
+                $worksheet->getStyle("A{$row}")->getFont()->setBold(true);
+                $row++;
+            }
+            
+            if (!empty($advancedFilters['ethnicity'])) {
+                $worksheet->setCellValue("A{$row}", 'Ethnicity Filter:');
+                $worksheet->setCellValue("B{$row}", implode(', ', $advancedFilters['ethnicity']));
+                $worksheet->getStyle("A{$row}")->getFont()->setBold(true);
+                $row++;
+            }
+            
+            if (!empty($advancedFilters['education_level'])) {
+                $worksheet->setCellValue("A{$row}", 'Education Level Filter:');
+                $worksheet->setCellValue("B{$row}", implode(', ', $advancedFilters['education_level']));
+                $worksheet->getStyle("A{$row}")->getFont()->setBold(true);
+                $row++;
+            }
+            
+            if (!empty($advancedFilters['work_status'])) {
+                $worksheet->setCellValue("A{$row}", 'Work Status Filter:');
+                $worksheet->setCellValue("B{$row}", implode(', ', $advancedFilters['work_status']));
+                $worksheet->getStyle("A{$row}")->getFont()->setBold(true);
+                $row++;
+            }
+            
+            if ($advancedFilters['age_min'] || $advancedFilters['age_max']) {
+                $ageRange = '';
+                if ($advancedFilters['age_min']) $ageRange .= 'Min: ' . $advancedFilters['age_min'];
+                if ($advancedFilters['age_max']) $ageRange .= ($ageRange ? ', ' : '') . 'Max: ' . $advancedFilters['age_max'];
+                $worksheet->setCellValue("A{$row}", 'Age Range Filter:');
+                $worksheet->setCellValue("B{$row}", $ageRange);
+                $worksheet->getStyle("A{$row}")->getFont()->setBold(true);
+                $row++;
+            }
+            
+            if (!empty($advancedFilters['household_type'])) {
+                $worksheet->setCellValue("A{$row}", 'Household Type Filter:');
+                $worksheet->setCellValue("B{$row}", implode(', ', $advancedFilters['household_type']));
+                $worksheet->getStyle("A{$row}")->getFont()->setBold(true);
+                $row++;
+            }
+        }
+    }
+
+    /**
+     * Calculate how many rows the filter information will take
+     */
+    private function getFilterInfoRowCount(array $reportData): int
+    {
+        $count = 5; // Header + date range + reference data set + program filter + heads of household
+        
+        if (isset($reportData['report_metadata']['advanced_filters'])) {
+            $advancedFilters = $reportData['report_metadata']['advanced_filters'];
+            
+            if (!empty($advancedFilters['gender'])) $count++;
+            if (!empty($advancedFilters['ethnicity'])) $count++;
+            if (!empty($advancedFilters['education_level'])) $count++;
+            if (!empty($advancedFilters['work_status'])) $count++;
+            if ($advancedFilters['age_min'] || $advancedFilters['age_max']) $count++;
+            if (!empty($advancedFilters['household_type'])) $count++;
+        }
+        
+        return $count;
     }
 }

@@ -15,6 +15,7 @@ class ReferenceDataSet extends Model
         'version',
         'is_active',
         'is_draft',
+        'is_import_default',
         'activated_at',
         'created_by'
     ];
@@ -22,6 +23,7 @@ class ReferenceDataSet extends Model
     protected $casts = [
         'is_active' => 'boolean',
         'is_draft' => 'boolean',
+        'is_import_default' => 'boolean',
         'activated_at' => 'datetime'
     ];
 
@@ -46,6 +48,28 @@ class ReferenceDataSet extends Model
                    ->where('is_draft', false)
                    ->orderBy('activated_at', 'desc')
                    ->first();
+    }
+
+    public static function getImportDefault(): ?self
+    {
+        return self::where('is_import_default', true)
+                   ->where('is_draft', false)
+                   ->first();
+    }
+
+    public function setAsImportDefault(): bool
+    {
+        if ($this->is_draft) {
+            return false;
+        }
+
+        // Remove import default from all other sets
+        self::where('is_import_default', true)->update(['is_import_default' => false]);
+        
+        // Set this set as import default
+        $this->update(['is_import_default' => true]);
+
+        return true;
     }
 
     public function activate(): bool
@@ -84,6 +108,7 @@ class ReferenceDataSet extends Model
             'version' => $newVersion,
             'is_active' => false,
             'is_draft' => true,
+            'is_import_default' => false,
             'created_by' => auth()->id()
         ]);
 
@@ -103,8 +128,12 @@ class ReferenceDataSet extends Model
 
     public function getStatusAttribute(): string
     {
-        if ($this->is_active) {
+        if ($this->is_active && $this->is_import_default) {
+            return 'Active & Import Default';
+        } elseif ($this->is_active) {
             return 'Active';
+        } elseif ($this->is_import_default) {
+            return 'Import Default';
         } elseif ($this->is_draft) {
             return 'Draft';
         } else {
