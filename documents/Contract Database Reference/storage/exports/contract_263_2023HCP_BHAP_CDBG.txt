@@ -1,0 +1,31 @@
+Purpose: <p>-Assist LMI first time homebuyers at or below 80% AMI with down payment and closing costs.&nbsp;</p><p>-Salary and Benefits for HCP</p><p>-If personnel expenses are not 100% covered for by CDBG funds under this Agreement, copies of allocations showing a split of funding between CDBG, and other funding sources must be submitted with draw down request.</p><p>-Please see Exhibit A for Program requirements.&nbsp;</p>
+Funder: City of Bethlehem -CDBG-BHAP
+Program: HCP
+Amount: 20000.00
+Start Date: 2023-01-01
+End Date: 2024-06-30
+
+Notes: 
+
+Fund Number: 0550
+
+Attached Document: 656e2d071c5fb_2023HCP_BHAP.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6584a0f18309d_2023HCP_BHAP_CDBG_executed-contract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6585c4aed09cc_2023HCP_BHAP_Amendment-1_signed.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 65b7d1d987b5d_2023HCP_BHAP_CDBG_extension.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

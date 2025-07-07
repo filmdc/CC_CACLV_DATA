@@ -1,0 +1,16 @@
+Purpose: <p>Baltimore Life Community Grant</p><p>Grant purpose: To support SBR annual litter pickup event.</p><p>Contract: no contract, just a check contribution</p><p>Reporting: Not required</p>
+Funder: Baltimore Life Community Fund
+Program: SBR
+Amount: 500.00
+Start Date: 2024-01-01
+End Date: 2024-06-30
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 65a153f4724e6_Baltimore-Life-Communtiy-Check_12-18-2023.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

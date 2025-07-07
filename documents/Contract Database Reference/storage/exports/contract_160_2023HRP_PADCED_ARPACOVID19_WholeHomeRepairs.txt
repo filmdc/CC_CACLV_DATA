@@ -1,0 +1,1023 @@
+Purpose: <p>-Address habitability and safety concerns, provide measures to improve energy or water efficiency and make units accessible for individuals with disabilities.&nbsp;</p><p>-$2,348,544 for eligible Whole-Home Repairs</p><p>-$109,000 for administrative costs</p><p>-$272,000 for provisions and enhancements</p><p>-This is not a reimbursable grant, and we will be receiving all of the funds upfront.</p>
+Funder: PA DCED
+Program: CAH
+Amount: 2729544.00
+Start Date: 2022-12-12
+End Date: 2026-12-31
+
+Notes: <p>-Money must be fully obligated by December 31, 2024.</p><p>-Funds must be kept in an interest-bearing account</p><p>-PA Prevailing Wage -Prime construction contracts in excess of $24,999 must pay PA prevailing wage&nbsp;</p><p>-Open and Competitive bidding procedures for any contract in excess of $10,000 (must have 3 arm length bids)</p><p>&nbsp;<strong>-COVID Impact Eligibility Question</strong></p><p>*The project/client is presumed eligible if the household is a low- or moderate-income household as defined by the State and Local Fiscal Recovery fund guidance.&nbsp; Per SLFRF, Low- or moderate-income households and communities are those with (i) income at or below 300 percent of the Federal Poverty Guidelines for the size of the household based on the most recently published poverty guidelines or (ii) income at or below 65 percent of the area median income for the county and size of household based on the most recently published data. **For households whose income exceeds the federal definition as defined above but falls within the WHR requirement for an eligible homeowner (household income not to exceed 80% of the area median income), the Grantee should document the Covid impact (“impacted or “disproportionately impacted”) using the attached FRAMEWORK FOR ELIGIBLE USES BEYOND THOSE ENUMERATED found within the SLFRF Final Rule Overview.</p><p>-All work needs to be done by a qualified contractor who is licensed and insured. Habitat for Humanity cannot use volunteers who do not meet this criterion.</p><p>&nbsp;</p><p><strong>***Update***</strong></p><p><strong>Program monitoring to take place in the Spring. A predetermined percentage of projects will be selected at random for review. Requested documents to include- project/ case files, invoices, proof of eligibility and photos.</strong></p>
+
+Fund Number: 7000
+
+Attached Document: 642afc88a7163_SLFRF-Final-Rule-Overview-_-FRAMEWORK-FOR-ELIGIBLE-USES-BEYOND-THOSE-ENUMERATED-(1).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 642afc943ec55_Whole-Home-Repairs---Reporting-Template.eml
+Unsupported file format: message/rfc822
+--------------------
+Attached Document: 642afc980d606_Whole-Home-Reporting-Template---Locked-Version--3_29_2023.xlsx
+WHOLE-HOME REPAIRS										Subgrantee		Amount	Contact Information			Expected Participation/ Use of Funds			
+QUARTERLY REPORTS																			
+Grantee Name:																			
+DCED Contract #:																			
+Award amount:																			
+Contract dates:																			
+Grantee's UEI:																			
+Grantee's FEIN/TIN:																			
+Registered in SAM.gov?																			
+Grantee's address                       (street address, city, & zip)																			
+Contact Name:																			
+Contact Email:																			
+Contact Phone #:																			
+Dashboard																			
+Total Obligations:			 $ -   																
+Total Expenditures:			 $ -   																
+Total Program Income:			 $ -   							List of programs funded through the Whole-Home Repairs Program:									
+*** If there are any clawbacks, please indicate if the grant award amount needs to be adjusted in the "Additional Information" section. Clawbacks are factored into the Total Expenditures but not the Total Obligations.																			
+																			
+																			
+Total number of grant/loan applications received:																			
+Total number of grant/loan application denied:																			
+Summary of the most common reasons for denial of applications:																			
+																			
+																			
+																			
+																			
+																			
+																			
+										Additional Information or Adjustments									
+New staff hired to fulfill services																			
+Summary of system improvement to fulfill services:																			
+																			
+																			
+																			
+																			
+																			
+																			
+																			
+																			
+																			
+																			
+																			
+
+--------------------
+Attached Document: 645504c4ebadb_WHRP-Sample-Self-Certification-of-Annual-Income-Form.docx
+DCED WHOLE-HOME REPAIRS PROGRAM
+SAMPLE SELF-CERTIFICATION OF ANNUAL INCOME FORM
+PURPOSE:
+This is a written statement that permits the documentation of eligibility for the program based on household income.
+APPLICABILITY:
+This sample self-certification of income form may be used by agencies to document annual income of:
+Homeowners
+Landlords
+Tenants
+This form must accompany the application for assistance and be kept as a record in the client/project file. 
+DISCLOSURE:
+The sample form is provided as a guide and should be adapted to include the agency’s policy and procedures regarding eligibility requirements for its Whole-Home Repairs Program. Depending on the agency’s application intake process, this form may be filled out between the agency and the applicant, or by the applicant. Applicants can complete the form using current income information available to them. The agency should ensure the instructions are clear in each section when they adapt the form for its program.
+INSTRUCTIONS:
+Please complete one form and include the requested information for all persons in the household. Complete an additional form if the applicant needs more space. The adult head of household must sign and date the form.
+PART I: ELIGIBILITY OVERVIEW
+Homeowners
+Whole-Home Repairs Program funding for homeowners is limited to income eligible households whose income does not exceed 80% of the total area median income (AMI) as defined by the . For households where the AMI is greater than 300% of the  or 65% of the AMI, there will need to be proof of COVID-19 Impact as described in the .
+Additionally, eligible households include those who qualify for the following federal benefits: Temporary Assistance for Needy Families (TANF), Supplemental Nutrition Assistance Program (SNAP), Free- and Reduced-Price Lunch (NSLP) and/or School Breakfast (SBP) programs, Medicare Part D Low-Income Subsidies, Supplemental Security Income (SSI), Head Start and/or Early Head Start, Special Supplemental Nutrition Program for Women, Infants, and Children (WIC), Section 8 Vouchers, Low-Income Home Energy Assistance Program (LIHEAP), and Pell Grants. An eligible household may also include those who qualify (and have been verified in the past 12 months) for other federal, state, and local programs including the Weatherization Assistance Program (WAP) and DCED’s LIHEAP Crisis Program.
+Landlords/Tenants
+Whole-Home Repairs Program funding for landlords is limited to small landlords who rent affordable units to tenants at or below 60% of the area median income, adjusted for household size, as defined annually by the . A small landlord is a person who meets all of the following criteria:
+The person is a landlord.
+The person has an ownership stake in no more than five properties and no more than 15 rental units.
+The person rents those properties or units described immediately above for use as a primary residence for a fee, regardless of the length or form of the lease.
+PART II: HOUSEHOLD INFORMATION
+Enter name of applicant, legal address (where the applicant currently lives) and contact information below.
+Name of Applicant: __________________________________________________________________________________
+For homeowners only:
+Written attestation of COVID-19 Impact as outlined in Part I: Eligibility Overview (if applicable).
+For homeowners only:
+Please list any federal, state, and local programs that you currently qualify for as outlined in Part I: Eligibility Overview.
+For tenants only:
+Written attestation of residence - please provide information about your rental unit and landlord.
+PART III: ANNUAL INCOME
+Enter all household and annual gross income information below. 
+Sources of income include:
+Money, wages and salaries before taxes and any deductions 
+Net receipts from non-farm or farm self-employment (receipts from a person&#039;s own business or from an owned or rented farm less deductions for business or farm expenses) 
+Regular payments from social security including SSDI, railroad retirement, unemployment compensation, strike benefits from union funds, worker&#039;s compensation, veteran&#039;s payments, training stipends, alimony, and military family allotments 
+Private pensions, government employee pensions (including military retirement pay), and regular insurance or annuity payments 
+Dividends and/or interest 
+Net rental income and net royalties 
+Periodic receipts from estates or trusts 
+Net gambling or lottery winnings
+Written attestation of lack of income documentation (if applicable).
+PART IV: APPLICANT CERTIFICATION
+I certify under penalty of perjury that the above information is complete and accurate to the best of my knowledge. I understand that Title 18, Section 1001 of the U.S. Code states that a person is guilty of a felony and assistance can be terminated for knowingly and willingly making a false or fraudulent statement to a department of the United States Government. I agree to provide any additional documentation required by the program administer to document my/our household income.
+
+--------------------
+Attached Document: 6470c65bbabb2_WHRP-Eligibility-Guidelines--FINAL---5.25.2023.pdf
+May 25, 2023 
+ 
+1 
+ 
+DCED Whole-Home Repairs Program  
+Eligibility Guidelines 
+ 
+Client Income Eligibility 
+ 
+Eligibility Determination 
+1. A dwelling unit is eligible for services if: 
+a. The household income does not exceed 80% of the total area median 
+income (AMI) as defined by the U.S. Department of Housing and Urban 
+Developments Income Limits. 
+i. For households where the AMI is greater than 300% of the U.S. 
+Department of Health and Human Services Federal Poverty Income 
+Guidelines or 65% of the AMI, there will need to be proof of Covid 
+Impact as described in the SLFRF Final Rule Overview. 
+b. It is owned by a small landlord who rents occupied affordable units to 
+tenants at or below 60% of area median income, adjusted for household 
+size, as defined annually by the Pennsylvania Housing Finance Agency’s 
+PennHOMES countywide limits. A small landlord is a person who meets 
+all of the following criteria: 
+i. The person is a landlord. 
+ii. The person has an ownership stake in no more than five properties 
+and no more than 15 rental units. 
+iii. The person rents those properties or units described immediately 
+above for use as a primary residence for a fee, regardless of the 
+length or form of the lease. 
+ 
+ 
+Income Determination 
+1. Income Inclusions 
+a. Income is defined as cash receipts earned and/or received by the clients 
+before taxes and deductions but not the Income Exclusions listed 
+immediately below.  
+b. All income that is not specifically excluded must be included.  
+c. Cash receipts include, but are not limited to, the following:  
+i. Money, wages and salaries before taxes and any deductions  
+ii. Net receipts from non-farm or farm self-employment (receipts from 
+a person's own business or from an owned or rented farm less 
+deductions for business or farm expenses)
+
+May 25, 2023 
+ 
+2 
+ 
+iii. Regular payments from social security including SSDI, railroad 
+retirement, unemployment compensation, strike benefits from union 
+funds, worker's compensation, veteran's payments, training 
+stipends, alimony, and military family allotments  
+iv. Private pensions, government employee pensions (including 
+military retirement pay), and regular insurance or annuity payments  
+v. Dividends and/or interest  
+vi. Net rental income and net royalties  
+vii. Periodic receipts from estates or trusts  
+viii. Net gambling or lottery winnings  
+ 
+2. Income Exclusions: The following cash receipts are not considered sources of 
+income for the purposes of determining income eligibility: 
+a. Earned income or unemployment compensation for minors under the age 
+of 18 (or full-time high school students) 
+b. Capital gains  
+c. Any assets drawn down as withdrawals from a bank  
+d. Money received from the sale of property, house, or car 
+e. One-time payments from a welfare agency to a family or person who is in 
+temporary financial difficulty  
+f. Tax refunds  
+g. Gifts, loans, or lump-sum inheritances  
+h. College scholarships  
+i. One-time insurance payments, or compensation for injury  
+j. The value of food and fuel produced and consumed on farms  
+k. The imputed value of rent from owner-occupied non-farm or farm housing;  
+l. Depreciation for farm or business assets;  
+m. Combat zone pay to the military  
+n. Reverse Mortgages  
+o. Payments for the care of Foster Children  
+p. Child Support - Whether received by the Payee or paid by the Payor, child 
+support payments are not considered sources of Income for the purposes 
+of determining income eligibility. 
+i. Payee: Child support received by a Payee from any state program 
+or individual during an applicable tax year is not considered income 
+(and is excluded) for the purposes of determining eligibility.  
+ii. Payor: Child support paid by a Payor through a state program 
+and/or to an individual may not be deducted from income (and is 
+included) for the purposes of determining eligibility.  
+q. Non-cash benefits 
+i. Non-cash benefits refer to benefits that the client does not pay as 
+cash or receive as cash. These may include:
+
+May 25, 2023 
+ 
+3 
+ 
+1. Employee fringe benefits, food, or housing received in lieu of 
+wages;  
+2. The employer- or union-paid portion of health insurance;  
+3. The non-cash components of Federal non-cash benefit 
+programs such as Medicare, Medicaid, Food Stamps, school 
+lunches, and housing assistance.  
+4. Deductions from a paycheck are not considered non-cash 
+and would, therefore, be included. Examples include:  
+a. Included as Income: If a client’s regular social security 
+is $10,000 per year, but 10% is automatically 
+deducted for Medicare, then the client only receives 
+$9,000. When figuring income for WHRP, though, this 
+client’s annual income from Social Security is 
+$10,000, not $9,000 because this is not considered a 
+non-cash benefit.  
+b. Excluded from Income: If the same client receives, 
+through Medicare, non-cash medical services 
+(prescription drugs, a surgery, or some other non-
+cash service) valuing $30,000, these services would 
+be excluded because they are non-cash benefits. In 
+this case, the client’s income is still $10,000, not 
+$40,000. 
+ 
+Proof of Income 
+1. Agencies must acquire proof of eligibility and thoroughly document in the client’s 
+file all aspects of Eligibility Determination and Proof. 
+a. The following subsections are non-exhaustive collections of examples of 
+documents providing proof of eligibility; as such other forms of eligibility 
+proof may exist or in some cases, the listed methods may be inadequate. 
+Regardless of these examples, agencies are responsible for proving 
+eligibility. 
+b. No matter what method is used, proof of eligibility must be thoroughly 
+established and fully and completely documented in the client’s file. 
+c. For the purposes of the entirety of these guidelines, any document 
+requiring a signature may be either: 
+i. Notarized; or 
+ii. Witnessed by an agency representative, but only if: 
+1. The person(s) signing the document(s) provide valid proof of 
+identity (this proof of identity must be documented with the 
+signed documents); and
+
+May 25, 2023 
+ 
+4 
+ 
+2. The agency representative signs and dates the document(s) 
+as a witness to verify the identity of the person(s) signing the 
+document(s). 
+d. Methods of Proof for Homeowners 
+i. Homeowners are required to complete and sign a self-
+certification/self-attestation of annual income form disclosing the 
+total annual household income and all sources of income for all 
+occupants.  Earned income or unemployment compensation for 
+minors under the age of 18 (or full-time high school students) may 
+be omitted from this form. 
+ii. Homeowners are required to provide at least one of the following: 
+1. A statement from all current employers stating wages or rate 
+of compensation (if applicable, statement should address 
+hours worked per week and take into consideration overtime 
+pay), or at least two-months of current pay statements from 
+all current employers and/or evidence of participation in 
+public benefit programs.  Earned income or unemployment 
+compensation for minors under the age of 18 (or full-time 
+high school students) may be excluded from this process. 
+a. Any public benefit program received by any member 
+of the household should be considered and properly 
+documented.  It’s understood that in some instances, 
+the household’s total income may derive solely from 
+public benefit programs.   
+2. Proof that the household’s income has been verified through 
+another federal, state, or local program within six-months 
+prior to the WHR application submittal date. 
+a. For the purposes of other federal, state, or local 
+programs used for income verification, the WHR 
+agency must clearly identify the program, date of 
+verification, verification criteria used (e.g., 80% AMI, 
+300% FPL, etc.), and provide proper documentation 
+that the results of the verification process resulted in a 
+verified household income not to exceed 80% AMI.  
+For Example: 
+i. If the WHR client provided documentation from 
+another federal, state, or local program stating, 
+“you are approved and your household income 
+is deemed to be x,” then that documentation 
+can be used in lieu of wage documentation to 
+prove household income that does not exceed 
+80% AMI.
+
+May 25, 2023 
+ 
+5 
+ 
+ii. If the WHR client provides approval 
+documentation for another program that does 
+not provide specific household income details, 
+but the WHR agency can document that the 
+program’s eligibility criteria resulted in a 
+household income not to exceed 80% AMI, this 
+documentation can be used in lieu of wage 
+documentation.   
+e. Methods of Proof for Tenants 
+i. Tenants are required to complete and sign a self-certification/self-
+attestation of annual income form disclosing the total annual 
+household income and all sources of income for all occupants.  
+Earned income or unemployment compensation for minors under 
+the age of 18 (or full-time high school students) may be omitted 
+from this form. 
+ 
+2. Other Sources of Income Determination 
+a. Self-Employment/Business Income: 
+1. Notarized documentation providing a detailed description of 
+gross income received, less expenses (i.e., net income) 
+a. The self-certification form would be sufficient 
+2. Quarterly or annual signed tax forms (including appropriate 
+schedules) 
+3. If the agency becomes aware of a business operated from 
+the private residence or a commercial location, the business 
+owner must provide proof of net income as identified in the 
+Eligibility Determination section. 
+b. Dividends, Interest, Royalties, Rents, Income from Estates or Trusts: 
+Written documentation from the business or organization and/or legal 
+entity from which the income has been generated.  
+c. Unemployment Benefits, Pensions, Insurance and Annuities, Worker’s 
+Compensation, Strike Benefits: 
+i. Documentation must be generated by the appropriate legal entity 
+ii. Statement from local Unemployment Compensation office 
+iii. If taxes are not withheld, Notice of Determination (Unemployment 
+Compensation) checks or bank statements showing direct deposits 
+of Unemployment Compensation for the previous twelve months or 
+for the period for which benefits were received. If taxes are 
+withheld, this income should be converted to the pre-tax level.
+
+May 25, 2023 
+ 
+6 
+ 
+3. Net Rental Income 
+a. Net Rental Income is defined as Gross Rental Income receipts less Rental 
+Expenses. Proof of Net Rental Income can be provided by one of the 
+methods listed below.  
+i. Copy of prior year tax return showing net rental income.  
+ii. Copies of any agreement or lease which specifies the client's 
+name, effective dates, and rental amount along with copies of 
+expenditure receipts  
+ 
+Proof of Ownership or Tenancy 
+1. Proof of Property Ownership 
+a. Client Owned/Occupied Dwelling Units and Rental Units  
+i. A client who owns and occupies (as primary residence) his/her 
+dwelling unit must provide proof of ownership and occupancy.  
+ii. Ownership Verification: Ownership must be verified and 
+documented by any means available for both owner-occupied and 
+rental units, examples include: 
+1. Photocopy of the deed or Mobile Home Title  
+2. The deed number and page number found in the deed book  
+3. Copy of the real estate tax bill  
+4. Mortgage bill that includes the client’s name and property 
+address  
+5. Copy of water or sewer bill or other utility bills if it can be 
+determined and documented that the bill is in the name of 
+the property owner(s) only.  
+6. Verification through the County Recorder of Deeds  
+7. Verification through a government-sponsored online source 
+8. Any other means available to the WHR agency that’s 
+approved by DCED, including but not limited to verification 
+methods in tangled title situations.  Please contact DCED 
+WHR staff to seek approval of methods and discuss 
+further.    
+b. Rental-Occupied Dwelling Units Eligibility Requirement 
+i. Agencies must make a best effort to confirm and keep all 
+documentation on file that a landlord has an ownership stake in no 
+more than five properties and no more than 15 rental units. 
+2. Rent Verification  
+a. An eligible landlord must provide proof of the amount of rent charged 
+monthly for each unit receiving WHR funds. 
+b. Landlords must show evidence of monthly rent by providing agencies with 
+at least one of the following:
+
+May 25, 2023 
+ 
+7 
+ 
+i. A lease that clearly indicates the amount of monthly rent; 
+ii. Canceled rent checks that clearly indicate the checks are for 
+monthly rent;  
+iii. If neither canceled checks nor a lease is available, a notarized 
+statement signed by the tenant and landlord indicating the amount 
+of rent the client pays monthly. In this case (when neither canceled 
+checks nor a lease is available), the statement may be included 
+with the Landlord/Tenant Agreement (see “Landlord/Tenant 
+Agreement” below).  
+iv. The landlords WHR file must contain the amount and proof of 
+monthly rent. 
+c. Landlord/Tenant Agreement:  
+i. A notarized agreement must be signed by both the owner/agent 
+and tenant to ensure that:  
+1. Small landlord offered a three-year extension of the lease to 
+the tenant occupying the unit when the WHR funds are 
+accepted by the small landlord.  The tenant may decline or 
+renegotiate to a shorter term to the extension, but there must 
+be evidence that the initial three-year extension was offered 
+and accepted or declined. 
+2. Annual increases in monthly rent will not exceeded 3% of the 
+base rent or that the unit will continue to be occupied by a 
+tenant participating in the Housing Choice Voucher Program. 
+3. Tenant’s Permission: Written permission must be obtained 
+from the unit’s tenant before entering the unit to perform 
+WHR services. 
+ 
+Proof of Identity 
+1. Verification of Identity 
+a. Agencies must use Photo ID to verify the identity of all WHR recipients.  
+Agencies must verify that the recipient’s Photo ID matches both the client 
+and the client’s name on the application for Whole-Home Repair Program 
+services. 
+b.  Acceptable Photo ID types include (but are not limited to): 
+i. Drivers Licenses or other state photo identity cards issued by the 
+PA Department of Motor Vehicles (or equivalent) 
+ii. U.S. passport 
+iii. U.S. passport card 
+iv. U.S. Military ID (active duty or retired military and their dependents, 
+and Department of Defense civilians) 
+v. Permanent Resident Card 
+vi. A Native American Tribal Photo ID
+
+May 25, 2023 
+ 
+8 
+ 
+c. If no Photo ID is available, there must be documentation supporting the 
+client’s reason for no ID and client must sign self-declaration. 
+d. Documentation of Photo ID 
+i. Agencies must document in the client’s file the Photo ID. 
+ii. Agencies must document in the client’s file that the Photo ID 
+matches both the client and the client’s name on the application. 
+iii. Clients who are unable to verify their identity through an acceptable 
+Photo ID must self-declare their identity with a signed statement. 
+No Whole-Home Repair services may occur at a home until an 
+eligible client provides adequate and matching Photo ID or a signed 
+statement explaining that the client does not have Photo ID but that 
+the client is the one who applied for the Whole-Home Repair 
+services and are a resident of the home. 
+ 
+3. Social Security Number 
+a. Because of their confidential nature, agencies must make every effort to 
+protect the security of all collected Social Security numbers.
+--------------------
+Attached Document: 6470c65eee512_WHRP-Sample-Self-Certification-of-Annual-Income-Form-(1).docx
+DCED WHOLE-HOME REPAIRS PROGRAM
+SAMPLE SELF-CERTIFICATION OF ANNUAL INCOME FORM
+PURPOSE:
+This is a written statement that permits the documentation of eligibility for the program based on household income.
+APPLICABILITY:
+This sample self-certification of income form may be used by agencies to document annual income of:
+Homeowners
+Tenants
+This form must accompany the application for assistance and be kept as a record in the client/project file. 
+DISCLOSURE:
+The sample form is provided as a guide and should be adapted to include the agency’s policy and procedures regarding eligibility requirements for its Whole-Home Repairs Program. Depending on the agency’s application intake process, this form may be filled out between the agency and the applicant, or by the applicant. Applicants can complete the form using current income information available to them. The agency should ensure the instructions are clear in each section when they adapt the form for its program.
+INSTRUCTIONS:
+Please complete one form and include the requested information for all persons in the household. Complete an additional form if the applicant needs more space. The adult head of household must sign and date the form.
+PART I: ELIGIBILITY OVERVIEW
+Homeowners
+Whole-Home Repairs Program funding for homeowners is limited to income eligible households whose income does not exceed 80% of the total area median income (AMI) as defined by the . For households where the AMI is greater than 300% of the  or 65% of the AMI, there will need to be proof of COVID-19 Impact as described in the .
+Additionally, eligible households include those who qualify for the following federal benefits: Temporary Assistance for Needy Families (TANF), Supplemental Nutrition Assistance Program (SNAP), Free- and Reduced-Price Lunch (NSLP) and/or School Breakfast (SBP) programs, Medicare Part D Low-Income Subsidies, Supplemental Security Income (SSI), Head Start and/or Early Head Start, Special Supplemental Nutrition Program for Women, Infants, and Children (WIC), Section 8 Vouchers, Low-Income Home Energy Assistance Program (LIHEAP), and Pell Grants. An eligible household may also include those who qualify (and have been verified in the past 12 months) for other federal, state, and local programs including the Weatherization Assistance Program (WAP) and DCED’s LIHEAP Crisis Program.
+Landlords/Tenants
+Whole-Home Repairs Program funding for landlords is limited to small landlords who rent affordable units to tenants at or below 60% of the area median income, adjusted for household size, as defined annually by the . A small landlord is a person who meets all of the following criteria:
+The person is a landlord.
+The person has an ownership stake in no more than five properties and no more than 15 rental units.
+The person rents those properties or units described immediately above for use as a primary residence for a fee, regardless of the length or form of the lease.
+PART II: HOUSEHOLD INFORMATION
+Enter name of applicant, legal address (where the applicant currently lives) and contact information below.
+Name of Applicant: __________________________________________________________________________________
+For homeowners only:
+Written attestation of COVID-19 Impact as outlined in Part I: Eligibility Overview (if applicable).
+For homeowners only:
+Please list any federal, state, and local programs that you currently qualify for as outlined in Part I: Eligibility Overview.
+For tenants only:
+Written attestation of residence - please provide information about your rental unit and landlord.
+PART III: ANNUAL INCOME
+Enter all household and annual gross income information below. 
+Sources of income include:
+Money, wages and salaries before taxes and any deductions 
+Net receipts from non-farm or farm self-employment (receipts from a person&#039;s own business or from an owned or rented farm less deductions for business or farm expenses) 
+Regular payments from social security including SSDI, railroad retirement, unemployment compensation, strike benefits from union funds, worker&#039;s compensation, veteran&#039;s payments, training stipends, alimony, and military family allotments 
+Private pensions, government employee pensions (including military retirement pay), and regular insurance or annuity payments 
+Dividends and/or interest 
+Net rental income and net royalties 
+Periodic receipts from estates or trusts 
+Net gambling or lottery winnings
+Written attestation of lack of income documentation (if applicable).
+PART IV: APPLICANT CERTIFICATION
+I certify under penalty of perjury that the above information is complete and accurate to the best of my knowledge. I understand that Title 18, Section 1001 of the U.S. Code states that a person is guilty of a felony and assistance can be terminated for knowingly and willingly making a false or fraudulent statement to a department of the United States Government. I agree to provide any additional documentation required by the program administer to document my/our household income.
+
+--------------------
+Attached Document: 6470c66377277_2023.5.17-WHRP-Agency-Monthly-Call---Q-A.pdf
+The purpose of this document is to provide DCED’s general understanding of the administration of the 
+Federal State and Local Fiscal Recovery Fund (SLFRF) through the Pennsylvania (DCED) Whole-Home 
+Repairs Program. While we can speak directly to the Pennsylvania fiscal code enacting the Whole-
+Home Repairs program, many of the questions addressed within this document can only be answered 
+through the guidance of the U.S. Treasury (the SLFRF office). It’s the responsibility of each grantee 
+(county agency) to administer their programs in accordance with the SLFRF rules and regulations. 
+May 17, 2023 – WHR Monthly Agency Meeting Q&A 
+COVID Impact 
+ How do we verify covid impact if an applicant just needs a new roof, for example? 
+Covid impact will need to be demonstrated by following the SLFRF Overview of Final 
+Rule guidance (Framework for Eligible Uses Beyond Those Enumerated – Appendix B, 
+page 32).  Since this guidance comes directly from the Federal Government and not 
+DCED, we are asking the agencies to work with their internal council to implement the 
+SLFRF guidance as it is written.   
+ 
+ If the 80% AMI is greater than 300% FPI, do we need to determine COVID impact? 
+Yes, if the 80% AMI is greater than the 300% FPI proof of Covid Impact will need to be 
+provided. 
+Income Limits 
+ For tenant income being 60% of PHFA PennHomes Limits – 
+o When will those limits be updated?  
+The 2023 PHFA PennHomes Limits are to set to be updated and effective 6/15/23 
+o How long will we use the 2022 limits?  
+The 2022 limits can be used through the date the change becomes effective.  Any 
+application utilizing WHR funds received on or after the 2023 effective date should 
+use the 2023 limits. 
+ If a non-profit (or any other public assistance program) provides a letter stating a client 
+qualifies for a program with income thresholds that are below the 80% AMI is that sufficient 
+documentation? 
+Yes, this is sufficient.  As with all WHR recipients for WHR grant funding, this letter will 
+be supplemented by an income self-certification form which will show the total 
+household income.  The self-certification form should be reviewed by the WHR agency 
+to ensure that the household income is being self-certified at or below 80% AMI.
+
+ If the household income changes to above the 80% AMI before the rehabilitation starts, 
+would the applicant still be eligible for assistance? 
+The Income Eligibility Verification Sign-Off process has been removed from the DCED 
+WHR Eligibility & Income Verification Guidelines.  Agencies should confirm that the 
+client meets eligibility during the initial application period only. 
+Income Verification 
+ Can tenants be income certified using categorical eligibility as well? 
+Moving forward, tenants will only be required to self-certify household income.  No 
+other income verification process will be required.   
+ Is the self-income verification form the same as the zero-income form? 
+No, the zero-income form would not be adequate to use in place of the self-income 
+verification form. 
+ If we collect actual income information (copy of paystubs, social security benefits, etc.) do 
+we need a separate form for the homeowner to complete? Are copies of income documents 
+sufficient? 
+Homeowners must complete a self-certification of annual income form.  This is in 
+addition to the documentation stated in the Eligibility Guidelines under Methods of 
+Proof. 
+ Is the goal for the income verification to verify last 12 months of income, current income, or 
+anticipated income? 
+The intent is to have the homeowner complete an annual income self-certification 
+form and then supplement that form with two-months of income documentation 
+supporting the income as it’s been self-certified.  With this method, it’s the intent to 
+be forward looking at the time of the application, with the primary goal to establish 
+the household’s annual income at application.    
+ 
+ Do federal and state tax returns count as the past 12 months of income?  
+As discussed in the previous answer, the intent is to verify annual household income at 
+the time of application.  For this reason, we will not allow for the use of federal tax 
+returns.
+
+ Does the household income include only adults 18 and over or does it include all household 
+income like SSI for a 12-year-old child? 
+Household income should include all household income including public benefits (such 
+as SSI) for children.  Earned income or unemployment compensation for minors under 
+the age of 18 (or full-time high school students) may be excluded from this process.  
+This rule was implemented in conjunction with DOE’s recent rule update to the way 
+income is measured through the Weatherization Assistance Program and is intended 
+to exclude part-time income earned by children within the household.  
+Liens 
+ Do we have to put a lien on the homeowner’s property after the work is done? 
+For landlords receiving a forgivable loan, yes. 
+For an owner-occupied homeowner, this is not a requirement of WHR Program, but 
+agencies are free to implement this stipulation as they administer the program in their 
+county.  DCED has provided no input as to whether this practice should be considered 
+by a county WHR agency as it’s at the sole distraction of the local agency.  
+Loans 
+ Do the loan forgiveness dates go backwards from the loan received date? If they are 
+forward, will the landlords make payments up until that 15-year period? If they pay it off, 
+then qualify for forgiveness, are we expected to just cut them a check? 
+The WHR loan forgiveness criteria will be monitored for the 15-years following the 
+landlord’s receipt of WHR funds.  Because of the nature of the forgivable loan, it’s 
+expected that no principal payments will be received by the WHR agency throughout 
+the life of the loan.  If no principal is received throughout the life of the loan, no 
+reimbursement will be owed to the landlord at year 15 if they successfully complete 
+the monitoring period.      
+Reporting 
+ If we use categorical eligibility and do not have a specific income level, can we omit this 
+from the reporting spreadsheet (both the detailed dollar income and the percent of AMI)? 
+This information is a requirement.  Categorical eligibility is not a viable source for 
+proof of income for this program.  If the method of proof obtained is documentation 
+from another program that doesn’t provide the actual household income and only 
+confirms the household is below the 80% AMI threshold, the household income 
+information should be captured on the self-certification form and reported to DCED.
+
+ On the reporting spreadsheet, the column header asks for the percent of AMI. Do you 
+expect a specific percentage? 
+Yes, the report should reflect the correct AMI for that household.  
+ On the reporting spreadsheet, do you want the full address listed? 
+Please include the property’s full address on the report.  
+RFQ 
+ Has there been any update on if we can RFQ or sole source a standing contractor so we can 
+expedite delivery of projects and meet the timelines? 
+No.  We continue to encourage all grantees to rely on the State and Local Fiscal 
+Recovery Fund (SLFRF) guidance for policy questions not otherwise addressed by the 
+PA legislation defining the Whole-Home Repairs Program.  As with any other federally 
+funded program, the SLFRF policies should be adhered to in conjunction with the PA 
+legislation.     
+ Until further guidance is released in reference to the contractor process, are we able to 
+follow our county procurement process to move construction along? 
+It’s been the understanding of the WHR office that each WHR agency can follow their 
+own procurement procedures when it comes to the selection of contractors.  This is 
+because the homeowner (from DCED’s perspective) is a beneficiary of the funds rather 
+than a grantee (with the grantee/subgrantee being the county agency or a 
+subrecipient agency).  DCED has suggested that an RFP/RFQ may be appropriate if the 
+WHR agency is attempting to select one General Contractor to manage a large portion 
+of the repair work. 
+If a grantee is selecting a subgrantee/subrecipient to assist in the administration of 
+the WHR program, the following Bidding Requirements should be followed:  
+If the Grantee is a political subdivision or other entity for which open and competitive 
+bidding procedures have been established by law, the Grantee shall comply with those 
+procedures if they are applicable to the project being funded with the grant funds.  
+Otherwise, the Grantee shall comply with open and competitive bidding procedures in 
+awarding any and all grants, subgrants, contracts, subcontracts or other agreements 
+in excess of $10,000.00 for construction, reconstruction, demolition, alteration and/or 
+repair, for acquisition of machinery and equipment, or for engagement of the services 
+of a professional consultant, when said grants, subgrants, contracts, subcontracts or 
+other agreements are funded in whole or at least 50% in part with funds made 
+available under this Contract.  Open and competitive bidding procedures require the 
+Grantee to obtain a minimum of three arm’s length bids from vendors capable of 
+providing the goods and/or performing the services requested.  Arm’s length 
+transactions occur when the parties to the transaction are not related to one another 
+and each party is acting in its own self-interest.  The Grantor may require the Grantee 
+to submit proof of compliance with said procedures, and failure to provide such proof
+
+to the satisfaction of the Grantor may result in termination of the Contract and 
+repayment of all or a portion of the funds available under this Contract.  Upon written 
+request and for good cause shown, the Grantor may, at the Grantor's sole discretion, 
+permit the Grantee to use an alternative procedure for solicitation of bids not 
+inconsistent with law. 
+ If we are nonprofit administering a local program rather than a municipal organization, can 
+we follow our procurement policies?  
+Please see previous answer.  
+ In relationship to bids, are the homeowners able to get at least one bid for the work to be 
+done and that is what is just for the project? We would not be bidding the project but rather 
+receiving the bid from a contractor that the homeowner has chosen. 
+The process of selecting a contractor to perform WHR repairs is at the discretion of the 
+local agency.  
+Workforce Development 
+ Has there been any consideration of hosting a future agency call specific to the workforce 
+development component? 
+We plan to cover Workforce Development on the June call.
+--------------------
+Attached Document: 6489e66c230e3_WholeHomeRepair-Eligibility-Guidelines-2023.6.13.pdf
+June 13, 2023 
+ 
+1 
+ 
+DCED Whole-Home Repairs Program  
+Eligibility Guidelines 
+ 
+Client Income Eligibility 
+Eligibility Determination 
+1. A dwelling unit is eligible for services if: 
+a. The household income does not exceed 80% of the total area median 
+income (AMI) as defined by the U.S. Department of Housing and Urban 
+Developments Income Limits. 
+i. For households where the AMI is greater than 300% of the U.S. 
+Department of Health and Human Services Federal Poverty Income 
+Guidelines or 65% of the AMI, there will need to be proof of Covid 
+Impact as described in the SLFRF Final Rule Overview. 
+b. It is owned by a homeowner who meets any of the following criteria: 
+i. An owner of record evidenced by a publicly recorded deed. 
+ii. An owner-occupant of a manufactured home who leases a space in 
+a manufactured home community. 
+iii. An equitable owner who can demonstrate an ownership interest in 
+a property as provided by law, including: 
+1. A person who has inherited an interest in a property 
+2. A person who has entered a contract to purchase the 
+property. 
+3. A person who was the owner of record before a fraudulent 
+conveyance of the property. 
+4. A person who is a trust beneficiary and a person holding a 
+partial ownership interest in a property such as tenancy by 
+the entirety, joint tenancy, tenancy in a common and life 
+estate. 
+c. It is owned by a small landlord who rents occupied affordable units to 
+tenants at or below 60% of area median income, adjusted for household 
+size, as defined annually by the Pennsylvania Housing Finance Agency’s 
+PennHOMES countywide limits. A small landlord is a person who meets 
+all of the following criteria: 
+i. The person is a landlord. 
+ii. The person has an ownership stake in no more than five properties 
+and no more than 15 rental units. 
+iii. The person rents those properties or units described immediately 
+above for use as a primary residence for a fee, regardless of the 
+length or form of the lease.
+
+June 13, 2023 
+ 
+2 
+ 
+Income Determination 
+1. Income Inclusions 
+a. Income is defined as cash receipts earned and/or received by the clients 
+before taxes and deductions but not the Income Exclusions listed 
+immediately below.  
+b. All income that is not specifically excluded must be included.  
+c. Cash receipts include, but are not limited to, the following:  
+i. Money, wages and salaries before taxes and any deductions  
+ii. Net receipts from non-farm or farm self-employment (receipts from 
+a person's own business or from an owned or rented farm less 
+deductions for business or farm expenses)  
+iii. Regular payments from social security including SSDI, railroad 
+retirement, unemployment compensation, strike benefits from union 
+funds, worker's compensation, veteran's payments, training 
+stipends, alimony, and military family allotments  
+iv. Private pensions, government employee pensions (including 
+military retirement pay), and regular insurance or annuity payments  
+v. Dividends and/or interest  
+vi. Net rental income and net royalties  
+vii. Periodic receipts from estates or trusts  
+viii. Net gambling or lottery winnings  
+2. Income Exclusions: The following cash receipts are not considered sources of 
+income for the purposes of determining income eligibility: 
+a. Earned income or unemployment compensation for minors under the age 
+of 18 (or full-time high school students) 
+b. Capital gains  
+c. Any assets drawn down as withdrawals from a bank  
+d. Money received from the sale of property, house, or car 
+e. One-time payments from a welfare agency to a family or person who is in 
+temporary financial difficulty  
+f. Tax refunds  
+g. Gifts, loans, or lump-sum inheritances  
+h. College scholarships  
+i. One-time insurance payments, or compensation for injury  
+j. The value of food and fuel produced and consumed on farms  
+k. The imputed value of rent from owner-occupied non-farm or farm housing;  
+l. Depreciation for farm or business assets;  
+m. Combat zone pay to the military  
+n. Reverse Mortgages  
+o. Payments for the care of Foster Children  
+p. Child Support - Whether received by the Payee or paid by the Payor, child 
+support payments are not considered sources of Income for the purposes 
+of determining income eligibility.
+
+June 13, 2023 
+ 
+3 
+ 
+i. Payee: Child support received by a Payee from any state program 
+or individual during an applicable tax year is not considered income 
+(and is excluded) for the purposes of determining eligibility.  
+ii. Payor: Child support paid by a Payor through a state program 
+and/or to an individual may not be deducted from income (and is 
+included) for the purposes of determining eligibility.  
+q. Non-cash benefits 
+i. Non-cash benefits refer to benefits that the client does not pay as 
+cash or receive as cash. These may include: 
+1. Employee fringe benefits, food, or housing received in lieu of 
+wages;  
+2. The employer- or union-paid portion of health insurance;  
+3. The non-cash components of Federal non-cash benefit 
+programs such as Medicare, Medicaid, Food Stamps, school 
+lunches, and housing assistance.  
+4. Deductions from a paycheck are not considered non-cash 
+and would, therefore, be included. Examples include:  
+a. Included as Income: If a client’s regular social security 
+is $10,000 per year, but 10% is automatically 
+deducted for Medicare, then the client only receives 
+$9,000. When figuring income for WHRP, though, this 
+client’s annual income from Social Security is 
+$10,000, not $9,000 because this is not considered a 
+non-cash benefit.  
+b. Excluded from Income: If the same client receives, 
+through Medicare, non-cash medical services 
+(prescription drugs, a surgery, or some other non-
+cash service) valuing $30,000, these services would 
+be excluded because they are non-cash benefits. In 
+this case, the client’s income is still $10,000, not 
+$40,000. 
+ 
+Proof of Income 
+1. Agencies must acquire proof of eligibility and thoroughly document in the client’s 
+file all aspects of Eligibility Determination and Proof. 
+a. The following subsections are non-exhaustive collections of examples of 
+documents providing proof of eligibility; as such other forms of eligibility 
+proof may exist or in some cases, the listed methods may be inadequate. 
+Regardless of these examples, agencies are responsible for proving 
+eligibility. 
+b. No matter what method is used, proof of eligibility must be thoroughly 
+established and fully and completely documented in the client’s file.
+
+June 13, 2023 
+ 
+4 
+ 
+c. For the purposes of the entirety of these guidelines, any document 
+requiring a signature may be either: 
+i. Notarized; or 
+ii. Witnessed by an agency representative, but only if: 
+1. The person(s) signing the document(s) provide valid proof of 
+identity (this proof of identity must be documented with the 
+signed documents); and 
+2. The agency representative signs and dates the document(s) 
+as a witness to verify the identity of the person(s) signing the 
+document(s). 
+d. Methods of Proof for Homeowners 
+i. Homeowners are required to complete and sign a self-
+certification/self-attestation of annual income form disclosing the 
+total annual household income and all sources of income for all 
+occupants.  Earned income or unemployment compensation for 
+minors under the age of 18 (or full-time high school students) may 
+be omitted from this form. 
+ii. Homeowners are required to provide at least one of the following: 
+1. A statement from all current employers stating wages or rate 
+of compensation (if applicable, statement should address 
+hours worked per week and take into consideration overtime 
+pay), or at least two-months of current pay statements from 
+all current employers and/or evidence of participation in 
+public benefit programs.  Earned income or unemployment 
+compensation for minors under the age of 18 (or full-time 
+high school students) may be excluded from this process. 
+a. Any public benefit program received by any member 
+of the household should be considered and properly 
+documented.  It’s understood that in some instances, 
+the household’s total income may derive solely from 
+public benefit programs.   
+2. Proof that the household’s income has been verified through 
+another federal, state, or local program within six-months 
+prior to the WHR application submittal date. 
+a. For the purposes of other federal, state, or local 
+programs used for income verification, the WHR 
+agency must clearly identify the program, date of 
+verification, verification criteria used (e.g., 80% AMI, 
+300% FPL, etc.), and provide proper documentation 
+that the results of the verification process resulted in a 
+verified household income not to exceed 80% AMI.  
+For Example: 
+i. If the WHR client provided documentation from 
+another federal, state, or local program stating,
+
+June 13, 2023 
+ 
+5 
+ 
+“you are approved and your household income 
+is deemed to be x,” then that documentation 
+can be used in lieu of wage documentation to 
+prove household income that does not exceed 
+80% AMI.  
+ii. If the WHR client provides approval 
+documentation for another program that does 
+not provide specific household income details, 
+but the WHR agency can document that the 
+program’s eligibility criteria resulted in a 
+household income not to exceed 80% AMI, this 
+documentation can be used in lieu of wage 
+documentation.   
+e. Methods of Proof for Tenants 
+i. Tenants are required to complete and sign a self-certification/self-
+attestation of annual income form disclosing the total annual 
+household income and all sources of income for all occupants.  
+Earned income or unemployment compensation for minors under 
+the age of 18 (or full-time high school students) may be omitted 
+from this form. 
+2. Other Sources of Income Determination 
+a. Self-Employment/Business Income: 
+1. Notarized documentation providing a detailed description of 
+gross income received, less expenses (i.e., net income) 
+a. The self-certification form would be sufficient 
+2. Quarterly or annual signed tax forms (including appropriate 
+schedules) 
+3. If the agency becomes aware of a business operated from 
+the private residence or a commercial location, the business 
+owner must provide proof of net income as identified in the 
+Eligibility Determination section. 
+b. Dividends, Interest, Royalties, Rents, Income from Estates or Trusts: 
+Written documentation from the business or organization and/or legal 
+entity from which the income has been generated.  
+c. Unemployment Benefits, Pensions, Insurance and Annuities, Worker’s 
+Compensation, Strike Benefits: 
+i. Documentation must be generated by the appropriate legal entity 
+ii. Statement from local Unemployment Compensation office 
+iii. If taxes are not withheld, Notice of Determination (Unemployment 
+Compensation) checks or bank statements showing direct deposits 
+of Unemployment Compensation for the previous twelve months or 
+for the period for which benefits were received. If taxes are 
+withheld, this income should be converted to the pre-tax level.
+
+June 13, 2023 
+ 
+6 
+ 
+3. Net Rental Income 
+a. Net Rental Income is defined as Gross Rental Income receipts less Rental 
+Expenses. Proof of Net Rental Income can be provided by one of the 
+methods listed below.  
+i. Copy of prior year tax return showing net rental income.  
+ii. Copies of any agreement or lease which specifies the client's 
+name, effective dates, and rental amount along with copies of 
+expenditure receipts  
+ 
+Proof of Ownership or Tenancy 
+1. Proof of Property Ownership 
+a. Client Owned/Occupied Dwelling Units 
+i. A client who owns and occupies (as primary residence) his/her 
+dwelling unit must provide proof of ownership and occupancy.  
+ii. Ownership Verification: Ownership must be verified and 
+documented by any means available for both owner-occupied and 
+rental units, examples include: 
+1. Photocopy of the deed or Mobile Home Title  
+2. The deed number and page number found in the deed book  
+3. Copy of the real estate tax bill  
+4. Mortgage bill that includes the client’s name and property 
+address  
+5. Copy of water or sewer bill or other utility bills if it can be 
+determined and documented that the bill is in the name of 
+the property owner(s) only.  
+6. Verification through the County Recorder of Deeds  
+7. Verification through a government-sponsored online source 
+8. Any other means available to the WHR agency that’s 
+approved by DCED, including but not limited to verification 
+methods in tangled title situations.  Please contact DCED 
+WHR staff to seek approval of methods and discuss 
+further.    
+b. Rental-Occupied Dwelling Units Eligibility Requirement 
+i. Agencies must make a best effort to confirm and keep all 
+documentation on file that a landlord is either the sole owner or 
+having  an ownership stake in no more than five properties and no 
+more than 15 rental units. 
+2. Rent Verification  
+a. An eligible landlord must provide proof of the amount of rent charged 
+monthly for each unit receiving WHR funds. 
+b. Landlords must show evidence of monthly rent by providing agencies with 
+at least one of the following:
+
+June 13, 2023 
+ 
+7 
+ 
+ 
+i. A lease that clearly indicates the amount of monthly rent; 
+ii. Canceled rent checks that clearly indicate the checks are for 
+monthly rent;  
+iii. If neither canceled checks nor a lease is available, a notarized 
+statement signed by the tenant and landlord indicating the amount 
+of rent the client pays monthly. In this case (when neither canceled 
+checks nor a lease is available), the statement may be included 
+with the Landlord/Tenant Agreement (see “Landlord/Tenant 
+Agreement” below).  
+iv. The landlords WHR file must contain the amount and proof of 
+monthly rent. 
+c. Landlord/Tenant Agreement:  
+i. A notarized agreement must be signed by both the owner/agent 
+and tenant to ensure that:  
+1. Small landlord offered a three-year extension of the lease to 
+the tenant occupying the unit when the WHR funds are 
+accepted by the small landlord.  The tenant may decline or 
+renegotiate to a shorter term to the extension, but there must 
+be evidence that the initial three-year extension was offered 
+and accepted or declined. 
+2. Annual increases in monthly rent will not exceeded 3% of the 
+base rent or that the unit will continue to be occupied by a 
+tenant participating in the Housing Choice Voucher Program. 
+3. Tenant’s Permission: Written permission must be obtained 
+from the unit’s tenant before entering the unit to perform 
+WHR services. 
+ 
+Proof of Identity 
+1. Verification of Identity 
+a. Agencies must use Photo ID to verify the identity of all WHR recipients.  
+Agencies must verify that the recipient’s Photo ID matches both the client 
+and the client’s name on the application for Whole-Home Repair Program 
+services. 
+b.  Acceptable Photo ID types include (but are not limited to): 
+i. Drivers Licenses or other state photo identity cards issued by the 
+PA Department of Motor Vehicles (or equivalent) 
+ii. U.S. passport 
+iii. U.S. passport card 
+iv. U.S. Military ID (active duty or retired military and their dependents, 
+and Department of Defense civilians) 
+v. Permanent Resident Card
+
+June 13, 2023 
+ 
+8 
+ 
+vi. A Native American Tribal Photo ID 
+c. If no Photo ID is available, there must be documentation supporting the 
+client’s reason for no ID and client must sign self-declaration. 
+d. Documentation of Photo ID 
+i. Agencies must document in the client’s file the Photo ID. 
+ii. Agencies must document in the client’s file that the Photo ID 
+matches both the client and the client’s name on the application. 
+iii. Clients who are unable to verify their identity through an acceptable 
+Photo ID must self-declare their identity with a signed statement. 
+No Whole-Home Repair services may occur at a home until an 
+eligible client provides adequate and matching Photo ID or a 
+signed statement explaining that the client does not have Photo ID 
+but that the client is the one who applied for the Whole-Home 
+Repair services and is an eligible small landlord or homeowner. 
+3. Social Security Number 
+a. Because of their confidential nature, agencies must make every effort to 
+protect the security of all collected Social Security numbers.
+--------------------
+Attached Document: 64aff19a243f4_2023HRP_COVID-19-ARPA-Whole-Home-Repairs-Program_executedcontract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 667485c054ad2_DCED-_-Whole-Home-Repairs-Program-(WHRP)-Update.zip
+Unsupported file format: application/zip
+--------------------

@@ -1,0 +1,177 @@
+Purpose: <p><strong>Purpose:</strong></p><p>This agreement between SHFB and Carbon County establishes the terms and conditions for SHFB to provide TEFAP services to Carbon County.</p><p>SHFB must prepare a budget for the fiscal period of 10/1/2024 - 9/30/2025 identifying estimated operating costs for the distribution of Federal and State issued food commodities, using the following Allowable Costs line items as determined by PDA.</p><ul><li>Storage costs</li><li>Transportation Costs</li><li>Equipment Rental Costs</li><li>Printing/Copying Costs</li><li>Administrative Costs</li></ul><p>With prior approval, administrative monies may be used to purchase capital assets; i.e., freezers, refrigerators, and other equipment used to support emergency food assistance programs.</p><p>Services provided from 10/01/2024 - 9/30/2025 will be reimbursed at $.12 per lb distributed.</p><p>Reports are required quarterly as follows:</p><ul><li>Report #1 for (10/01/2024-12/31/2024); Due: <strong>01/20/2025</strong></li><li>Report #2 for (01/01/2025-03/31/2025); Due: <strong>04/20/2025</strong></li><li>Report #3 for (04/01/2025-06/30/2025); Due: <strong>07/20/2025</strong></li><li>Report #4 for (07/01/2025-09/30/2025); Due: <strong>10/20/2025</strong></li></ul><p><strong>NOTE</strong>: The invoice shall be accompanied by a completed TEFAP INVENTORY/PARTICIPATION REPORT for the respective quarter's activity, to support the amount being invoiced according to TEFAP regulations. ANY INVOICE NOT ACCOMPANIED BY A "TEFAP INVENTORY/PARTICIPATION REPORT" WILL NOT BE PAID UNTIL SUCH TIME AS THE COMPLETED REPORT IS RECEIVED. Reports are filed via the <a href="https://www.pameals.pa.gov/Authentication/Login">PAmeals.pa.gov</a> website.</p><p><strong>Special Provisions outlined in the contract include:</strong></p><ul><li>When SHFB accepts commodities allocated by PDA under the program, it must remove the product(s) within ninety (90) days of the allocation notice.</li><li>SHFB agrees to distribute all commodities received by the county within a maximum time period of sixty (60) days from the date of acceptance by the county.</li></ul><p>&nbsp;</p><p><strong>Contact:</strong><br>Cindy Bizarre<br>401 Delaware Avenue, Third Floor<br>Palmerton, PA &nbsp;18071<br>Phone: 1-800-441-1315 ext. 4511 or 610-824-7830 ext. 4511<br>Fax: &nbsp;610-824-7836<br>Email: &nbsp;cbizarre@ptd.net</p>
+Funder: Carbon County
+Program: SHFB
+Amount: 0.00
+Start Date: 2024-10-01
+End Date: 2025-09-30
+
+Notes: 
+
+Fund Number: F8078
+
+Attached Document: 66ce1bfe56ba3_2024-2025-Carbon-TEFAP-Agreement-Executed.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 66ce1f91dac27_2024-2025-Declaration-of-Need-Form-(English).pdf
+Children (0-17)
+Adults
+Seniors (60 and up)
+1	27,861$                   	2,322$                 	536$                          
+2	37,814$                   	3,151$                 	728$                          
+3	47,767$                   	3,981$                 	919$                          
+4	57,720$                   	4,810$                 	1,110$                       
+5	67,673$                   	5,640$                 	1,302$                       
+6	77,626$                   	6,469$                 	1,493$                       
+7	87,579$                   	7,299$                 	1,685$                       
+8	97,532$                   	8,128$                 	1,876$                       
+9,953$                     	830$                    	192$                          
+The Emergency Food Assistance Program is operated in accordance with United States Department of Agriculture (USDA) policy, 
+which prohibits discrimination on the basis of race, color, national origin, sex, age or disability.  Eligibility is based upon the income 
+guidelines listed below.  The recipient circles the entire line that applies to their Household Size, understanding they must be at, or 
+below, the income level indicated to be eligible for program benefits.
+Household Size            
+Circle One
+I understand the household income limitations and hereby certify that my household size and income make me eligible for participation 
+in the program.  I also certify that, as of today, my household lives in the area served by Pennsylvania in The Emergency Food 
+Assistance Program.  This certification form is being completed in connection with the receipt of Federal assistance.
+I UNDERSTAND THAT MAKING A FALSE STATEMENT MAY RESULT IN MY HAVING TO PAY FOR THE VALUE OF THE FOOD 
+IMPROPERLY ISSUED TO ME AND MAY SUBJECT ME TO CRIMINAL PROSECUTION UNDER STATE AND FEDERAL LAW.
+Recipient Signature	Date
+                       
+                        Return completed form to your designated county agency.  If you are unsure of the correct agency,                                                                                                                                       
+                        please call the Bureau at 1-800-468-2433.
+Bureau of Food Assistance
+The Emergency Food Assistance Program (TEFAP)
+“Self Declaration of Need"
+Effective July 1, 2024 to June 30, 2025
+Recipient Name
+Street Address
+City                           State                              Zip             Distribution Site Location
+Agency Representative Signature                       Date
+Distribution Site Name                                        Number
+THIS FORM IS NOT TO BE ALTERED OR CHANGED IN ANY WAY.
+Total Household Income (based on 185% of Poverty)
+Annual	Monthly	Weekly
+For each additional family member add:
+PLEASE  REFER TO THE REVERSE SIDE OF THIS DOCUMENT FOR AN IMPORTANT USDA NON-DISCRIMINATION STATEMENT
+
+USDA Nondiscrimination Statement
+In accordance with federal civil rights law and U.S. Department of Agriculture (USDA) civil rights 
+regulations and policies, this institution is prohibited from discriminating on the basis of race, color, 
+national origin, sex (including gender identity and sexual orientation), disability, age, or reprisal or 
+retaliation for prior civil rights activity.
+Program information may be made available in languages other than English. Persons with disabilities 
+who require alternative means of communication to obtain program information (e.g., Braille, large print, 
+audiotape, American Sign Language), should contact the responsible state or local agency that 
+administers the program or USDA’s TARGET Center at (202) 720-2600 (voice and TTY) or contact 
+USDA through the Federal Relay Service at (800) 877-8339.
+To file a program discrimination complaint, a Complainant should complete a Form AD-3027, USDA 
+Program Discrimination Complaint Form which can be obtained online at: 
+https://www.usda.gov/sites/default/files/documents/USDA-OASCR%20P-Complaint-Form-0508-0002-
+508-11-28-17Fax2Mail.pdf, from any USDA office, by calling (866) 632-9992, or by writing a letter 
+addressed to USDA. The letter must contain the complainant’s name, address, telephone number, and a 
+written description of the alleged discriminatory action in sufficient detail to inform the Assistant 
+Secretary for Civil Rights (ASCR) about the nature and date of an alleged civil rights violation. The 
+completed AD-3027 form or letter must be submitted to USDA by:                                                                                                                                                                                                                                                                                                             
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+1. mail:
+U.S. Department of Agriculture
+Office of the Assistant Secretary for Civil Rights
+1400 Independence Avenue, SW
+Washington, D.C. 20250-9410; or
+2. fax:
+(833) 256-1665 or (202) 690-7442; or                                                                                                                                                                                                
+3. email:
+program.intake@usda.gov
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+This institution is an equal opportunity provider.
+
+Date
+I______________________________ hereby authorize _________________________________ to pick up my 
+TEFAP Food Package and deliver it to me.
+Client Signature	Proxy Signature
+Pantry Representative
+The Emergency Food Assistance Program                                                                                                                                                                                              
+Pennsylvania TEFAP Proxy Form
+        Proxy ID Verified
+--------------------
+Attached Document: 66ce1f91db809_2024-2025-Declaration-of-Need-Form-(Spanish).pdf
+Niños (0-17)
+Adultos (18-59)
+Ancianos (60 o más)
+1	27,861$                    	2,322$                 	536$                           
+2	37,814$                    	3,151$                 	727$                           
+3	47,767$                    	3,981$                 	919$                           
+4	57,720$                    	4,810$                 	1,110$                        
+5	67,673$                    	5,640$                 	1,302$                        
+6	77,626$                    	6,469$                 	1,493$                        
+7	87,579$                    	7,299$                 	1,685$                        
+8	97,532$                    	8,128$                 	1,876$                        
+9,953$                      	830$                    	192$                           
+El Programa de Asistencia Alimenticia de Emergencia es operado de acuerdo a las normas del Departamento de Agricultura de los 
+Estados Unidos (USDA), que prohíbe la discriminación a base de raza, color, origen nacional, sexo, edad o incapacidad.  Elegibilidad 
+es basada segun la tasa de ingreso a continuación.  El recipiente circulara la linea entera que aplica a su Tamaño de Familia, 
+entendiendo que deben de estar en o por debajo del nivel del ingreso para ser elegible para el programa.
+Tamaño de familia 
+(circule uno)
+Entiendo las limitaciones de ingreso del hogar y por la presente certifico que el tamaño de mi familia e ingresos me hacen elegible 
+para participar en el programa.  También certifico que, a partir de hoy, mi familia vive en el área servida en Pennsylvania por El 
+Programa de Asistencia Alimenticia de Emergencia.  Esta certificación esta siendo completada en conexión con la recibimiento de 
+asistencia Federal.
+ENTIENDO QUE HACIENDO FALSO TESTIMONIO PUEDE RESULTAR EN TENER QUE PAGAR EL VALOR DE LOS ALIMENTOS 
+OBTENIDOS IMPROPIAMENTE Y PUEDE SER SUJETO A PERSECUCION BAJO LEYES ESTATALES Y FEDERALES.
+Firma del Recipiente	Fecha
+                                Devuelva el formulario a su agencia Condado designado.  Si no esta seguro de la Agencia correcta, por favor llame la oficina 
+al 1-800-468-2433.                                                                                                                        
+Oficina de Distribución de Alimentos
+El Programa de Asistencia Alimenticia de Emergencia (TEFAP)
+"Declaración Personal de Necesidad"
+Efectivo desde el 1 de julio del 2024 al 30 de junio del 2025
+Nombre del Recipiente
+Dirección
+Ciudad               Estado               Código Postal Localización del Lugar de distribución
+Firma de Representante de la Agencia              Fecha
+Nombre del Lugar de Distribución              Numero de agencia
+Ingreso total del Hogar (basado en un 185% de pobreza)
+Anual	Mensual	Semanal
+Por cada miembro de damilia adicional anade:
+ESTE FORMULARIO NO DEBE SER ALTERADO O MODIFICADO DE NINGUNA MANERA.
+
+USDA es un proveedor y empeador de igualdad de oportunidades.
+USDA Nondiscrimination Statement
+De conformidad con la Ley Federal de Derechos Civiles y los reglamentos y políticas de derechos civiles del Departamento 
+de Agricultura de los EE. UU. (USDA, por sus siglas en inglés), se prohíbe que el USDA, sus agencias, oficinas, empleados e 
+instituciones que participan o administran programas del USDA discriminen sobre la base de raza, color, nacionalidad, 
+sexo, discapacidad, edad, o en represalia o venganza por actividades previas de derechos civiles en algún programa o 
+actividad realizados o financiados por el USDA. 
+Las personas con discapacidades que necesiten medios alternativos para la comunicación de la información del programa 
+(por ejemplo, sistema Braille, letras grandes, cintas de audio, lenguaje de señas americano, etc.), deben ponerse en 
+contacto con la agencia (estatal o local) en la que solicitaron los beneficios. Las personas sordas, con dificultades de 
+audición o discapacidades del habla pueden comunicarse con el USDA por medio del Federal Relay Service [Servicio Federal 
+de Retransmisión] al (800) 877-8339. Además, la información del programa se puede proporcionar en otros idiomas.
+Para presentar una denuncia de discriminación, complete el Formulario de Denuncia de Discriminación del Programa del 
+USDA, (AD-3027) que está disponible en línea en: http://www.ascr.usda.gov/complaint_filing_cust.html y en cualquier 
+oficina del USDA, o bien escriba una carta dirigida al USDA e incluya en la carta toda la información solicitada en el 
+formulario. Para solicitar una copia del formulario de denuncia, llame al (866) 632-9992. Haga llegar su formulario lleno o 
+carta al USDA por: 
+(1) correo: U.S. Department of Agriculture 
+Office of the Assistant Secretary for Civil Rights 
+(1)  correo: U.S. Department of Agriculture
+ Office of the Assistant Secretary for Civil Rights
+1400 Independence Avenue, SW
+Washington, D.C. 20250-9410;
+(2)  fax: (202) 690-7442; o 
+(3) correo electrónico: program.intake@usda.gov.
+CONSULTE EL REVERSO DE ESTE DOCUMENTO PARA UNA DECLARACIÓN DE NO DISCRIMINACIÓN  IMPORTANTE DEL USDA
+
+Fecha
+Yo _________________________autorizo a,_______________________________para recoger mi
+paquete del alimento TEFAP para ser entregado  a mí.
+Firma del cliente	Firma de proxy autorizado
+Representante de la Despensa
+El Programa de Asistencia Alimenticia de Emergencia                                                                                                      Forma de 
+Autorizacion Proxy para el programa TEFAP de Pennsylvania
+Identificacion del proxy verificada
+--------------------

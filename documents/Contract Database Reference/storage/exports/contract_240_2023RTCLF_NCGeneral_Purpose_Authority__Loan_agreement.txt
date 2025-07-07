@@ -1,0 +1,16 @@
+Purpose: <p>-Funding small business loans in NC</p><p>-5-year term</p><p>-Pay 1% interest annually</p><p>-Semiannual reports (Chris says he doesn't do reports for this loan although the loan agreement states otherwise)</p>
+Funder: Northampton County
+Program: RTCLF
+Amount: 350000.00
+Start Date: 2023-09-27
+End Date: 2028-09-27
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 65298769c4989_2023RTCLF_NCGeneral-Purpose-Authority_loan-agreement.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

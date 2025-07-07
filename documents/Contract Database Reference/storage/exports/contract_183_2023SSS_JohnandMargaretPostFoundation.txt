@@ -1,0 +1,476 @@
+Purpose: <p>SSS general operating expenses.</p>
+Funder: John and Margaret Post Foundation
+Program: SSS
+Amount: 20000.00
+Start Date: 2023-05-16
+End Date: 
+
+Notes: <p>-Written progress report due to the Foundation by November 15, 2023.&nbsp;</p>
+
+Fund Number: 
+
+Attached Document: 646badeb93c00_2023SSS_John-&-Margaret-Post-Foundation_Award-Notification.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 646badee397ea_2023SSS_John-&-Margaret-Post-Foundation_Proposal-Submitted.pdf
+LOGOUT
+Confirmation of Application Receipt:
+Your proposal was successfully submitted to Wells Fargo Philanthropic Services. No further action on your part is required and
+you can expect to receive notice of your proposal's status shortly. To print a copy of this completed application go to 'File', then
+'Print' on your browser toolbar. Click here to return to the homepage when you are finished.
+Foundation Selection
+Grant Guidelines
+ 
+General Criteria and Limitations
+ 
+Communication
+ 
+Recommendations for the Application Process
+ 
+*Foundation----The John & Margaret Post Foundation
+ 
+Organization Information
+Tax Exempt Status Details
+ 
+Registered NameCOMMUNITY ACTION COMMITTEE OF THE LEHIGH VALLEY INC 
+Tax ID231669589 
+Organization Tax Status----170(b)(1)(A)(vi)
+ 
+Tax Exemption Date10/03/2006 
+Tax Exemption Comments  
+Tax Exempt Status Note: 
+Organization Name and Mailing Address
+ 
+*Organization NameCommunity Action Committee Of The Lehigh Valley Inc 
+Also Known As/Doing Business AsCommunity Action Lehigh Valley 
+*Organization CountryUnited States
+ 
+*Organization Address 11337 East Fifth Street 
+Organization Address 2 
+Organization Address 3 
+*Organization CityBethlehem 
+* Organization StatePennsylvania
+ 
+*Organization Zip/Postal Code18015 
+Organization Additional Details
+
+ 
+Physical Address 
+Website Addresshttp://https://www.communityactionlv.org/ 
+*Organization TypeHuman Services
+ 
+Organization Details
+*Mission StatementThe mission of Community Action Lehigh Valley (CALV) is to improve the quality
+of life in the Lehigh Valley by building a community in which all people have
+access to economic opportunity, the ability to pursue that opportunity, and a
+voice in the decisions that affect their lives. The mission of the Sixth Street
+Shelter is to assist families experiencing homelessness secure safe housing
+through family-centered services, in-house programming, and referrals to
+community resources while advocating to end homelessness and housing
+insecurity in the Lehigh Valley. 
+*Fiscal Agent/Sponsor?Not Applicable
+ 
+Leadership, Staff, and Volunteers
+ 
+*Organization Leadership
+ 
+*Number of Paid Full Time Staff	104 
+*Number of Paid Part Time Staff	2 
+*Number of Volunteers1625 
+Current Fiscal Year Finances
+ 
+*Total Annual Budget$36,349,328.00 
+*Organization Budget Detail
+*Full Name *Position/Title	*Name of Employer	*Professional Title
+Anna Barbosa	Board Member	Pinebrook Family Answers Director of Integrated Health
+Services
+Kim Capers	Board Member	One Valley Realty	Insurance Agent
+Louis Cinquino	Board President	Cinquino Direct	Owner
+Zachariah Cobrinik	Past President	Retired	Retired
+Yorman DeLaRosa	Board Member	Lehigh County	Community Liaison
+Charles Dertinger	Board Member	Northampton County	Director of Administration
+Linda Faust	Board Secretary	State Rep Zach Mako	Representative of Northern
+Lehigh Community
+*Budget Category	*Budget Amount
+Contracts – Program Related	$2,328,789.00
+Grants to other organizations	$180,000.00
+Inter-Agency Grants	$31,000.00
+fi
+
+ 
+*Budget ChangesThere have been no significant changes in our current year budget since it was
+initially established. 
+*Administrative Expenses - % of Budget6.9% 
+Prior Fiscal Year Finances
+ 
+*Fiscal Year End Date06/30/2021 
+*Tax Return Filed?Yes 
+Organization Revenue
+ 
+*Revenue Worksheet
+ 
+Organization Expenses
+ 
+*Expenses Worksheet
+ 
+*Revenue Less Expenses$6,255,756.00 
+Specific Assistance Individuals	$14,937,851.00
+Salaries & wages	$6,399,033.00
+Pension plan contributions	$325,447.00
+Employee benefits (not
+pension)
+$1,959,401.00
+Payroll taxes, etc.	$661,566.00
+Accounting fees	$60,750.00
+Legal fees	$49,618.00
+Professional fees - other	$1,620,465.00
+Temporary help	$25,000.00
+Supplies / Program Supplies	$869,939.00
+Purchased Commodities	$1,605,697.00
+Telephone &
+telecommunications
+$127,668.00
+Postage, shipping, mailing
+services
+$56,505.00
+Printing & copying	$133,925.00
+Books, subscriptions,
+references
+$80,104.00
+Rent	$44,760.00
+Utilities	$160,370.00
+Real Estate Taxes	$740.00
+Facilities Maintenance	$265,075.00
+Furniture & Equipment Expense	$107,065.00
+Vehicle Expenses	$170,542.00
+Travel	$120,057.00
+Conferences, conventions,
+meetings
+$91,339.00
+*Revenue Type *Revenue Amount
+Contributions and
+Grants
+$38,072,348.00
+Program Service
+Revenue
+$2,441,214.00
+Investment Income	$2,092.00
+Other Revenue	$2,239.00
+Total: 40,517,893.00
+*Expense Type *Expense Amount
+Program Services	$30,238,199.00
+Administration	$3,401,051.00
+Fundraising	$622,887.00
+Other Expenses	$0.00
+Total: 34,262,137.00
+
+Organization Assets & Liabilities
+ 
+*Total Assets$24,914,072.00 
+*Total Liabilities$7,056,470.00 
+*Net Assets or Fund Balances$17,857,602.00 
+*Endowment Net Assets$0.00 
+Additional Finance-Related Comments 
+Request Summary
+*Requested Amount$20,000.00 
+*Support TypeProject/Program Support
+ 
+*Project TitleSixth Street Shelter 
+*Project/Program DescriptionThe Sixth Street Shelter, a program of Community Action Lehigh Valley (CALV),
+helps families with children work their way out of homelessness. A 60- to 90-day
+stay in the Shelter enables families to begin to stabilize their income and address
+the problems that led to their homelessness. The property has 25 private
+apartments, a Family Resource Center, and playground. Specifically, the Shelter
+helps families set and reach their goals through intensive and effective case
+management, in-house programming, and referrals to appropriate services.
+Funding would help sustain the important work of the Shelter by providing general
+operating funds to support all activities. Funding for general operations is
+particularly important now, as federal emergency funding authorized during the
+pandemic is eliminated, even though Lehigh Valley residents continue to face
+barriers caused by affordable housing and rental shortages, job loss, and inflation. 
+*Common Goals The Sixth Street Shelter shares a common mission with the John A. and Margaret
+Post Foundation -- to improve the quality of life for people and society in general.
+The Sixth Street Shelter works with families experiencing homelessness to help
+them on their way to self-sufficiency. It is the only shelter in the area where entire
+families of any configuration (including those with fathers and teenaged boys,
+multi-generational families, and those from the LGBTQ+ community) stay together
+in their own apartments. In addition to the comprehensive services provided to
+Shelter residents, the Sixth Street Shelter has become a resource center for former
+residents and people from the surrounding neighborhood. People regularly drop
+by looking for information regarding community programs and resources, which
+are always readily available. 
+Demographics
+ 
+*Primary Program Area ServedHuman Services
+ 
+*Primary Geographic Area ServedUSA
+ 
+* Primary State ServedPennsylvania
+ 
+Primary County ServedLehigh County 
+*Primary Population ServedHomeless
+ 
+*Primary Age Group ServedGeneral/Unspecified
+ 
+Demographics Comments Last fiscal year, 71 families consisting of 316 people (including 198 children, 18 of
+whom were five and under) found refuge at Sixth Street Shelter. Nearly 60% of
+those families were headed by women. Many of the heads of households that the
+Shelter serves are unemployed or underemployed, or recipients of SSI and SSDI
+whose low incomes cannot support even what the U.S. Department of Housing and
+Urban Development (HUD) has determined as the Fair Market Rent (FMR) for an
+apartment in the Lehigh Valley. Others have come to the end of their
+
+unemployment benefits or welfare benefits and are poorly equipped educationally
+and vocationally to find jobs in a changing labor market. Some face additional
+challenges, such as a disability (physical and/or mental) or experiencing domestic
+violence. The ongoing impacts of the COVID-19 pandemic continue to exacerbate
+the challenges our families face, as there is a disproportionate impact on low-
+income members of our community. 
+Request Details
+Primary Request Contact
+ 
+*Contact SalutationDr. 
+*Contact First NameJulie 
+Contact Middle Name/Initial 
+*Contact Last NameShoults 
+Contact Suffix  
+*Contact TitlePlanner 
+*Contact Phone Number484-893-1038 
+*Contact Email AddressPlanner-SSS@caclv.org 
+Project Details
+ 
+*Project/Program ObjectivesThe Sixth Street Shelter assists families experiencing
+homelessness secure safe housing through family-centered
+services, in-house programming, and referrals to community
+resources while advocating to end homelessness and
+housing insecurity in the Lehigh Valley. The property has 25
+private apartments, a Family Resource Center, playground,
+and full-choice food pantry for residents. A 60- to 90-day stay
+in the Shelter enables families to begin to stabilize their
+income and address the problems that led to their
+homelessness. The families who come to the Sixth Street
+Shelter do so for a variety of reasons: low-paying jobs, lack of
+affordable housing, domestic violence and mental and/or
+physical health crises, and lack of access to reliable
+transportation, healthcare, and childcare. The Shelter
+provides each family with a fully furnished apartment and
+supportive services, including individualized case
+management. Staff work to connect them with the necessary
+resources to address their individual needs, such as financial
+literacy and parenting classes, access to childcare and
+healthcare, and mental health support. During their
+residency, the family develops a Family Service Plan with their
+caseworker, setting household, budgeting, educational, and
+vocational goals and seeking suitable housing and
+employment. We have also started a new Benchmark Family
+Care Initiative, which aims to ensure that all residents have or
+obtain medical insurance and are connected to appropriate
+providers so that they can achieve a list of benchmarks
+related to their relevant medical, dental, and mental health
+care. Staff maintain contact with the family following their
+move into permanent housing to offer additional assistance
+and determine how well they are continuing to move toward
+self-sufficiency. It costs approximately $3,300 per month to
+provide a family with a furnished apartment, case
+management, and supportive services. A $20,000 grant
+would support two families each for a three-month stay at
+the Sixth Street Shelter.
+The ongoing impacts of the COVID-19 pandemic continue to
+exacerbate the challenges our families face, as there is a
+disproportionate impact on low-income members of our
+community. The pandemic has also intensified the already
+
+detrimental impacts of homelessness on children. The First
+Focus Campaign for Children summarizes quite clearly,
+"Studies show that housing instability and homelessness
+exert long-term adverse physiological, academic, and
+economic effects on children." Research from the National
+Center on Family Homelessness indicates that children
+experiencing homelessness are twice as likely to be food
+insecure, and, according to the U.S. Department of Education,
+have three times the rate of emotional and behavioral
+problems. The National Alliance to End Homelessness states
+that they experience more school mobility, have lower
+academic performance, and are more likely to experience
+separations from their families. Sixth Street Shelter works to
+keep families housed together and to offer greater stability
+and a supportive environment to children and their families
+while they navigate the challenges they face. Homelessness is
+often traumatic for children, and the Sixth Street Shelter
+provides resources and services to help mitigate these
+impacts and set families on a path out of homelessness. 
+*Implementation PlanThe Sixth Street Shelter is a long-standing program and
+operates year-round to meet the needs of local families. The
+Sixth Street Shelter has an Annual Work Plan that outlines
+goals and measurable objectives crafted to have a positive
+impact on both the Shelter's residents and the broader
+community. In order to achieve these goals, Shelter staff will
+work with the families to provide intensive case management
+and supportive services. During their residency at the Shelter,
+families will: 1) work on the issues that contributed to their
+homelessness by developing a Family Service Plan with the
+Shelter's staff to set household, budgeting, educational, and
+vocational goals; 2) look for suitable housing with the support
+of their Case Manager; 3) learn job-seeking skills in our
+Family Resource Center; 4) meet with their Case Manager
+regularly to assess their progress in achieving the
+benchmarks set for their medical and dental care; and 5)
+attend classes and workshops provided by Shelter staff and
+local partners. Topics for these sessions include healthy
+relationships, parenting, health and wellness, and financial
+literacy, among others. Shelter staff will also follow up with
+former residents to check on their continued progress and
+offer additional assistance. 
+*Measuring SuccessEach year, a Work Plan is developed with measurable goals
+and performance targets that guide program activities. In
+order to measure effectiveness of services and outcomes, the
+work plan is evaluated twice yearly by the Program
+Development & Evaluation Committee of CALV's Board of
+Directors and is then approved by CALV's full Board. In
+addition, Sixth Street Shelter utilizes the Homeless
+Management Information System (HMIS) and ClientTrack to
+track and analyze participant data. The Shelter also tracks
+qualitative data to document the positive long-term impact of
+the Shelter in the community. Staff conduct follow-up
+evaluations with former residents that can be located at 3-,
+6-, and 12-month intervals to ascertain their continued
+progress.
+The Sixth Street Shelter has set the following performance
+targets for our current fiscal year: 1) At least 100 families will
+reside at the Shelter and develop Family Service Plans based
+on their housing, educational and financial goals; 2) 50% of
+families will save money toward rent or a security deposit
+upon leaving the Shelter; 3) 75% of families will achieve their
+Family Service Plan goals; 4) 100% of families will create a
+written budget to understand credit and money
+management as a part of their goal plan; 5) 40% of families
+will move into affordable housing upon leaving.  
+*CollaborationThe Sixth Street Shelter partners with many government
+entities and non-profit agencies to ensure that residents
+receive the services and gain the skills they will need as part
+of a comprehensive plan to help them to become self-
+sufficient. The Shelter has a nearly 30-year partnership with
+Lehigh County Office of Children and Youth Services, and
+
+many other local organizations contribute to programming
+for our residents. For instance, ESSA Bank leads financial
+literacy classes, CareerLink assists with job searches and
+resume writing, and Highmark Wholecare facilitates
+"Wellness Friday" sessions for both Shelter residents and
+community members. The Shelter is also a member of the
+Lehigh Valley Regional Homeless Advisory Board. The
+LVRHAB is a consortium of representatives from City and
+County governments, social service agencies, veterans
+support groups, faith-based and other community
+organizations, homeless advocates, homeless or formerly
+homeless people, representatives from legislators, and other
+interested parties with the mission to prevent and end
+homelessness in the Lehigh Valley. 
+*Project/Program BackgroundSince 1984, the Sixth Street Shelter, a program of Community
+Action Lehigh Valley, has been offering services to help
+prepare families for the challenges of a difficult job and
+rental market that too often result in homelessness. It is the
+only family shelter in the region that admits families of any
+configuration (with at least one child under 18) and houses
+them in their own private apartments. The Sixth Street
+Shelter has proven to be a vital resource in the community,
+and while it has been operating for almost 40 years, the
+program has adapted to the changing needs of the
+community. For instance, there is currently a severe shortage
+of available, affordable housing units locally, and landlords
+have been very selective in whom they rent to. Our
+caseworkers report that they struggle to find housing for
+their clients despite having rental assistance and supportive
+services available. This means that residents are experiencing
+longer stays in the Shelter before moving into permanent
+housing. We recently added a Housing Innovation Specialist
+to our staff to work with our residents and local landlords in
+order to identify affordable housing options and facilitate
+faster placements for families. 
+Timeline
+ 
+*Project/Program Start Date07/01/2022 
+*Project/Program End Date06/30/2023 
+Project/Program TimelineContingent upon the timing of receipt of funding, we
+anticipate that all funds would be spent by the end of CALV's
+fiscal year, which is June 30, 2023. The program runs year-
+round on a July 1-June 30 fiscal year. Its Work Plan is
+evaluated twice yearly (mid-year and year-end) in order to
+measure the effectiveness of services and program
+outcomes. This evaluation is conducted by the Program
+Development & Evaluation Committee of CALV's Board of
+Directors and is then approved by the full Board. In addition,
+Shelter staff conduct follow-up evaluations with former
+residents at 3-, 6-, and 12-month intervals in order to
+ascertain their continued progress. All of this information is
+logged for future reference in order to help the program
+monitor its efficiency and community impact over time. 
+Project Finances
+ 
+*Total Project Budget$1,250,367.00 
+*Project Budget Detail Worksheet
+*Expense	*Budget Amount
+Specific assistance – individuals	$30,000.00
+Salaries and wages	$494,520.00
+
+ 
+*Other Project FundingThe Sixth Street Shelter is sustained by a multi-faceted
+development strategy and has a nearly 40-year history of
+making our fundraising goals and supporting our program.
+Sixth Street Shelter staff meet regularly with the
+development and grant writing team to discuss funding
+opportunities and to ensure we are on target to meet our
+goals. We receive funding from corporations, foundations,
+government entities, and individual donors.
+The following is a breakdown of our current fiscal year
+funding:
+Community Service Block Grant: $140,000 (Committed)
+Lehigh County Children & Youth Family Preservation Program
+= $236,000 (Committed)
+Allentown Emergency Solutions Grant = $40,000 (Committed)
+Allentown ESG CARES CV-2 = $25,000 (Committed)
+FEMA -- Emergency Food & Shelter Program = $150,149
+(Committed)
+Lehigh County Homelessness Prevention Grant = $30,000
+(Committed)
+Lehigh County Clearinghouse Aftercare = $24,108
+(Committed)
+United Way -- Greater Lehigh Valley = $10,000 (Committed)
+TJX Foundation = $8,250 (Committed)
+Santander Bank Charitable Foundation = $7,500 (Committed)
+Ruth P. Seruga Trust = $3,000 (Committed)
+Fox & Roach/Trident Charities = $2,500 (Committed)
+Asbury United Methodist Church = $4,500 (Committed)
+Kiwanis Club of Allentown Foundation = $1,000 (Committed)
+Erie Insurance Giving Network = $5,000 (Committed)
+Lehigh County COVID-19 Relief Nonprofit Block Grant
+Program = $61,000 (Pending)
+Max & Victoria Dreyfus Foundation = $10,000 (Pending)
+Harry C. Trexler Trust = $20,000 (Pending)
+St. Paul's UCC Trexlertown = $2,000 (Pending)
+Provident Bank Foundation = $15,000 (Pending)
+Leona Gruber Trust = $2,000 (Pending)
+Sylvia Perkin Perpetual Charitable Trust = $6,456 (Pending)
+Caroline J.S. Sanders Trust #2 = $7,000 (Pending)
+Verna O. Canova Foundation = $10,000 (Pending)
+Pension	$23,224.00
+Employee benefits (not
+pension)
+$131,169.00
+Payroll taxes	$51,388.00
+Legal and professional fees	$5,430.00
+Program supplies	$15,500.00
+
+Individual/Small Business Contributions = $202,210
+(Committed)
+Individual/Small Business Contributions = $130,740 (Pending)
+Non-Government Grants = $90,954 (Pending)
+Earned Revenue (rent from caretaker apartment) = $6,000
+(Pending)
+Total: $1,250,367 
+Technical Support
+PRIVACY, Cookies, Security & Legal   |   Notice of Data Collection   |   Contact Us   |   Search for Foundations   
+© 2023 Wells Fargo Bank, N.A. | WCR-0322-00247
+--------------------

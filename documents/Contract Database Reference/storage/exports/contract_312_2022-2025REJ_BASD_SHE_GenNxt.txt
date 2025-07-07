@@ -1,0 +1,16 @@
+Purpose: <p>-General Operating Expenses for the SHE and Generation Next Programs at partnering Bethlehem Area School District Schools.</p><p>Payments Per School Year are as follows:</p><p>2022-2023 School Year- $42,500 for SHE and $42,500 for Generation next for a total of $85,000 for the year</p><p>2023-2024 School Year- $30,000 for SHE and $30,000 for Generation next for a total of $60,000 for the year</p><p>2024-2025 School Year- $30,000 for SHE and $30,000 for Generation next for a total of $60,000 for the year</p><p>Invoices should be sent to Brenda Ortega bortega@basdschools.org.</p><p>&nbsp;</p>
+Funder: Bethlehem Area School District
+Program: REJ
+Amount: 205000.00
+Start Date: 2022-10-01
+End Date: 2025-06-09
+
+Notes: 
+
+Fund Number: 8000
+
+Attached Document: 65f89e841eeca_2022-2025REJ_BASD.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

@@ -1,0 +1,48 @@
+Purpose: <p>$41,200 for personnel salary, taxes and benefits, $350,000 operating expenses 14 households at &lt; 80% AMI and $20,600 for admin&nbsp;</p>
+Funder: PHARE RTT
+Program: CAH
+Amount: 411800.00
+Start Date: 2022-10-06
+End Date: 2024-03-06
+
+Notes: 
+
+Fund Number: F0617
+
+Attached Document: 64270b093cf41_2022CABH_PHARERTTEnergyEfficiencyandMobility_grant-award-summary.pdf
+Grant Award Summary 
+Program  CABH 
+Funder and 
+Year  
+2022 PHARE/RTT Energy Efficiency and Mobility 
+Time Frame October 2022-March 2024 
+ 
+Amount 
+Received 
+$411,800 
+Purpose $41,200 for personnel salary, taxes and benefits, $350,000 operating 
+expenses 14 households at < 80% AMI and $20,600 for admin 
+Reports Due Reports are due semiannually by January 31
+st
+ and July 31
+st
+. A Final project 
+report will be due 30 post final expenditure. Reports are to be completed 
+on the PHARE website:  PHARE Login Page (phfa.org) 
+Data to be 
+collected 
+Itemized list of grant expenditures, household income data, amount 
+expended per household, geographic distribution of funds, list of third-
+party vendors, in service date and subcontractors employed to carry out 
+the project. 
+Need to Know Funds should be deposited in an interest-bearing account and 
+maintained separate from other funds (separate fund code). 
+Additional Info Reports and records are to be kept a minimum of 4 years. 
+ 
+Please let me know if you have any further questions or concerns!
+--------------------
+Attached Document: 64270b128b534_Community-Action-Lehigh-COMMUNITY-Grant-Agree-Full-Ex.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

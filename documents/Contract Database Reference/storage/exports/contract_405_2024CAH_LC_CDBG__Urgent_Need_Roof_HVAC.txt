@@ -1,0 +1,16 @@
+Purpose: <p>-Rehabilitation of 18 properties providing new roof and or HVAC system. &nbsp;Also, modifications to homes of homeowners who wish to age in place.</p><ul><li>LMI Qualify all applicants and adult family members</li><li>Only Lehigh County residents living outside the city limits of Allentown and Bethlehem and not residents of Lower Milford Township qualify.</li><li>Environmental Review to be conducted and submitted to Lehigh County for review and approval prior to beginning work on any home.<ul><li>Environmental Review paperwork is attached</li></ul></li><li>Follow 3 bid procurement process with proper documentation</li><li>A lien must be filed on each property (five-year self-forgiving lien based on the job cost, with forgiveness of 20% per year)</li><li>If the subrecipient receives income from the satisfaction of liens prior to the completion of the forgiveness period, the program income must be returned to Lehigh County.</li><li>Follow HUD Lead Based Paint Regulations</li><li>Follow Historic Preservation requirements</li><li>Contractors must produce COIs naming CALV and Lehigh County as additionally insured.</li><li>Best effort to provide bidding opportunity to Women and Minority Owned Business (W/MBE)</li><li>Staff who have salary reimbursed trough this grant must keep detail on duties performed during working hour to justify hours billed</li></ul><p>&nbsp;</p>
+Funder: Lehigh County
+Program: CAH
+Amount: 341371.04
+Start Date: 2025-01-01
+End Date: 2026-09-30
+
+Notes: <p><strong>Reimbursement Requests:&nbsp;</strong></p><ul><li>Documents listed on page 4-5 subsection n. must be included in reimbursement requests</li><li>Invoicing Deadlines are attached.</li></ul><p><strong>Reporting:</strong></p><ul><li>Required Quarterly and Annual reports to be submitted to cyndiking@lehighcounty.org<ul><li>Reporting forms and deadlines are attached.</li></ul></li></ul><p>&nbsp;</p>
+
+Fund Number: F4206
+
+Attached Document: 6750ab17a50c0_2024CAH_LC-CDBG_-Urgent-Roof-and-HVACsigned.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

@@ -1,0 +1,16 @@
+Purpose: <p>Prepackaged fresh food boxes for Monroe County.</p>
+Funder: Pocono Mountain United Way
+Program: SHFB
+Amount: 23000.00
+Start Date: 2022-07-01
+End Date: 2023-06-01
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 641ca7774ac15_2022_SHFB_PoconoMtnUW_ExecutedContract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

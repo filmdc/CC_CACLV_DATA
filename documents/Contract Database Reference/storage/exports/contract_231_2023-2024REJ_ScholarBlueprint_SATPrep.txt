@@ -1,0 +1,16 @@
+Purpose: <ul><li>CALV will be making three payments to Rosalind Lucien of The Scholar Blueprint, for SAT Prep services, on the following schedule pending the receipt of a proper invoice:<ul><li>$7,000 DISBURSED BY 1/5/23</li><li>$7,000 DISBURSED BY 3/15/23</li><li>$7,000 DISBURSED BY 6/7/23</li></ul></li></ul>
+Funder: No Funder Assigned
+Program: REJ
+Amount: 0.00
+Start Date: 2023-09-21
+End Date: 2024-06-30
+
+Notes: <p>-The contractor (Rosalind Lucien) will provide SAT Prep courses to Generation Next Students in Liberty, Easton Area and Freedom High School according to the schedule outlined in the MOA. Scope of services provided by the contractor are outlined in the MOA.</p><p>-Please read the MOA for CALV scope of administrative support</p>
+
+Fund Number: 
+
+Attached Document: 6511c6208f373_2023-2024REJ_The-Scholar-Blueprint_SAT-PREP_executed-MOA.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

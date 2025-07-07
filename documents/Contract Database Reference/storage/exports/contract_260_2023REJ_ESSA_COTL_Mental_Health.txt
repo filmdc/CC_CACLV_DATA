@@ -1,0 +1,41 @@
+Purpose: <p>-To be used for salary and benefits and payments to mental health providers for COTL Mental Health Initiative.</p><p>-Mental Health Provider MOA's attached.</p>
+Funder: ESSA
+Program: REJ
+Amount: 25000.00
+Start Date: 2023-11-13
+End Date: 2024-06-30
+
+Notes: 
+
+Fund Number: F2027
+
+Attached Document: 656dd8d7a87b2_Deposit1@ESSABank.com_20231113_154636-(1).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 660c1aa253fa7_2024-COTL-BrightsideMOA.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 660c1aa59b6a5_2024COTLCounselingSolutionsMOA.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 660c1aa843d42_2024COTLRenewWellnessMOA.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 661ffbb22478c_Kendrick-Counseling-MOIA-Mental-Health.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 663b813b20811_2024REJ_Mental-Health-MOU_Leah-Cofeild.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

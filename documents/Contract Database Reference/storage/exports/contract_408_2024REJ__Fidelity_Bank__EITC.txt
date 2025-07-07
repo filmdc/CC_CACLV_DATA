@@ -1,0 +1,21 @@
+Purpose: <ul><li>General Operating Support for Generation Next and SHE split 50/50</li></ul>
+Funder: Fidelity Bank EITC
+Program: REJ
+Amount: 6500.00
+Start Date: 2024-11-25
+End Date: 
+
+Notes: 
+
+Fund Number: 8000
+
+Attached Document: 67586e6e1c2bc_2024Fidelity-Bank-EITC.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 67586f612e642_2024-Fidelity-Bank-EITC-signed-document.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

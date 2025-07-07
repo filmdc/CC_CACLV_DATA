@@ -1,0 +1,54 @@
+Purpose: <p>General Operating support HCP.</p><p>Reporting TBD.</p><p>&nbsp;</p>
+Funder: TD Bank
+Program: HCP
+Amount: 15000.00
+Start Date: 2023-06-15
+End Date: 
+
+Notes: 
+
+Fund Number: 8000
+
+Attached Document: 64930db6549c4_2023HCP_TDCharitableFoundation_attestation.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 64b7f5bf5400b_Award-Notification---June-15-2023.pdf
+Response: TD Charitable Foundation Grant
+cgadmin@cybergrants.com
+Thu 6/15/2023 1:43 PM
+To:planner-HCP <planner-hcp@caclv.org>
+[Some people who received this message don't often get email from cgadmin@cybergrants.com. Learn
+why this is important at https://aka.ms/LearnAboutSenderIdentification ]
+Dear Julie Shoults,
+I am pleased to inform you on behalf of TD Bank that the TD Charitable Foundation has approved a
+$15,000.00 contribution to the Housing Counseling Program. The check for this payment will be mailed
+to the following organization name and address used on the application received. Payment will be
+mailed within two weeks, please email
+us-charitablegiving@td.com with any questions.
+Community Action Committee of the Lehigh Valley
+1337 East Fifth Street
+Bethlehem, PA 18015-2103
+Re: Request #88238639
+We believe that organizations such as yours play a significant role in sustaining vibrant and thriving
+communities.  TD Bank through its charitable giving arm, the TD Charitable Foundation, carries a legacy
+of supporting not-for-profit institutions and their important work throughout our region.  Since its
+inception in 2002, the foundation has contributed over $308 million in grant funding to not-for-profit
+organizations in the communities where we work, live, and do business.
+In support of our mission, TD recently launched TD Ready Commitment, which refocuses our giving to
+impact positive change increasing financial security, environmental quality, inclusive communities and
+equitable health outcomes. For more information, visit https://nam12.safelinks.protection.outlook.com/?
+url=https%3A%2F%2Fwww.td.com%2Fus%2Fen%2Fabout-us%2Fcommunities%2Fready-
+commitment&data=05%7C01%7Cjshoults%40caclv.org%7Ccfeb22da7ad24a49f29108db6dc80f83%7Ce6
+a62f885eeb46759e8ba7bfb2d304d4%7C0%7C0%7C638224478258818213%7CUnknown%7CTWFpbGZsb
+3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C
+&sdata=e5V1BhJGz5eb3jEcGs9HX9%2FeEA3yAGtRIy3i8kz1Pko%3D&reserved=0.
+We are pleased to support your ongoing community-based efforts and extend our very best wishes for
+continued success.
+Sincerely,
+John Barber | Senior Regional Giving Manager
+IOffice of Community and Charitable Giving I TD Charitable Foundation
+Geoffrey D. Brandon | Market President Commercial  I TD Bank
+CG/JMAIL/277075955
+--------------------

@@ -1,0 +1,886 @@
+Purpose: <p>&nbsp;</p><p>-To be used for CADA NPP</p>
+Funder: PA DCED
+Program: CADA
+Amount: 650000.00
+Start Date: 2020-07-01
+End Date: 2026-06-30
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 6564bb4312e67_2022CADA_NPPTaxAgreement_Executed.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 65942b3f47235_2023CADA_CapitolBlue_NPP-contribution.docx
+
+
+	
+
+--------------------
+Attached Document: 66f1c9f158670_Community-Action-Development-Corp-of-Lehigh-Valley-Amendment-Letter-and-Budget.pdf
+Center for Community Services 
+400 North St., 4
+th
+ Floor | Commonwealth Keystone Bldg. | Harrisburg, PA 17120- 0225 | 717.787.1984 | dced.pa.gov 
+ 
+ 
+ 
+September 20, 2024 
+ 
+ 
+Dawn Godshall 
+Executive Director 
+Community Action Development Corporation of the Lehigh Valley 
+523-525 North Seventh Street 
+Allentown, PA 18102 
+ 
+ 
+RE:  Neighborhood Assistance Program (NAP /NPP)  
+       NAP Agreement #C000086833 
+       Application #202306304832 
+ 
+Dear Dawn Godshall:   
+ 
+Your request to amend the above referenced agreement	, which was dated September 12, 
+2024, is approved.  A copy of this letter and the attachment 	must be maintained with your 
+current agreements, as it is a binding part of your award. 
+ 
+Thank you for your interest in the Neighborhood Assistance Program.  If you have any further 
+questions about your project , please contact Fadia Halma at the Lehigh Valley Regional Office 
+at (717) 877-8481.  
+ 
+Sincerely,  
+ 
+ 
+ 
+Melissa Tabb, Chief 
+Center for Community Services
+
+Neighborhood Partnership Program 
+2023-2024 Budget Justification - Original
+Applicant: Community Action Development Corporation of the Lehigh Valley
+Also known as: Community Action Development Allentown (CADA)
+DCED Other
+Cost Cost
+Buildings - Community Center	100,000$        -$                 
+Subtotal Acquisition/Renovations	100,000$        	-$                 
+TOTAL CONSTRUCTION	100,000$        	-$                 
+N/A
+N/A
+Number of	0	Hourly Hours on	DCED Other 
+Persons	Title	Rate Project Total Cost Cost
+1 Director	36.84$                    	0 76,617$                     	-$                 76,617$          
+     Salaries and Fringes
+INFRASTRUCTURE / SITE PREPARATION
+MACHINERY & EQUIPMENT
+ACQUISITION/GENERAL CONSTRUCTION
+     Acquisition/Renovations
+OPERATING COSTS / WORKING CAPITAL
+
+1 Community Outreach	21.82$                    0 45,376$                     -$                 45,376$          
+1 AfterZone Coordinator 	21.82$                    ~1040 22,688$                     22,688$          -$                 
+Fringe Benefits (AfterZone 
+Coordinator @ 10.2%)	69,181$                     2,312$             66,869$          
+Subtotal Salaries & Fringes	213,862$                   25,000$          188,862$        
+DCED Other 
+Cost Cost
+Staff Development	-$                 100$                
+-$                 2,500$             
+Subtotal Other	-$                 2,600$            
+DCED Other 
+Cost Cost
+Printing and Copying	-$                 400$                
+Postage/Shipping	-$                 300$                
+-$                 2,500$             
+Books and Subscriptions	-$                 3,700$             
+Program Supplies	15,000$          5,699$             
+-$                 12,800$          
+Subtotal Consumable Supplies	15,000$          25,399$          
+DCED Other 
+Cost Cost
+7,500$             3,350$             
+Subtotal Other	7,500$            3,350$            
+Consumable Supplies
+Training & Technical Assistance
+Advertising Expenses
+Travel
+Travel / Field Trips 
+Office Supplies
+Conferences and meetings
+
+DCED Other 
+Cost Cost
+AfterZone Cost Reimbursement - 
+Brigadier General Anna Mae Hays 
+Elementary School - 1227-1243 W 
+Gordon St, Allentown, PA 18102	10,000$          
+Rent	-$                 12,200$          
+Utilities	-$                 2,700$             
+Facility Maintenance	-$                 4,550$             
+Subtotal Other	10,000$          19,450$          
+DCED Other
+Cost Cost
+Computer Hardware and Software	-$                 1,620$             
+Furniture and Equipment	-$                 6,250$             
+Subtotal Other	-$                 7,870$            
+DCED Other 
+Cost Cost
+Audit 	-$                 5,250$             
+65,000$          3,518$             
+Subtotal Other	65,000$          8,768$            
+TOTAL OPERATING COSTS	122,500$        256,299$        
+DCED Other 
+RELATED COSTS	Cost Cost
+Professional Services/Consultants	-$                 10,100$          
+Insurance	-$                 2,000$             
+Administration 
+Space Costs
+Other
+Office Equipment
+
+Subtotal Related Costs	-$                 12,100$          
+DCED Other 
+Cost Cost
+92,500$          -$                 
+95,000$          -$                 
+James Lawson Freedom School	30,000$          	-$                 
+Youth Police Academy	10,000$          	-$                 
+85,000$          -$                 
+Generation Next	35,000$          	-$                 
+Creative Economy Art Programming	80,000$          	-$                 
+-$                 
+427,500$        	-$                 
+TOTAL RELATED COSTS	427,500$        268,399$        
+DCED Other 
+Cost Cost
+650,000$        268,399$        
+AfterZone Community Partners
+Subtotal Additional Project Activities
+Community Outreach Workers - Promise Neighborhoods 
+of the Lehigh Valley
+GRAND TOTAL
+    Additional Project Activities
+Coalition of Difference Makers Discretionary Grants
+
+Neighborhood Partnership Program 
+2023-2024 Budget Justification - Amended
+Applicant: Community Action Development Corporation of the Lehigh Valley
+Also known as: Community Action Development Allentown (CADA)
+DCED Other
+Cost Cost
+Buildings - Community Center	128,000$        -$                 
+Subtotal Acquisition/Renovations	128,000$        	-$                 
+TOTAL CONSTRUCTION	128,000$        	-$                 
+N/A
+N/A
+Number of	0	Hourly Hours on	DCED Other 
+Persons	Title	Rate Project Total Cost Cost
+1 Director	36.84$                    	0 76,617$                     	-$                 76,617$          
+ACQUISITION/GENERAL CONSTRUCTION
+     Acquisition/Renovations
+INFRASTRUCTURE / SITE PREPARATION
+MACHINERY & EQUIPMENT
+OPERATING COSTS / WORKING CAPITAL
+     Salaries and Fringes
+
+1 Community Outreach	21.82$                    0 45,376$                     -$                 45,376$          
+1 AfterZone Coordinator 	21.82$                    ~1131 24,688$                     24,688$          -$                 
+Fringe Benefits (AfterZone 
+Coordinator @ 10.2%)	69,181$                     2,312$             66,869$          
+Subtotal Salaries & Fringes	215,862$                   27,000$          188,862$        
+DCED Other 
+Cost Cost
+Staff Development	-$                 100$                
+-$                 2,500$             
+Subtotal Other	-$                 2,600$            
+DCED Other 
+Cost Cost
+Printing and Copying	-$                 400$                
+Postage/Shipping	-$                 300$                
+-$                 2,500$             
+Books and Subscriptions	-$                 3,700$             
+Program Supplies	12,000$          5,699$             
+-$                 12,800$          
+Subtotal Consumable Supplies	12,000$          25,399$          
+DCED Other 
+Cost Cost
+5,000$             3,350$             
+Subtotal Other	5,000$            3,350$            
+Travel / Field Trips 
+Training & Technical Assistance
+Conferences and meetings
+Consumable Supplies
+Advertising Expenses
+Office Supplies
+Travel
+
+DCED Other 
+Cost Cost
+AfterZone Cost Reimbursement - 
+Brigadier General Anna Mae Hays 
+Elementary School - 1227-1243 W 
+Gordon St, Allentown, PA 18102	9,500$             
+Rent	-$                 12,200$          
+Utilities	-$                 2,700$             
+Facility Maintenance	-$                 4,550$             
+Subtotal Other	9,500$            19,450$          
+DCED Other
+Cost Cost
+Computer Hardware and Software	-$                 1,620$             
+Furniture and Equipment	-$                 6,250$             
+Subtotal Other	-$                 7,870$            
+DCED Other 
+Cost Cost
+Audit 	-$                 5,250$             
+65,000$          3,518$             
+Subtotal Other	65,000$          8,768$            
+TOTAL OPERATING COSTS	118,500$        256,299$        
+DCED Other 
+RELATED COSTS	Cost Cost
+Professional Services/Consultants	-$                 10,100$          
+Insurance	-$                 2,000$             
+Space Costs
+Office Equipment
+Other
+Administration
+
+Subtotal Related Costs	-$                 12,100$          
+DCED Other 
+Cost Cost
+92,500$          -$                 
+95,000$          -$                 
+James Lawson Freedom School	30,000$          	-$                 
+Youth Police Academy	10,000$          	-$                 
+68,000$          -$                 
+Generation Next	28,000$          	-$                 
+Creative Economy Art Programming	80,000$          	-$                 
+-$                 
+403,500$        	-$                 
+TOTAL RELATED COSTS	403,500$        268,399$        
+DCED Other 
+Cost Cost
+650,000$        268,399$        
+AfterZone Community Partners
+Community Outreach Workers - Promise Neighborhoods 
+of the Lehigh Valley
+Coalition of Difference Makers Discretionary Grants
+Subtotal Additional Project Activities
+GRAND TOTAL
+    Additional Project Activities
+
+CADA NPP Budget 23-24 - Original Neighborhood Assistance Program (NAP) CSBG - Federal Allentown CDBG - Federal General Contributions - Private Total
+Acquisition
+Buildings $                                                              100,000.00  $     100,000.00 
+Operatings Costs / Working Capital 
+Salary / Fringe Benefits $                                                                 25,000.00  $                 130,000.00  $                               15,000.00  $                                                     43,862.00  $     213,862.00 
+Training / Technical Assistance $                                                       2,600.00  $          2,600.00 
+Consumable Supplies $                                                                 15,000.00  $                                  2,000.00  $                                                     23,399.00  $        40,399.00 
+Travel $                                                                   7,500.00  $                                  1,500.00  $                                                       1,850.00  $        10,850.00 
+Office Equipment $                                                       7,870.00  $          7,870.00 
+Space Costs $                                                                 10,000.00  $                                  1,500.00  $                                                     17,950.00  $        29,450.00 
+Audit $                                                       5,250.00  $          5,250.00 
+Indirect Costs $                                                                 65,000.00  $                                                       3,518.00  $        68,518.00 
+Related Costs
+Professional Services / Consultants $                               10,000.00  $                                                           100.00  $        10,100.00 
+Insurance $                                                       2,000.00  $          2,000.00 
+Miscellaneous
+AfterZone Community Partners $                                                                 92,500.00  $        92,500.00 
+Grants to other organizations $                                                              335,000.00  $     335,000.00 
+TOTAL $                                                              650,000.00  $                 130,000.00  $                               30,000.00  $                                                  108,399.00  $     918,399.00
+
+CADA NPP Budget 23-24 - Amended Neighborhood Assistance Program (NAP) CSBG - Federal Allentown CDBG - Federal General Contributions - Private Total
+Acquisition
+Buildings $                                                                128,000.00  $                    128,000.00 
+Operatings Costs / Working Capital 
+Salary / Fringe Benefits $                                                                   27,000.00  $                       130,000.00  $                                15,000.00  $                                             43,862.00  $                    215,862.00 
+Training / Technical Assistance $                                                2,600.00  $                         2,600.00 
+Consumable Supplies $                                                                   12,000.00  $                                   2,000.00  $                                             23,399.00  $                       37,399.00 
+Travel $                                                                      5,000.00  $                                   1,500.00  $                                                1,850.00  $                         8,350.00 
+Office Equipment $                                                7,870.00  $                         7,870.00 
+Space Costs $                                                                      9,500.00  $                                   1,500.00  $                                             17,950.00  $                       28,950.00 
+Audit $                                                5,250.00  $                         5,250.00 
+Indirect Costs $                                                                   65,000.00  $                                                3,518.00  $                       68,518.00 
+Related Costs
+Professional Services / Consultants $                                10,000.00  $                                                    100.00  $                       10,100.00 
+Insurance $                                                2,000.00  $                         2,000.00 
+Miscellaneous
+AfterZone Community Partners $                                                                   92,500.00  $                       92,500.00 
+Grants to other organizations $                                                                311,000.00  $                    311,000.00 
+TOTAL $                                                                650,000.00  $                       130,000.00  $                                30,000.00  $                                          108,399.00  $                    918,399.00
+
+PROPOSED PROJECTS FOR YEAR 4 (FY 2023-2024) (Original) 
+  
+The Allentown’s CORE NPP Steering Committee will continue to focus on the following priorities for 
+implementation in FY 2023-2024:  
+  
+ Education  
+ Vocation  
+ Health and Recreation  
+ Citizen Engagement  
+  
+In March of 2020, the Steering Committee of Allentown’s CORE met to discuss the development of 
+CADA’s new Neighborhood Partnership Program. With the recommendations of Community Action 
+Lehigh Valley’s Executive Director, the now-retired Alan Jennings, as well as staff from Community 
+Action Development Allentown, Promise Neighborhoods of the Lehigh Valley, the Cultural Coalition of 
+Allentown (now Lehigh Valley Arts and Cultural Alliance), and Downtown Allentown Community 
+Development Initiative, a first-year draft schedule of activities was presented to the Steering Committee for 
+review. Over the summer, Steering Committee members deliberated on these proposed activities and 
+arrived at the following projects for funding priorities for implementation in FY 2020-2021 (NPP Year 1). 
+Following the COVID-19 pandemic and social distancing regulations, it was difficult to identify meaningful 
+changes to be made to be our priorities moving into Year 2. The Steering Committee approved a motion to 
+maintain the same proposed projects, including their financial allocations, in Year 2. This decision was 
+predicated on the assumption that the second year of programming will yield significantly more usable data 
+and experience moving forward than Year 1, which saw so much disruption following the COVID-19 
+pandemic.  
+  
+Following a year of programming that saw less interruptions caused by the COVID-19 pandemic, Year 2 
+of Allentown’s CORE allowed for a much more thorough understanding of how our programming addressed 
+community needs. Thus, Year 3 of Allentown’s CORE featured some significant shifts in programming.  
+  
+One of the most obvious changes made to the Neighborhood Partnership Program in its third year was its 
+new name: Allentown’s CORE. In April and May of 2021, an online contest was held where local youth 
+were able to submit their ideas to rename the Neighborhood Partnership Program as they saw fit. The 
+student with the winning submission was Jamari Rivera, aged 15.   
+  
+Another key change to Allentown’s CORE was the addition of the Allentown AfterZone initiative. Based 
+on the model crafted by the Providence After School Alliance (PASA) in Providence, Rhode Island, the 
+programs offered in the AfterZone would be integrated into the education goals of the Allentown School 
+District, ensuring that each program supports the academic needs of each student. Hands-on learning is at 
+the core of PASA’s model. Students choose their programs from program brochures, allowing them to 
+become empowered learners with a sense of personal agency. Crucially, all AfterZone programming is 
+entirely free for students. CADA acts as a connective hub, providing administrative oversight and 
+monitoring of community organizations and service providers. The Allentown AfterZone provides each 
+student with access to year-round, learning that engages young people in a way that excites them, stimulates 
+their curiosity, and assists them in realizing their skills, talents, and abilities. Beginning with middle school 
+students and integrating high school students in the near future, the Allentown AfterZone represents a city-
+wide expanded learning system consisting of after-school, out-of-school, and summer activities.  
+  
+Following a year of highly successful programming, only small alterations to allocation amounts have been 
+suggested for Year 4. While the allocation has not changed for the line item related to the acquisition of the
+
+youth center, significant progress has been made towards the acquisition of our primary target site: the 
+former Cleveland Elementary School building, located in the heart of the target neighborhood.  
+  
+Education ($140,000)   
+  
+Generation Next ($35,000)  
+  
+Generation Next is a strategy designed to help level the field and ensure that underserved students have 
+increased access to opportunities to further their education. Students are recruited as freshman and continue 
+with the program as they advance through college. Students must fit two of the following requirements: 
+first generation college student, from a low-moderate income family and/or minority background. Program 
+benefits include social/emotional intelligence building curriculum, SAT preparation and test costs, college 
+campus visit, personal mentor, and access to discretionary funds.  
+  
+Objective #1: By September 30, 2024, CALV will facilitate Generation Next at William Allen High School 
+for thirty (30) students and their parents/guardians.  
+  
+Objective #2: By September 30, 2024, CALV will ensure 90% retention rate for students in Generation 
+Next.   
+  
+Objective #3: By September 30, 2024, CALV will ensure 90% of students in Generation Next demonstrate 
+improved positive approaches toward learning, including improved attention skills.  
+  
+Objective #4: By September 30, 2024, 95% of students in Generation Next will be on pace to advance to 
+the next grade.  
+  
+Allentown AfterZone ($105,000)  
+  
+The Allentown AfterZone program represents a city-wide expanded learning system consisting of after-
+school, out-of-school, and summer activities. Some programs would take place in Allentown’s public 
+schools, others at community partner locations throughout Allentown. The programs offered in the 
+AfterZone are integrated into the education goals of the Allentown School District, ensuring that each 
+program supports the academic needs of each school and student. CADA acts as a connective hub, providing 
+administrative oversight and monitoring of community organizations and service providers.  
+  
+Objective #5: Continue to employ one (1) part-time Program Coordinator at 25 hours per week.   
+  
+Objective #6: Identify five (5) community partners to collaborate with on the development of AfterZone 
+programming.  
+  
+Objective #7: Develop and launch a combination of five (5) AfterZone programs or events.  
+  
+Objective #8: Serve a minimum of seventy-five (75) youth through AfterZone programming and events.  
+  
+Objective #9: Utilize Allentown School District buildings for at least 80% of AfterZone programming and 
+events.  
+  
+  
+VOCATION ($30,000)
+
+Youth Entrepreneurship Program ($30,000)  
+  
+This program will provide entrepreneurial mentorship opportunities for youth who want to learn more about 
+starting/owning their own business in a field of their choice. CADA’s Director will recruit and pair local 
+youth with an appropriate entrepreneur/small business owner.   
+  
+Objective #10: By September 30, 2024, CADA’s Director will recruit at least ten (10) local 
+entrepreneurs/small business owners to the Youth Entrepreneurship Program.  
+  
+Objective #11: By September 30, 2024, CADA’s Director will pair at least ten (10) youth with local 
+entrepreneurs/small business owners.  
+  
+Objective #12: By September 30, 2024, at least ten (10) youth will have a broader understanding of their 
+future career goals based on their time in the Youth Entrepreneurship Program.  
+  
+  
+HEALTH AND RECREATION ($190,000)  
+  
+Youth Center – Fourth-Year Costs (acquisition and renovations) ($100,000)  
+  
+During the fourth year of the Neighborhood Partnership Program, CADA staff will continue to work with 
+the Allentown School District to finalize the acquisition of the identified youth center site. Costs will help 
+cover acquisition costs as well as interim operating costs.  
+  
+Objective #13: By September 30, 2024, CADA will identify five (5) interim spaces where NPP activities 
+can be held until the acquisition and creation of a new community center.  
+  
+Objective #14: By September 30, 2024, CADA will finalize the acquisition and begin the development of 
+the identified youth center site located in Center City, Allentown.  
+  
+Youth Police Academy ($10,000)  
+  
+The Allentown Police Youth Academy, in partnership with the Allentown School District, will host a two-
+week Youth Police Academy for thirty-five (35) to forty (40) students. The programs will provide 
+classroom sessions with lectures, role plays and topical demonstrations by police officers in the areas of 
+law, behavioral science, drug prevention and gang resistance. Field trips to a police department facility or 
+city park will also be part of the curriculum. The second week of the program will include instruction at the 
+Lehigh County Technical Institute, to further educate participating students in the field of law enforcement 
+while continuing to strengthen the bond between students and officers.  
+  
+Objective #15: By September 30, 2024, CADA will provide program supplies for the Youth Police 
+Academy that will serve, on average, forty (40) students over a four-week period during summer 2022.  
+  
+Creative Economy – Art Programming ($80,000)  
+  
+The Lehigh Valley Arts and Cultural Alliance, through the Artist-Neighbor Growth and Opportunity Project 
+(TANGO) will provide community youth with art and cultural activities, including dance classes, video, 
+multimedia projects, mural mentorship program, and creative entrepreneurship opportunities.
+
+Objective #16: By September 30, 2024, the Lehigh Valley Arts and Cultural Alliance will offer a 
+combination of yoga, Pilates, and dance classes to fifty (50) to seventy (70) students during the school year.  
+  
+Objective #17: By September 30, 2024, the Lehigh Valley Arts and Cultural Alliance will offer video and 
+multimedia lab programming to twenty (20) to twenty-four (24) students.  
+  
+Objective #18: By September 30, 2024, the Lehigh Valley Arts and Cultural Alliance will offer twenty-
+four (24) to thirty (30) students the opportunity to learn how to work and operate a recording studio.  
+  
+Objective #19: By September 30, 2024, the Lehigh Valley Arts and Cultural Alliance, in partnership with 
+the Fine Feather Foundation, will conduct a 6 to 8-week summer camp focusing on the performing arts.  
+  
+Objective #20: By September 30, 2024, the Lehigh Valley Arts and Cultural Alliance will offer the Mural 
+Arts Mentorship program to three (3) to four (4) students.  
+  
+  
+CITIZEN ENGAGEMENT ($210,000)  
+  
+Community Outreach Workers ($95,000)  
+  
+The Community Outreach Workers of Promise Neighborhoods of the Lehigh Valley will be responsible for 
+program outreach, connecting community youth with support services as well as building rapport with high-
+risk youth. They serve as a link and support for youth through connections to community resources and 
+participate, as necessary, in organizing strategic and inclusive responses to incidents of violence.  
+  
+Objective #21: By September 30, 2024, Promise Neighborhoods will continue to employ two (2) full time 
+employees to serve as Community Outreach Workers.  
+  
+Objective #22: By September 30, 2024, Community Outreach Workers will have completed ongoing Cure 
+Violence training and provide CADA with documentation of their trainings and certifications.  
+  
+Objective #23: By September 30, 2024, Community Outreach Workers will have assisted in the response 
+to thirty-five to fifty (35-50) acts of violence within Allentown city limits. The Community Outreach 
+Workers will provide documentation of their responses and the specific outcomes of their responses.  
+  
+James Lawson Freedom School ($30,000)  
+  
+The James Lawson Freedom School is a research-driven, best practice six-week summer enrichment 
+program that partners low-income students and students struggling in school within the Allentown School 
+District with area college students to create a dynamic intergenerational learning environment that builds 
+the necessary literacy and leadership skills required for success in learning and life.   
+  
+Objective #24: By September 30, 2024, the James Lawson Freedom School will have provided a six-week 
+summer literacy and cultural enrichment program to sixty-five (65) K-12 students in the Allentown School 
+District footprint.  
+  
+Objective #25: By September 30, 2024, the James Lawson Freedom School will provide quality 
+programming including high quality academic enrichment, parent and family involvement, civic 
+engagement and social action, intergenerational servant leadership development, and nutrition, health, and 
+mental health.
+
+Objective #26: By September 30, 2024, based on pre- and post-testing, students of the James Lawson 
+Freedom School will demonstrate increased academic performance in reading efficiency.   
+  
+Objective #27: By September 30, 2024, based on pre- and post-testing, students of the James Lawson 
+Freedom School will maintain or gain in their instructional reading level.  
+  
+Coalition of Difference-Makers Discretionary Grants ($85,000)   
+  
+Objective #28: By September 30, 2024, the Coalition of Difference Makers will distribute $85,000 of 
+discretionary funding to community organizations with the intent to build their capacity for long-term 
+growth and success.  
+  
+Objective #29: By September 30, 2024, at least seventy-five (75) community youth will have been 
+positively impacted through the projects funded by the Coalition of Difference Makers.  
+  
+  
+ORGANIZATION AND MANAGEMENT ($80,000)  
+  
+Administration ($65,000)  
+  
+NPP funds will support the cost of the administration of the Allentown’s Future Neighborhood Partnership 
+Program through the efforts of the Community Action Development Allentown and Community Action 
+Lehigh Valley.   
+  
+Objective #30: By September 30, 2024, the Community Action Lehigh Valley and the Community Action 
+Development Allentown will continue to provide proficient administration of the Neighborhood 
+Partnership Program.  
+  
+  
+Program Supplies ($15,000)  
+  
+NPP funds will support the cost of office and program supplies necessary to implement programming.  
+  
+Objective #31: Program supplies will be purchased and distributed to community partners as needed.  
+  
+  
+TIMELINE   
+  
+SCHEDULE OF ACTIVITIES  
+Sept 
+2023  
+Dec  
+2023  
+Mar  
+2024  
+  
+Jun  
+2024  
+Sept  
+2024  
+Facilitate Generation Next at William Allen High School  
+X  X  X    X  X  
+Continue to employ AfterZone Program Coordinator  
+X  X  X  X  X  
+Provide AfterZone programming to students in Allentown 
+School District buildings  
+X  X  X  X  X
+
+Maintain local entrepreneurs/small business owners for the 
+Youth Entrepreneurship Program program  	X  X  X  X  X  
+Pair neighborhood youth with local entrepreneurs/small 
+business owners  
+X  X  X  X  X  
+Identify interim spaces where NPP activities can be held   
+X  X  X  X  X  
+Identify, acquire, and renovate a community center within the 
+project area in Center City Allentown  
+X  X  X  X  X  
+Administer the Allentown Youth Police Academy  
+X    X  X  
+Provide arts programming, including dance classes, multimedia 
+lab, and recording studio instruction to students.  X  X  X  X  X  
+Enroll students in the Mural Arts Mentorship program  
+X  X  X  X  X  
+Employ two (2) Community Outreach Workers  
+X  X  X  X  X  
+Offer James Lawson Freedom School to students in the 
+Allentown School District  	X    X  X  
+Distribute discretionary grants to local youth-serving 
+organizations  
+X  X  X  X  X  
+Provide proficient administration of the Neighborhood 
+Partnership Program.  
+X  X  X  X  X
+
+PROPOSED PROJECTS FOR YEAR 4 (FY 2023-2024) (Amended) 
+  
+The Allentown’s CORE NPP Steering Committee will continue to focus on the following priorities for 
+implementation in FY 2023-2024:  
+  
+ Education  
+ Vocation  
+ Health and Recreation  
+ Citizen Engagement  
+  
+In March of 2020, the Steering Committee of Allentown’s CORE met to discuss the development of 
+CADA’s new Neighborhood Partnership Program. With the recommendations of Community Action 
+Lehigh Valley’s Executive Director, the now-retired Alan Jennings, as well as staff from Community 
+Action Development Allentown, Promise Neighborhoods of the Lehigh Valley, the Cultural Coalition of 
+Allentown (now Lehigh Valley Arts and Cultural Alliance), and Downtown Allentown Community 
+Development Initiative, a first-year draft schedule of activities was presented to the Steering Committee for 
+review. Over the summer, Steering Committee members deliberated on these proposed activities and 
+arrived at the following projects for funding priorities for implementation in FY 2020-2021 (NPP Year 1). 
+Following the COVID-19 pandemic and social distancing regulations, it was difficult to identify meaningful 
+changes to be made to be our priorities moving into Year 2. The Steering Committee approved a motion to 
+maintain the same proposed projects, including their financial allocations, in Year 2. This decision was 
+predicated on the assumption that the second year of programming will yield significantly more usable data 
+and experience moving forward than Year 1, which saw so much disruption following the COVID-19 
+pandemic.  
+  
+Following a year of programming that saw less interruptions caused by the COVID-19 pandemic, Year 2 
+of Allentown’s CORE allowed for a much more thorough understanding of how our programming addressed 
+community needs. Thus, Year 3 of Allentown’s CORE featured some significant shifts in programming.  
+  
+One of the most obvious changes made to the Neighborhood Partnership Program in its third year was its 
+new name: Allentown’s CORE. In April and May of 2021, an online contest was held where local youth 
+were able to submit their ideas to rename the Neighborhood Partnership Program as they saw fit. The 
+student with the winning submission was Jamari Rivera, aged 15.   
+  
+Another key change to Allentown’s CORE was the addition of the Allentown AfterZone initiative. Based 
+on the model crafted by the Providence After School Alliance (PASA) in Providence, Rhode Island, the 
+programs offered in the AfterZone would be integrated into the education goals of the Allentown School 
+District, ensuring that each program supports the academic needs of each student. Hands-on learning is at 
+the core of PASA’s model. Students choose their programs from program brochures, allowing them to 
+become empowered learners with a sense of personal agency. Crucially, all AfterZone programming is 
+entirely free for students. CADA acts as a connective hub, providing administrative oversight and 
+monitoring of community organizations and service providers. The Allentown AfterZone provides each 
+student with access to year-round, learning that engages young people in a way that excites them, stimulates 
+their curiosity, and assists them in realizing their skills, talents, and abilities. Beginning with middle school 
+students and integrating high school students in the near future, the Allentown AfterZone represents a city-
+wide expanded learning system consisting of after-school, out-of-school, and summer activities.  
+  
+Following a year of highly successful programming, only small alterations to allocation amounts have been 
+suggested for Year 4. While the allocation has not changed for the line item related to the acquisition of the
+
+youth center, significant progress has been made towards the acquisition of our primary target site: the 
+former Cleveland Elementary School building, located in the heart of the target neighborhood.  
+  
+Education ($140,000) ($132,000) 
+  
+Generation Next ($35,000) ($28,000) 
+  
+Generation Next is a strategy designed to help level the field and ensure that underserved students have 
+increased access to opportunities to further their education. Students are recruited as freshman and continue 
+with the program as they advance through college. Students must fit two of the following requirements: 
+first generation college student, from a low-moderate income family and/or minority background. Program 
+benefits include social/emotional intelligence building curriculum, SAT preparation and test costs, college 
+campus visit, personal mentor, and access to discretionary funds.  
+  
+Objective #1: By September 30, 2024, CALV will facilitate Generation Next at William Allen High School 
+for thirty (30) students and their parents/guardians.  
+  
+Objective #2: By September 30, 2024, CALV will ensure 90% retention rate for students in Generation 
+Next.   
+  
+Objective #3: By September 30, 2024, CALV will ensure 90% of students in Generation Next demonstrate 
+improved positive approaches toward learning, including improved attention skills.  
+  
+Objective #4: By September 30, 2024, 95% of students in Generation Next will be on pace to advance to 
+the next grade.  
+  
+Allentown AfterZone ($105,000) ($104,000) 
+  
+The Allentown AfterZone program represents a city-wide expanded learning system consisting of after-
+school, out-of-school, and summer activities. Some programs would take place in Allentown’s public 
+schools, others at community partner locations throughout Allentown. The programs offered in the 
+AfterZone are integrated into the education goals of the Allentown School District, ensuring that each 
+program supports the academic needs of each school and student. CADA acts as a connective hub, providing 
+administrative oversight and monitoring of community organizations and service providers.  
+  
+Objective #5: Continue to employ one (1) part-time Program Coordinator at 25 hours per week.   
+  
+Objective #6: Identify five (5) community partners to collaborate with on the development of AfterZone 
+programming.  
+  
+Objective #7: Develop and launch a combination of five (5) AfterZone programs or events.  
+  
+Objective #8: Serve a minimum of seventy-five (75) youth through AfterZone programming and events.  
+  
+Objective #9: Utilize Allentown School District buildings for at least 80% of AfterZone programming and 
+events.  
+  
+  
+VOCATION ($30,000)
+
+Youth Entrepreneurship Program ($30,000)  
+  
+This program will provide entrepreneurial mentorship opportunities for youth who want to learn more about 
+starting/owning their own business in a field of their choice. CADA’s Director will recruit and pair local 
+youth with an appropriate entrepreneur/small business owner.   
+  
+Objective #10: By September 30, 2024, CADA’s Director will recruit at least ten (10) local 
+entrepreneurs/small business owners to the Youth Entrepreneurship Program.  
+  
+Objective #11: By September 30, 2024, CADA’s Director will pair at least ten (10) youth with local 
+entrepreneurs/small business owners.  
+  
+Objective #12: By September 30, 2024, at least ten (10) youth will have a broader understanding of their 
+future career goals based on their time in the Youth Entrepreneurship Program.  
+  
+  
+HEALTH AND RECREATION ($190,000) ($218,000) 
+  
+Youth Center – Fourth-Year Costs (acquisition and renovations) ($100,000) ($128,000) 
+  
+During the fourth year of the Neighborhood Partnership Program, CADA staff will continue to work with 
+the Allentown School District to finalize the acquisition of the identified youth center site. Costs will help 
+cover acquisition costs as well as interim operating costs.  
+  
+Objective #13: By September 30, 2024, CADA will identify five (5) interim spaces where NPP activities 
+can be held until the acquisition and creation of a new community center.  
+  
+Objective #14: By September 30, 2024, CADA will finalize the acquisition and begin the development of 
+the identified youth center site located in Center City, Allentown.  
+  
+Youth Police Academy ($10,000)  
+  
+The Allentown Police Youth Academy, in partnership with the Allentown School District, will host a two-
+week Youth Police Academy for thirty-five (35) to forty (40) students. The programs will provide 
+classroom sessions with lectures, role plays and topical demonstrations by police officers in the areas of 
+law, behavioral science, drug prevention and gang resistance. Field trips to a police department facility or 
+city park will also be part of the curriculum. The second week of the program will include instruction at the 
+Lehigh County Technical Institute, to further educate participating students in the field of law enforcement 
+while continuing to strengthen the bond between students and officers.  
+  
+Objective #15: By September 30, 2024, CADA will provide program supplies for the Youth Police 
+Academy that will serve, on average, forty (40) students over a four-week period during summer 2022.  
+  
+Creative Economy – Art Programming ($80,000)  
+  
+The Lehigh Valley Arts and Cultural Alliance, through the Artist-Neighbor Growth and Opportunity Project 
+(TANGO) will provide community youth with art and cultural activities, including dance classes, video, 
+multimedia projects, mural mentorship program, and creative entrepreneurship opportunities.
+
+Objective #16: By September 30, 2024, the Lehigh Valley Arts and Cultural Alliance will offer a 
+combination of yoga, Pilates, and dance classes to fifty (50) to seventy (70) students during the school year.  
+  
+Objective #17: By September 30, 2024, the Lehigh Valley Arts and Cultural Alliance will offer video and 
+multimedia lab programming to twenty (20) to twenty-four (24) students.  
+  
+Objective #18: By September 30, 2024, the Lehigh Valley Arts and Cultural Alliance will offer twenty-
+four (24) to thirty (30) students the opportunity to learn how to work and operate a recording studio.  
+  
+Objective #19: By September 30, 2024, the Lehigh Valley Arts and Cultural Alliance, in partnership with 
+the Fine Feather Foundation, will conduct a 6 to 8-week summer camp focusing on the performing arts.  
+  
+Objective #20: By September 30, 2024, the Lehigh Valley Arts and Cultural Alliance will offer the Mural 
+Arts Mentorship program to three (3) to four (4) students.  
+  
+  
+CITIZEN ENGAGEMENT ($210,000) ($193,000) 
+  
+Community Outreach Workers ($95,000)  
+  
+The Community Outreach Workers of Promise Neighborhoods of the Lehigh Valley will be responsible for 
+program outreach, connecting community youth with support services as well as building rapport with high-
+risk youth. They serve as a link and support for youth through connections to community resources and 
+participate, as necessary, in organizing strategic and inclusive responses to incidents of violence.  
+  
+Objective #21: By September 30, 2024, Promise Neighborhoods will continue to employ two (2) full time 
+employees to serve as Community Outreach Workers.  
+  
+Objective #22: By September 30, 2024, Community Outreach Workers will have completed ongoing Cure 
+Violence training and provide CADA with documentation of their trainings and certifications.  
+  
+Objective #23: By September 30, 2024, Community Outreach Workers will have assisted in the response 
+to thirty-five to fifty (35-50) acts of violence within Allentown city limits. The Community Outreach 
+Workers will provide documentation of their responses and the specific outcomes of their responses.  
+  
+James Lawson Freedom School ($30,000)  
+  
+The James Lawson Freedom School is a research-driven, best practice six-week summer enrichment 
+program that partners low-income students and students struggling in school within the Allentown School 
+District with area college students to create a dynamic intergenerational learning environment that builds 
+the necessary literacy and leadership skills required for success in learning and life.   
+  
+Objective #24: By September 30, 2024, the James Lawson Freedom School will have provided a six-week 
+summer literacy and cultural enrichment program to sixty-five (65) K-12 students in the Allentown School 
+District footprint.  
+  
+Objective #25: By September 30, 2024, the James Lawson Freedom School will provide quality 
+programming including high quality academic enrichment, parent and family involvement, civic 
+engagement and social action, intergenerational servant leadership development, and nutrition, health, and 
+mental health.
+
+Objective #26: By September 30, 2024, based on pre- and post-testing, students of the James Lawson 
+Freedom School will demonstrate increased academic performance in reading efficiency.   
+  
+Objective #27: By September 30, 2024, based on pre- and post-testing, students of the James Lawson 
+Freedom School will maintain or gain in their instructional reading level.  
+  
+Coalition of Difference-Makers Discretionary Grants ($85,000) ($68,000) 
+  
+Objective #28: By September 30, 2024, the Coalition of Difference Makers will distribute $85,000 of 
+discretionary funding to community organizations with the intent to build their capacity for long-term 
+growth and success.  
+  
+Objective #29: By September 30, 2024, at least seventy-five (75) community youth will have been 
+positively impacted through the projects funded by the Coalition of Difference Makers.  
+  
+  
+ORGANIZATION AND MANAGEMENT ($80,000) ($77,000)  
+  
+Administration ($65,000)  
+  
+NPP funds will support the cost of the administration of the Allentown’s Future Neighborhood Partnership 
+Program through the efforts of the Community Action Development Allentown and Community Action 
+Lehigh Valley.   
+  
+Objective #30: By September 30, 2024, the Community Action Lehigh Valley and the Community Action 
+Development Allentown will continue to provide proficient administration of the Neighborhood 
+Partnership Program.  
+  
+  
+Program Supplies ($15,000) ($12,000) 
+  
+NPP funds will support the cost of office and program supplies necessary to implement programming.  
+  
+Objective #31: Program supplies will be purchased and distributed to community partners as needed.  
+ 
+ 
+SCHEDULE OF ACTIVITIES  
+Sept 
+2023  
+Dec  
+2023  
+Mar  
+2024  
+  
+Jun  
+2024  
+Sept  
+2024  
+Facilitate Generation Next at William Allen High School  
+X  X  X    X  X  
+Continue to employ AfterZone Program Coordinator  
+X  X  X  X  X  
+Provide AfterZone programming to students in Allentown 
+School District buildings  
+X  X  X  X  X  
+Maintain local entrepreneurs/small business owners for the 
+Youth Entrepreneurship Program program  	X  X  X  X  X
+
+Pair neighborhood youth with local entrepreneurs/small 
+business owners  
+X  X  X  X  X  
+Identify interim spaces where NPP activities can be held   
+X  X  X  X  X  
+Identify, acquire, and renovate a community center within the 
+project area in Center City Allentown  
+X  X  X  X  X  
+Administer the Allentown Youth Police Academy  
+X    X  X  
+Provide arts programming, including dance classes, multimedia 
+lab, and recording studio instruction to students.  X  X  X  X  X  
+Enroll students in the Mural Arts Mentorship program  
+X  X  X  X  X  
+Employ two (2) Community Outreach Workers  
+X  X  X  X  X  
+Offer James Lawson Freedom School to students in the 
+Allentown School District  	X    X  X  
+Distribute discretionary grants to local youth-serving 
+organizations  
+X  X  X  X  X  
+Provide proficient administration of the Neighborhood 
+Partnership Program.  
+X  X  X  X  X
+--------------------
+Attached Document: 66fc1aefeae00_CADA-NPP---Allentown's-CORE-24-25.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

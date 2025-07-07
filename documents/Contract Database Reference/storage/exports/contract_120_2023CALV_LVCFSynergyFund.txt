@@ -1,0 +1,53 @@
+Purpose: <p>Costs associated with acquisition of HADC Allentown.</p><p>Final Report Due by 2/1/2024.</p>
+Funder: Lehigh Valley Synergy Fund Grant 
+Program: CALV
+Amount: 9193.00
+Start Date: 2023-02-10
+End Date: 
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 641c611f0fdc7_2023CACLV_LVCFSynergy-Fund_award-notification.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 641c61220e721_Synergy-FUND-award-email.pdf
+From: LVCF Accounting <accounting@lvcfoundation.org> 
+Sent: Friday, February 10, 2023 9:19 AM 
+To: Dawn Godshall <dgodshall@caclv.org>; Amy Boccadoro <aboccadoro@caclv.org>; Evans, Dave 
+<Dave@HADCallentown.org> 
+Cc: Craig Lafey <clafey@caclv.org>; Megan Briggs <megan@lvcfoundation.org> 
+Subject: LVCF ACH Grant Payment in Process- Synergy Fund 
+  
+February 10, 2023 
+  
+  
+Ms. Dawn Godshall, Executive Director 
+Community Action Lehigh Valley 
+1337 E. Fifth Street 
+Bethlehem, PA  18015 
+  
+Dear Dawn, 
+  
+The Community Foundation is delighted to make a grant of $9,193.00 to Community Action 
+Lehigh Valley from the Lehigh Valley Synergy Fund to be used for exploring an 
+acquisition.  Please refer to the award notification previously sent to you by email for applicable 
+terms and other important information. 
+  
+The Board of Governors of the Lehigh Valley Community Foundation joins me in 
+wishing you continued success. 
+  
+Sincerely, 
+ 
+Erika Riddle Petrozelli, CPA 
+President & Chief Executive Officer
+
+| 
+ 
+ 
+| , 
+T: | F:
+--------------------

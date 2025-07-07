@@ -1,0 +1,21 @@
+Purpose: <p>General operating support for HCP (5,000) and SSS (5,000).</p><p>-We are required to use Santander Trademark and acknowledge their contribution through social media.</p>
+Funder: Santander
+Program: Multi
+Amount: 10000.00
+Start Date: 2023-07-01
+End Date: 2024-06-30
+
+Notes: <p>-Restricted funds</p><p>-6-month report due by 1/31/24 and final report due by 8/15/24</p><p>Items to be included:</p><p>-use of donated funds and progress towards achieving objectives, impact of grant funds, whether or not funds were diverted from the purpose of the grant, financial report of detailed expenditures.</p>
+
+Fund Number: 3200
+
+Attached Document: 64930a592c794_2023HCPSSS_Santander_tradmarkagreement.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 64930a5bd17de_2023HCPSSS_Santander_executedgrantagreement.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

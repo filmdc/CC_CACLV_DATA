@@ -1,0 +1,21 @@
+Purpose: <p>Marketing, advertising and signage.</p>
+Funder: NC Hotel Tax Grant-Slate Belt Marketing and Promotions
+Program: SBR
+Amount: 10000.00
+Start Date: 2021-11-01
+End Date: 2023-12-31
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 652d6e4c39bcd_2021SBR_-Hotel-Tax_-Slate-Belt-Marketing-and-Promotions.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 652d6e505a7d1_2021-2022-Slate-Belt-Marketing-and-Promotions-2nd-Amendment-extension.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

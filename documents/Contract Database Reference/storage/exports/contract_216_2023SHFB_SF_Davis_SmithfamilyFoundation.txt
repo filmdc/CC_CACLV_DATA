@@ -1,0 +1,21 @@
+Purpose: <p>Unrestricted general operating grant for The Seed Farm.</p>
+Funder: Davis & Smith Family Foundation
+Program: SHFB
+Amount: 50000.00
+Start Date: 2023-08-03
+End Date: 
+
+Notes: <figure class="image"><img src="http://10.55.0.10/storage/375/image.png"></figure>
+
+Fund Number: 8000
+
+Attached Document: 64d10c4894838_2023SHFB_SF_DavisSmithFamilyFoundation_awardemail.docx
+
+
+
+--------------------
+Attached Document: 64db8d5499b00_2023SHFB_David&SMithFamilyFoundation_award.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

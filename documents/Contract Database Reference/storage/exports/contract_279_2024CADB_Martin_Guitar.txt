@@ -1,0 +1,107 @@
+Purpose: <p>Gerneral operating CADB.</p>
+Funder: Martin Guitar Foundation
+Program: CADB
+Amount: 10000.00
+Start Date: 2023-12-31
+End Date: 
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 659c40c738b03_MartinGuitarFdn.2023-(2).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 659c40cc3a4b3_Martin-Guitar-FY23-24-Proposal.pdf
+1 
+ 
+PROPOSAL TO THE MARTIN GUITAR CHARITABLE FOUNDATION – FY23-24 
+ 
+Overview Of Organization: Community Action Development Bethlehem 
+ 
+Community Action Development Bethlehem (CADB), a subsidiary of Community Action Lehigh 
+Valley, is located in south Bethlehem, Pennsylvania, and was incorporated as a 501(c)(3) 
+organization on October 6, 1997. The organization is dedicated to working with the residents and 
+business owners of south Bethlehem to create sustainable economic development and community 
+revitalization. CADB’s mission states: “based on a belief in economic and social justice, CADB 
+improves the quality of life in south Bethlehem by fostering economic opportunity, promoting 
+community development, and empowering residents to actively participate in the decision-making 
+process regarding the future of our diverse community.” 
+ 
+The history of Community Action Development Bethlehem starts with its parent organization 
+Community Action Lehigh Valley. The organization started in 1964, with the formation of a 
+steering committee of the first Economic Action Program with an annual budget of $34,535 in 
+Bethlehem. On December 20, 1965, when Sargent Shriver led the Office of Economic Opportunity 
+and launched the nationwide Community Action Program, Community Action Lehigh Valley was 
+officially incorporated as a 501(c)(3) non-profit corporation. Today, Community Action Lehigh 
+Valley has an operating budget of $20,648,330 and houses four subsidiaries including Community 
+Action Development Bethlehem. 
+ 
+Request For Program Support 
+ 
+Funds requested from the Martin Guitar Charitable Foundation will be utilized by Community 
+Action Development Bethlehem (CADB) to assist residents and business owners of south 
+Bethlehem to create sustainable economic development and community revitalization. CADB 
+carries out its mission through community organizing activities and services that foster community 
+ownership. Community ownership includes the creation and development of businesses and the 
+political and problem-solving process around issues that affect the community. Leadership is 
+provided by the Board of Directors of CADB, which is comprised of residents, small business 
+owners, and area civic leaders interested in improving the quality of life in south Bethlehem. Staff 
+work diligently to develop relationships among business owners and residents of south Bethlehem. 
+They also learn about neighborhood needs from the residents, identify residents interested in taking 
+an active role in ownership of their neighborhoods, develop neighborhood leaders, and organize 
+residents to use their collective power to solve neighborhood problems. The goal for CADB staff 
+is to empower residents to have a greater voice in their community while encouraging and assisting 
+them to attain more economic independence. 
+ 
+Through Southside’s Tomorrow Neighborhood Partnership Program, Community Action 
+Development Bethlehem carries out several projects that are created by and for the residents of 
+south Bethlehem. These projects align with the focus areas outlined in the Southside's Tomorrow 
+Master Plan: Public and Green Spaces, Affordable Housing, and Communication and 
+Connectivity.
+
+2 
+ 
+Projects include community building events, community gardening, youth programming and 
+facade improvements to name a few. In addition, CADB's office acts as a hub for information and 
+referral services connecting residents to resources provided by local organizations. 
+ 
+We appreciate the previous support that we have received from the Martin Guitar Charitable 
+Foundation and would love to continue our valuable partnership here in south Bethlehem. We 
+respectfully request $10,000 in support of CADB and its programming on the Southside. 
+ 
+Budget Overview For Community Action Development Bethlehem 
+ 
+For the 23-24 fiscal year, Community Action Development Bethlehem has a budget of 697,577. 
+About half of the annual budget is provided by the Neighborhood Partnership Program (NPP) of 
+the Pennsylvania Department of Community and Economic Development (PA DCED).  We are 
+proud to have had the PA DCED approve our NPP, Southside’s Tomorrow, in November 2022 for 
+the 2023-2024 fiscal year.  This will be the third year of our six-year partnership. Each year, CADB 
+will administer the program by allocating $325,000 yearly to various projects in community-
+identified focus areas of Housing Quality and Affordability, Public and Green Spaces, and 
+Communication and Connectivity. 
+ 
+Internet Links To Essential Supporting Information 
+ 
+Community Action Development Bethlehem (CADB) 
+Website: https://www.communityactionlv.org/bethlehem  
+Facebook page: https://www.facebook.com/CADCB/  
+Instagram account: @southsidebethproud 
+ 
+Community Action Lehigh Valley (CALV) 
+Website: https://www.communityactionlv.org  
+Facebook page: https://www.facebook.com/CommunityActionLV 
+Twitter handle: @caclv 
+Instagram account: communityactionlv 
+ 
+ 
+Attachments 
+ 
+1) Report on CADB Annual Work Plan 2022-2023 
+2) 501(c)(3) determination letter for CADB 
+3) List of current CADB Board of Directors and their affiliations 
+4) First two pages of most recent 990 form for CADB 
+5) List of major sources of support for CADB
+--------------------

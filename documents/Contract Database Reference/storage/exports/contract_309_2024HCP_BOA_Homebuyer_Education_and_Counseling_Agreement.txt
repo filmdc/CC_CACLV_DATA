@@ -1,0 +1,16 @@
+Purpose: <p>-Reimbursement for Homeownership Education Counseling as outlined in 1.1.3.</p><figure class="image"><img src="http://10.55.0.10/storage/728/image.png"></figure><p>-Provide Proof of completion of Homebuyer Education to counselee and to BOA.</p><p>-Acquire written permission to share counselee information with BOA if requested by the counselee</p><p>-BOA shall pay Counselor a fee of $500 for instructor led classes and $100 for self-guided classes</p><p>-Please see exhibit A for Counseling Responsibilities</p><p>-Please see Exhibit B for Logo and License Agreement.</p>
+Funder: Bank of America
+Program: HCP
+Amount: 0.00
+Start Date: 2024-04-01
+End Date: 2026-03-31
+
+Notes: <p>-Section 2.2 Payment Process fee and Invoice Submission</p><figure class="image"><img src="http://10.55.0.10/storage/729/image.png"></figure>
+
+Fund Number: 8000
+
+Attached Document: 66181c7b3f73e_2024HCP_BOA_Homebuyer-Education-and-Counseling-Agreement.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

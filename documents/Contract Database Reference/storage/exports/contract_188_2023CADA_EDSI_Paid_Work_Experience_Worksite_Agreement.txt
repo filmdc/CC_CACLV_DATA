@@ -1,0 +1,21 @@
+Purpose: <p>This contract does not generate revenue for CADA.</p><p>This contract sets up an agreement between CADA and EDSI in conjunction with Workforce Board Lehigh Valley to provide paid work experience to youth in Allentown.</p><p>This program will take place at 215 North 9th Street and be supervised by Pas Simpson of Big Happy Consultants.</p><p>&nbsp;</p>
+Funder: No Funder Assigned
+Program: CADA
+Amount: 0.00
+Start Date: 2023-06-06
+End Date: 
+
+Notes: <p>Compliance:</p><p>-1 supervisor-12 participants</p><p>-Cooperation with PA CareerLink to provide training and education</p><p>-Assess participants with pre and post testing with a Work Readiness Attainment Rating sheet and provide testing to EDSI</p><p>-Summer Youth Program shall not exceed 8 wees continuously and no more than 30 hours a week inclusive of lunch and breaks.</p><p>-Time and attendance signed by participant and supervisor is required to be turned into PA Career Link Lehigh Valley and EDSI staff on a weekly basis.</p>
+
+Fund Number: 
+
+Attached Document: 6483377443f4f_2023CADA_EDSI-Paid-Worksite-Agreement.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 64b58ef087158_2023CADA_EDSI_Paid-Work-Experience-Worksite-Executed-Agreement.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

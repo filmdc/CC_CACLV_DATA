@@ -1,0 +1,20 @@
+Purpose: <p>-General operating support CADB.</p><p>-There are no reporting requirements at this time.</p>
+Funder: Wind Creek
+Program: CADB
+Amount: 20000.00
+Start Date: 2023-07-25
+End Date: 
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 64c7e9eada38d_2023CADA_WindCreek-award-email.docx
+
+
+--------------------
+Attached Document: 64c7f92535426_2023CADB_WindCreek_ApplicationAsSubmitted.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

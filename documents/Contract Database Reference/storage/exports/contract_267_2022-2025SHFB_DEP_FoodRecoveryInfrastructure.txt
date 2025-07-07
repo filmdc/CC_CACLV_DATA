@@ -1,0 +1,419 @@
+Purpose: <p>Grant awarded from the PA Department of Environmental Protection for <strong>$47,488.00</strong> for warehouse equipment purchase. We were approved to purchase 6 walk behinds jacks and 2 riding jacks</p><p>Grant period extends from July 1, 2022 - November 28, 2025.</p><p>Request for reimbursement must be submitted on the Disbursement Request Form below.&nbsp;</p><p>There is no reporting requirement.</p><p>Questions should be directed to:</p><p>Jessica Shilladay</p><p>Dept of Environmental Protection, Bureau of Waste Management</p><p>Division of Waste Minimization and Planning</p><p>Rachel Carson State Office Bldg</p><p>PO Box 8472</p><p>Harrisburg, PA 17105-8472</p><p>jesshillad@pa.gov</p><p>717-787-0125</p>
+Funder: PA Dept of Environmental Protection
+Program: SHFB
+Amount: 47488.00
+Start Date: 2022-07-01
+End Date: 2025-11-28
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 657a078838f9c_DEP-Recovery-Fully-Executed-Grant-Agreement.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 657a07e105066_DEP-Recovery_Executed-Ltr--DR.pdf
+Bureau of Waste Management 
+Rachel Carson State Office Building | P.O. Box 8472 | Harrisburg, PA 17105‐8472 | 717.787.9871 
+www.dep.pa.gov 
+ 
+ 
+ 
+ 
+December 8, 2023 
+ 
+Ms. Dawn Godshall 
+Community Action Committee Of Lehigh Valley 
+1337 E 5th St 
+Bethlehem, Pa 18015-2103 
+ 
+Dear Ms. Godshall: 
+ 
+Community Action Committee Of Lehigh Valley has entered into an agreement with the 
+Department of Environmental Protection (DEP) for a Food Recovery Infrastructure Grant (SAP 
+Document C990004163).  The grant amount is $47,488.00, and the period of performance begins 
+July 1, 2022 and must be completed by November 28, 2025, the termination date of this 
+agreement.  I have enclosed a fully executed copy of the agreement.   
+ 
+You will need to: 
+ 
+1. Notify DEP of your appointed project officer within the time specified in the agreement 
+(reference: Attachment E., Special Conditions #16), unless you have already done so. 
+ 
+I have enclosed copies of the invoicing form you will need to request reimbursements.  If you 
+need assistance completing the invoicing form, please contact Jessica Shilladay, Department of 
+Environmental Protection, Bureau of Waste Management, Division of Waste Minimization and 
+Planning, Rachel Carson State Office Building, P.O. Box 8472, Harrisburg, PA 17105-8472, at 
+jesshillad@pa.gov or (717) 787-0125. 
+ 
+If you have any other questions, please contact me. 
+ 
+Sincerely, 
+ 
+ 
+ 
+Mark Vottero, Chief  
+Municipal Recycling Implementation Section  
+ 
+ 
+Enclosures
+
+Bureau of Waste Management 
+Rachel Carson State Office Building | P.O. Box 8472 | Harrisburg, PA 17105‐8472 | 717.787.9871 
+www.dep.pa.gov 
+Ms. Dawn Godshall -2- December 8, 2023 
+ 
+bcc: File: Community Action Committee Of Lehigh Valley (C990004163) 
+ FRIG Grant (Program# 202303161975)
+--------------------
+Attached Document: 657a07e107303_DEP-Recovery_DisbursementRequestForm.pdf
+Bureau of Waste Management 
+Rachel Carson State Office Building | P.O. Box 8472 | Harrisburg, PA 17105‐8472 | 717.787.9871 
+www.dep.pa.gov 
+ 
+ 
+COMMONWEALTH OF PENNSYLVANIA 
+DEPARTMENT OF ENVIRONMENTAL PROTECTION 
+BUREAU OF WASTE MANAGEMENT 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+FOOD RECOVERY INFRASTRUCTURE GRANT 
+ 
+DISBURSEMENT REQUEST FORM
+
+-1-  
+ 
+ 
+GRANTEE AUTHORIZED DISCLOSURE STATEMENT 
+ 
+I CERTIFY TO THE BEST OF MY KNOWLEDGE AND BELIEF THAT THE EXPEN DITURES LISTED 
+HEREAFTER ARE CORRECT AND COMPLETE AND ALL EXPENDITURES, INCLUD ING ALL 
+DONATIONS AND IN-KIND SERVICES, AR E FOR THE PURPOSES SET FORTH IN THE GRANT 
+AGREEMENT. 
+ 
+By signing and submitting this report, I certify to the best of my knowledge that the report is true, complete, and 
+accurate and that the information contained herein is for the purposes and objectives set forth in the terms of the 
+award.  I am aware that any false information or the omission of any material fact may subject me to criminal, 
+civil, or administrative penalties for fraud, false statements, false claims or otherwise. 18 Pa.C.S §4904.
+ 
+ 
+ 
+DISBURSEMENT REQUEST # :  
+ 
+Is this a final request:          Yes  No 
+ 
+ 
+Vendor ID# __________ SAP Vendor Bank Account Code (e.g. BN01, BN02 …): ______ 
+ 
+ 
+ 
+ 
+SIGNATURE OF AUTHORIZED CERTIFYING OFFICIAL: 
+ 
+_________________________________________________________________ 
+ 
+DATE: 
+ 
+_________________________________________________________________ 
+ 
+TYPED OR PRINTED NAME & TITLE: 
+ 
+_________________________________________________________________ 
+ 
+ 
+TELEPHONE NUMBER: 
+ 
+_________________________________________________________________ 
+ 
+ 
+EMAIL: 
+ 
+_________________________________________________________________
+
+-1-  
+ 
+COMMONWEALTH OF PENNSYLVANIA 
+DEPARTMENT OF ENVIRONMENTAL PROTECTION 
+BUREAU OF WASTE MANAGEMENT 
+ 
+FOOD RECOVERY INFRASTRUCTURE GRANT 
+DISBURSEMENT REQUEST FORM 
+ 
+DEPARTMENT USE ONLY 
+  
+INVOICE DATE:    
+ 
+1. PAYEE: COMMUNITY ACTION COMMITTEE OF LEHIGH VALLEY 
+ 
+1. ADDRESS:   1337 E 5TH ST, B ETHLEHEM  PA  18015-2103 
+ 
+2. FEDERAL I.D. NUMBER: 231669589 
+ 
+4. VENDOR I.D. NUMBER: 119431 
+ 
+5. AGREEMENT NUMBER: SAP Document # C990004163 
+ 
+6. INVOICE NUMBER:   C990004163- 
+ 
+7. COUNTY:   Northampton 
+ 
+    
+ 
+ 
+DISBURSEMENT REQUES T #:   AMOUNT:  $  
+ Check 
+ 
+SAP Vendor Bank Account Code (e.g. BN01, BN02 …): ______ 
+ 
+ 
+ 
+eFACTS check performed on .  Cont	ractor has no outstanding compliance issues. 
+ DATE 
+ 
+APPROVED FOR PAYMENT: 
+ 
+    
+  DATE Value Date: _____________ 
+ 
+Budget Period SAP Fund Gen. Led. Cost Center Int. Order Amount 
+ 2909600000  6600800 3522509000  3525025500 	$ 
+     $ 
+ 
+ 
+ 
+ 
+DO NOT WRITE ON THIS PAGE
+
+-2-  
+ 
+ 
+ 
+ 
+FOOD RECOVERY INFRASTRUCTURE GRANT 
+DISBURSEMENT REQUEST FORM 
+ 
+PART A:  ITEMIZED EXPENDITURE LIST 
+ 
+FOR BUDGET CATEGORY:  PROJECT EQUIPMENT 
+ 
+ DEP SHARE  
+BUDGET  	$47,488.00  
+ 
+SCOPE OF WORK The grantee will purchase food recovery equipment for the proper management and 
+operation of food waste reduction and recovery.  The only equipment eligible for funding include refrigerant or 
+non-refrigerant vehicles, box trucks, cargo vans, freezers, refrigerators, stoves, ovens, microwaves, dollies, hand 
+lift trucks, pallet jacks or equivalent.  Also eligible for funding under this grant agreement is the installation of 
+the approved project equipment.  Installation is defined under this agreement as shipping, delivery, placement, 
+assembly and set-up only. The equipment must be utilized by a Pennsylvania registered nonprofit organization 
+to repurpose and redistribute apparently safe and wholesome food segments to the general public.  Any food 
+material not utilized in the project must be composted to the greatest extent possible.  
+ 
+Costs not eligible for funding under this grant agreement include but are not limited to passenger vehicles 
+(including pick-up trucks, cars, SUV’s, mini-vans), labor, warranties, insurance, tax and tags, 
+installation/upgrades (electrical/plumbing/demolition), site improvement and preparation, construction or 
+building costs, tables, shelving, pans, utensils, ice makers, generators, ramps and serving carts.   
+ 
+VENDOR NAME 
+INVOICE 
+NUMBER 
+DESCRIPTION OF 
+ITEM(S)/SERVICE(S) 
+DATE ITEM  
+OR SERVICE 
+RECEIVED COST 
+1.  
+2.     
+3.     
+4.     
+5.     
+6.     
+7.    
+8.    
+9.    
+10.    
+ 
+ 	CURRENT EXPENDITURES CLAIMED    
+ 	AMOUNT IN EXCESS OF BUDGET  
+ CURRENT ELIGIBLE EXPENDITURES    
+ 
+PLEASE ATTACH ALL INVOICES IN THE ORDER LISTED
+
+-3-  
+ 
+INSTRUCTIONS FOR COMPLETING THE D ISBURSEMENT REQUEST FORM FOR 
+ACT 101, SECTION 301 FOOD WASTE INFRASTRUCTURE GRANTS 
+ 
+Please read all instructions carefully before completing this form. Failure to provide the required information and 
+supporting documentation will delay reimbursement. 
+ 
+GENERAL INSTRUCTIONS 
+ 
+PLEASE BE SURE TO MAKE EXTRA COPIES OF THE ATTACHED DISBURSEMEN	T REQUEST FORM FOR 
+FUTURE USE BEFORE COMPLET ING YOUR FIRST REQUEST. 
+ 
+The completed disbursement request form, including all attachments, must be submitted by email to Jessica Shilladay, 
+PA DEP, Bureau of Waste Management at jesshillad@pa.gov. 
+ 
+***Make sure the form is signed by an authorized Non-Profit Organization official*** 
+ 
+Make sure the Grantee Authorized Disclosure Statement form is signed by an authorized official.  On the line marked 
+“DISBURSEMENT REQUEST #:” indicate if this is the first request you are submitting, or the second request you are 
+submitting, etc.  Be sure to check the appropriate box to indicate if this request is or is not the final disbursement request 
+for the grant agreement.   
+ 
+Enter the Vendor ID number associated with this grant and your SAP Vendor Bank Account Code (e.g. BN01, BN02).  Your 
+SAP Vendor Bank Account Code is the unique identifier set up by your organization when obtaining your Vendor ID number.   
+ 
+If you do not know your SAP Vendor Bank Account Code, grantees can obtain their SAP Vendor Bank Account Code one 
+of two ways: 
+1. Call the VDMU at 1-877-435-7363. Have FEIN/VID ready as well as the bank account number for which the SAP 
+Vendor Bank Account Code is needed. 
+2. Email the VDMU at 
+ra-co-bfm-cvmu@pa.gov providing their FEIN/VID and the last 3 digits of the bank account 
+the SAP Vendor Bank Account Code is needed. 
+ 
+Detach instructions prior to submission. 
+ 
+PAGE  #1: 
+ DO NOT WRITE ON THIS PAGE.  IT IS FOR DEPARTMENT USE ONLY AND I T MUST BE ATTACHED TO THE 
+COMPLETED DISBURSEMENT REQUEST F ORM WHEN SUBMITTED FOR REIMBURS EMENT. 
+ 
+PAGE  #2:  
+PART A - ITEMIZED EXPENDITURE LIST 
+ 
+The purpose of this form is to determine the eligible expenditures made and the match provided for the current request 
+period.  A “Part A” form has been provided for each approved budget category in your grant agreement. 
+ 
+BEFORE COMPLETING THE ATTA CHED PART A, YOU SHOULD: 
+ 
+* Gather all invoices being submitted during the current request period. 
+ 
+* Review your invoices and make sure that all items purchased and services provided were within your contract time 
+period.  No items purchased prior to July 1, 2022 will be reimbursed by the Department. 
+ 
+* Review your invoices to verify that all items purchased or services provided were approved under the “Scope of 
+Work” for the Budget Category.  For your convenience, the “Scope of Work” has been listed at the top of the Part A 
+form provided for the Project Equipment Budget Category. 
+ 
+* Organize invoices according to the Project Equipment Budget Category that the expenditure is approved under.
+
+-4-  
+ 
+ 
+* Make sure you are submitting “VALID” invoices.  Internal purchase orders, bid documents, proposals and statements 
+are not acceptable. 
+ 
+* Make sure the invoices are legible and that they accurately state the items & services being billed. 
+ 
+DOCUMENTATION REQUIREMENTS 
+ 
+Project Equipment: A dated invoice that shows the expenditures incurred with the purchasing of food reduction equipment.
+
+-5-  
+ 
+COMPLETING THE PART A ITEMIZED EXPENDITURE LIST 
+ 
+FOR EACH INVOICE BEING SUBMITTED FOR THE CUR RENT REQUEST PERIOD : 
+ 
+1. List the vendor name.   
+2. List the invoice number.  If there is none, then leave blank. 
+3. Enter a brief description of the item purchased or service provided. 
+4. List the date the item or service was actually received by your organization.   
+5. List the cost of the items that you are seeking reimbursement for. 
+ 
+After you have listed all invoices for the current request period for the Project Equipment Budget Category, total the amounts 
+listed in the “COST” column.  Enter this amount on the “CURRENT EXPENDITURES  CLAIMED” line.  Next, for the first 
+disbursement request, compare this amount to the amount listed in the “APPROVED  COSTS” box of the BUDGET at the 
+top of the page.  If the “CURRENT EXPENDITURES  CLAIMED” is greater than the amount listed in the “APPROVED  
+COSTS” box, then you have exceeded the contract maximum for the budget category and your current expenditures must 
+be reduced.  Subtract the “CURRENT  EXPENDITURES  CLAIMED” from the “APPROVED  COSTS” and enter that amount 
+on the line marked “AMOUNT IN EXCESS OF BUDGET.” Then, to 	determine the “CURRENT ELIGIBLE  
+EXPENDITURES” subtract the “AMOUNT IN  EXCESS” from the “CURRENT  EXPENDITURES  CLAIMED” and enter that 
+amount on the “CURRENT  ELIGIBLE  EXPENDITURES” line.  This is the amount of the current expenditures that is eligible 
+for reimbursement. 
+ 
+For subsequent requests, after you have calculated the “CURRENT EXPENDITURES CLAIMED” you must add that amount 
+to the amount listed on the “CURRENT ELIGIBLE EXPENDITURES” line from the previous disbursement request of the 
+previous PART A Form. If the total exceeds the “APPROVED COSTS” of the budget, then once again, the current 
+expenditures claimed must be reduced. To determine the amount in excess of the contract maximum, add the “CURRENT  
+EXPENDITURES CLAIMED” to the amount listed on the “CURRENT ELIGIBLE EXPENDITURES” line from the previous 
+disbursement request of the previous PART A Form and subtract the total from the “APPROVED  COSTS.” Enter this 
+amount on the “AMOUNT IN EXCESS OF BUDGET” line.  Then to determine the “CURRENT ELIGIBLE EXPENDITURES,” 
+subtract the “AMOUNT IN EXCESS” from the “CURRENT EXPENDITURES CLAIMED” and enter this amount on the 
+“CURRENT ELIGIBLE EXPENDITURES” line. 
+ 
+Make sure to attach, in the order listed, copies of the invoices. 
+ 
+Please Note: Make sure you list only the invoices that apply to the Project Equipment Budget Category.  
+ 
+ 
+INSTRUCTIONS FOR COMPLETING TH E PART B – PROGRESS REPORT 
+ 
+Each disbursement request is to be accompanied by a report that details the progress you are making in completing the 
+project as outlined in the grant agreement.  The report should cover the period for which you are seeking reimbursement 
+under this request.  When writing the report, you should utilize the following outline on the form provided:  
+ 
+1. Provide a general summary of the work completed thus far, keeping in mind the desired outcome of your project and 
+the timetable established for completion in the grant agreement. Describe any setbacks, delays, successes and 
+surprises experienced. 
+2. For each Approved Budget Category of your grant agreement, provide a detailed description of the work performed 
+during the time period covered by this report.  
+3. Provide copies of materials or documents developed for the project during the time period of the report. 
+ 
+At a minimum, Progress Reports, whether or not accompanied by a
+ disbursement request, shall be submitted on a quarterly 
+basis commencing three (3) months after the execution date of this Agreement and include the estimated quantity of food 
+distributed and number of residents fed.   
+ 
+One (1) copy of the Final Project Report shall be submitted to the Department’s Central Office within two (2) months after 
+the project completion date. The reports must be emailed to Jessica Shilladay at jesshillad@pa.gov.
+
+-6-  
+ 
+ 
+FOOD RECOVERY INFRASTRUCTURE GRANT 
+DISBURSEMENT REQUEST FORM 
+ 
+PART B:  PROGRESS REPORT 
+ 
+GRANTEE:  COMMUNITY ACTION COMMITTEE OF LEHIGH VALLEY 
+AGREEMENT NUMBER:  C990004163 
+ 
+TIME PERIOD COVERED BY THIS REPORT:  FROM   TO  . 
+ Month/Day/Year M	onth/Day/Year
+--------------------
+Attached Document: 657b21ed7fce5_DEP-Equioment-Quotes.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

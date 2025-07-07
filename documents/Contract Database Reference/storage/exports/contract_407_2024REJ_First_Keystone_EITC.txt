@@ -1,0 +1,16 @@
+Purpose: <p>General Operating support for Generation Next and SHE split 50/50.</p>
+Funder: First Keystone Community bank
+Program: REJ
+Amount: 2000.00
+Start Date: 2024-11-25
+End Date: 
+
+Notes: 
+
+Fund Number: 8000
+
+Attached Document: 6751fa728ed29_First-Keystone-EITC-2024.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

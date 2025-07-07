@@ -1,0 +1,184 @@
+Purpose: <p>This is a $10,000 lump sum grant to support the start-up, sustainment, or expansion of Child and Family Feeding Programs.</p><p>Funds can be used to support the costs <strong>directly associated</strong> with this program:</p><ul><li>Staff salary &amp; benefits</li><li>Food</li><li>Equipment</li><li>Supplies</li><li>Outreach</li><li>Training</li><li>Cost-share for home delivery services</li><li>Program evaluation</li><li>SNAP outreach and/or application assistance targeted toward families with children</li><li>Educational activities to engage policy &amp; decision-makers, with the goal of improving child nutrition programs and ultimately reaching more children and their families.</li></ul><p><strong>Reporting Requirements</strong></p><p>There will be one (1) final report required for this grant, due <strong>August 26, 2025</strong> and covering entire grant period, 2/1/25-7/31/25 <i>(6 months)</i></p><p>Report requirements include but are not limited to:</p><ul><li>Grant impact and program description</li><li>Confirmation of funds expenditure</li><li>Metrics<ul><li># meals and/or pounds distributed</li><li># of children served (unduplicated)</li><li># of households served (unduplicated)</li><li># of program/distribution sites</li></ul></li><li>Successes and challenges</li><li>Stories, photos, and testimonials</li><li>Media and communications</li><li>Donor engagement</li></ul><p><strong>Publicity Requirements</strong></p><p>As a grant recipient, your food bank is encouraged to recognize the donor for this grant award throughout the grant period using social media and online platforms to help promote the partnership and create community visibility of this grant award.</p><p>While reports are an important method used to foster donor relations, they are no substitute for hearing directly from you.  We encourage you to email a thank-you letter to the following:&nbsp;</p><p><strong>Kate Cote</strong>&nbsp;<br><i>C&amp;S Wholesale Grocers</i>&nbsp;<br>c/o Brandon Sampson<br><i>Feeding America Corporate Partnerships Team</i>&nbsp;<br><a href="mailto:bsampson@feedingamerica.org">bsampson@feedingamerica.org</a>&nbsp;</p><p>Questions related to Feeding America’s relationship with the donor, please contact Brandon Sampson, <i>Manager, Corporate Partnerships</i>, at&nbsp;<a href="mailto:bsampson@feedingamerica.org">bsampson@feedingamerica.org.</a></p><p>Technical GMS questions related to proposal or report submission, please contact Sally Yan, <i>Sr. Manager, Member Grants</i>, at&nbsp;<a href="mailto:syan@feedingamerica.org">syan@feedingamerica.org</a>&nbsp;&nbsp;</p>
+Funder: C&S Wholesale
+Program: SHFB
+Amount: 10000.00
+Start Date: 2025-02-01
+End Date: 2025-07-31
+
+Notes: 
+
+Fund Number: 8095
+
+Attached Document: 67892d0feeb57_Report-Template_FY25-C&S-Wholesale-Grocers-Child-and-Family.docx
+FY25 C&amp;S Wholesale Grocers Child and Family Feeding Programs Grant
+Final Report
+General Information
+Please select the Child and Family Feeding program/initiative(s) for which the grant funds were used. Select all that apply.
+BackPack
+Kids Cafe
+School Pantry
+Mobile Pantry
+Farmer’s Market Model
+Summer feeding program
+SNAP Application Assistance/Outreach to families with children
+Other Local Child and Family Feeding Program
+Please provide a brief description of your program, including an overview of progress made during the grant period. If you selected &quot;Other Local Program,” please describe your grant-funded program model.
+If you selected Mobile Pantry, Farmer’s Market Model, SNAP Application Assistance/Outreach, or Other Local Program, please describe the process used to select sites to prioritize reaching families with children.
+Please describe the overall impact of the grant including how these funds helped reach children or families with children.
+Metrics
+Please provide the actual metrics below for only the grant-funded portion of the program for which these funds were allocated within the grant period. 
+If a metric does not apply or was not measured, enter “0.”
+Total # of households served (unduplicated or measured using a one-day high) 
+Total # of children served (unduplicated or measured using a one-day high)
+Total # of meals distributed
+Total # of pounds distributed
+Total # of program/distribution sites (unduplicated)
+If applicable, please share any additional metrics you measured that were not included in the list above. 
+Please provide the methodology used to calculate the above metrics.  
+Budget 
+Did you spend all of the grant funds by the end of the grant period? 
+Yes/No
+If no, please provide a brief explanation of why you have funds remaining at the end of the grant period. In addition, please include all of the following information:
+How much funding is remaining at the end of the grant period
+How you plan to spend the remaining funds
+When you expect the remaining funds to be fully spent 
+Stories &amp; Testimonials
+Please use the Files tab to share stories, testimonials, photographs, and/or participants’ artwork illustrating the effect of your program/intervention with the donors that supported this work, though we recognize that is not always easy to do. Food bank, agency, and/or partner quotes about how helpful these grants are to their efforts can be especially useful in relaying impact to donors. If you have any that are readily available, please upload release forms with photographs. If you do not include release forms, Feeding America will assume that they are for our internal use only and can be shared with the donor for its internal use only. Consider including your best 1-3 stories/testimonials and/or uploading your best 1-3 files – we appreciate quality over quantity.
+Media &amp; Communications
+It is helpful to share public communications or media related to this grant with the donors that supported this work, though we recognize that is not always easy to do. If you have any that are readily available, please upload copies of the assets on the Files tab or share links when available.
+Donor Engagement
+Please provide an overview of any volunteer events or employee engagement activities that have been held with the donor&#039;s employees within the grant period.  If you have not held any donor volunteer events or employee engagement opportunities as part of this grant, please enter &quot;N/A.&quot;
+If applicable, please provide the total number of donor employees who volunteered with your organization during the grant period.
+If applicable, please provide the total number of volunteer hours that the donor&#039;s employees donated to your organization during the grant period.
+
+--------------------
+Attached Document: 67892d0ff2f14_Non-Prescription-Drug-Distribution-Registration.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 67892fb3a39dc_Award_FY25-CS-Wholesale-Grocers-Child-and-Family-Feeding.docx
+GMS GRANT ANNOUNCEMENT
+FY25 C&amp;S Wholesale Grocers Child and Family Feeding
+Grant Opportunity Award Notification
+Executive Summary
+Overall funding amount to be awarded: $220,000
+Individual award amount: 22 awardees will receive $10,000 each
+Grant period: 2/1/2025 – 7/31/2025 (6 months)
+Report requirements: One final report is due August 26, 2025
+Accept or decline by: 11:59 PM CT on January 23, 2025
+Grant Overview 
+Congratulations! We are pleased to inform you that your food bank has been selected to receive a FY25 Child and Family Feeding grant, thanks to C&amp;S Wholesale Grocers. The goal of this grant is to support the start-up, sustainment, or expansion of Child and Family Feeding programs in your service area.
+Grant Activities/Expectations 
+Funds should support Child and Family Feeding programs or initiatives at your organization: 
+BackPack
+Kids Cafe 
+School Pantry
+Summer Feeding Programs 
+SNAP Application Assistance targeted toward families with children 
+Mobile Pantries, Drive-Thru, or Farmer’s Market models that directly target households with children
+Local Child and Family Feeding Programs
+Grant Period &amp; Amount
+A total of $220,000 will be awarded through this grant opportunity. We are awarding twenty-two (22) grantees at $10,000 each.
+The grant period will run from February 1, 2025 through July 31, 2025 (6 months). Grant funds must be spent by the end of the grant period.  Grantees can expect to receive payment in late-January 2025.
+ 
+Strategic Context
+   
+Commitment to Equity
+To achieve our vision of an America where no one is hungry, we are committed to equity, ensuring fair treatment, access, opportunity, and advancement for all people. We will identify and work towards solutions to eliminate social, structural, and systemic inequities that contribute to food insecurity, with a focus on communities that have been historically disadvantaged and/or adversely impacted by racial and/or geographical inequities. While there are many components to equity, racial inequity has resulted in poorer outcomes for communities of color, including higher rates of food insecurity and poverty, and worse health outcomes. Please see our  for more detail. 
+Use of Data to Inform Your Work
+We strongly encourage grantees to utilize national and/or local data to identify and target one or more currently underserved rural and/or communities of color for this work. Please see  for more detail.
+Donor Overview
+C&amp;S Wholesale Grocers is an industry leader in supply chain logistics and wholesale grocery supply. C&amp;S Wholesale is a , providing food and funding support to Feeding America and network members. We are excited to continue our partnership in FY25, providing $220,000 in grant funding for children and their families living in communities that are home to company employees and facilities. 
+ 
+Grantee Selection
+Eligibility
+Grantees were selected based on their service areas located in a donor key market.
+Organizations will have the opportunity to accept or decline the award. If any organization declines, the opportunity will be offered to another organization that meets the criteria above.
+Use of Funds
+Funds can be used to support the costs directly associated with implementing the Child and Family Feeding program/initiative(s) of your choice, such as:  
+Staff salary &amp; benefits
+Food
+Equipment
+Supplies
+Outreach
+Training
+Cost-share for home delivery services
+Program evaluation
+SNAP outreach and/or application assistance targeted toward families with children
+Educational activities to engage policy &amp; decision-makers, with the goal of improving child nutrition programs and ultimately reaching more children and their families.
+Ineligible Expenses
+Funds may not be used to support the following expenses:
+Expenses unrelated to your organization’s Child and Family Feeding effort(s)
+Direct lobbying efforts
+Capital campaigns
+Please note:   
+Food banks can consider re-granting funds to Partner State Associations (PSAs), Partner Distribution Organizations (PDOs), Regional Distribution Organizations (RDOs) and/or agencies or other partners that can help execute the grant and reach populations most disproportionately affected by food insecurity.  
+Use of the term “agencies” is broad, including current agencies and new partners, but it does NOT include schools or government partners. Partners should be 501c3 organizations, or federal or state-recognized Native tribes.  
+The same restrictions and deadlines for expenditures apply to all sub-grantees. Food banks determine the internal reporting requirements for organizations receiving sub-awards. Note that the food bank must retain administrative and fiscal responsibility for the sub-grant execution, including timing/use of funds and reporting to Feeding America.  
+If you are unsure whether an expense fits within the scope of this grant opportunity, please contact Sally Yan, Sr. Manager, Member Grants, at . 
+Timeline
+Award notification: 1/10/2025 
+Accept or decline by: 1/23/2025
+Grant period starts: 2/1/2025
+Grant period ends: 7/31/2025
+Final report due: 8/26/2025
+Reporting Requirements
+There will be one (1) final report required for this grant, to be collected via the GMS:
+Final report – due August 26, 2025 – covering entire grant period, 2/1/25-7/31/25 (6 months)
+Report requirements include but are not limited to:
+Grant impact and program description
+Confirmation of funds expenditure
+Metrics
+# meals and/or pounds distributed
+# of children served (unduplicated)
+# of households served (unduplicated)
+# of program/distribution sites
+Successes and challenges
+Stories, photos, and testimonials
+Media and communications
+Donor engagement
+Please refer to the Files tab to download and view a draft report template. A final version of the report will be released via the GMS at least one month before the report is due, and you will receive a report reminder one month before the report deadline.
+Publicity Requirements
+As a grant recipient, your food bank is encouraged to recognize the donor for this grant award throughout the grant period using social media and online platforms to help promote the partnership and create community visibility of this grant award (i.e., social media posts, website promotion, electronic communication with board members, volunteers, and other constituents). You may also choose to recognize the donor in additional ways, in line with your organization’s donor recognition policy.
+Acknowledgments 
+While reports are an important method used to foster donor relations, they are no substitute for hearing directly from you.  We encourage you to email a thank-you letter to the following: 
+ 
+Kate Cote 
+C&amp;S Wholesale Grocers 
+c/o Brandon Sampson
+Feeding America Corporate Partnerships Team 
+ 
+Application Instructions
+We are requesting confirmation of your interest in this funding opportunity by reviewing the grant details, accepting the grant agreement, responding to the questions on the Application Form tab, and submitting the application as soon as possible and no later than 11:59 pm CT on January 23, 2025.
+Please note: If you are choosing to decline this opportunity, please indicate your decision on the Application Form tab, and then submit the proposal so we will have a record of which organizations have declined the opportunity.  
+Contact Information 
+Questions related to Feeding America’s relationship with the donor, please contact Brandon Sampson, Manager, Corporate Partnerships, at  
+Technical GMS questions related to proposal or report submission, please contact Sally Yan, Sr. Manager, Member Grants, at   
+Application Questions
+Equitable Access
+As part of our commitment to equitable access, Feeding America is interested in learning where grant funds are being invested. These standard questions are for learning purposes ONLY - your responses will NOT be considered as part of your grant application. Please do not spend much time on these questions - your good faith estimate is appreciated. 
+Target Communities: 
+Based on your best estimate, will your organization use this grant funding primarily to support communities of color and/or rural communities? If you are not sure how to answer this question, please reach out to the assigned grants manager for this grant opportunity. 
+Following are examples for each response option: 
+Yes - grant funding will primarily to support communities of color and/or rural communities: 
+* This grant will be used to provide food primarily to communities of color or rural communities. 
+* This grant will be used to do outreach, conduct assessments, or build relationships with neighbors primarily in communities of color and/or rural communities. 
+* This grant will be used to hire staff whose job function is to primarily support communities of color and/or rural communities. 
+No - we choose not to primarily support communities of color and/or rural communities with these funds: 
+*This grant will be used to purchase equipment, vehicles, or supplies that will be used toward general food bank operations and not specifically be used toward efforts that focus on supporting communities of color and/or rural communities. 
+*This grant will be used toward general operating expenses that are not specifically focused on supporting communities of color and/or rural communities. 
+N/A – the grant opportunity’s restricted use of funds is not aligned to directly supporting communities of color or rural communities: 
+* This grant’s use of funds is restricted to staff training on food safety. 
+* This grant’s use of funds is restricted to travel to attend a professional development opportunity. 
+Yes
+No - we choose not to primarily support communities of color and/or rural communities with these funds
+N/A - this grant opportunity&#039;s restricted use of funds is not aligned to directly support communities of color or rural communities
+N/A - we are declining this grant funding
+Which communities do you plan to specifically target with this grant funding? Please select one.
+Communities of Color
+Rural Communities
+Both Communities of Color and Rural Communities
+N/A - grant funding will not support activities specifically targeted to Communities of Color or Rural Communities
+
+--------------------

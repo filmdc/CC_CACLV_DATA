@@ -1,0 +1,105 @@
+Purpose: <p>General Support Military Share.</p>
+Funder: WAWA Foundation
+Program: SHFB
+Amount: 2500.00
+Start Date: 2023-05-05
+End Date: 
+
+Notes: 
+
+Fund Number: F8062
+
+Attached Document: 647651b972537_Check-14050-(1).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 647651bc06d68_2023_SHFB_WawaFoundation_ProposalSubmitted.pdf
+Second Harvest Food Bank of the Lehigh Valley and Northeast Pennsylvania  
+Letter of Intention to Apply for Funding from The Wawa Foundation 
+January 25, 2023 
+Statement of Need and Summary of Project  
+Feeding America estimates that 20% of people served through the charitable food network are 
+veterans or have a veteran in their household. Further, according to the most recent data from 
+the U.S. Census Bureau’s American Community Survey 5-Year Estimates (2017-2021), there are 
+over 59,000 veterans living within Second Harvest’s six-county service territory and 5% are living 
+at or below the poverty level, meaning that more than 3,100 veterans are struggling to make 
+ends meet, and most likely do not have the funds to purchase nutritious, fresh foods for 
+themselves and their families. 
+  
+According to Feeding America, as many as 24% of active-duty service members and their families 
+experience food insecurity.  Service members are often required to move from base to base, 
+making it difficult for spouses to maintain consistent work, leaving many families to rely on a 
+single income. The family budget is tight when relying on one low-ranking military salary. One-
+third of students at Department of Defense schools were eligible for free and reduced-price 
+meals during the 2018-2019 school year. 
+ 
+Additionally, though many military families face food insecurity, few qualify for federal food 
+assistance programs. When determining SNAP eligibility, housing allowances are considered 
+income for service members. According to the USDA, only 2% of active-duty service members 
+qualify for SNAP benefits, but about 7% of military members experience food insecurity. 
+ 
+Active military members and veterans are one of the most difficult groups to reach through the 
+emergency food network, citing pride as the biggest barrier. To address this need, the USDA, 
+Feeding America, and regional food banks have created food distribution programs that break 
+down these barriers. Second Harvest’s MilitaryShare program is a part of this nation-wide effort 
+and was designed to address the food insecurity needs of military families to promote health and 
+financial stability. 
+ 
+The mission of Second Harvest’s MilitaryShare program is “to serve those who served us” by 
+providing access to nutritious food, which will assist in improving health outcomes and easing 
+financial strain. When funds are tight, often the first thing to be cut from the family budget is 
+groceries, especially higher-priced nutritious foods. By supplying struggling military families with 
+healthy food, it saves room in the monthly budget for other expenses such as housing, utilities,
+
+and medical bills. By not having to worry about the cost of food, it might mean that families don’t 
+have to make the tough choice between paying their rent and keeping food on the table. 
+ 
+Each monthly MilitaryShare contains a box of shelf-stable foods, weighing roughly 20 pounds, 
+with additional fresh products such as eggs, milk, meat, and a 10-pound box of produce. Shelf-
+stable foods include canned fruits, vegetables, beans and meats, peanut butter, juices, cereals, 
+rice, and pasta, with a focus on whole grains and low-sugar products. Each share weighs between 
+35-40 pounds.  
+ 
+Second Harvest partners with our food pantry member agencies, local veterans’ groups, county 
+veterans’ affairs departments and military and reserve outlets to conduct outreach. Referrals 
+from such organizations can make the difference between those in need getting connected with 
+our program or remaining unaware. 
+ 
+Currently, Second Harvest distributes MilitaryShares to 480 military families each month across 
+six distribution sites, including four pantries within the Second Harvest network, and two 
+American Legion sites. Second Harvest pantry sites include: Feeding Families (Monroe), Hamlin 
+Food Pantry (Wayne), Mission of Love (Northampton), and Grace Community (Lehigh). American 
+Legion sites include Lehighton American Legion (Carbon) and Weatherly American Legion 
+(Carbon). 
+ 
+ 
+Geographic Areas Served 
+Second Harvest serves the six Pennsylvania counties of Carbon, Lehigh, Monroe, Northampton, 
+Pike and Wayne. Our MilitaryShare program is offered in all six counties. 
+ 
+Project Goals 
+Second Harvest operates the MilitaryShare program on an on-going basis. The following 
+outcomes will be achieved between July 1, 2022-June 30, 2023:  
+• Improve the financial stability of 480 veteran and military households per month by 
+providing access to food at six (6) distribution sites. 
+• Assist 480 veterans and military households with the maintenance and improvement 
+of their physical and mental health by ensuring regular access to nutritious food.
+
+• Engage 100 volunteers for packing and distribution of food boxes. 
+• Distribute 200,000 pounds of food. 
+ 
+Requested Amount and Administrative Costs 
+Second Harvest respectfully requests $10,000 to support our MilitaryShare program. During the 
+last completed program year (July 1, 2021 – June 30, 2022) our administrative costs were 4% of 
+total revenue. For the current program year (July 1, 2022 – June 30, 2023) administrative costs 
+are budgeted at 6.9% of total revenue. 
+ 
+Partnership with Wawa and The Wawa Foundation 
+We are extremely grateful for previous support from Wawa and The Wawa Foundation.  
+• On 10/5/22, we received $34,754.95 from Wawa. 
+• On 4/6/20, we received $2,500 through the COVID-19 Emergency Food Distribution 
+Fund. 
+• On 6/4/20, we received $4,000 through COVID-19 Emergency Food Purchasing. 
+We look forward to a continued partnership!
+--------------------

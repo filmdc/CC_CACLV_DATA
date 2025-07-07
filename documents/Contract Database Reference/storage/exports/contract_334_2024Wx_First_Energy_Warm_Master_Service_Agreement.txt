@@ -1,0 +1,1242 @@
+Purpose: <p><strong>Weatherization Service Provider (WSP) Responsibilities:&nbsp;</strong></p><ul><li>Weatherization Services to include but not limited to: Attic and wall insulation, Air sealing, Duct Sealing and Repair, Door and window weather stripping, etc. see page 2 section 1 Scope of work in the Statement of Work document.</li><li>Perform a full energy audit with pressure diagnostic and associated safety testing</li><li>Must complete a minimum of 50 jobs</li><li>WSP is responsible for recruiting and training personnel and securing criminal background checks within the last 7 years of all employees and subcontractors to be kept on file.</li><li>WSP personnel must display and wear program identification badges while at customers' homes. Badges must be returned to First Energy if and when employees terminate employment.</li><li>BPI certifications must be kept current and on file.</li><li>Potential quarterly Advisory Panel meeting participation.</li><li>Attend all First Energy sponsored trainings</li><li>Must have a dedicated quality control representative to ensure each job is inspected internally.</li><li>WSP must resolve all customer complaints and document the process int the "Job Notes" section of the LEEN System.</li><li>WSP is responsible for debris removal and cleanup of premises</li><li>Energy Education sessions must be provided to customers during initial visit.</li><li>Remedial education sessions may be required based on monthly reports provided to the WSP. Results and Conversations must be documented int he LEEN system before First Energy is invoiced.</li><li>See page 10 in the Statement of Work Document for required equipment.</li><li>See page 11 section 4.19 in the Statement of Work document for required diagnostic testing</li><li>WSP is responsible for Weatherization Service Provider and Customer Health and Safety see page 11 sections 4.20-4.21 in the Statement of Work Document.</li><li>Use LEEN System to manage assigned jobs and perform tasks. LEEN system to be used for reporting, tracking, invoices and program forms.</li></ul><p><strong>Publicity:</strong></p><ul><li>Any contact with news or media regarding this program needs to be approved by First Energy.</li><li>Prohibition of publicity- WSP shall not reference "First Energy" in any advertising, promotional materials or social media without prior express written consent.</li></ul><p><strong>Invoicing and Payment:</strong></p><ul><li>See page 3 Article 4 in Master Service Agreement for Invoicing and Payment Procedures</li><li>See page 9 section 4.17 in Statement of Work document for Job Completion and Invoicing. For jobs considered complete they must be coded as ready to inspect by a third-party Quality Assurance Inspector and all documents must be uploaded into the LEEN system. Invoicing to be submitted into LEEN system at the completion of the job within 30 days of the completion.</li></ul>
+Funder: First Energy
+Program: WX
+Amount: 1500000.00
+Start Date: 2024-06-01
+End Date: 2027-05-03
+
+Notes: <p><strong>Insurance Requirements:</strong></p><ul><li>General Commercial Liability $2,000,000 per occurrence</li><li>Automobile Liability $1,000,000</li><li>Professional Errors and Omissions $2,000,000 per occurrence</li><li>Cyber Liability $2,000,000 per occurrence</li></ul><p><strong>First Energy:</strong></p><ul><li>First Energy will conduct Quality Assurance Visits, Job inspections and periodic evaluations</li><li>Inspection, rejection, Revocation- work shall be subject to inspection, tests and count by First Energy anytime.</li></ul>
+
+Fund Number: 7750
+
+Attached Document: 6644ce28c8884_2024Wx_First-Energy-Warm_SOW-.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6644cf08540fb_2024Wx_First-Energy-Warm_-Information-Access-Agreement.pdf
+Rev 0 (08-07-2023) Page 1 of 10
+(DJR 8-7-23)
+FirstEnergy Information Assets Access Agreement
+This Information Assets Access Agreement (“Access Agreement”) is made and entered into by and between COMMUNITY ACTION 
+COMMITTEE OF THE LEHIGH VALLEY (“USER”) with principal executive offices at 1337 EAST FIFTH STREET, BETHLEHEM, 
+PA 18015-2103 on behalf of its employees effective as of June 1, 2024,  and FirstEnergy Service Company, for itself and on behalf 
+of its affiliates (“COMPANY”) with principal executive offices at 76 S. Main St., Akron, OH 44308.
+WHEREAS,
+(“MSA”) USER needs access to COMPANY’s Information Assets.  As needed, the COMPANY is granting USER controlled and 
+limited access to COMPANY’S Information Assets; and,
+WHEREAS
+and may be severely damaged by misuse, even inadvertent misuse; and
+WHEREAS
+requiring USER to be bound to the terms and conditions of this Access Agreement; and 
+WHEREAS
+described below; and
+NOW THEREFORE
+Information Assets as specified and limited herein, and after acknowledging the accuracy of the foregoing recitals, the parties hereby 
+agree to the following:
+1. Definitions.
+(a) “Breach of Security” means unauthorized access to, acquisition of, or disclosure of, PII or any individual’s information which 
+was held in the custody or control of USER, or a reasonable belief by either party that such unauthorized access, acquisition, or 
+disclosure has occurred.
+ 
+(b) “Data Protection Laws” means all applicable international, federal, state, provincial, and local laws, rules, regulations, directives, 
+requirements, codes, and industry standards and guidelines, relating to the privacy, confidentiality, integrity, protection, or security 
+of PII.
+(c) “Information Assets” shall be defined (per FirstEnergy’s Cyber Security Program) as: A technology resource including electronic 
+information, software, computing devices, network devices, or communication services used to create, modify, retrieve, transmit, 
+or store information that:
+(i) Contains COMPANY non-public information, or;
+(ii) Is a COMPANY-owned asset, or;
+(iii) Is an asset operated by a third party that COMPANY grants access to USER to perform or fulfill Work contracted for by 
+the COMPANY.
+(d) “Personally Identifiable Information” or “PII” means any information that identifies, relates to, describes, is reasonably capable of 
+being associated with a particular individual or household, that is accessed or processed by USER pursuant to this Access 
+Agreement, and that is deemed “personal data,” “personal information,” or the like under the Data Protection Laws.
+(e) “Work” means all goods, parts, materials, equipment, services, labor, data, and other obligations covered by, contemplated or 
+intended for USER to supply or perform under a MSA or other agreement, as specified in the MSA or other agreement, together 
+with miscellaneous expendable job supplies, installation-related equipment and/or tools, transportation, facilities and/or services 
+necessary for USER to complete its obligations under a MSA or other agreement.
+2. Access to COMPANY’S Information Assets.  In consideration of and reliance upon USER assuming the obligations described 
+herein, the COMPANY agrees to allow USER access to COMPANY’S Information Assets based on the COMPANY’S business 
+need to complete Work, in one or more of the following manners:
+(a) Establish a remote access connection to the COMPANY’S Information Assets using a COMPANY-owned device provided 
+to USER’S employees and using such COMPANY-OWNED device’s associated remote access system; 
+(b)  Establish a remote access connection to the COMPANY’S Information Assets using USER-owned devices via a secure 
+remote access terminal system from which information extraction is technically restricted. If such access is granted by 
+COMPANY, USER agrees to configure all USER computer systems used to access COMPANY Information Assets in 
+accordance with: (i) any technical standards provided to USER in writing; and (ii) COMPANY’S Exhibit A “Acceptable Use 
+Practice for Accessing FirstEnergy Information Assets” (hereinafter “Exhibit A”), including any modifications thereto located at 
+Cyber Security Policies, Standards, and Procedures (mcas.ms) which USER agrees to access from time to time;
+(c) Establish per-service access to the COMPANY’S Information Assets using COMPANY-supplied credentials to USER;
+Page 1 of 10DocuSign Envelope ID: 4902A80E-347D-41AD-875F-207080207B69
+
+Rev 0 (08-07-2023) Page 2 of 10
+(DJR 8-7-23)
+(d) Establish site-to-site Virtual Private Network (VPN) connections between COMPANY and USER’S networks for the 
+purposes of using the COMPANY’S Information Assets, or to securely transfer data between the parties. If such access is 
+granted by COMPANY, USER agrees to configure all USER computer systems used to access COMPANY’S Information 
+Assets in accordance with: (i) any technical standards provided to USER in writing; and (ii) Exhibit A, including any 
+modifications thereto located at Cyber Security Policies, Standards, and Procedures (mcas.ms) which USER agrees to access 
+from time to time;
+Regardless of the type of access provided, USER is subject to strict compliance with the COMPANY’S security procedures 
+and standards as the same may be deemed given to USER by USER accessing Cyber Security Policies, Standards, and Procedures 
+(mcas.ms) from time to time. The current COMPANY security procedures and standards are detailed in Exhibit A and are 
+incorporated herein by reference.  The COMPANY may modify Exhibit A at any time and USER agrees that such modified security 
+procedures and standards shall become part of this Access Agreement.  
+3. Denial of Access.  The COMPANY reserves the right to deny or disable access to Information Assets at any time, without Notice 
+(defined in Article 13.9), for its own convenience.  The COMPANY shall deny or disable access to Information Assets without any 
+prior Notice if USER does not implement and certify its implementation of the security procedures and standards set forth in 
+Exhibit A and in any Notice within the applicable time specified in Exhibit A.  Any denial or disabling of access to Information 
+Assets shall be without prejudice to any other rights or remedies that the COMPANY may have in law or equity.  Such denial 
+or disabling of access to Information Assets shall not constitute a breach of this Access Agreement, or (if applicable) to any 
+MSA or other agreement this Access Agreement supports, or any other obligation of the COMPANY to USER and, unless 
+otherwise agreed, USER shall continue to perform its obligations under any MSA or other contract or agreement without interruption or delay.
+4. Exceptions.  If USER believes it cannot implement a Directive within the time required without adversely affecting its own network(s) or 
+business, it may so inform the COMPANY by Notice, and the COMPANY will attempt to resolve USER concerns while still 
+protecting Information Assets.  The COMPANY may, in its sole and absolute discretion, allow USER to adopt measures equivalent 
+in effectiveness to those to which exception has been taken.  Such action on the part of the COMPANY shall not constitute a 
+waiver or course of dealing that would permit the USER to avoid the implementation of any other Directive.  Prior to denying 
+access, the COMPANY is not obligated to extend the deadline for implementation of any Directive, to address or resolve USER’S 
+concerns in a manner acceptable to USER, or at all.  The COMPANY’S Chief Information Security Officer or authorized delegate 
+shall make the final decision on any exception requested by USER.
+5. Non-Use, Non-Disclosure Related to Information Assets Access.
+(a) USER agrees and acknowledges that in the course of accessing COMPANY’S Information Assets, USER may either come to possess 
+or be in possession of COMPANY’S Confidential Information. COMPANY’S “Confidential Information” includes Personally 
+Identifiable Information (“PII”), scientific and technical information, data, formulas, devices, concepts, inventions, designs, drawings, 
+methods, techniques, computer software, screens, user interfaces, system designs and documentation, marketing and commercial 
+strategies, information concerning COMPANY’S or any of its affiliates’ employees, customers, or suppliers, processes, data concepts, 
+and know-how, and unique combinations of separate items that individually may or may not be confidential, which information is not 
+generally known to the public and either derives economic value (actual or potential) from not being generally known, or has a character 
+such that COMPANY or any of its affiliates has an interest in maintaining its secrecy.  
+(b) USER agrees to hold in confidence in the same manner as it holds its own Confidential Information; but in no event less than a 
+commercially reasonable manner, all of COMPANY’S Confidential Information to which it has access pursuant to the Access 
+Agreement.  USER shall not use or disclose COMPANY’S Confidential Information for any reason or purpose without the prior written 
+consent of the COMPANY. Notwithstanding the foregoing sentence, if applicable, USER may use Confidential Information for the sole 
+purpose of the performance of Work for the benefit of the COMPANY without obtaining COMPANY’S prior written consent.
+(c) Access to COMPANY’S Confidential Information shall be restricted to USER employees: (i) who have a need to know such 
+information in connection with any Work; and (ii) for whom a Form No. X-3788 (
+has been completed; 
+pose a threat to the security or integrity of COMPANY’s Confidential Information or Information Assets (or as otherwise required or permitted 
+by applicable law or regulation). 
+(d) All Confidential Information, including any copies thereof, in any media in the possession or control of the USER and all 
+Confidential Information embodied or included in any software or data files loaded or stored on Information Assets in the 
+possession or control of the USER shall be removed by USER and returned to COMPANY either upon demand, or if applicable no 
+later than the completion of Work for COMPANY.
+(e) USER shall not copy the Confidential Information in whole or in part or use all or any part of the Confidential Information 
+to reverse engineer, duplicate the function, sequence or organization of the Information Assets for any purpose without the prior written 
+permission of the COMPANY.
+(f) Except for PII, the restrictions set forth in this Article shall not apply to information that:  (i) is or has become generally known 
+to, or readily ascertainable by, the public without the fault or omission of the USER or its employees; or (ii) was already known 
+to USER prior to the first disclosure of such information to USER by COMPANY; or (iii) was received by USER without 
+restrictions as to its use from a third party who is lawfully in possession and not restricted as to the use thereof; or (iv) is required 
+Page 2 of 10DocuSign Envelope ID: 4902A80E-347D-41AD-875F-207080207B69
+
+Rev 0 (08-07-2023) Page 3 of 10
+(DJR 8-7-23)
+to be disclosed by law or by order of a court of competent jurisdiction; or (v) was independently developed by USER through 
+persons who have not had, either directly or indirectly, access to or knowledge of similar information provided by COMPANY.
+(g) Regarding PII, USER shall implement appropriate measures to ensure the security and confidentiality of all PII in its possession, 
+including protecting against any threats or hazards to the security or integrity of the PII that USER should reasonably be able to 
+anticipate, and against unauthorized access to or use of the PII. To the extent that USER has PII in their possession, USER shall 
+implement a comprehensive written information security program containing organizational, administrative, physical and 
+technical security measures that satisfies all relevant state and federal laws and regulations. USER shall allow COMPANY to 
+review USER’S comprehensive written information security program as well as any audit reports, summaries of test results, or 
+other documents related to security measures taken by USER, and, as deemed necessary by COMPANY, inspect the 
+implementation of associated administrative, physical and technical security measures, as the case may be, to assess whether 
+USER’S written information security program complies with information security requirements set forth by regulations. Such 
+inspections will not include: (i) access by COMPANY to Confidential Information of USER’S other customers; or (ii) direct 
+access to any USER systems.
+ 
+(h) USER shall notify COMPANY within one (1) business day of becoming aware of any Breach of Security. USER’S Notice shall 
+include the following: (i) date and time that USER discovered the Breach of Security and the date and time when the breach 
+actually occurred, if discoverable; (ii) a detailed description of the Breach of Security; (iii) a list of the systems and data at risk, 
+including a list of affected individuals; and (iv) a description of actions taken after the Breach of Security was discovered. 
+Thereafter, USER shall provide COMPANY with periodic updates describing the investigation into the Breach of Security and 
+all corrective or remedial actions taken or to be taken by USER.
+(i) COMPANY may, in its sole discretion, take any and all actions necessary or reasonable to respond to a Breach of Security 
+involving PII, including but not limited to conducting an investigation into the cause of the Breach of Security involving PII and 
+notifying affected persons or government agencies accordingly. USER shall provide the COMPANY with all information 
+reasonably necessary to: (i) aid COMPANY’S compliance with all Data Protection Laws and any other laws or regulations that 
+may be applicable to a Breach of Security involving PII; and (ii) facilitate COMPANY’S determination of whether the breach 
+was effectively mitigated. USER shall bear all costs and expenses incurred by COMPANY related to the Breach of Security of 
+PII and compliance with law. Alternatively, USER may take action to remedy the Breach of Security involving PII at USER’S 
+sole expense. This may include, for example, sending notice to all individuals affected by the Breach of Security of PII. For the 
+sake of clarity, COMPANY shall make the final decision how and whether to notify third parties of any such Breach of Security, 
+including individuals, law enforcement or governmental authorities, and/or the general public of such Breach of Security. Unless 
+required to do so by applicable law, USER agrees that it will not inform any third party of any Breach of Security incident to the 
+extent that it may be associated with or linked to COMPANY without first obtaining COMPANY’S prior written consent, other 
+than to inform a complainant that the matter has been forwarded to COMPANY’S legal counsel.
+(j) If USER is requested or required (by interrogatories, governmental request for information, request for production of documents, 
+subpoena, Civil Investigative Demand or similar process, or otherwise required by applicable law) to disclose any COMPANY 
+Confidential Information, USER shall provide COMPANY with prompt Notice of such request(s) so COMPANY may seek an 
+appropriate protective order and USER shall use appropriate efforts to limit the disclosure and maintain confidentiality to the 
+maximum extent possible.
+(k) If USER breaches or threatens to breach this Article, the parties acknowledge that there may exist no adequate remedy at law, and 
+hereby agree that COMPANY shall have the right to seek temporary and permanent injunctive relief to restrain a violation of this 
+Article, without the necessity of posting a bond.  COMPANY’S right to injunctive relief shall be cumulative and in addition to its 
+right to seek and obtain other remedies, including monetary damages.
+6. Compliance Audit Related to Information Assets Access.  In the event that the COMPANY in its sole discretion reasonably 
+concludes, that USER or any individual for whom it is responsible has breached its obligations under this Access Agreement, 
+the COMPANY may at any time upon reasonable Notice request an audit be conducted by an independent third party to 
+certify USER’S obligations under this Access Agreement have not been breached. 
+7. Notice of Unauthorized Access
+(a) USER shall notify the COMPANY by email and telephone as soon as possible but no later than twenty-four (24) hours of 
+any breach of the security procedures and standards set forth in Exhibit A, any unauthorized access to Information Assets, 
+or the introduction of any malicious code, such as, but not limited to, a virus, worm, malware, ransomware, backdoor, or 
+undisclosed executable file  into COMPANY’S Information Assets.  
+(b) USER agrees to request access rights to COMPANY’S Information Assets only for USER’S employees for whom a Form 
+No. X-3788 (Contractor Background Request) (or any successor form) has been completed; provided that COMPANY 
+retains discretion to reject access for any such USER employee whom COMPANY deems to pose a threat to the security 
+Page 3 of 10DocuSign Envelope ID: 4902A80E-347D-41AD-875F-207080207B69
+
+Rev 0 (08-07-2023) Page 4 of 10
+(DJR 8-7-23)
+or integrity of COMPANY’s Confidential Information or Information Assets (or as otherwise required or permitted by 
+applicable law or regulation). 
+8. DISCLAIMER OF WARRANTIES RELATED TO INFORMATION ASSETS ACCESS. ACCESS TO COMPANY’S 
+INFORMATION ASSETS (AND ANY AND ALL HARDWARE, SOFTWARE, AND OTHER COMPONENTS THEREOF) IS 
+PROVIDED “AS-IS” WITH NO WARRANTIES, EITHER EXPRESS OR IMPLIED. THE COMPANY HEREBY DISCLAIMS 
+ALL IMPLIED WARRANTIES, INCLUDING THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A 
+PARTICULAR PURPOSE, AND NON-INFRINGEMENT IN CONNECTION WITH THE PROVISION OF INFORMATION 
+ASSETS ACCESS TO USER.  USER ACKNOWLEDGES AND ACCEPTS ALL RISKS ASSOCIATED WITH ITS ACCESS TO 
+AND USE OF THE COMPANY’S INFORMATION ASSETS. 
+9. USER’S INDEMNIFICATION OBLIGATIONS.
+TO THE FULLEST EXTENT OF THE LAW, USER AGREES TO DEFEND, INDEMNIFY, AND HOLD HARMLESS THE 
+COMPANY, ITS PARENT, SUBSIDIARIES, AND AFFILIATES, AND EACH OF THEIR RESPECTIVE OFFICERS, 
+DIRECTORS, EMPLOYEES, AGENTS, SUCCESSORS, AND ASSIGNS FROM AND AGAINST ANY AND ALL LOSSES, 
+COSTS, EXPENSES, DAMAGES, CLAIMS, LIABILITIES, JUDGMENTS, FINES, OR PENALTIES (HEREINAFTER “LOSSES”) 
+ARISING OUT OF USERS’ ACCESS TO THE COMPANY’S INFORMATION ASSETS; ANY USE OF THE COMPANY’S 
+INFORMATION ASSETS BY USER; A BREACH OF SECURITY; OR THE BREACH OF THIS ACCESS AGREEMENT BY 
+USER.
+10. INSURANCE
+A. USER’S Insurance.  USER shall secure and maintain in force minimum policies of insurance of the types listed below and shall 
+furnish to COMPANY, prior to accessing COMPANY’S Information Assets and throughout the duration of such access, certificates 
+of insurance evidencing current coverage listed below (collectively, the “Policies”).  
+1. Commercial General Liability (CGL) insurance including products-completed operations, independent contractors, and 
+contractual liability coverages with minimum limits of $2,000,000 per occurrence, combined single limit for bodily injury 
+(including disease or death), personal injury, and property damage (including loss of use) liability.
+2. Automobile Liability insurance, including non-ownership and hired car endorsement, with minimum limits of $1,000,000 per 
+occurrence, combined single limit.
+3. Worker’s Compensation coverage in the statutory amounts under the worker’s compensation act(s) of the location(s) in which the 
+Work is to be performed, for the current period.
+4. Employer’s Liability with a minimum limit of $1,000,000 for each accident or illness.
+5. Cyber Liability Insurance with limits not less than $2,000,000 per occurrence.
+Any of the above per-occurrence limits may be satisfied by a combination of primary and excess liability coverage.
+B. Additional Insured.  FirstEnergy Corp. and its subsidiaries and affiliates shall be included by USER as an additional insured to 
+the Policies for the portion of any losses resulting from, or related to, the USER’S sole or concurrent negligence.  The Policies shall 
+provide primary and non-contributory coverage in relation to any insurance COMPANY carries for the same losses, and include a 
+separation of insured’s provisions. The limits of liability specified for the required insurance coverage herein are the minimum limits 
+of liability that must be carried by USER. The limits of insurance required herein will in no way be deemed to limit any liabilities or 
+obligations assumed by USER hereunder or under applicable law, except as provided by statute. A copy of the endorsement adding 
+FirstEnergy Corp. and its subsidiaries and its affiliates as an additional insured (blanket endorsement is acceptable) shall be attached 
+to the certificate of insurance providing general liability coverage.
+C. Lapse of Coverage. The Policies shall not be canceled or allowed to lapse, and no material change shall be made altering, 
+restricting or reducing the insurance provided or changing the name of the insured without giving immediate Notice in writing to 
+FirstEnergy Service Company, Insurance Risk Management, 76 South Main Street, Akron, Ohio 44308, with receipt of Notice 
+acknowledged.  In the event of cancellation or lapse of or prohibited change in any Policy, COMPANY shall have the right to suspend 
+USER’S access to COMPANY’S Information Assets until the Policy and certificates in evidence thereof are reinstated or arrangements 
+acceptable to COMPANY are made pending issuance of new Policies and certificates.  If any Policy shall be about to lapse or be 
+canceled, USER shall obtain a new Policy with like coverage, and if USER fails to do so, COMPANY may terminate the Access 
+Agreement.
+D. Waiver of Subrogation.  USER hereby waives (and any of its subcontractors shall waive) any rights of subrogation they or any of 
+their insurers may have against COMPANY and each non-affiliated company disclosed in the Access Agreement, their respective 
+agents or employees.
+11. LIMITATION OF LIABILITY 
+IN NO EVENT WILL THE COMPANY BE LIABLE FOR ANY LOSSES ARISING OUT OF: USERS’ ACCESS TO THE 
+COMPANY’S INFORMATION ASSETS; ANY DAMAGES RESULTING FROM ANY DELAY, OMISSION, OR ERROR 
+IN THE ELECTRONIC TRANSMISSION OR RECEIPT OF DATA; ANY FORCE MAJEURE EVENT; ANY USE OF 
+Page 4 of 10DocuSign Envelope ID: 4902A80E-347D-41AD-875F-207080207B69
+
+Rev 0 (08-07-2023) Page 5 of 10
+(DJR 8-7-23)
+THE COMPANY’S INFORMATION ASSETS BY USER; A BREACH OF SECURITY; OR THE BREACH OF THIS ACCESS 
+AGREEMENT BY USER, INCLUDING ANY LOSSES THAT ARE CATEGORIZED AS BEING DIRECT, SPECIAL, 
+PUNITIVE, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES (INCLUDING LOSS OF USE, DATA, 
+BUSINESS OR PROFITS) WHETHER SUCH LIABILITY ARISES FROM ANY CLAIM BASED UPON CONTRACT, 
+WARRANTY, TORT (INCLUDING NEGLIGENCE), AND PRODUCT LIABILITY OR OTHERWISE, AND WHETHER 
+OR NOT THE COMPANY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH LOSS OR DAMAGE.  
+12. TERMINATION; MODIFICATION 
+USER acknowledges and agrees that COMPANY has the right to immediately terminate this Access Agreement, or any access 
+granted to USER, at any time with or without cause. COMPANY may modify the terms and conditions of this Access Agreement 
+at any time upon thirty (30) days’ written Notice to USER. If USER does not wish to continue its access to the COMPANY’S 
+Information Assets under such modified terms and conditions, USER may terminate this Access Agreement by written Notice 
+delivered to COMPANY prior to the effective date of the modification.
+13. MISCELLANEOUS RELATED TO INFORMATION ASSETS ACCESS.
+13.1 This Access Agreement constitutes the entire agreement between the parties with respect to accessing COMPANY’s 
+Information Assets and supersedes any prior understanding or agreement relating to the same subject matter. 
+13.2 This Access Agreement may not be modified unless approved in writing by COMPANY. 
+13.3 Severability.  If for any reason a court of competent jurisdiction finds any provision or portion of this Access Agreement to 
+be unenforceable, that provision of the Access Agreement will be enforced to the maximum extent permissible so as to effect 
+the intent of the parties, and the remainder of this Access Agreement will continue in full force and effect.
+13.4 Waiver.  The failure of any party to enforce any of the provisions of this Access Agreement will not be construed to be a 
+waiver of the right of such party thereafter to enforce such provisions.
+13.5 Assignment.  USER may not assign any Information Assets access granted under this Access Agreement, in whole or in part, 
+including by operation of law. 
+subsidiary without the prior consent of USER.
+13.6 Relation to Other Agreements.  In case of any conflict between the provisions of the MSA or other agreements of the parties 
+and this Access Agreement, the provisions of this Access Agreement shall control as to the USER’S access to COMPANY’S 
+Information Assets.
+13.7  Gifts and Gratuities/Conflicts of Interest. COMPANY’S employees are subject to conflicts of interest and gifts and gratuities 
+policies, which generally prohibit such employees and/or their family members from giving or receiving gifts, favors, services, 
+or privileges (including travel, entertainment, and discounts that would not be available to the general public) from existing or 
+potential customers, suppliers, or contractors that: (1) have more than a nominal value; (2) exceed the level of standard business 
+courtesies; or (3) the acceptance of cash, gift certificates, or loans in any amount.  The conflicts of interest policy generally 
+prohibits COMPANY’S employees and/or their family members from serving as an officer, director, employee, consultant, 
+agent of, or from owning any beneficial interest in an organization having a business relationship with COMPANY as a supplier 
+or contractor, if the COMPANY employee is in a position to influence decisions concerning the relationship.  The entire text 
+of these policies may be found within the COMPANY’S Supply Chain Section at 
+https://www.firstenergycorp.com/supplychain.html.  USER and prospective suppliers to COMPANY are expected to be aware 
+of these policies in their dealings with COMPANY’S employees and their family members. 
+of these policies should be reported; and, may be reported anonymously and confidentially by a customer, supplier, contractor, 
+or employee by calling the FirstEnergy Employee Concerns Line (1-800-683-3625), 24 hours a day, 7 days a week.
+13.8 Jurisdiction; Governing Law.  The parties agree to the jurisdiction of the federal or state courts located in Summit County, 
+Ohio and that the laws of the State of Ohio shall apply to the interpretation and construction of this Access Agreement for 
+both substantive and procedural matters without giving effect to its rules regarding conflicts of laws.
+13.9 Notice.
+If Notice is to the COMPANY: If Notice is to USER: COMMUNITY ACTION COMMITTEE OF THE 
+LEHIGH VALLEY
+FirstEnergy Service Company Name: 
+76 S. Main Street Address: 1337 EAST FIFTH STREET
+Akron, OH  44308 City, State, Zip: BETHLEHEM, PA 18015-2103
+ATTN:  Supply Chain, A-GO-10 ATTN:
+Phone: 
+Fax:
+Page 5 of 10DocuSign Envelope ID: 4902A80E-347D-41AD-875F-207080207B69
+
+Rev 0 (08-07-2023) Page 6 of 10
+(DJR 8-7-23)
+And
+FirstEnergy Service Company
+Chief Information Security Officer
+76 S. Main St.
+Akron, OH  44308
+ATTN:  Chief Information Security Officer A-GO-18
+Phone: 330-761-4700 (24/7 Security Operations Center watch number)
+13.10 Survival.  In addition to those rights and obligations which by their nature would survive termination or expiration the following 
+provisions of this Access Agreement shall survive any termination or expiration: Articles related to: Non-Use, Non-Disclosure 
+Related to Information Assets Access; Disclaimer of Warranties Related to Information Assets Access; USER’S Indemnification 
+Obligations; Limitation of Liability; and Miscellaneous Related to Information Assets Access.
+13.11 This Access Agreement may be executed simultaneously in two (2) or more counterparts, each of which will be considered an 
+original, but all of which together will constitute one and the same instrument. Execution and delivery of this Access Agreement 
+may be evidenced by facsimile transmissions and will be sufficient to bind the parties to the terms and conditions of this Access 
+Agreement.
+IN WITNESS WHEREOF, the parties hereto have executed this Information Assets Access Agreement, by their duly authorized 
+representatives below.
+FirstEnergy Service Company (COMPANY) COMMUNITY ACTION COMMITTEE OF THE LEHIGH VALLEY 
+(USER)
+______________________________________________ ___________________________________________
+Name: ________________________________________ Name:______________________________________
+Title: _________________________________________________ Title: ______________________________________________
+Page 6 of 10DocuSign Envelope ID: 4902A80E-347D-41AD-875F-207080207B69
+Supply Chain Category Specialist
+D. Ritchie
+Jessica Reimert
+Deputy Executive Director, Operations
+
+Rev 0 (08-07-2023) Page 7 of 10
+(DJR 8-7-23)
+EXHIBIT A
+ACCEPTABLE USE PRACTICE FOR THIRD PARTIES ACCESSING FIRSTENERGY INFORMATION ASSETS
+Last Modified: [08-07-2023]
+1. Introduction
+FirstEnergy Service Company (the “we,” “us”, “our”) provides access to its Information Assets to USER (“you” or 
+“your”) on a short-term basis as a courtesy and convenience to you on an as-is basis. Use of our Information Assets is at your own 
+risk. Capitalized terms used but not defined herein have the same meanings as ascribed to such terms in the FirstEnergy Information 
+Assets Access Agreement (“Access Agreement”).
+This Acceptable Use [PRACTICE] (this “AUP”), along with the Access Agreement (as applicable), governs your access to and use 
+of our Information Assets. COMPANY reserves the right to amend, alter, or modify your conduct requirements as set forth in this 
+AUP at any time. By executing the Access Agreement, you accept and agree to be bound and abide by this AUP. If you do not want 
+to agree to this AUP, you must not access or use our Information Assets.
+2. Implementation of Security Procedures.  
+You must, prior to establishing any connection to our Information Assets, implement and comply with the following policies, 
+security procedures and standards:
+(a) Background Checks
+USER hereby represents and warrants that each USER employee with access to our Information Assets has had a background 
+check consisting of, at a minimum, an identity verification (e.g. Social Security Number verification in the U.S.) and a seven (7) 
+year criminal check that revealed no evidence of a criminal conviction; and that, to the best of USER’s knowledge, each such 
+USER employee does not pose a threat to the security or integrity of COMPANY’s Information Assets. To the extent that USER 
+becomes aware of any such potential threat to COMPANY’s Information Assets, USER shall immediately remove such USER 
+employee from accessing our Information Assets and USER shall provide immediate Notice to COMPANY. At any time during 
+access to our Information Assets, COMPANY may request USER to verify that its USER employees are in compliance with the 
+background check requirements set forth herein.
+ 
+Each such USER employee must have completed 
+later) 
+that COMPANY retains discretion to reject access for any such USER employee whom COMPANY deems to pose a threat to 
+the security or integrity of COMPANY’s Confidential Information or Information Assets (or as otherwise required or permitted 
+by applicable law or regulation).
+(b) Internet Use Policy
+You agree that any use of the Internet or electronic communications as provided by us will be solely for business purposes. Your 
+use of Internet or electronic communications provided by us is covered by 
+Voice Mail, Internet, Internal Web, and Messaging Services
+electronic communications to assure compliance with these policies and standards at any time and without Notice.
+(c) Remote Access Security
+All access to our Information Assets must be in accordance with our policies regarding system, access, and cryptographic security 
+requirements. All network traffic may be monitored by us at any time and without Notice. USERS accessing Information Assets 
+and not using COMPANY-owned equipment must use reasonably secured endpoints with industry-standard security technologies 
+and protections applied, provided, and managed by the Supplier of the Work. 
+Remote access using individually assigned accounts is non-delegable by USER to anyone else. USERS are prohibited from using 
+remote access technologies not provided or approved by COMPANY to expose, proxy, or remotely control active connections to our 
+Information Assets.
+(d)  Security of COMPANY-owned devices provided to USER
+If COMPANY-owned devices are provided, you may not disable or tamper with any security setting or software on the 
+provided Information Asset, including but not limited to anti-virus/anti-malware software, log aggregation, log forwarding, 
+Page 7 of 10DocuSign Envelope ID: 4902A80E-347D-41AD-875F-207080207B69
+
+Rev 0 (08-07-2023) Page 8 of 10
+(DJR 8-7-23)
+security auditing, and endpoint incident response.
+(e)  Security of USER-owned devices accessing Information Assets
+If USER-owned devices are used to access Information Assets, you must deploy COMPANY-approved anti-virus/anti-
+malware protection software on all general-purpose computing platforms used by you to connect to our Information Assets.
+(f)  Security of COMPANY-provided individual accounts 
+When the COMPANY provides USER with individual accounts, you shall not share or otherwise disclose passwords, multi-factor 
+codes, or other such security-related information to any person other than to the individual for whom the account was granted. This 
+includes USER information technology support staff or other security support staff.
+USER individual accounts that access our Information Assets are governed by the FirstEnergy Cyber Security Policy or its successor 
+policy document. As noted, COMPANY retains discretion to reject access to any USER employee whom COMPANY deems to 
+pose a threat to the security or integrity of COMPANY’s Confidential Information or Information Assets (or as otherwise required 
+or permitted by applicable law or regulation).  
+(g)   Training for access to Information Assets
+COMPANY may require initial and ongoing training of USER’S employees with access to our Information Assets. Such training may 
+be required on a periodic basis to maintain ongoing access to our Information Assets. USER acknowledges that USER’S employees 
+will complete such training in a timely and efficient matter when so required by us. We agree that training will be limited to such 
+training that is identified by us as fulfilling requirements for the COMPANY to remain in compliance with various federal and state 
+regulatory and legal requirements.
+(i) Malicious Code.  USER shall not: (i) introduce any malicious or surreptitious code into our Information Assets, including any 
+virus, worm, malware, ransomware, backdoor, or undisclosed executable file; (ii) use any means to circumvent any COMPANY 
+system security measure; (iii) attempt to access any COMPANY system resource that we have not authorized for USER’S access.
+(j) Third Party Access.  Except for “Work” as specified in a MSA or other agreement, USER shall not allow any third party, 
+including but not limited to subcontractors, temporary employees or, in the case where USER is a business entity, other 
+persons who are not full-time employees of USER, to access our Information Assets through USER’S computer systems or 
+networks unless specifically authorized by the COMPANY in writing.  We, in our sole discretion, may require such other 
+person or persons to separately execute a copy of our Access Agreement prior to granting access to our Information Assets.  
+USER shall take all steps necessary to secure its own networks and its access to our Information Assets to prevent any person 
+not authorized by the COMPANY from gaining access to our Information Assets.
+3. Prohibited Uses
+You may use our Information Assets only for lawful purposes and in accordance with this AUP. You agree not to use our Information 
+Assets:
+(a) In any way that violates any applicable federal, state, local, or international law or regulation (including, without 
+limitation, any laws regarding the export of data or software to and from the U.S. or other countries).
+(b) For the purpose of exploiting, harming, or attempting to exploit or harm, minors in any way by exposing them to 
+inappropriate content, asking for their Personally Identifiable Information, or otherwise.
+(c) To send, knowingly receive, upload, download, use, or re-use any material which violates the rights of any individual or 
+entity established in any jurisdiction.
+(d) To transmit, or procure the sending of, any advertising or promotional material, including any “junk mail,” “chain letter,” 
+“spam,” or any other similar solicitation.
+(e) To impersonate or attempt to impersonate the COMPANY, a COMPANY employee, another user, or any other person or 
+entity (including, without limitation, by using e-mail addresses or screen names associated with any of the foregoing).
+(f) To engage in any other conduct that restricts or inhibits anyone’s use of our Information Assets, or which, as determined 
+by us, may harm the COMPANY or users of our Information Assets or expose them to liability.
+Page 8 of 10DocuSign Envelope ID: 4902A80E-347D-41AD-875F-207080207B69
+
+Rev 0 (08-07-2023) Page 9 of 10
+(DJR 8-7-23)
+Additionally, you agree not to:
+(g) Use our Information Assets in any manner that could disable, overburden, damage, or impair our Information Assets or 
+interfere with any other party’s use of our Information Assets, including their ability to engage in real time activities 
+through our Information Assets.
+(h) Use any robot, spider, or other automatic device, process, or means to access our Information Assets for any purpose, 
+including monitoring or copying any traffic on our Information Assets or resources available on our Information Assets.
+(i) Use any manual process to monitor or copy any traffic on our Information Assets or for any other unauthorized purpose 
+without our prior written consent.
+(j) Use any device, software, or routine that interferes with the proper working of our Information Assets, or any server, 
+computer, database, or other resource or element connected to our Information Assets.
+(k) Violate, attempt to violate, or knowingly facilitate the violation of the security or integrity of our Information Assets.
+(l) Otherwise attempt to interfere with the proper working of our Information Assets.
+(m) To damage, destroy, or otherwise render unusable or unrecoverable any COMPANY information.
+(n) Connect any device or peripheral to an Information Asset, including any COMPANY-owned endpoint provided to the 
+USER, that is not owned by COMPANY or has been otherwise approved by the COMPANY.
+(o) Use any Information Asset to connect to a third party’s system for purposes other than fulfillment of “Work” as specified 
+in a MSA or other agreement or for limited personal use as described in FE Business Practice 9.5 Personal Use of 
+Computer Equipment and Software Practice
+4. Content Standards
+You agree not to use our Information Assets to send, knowingly receive, upload, download, use, or re-use any material which:
+(a) Contains any material that is defamatory, obscene, indecent, abusive, offensive, harassing, violent, hateful, inflammatory, 
+or otherwise objectionable.
+(b) Promotes sexually explicit or pornographic material, violence, or discrimination based on race, sex, religion, nationality, 
+disability, sexual orientation, or age.
+(c) Infringes any patent, trademark, trade secret, copyright, or other intellectual property, or other rights of any other person.
+(d) Violates the legal rights (including the rights of publicity and privacy) of others or contains any material that could give 
+rise to any civil or criminal liability under applicable laws or regulations.
+(e) Is likely to deceive any person.
+(f) Promotes any illegal activity, or advocates, promotes, or assists any unlawful act.
+(g) Impersonates any person, or misrepresents your identity or affiliation with any person or organization.
+(h) Involves commercial activities or sales, such as contests, sweepstakes, and other sales promotions, barter, or advertising.
+(i) Gives the impression that they emanate from or are endorsed by COMPANY or any other person or entity, if this is not 
+the case.
+Page 9 of 10DocuSign Envelope ID: 4902A80E-347D-41AD-875F-207080207B69
+
+Rev 0 (08-07-2023) Page 10 of 10
+(DJR 8-7-23)
+5. 
+COMPANY may from time-to-time revise requirements in the AUP.  USER will implement and maintain the requirements of such 
+revisions within the time frames set forth below depending on the nature of the instructions (the “Directives”) in the Notice given by 
+the COMPANY.  A Notice may be made at any time by the COMPANY and directed to the person designated in Article 13.9 or 
+to the USER’s address specified above, at the election of the COMPANY.  Notices may be deemed provided to USER by USER 
+accessing Cyber Security Policies, Standards, and Procedures (mcas.ms), or by COMPANY sending an email, hardcopy first class 
+mail, or by facsimile, at the election of the COMPANY.
+(a) Directives contained in Notices identified as “Emergency” shall be implemented immediately;
+(b) Directives contained in Notices identified as “Urgent” shall be implemented within forty-eight (48) hours;
+(c) Directives contained in Notices identified as “Important” shall be implemented within seven (7) days;
+(d) All other Notices shall be implemented within thirty (30) days.
+USER shall provide immediate written confirmation to the COMPANY, signed by an officer of the USER, that it has implemented 
+the security procedures and standards set forth in each Notice.
+6. Monitoring and Enforcement
+COMPANY, in its sole discretion, will determine whether your conduct is in compliance with this AUP. We have the right to:
+(a) Monitor your use of our Information Assets for any purpose in our sole discretion and as we see fit.
+(b) Take any action we deem necessary or appropriate in our sole discretion if we believe your conduct violates this AUP, 
+infringes any intellectual property right or other right of any person or entity, threatens the personal safety of users of our 
+Information Assets, or the public, or could create liability for the COMPANY.
+(c) Disclose your identity or other information about you to any third party who claims that material posted by you violates 
+their rights, including their intellectual property rights or their right to privacy.
+(d) Take appropriate legal action, including without limitation, referral to law enforcement, for any illegal or unauthorized use 
+of our Information Assets for any or no reason, including without limitation, any violation of this AUP.
+Without limiting the foregoing, we have the right to fully cooperate with any law enforcement authorities or court order requesting or 
+directing us to disclose the identity or other information of anyone who accesses or uses our Information Assets. YOU WAIVE AND 
+HOLD HARMLESS THE COMPANY AND ITS PARENT, SUBSIDIARIES, AND AFFILIATES FROM ANY CLAIMS 
+RESULTING FROM ANY ACTION TAKEN BY THE COMPANY OR ANY OF THE FOREGOING PARTIES DURING, OR 
+TAKEN AS A CONSEQUENCE OF, INVESTIGATIONS BY EITHER THE COMPANY, THE FOREGOING PARTIES, OR LAW 
+ENFORCEMENT AUTHORITIES.
+Page 10 of 10DocuSign Envelope ID: 4902A80E-347D-41AD-875F-207080207B69
+--------------------
+Attached Document: 6644cf0b78842_2024Wx_First-Energy-Warm_-Master-Service-Agreement.pdf
+MSA PRO/CNSLT REV 0 (FE LEGAL 08-07-2023)	Page 1 of 14
+MASTER SERVICE AGREEMENT FOR
+PROFESSIONAL OR CONSULTING SERVICES
+This Master Service Agreement for Professional or Consulting Services dated as of June 1, 2024, is made between FirstEnergy Service 
+Company (“Agent”) acting on behalf of the Purchaser identified in the Statement of Work or in the ship to address on each Purchase 
+Order,  with its principal address at 76 S Main St. Akron, OH 44308 and COMMUNITY ACTION COMMITTEE OF THE LEHIGH VALLEY  with 
+its principal address at 1337 EAST FIFTH STREET, BETHLEHEM, PA 18015-2103 (“Supplier”).
+WHEREAS the purpose of this Agreement is to establish Master Service Agreement terms and conditions which will apply to Statements 
+of Work, Purchase Orders and Change Orders issued by the Purchaser to procure professional and/or consulting services from Supplier.
+NOW THEREFORE, in consideration of the promises and mutual covenants herein contained, the sufficiency of which are acknowledged 
+and agreed to by the parties, and intending to be legally bound, Purchaser and Supplier mutually agree as follows:
+ARTICLE 1 - DEFINITIONS
+When used in the Agreement, the following terms shall have the meanings given below except when expressly indicated otherwise:
+A. “Agent” means FirstEnergy Service Company, its successors and assigns, as the authorized agent for the Purchaser, unless FirstEnergy 
+Service Company is identified as being the Purchaser thereby rendering Article 15 “Authority of Agent” inapplicable.
+B. “Agreement” means the terms and conditions set forth in this document, together with a Statement of Work and/or Purchase Order, 
+including all attachments, exhibits, revisions, addendums, and supplements thereto.
+C. “Data” means material that includes documentation, manuals, maps, plans, schedules, programs, Specifications, software, reports, 
+drawings, designs and other relevant information.
+D. “Purchase Order” is the document describing commercial terms and additional terms unique to the transaction described therein.  
+E. “Purchaser” means: the FirstEnergy company designated in the “Ship To” address of each Purchase Order for which the Work shall be 
+performed. If more than one FirstEnergy company is identified as the Purchaser, the liability of each FirstEnergy company named 
+shall be several and not joint and shall be limited to such FirstEnergy company’s interest in the Agreement. 
+F. “Purchaser’s Site” means locations owned or leased by Purchaser, that the Work is intended to benefit, to which the Work is to be 
+delivered, or where the Work is to be performed. 
+G. “Specifications” mean the detailed description of the requirements associated with the goods and/or services to be provided by 
+Supplier under the Agreement, including without limitation, drawings, dimensions, components, attachments, technical and non-
+technical requirements and characteristics, standards, performance requirements, and tolerances.  Should any conflict occur between 
+the Specifications and any other provision of the Agreement, the Specifications shall take precedence only when and to the extent 
+that such application does not result in any way in the dilution or diminution of the rights or benefits of the Purchaser under the 
+Agreement.
+H. “Statement of Work” (SOW) means the detailed description of the Work to be performed, the dates and times for completion and 
+delivery of the Work, each party’s obligations and other requirements necessary for completion of the Work, and any other terms that 
+apply to that specific SOW.
+I. “Supplier” means the organization, individual or entity which is providing the Work under the Agreement.  
+J. “Work” means the deliverables, products, outcomes, results, information, new discoveries, inventions, improvements, technical 
+consulting or other technical services, design services, analytical services, quality assurance, supervision and direction of work, or 
+performance of labor, and all other facilities and services which are necessary for Supplier to complete its obligations under the 
+Agreement. 
+ARTICLE 2 – TERMS OF AGREEMENT
+A. Offer and Acceptance.  Supplier’s acknowledgement, commencement of performance, or any conduct which recognizes the existence 
+of a contract pertaining to the subject matter hereof shall constitute acceptance by Supplier of the Agreement and all of its terms and 
+conditions.  Acceptance of the Agreement is expressly limited to Supplier’s assent to all of the terms and conditions of the Agreement.  
+Additional or different terms provided in Supplier’s acceptance of Purchaser’s offer which vary in any degree from any of the terms 
+herein or expressly referenced on the face of the Agreement shall be deemed material and are hereby objected to and rejected.  If 
+the Agreement shall be deemed an acceptance by Purchaser in response to an offer by Supplier and if any terms herein are additional 
+to or different from any terms of such offer, then the issuance of the Agreement by Purchaser shall constitute an acceptance expressly 
+conditioned upon Supplier’s assent to all of the terms and conditions of the Agreement. Additional or different terms in any 
+acknowledgement, invoice, or communication submitted by Supplier, or any attempt by Supplier to vary in any degree any of the 
+Page 1 of 14DocuSign Envelope ID: 8A8F744B-7C25-49FA-AC53-A33898B63085
+
+MSA PRO/CNSLT REV 0 (FE LEGAL 08-07-2023)	Page 2 of 14
+terms of the Agreement, unless expressly agreed to by Purchaser in writing, shall be deemed material and are hereby objected to 
+and rejected.  Any such terms proposed by Supplier, whether by offer or acceptance, shall be void unless expressly agreed to in 
+writing by Purchaser.  
+B. Integration; Modification.  The parties intend the Agreement to constitute the complete, exclusive and fully integrated statement of 
+their agreement concerning the subject matter hereof.  As such, the Agreement is the sole repository of their agreement, and the 
+parties are not bound by any other agreements of whatsoever kind or nature pertaining to the subject matter hereof.  The parties 
+further intend the complete, exclusive and fully integrated statement of their agreement may not be supplemented or interpreted by 
+any evidence of trade usage, course of dealing, or course of performance. No amendment, modification, or rescission of the 
+Agreement shall be enforceable unless the same is in writing and signed by the party against whom the terms of such amendment, 
+modification, or rescission are sought to be enforced.
+C. Non-Exclusivity.  The Agreement is not exclusive, and Purchaser may, at its sole discretion, contract with others to perform such Work 
+as is herein contemplated or may perform such Work with its own forces. 
+D. Modifications to Work. If Purchaser requires modifications and/or changes to the Work after it has been performed, which 
+modifications and/or changes are through no fault of Supplier, or if Purchaser desires additional Work not covered by the Agreement, 
+Supplier shall only perform such Work as ordered by Purchaser in writing and shall be paid for such Work as agreed to in writing 
+between the parties.  
+E. Independent Contractor. Supplier shall be considered an independent contractor in its performance hereunder and responsible for 
+all acts or omissions (negligent or otherwise) of its agents, employees and subcontractors. Supplier alone shall be liable and 
+responsible for the manner and methods by which the Work is performed and for materials, work force and equipment supplied in 
+connection therewith, irrespective of whether or not any changes are made as a result of any comments received from Purchaser.  
+Nothing in the Agreement or in the performance of the Work shall be construed to create a partnership, joint venture or other joint 
+business arrangement between Purchaser and Supplier. Supplier shall be responsible for all contributions for unemployment 
+compensation, workers’ compensation, social security, and other employment benefits of its employees.  
+ARTICLE 3 – SHIPMENT, DELIVERY, AND INSPECTION OF WORK
+A. Title and Risk of Loss. Title and risk of loss of products and materials incorporated into the Work passes to Purchaser upon notification 
+to Supplier by Purchaser of acceptance of the Work. All products and materials brought to Purchaser’s Site by Supplier or its 
+subcontractors must be removed by Supplier or subcontractor immediately once no longer needed, or upon Supplier’s departure 
+whichever is sooner.
+B. Time is of the Essence.  THE OBLIGATION OF SUPPLIER TO MEET THE DELIVERY DATES, SPECIFICATIONS AND QUANTITIES SET FORTH 
+HEREIN IS OF THE ESSENCE OF THE AGREEMENT. By executing the Agreement, Supplier acknowledges the time for completion set 
+forth in the Agreement.
+C. Delivery. Supplier shall notify Purchaser immediately of any delay in delivery or shipment that may affect the completion date of the 
+Work. If Supplier fails to meet the delivery schedule, Purchaser, without limiting its other rights or remedies, may: (1) direct expedited 
+routing and charge to Supplier all additional and incidental costs incurred thereby; or (2) cancel all or part of the Work.  
+D. Inspection, Rejection and Revocation. The Work shall be subject to inspection, tests, and count by Purchaser at any time or place at 
+the discretion of Purchaser whether during or after manufacture, delivery, construction, or installation.  Nothing herein shall relieve 
+Supplier of the obligation to make full and adequate testing and inspection of any Work.  If any of the Work is defective or otherwise 
+not in conformity with the requirements of this Agreement, Purchaser, in addition to its other rights, may reject such Work and: (1) 
+receive full credit from Supplier; or (2) require its correction in accordance with Article 6.  Any Work rejected by Purchaser may be 
+returned to Supplier at Supplier’s risk and expense and shall not thereafter be tendered for acceptance without Purchaser’s written 
+consent.  
+E. Records. Supplier shall maintain books, records, documents, and other information sufficient to determine the status of Supplier’s 
+performance, testing, and compliance with the requirements of the Agreement.
+F. Work Acceptance. Acceptance of the Work shall be when: (1) Supplier has completed the performance of the Work; (2) all required 
+testing has been successfully completed; (3) the Work complies with applicable law and all of the requirements of this Agreement; 
+(4) Supplier has provided all tools and spare parts, all drawings and specifications, all supplier and/or manufacturer warranties, and 
+all manuals and other documentation related to the Work that are required to be provided by Supplier; (5) Supplier has removed all 
+supplies, waste, materials, rubbish, and temporary facilities from Purchaser’s Site; and (6) Supplier has delivered to Purchaser lien 
+and claim waivers as required by Article 10.
+G. Purchaser’s Review and Approvals.  Purchaser’s review or approval of, or right to review, release and/or approve, any Work provided 
+or performed by Supplier under this Agreement (including approval of drawings and Specifications, subcontractors, safety and 
+environmental protection guidelines, quality assurance, quality control, testing and inspection procedures) shall not in any way be 
+Page 2 of 14DocuSign Envelope ID: 8A8F744B-7C25-49FA-AC53-A33898B63085
+
+MSA PRO/CNSLT REV 0 (FE LEGAL 08-07-2023)	Page 3 of 14
+deemed to limit or alter Supplier’s responsibility to schedule, coordinate, perform, inspect, test, and complete the Work in strict 
+accordance with the requirements of this Agreement, or Supplier’s obligations under Article 6. 
+ARTICLE 4 – CONTRACT PRICE AND PAYMENT
+A. Pricing.  Pricing stated in the Agreement shall be the maximum Purchaser shall pay Supplier for the Work.  Unless otherwise set forth 
+in the Agreement, Purchaser will not be responsible for any additional charges, including boxing, packing, crating, carting, insurance, 
+or shipping.  All amounts referenced in the Agreement are in United States dollars.  Except to the extent otherwise provided in the 
+Agreement, Supplier shall pay all taxes, duties, levies, and all other fees and charges imposed by any governmental entity with respect 
+to the Agreement and the Work. 
+B. Invoicing.  
+1. Unless otherwise instructed in a Statement of Work, invoices shall be submitted electronically in FirstEnergy Service Company’s 
+eProcurement system against the Purchase Order. The elements of all amounts invoiced shall be shown separately, by applicable 
+line items, and shall be classified as Purchaser may require for accounting and payment purposes. Any taxes payable by 
+Purchaser hereunder shall be shown separately on any bids and invoices sent to Purchaser.  For Work to be performed on a time 
+and materials basis, each invoice must: (1) detail by activity the man-hours worked by Supplier; (2) detail by activity the labor cost; 
+(3) detail the direct reimbursable costs in connection with the Work; (4) indicate the cumulative cost to date for all activities; (5) 
+indicate the total monthly cost of the Work; and (6) include other information reasonably required by Purchaser.  Any disputed 
+invoice or portion thereof need not be paid, but in such case, Purchaser shall promptly notify Supplier of any rejected invoice or 
+portion thereof (with reasons for such rejection).  Invoices shall be submitted upon final completion of the Work, not later than 
+the 10th day of each month, or as otherwise mutually agreed on the face of the Agreement.  Purchaser may deduct five percent 
+(5%) as a processing fee from Supplier for any invoice issued more than one hundred eighty (180) days after Purchaser’s 
+acceptance of the Work.  
+2.
+as an Evaluated Receipt Settlement (ERS), Supplier invoice is not required. The payment will be scheduled and paid based on Purchase 
+Order payment terms.  
+C. Payment.  Each invoice shall, after approval by Purchaser, be processed for payment in accordance with the terms of payment as set 
+forth on the face of each Purchase Order issued pursuant to the Agreement.  Purchaser may retain ten percent (10%) of each payment 
+due, which shall be paid to Supplier when Purchaser has fully accepted the Work and is satisfied that the interests of the Purchaser 
+in the completed Work have been protected.  Such payment shall not be unreasonably withheld.  Following receipt of a correct invoice 
+or acceptance of the Work, whichever is later, Purchaser shall make payments on the next scheduled payment system run. Purchaser’s 
+scheduled payment system runs shall not be longer than on a bi-weekly basis.  Payments by Purchaser shall not be deemed evidence 
+of acceptance by Purchaser of the Work.  After completion of the Agreement and final acceptance of the Work, any retained monies, 
+except those retained under Article 4(D) hereof, will be paid without interest to Supplier in accordance with the terms of payment 
+designated in the Agreement. 
+D. Withholding.
+1. If Purchaser has a claim under the Agreement, regardless of when it is discovered, including a claim that: (1) Supplier's invoice is 
+erroneous; or (2) the Work is deficient, defective or incomplete; or (3) Purchaser, another supplier, subcontractor, or other party 
+suffers damage or injury which is attributable to Supplier; or (4) Supplier fails to make a payment as and when due to a 
+subcontractor or supplier for materials, labor or equipment; or (5) Supplier has failed to supply any affidavit, release or waiver of 
+lien Purchaser may require; then Purchaser may withhold payment of, or set-off the amount of its claim, costs or loss against 
+any amount owed to Supplier.  If any monies are so withheld, Purchaser shall only pay such amount when, without cost to the 
+Purchaser, the cause of such withholding has been eliminated to Purchaser’s satisfaction. If any monies are so withheld, 
+Purchaser shall not be responsible for any interest payment to Supplier. 
+2. New Jersey Withholding.  If applicable, in accordance with New Jersey law, Purchaser shall withhold a portion of payments owed 
+to Supplier for services to construct, improve, alter, or repair a building, structure, or improvement to real property; unless 
+Supplier provides written documentation that Supplier is an entity registered to do business within the State of New Jersey.
+E. Set-off. Purchaser shall be entitled at all times to set-off any amount owing from Supplier to Purchaser or any affiliate of Purchaser 
+against any amount payable by Purchaser hereunder.  
+F. Audit.  Purchaser shall (upon reasonable notice) have the right to audit books and records of Supplier for the purpose of confirming 
+the amount due to Supplier or Supplier’s performance of its obligations under the Agreement.  Supplier, its subcontractors and any 
+other entity Supplier uses to perform its obligations under the Agreement shall preserve all such records for a period of three (3) 
+years after final payment hereunder. Upon request, Supplier shall provide Purchaser with information related to prices of materials, 
+equipment and services sufficient to enable Purchaser to comply with accounting regulations of any governmental or quasi-
+Page 3 of 14DocuSign Envelope ID: 8A8F744B-7C25-49FA-AC53-A33898B63085
+
+MSA PRO/CNSLT REV 0 (FE LEGAL 08-07-2023)	Page 4 of 14
+governmental organization.  Supplier shall provide for such right to audit by Purchaser in all contracts with subcontractors and other 
+entities relating to the Agreement.
+G. Self-Employed Status. Supplier is deemed to be a self-employed independent contractor; and accordingly, no sums are contemplated 
+to be withheld from Supplier's compensation to cover the payment of income taxes, FICA (social security), FUTA (unemployment 
+compensation) or other taxes. Supplier agrees to file all required federal, state and local income tax and other tax returns (including, 
+without limitation, all required declarations of estimated tax) covering Supplier's compensation hereunder.  Supplier agrees to pay all 
+such taxes and contributions when due; and Supplier hereby indemnifies Purchaser and holds it harmless from and against any and 
+all loss, cost and liability whatsoever incurred by or claimed against Purchaser for any failure of Supplier to comply herewith.  
+ARTICLE 5 – SERVICES AND SUPPLIER’S EMPLOYEES
+A. Supplier Employees. Supplier will employ experienced, qualified, reliable, and trustworthy persons to perform the Work. At 
+Purchaser's request, the credentials of any of Supplier's employees assigned to perform the Work shall be submitted to Purchaser in 
+advance of such assignment.  Individuals employed by or representing Supplier on Purchaser’s Site (or who have access to Purchaser’s 
+network) shall be subject to Purchaser’s continuing approval.  During the performance of the Work, Purchaser may object to any 
+Supplier employee who, in Purchaser's opinion, does not meet these criteria or whose performance is unsatisfactory.  In such case, 
+Supplier shall, at its expense and risk, immediately replace or remove such individual from the Work.  Notwithstanding the foregoing, 
+Supplier shall be responsible for all acts or omissions (negligent or otherwise) of its agents, employees and subcontractors.
+B. Background Checks. Supplier shall make best efforts to ensure that each employee assigned to the Work has had a background check 
+consisting of, at a minimum, an identity verification (e.g. Social Security Number verification in the U.S.) and a seven (7) year criminal 
+check that revealed no evidence of a criminal conviction and does not pose a threat to the security or integrity of Purchaser’s Site, 
+customers, information assets, and/or employees. To the extent that Supplier becomes aware of any such potential threat to 
+Purchaser’s Site, customers, information assets, and/or employees, Supplier shall immediately remove such employee from the Work.  
+Purchaser, at any time prior to the start of or during the Work, may request Supplier to verify it is in compliance with the background 
+check requirements set forth herein.
+C. Substance Abuse. Supplier agrees to comply with all applicable state and federal laws regarding drug-free workplace, as well as 
+Purchaser’s rules and regulations concerning the same, available upon request.  Supplier is responsible for ensuring all Supplier’s 
+employees and its subcontractors, while working on Purchaser’s Site, will not: (1) be under the influence of drugs or alcohol; or (2) 
+purchase, transfer, use or possess illegal drugs or alcohol; or (3) abuse prescription drugs in any way.  
+D. Non-Interference.  Supplier shall conduct the Work so as to minimize interference with other activities at Purchaser’s Site.   If Supplier 
+is working at Purchaser’s Site, Supplier shall cooperate fully with Purchaser and other vendors, and shall plan and perform the Work 
+in such a manner so as not to interfere with the activities or operations of Purchaser or other vendors. Purchaser will establish 
+priorities and, at the request of Supplier or other vendors, shall resolve interferences.  Supplier shall not permit its employees or the 
+employees of any of its subcontractors to operate the existing Purchaser’s Site or any of Purchaser’s equipment or facilities or to 
+perform maintenance work on Purchaser’s Site or any of Purchaser’s other facilities, except as specified under the Agreement.  
+Supplier and its employees, agents, subcontractors and suppliers shall enter and exit Purchaser’s Site only by the entrances 
+designated from time to time by Purchaser. Purchaser shall have the right to inspect all individuals, property, and vehicles entering 
+and leaving any of Purchaser’s facilities and exercise such control of individuals, property, and vehicles as Purchaser deems necessary 
+in its sole discretion.  Supplier shall comply with all of Purchaser’s protection and safety rules for any Purchaser Site at which the Work 
+is performed, and with all instructions and directives from Purchaser’s Site manager or their designees.   
+E. Safety and Health. Supplier shall conduct its operations in a manner to avoid risk of bodily harm to persons or damage to property.  
+Supplier shall take all precautions necessary and shall be solely responsible for the safety of the Work and the safety and adequacy 
+of the manner and methods it employs in performing the Work and shall not require any employee or representative performing 
+hereunder to work in surroundings or under working conditions that are unsanitary, hazardous, or dangerous to safety or health.  
+Supplier shall conduct the Work in conformance with all applicable safety and health laws, ordinances, rules, regulations, orders, and 
+all other requirements (including, without limitation, standards under the Occupational Safety and Health Act (OSHA) and Purchaser’s 
+safety requirements) when at Purchaser’s Site. Supplier shall continuously inspect its work, materials, and equipment to identify any 
+unsafe conditions, and shall promptly take action to correct any condition which presents such a risk. To the extent applicable, 
+Supplier shall comply with all hazard communication standards promulgated by OSHA, 29 CFR 1910.1200, et. seq., the Pennsylvania 
+Right To Know Act and similar hazard communication laws of other states; this includes evaluating and labeling all hazardous 
+chemicals as defined by said standards and maintaining Material Safety Data Sheets on all such hazardous chemicals to ensure that 
+hazard information with regard to chemical hazards produced, imported, or used within the workplace is transmitted to affected 
+employees of Supplier, its subcontractor(s) and Purchaser.  
+Page 4 of 14DocuSign Envelope ID: 8A8F744B-7C25-49FA-AC53-A33898B63085
+
+MSA PRO/CNSLT REV 0 (FE LEGAL 08-07-2023)	Page 5 of 14
+F. Testimony.  Supplier agrees that (at the request of Purchaser) the persons performing Work under the Agreement shall be made 
+available as witnesses in any litigation, hearing or proceeding to which Purchaser is or becomes a party, to explain or defend, as 
+appropriate, any aspect of methods used by Supplier, or results or conclusions developed by Supplier in connection with the 
+applicable Work.  Purchaser shall pay Supplier at its prevailing rates for all time spent by its personnel in connection with any court, 
+administrative or other legal proceedings arising from or relating to the Work (except in a dispute between the parties), regardless of 
+whether or not Supplier is subpoenaed to appear at such proceedings by Purchaser or any third party.  Purchaser shall be entitled to 
+a credit against such fees for any statutory witness fees paid to Supplier by Purchaser or any third party. 
+ARTICLE 6 - STANDARD OF CARE AND PERFORMANCE
+A. Standard of Care.  Supplier  warrants the Work: (1) will be conducted in a manner consistent with the highest generally accepted level 
+of care and skill ordinarily exercised by professionals and other persons performing work of a nature similar to the Work; and (2) will 
+be performed safely, lawfully, efficiently and properly, and otherwise in a good and workmanlike manner; and (3) will be in strict 
+conformity with the requirements of the Agreement, including, without limitation, all specific design standards and the Specifications 
+and drawings incorporated into this Agreement; and (4) will be of good workmanship and quality, free from defects (including, without 
+limitation, defects in design, material, workmanship and title); and (5) will be fit for the ordinary purposes for which such Work is used 
+or intended and for any particular purpose by Purchaser of which Supplier is aware.  Supplier further warrants that all equipment 
+used in connection with performance of the Work shall be in safe and proper working order.  Supplier acknowledges and agrees that 
+Purchaser is relying upon Supplier’s professional expertise for the accuracy, competence and completeness of Supplier’s Work.
+B. Performance.  Supplier represents and warrants that it is technically, physically, financially, and legally competent, able to perform, 
+and capable of performing the Work.  Supplier represents, warrants and covenants that it has, and will have throughout the term of 
+the Agreement, the requisite personnel, competence, skill and physical resources to perform the Work, and that it has, and shall 
+maintain, the capability, experience, registrations, and permits required to perform the Work.  
+C. Remedies. Supplier shall cure any breach of the foregoing warranties at no cost to Purchaser and shall reimburse Purchaser for any 
+damages that may be incurred by Purchaser as a result of reliance by Purchaser, its employees, agents, other suppliers or 
+subcontractors on such Work or anticipated performance by Supplier.  The costs of transporting, repairing, replacing, removing or 
+installing material to make the Work comply with the above performance standards, warranties and requirements shall be borne by 
+Supplier.  If Supplier should fail to cure such breach or if Purchaser determines that Supplier will be unable to cure such breach before 
+the scheduled time of completion, Purchaser may correct such breach itself or through a third party and charge Supplier for the costs 
+incurred therefor.
+ARTICLE 7 - INTELLECTUAL PROPERTY RIGHTS
+A. Ownership.   All items Supplier is to deliver to Purchaser associated with the Work (including drawings and Specifications, Data, 
+calculations, manuals, reports, documentation, designs, programs, software, and training materials), whether or not patentable, 
+registrable as a copyrightable work, or registrable as a trademark or service mark, shall become the property of Purchaser and 
+Purchaser shall own all intellectual property rights therein (including the rights to any patent, trademark or service mark, trade secret, 
+and copyright). Any works of authorship conceived or recorded by Supplier during the term of the Agreement pertaining in any 
+material respect to the Work shall be done as “work made for hire” as defined and used in the Copyright Act of 1976, 17 USC §1 et 
+seq. Purchaser, as the entity for which the work of authorship is prepared, shall own all right, title and interest in and to such materials, 
+including the entire copyright therein. To the extent that any such material is not deemed to be a “work made for hire”, Supplier 
+hereby assigns to Purchaser ownership of all right, title, and interest in and to such materials, including copyright. Notwithstanding 
+the foregoing, nothing herein shall be deemed to convey or grant any ownership of intellectual property rights: (1) owned by Supplier 
+prior to the effective date of this Agreement; or (2) developed by Supplier outside of the scope of work for the Work; provided that 
+Purchaser shall receive with respect to any such rights a nonexclusive, irrevocable, fully paid-up and royalty-free, transferable, sub-
+licensable license to use, copy, communicate, and prepare modifications to such rights for the purpose of completing, operating, 
+maintaining, repairing, modifying, adding to, improving, and demolishing the Work and related systems and any replacement thereof.
+B. Infringement.  Supplier warrants that the Work and every part thereof: (1) is and will be original; (2) does not and will not infringe 
+upon or misappropriate any patent, copyright, trademark, or other intellectual property rights of any third party; and (3) has not 
+previously been transferred to a third party or is otherwise encumbered. If the Work or any portion thereof is held to constitute an 
+infringement or misappropriation of the intellectual property rights of a third party, then Article 8(B) shall apply.
+C. Data Furnished by Purchaser.  All Data Purchaser furnishes in connection with the Work shall remain Purchaser’s exclusive property.  
+Supplier shall not use Purchaser-furnished Data for any purpose other than for the Work. Supplier shall, upon Purchaser’s request: 
+(1) sign and deliver a written itemized receipt for all Purchaser-furnished Data and shall be responsible for its safekeeping; and (2) 
+return to Purchaser Purchaser-furnished Data and all copies thereof. 
+Page 5 of 14DocuSign Envelope ID: 8A8F744B-7C25-49FA-AC53-A33898B63085
+
+MSA PRO/CNSLT REV 0 (FE LEGAL 08-07-2023)	Page 6 of 14
+ARTICLE 8 - INDEMNITY
+A. Supplier’s Indemnity.  Supplier shall indemnify, defend, and hold harmless Purchaser, its parent, subsidiaries and affiliates, and each 
+of their respective agents, officers, employees, successors, assigns, and indemnitees (the “Indemnified Parties”), from and against 
+any and all losses, costs, damages, claims, liabilities, fines, penalties, and expenses (including, without limitation, attorneys’ and other 
+professional fees and expenses, any mediation, arbitration, and court costs, incurred in connection with the investigation, defense, 
+and settlement of any claim asserted against any Indemnified Party or the enforcement of Supplier’s obligations under this Article 
+(collectively, “Losses”)) which any of the Indemnified Parties may suffer or incur, arising out of or related to the Work and/or the 
+actions or omissions of Supplier and/or its subcontractors, including Losses relating to: (1) actual or alleged bodily or mental injury to 
+or death of any person; or (2) damage to or loss of use of property of Purchaser, Supplier, or any third party; or (3) any contractual 
+liability owed by Purchaser to a third party; or (4) any breach of or inaccuracy in the covenants, representations, and warranties made 
+by Supplier under the Agreement; or (5) any violation by Supplier or any subcontractor of any ordinance, regulation, rule, or law of 
+the United States or any political subdivision or duly constituted public authority; or (6) any lien or encumbrance arising out of or in 
+connection with performance of Supplier’s obligations under the Agreement; , that Supplier’s indemnity 
+obligations under this Article 8(A) shall not apply to any Losses to the extent such Losses are found to have been caused by the 
+negligence or willful misconduct of any of the Indemnified Parties.
+B. Intellectual Property Indemnity.  Supplier shall indemnify, defend, and hold harmless the Indemnified Parties from and against any 
+and all Losses which any of the Indemnified Parties may suffer or incur arising out of or related to any claim, suit, or proceeding 
+alleging that the Work, the intended use thereof, or any materials and information designed, specified, or used by Supplier or any 
+subcontractor in performing the Work violates, infringes, or misappropriates any patent rights, copyrights, trademarks, trade secrets, 
+or other intellectual property rights of any third party.  If the use of any Work is enjoined or restrained and Supplier fails to remove 
+such injunction or restraining order within a reasonable time, Supplier shall promptly and at Supplier’s expense: (1) secure for 
+Purchaser the right to use the Work or any portion thereof which is said to be infringing by procuring for Purchaser a royalty-free 
+license or; (2) replace the Work or such portion thereof with non-infringing Work that meets the requirements of the Agreement; or 
+(3) remove such infringing Work or such portion thereof, as Purchaser may elect, and refund the sums paid therefor by Purchaser, 
+together with any out-of-pocket costs incurred by Purchaser in connection with its purchase and use of the infringing Work, all without 
+damage or injury to Purchaser’s other property.
+C. Waiver of Immunities.  If an employee of Supplier or its subcontractor, or such employee’s heirs, assigns, or anyone otherwise entitled 
+to receive damages by reason of injury or death to such employee, brings an action at law against any Indemnified Party, then 
+Supplier, for itself, its successors, assigns, and subcontractors hereby expressly waives any provision of any workers’ compensation 
+act or other similar law whereby Supplier could preclude its joinder by such Indemnified Party as an additional defendant in such 
+actions, or avoid liability for damages, contribution, defense, or indemnity in any such action at law, or otherwise. Supplier’s obligation 
+to Purchaser under this Article 8 shall not be limited by any limitation on the amount or type of damages, benefits or compensation 
+payable by or for Supplier under any worker’s compensation acts, disability benefit acts, or other employee benefit acts on account 
+of claims against Purchaser by an employee of Supplier or anyone employed directly or indirectly by Supplier or anyone for whose 
+acts Supplier may be liable.
+ARTICLE 9 - INSURANCE
+A. Supplier’s Insurance.  Supplier shall secure and maintain in force minimum policies of insurance of the types listed below and 
+shall furnish to Purchaser, prior to providing any portion of the Work and throughout the duration of the Supplier’s 
+performance of the Work, certificates of insurance evidencing current coverage listed below (collectively, the “Policies”).  
+1. Commercial General Liability (CGL) insurance including products-completed operations, independent contractors, and 
+contractual liability coverages with minimum limits of $2,000,000 per occurrence, combined single limit for bodily injury (including 
+disease or death), personal injury, and property damage (including loss of use) liability.
+2. Automobile Liability insurance, including non-ownership and hired car endorsement, with minimum limits of $1,000,000 per 
+occurrence, combined single limit.
+3. Worker’s Compensation coverage in the statutory amounts under the worker’s compensation act(s) of the location(s) in which 
+the Work is to be performed, for the current period.
+4. Employer’s Liability with a minimum limit of $1,000,000 for each accident or illness.
+5. Professional or Errors and Omissions insurance with minimum limits of $2,000,000 per occurrence.
+6. If the Supplier will have access to the Purchaser’s Network/Systems or any of Purchaser’s customer data, Supplier is required to 
+provide Cyber Liability Insurance with limits of not less than $2,000,000 per occurrence.  
+Any of the above per-occurrence limits may be satisfied by a combination of primary and excess liability coverage.
+Page 6 of 14DocuSign Envelope ID: 8A8F744B-7C25-49FA-AC53-A33898B63085
+
+MSA PRO/CNSLT REV 0 (FE LEGAL 08-07-2023)	Page 7 of 14
+B. Additional Insured.  FirstEnergy Corp. and its subsidiaries and affiliates shall be included by Supplier as an additional insured to the 
+Policies for the portion of any losses resulting from, or related to, the Supplier’s sole or concurrent negligence.  The Policies shall 
+provide primary and non-contributory coverage in relation to any insurance Purchaser carries for the same losses, and include a 
+separation of insured’s provisions.  The limits of liability specified for the required insurance coverage herein are the minimum limits 
+of liability that must be carried by Supplier. The limits of insurance required herein will in no way be deemed to limit any liabilities or 
+obligations assumed by Supplier hereunder or under applicable law, except as provided by statute. A copy of the endorsement adding 
+FirstEnergy Corp. and its subsidiaries and its affiliates as an additional insured (blanket endorsement is acceptable) shall be attached 
+to the certificate of insurance providing general liability coverage.
+C. Lapse of Coverage. The Policies shall not be canceled or allowed to lapse, and no change shall be made altering, restricting, or 
+reducing the insurance provided or changing the name of the insured without giving immediate notice in writing to FirstEnergy Service 
+Company, Insurance Risk Management, 76 South Main Street, Akron, Ohio 44308, with receipt of notice acknowledged.  In the event 
+of cancellation or lapse of or prohibited change in any Policy, Purchaser shall have the right to suspend provision of the Work by 
+Supplier until the Policy and certificates in evidence thereof are reinstated or arrangements acceptable to Purchaser are made 
+pending issuance of new Policies and certificates.  If any Policy shall be about to lapse or be canceled, Supplier shall, obtain a new 
+Policy with like coverage, and if Supplier fails to do so, Purchaser may terminate the Agreement.
+D. Waiver of Subrogation.  Supplier hereby waives (and any of its subcontractors shall waive) any rights of subrogation they or any of 
+their insurers may have against Purchaser, and each non-affiliated company disclosed in the Agreement, their respective agents or 
+employees.
+ARTICLE 10 – ENCUMBRANCES
+Supplier shall neither file (nor cause or permit to be filed) any lien or encumbrance with respect to the Work and hereby waives any right 
+to file (or cause to be filed) such lien or encumbrance.  Supplier, in each of its subcontracts and agreements with suppliers related to the 
+Work, shall require all subcontractors and suppliers to expressly waive their rights to file liens and shall provide Purchaser with copies of 
+such waivers.
+ARTICLE 11 – TERMINATION OR SUSPENSION
+A. Events of Default; Termination for Cause. If Supplier: (1) fails to comply with applicable laws and ordinances; or (2) assigns or 
+subcontracts its obligations under the Agreement or any part hereof without Purchaser’s prior written consent; or (3) otherwise fails 
+or refuses to perform its obligations under the Agreement in any respect; or (4) fails to provide Purchaser, upon request with adequate 
+assurance of future performance of the Agreement; or (5) becomes insolvent or makes a general assignment for the benefit of 
+creditors or admits in writing its inability to pay debts as they mature or if a trustee or receiver of Supplier or of any substantial part 
+of Supplier’s assets is appointed by any court or proceedings instituted under any provisions of the Federal Bankruptcy Code or any 
+state insolvency law by or against Supplier are acquiesced in or are not dismissed within thirty (30) days or result in an adjudication 
+in bankruptcy or insolvency; or (6) unnecessarily delays the Work or any part thereof; or (7) fails to perform the Work in accordance 
+with the acceptable practices and customary diligence of the profession or industry of which Supplier is a member or in a timely way; 
+or (8) engages in conduct that violates FirstEnergy’s Supplier Code of Conduct (defined below), including but not limited to Supplier’s 
+obligation to promptly notify Purchaser of any potential compliance or ethics concerns; then Purchaser may terminate the Agreement 
+immediately or cancel any remaining portion of the Work (and Purchaser’s corresponding obligations) and/or pursue any further 
+remedies available at law or in equity.  Notice of termination shall be in writing and shall be effective upon receipt thereof.   Upon a 
+final determination by a court of competent jurisdiction that a termination pursuant to this Article 11(A) was improper, the termination 
+shall be deemed a termination for convenience pursuant to Article 11(B).
+B. Termination or Suspension for Convenience.   Purchaser may, at any time without cause and for its own convenience, terminate or 
+suspend the Agreement, or from time to time, cancel any portion of the Work (and Purchaser’s corresponding obligations) by giving 
+Supplier written notice. Upon receiving a notice of termination, suspension or cancellation and (except as otherwise directed by 
+Purchaser) Supplier shall: (1) stop all efforts under the Agreement related to the affected Work; and (2) place no further orders or 
+subcontracts related to the affected Work; and (3) take all actions necessary (or as directed by Purchaser) to protect and preserve the 
+Work; and (4) Supplier shall return all equipment, supplies, identification cards, etc. to Purchaser (collectively “Cessation Actions”).   
+Purchaser shall pay Supplier its actual, necessary, reasonable, and verifiable expenses as a direct consequence of such termination, 
+suspension, or cancellation. Supplier shall furnish all necessary documentation to substantiate such expenses to Purchaser's 
+satisfaction. Purchaser shall be entitled to the Work for which Purchaser has paid or, at Purchaser's option, Supplier shall attempt to 
+liquidate the same, and Purchaser shall be entitled to the benefits of any value received.  Supplier shall make every reasonable effort 
+to mitigate costs.  Purchaser shall not be liable for lost profit, anticipated profit or unabsorbed indirect costs or overhead on the 
+terminated or cancelled Work. Purchaser's liability for termination expenses shall not exceed, in any event, the unpaid balance of the 
+Page 7 of 14DocuSign Envelope ID: 8A8F744B-7C25-49FA-AC53-A33898B63085
+
+MSA PRO/CNSLT REV 0 (FE LEGAL 08-07-2023)	Page 8 of 14
+contract price.  The compensation described in this Article 11(B) shall be Supplier’s sole and exclusive compensation and remedy if 
+the Agreement is terminated, suspended or cancelled for convenience.
+C. Return of Pre-Paid Funds.  Upon termination of the Agreement under this Article 11 for cause or convenience, Supplier shall return 
+all pre-paid funds received from Purchaser to which Supplier is not entitled.
+ARTICLE 12– CHANGES TO SCOPE OF WORK
+Purchaser may at any time, by written notice, make changes altering, adding to, or reducing the scope of the Work, or changing the 
+Statement of Work, Specifications, packing and shipping instructions, time and/or place of delivery, quantities, sequencing, or accelerating 
+the Work under the Agreement (“Change Order”).  Supplier’s performance of additional Work as related to the changes shall in no way be 
+a basis of claims involving loss of efficiency on any Work performed or to be performed under the Agreement. Performance of additional 
+Work shall not be a basis for schedule extensions unless such extensions are agreed upon at the time of award of the additional Work.  
+Such changes shall be initiated by written order of Purchaser and Supplier shall submit the proposed cost or credit to Purchaser for any 
+changes in the Work within fifteen (15) business days after receipt of the written order for Purchaser’s approval.  No change to the cost or 
+schedule of the Work shall be binding upon Purchaser without Purchaser’s written approval.  Supplier shall be paid for any additional 
+Work by an amount to be determined, at Purchaser’s option, by (a) unit prices, (b) lump sums, or (c) other methods of reimbursement, in 
+each case as designated in the Agreement, or as subsequently agreed upon in writing.
+ARTICLE 13 – COMPLIANCE WITH LAWS, REGULATIONS, AND PERMITS
+A. During the performance of the Agreement, Supplier shall strictly comply with all federal, state and local laws, rules or regulations and 
+executive orders applicable to the Work.  
+B. Without limiting the foregoing, and unless exempted under the rules, regulations and relevant orders (41 CFR Chapter 60) of the U.S. 
+Secretary of Labor, in connection with the Work, Supplier agrees as follows: 
+1. Supplier shall not discriminate against any employee or applicant for employment because of race, color, religion, gender, 
+national origin, age or disability. Supplier shall take affirmative action to ensure that applicants are employed, and that 
+employees are treated during employment, without regard to their race, color, religion, gender, national origin, age or disability.  
+Such action shall include, but not be limited to, employment, upgrading, demotion or transfer; recruitment or recruitment 
+advertising; layoff or termination; rates of pay or other forms of compensation; and selection for training, including 
+apprenticeship.  Supplier shall post in conspicuous places, available to employees and applicants for employment, notices to be 
+provided by the U.S. Department of Labor setting forth the provisions of this nondiscrimination clause.
+2. Supplier shall state, in all solicitations or advertisements for employees placed by or on its behalf, that all qualified applicants will 
+receive consideration for employment without regard to race, color, religion, gender, national origin, age or disability.
+3. Supplier shall send to each labor union or representative of workers with which it has a collective bargaining agreement, contract 
+or understanding, a notice to be provided by the U.S. Department of Labor, advising the labor union or workers’ representative 
+of Supplier’s commitments under the following provisions, as amended from time to time:
+a. Section 202 of Executive Order 11246 (Equal Opportunity);
+b. Executive Order 11701 (Employment of Veterans);
+c. Executive Order 11758 (Employment of the Handicapped);
+d. Executive Order 11141 (Employment Discrimination Because of Age);
+e. Executive Order 11625 and Public Law 95-507 (Utilization of Disadvantaged Business Enterprises); and
+f. Executive Order 13496 (Employee Rights Under the National Labor Relations Act) and shall post copies thereof in 
+conspicuous places available to employees and applicants for employment.  
+4. Supplier and its subcontractors shall abide by the requirements of 41 CFR 60-300.5(a), which prohibits discrimination 
+against qualified protected veterans and requires affirmative action by covered prime contractors and subcontractors to employ 
+and advance in employment qualified protected veterans.  
+5. Supplier and its subcontractors shall abide by the requirements of 41 CFR 60-741.5(a), which prohibits discrimination 
+against qualified individuals on the basis of disability and requires affirmative action by covered prime contractors and 
+subcontractors to employ and advance in employment qualified individuals with disabilities.
+C. If this Agreement is a subcontract under a government contract or a federally-funded project, Supplier shall comply with 
+subcontractor flow-down requirements under the Federal Acquisition Regulations (48 CFR Chapter 1), as amended from time to time, 
+which are specified in supplemental terms to this Agreement.
+D. If applicable, Supplier shall comply with the Department of Commerce Export Administration Regulations (“”) in 15 CFR Chapter 
+VII, subchapter C, including 15 CFR Section 734.2 which prohibits the export or release of controlled technology and/or software to 
+foreign nationals within the United States who are not lawfully admitted to the United States for permanent residence.  Supplier shall 
+Page 8 of 14DocuSign Envelope ID: 8A8F744B-7C25-49FA-AC53-A33898B63085
+
+MSA PRO/CNSLT REV 0 (FE LEGAL 08-07-2023)	Page 9 of 14
+confirm that these regulations either do not apply to Supplier’s activities under the terms of the Agreement or that Supplier has 
+procedures to ensure compliance.  If Supplier is directly or indirectly employing a foreign national not currently lawfully admitted to 
+the United States for permanent residence to perform Work under the Agreement, Supplier warrants to Purchaser that such 
+employment does not violate the foregoing regulations.
+E. Foreign Corrupt Practices Act (“FCPA”).  The following provisions shall apply to Supplier (unless it is a foreign concern) if it performs 
+or obtains any of the Work in a foreign country:
+1. All payments to Supplier shall be by check or bank transfer only.  No payment shall be in cash or by bearer instrument and no 
+payment shall be made to any corporation or person other than Supplier.  All payments due hereunder shall be made to Supplier 
+at its principal place of business in the United States, even if Supplier performs or obtains the Work in a foreign country.
+2. Supplier represents that it is familiar with the FCPA and its purposes; and that, in particular, it is familiar with the prohibition 
+against paying or giving of anything of value, either directly or indirectly, by an American company to an official of a foreign 
+government for the purpose of influencing an act or decision in his official capacity, or inducing him to use his influence with that 
+government, to assist a company in obtaining or retaining business for or with, or directing business to, any person.
+3. Supplier represents that none of its partners, purchasers, principals, and staff members are officials, officers, or representatives 
+of any government or political party or candidates for political office.  Supplier shall not use any part of its compensation for any 
+purpose and shall take no action that would constitute a violation of any law of the United States (including the FCPA) or of any 
+jurisdiction where it performs services or manufactures or sells goods.  Purchaser represents that it does not desire and will not 
+knowingly request any Work by Supplier that would or might constitute any such violation.
+4. Purchaser may terminate the Agreement for default at any time, without any liability or obligation, if it believes, in good faith, 
+that Supplier has violated this Article.  Any action by Supplier which would or might constitute a violation of the FCPA, or a request 
+for such action from Supplier’s representative, shall result in immediate termination of the Agreement for default. Should 
+Supplier ever receive, directly or indirectly, from any Purchaser representative a request that Supplier believes will or might 
+violate the FCPA, Supplier shall immediately notify Purchaser’s general counsel.
+5. Purchaser may disclose the existence and terms of the Agreement, including the compensation provisions, at any time, for any 
+reason and to whomever Purchaser’s general counsel determines has a legitimate need to know the same including, without 
+limitation, the United States government, the government of any country where the Work is performed or obtained, and any 
+regulatory agency with jurisdiction over Purchaser.
+F. Government Authorizations.  Unless the Agreement otherwise provides, Supplier shall, at its own expense, obtain from appropriate 
+governmental authorities all permits, inspections and licenses which are required for the Work and comply with all rules and 
+regulations of insurance companies that have insured Supplier in any way related to the Work.
+G. Any costs, fines, penalties, awards, damages, or other liabilities associated with any violations of this Article shall be borne and paid 
+by Supplier.
+H. Information Assets Access.  If Supplier’s employees are given access to Purchaser’s information and control systems, Supplier and 
+such employees shall agree to and comply with FirstEnergy’s Information Assets Access Agreement 
+https://www.firstenergycorp.com/supplychain.html) governing Supplier’s and such employees’ use of such systems.  
+I. Information Security.  If applicable to its performance of the Work, Supplier shall be subject to the following:
+1. Supplier Requirements: Without limiting Supplier’s confidentiality obligations under the Agreement, Supplier shall be responsible 
+for establishing and maintaining an information security program (including any relevant subcontractors) that is designed to: (i) 
+ensure the security and confidentiality of Purchaser’s Data; and (ii) protect against any threats or hazards to the security or 
+integrity of Purchaser’s Data; and (iii) protect against unauthorized access to or use of Purchaser’s Data; and (iv) ensure the proper 
+deletion of Purchaser’s Data; and (v) ensure that all Supplier’s subcontractors, if any, comply with the foregoing.  If Supplier’s 
+information security system is breached, Supplier must timely notify Purchaser of such breach via e-mail and phone call.   The 
+minimum information security requirements are incorporated into this Agreement as “FirstEnergy Security Requirements for 
+External System &  Service Providers” 	https://www.firstenergycorp.com/supplychain.html) 
+of Supplier in its performance of the Work. 
+2.    Right to Audit.  Supplier’s information security program will be subject to periodic review, as requested by Purchaser.  Supplier 
+shall notify Purchaser of any modification to the information security program (including modifications made by subcontractors) 
+for Purchaser’s review and implement any safeguards required by Purchaser.   
+3. Third-Party Audit.  No less than annually, Supplier shall conduct an independent third-party audit of its information security 
+program and provide such audit results to Purchaser.  Supplier shall implement any required safeguards as identified by such 
+information security program audit.  
+Page 9 of 14DocuSign Envelope ID: 8A8F744B-7C25-49FA-AC53-A33898B63085
+
+MSA PRO/CNSLT REV 0 (FE LEGAL 08-07-2023)	Page 10 of 14
+J. Codes of Conduct. Supplier shall comply with all requirements of FirstEnergy’s Supplier Code of Conduct: The Power of 
+Collaboration (located at: https://www.firstenergycorp.com/supplychain.html) 
+governmental regulatory codes of conduct applicable to the Work.
+K. NERC CIP Requirements.  The following obligations shall apply to each Supplier employee who is authorized as part of the Work to 
+have either electronic or unescorted physical access to Bulk Electric Systems (“BES”) Cyber Systems (which Purchaser shall from time 
+to time identify for Supplier) (“”).  Upon request from Purchaser, at any time prior to the start of or during the Work, 
+Supplier shall:
+(a) provide direct evidence (i.e. the actual search criteria and results) verifying that no CIP Employee possesses a criminal 
+conviction; and 
+(b) certify that each CIP Employee has completed the training necessary to achieve the North American Electric Reliability 
+Corporation (“NERCCIP”) certification.  (If required, Purchaser shall provide and pay for 
+the training to achieve NERC CIP certification). 
+Pursuant to a NERC CIP compliant documented personnel risk assessment and training program, Supplier shall provide such evidence 
+and certification confirming that each CIP Employee:
+(y) has either: (i) within the past seven (7) years, submitted to a background check consisting of at a minimum an identity 
+verification (e.g. Security Number verification in the U.S.) and a seven (7) year criminal check that revealed no evidence of a 
+criminal conviction; or (ii) has been subject to a similar seven-year cycle recheck; and
+(z) has received the Purchaser-sponsored Security Awareness training or will receive such training prior to accessing BES Cyber 
+Systems. 
+Supplier shall inform Purchaser immediately, but no later than four (4) hours after actual knowledge, via email and phone call, if 
+Supplier’s employee having authorized electronic or authorized unescorted physical access to BES Cyber Systems is terminated or 
+when the access rights of a Supplier’s employee to BES Cyber Systems needs to be changed or revoked. Supplier agrees to adhere to 
+current and future NERC CIP compliance regulations applicable to the Work and as required by Purchaser.
+L. Gifts and Gratuities/Conflicts of Interest. Purchaser’s employees are subject to conflicts of interest and gifts and gratuities policies, 
+which generally prohibit such employees and/or their family members from giving or receiving gifts, favors, services, or privileges 
+(including travel and entertainment, and discounts that would not be available to the general public) from existing or potential 
+customers, suppliers, or contractors that: (1) have more than a nominal value; or (2) exceed the level of standard business courtesies; 
+or (3) the acceptance of cash, gift certificates, or loans in any amount.  The conflicts of interest policy generally prohibits Purchaser’s 
+employees and/or their family members from serving as an officer, director, employee, supplier, agent of, or owning any beneficial 
+interest in, an organization having a business relationship with Purchaser as a supplier or contractor, if the employee is in a position 
+to influence decisions concerning the relationship.  The entire text of these policies may be found within FirstEnergy’s Supply Chain 
+Section at https://www.firstenergycorp.com/supplychain.html. Supplier and prospective suppliers to Purchaser are expected to be 
+aware of these policies in their dealings with Purchaser’s employees and their family members. Any suspected or actual violations of 
+these policies should be reported; and, may be reported anonymously and confidentially by a customer, supplier, contractor, or 
+employee by calling FirstEnergy’s Employee Concerns Line (1-800-683-3625), 24 hours a day, 7 days a week.
+M. Conflict Minerals.  For purposes of this Agreement, “Conflict Minerals” means any cassiterite, columbite-tantalite, gold, wolframite, 
+or the derivatives tantalum, tin, or tungsten and any other mineral or its derivatives determined by the U.S. Secretary of State pursuant 
+to Section 13p of the Securities and Exchange Act of 1934 to be financing conflict in the Democratic Republic of Congo (“DRC”) or any 
+country that shares an internationally recognized border with the DRC (collectively, and together with the DRC, the “Conflict Region
+With respect to any deliverable Purchaser reasonably determines has been or will be “contracted to be manufactured” or incorporated 
+into a product “manufactured” by Purchaser, in each case, as contemplated by Section 1502 of the Dodd-Frank Wall Street Reform 
+and Consumer Protection Act (the “Act”), and could contain Conflict Minerals:
+1. Supplier shall disclose to Purchaser, in writing, whether such Work does contain Conflict Minerals and, if so, the type(s) of Conflict 
+Mineral(s) the Work contains;
+2. Supplier hereby represents to Purchaser that any such Conflict Minerals did not originate in the Conflict Region or, in the 
+alternative, such Work is “DRC conflict free” as defined in the Act and the implementing regulations; and
+3. Supplier shall comply with, and support Purchaser’s efforts to comply with, the Act and its implementing regulations (including, 
+without limitation, the Act’s due diligence and reporting requirements), regardless of whether Supplier is a covered issuer under 
+the Act, and comply with Purchaser’s Conflict Minerals Policy.
+Purchaser may terminate this Agreement for default at any time, without any liability or obligation, if it believes, in good faith, that 
+Supplier has violated this Article 13(M).
+N. Identity Theft.  Supplier agrees to perform all duties contemplated herein consistent with reasonable policies, procedures and related 
+controls that are designed to detect, prevent and mitigate the risk of identity theft, and to take appropriate steps to prevent, or 
+Page 10 of 14DocuSign Envelope ID: 8A8F744B-7C25-49FA-AC53-A33898B63085
+
+MSA PRO/CNSLT REV 0 (FE LEGAL 08-07-2023)	Page 11 of 14
+mitigate the same if any such events occur.  The need for this contractual provision is based on the Identity Theft Red Flags Rule 
+promulgated under the Fair and Accurate Credit Transactions Act of 2003, which provides in pertinent part at 16 CFR Part 681 
+Attachment A VI (C):  A financial institution or creditor should take steps to ensure that the activity of the service provider is conducted 
+in accordance with reasonable policies and procedures designed to detect, prevent and mitigate the risk of identity theft. 
+O. Prevailing Wage. Supplier shall be responsible for determining whether any federal, state, county or municipal prevailing wage law 
+applies to this Agreement, and if one does apply, then Supplier shall comply with the law, as amended, and shall be responsible for 
+all computations related thereto.  Further, Supplier will indemnify Purchaser for any claims arising from Supplier’s failure to comply 
+with this obligation.
+ 
+ARTICLE 14 – LIMITATION OF LIABILITY/DAMAGES
+Except as otherwise expressly provided under this Agreement, under no circumstances shall Purchaser, its parent, subsidiaries, and 
+affiliates, be liable for any incidental, indirect, special, punitive or consequential damages (including anticipated profits or revenues).
+ARTICLE 15 – AUTHORITY OF AGENT
+A. Authority of Agent.  Agent is wholly authorized to perform any action, as agent and representative of Purchaser, included in, related 
+to, or necessary to carry out the provisions of this Agreement, including any Purchase Order, Statement of Work, or Change Order 
+issued hereunder.
+B. Liability of Agent.  Notwithstanding the Agent’s authority described herein, the Agent is not, nor shall it be construed to be, a party to 
+the Agreement or to any Purchase Order, Statement of Work, or Change Order governed thereby.  Under no circumstances shall 
+Agent be liable for any obligations of Purchaser hereunder or for any incidental, indirect, special, punitive, or consequential damages 
+(including anticipated profits or revenues) for any controversy or dispute arising out of, related to, or touching in any way this 
+Agreement or any agreement related hereto. 
+ARTICLE 16 - PROHIBITION OF PUBLICITY
+Supplier shall not refer to the Agreement or reference Purchaser, its parent, subsidiaries and affiliates, directly or indirectly, in its 
+advertising or promotional materials, or in any form of so called “social media” without Purchaser’s prior express written consent. 
+ARTICLE 17 - CONFIDENTIALITY
+A. Supplier acknowledges that in the course of performing under the Agreement it may have access to and/or be in possession of 
+Purchaser’s Confidential Information. “Confidential Information
+devices, concepts, inventions, designs, drawings, methods, techniques, computer software, screens, user interfaces, system designs 
+and documentation, marketing and commercial strategies, information concerning Purchaser’s or any of its affiliates’ employees, 
+customers, or suppliers, processes, data concepts, know-how, and unique combinations of separate items that individually may or 
+may not be confidential, which information is not generally known to the public and either derives economic value (actual or potential) 
+from not being generally known or has a character such that Purchaser or any of its affiliates has an interest in maintaining its secrecy.  
+Supplier shall hold in confidence, in the same manner as it holds its own Confidential Information, all Purchaser’s Confidential 
+Information to which it may have access pursuant to the Agreement. Supplier shall not use Purchaser’s Confidential Information for 
+any purpose other than performance of the Work.  Access to Purchaser’s Confidential Information shall be restricted to Supplier’s 
+employees with a need to know such information in connection with the Work and as set forth in the Information Assets Access 
+Agreement.  Supplier shall return Data and Confidential Information to Purchaser upon completion of performance of the Agreement.
+B. Supplier shall not use or disclose Confidential Information for any reason or purpose without the prior written consent of the 
+Purchaser. Supplier may use Confidential Information for the sole purpose of the performance of the Agreement for the benefit of 
+the Purchaser. Supplier will take all precautions and actions to prevent sale, transfer, sublicense, use or disclosure of Confidential 
+Information to any third party.
+C. The restrictions set forth in this Article shall not apply to information that: (1) is or has become generally known to, or readily 
+ascertainable by, the public without fault or omission of the Supplier or its employees, subcontractors, or agents; or (2) was already 
+known to Supplier prior to the first disclosure of such information to Supplier by Purchaser; or (3) was received by Supplier without 
+restrictions as to its use from a third party who is lawfully in possession and not restricted as to the use thereof; or (4) is required to 
+be disclosed by law or by order of a court of competent jurisdiction; or (5) was independently developed by Supplier through persons 
+who have not had, either directly or indirectly, access to or knowledge of similar information provided by Purchaser.
+D. If Supplier is requested or required (by interrogatories, governmental request for information, request for production of documents, 
+subpoena, Civil Investigative Demand or similar process, or otherwise required by applicable law) to disclose any Confidential 
+Information of Purchaser, Supplier shall provide Purchaser with prompt notice of such request(s) so Purchaser may seek an 
+Page 11 of 14DocuSign Envelope ID: 8A8F744B-7C25-49FA-AC53-A33898B63085
+
+MSA PRO/CNSLT REV 0 (FE LEGAL 08-07-2023)	Page 12 of 14
+appropriate protective order and Supplier shall use appropriate efforts to limit the disclosure and maintain confidentiality to the 
+maximum extent possible.
+E. If Supplier breaches or threatens to breach this Article, the parties acknowledge that there may exist no adequate remedy at law, and 
+hereby agree that Purchaser shall have the right to seek temporary and permanent injunctive relief to restrain a violation of this 
+Article, without the necessity of posting a bond.  Purchaser’s right to injunctive relief shall be cumulative and in addition to its right to 
+seek and obtain other remedies, including monetary damages.
+F. Supplier shall incorporate the above provisions in all agreements with its subcontractors, agents, and assigns.
+ARTICLE 18 – PERSONALLY IDENTIFIABLE INFORMATION (PII)
+A. “Personally Identifiable Information” (PII) means any information that identifies, relates to, describes, is reasonably capable of being 
+associated with a particular individual or household, that is processed by Supplier pursuant to this Agreement, and that is deemed 
+“personal data,” “personal information,” or the like under the Data Protection Laws. 
+B. Data Protection Laws” means all applicable international, federal, state, provincial, and local laws, rules, regulations, directives, 
+requirements, codes and industry standards and guidelines, relating to the privacy, confidentiality, integrity, protection, or security of 
+PII.
+C. Any PII disclosed to Supplier or with which Supplier otherwise comes in contact while, as applicable, providing the Work will be deemed 
+to be Confidential Information, regardless of whether it is labeled or designated as such. Supplier shall not: (i) use PII for any purpose 
+other than as reasonably necessary to fulfill the terms of the Agreement; or (ii) make PII available to any employees, agents, 
+subcontractors, or other party representatives except those with a need to know.
+D. Supplier shall implement appropriate measures to ensure the security and confidentiality of all PII in its and its subcontractors’ 
+possession, including protecting against any threats or hazards to the security or integrity of the PII that Supplier should reasonably 
+be able to anticipate, and against unauthorized access to or use of the PII.
+E. Notwithstanding any other provisions hereof, Supplier shall notify Purchaser within one (1) business day of becoming aware of any 
+Breach of Security. “Breach of Security” shall mean unauthorized access to, acquisition of, or disclosure of, PII or any individual’s 
+information which was held in the custody or control of Supplier or its subcontractors of any tier, agents or other representatives, or 
+a reasonable belief by either party or its subcontractor of any tier, agent or representative that such unauthorized access, acquisition 
+or disclosure has occurred. Supplier’s notice shall include the following: (i) date and time that Supplier discovered the Breach of 
+Security and the date and time when the breach actually occurred, if discoverable; (ii) a detailed description of the Breach of Security; 
+(iii) a list of the systems and data at risk, including a list of affected individuals; and (iv) a description of actions taken after the Breach 
+of Security was discovered. Thereafter, Supplier shall provide Purchaser with periodic updates describing the investigation into the 
+Breach of Security and all corrective or remedial actions taken or to be taken by Supplier (or any applicable subcontractor).
+F. To the extent that Supplier has PII in their possession, Supplier shall implement a comprehensive written information security 
+program containing organizational, administrative, physical and technical security measures that satisfies all relevant state and 
+federal laws and regulations. Supplier shall allow Purchaser to review Supplier’s comprehensive written information security program 
+as well as any audit reports, summaries of test results, or other documents related to security measures taken by Supplier, and, as 
+deemed necessary by Purchaser, inspect the implementation of associated administrative, physical and technical security measures, 
+as the case may be, to assess whether Supplier’s written information security program complies with information security 
+requirements set forth by regulations. Such inspections will not include: (i) access by Purchaser to Confidential Information of 
+Supplier’s other customers; or (ii) direct access to any Supplier systems.
+G.   Purchaser may, in its sole discretion, take any and all actions necessary or reasonable to respond to a Breach of Security involving PII, 
+including but not limited to conducting an investigation into the cause of the Breach of Security involving PII and notifying affected 
+persons or government agencies accordingly. Supplier shall provide the Purchaser with all information reasonably necessary to: (i) 
+aid Purchaser’s compliance with all federal and state data breach notification laws and any other laws or regulations that may be 
+applicable to a Breach of Security involving PII; and (ii) facilitate Purchaser’s determination of whether the breach was effectively 
+mitigated. Supplier shall bear all costs and expenses incurred by Purchaser related to the Breach of Security of PII and compliance 
+with law. Alternatively, Supplier may take action to remedy the Breach of Security involving PII at Supplier’s sole expense. This may 
+include, for example, sending notice to all individuals affected by the Breach of Security of PII. For the sake of clarity, Purchaser shall 
+make the final decision how and whether to notify third parties of any such Breach of Security, including individuals, law enforcement 
+or governmental authorities, and/or the general public of such Breach of Security. Unless required to do so by applicable law, Supplier 
+agrees that it will not inform any third party of any Breach of Security incident to the extent that it may be associated with or linked 
+to Purchaser without first obtaining Purchaser’s prior written consent, other than to inform a complainant that the matter has been 
+forwarded to Purchaser’s legal counsel.
+Page 12 of 14DocuSign Envelope ID: 8A8F744B-7C25-49FA-AC53-A33898B63085
+
+MSA PRO/CNSLT REV 0 (FE LEGAL 08-07-2023)	Page 13 of 14
+H.   Supplier agrees to defend, indemnify and save the Indemnified Parties harmless from and against any and all Losses incurred as a 
+result of any claim or action brought by any third party related to a Breach of Security to the extent directly and proximately caused 
+by the negligence or willful misconduct of Supplier while engaged in the performance of Work under this Agreement; provided, 
+however, that if there also is fault on the part of an Indemnified Party hereunder or any entity or individual acting on an Indemnified 
+Party’s behalf, the foregoing indemnification shall be on a comparative fault basis.
+ARTICLE 19 - FORCE MAJEURE
+Neither party shall be liable to the other for failure to perform or for delay in performance due to unforeseen causes beyond its reasonable 
+control, and such causes are without the failure or negligence of the affected party.  Such unforeseen causes include, but are not limited 
+to, acts of God, fire, flood, epidemic, pandemic, strike, work stoppage or other labor difficulty, acts of governmental authority, federal, 
+state, or local laws, orders or regulations, embargo, war, terrorist act, riot, civil commotion and/or insurrection, or by any other event or 
+circumstance of whatsoever kind or nature not within the control of the affected party which, by exercise of reasonable diligence such 
+party is unable to prevent, whether or not similar or dissimilar to any of the foregoing class of events or circumstances (“Force Majeure 
+Event”).  For the avoidance of doubt, economic hardship of an affected party shall not be considered a Force Majeure Event.  
+In the event of a Force Majeure Event, the time for performance by the affected party shall be extended by a period of time equal to the 
+time lost by reason thereof.  The affected party will: (a) promptly notify the non-affected party in writing of any causes or circumstances 
+claimed to constitute a Force Majeure Event, the obligations which will be affected by such Force Majeure Event, the measures taken or to 
+be taken to minimize the impact thereof, the schedule upon which such measures will be implemented, the anticipated duration of the 
+failure to perform or delay, and documented evidence supporting the claim; and (b) use reasonable commercial efforts to mitigate the 
+effect of such failure to perform or delay and to remedy the impact on the Work.  The non-affected party will review the claim and advise 
+the affected party in writing of the decision regarding the claim for extension of time for performance of the Agreement.
+ARTICLE 20 – MISCELLANEOUS
+A. Assignment and Subcontractors.
+1. Supplier may not assign any rights or claims, or delegate any duties under the Agreement, in whole or in part, without Purchaser’s 
+prior written consent, which shall not be unreasonably withheld.  In the event of any assignment, subcontracting or delegation 
+permitted hereunder, Supplier shall continue to be liable for the performance of its obligations hereunder.
+2. If Supplier proposes to subcontract any portion of the Work, it shall submit to Purchaser the name of each proposed 
+subcontractor(s) prior to engaging such subcontractor(s), with the proposed portion of the Work and such information about the 
+subcontractor(s) as Purchaser may request.  Purchaser may reject any and all subcontractors at its absolute discretion.  Supplier 
+shall not be relieved of any responsibility or obligations under the Agreement by subcontracting any portion of the Work, whether 
+or not such proposed subcontract is approved by Purchaser.
+3. This Agreement is binding upon and shall inure to the benefit of the parties and their permitted successors and assigns.
+B. Non-Waiver.  The delay or failure of either party to assert or enforce the strict performance of any of the terms of the Agreement or 
+to exercise any rights hereunder, shall not be construed as a waiver or relinquishment to any extent of its rights to assert or rely upon 
+such terms or rights at any later time or on any future occasion. 
+C. Severability.  If any portion of the Agreement is held invalid, the parties agree that such invalidity shall not affect the validity of the 
+remaining portions of the Agreement, and the parties further agree to substitute for the invalid provision, a valid provision that most 
+closely approximates the economic effect and intent of the invalid provision.
+D. Cumulative Rights.  Purchaser’s rights and remedies set forth in the Agreement are cumulative and not exclusive, are in addition to 
+any other rights and remedies provided at law, in equity, or under the Agreement, and may be pursued separately or concurrently as 
+Purchaser determines.
+E. Governing Law, Jurisdiction and Venue.  All matters of dispute between the parties, whether regarding, arising from or relating to the 
+Agreement, or arising from alleged extra-contractual facts prior to, during, or subsequent to, formation of the Agreement including, 
+without limitation, fraud, misrepresentation, negligence or any other alleged tort or violation of contract shall be governed, construed, 
+and enforced in accordance with the laws of the State of Ohio for both substantive and procedural matters (without giving effect to 
+conflict of laws principles) regardless of the theory upon which such matter is asserted. The parties expressly exclude the applicability 
+of the United Nations Convention on Contracts for the International Sale of Goods.  Any legal suit, action, or proceeding regarding, 
+arising from or relating to the Agreement, may be (and, if against Purchaser, must exclusively be) instituted in a state or federal court 
+in Summit County, Ohio.  Supplier waives any objection it may have now or hereafter regarding the jurisdiction or venue of any such 
+suit, action or proceeding and hereby irrevocably submits to the jurisdiction of any such court in any such suit, action or proceeding.
+Page 13 of 14DocuSign Envelope ID: 8A8F744B-7C25-49FA-AC53-A33898B63085
+
+MSA PRO/CNSLT REV 0 (FE LEGAL 08-07-2023)	Page 14 of 14
+F. Interpretation.  The following principles of interpretation shall apply to the Agreement:  (1) paragraph headings and captions are 
+inserted for convenience only and shall not constitute a part of the Agreement and shall not be considered in construing intent, 
+meaning, content or construction; (2) neither Purchaser nor Supplier shall be considered to be the party responsible for drafting any 
+particular provision of the Agreement; (3) the words “hereof,” “herein,” “hereunder,” and words of similar import shall refer to the 
+Agreement as a whole and not to any particular provision hereof; (4) the word “including” means “including, but not limited to” and 
+shall be interpreted as broadly as possible; (5) words in the singular include the plural and vice versa; (6) all references to "days" shall 
+be calendar days (and not merely business days, unless the Agreement so states); (7) any provision hereof that is prohibited or 
+unenforceable shall, as to such jurisdiction, be ineffective to the extent of such prohibition or unenforceability without invalidating 
+the remaining provisions hereof or affecting the validity or enforceability of such provision in any other jurisdiction and the prohibited 
+or unenforceable provision shall be reformed or modified to reflect the parties' intent to the maximum extent permitted by applicable 
+legal requirements; and (8) if any conflict arises between a term defined in this document and a term (defined or otherwise) contained 
+in another document comprising a part of the Agreement, the conflict shall be resolved in favor of the more specific defined term 
+unless the context clearly indicates otherwise.
+G. Execution and Counterparts.  This Agreement may be executed in counterparts, all of which shall be considered one and the same 
+agreement.  Delivery of a copy of this Agreement by facsimile transmission, by electronic mail in “portable document format” (“pdf”) 
+form, or by any other electronic means intended to preserve the original graphic and pictorial appearance of a document, shall have 
+the same effect as physical delivery of the paper document bearing the original signature.
+IN WITNESS WHEREOF, the Purchaser and Supplier hereto have executed this Agreement, by their duly authorized agents.
+AGENT FOR PURCHASER SUPPLIER
+FirstEnergy Service Company COMMUNITY ACTION COMMITTEE OF THE LEHIGH VALLEY
+______________________________________________ ___________________________________________
+Name: ________________________________________ Name: ______________________________________
+Title: __________________________________________ Title: _______________________________________
+Page 14 of 14DocuSign Envelope ID: 8A8F744B-7C25-49FA-AC53-A33898B63085
+Supply Chain Category Specialist
+D. Ritchie
+Deputy Executive Director, Operations
+Jessica Reimert
+--------------------
+Attached Document: 6650966adadef_2024WX_First-Energy-SUbcontracting-Plan-and-Confidentiality-Agreement.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 66bcb23fbc1b6_Confidentiality_Agreement-FE_RFP_CACLV_932044-(1).pdf
+8/14/2024 | 9:13:45 AM EDT
+Supply Chain Category Specialist
+--------------------

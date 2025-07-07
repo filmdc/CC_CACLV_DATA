@@ -1,0 +1,349 @@
+Purpose: <p>SHFB has been awarded a $100,000.00 grant from the AllOne Foundation to increase access to nutritious foods for the people of Carbon, Monroe, Pike, and Wayne Counties.</p><p>Grant period starts Dec 18, 2023 and ends Dec 17, 2024.</p><p>A full and complete narrative and financial report to the Foundation at the mid-project date as stated in the proposal as well as 30 days following the conclusion of the grant period. Information on submitting the report will be emailed to planner-SHFB@caclv.org.</p><p>Proposed budget is below:</p><figure class="image"><img src="http://10.55.0.10/storage/1305/image.png" alt=""></figure>
+Funder: AllOne Foundation
+Program: SHFB
+Amount: 100000.00
+Start Date: 2023-12-18
+End Date: 2024-12-17
+
+Notes: 
+
+Fund Number: F8064
+
+Attached Document: 658ec5fa4cf68_AOF-Agreement-Template-Second-Harvest-Food-Bank-11-21-23.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 658ec6567fa77_AllOneFoundation-2024-proposal.pdf
+1 
+ 
+AllOne Foundation Application 
+Due 11/1 
+https://formstack.io/90299  
+ 
+First Name 
+Allison 
+Last Name 
+Czapp 
+Work Email 
+aczapp@caclv.org 
+Phone 
+484-287-4015 
+Mailing Street 
+6969 Silver Crest Road 
+Mailing City 
+Nazareth 
+Mailing State 
+PA 
+Mailing Zip Code 
+18064 
+EIN # of tax exemption designation under Section 501(c)(3 
+23-1669589 
+Other Grant Contact Name 
+Allison Czapp 
+Other Grant Contact Title 
+Associate Executive Director 
+Other Grant Contact Email 
+Planner-shfb@caclv.org 
+Other Grant Contact Phone
+
+2 
+ 
+484-287-4015 
+Total Requested Amount 
+$110,000 
+ 
+Name of Project/Program 
+Second Harvest Food Bank – Nutritious Food Distribution 
+ 
+Impact Area - please check all that apply 
+Behavioral & Mental Health  
+Women & Children 
+Autism 
+Opioid Solutions 
+Food Security 
+ 
+Brief description for which funding is being requested. 
+Second Harvest Food Bank requests funding to support the purchase, storage, and distribution of 
+nutritious foods to our network of food pantries within Carbon, Monroe, Pike, and Wayne Counties.  
+ 
+Briefly summarize the mission of your organization. 
+The mission of Second Harvest Food Bank of the Lehigh Valley and Northeast Pennsylvania is to obtain 
+food and distribute it to people in need through area non-profits and to provide resources for education 
+and advocacy to end hunger. We provide nutritious food, offer nutrition education, advocate to end 
+food insecurity, dismantle barriers to create access, and work to attain food justice. We respect and 
+preserve the dignity of each of our neighbors.  
+Second Harvest Food Bank serves Lehigh, Northampton, Carbon, Monroe, Pike, and Wayne counties. 
+Last year, Second Harvest distributed 14.7 million pounds of food to our network of 200+ nonprofit 
+agencies (food pantries, schools, meal centers, shelters, childcare agencies, senior centers), a 44% 
+increase from the previous year. Included in this total is 6.7 million pounds of fresh produce, perishable 
+protein, and fresh dairy products (46% of total distribution). Annually, we rescue more than 8 million 
+pounds of food from ending up in a landfill.
+
+3 
+ 
+On average, the Second Harvest network serves more than 87,000 people each month - a 52% increase 
+from last year. The pantries within the Second Harvest network are operated almost solely through the 
+work of community volunteers. Our food distribution is a model of neighbors helping neighbors. 
+Second Harvest is a program of Community Action Lehigh Valley and a member of Feeding America. 
+ 
+Narrative of the Project/Program (Max 2,000 words) 
+Second Harvest Food Bank will increase access to nutritious foods for the people of Carbon, Monroe, Pike, 
+and Wayne counties.  
+Many people in Northeast Pennsylvania are struggling. According to Feeding America hunger statistics, 
+there are 31,860 people facing food insecurity across the counties of Carbon, Monroe, Pike, and Wayne – 
+representing 9.2% of the population. Inflation continues to have an impact and is exacerbated by the 
+affordable housing crisis affecting our region. As neighbors look to stretch every dollar of their food 
+budget, nutritious foods are often priced out. It is our continued mission, through partnerships with 
+organizations like the AllOne Foundation, to not only increase the amount of food available to our 
+communities but to improve the quality of that food.  
+Last year, we distributed a total of 5.7 million pounds of food to agencies in Carbon, Monroe, Pike, and 
+Wayne counties, including 3.4 million pounds (59%) of nutritious “Foods to Encourage” (F2E). Feeding 
+America developed the F2E framework to align with recommendations from USDA's MyPlate and Dietary 
+Guidelines for Americans. The framework promotes the consumption of fruits, vegetables, lean protein, 
+whole grains, and low-fat dairy products. 
+To increase our distribution of fresh and nutritious foods, and as part of our larger nutrition strategy, we 
+developed and implemented a Food and Nutrition Policy based on Healthy Eating Research (HER) 
+guidelines (which were created in partnership between the Robert Wood Johnson Foundation, Duke 
+University, and the charitable food network). Our Nutrition Policy prioritizes and deprioritizes food by 
+categorizing them as “choose often”, “choose sometimes”, and “choose rarely”. “Choose often” foods 
+coincide with Feeding America’s Foods to Encourage. Our Nutrition Policy informs all aspects of our food 
+sourcing and distribution strategies.  
+Because research shows that nutrition education is a critical component in changing food purchasing 
+and eating behaviors in people with lower-incomes, we implement our Healthy Pantry Initiative (HPI) in 
+tandem with our Nutrition Policy. HPI is a program of Feeding Pennsylvania that works to encourage 
+pantry customers to choose healthier food items. Second Harvest’s Nutrition Educator / Healthy Pantry 
+Coordinator works intimately with pantry directors and volunteers to help them create pantry spaces 
+that are client-centered and promote the consumption of healthy foods. Our Nutrition Educator also 
+works closely with pantry participants to ensure that the foods available to take home are prepared and 
+consumed in healthy ways. Our Nutrition Educator coordinates taste-testing events, cooking 
+demonstrations, and provides educational materials and recipes cards. Currently, our cohort of 16 HPI 
+sites includes 6 sites within Carbon, Monroe, Pike, and Wayne counties. After about one and a half to 
+two years in the program, pantry sites move into a maintenance phase, remaining in the program to 
+receive support and access to nutrition education. As pantries move through into the maintenance
+
+4 
+ 
+phase, staff capacity frees up, and new pantries are introduced. Second Harvest has plans to onboard 
+additional agencies within our northern tier.  
+It is our mission to provide access to food to the increasing number of individuals and families facing 
+food insecurity, with a distinct focus on fresh and healthy options. We are strengthening our community 
+through equitable food access. We are currently working to shore up our pantry network to ensure 
+sustainability and expand capacity. One particular project includes providing wide support and 
+attention, including identifying funding opportunities, grant-writing, infrastructure needs, staff training 
+and succession planning assistance, to a Second Harvest member agency in Carbon County, as they 
+purchase a new site and complete extensive renovations, to create a pantry, congregate meal site, and 
+community center with wrap-around services all under one roof. This project will provide much needed 
+resources to the residents of Lansford Borough and the surrounding area.  
+As part of this deeper work in the community, to identify additional areas that need more focused 
+attention, we are eagerly collaborating with the Commission on Economic Opportunity’s (CEO) 
+Weinberg Northeast Regional Food Bank and Central Pennsylvania Food Bank. The collective impact 
+work will leverage the strengths of each food bank while enabling learning and sharing of information, 
+best proactive models, and resources to close the meal gap in this region of the Commonwealth. 
+CEO/Weinberg is contracting with The Institute, a data analysis, research, and consulting organization 
+with offices in Scranton and Wilkes-Barre, to conduct an environmental scan of the charitable food 
+assistance programs across the region.  This full-scale scan will identify food pantries, youth and senior 
+feeding programs, congregant meal sites, and will result in a zip code-level mapping of the entire 
+charitable food system.   
+This work will provide collaborative data that identifies gaps in service, duplication of services, and needs 
+within the food-insecure population.  This assessment and planning will include focus groups with people 
+facing food insecurity, visits with school officials and pantries, understanding of state and federal feeding 
+requirements, engagement with the broader community and identification of potential partners. As a 
+result, recommendations will be made, and a strategy developed to implement best practices to close the 
+meal gap.   
+The food resource and infrastructure investments made to our pantry network will ultimately increase 
+access to fresh and nutritious foods for the residents of Carbon, Monroe, Pike, and Wayne counties.  
+ 
+Describe the need, issue, or opportunity that your proposal addresses. 
+Access to nutritious food for under-resourced populations is an immediate need. 
+According to Feeding America’s Map the Meal Gap 2021, the food insecurity rate for Carbon, Monroe, 
+Pike, and Wayne counties is 9.6% (31,860 people). The rate is higher for children, at 13.4%. Populations 
+facing food insecurity are strongly correlated with those that have been impacted by systemic racism and 
+economic exploitation. The food insecurity rate for Carbon, Monroe, Pike, and Wayne counties is higher 
+for Black (12%) and Hispanic (17%) individuals, as compared to their white counterparts (8%).
+
+5 
+ 
+Per U.S. Census data, there are 31,254 people living below the poverty level in Carbon, Monroe, Pike, and 
+Wayne counties, representing 11% of the total population of the area.  
+The current economic climate continues to impact our neighbors. Monthly reports submitted by our 
+partner agencies show that the number of people receiving food in Carbon, Monroe, Pike, and Wayne 
+counties increased by 32% from this same time last year.  
+The Food Research and Action Center’s (FRAC) report titled, Hunger & Health: Impact of Poverty, Food 
+Insecurity, and Poor Nutrition, cites that childhood poverty and socioeconomic inequalities have health 
+implications that carry through into adulthood. For example, lower childhood socioeconomic status is 
+associated with chronic disease, poor mental health, and unfavorable health behaviors in adulthood. 
+Poverty in childhood has been linked to serious, long-term economic consequences, including higher 
+health care expenditures, lower educational achievement, and increased risk of poverty later in life. 
+ 
+Poverty, food insecurity, and poor nutrition have serious consequences for the health and well-being of 
+children and adults, including a greater risk for chronic disease and poor mental health. Beyond the 
+consequences for individuals and families, these consequences also have costly implications for the 
+economy and healthcare system.  
+ 
+To broaden access and opportunity, it is essential that Second Harvest continues to provide nutritious 
+foods to the people facing food insecurity.  
+ 
+ 
+Describe the consumers who will be served. Estimate number served by your proposal, age range, 
+gender, income status, etc. 
+This project will serve under-resourced residents of Carbon, Monroe, Pike, and Wayne counties with 
+incomes equal to or less than 185% of the federal poverty guidelines. The poverty rate for this area is 
+11%, and 17,355 households are receiving SNAP benefits.  
+People who visit food pantries and participate in Second Harvest’s programs are diverse in terms of age, 
+race, and ethnicity. Within Carbon, Monroe, Pike, and Wayne counties, on average, Second Harvest 
+currently serves 25,260 individuals per month, including 7,750 children and 6,200 seniors, through our 
+network of 54 member agencies within the four-county region. This represents a 32% increase in 
+individuals seeking food assistance in just one year.  
+ 
+Provide a numbered listed of intended outcomes. 
+1. Increase distribution of healthy “choose often” foods to agencies in Carbon, Monroe, Pike, and Wayne 
+counties. 
+ 
+Describe the key activities that will achieve those outcomes. 
+Please see attached rubric for detail regarding key activities and outcomes - uploaded into the letters of 
+support section of the application.
+
+6 
+ 
+ 
+Number of Year(s) you will be requesting funding 
+1 
+Provide a timeline of the program/project including beginning and end dates and expected sequence of 
+key activities. 
+Please see attached rubric for detail regarding timeline of activities- uploaded into the letters of support 
+section of the application. 
+ 
+List the name, title, and a brief summary of qualifications of the key personnel responsible. 
+Allison Czapp, Associate Executive Director: Allison oversees all programming and operations of the food 
+bank and each of its programs. Prior to joining the Second Harvest team in March 2022, Allison worked 
+for nine years with Buy Fresh Buy Local Greater Lehigh Valley and was director from 2017-2022. Buy 
+Fresh Buy Local is a national network dedicated to increasing the economic viability of small family farms 
+and strengthening regional food systems. Allison developed strong ties to the local farming community, 
+conducted extensive research on local food systems, and launched Fresh Food Bucks, a SNAP incentives 
+program. She served as Chair of the Lehigh Valley Food Policy Council for three years, and coordinated 
+the Healthy Corner Store Initiative from 2014-2017. Allison holds a BA in Anthropology and Journalism 
+and a Master’s degree in Anthropology with a concentration in Food Studies.  
+Nicole Folino, Community Services Manager: Nicole oversees all programming that involves getting food 
+out to the community including, MilitaryShare, the PA Senior Box Program, Nutrition Education, and 
+SNAP Outreach. She also supervises our Agency Relations Team. Nicole worked as an Agency Relations 
+Coordinator for two years before transitioning to her current role in October 2022.  Prior to her work 
+with Second Harvest, Nicole held various positions in local nonprofits and owned a business in the food 
+industry. Nicole has a BA in English and Public Relations.  
+Bradley Holub, Food Sourcing Coordinator: Bradley is responsible for the acquisition of Second Harvest’s 
+inventory of food. He coordinates with donors and manages the purchasing process, maintaining many 
+funding streams and sources. Bradley joined Second Harvest in November 2021. Prior to working at 
+Second Harvest, he managed a family-owned restaurant. He holds a BA in German and Industrial 
+Organizational Psychology with a minor in Business.  
+ 
+Kimberly Slack, Nutrition Educator and Healthy Pantry Initiative Coordinator: Kim manages Second 
+Harvest Food Bank’s Healthy Pantry Initiative, a program aimed at increasing healthy options available to 
+participants of food pantries. Kim works closely with Second Harvest food pantries to provide support to 
+staff and volunteers and nutrition education to pantry participants. Kim joined the Second Harvest team 
+in January 2023. Kim’s previous work includes healthcare and public education settings in which she 
+worked with vulnerable populations. Kim holds a BS in Clinical Dietetics and Nutrition. 
+Leslie Kemp, Agency Relations Coordinator: Leslie oversees half of the Second Harvest member agency 
+network, providing trainings on food safety, civil rights, and food pantry operations. Leslie works with the 
+network to troubleshoot and find solutions. She holds monthly pantry forums that encourage feedback
+
+7 
+ 
+and information sharing. Leslie joined the team in November 2022 and came into her role with 10+ years 
+working in healthcare settings, where she supported medical staff and worked with patients receiving 
+trauma care. Leslie is currently pursuing a Bachelors in Business Administration and Management.    
+Brandon Campos, Agency Relations Coordinator: Brandon oversees half of the Second Harvest member 
+agency network, providing trainings on food safety, civil rights, and food pantry operations. Brandon 
+works with the network to troubleshoot and find solutions. He holds monthly pantry forums that 
+encourage feedback and information sharing. Brandon joined Second Harvest in June 2020, and before 
+stepping into the role of Agency Relations Coordinator, he held roles as: Warehouse Worker and Driver, 
+Food Sourcing Coordinator, and Retail Recovery Coordinator. Prior to his time at Second Harvest, 
+Brandon worked at a homeless shelter. Brandon holds a BA in History.  
+ 
+Describe all collaborative relationships (financial and programmatic) with other organizations for this 
+project/program.  
+Second Harvest works with an extensive network of partners to distribute food and provide services. We 
+collaborate with 200+ nonprofit agencies, including faith-based organizations, schools, community 
+programs, health organizations, and residential facilities. To procure food, we partner with myriad 
+manufacturers, wholesalers, retail outlets, and local farms.  
+Second Harvest is a member of Feeding America, Feeding Pennsylvania, and Hunger Free PA.  These 
+partnerships bring a network of best practices and expertise to the region.  Some examples of innovative 
+partnerships include: The Mid-Atlantic Regional Cooperative and Fill a Glass with Hope, which are 
+collaborative efforts led by Feeding Pennsylvania - one provides low-cost, high-quality fresh produce and 
+the other, fresh milk.   
+Additionally, we are partnering with CEO/Weinberg and Central Pennsylvania Food Bank to complete 
+the environmental scan. These food banks bring their own vast networks of member and partner food 
+distribution programs.   
+ 
+Are matching corporate or government funds available? Please indicate. 
+The Pennsylvania Agricultural Surplus System (PASS) and USDA’s Local Food Purchase Assistance 
+Cooperative Agreement (LFPA) are government funding sources allocated to food banks for the purpose 
+of purchasing fresh and locally-grown foods. This year, $131,828 in PASS funding and $249,234 in LFPA 
+funding have been allocated to purchase foods for Carbon, Monroe, Pike, and Wayne counties.  
+Additionally, as can been seen in the following budget, there are ample public and private contributions 
+to support Second Harvest’s food distribution efforts.  
+ 
+Proposal: Geographic Area to Be Served 
+Select: Carbon, Monroe, Pike, Wayne
+
+8 
+ 
+ 
+Describe your evaluation plan, including methods and measurable outcomes you will use to track 
+progress. 
+Please see attached rubric for detail the evaluation plan- uploaded into the letters of support section of 
+the application. 
+ 
+Describe how you plan to sustain the project/program in the future, beyond the funding period you have 
+requested from AllOne Foundation 
+Second Harvest, a member of Feeding America – the nation’s largest charitable food network – is 
+sustained by a multi-faceted development strategy. Funding comes from corporations, foundations, 
+government entities, and individual donors.  Second Harvest has a 40-year history of meeting our 
+fundraising goals and supporting our programs; this includes a comprehensive fundraising strategy for 
+each of Second Harvest’s community programs and food distribution strategies.  
+The development team at Second Harvest consists of three full-time and one part-time staff members 
+who are responsible for fundraising, including personal solicitation of funds and grant-writing. 
+Community Action’s Executive Director and Associate Executive Director of Development also provide 
+fundraising support. 
+Confirmed Program Income 
+Individual contributions: 372,688 
+United Way and other federated campaign income: 0 
+Income earned through fees: 15,532.77 
+Additional revenue: 359,664.15 
+Membership income: 0 
+Government grants and contracts: 279,288.25 
+Fundraising events and product sales: 0 
+In-kind support: 0 
+ 
+Pending Program Income 
+Individual contributions: 2,000,812 
+United Way and other federated campaign income: 0 
+Income earned through fees: 234,467.23 
+Additional revenue: 472,157.23
+
+9 
+ 
+Membership income: 0 
+Government grants and contracts: 2,018,183.75 
+Fundraising events and product sales: 0 
+In-kind support: 0 
+ 
+Total Program Expenses per the requested amount - Please describe each expenditure in column one 
+and indicate the dollar amount in column two.  
+Proposal Expense 1: Salary and fringe benefits for two Agency Relations Coordinators and one Driver. 
+Proposal Expense 1 Amount: $40,000 
+Proposal Expense 2: Purchase of nutritious foods 
+Proposal Expense 2 Amount: $60,000 
+Proposal Expense 3: Transportation costs for food delivery to partner agencies 
+Proposal Expense 3 Amount: $5,000 
+Proposal Expense 4: Equipment and supplies for pantries, including marketing and outreach materials  
+Proposal Expense 4 Amount: $4,000 
+Proposal Expense 5: Mileage reimbursement for Agency Relations staff travel  
+Proposal Expense 5 Amount: $1,000 
+ 
+UPLOADS 
+IRS 501(c)(3) tax determination letter. 
+List of current Board of Directors and officers and their affiliations 
+Most Recent 990 form filed with IRS 
+Most recent financial statements 
+Activities and Outcomes rubric
+--------------------

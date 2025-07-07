@@ -1,0 +1,19 @@
+Purpose: <p>The purpose of this grant is to purchase and distribute fresh produce to food panties within Lehigh County.&nbsp;</p><p>Proposed goals:</p><figure class="image"><img src="http://10.55.0.10/storage/1270/image.png"></figure><p>After initial grant implementation, four of the six pantries referenced above decided that level of data collection mandated by the CDBG agreement was prohibitive; the only two pantries utilizing funding for the contract period was WCHI and St. Stephen's Pantry at Whitehall.</p><p>&nbsp;</p><p>&nbsp;</p>
+Funder: Lehigh County
+Program: SHFB
+Amount: 74250.00
+Start Date: 2021-05-01
+End Date: 2024-09-30
+
+Notes: 
+
+Fund Number: 2910
+
+Attached Document: 6744b6f39c3af_Second-Harvest-Subrecipient-Agreement.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6744b7b7be9e4_LC-CDBG-Quarterly-Report-Template.doc
+Unsupported file format: application/msword
+--------------------

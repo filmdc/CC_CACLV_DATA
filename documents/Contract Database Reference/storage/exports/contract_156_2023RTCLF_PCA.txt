@@ -1,0 +1,21 @@
+Purpose: <p>Administration-salary and fringe benefits for RTCLF staff</p>
+Funder: PCA
+Program: RTCLF
+Amount: 75000.00
+Start Date: 2023-03-23
+End Date: 2028-06-30
+
+Notes: <p>-PCA funding must be acknowledged in all published materials and announcements related to the grant process. Use approved language located in Article VI of the contract.</p><p>-A minimum of 5 Creative Business Loans must be given out in the Lehigh Valley</p><p>-Please see ineligible uses located in Grant Award Exhibit A Section 1.</p><p>-Required Reports: Quarterly and Final year-end report</p>
+
+Fund Number: 6000
+
+Attached Document: 642c3f35414ea_2023RTCLF_PCA_contract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 645ba9591d4dc_2023RTCLF_PCA_executedcontract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

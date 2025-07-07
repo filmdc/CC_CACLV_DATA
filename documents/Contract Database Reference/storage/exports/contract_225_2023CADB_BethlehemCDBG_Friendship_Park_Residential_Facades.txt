@@ -1,0 +1,106 @@
+Purpose: <p>-$3,000 for salary (Amendment 2 allows for full grant amount to be used for construction hard and soft costs)</p><p>-$27,000 for construction costs&nbsp;</p><p>Funds to be used to improve at least 2 residential facades in the Friendship Park Target Area.</p>
+Funder: City of Bethlehem
+Program: CADB
+Amount: 30000.00
+Start Date: 2023-01-01
+End Date: 2024-12-31
+
+Notes: <p>-Quarterly Reporting through Neighborly Portal</p><p>-Reimbursable Grant- see Attachment A of contract</p><p>-See Guidelines for grant terms and eligible improvements</p><p>-Payment must go directly to contractor</p><p>-Rental units benefiting from CDBG dollars must be occupied at an affordable rent and we must maintain documentation</p><p>-We must income qualify applicants</p>
+
+Fund Number: 2142
+
+Attached Document: 64f9ec9dba3ca_2023CADB_BethlehemCDBG_Friendship-Park-Residential-Facades_contractsigned.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 64f9eca6f2f0d_2023CADB_BethlehemCDBG_Friendship-Park-Residential-Facades_attachmentB-guidelines.docx
+
+Residential Façade Program Guidelines
+For over 15 years, Community Action Development Bethlehem (CADB) and the City of Bethlehem have collaborated to provide façade improvements to homeowners in south Bethlehem. Beginning in 2023, CADB will offer façade grants to residents of the Friendship Park area of the Northside Alive neighborhood (see attached map for eligibility). The Residential Façade Program provides grants of up to $15,000 per property to complete essential repairs and weatherization of the exterior of homes. 
+Eligibility
+Owner-occupied residential, locally-owned rental properties, and investor-owned properties with a long-term commitment to rent to low- to moderate-income families in north Bethlehem located within the geographic area specified below:
+
+Low-income homeowners and local residential property owners are given priority and participation may be restricted to homeowners and tenants at specific income levels based on funding requirements. Priority will be given to those projects creating a positive impact on the community.
+All property owners must be current on City, county, and school district taxes, which must be documented by a copy of a recent tax bill or a recent mortgage payment, through which property tax is escrowed. The property may not have any outstanding municipal debt, including but not limited to utilities, or other municipal liens. Sufficient insurance coverage on each property is also required. Properties must be structurally sound to be eligible. The property owner must agree to a building code inspection of the exterior of the structure.
+Terms of the Grant
+Up to $15,000 grant (no cash match required) for income-qualified households whose total household income is at or less than 80% of the prevailing area median income (see page 6 for current income guidelines). Households exceeding income guidelines will be eligible if repairs are necessary for the completion of a project at an adjoining income-qualified household and receive approval from the City of Bethlehem. 
+These grants are being made available to homeowners and property owners in the form of self-forgiving loans. If homeowners remain in their home for a full five years after using the funds for their façade improvement, the loan will be forgiven. If they sell their home within five years, they will be obligated to repay the loan at 80% after year 1, 60% after year 2, 40% after year 3, and 20% after year 4. Property owners who do not live in the home will be obligated to repay the loan at closing if the property is sold within five years, at 80% after year 1, 60% after year 2, 40% after year 3, and 20% after year 4. In order to administer this loan, CADB will put a lien on the property and release it after five years. 
+All rental property owners will be required to sign a commitment to affordability stating that they will not charge above Fair Market Rent for the property for five years following the completion of façade improvements. 
+The contractor is responsible for obtaining all required permits associated with the proposed façade project. The contractor will be paid in up to three increments totally 90% paid according to work completed on the specifications. The final 10% will be released when the Certificate of Final Inspection is signed by CADB and the property owner.
+The property owner is responsible for all project costs over and above maximum grant amount and must pay those costs to CADB before any work can begin. 
+Eligible Improvements
+A project must enhance the primary façade, which is any side of the building facing a public street. Buildings situated on street corners with facades facing two public streets or those facing a street and a public space, such as a park, may be eligible for two façade grants.
+Eligible Activities -- Proposed facade improvements should preserve the original building design and be sympathetic to the architectural character of the surrounding neighborhood. The removal of historic features is prohibited.
+Eligible improvements can include:
+Brick and Stone Masonry (including porch/steps) - Removal of Brickote, structural repairs, cleaning and repointing.
+Architectural Metals - Repair, cleaning, refinishing, painting, duplication, and restoration of exterior building components, e.g., cast iron, pressed tin. Removal or painting over copper patina is not eligible.
+Doors and Upper-Story Windows - Maintenance, repairs, restoration, and replacement of window sash, exterior doors, and installation of storm windows in conjunction with other significant facade improvements.
+Exterior Woodwork - Maintenance, repair, rehabilitation, and restoration of sills, window and door frames, bulkheads, roof cornices, window hoods, decorative moldings.
+Painting - Surface preparation, cleaning, painting.
+Awnings - Installation, repair, and maintenance of fabric awnings in connection with real property improvements.
+Design Assistance – As determined by the director, design assistance of up to $1,000 may be included in the grant. Design assistance may include architectural services, historic preservation, and graphic design.
+Exterior lighting.
+Roof repair (but not replacement) – may be allowed in certain cases where the roof is clearly visible from the street (like a mansard or peaked roof) and that the repair will also preserve/restore the architectural and historic significance of the building.
+Outreach
+The Northside Alive Housing Committee will select a target area for outreach each year based on the potential for community impact and homeownership rate in the surrounding area. CADB staff will make every effort to inform eligible homeowners about this program in target areas identified by the Northside Alive Housing Committee. Outreach may include, but is not limited to, door-to-door canvassing, mailings, and phone calls.
+Application Process
+Applications may be obtained from CADB at 409 East Fourth Street, Bethlehem PA 18015.
+Completed applications are submitted to the director of CADB.
+Applications are processed on a first-come, first-served basis. However, neighboring property owners are encouraged to submit applications simultaneously to maximize community impact. Priority may also be given to applicants based on income or potential for impact.
+Applications will be reviewed and prioritized by the Northside Alive Housing Committee.
+If an application is denied, property owners or local residential property owner may request that the application be reconsidered by the Northside Alive Steering Committee.
+Estimates for work to be completed will be determined after the initial review of the application.
+Work may not begin until the application is approved and the owners have signed all of the necessary paperwork. Any construction started before the application and approval process will not be eligible for a grant.
+Project Approval and Appeal Process 
+Upon completion of project, work will be inspected for quality and compliance with code requirements and design guidelines.
+The inspector, homeowner or local residential property owner, and contractor must sign a verification form stating that the work was done in a satisfactory manner.
+If the inspector finds a problem with the work, the contractor must correct the problem before receiving final payment. Generally, 10% of the contract amount will be kept as a retainage until all work has been completed.
+Determining the Scope of Each Project 
+CADB staff will arrange to visit each home to assess, photograph, and determine the extent of work needed for the façade renovation in accordance with the ordinances of the City of Bethlehem where the property is located. Staff will then write-up the scope of work and estimate the rehab costs for the project, bearing in mind the budget for each of the façade improvements. Staff will then review the scope of work with the property owners, who will approve the written description. 
+Contracting Process
+CADB will follow the contracting process required by each funder. At a minimum, qualifying contractors must:
+Be registered by the Commonwealth of Pennsylvania
+Not be debarred or suspended
+Provide a valid Pennsylvania Home Improvement Contractor License number
+All contractors will be provided with exactly the same description, so that their estimates can be accurately compared. It will be required that a minimum of three (3) estimates be obtained. The lowest estimate will be selected, unless there are extenuating circumstances, such as poor references, or an inability or unwillingness to follow through or schedule the work within a reasonable period of time. Contractors will be asked to provide the following information prior to being awarded the contract: 
+Commercial general liability insurance
+Automobile liability insurance
+Commercial Pollution Liability Insurance
+Worker’s compensation insurance or proof of exemption
+Indemnification - the contractor will hold CADB harmless to the fullest extent possible
+PA contractor’s registration number
+EIN
+HIC number
+Three references from previous jobs
+Should all the bids exceed the estimated amount for renovation, the CADB staff will notify the contractors of the situation, adjust the scope of work, and ask all of them to restructure their estimates. The staff will again review the estimates, accepting the lowest one. Should there be two or more estimates coming in at the same amount, the director will rank the projects according to the quality of the materials proposed and choose the one that would provide the most lasting improvements to the building in consultation with the Northside Alive Housing Committee.
+The terms of the contract will require that the work begin within 30 days of the execution of the contract and be completed within 90 days of the execution of the contract. 
+Design Philosophy
+This program is designed to highlight, preserve, and maintain the unique historic and architectural heritage of the City of Bethlehem to the extent that is practicably possible. 
+City of Bethlehem
+Income Guidelines for 2022
+Allentown-Bethlehem-Easton, PA HUD Metro FMR Area	
+Area Median Income (AMI) $90,600
+						
+
+--------------------
+Attached Document: 6571041da4766_Agt---Community-Action-Dev-Corp-of-Bethlehem---CDBG-PY-2022-CADCB-Friendship-Park-etc.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6594266e961ae_2023CADB_BethlehemCDBG_Friendship-Park-Residential-Facades_signed-amendment.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 65b7f3ca94272_2023CADB_BethlehemCDBG_Friendship-Park-Residential-Facades---Amd-1.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 66e8737e990d4_Amd-No.-2-CADCB---CDBG-Friendship-Park-Residential-Facades.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

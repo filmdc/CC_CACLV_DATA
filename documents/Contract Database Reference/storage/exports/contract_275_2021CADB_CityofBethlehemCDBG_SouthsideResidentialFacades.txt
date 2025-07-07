@@ -1,0 +1,36 @@
+Purpose: <p>-Exterior repair, weatherization, facade improvement, constructions, landscaping and incidental costs.</p><p>-Requires a $17,000 agency match.</p>
+Funder: City of Bethlehem
+Program: CADB
+Amount: 30000.00
+Start Date: 2021-09-24
+End Date: 2024-06-30
+
+Notes: 
+
+Fund Number: F2138
+
+Attached Document: 659449249c0fa_2021CADB_CityofBethlehem_CDBG_SouthsideResidentialFacades_736Broadway_Amendment-2.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 65c666887b5fa_2021CADB_CityofBethlehemCDBG_SouthsideResidentialFacades_736Broadway_Amendment3.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 677d4d9e8a1ff_CDBG-2021-CADCB-SS-Res-Facades-fully-executed-agreement.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 67928ef6c80be_Amd-No.-3-CADCB-SS-Residential-Facades-PY2021-(2).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 67928fcd76794_CADB-Southside-residential-Facades-Amendment-1.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

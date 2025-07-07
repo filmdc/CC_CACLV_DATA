@@ -1,0 +1,26 @@
+Purpose: <p><strong>Purpose:</strong> General Operating support</p><p><strong>Reporting Schedule:</strong> Within six (6) months of the date of execution of this Agreement by the parties and within forty-five (45) days of the end date of the Grant term, and/or upon request of the Grantor.</p><p>6-Month Report from Grantee due April 30, 2025</p><p>Final Report from Grantee due November 15, 2025</p>
+Funder: Santander
+Program: RTCLF
+Amount: 10000.00
+Start Date: 2024-10-01
+End Date: 
+
+Notes: <p><strong>Name and Logo Usage:</strong> Grant recipients are <strong>required</strong> to acknowledge the Bank’s philanthropic support in online or printed materials in accordance with the guidelines below and the terms of the Grant Agreement.</p><p>Santander Bank, N.A. is the legal name and may be used to reference the Bank in the absence of a trademark consent letter. The use of “Santander Bank Foundation” is not permitted.</p><p>Linking Registered Trademarks to Website. With written permission, our name or logo may link directly to the Santander Bank, N. A. website in online materials: <a href="https://www.santanderbank.com/">https://www.santanderbank.com</a></p><p>Official Social Media Accounts. Tagging on social media is permitted using our handles on the following sites:</p><ul><li>Instagram – santanderbankus</li><li>LinkedIn – Santander Bank, N.A.</li><li>Facebook – Santander Bank US</li></ul><p><br>Questions and requests for permission to use trademarks, or for quotes and other media resources should be directed to the Philanthropy Team at <a href="mailto:giving@santander.us">giving@santander.us</a>.</p>
+
+Fund Number: 8000
+
+Attached Document: 67335b2d9ae01_2024RTCLF-Santander-Grant-Agreement-(1).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 67335b7415527_2024RTCLF-Santander-trademark-agreement-(1).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 677bf160795f4_2024RTCLF-Santander-trademark-agreement-(2).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

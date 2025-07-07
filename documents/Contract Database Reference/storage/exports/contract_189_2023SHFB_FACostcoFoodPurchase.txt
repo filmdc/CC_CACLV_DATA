@@ -1,0 +1,355 @@
+Purpose: <p>-Purchase food from Costco's to primarily support rural and or communities of color.</p><p>-Social Media acknowledgment, media stories, press releases and testimonials are highly encouraged and asked for in the regular reporting cycle.</p><p>&nbsp;</p>
+Funder: Feeding America
+Program: SHFB
+Amount: 40625.00
+Start Date: 2023-06-01
+End Date: 2024-02-29
+
+Notes: <p>Reporting:</p><p>Initial Progress Report due October 31, 2023, covering June 1, 2023- September 30, 2023.</p><p>Final Report due March 19th, 2024, covering entire grant period of June 1st, 2023- February 29, 2024.&nbsp;</p><p>****Final report will only be required if the funds were not fully expended by the initial progress report.</p><p>Information to be collected:</p><p>-Confirmation of fund expenditures, purchase (quantity and description) tracked by food category, pounds and costs, description of programs supported by the purchases, grant impact, stories and testimonials.</p><p>&nbsp;</p>
+
+Fund Number: 8061
+
+Attached Document: 64833c844350f_DRAFT_FY23_Costco_Report_Template.docx
+Failed to extract text from Word document: PhpOffice\PhpWord\Reader\Word2007\AbstractPart::setCommentReference(): Argument #3 ($element) must be of type PhpOffice\PhpWord\Element\AbstractElement, null given, called in /var/www/Contracts_Database_Laravel_Gen/vendor/phpoffice/phpword/src/PhpWord/Reader/Word2007/AbstractPart.php on line 480
+--------------------
+Attached Document: 64833c866ffb1_2023_SHFB_FACostco_ProposalSubmitted.pdf
+Application Preview
+Applicant Status:Submitted
+Award Amount:$40,625.00
+Grant Period Start Date:06/01/2023
+Grant Period End Date:02/29/2024
+Organization Details:
+Organization Name: Seco
+nd Harvest Food Bank of
+Lehigh Valley and NE
+Pennsylvania
+Address 1: 6969 Silver
+Crest Road
+Address 2:
+City: Nazareth
+State: PA
+Zip Code: 18064
+Please note: We have removed word and character limits from most grant applications. Please do
+try to strike a balance between being concise and including the detail needed to answer all parts
+of each question. Bullet points and succinct responses are encouraged.
+Opportunity Details
+Directed - FY23 Costco Food Purchase
+Feeding America
+Date Submitted: 06/07/2023
+.
+Page 1 of 10
+
+Contact Information
+Program Overview
+Before beginning an application, it is essential to read all of the information on every tab of
+the RFP very carefully to make sure you understand all of the opportunity's unique details,
+requirements, and restrictions.
+If you have questions or need clarification about any part of the RFP after you've read it in its
+entirety, please reach out to the appropriate contact who is listed in the "Contact
+Information" section below.
+Questions
+Technical grant questions shall be directed to Sally Yan, Sr. Manager, Member Grants, syan@feedingam
+erica.org
+Questions regarding Feeding America’s relationship with Costco shall be directed to Charina Layman, M
+anager, Corporate Partnerships, chlayman@feedingamerica.org
+Congratulations! We are pleased to inform you that your food bank has been selected to receivea FY23 F
+ood Purchase Grant, thanks to Costco Wholesale Corporation. The goal of this grant is to support the
+purchase of food products from Costco store(s) within your service area.
+Executive Summary
+Overall funding amount to be awarded: $5,850,000
+Individual award amount: 144 food banks will receive $40,625 each.
+Grant period: June 1, 2023 – February 29, 2024
+Report requirements: One progress report (due 10/31/23) and one final report (due 3/19/24). Grantees
+that fully spend the funds by the progress reporting period will not be required to submit a final report.
+Purpose of Funding  
+This purpose of this grant opportunity is to provide food purchasing support for your food bank’s hunger relief
+programs, such as School Pantry, Mobile Pantry, BackPack, child and senior feeding, after-school program(s),
+Summer Feeding program(s), or other local programs.
+Strategic Context
+   
+Commitment to Equity
+To achieve our vision of an America where no one is hungry, we are committed to equity, ensuring fair
+treatment, access, opportunity, and advancement for all people. We will identify and work towards solutions to
+eliminate social, structural, and systemic inequities that contribute to food insecurity, with a focus on
+communities that have been historically disadvantaged and/or adversely impacted by racial and/or geographical
+inequities. While there are many components to equity, racial inequity has resulted in poorer outcomes for
+Directed - FY23 Costco Food Purchase
+Feeding America
+Date Submitted: 06/07/2023
+.
+Page 2 of 10
+
+communities of color, including higher rates of food insecurity and poverty, and worse health outcomes. Please
+see our Commitment to Equity for more detail.
+Use of Data to Inform Your Work
+We strongly encourage grantees to utilize national and/or local data to identify and target one or more currently
+underserved rural and/or communities of color for this work. The following definitions provide a starting point to
+help grantees define and select communities:
+Community -an area identified by the grantee using data (e.g., counties, zip codes, census tracts,
+Rural Community is defined as being in county/ies with a USDA Rural Urban Continuum Code (RUCC)
+of 4-9.
+Community of Color is defined as predominantly Asian, Black, Latino, Native American, Pacific
+Islander, and/or some other race (which the Census defines as any race or ethnicity not included in the
+estimates].  
+Predominance is typically measured in terms of high proportion or large number, compared to
+relevant data point(s) such as averages, medians, differences/disparities, etc. at the national,
+regional and/or local levels.
+The following data resources are available for your use: 
+Map the Meal Gap  & The Impact of Coronavirus on Food Insecurity
+Tableau Dashboard - Feeding America: Identifying Racism in the Drivers of Food Insecurity
+American Community Survey population data
+USDA Rural/Urban Continuum Codes (RUCC) 
+We encourage use of additional local data sources identified by the grantee.  Examples include but are not
+limited to: 
+Housing data
+School meal and/or enrollment data
+County Health Rankings
+Food Bank neighbor or operations data
+Grant Period & Amount
+A total of $5,850,000 will be awarded through this grant opportunity. We have awarded 144 food banks, who will
+each receive $40,625.
+The grant period will run from June 1, 2023 through February 29, 2024. Grant funds must be spent by the end of
+the grant period.  Grantees can expect to receive payment in mid-June 2023.
+Grantee Selection Process
+Eligibility
+Your eligibility for this award is based on having at least one Costco store location within your service area.
+Reporting Requirements
+There will be two (2) reports required for this grant, to be collected via the GMS. If your organization has
+completed all grant spending by the progress reporting period, then no final report is required.
+Progress Report – due October 31, 2023 to cover the period of June 1, 2023 through September 30,
+2023 (4 months)
+Final report – due March 19, 2024 – covering entire grant period of June 1, 2023 through February 29,
+Directed - FY23 Costco Food Purchase
+Feeding America
+Date Submitted: 06/07/2023
+.
+Page 3 of 10
+
+Use of Funds
+2024 (9 months)
+*A final report will only be required if funds were not fully spent by the progress reporting period.
+Report requirements include, but are not limited to:
+Confirmation of funds expenditure
+Purchases (quantity & description) tracked by food category, pounds, and cost
+Description of program(s) supported by the purchases
+Grant impact
+Stories/testimonials
+A sample reporting template is available to download from the Related Documents tab. Please note that actual
+reporting questions may change in response to Feeding America, donor, or grantee input.
+Requirements for Receipt of Funding
+We are requesting confirmation of your interest in this funding opportunity by reviewing the grant agreement,
+responding to the questions on the Application Form and Grant Agreement tabs, and submitting the
+application as soon as possible and no later than 11:59 pm PST on Tuesday, June 13, 2023.
+Please note: If you are choosing to decline this opportunity, please select "No" on the Grant Agreement tab, and
+then submit the proposal so we will have a record of which organizations have declined the opportunity. 
+Publicity Requirements
+The donor does not wish to have media or recognition around this grant; listing in an annual report is fine, but no
+further publicity is requested.
+Directed - FY23 Costco Food Purchase
+Feeding America
+Date Submitted: 06/07/2023
+.
+Page 4 of 10
+
+Reporting Overview
+Acknowledgements
+Funds are to be spent only on the purchase of food at Costco stores. All items purchased must be distributed to
+clients; they may not be used to support food bank operations.
+Funds should be spent down during the grant period and must be tracked/reported by purchase. Funds may be
+spent down in any amount, in any time frame that is most helpful to your operations and programs (i.e., there is
+If your organization does not already have a Costco business membership, grant funds may be used to cover
+this expense.
+Please note:   
+Food banks can consider re-granting funds to Partner State Associations (PSAs), Affiliate Food Banks,
+Regional Distribution Organizations (RDOs) and/or agencies or other partners that can help execute the
+grant and reach populations most disproportionately affected by food insecurity. 
+Use of the term “agencies” is broad, including current agencies and new partners, but it does NOT
+include schools or government partners. Partners should be 501c3 organizations, or federal or
+state-recognized Native tribes.  
+The same restrictions and deadlines for expenditures apply to all sub-grantees. Food banks determine
+the internal reporting requirements for organizations receiving sub-awards. Note that the food bank must
+retain administrative and fiscal responsibility for the sub-grant execution, including timing/use of funds
+and reporting to Feeding America.  
+If you are unsure whether an expense fits within the scope of this grant opportunity, please contact Sally Yan, S
+r. Manager, Member Grants, at syan@feedingamerica.org.
+Below are all of the report due dates for this opportunity, with notes and additional information, if
+applicable:
+October 31, 2023: Progress Report Due
+Progress Report – due October 31, 2023 to cover the period of June 1, 2023 through September
+30, 2023 (4 months)
+ 
+March 19, 2024: Final Report Due
+Final report – due March 19, 2024 – covering entire grant period of June 1, 2023 through February
+29, 2024 (9 months)
+*A final report will only be required if funds were not fully spent by the progress reporting period.
+ 
+Directed - FY23 Costco Food Purchase
+Feeding America
+Date Submitted: 06/07/2023
+.
+Page 5 of 10
+
+Application Instructions
+Application Form
+Donor Overview
+Costco Wholesale Corporation has been partnering with Feeding America since 2012 and is a Visionary
+partner.  In alignment with Costco Wholesale Corporation’s support for children and health/human services,
+Costco has invested in Feeding America’s local member food banks to help feed neighbors in need.  Thanks to
+consistent funding over the last few years, Costco has funded food purchases at 100% of the food banks in
+proximity to Costco store locations.
+While reports are an important method used to foster donor relations, they are no substitute for hearing directly
+from you.  We encourage you to email a thank-you letter to the following:
+Aaron Sato
+Program Manager, Community Relations Department
+Costco Wholesale                                          
+c/o Charina Layman, Feeding America Corporate Partnerships Team
+chlayman@feedingamerica.org
+Before beginning an application, it is essential to read all of the information on every tab of
+the RFP very carefully to make sure you understand all of the opportunity's unique details,
+requirements, and restrictions.
+If you have questions or need clarification about any part of the RFP after you've read it in its
+entirety, please reach out to the appropriate contact who is listed in the "Contact
+Information" section of the Opportunity Details tab of this RFP.
+Instructions for Applying:
+We are requesting confirmation of your interest in this funding opportunity by reviewing the grant agreement,
+responding to the questions on the Application Form and Grant Agreement tabs, and submitting the
+application as soon as possible and no later than 11:59 pm PST on Tuesday, June 13, 2023.
+Please note: If you are choosing to decline this opportunity, please select "No" on the Grant Agreement tab,
+and then submit the proposal so we will have a record of which organizations have declined the opportunity. 
+ 
+Directed - FY23 Costco Food Purchase
+Feeding America
+Date Submitted: 06/07/2023
+.
+Page 6 of 10
+
+Program Description
+Program Metrics
+Program/Project Budget
+Related Documents
+Grant Agreement
+IMPORTANT - Grant Agreement Instructions
+Before beginning an application, it is essential to read all of the information on every tab of
+the RFP very carefully to make sure you understand all of the opportunity's unique details,
+requirements, and restrictions.
+If you have questions or need clarification about any part of the RFP after you've read it in its
+entirety, please reach out to the appropriate contact who is listed in the "Contact
+Information" section of the Opportunity Details tab of this RFP.
+There is no program description requirement for accepting this grant opportunity.
+There is no projected program metrics requirement for accepting this grant opportunity.
+There is no program/project budget requirement for accepting this grant opportunity.
+Sample Costco Report Template
+Please click here to download a draft reporting template.
+Directed - FY23 Costco Food Purchase
+Feeding America
+Date Submitted: 06/07/2023
+.
+Page 7 of 10
+
+Grant Acceptance/Decline
+Equitable Access
+Please download, review, and save the FY23 Costco Food Purchase Grant Agreement for your
+reference.
+You do NOT need to upload a signed grant agreement if you accept the grant. Using the checkbox
+process below will streamline the award process and facilitate timelier disbursement of grant funds.
+Please indicate that you have read the grant guidelines as outlined on the "Opportunity Details" tab and
+you accept or decline the grant.
+IMPORTANT NOTE: by checking "YES," you are acknowledging that you have read, understand, and agree to% by checking "YES,
+the terms outlined in the grant agreement form and that key stakeholders at your organization - including
+the Executive Director and Chief Operating Officer (or equivalents) - have read, understand, and agree to
+the funds usage and requirements of the funding award as outlined on the Opportunity Details tab and in the
+grant agreement. Selecting "YES" is equivalent to submitting a grant agreement signed by your
+organization's Executive Director or equivalent.
+YES, we have read the grant guidelines and the grant agreement. We agree to the terms of the grant
+agreement and we accept this grant.
+Grant Feedback
+(Optional) Please follow this link to provide any feedback you may have for Feeding America related to
+Member Grants. Feedback is anonymous, but you have the option to provide contact information if you
+would like someone from the Member Grants team to follow up.
+Directed - FY23 Costco Food Purchase
+Feeding America
+Date Submitted: 06/07/2023
+.
+Page 8 of 10
+
+As part of our commitment to equitable access, Feeding America is interested in learning where
+grant funds are being invested. IMPORTANT NOTE: These questions are for learning purposes
+ONLY - your responses will NOT be considered as part of your grant application nor will they
+impact grant funding decisions.
+This set of questions is standard across ALL Feeding America grants, so we appreciate your
+answers despite the duplicative nature of the questions for some grant proposals.
+Please click here if you would like to access county-level data related to communities of color and rural
+communities.
+Please note that Feeding America defines rural counties as those with a Rural - Urban Continuum
+Code (RUCC) of 4 through 9.
+Please do not spend much time on these questions - your good faith estimate is appreciated. We
+do not need specific calculations. We recognize that actual service delivery numbers often differ
+from projections and that your responses below represent your best estimate at the time of
+application.
+Directed - FY23 Costco Food Purchase
+Feeding America
+Date Submitted: 06/07/2023
+.
+Page 9 of 10
+
+Target Communities
+Based on your best estimate, will you use this grant funding primarily to support communities of color
+and/or rural communities? NOTE: please select “No” if the staff, activities, and/or assets supported by this
+grant will not primarily support rural and/or communities of color. If you are not sure how to answer this
+question, please reach out to the assigned grants manager for this grant opportunity (see Contacts
+A few examples of work primarily supporting communities of color and/or rural communities include:
+This grant will be used to provide food primarily to communities of color or rural communities.
+This grant will start, sustain, or expand work to eliminate barriers and increase access to food and/or
+services primarily for communities of color or rural communities.
+This grant will be used to do outreach, conduct assessments, or build relationships with neighbors
+primarily in communities of color and/or rural communities.
+This grant will be used to support or build partnerships with local organizations primarily in
+communities of color and/or rural communities.
+This grant will be used to hire staff whose job function is to primarily support communities of color
+and/or rural communities.
+Other opportunities where the primary intention of the grant is to alleviate racial and/or geographic
+disparities in food insecurity and access to charitable food assistance.
+A few examples that would not be considered as primarily supporting communities of color and/or rural
+communities include:
+This grant will be used to purchase equipment, vehicles, or supplies that will be used toward general
+food bank operations and not specifically be used toward efforts that focus on supporting
+communities of color and/or rural communities.
+This grant will be used toward general operating expenses that are not specifically focused on
+supporting communities of color and/or rural communities.
+Yes
+Specific Communities
+Which communities do you plan to specifically target with this grant funding? Please select one.
+Both Communities of Color and Rural Communities
+Directed - FY23 Costco Food Purchase
+Feeding America
+Date Submitted: 06/07/2023
+.
+Page 10 of 10
+--------------------
+Attached Document: 64833c8824b1d_2023_SHFB_FACostco_GrantAgreement.docx
+FY23 Food Purchase Grant Opportunity
+Thanks to Costco wholesale 
+Grant Agreement
+The following are the terms and conditions of accepting this Food Purchase grant, if awarded, thanks to Costco Wholesale:
+You will keep a copy of this grant agreement for your records.  By agreeing to accept the grant on the Grant Agreement tab in the Grants Management System (GMS), you are agreeing to comply with the terms of the grant agreement and any restrictions and requirements laid out in the grant application and/or your award communication.
+Please accept or decline the grant on the Grant Agreement tab in the GMS.
+Cashing the award check also represents your acknowledgement of and agreement to these terms and conditions.  
+You shall submit sufficient detail to Feeding America’s satisfaction as outlined in your award letter and/or the report requirements for this grant.
+You shall maintain proper records and books that enable Feeding America to easily determine how grant funds have been used, making these books and records available to Feeding America at reasonable times for review and audit.  In addition, you shall comply with all reasonable requests of Feeding America for information and interviews regarding use of grant funds.
+Use of funds is restricted to the specifics of your submitted proposal.  You shall provide the Feeding America Member Grants team with written notice of any significant change in the program/project supported by the grant, or any request to change the allocation or use of funds from the originally submitted budget.
+If awarded a vehicle: 
+You agree to accept vehicle branding as described in the vehicle graphics requirement section of the RFP, incorporating the donor, Feeding America, and food bank logos.  The use of agency logos is not permitted.  Vehicle branding must remain in place for the life of the vehicle, defined as seven (7) years.  
+You agree that if your organization leaves the Feeding America Network within five (5) years of receipt of the vehicle, you will be expected to return the grant funds to Feeding America.  
+You may not sell, trade, or give away the funded vehicle without the permission of Feeding America.  If permission is granted, you are responsible for removing all signage and logos related to the donor and Feeding America.  
+Your organization is responsible for any fees for licensing, insurance, or taxes on the vehicle.
+Notification to Feeding America of any significant change in the program must be made within 30 days of the change, including site closure or redirection of funds for which prior approval by Feeding America is required.
+Lack of notification to Feeding America of any significant change in your grant is grounds for revocation of the grant and/or placement on grant restriction at the sole discretion of Feeding America.
+You shall also provide reasonable assistance to Feeding America in relation to requests for communication and employee engagement efforts as they relate to this grant.
+Miscellaneous legal provisions:
+This Agreement shall be governed by the laws of the state of Illinois
+Neither this Agreement nor any of the rights, interests, or obligations hereunder shall be assigned by any Party without the prior written consent of the other Party.
+This Agreement represents the complete agreement of the parties and supersedes any and all prior agreements.
+Grantee agrees to defend, indemnify, and hold Feeding America harmless from and against any and all claims, liabilities, losses, and expenses (including reasonable attorneys’ fees) directly, indirectly, wholly, or partially arising from or in connection with any act or omission of the indemnifying party, its employees or agents, in performance of this Agreement.
+By accepting the grant in the GMS, I fully understand and agree to comply with the above conditions and requirements of this grant from Feeding America.  I certify that should my organization be awarded a grant, the check from Feeding America represents a charitable contribution to our tax-exempt 501(c)(3) organization with no exchange of any goods or services.   
+
+--------------------

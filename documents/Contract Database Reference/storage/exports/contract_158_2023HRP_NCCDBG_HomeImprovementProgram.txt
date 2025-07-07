@@ -1,0 +1,155 @@
+Purpose: <p>-Roof replacement and HVAC for Seniors and other eligible populations. Wrap around service plans for mold and mildew.</p><p>$136,000 for Replacements, Renovations and Home Improvements</p><p>-$34,000 for project delivery costs</p><p>Amendment for an additional $75,940 and extension of expiration date attached.</p>
+Funder: Northampton County
+Program: CAH
+Amount: 245940.00
+Start Date: 2023-04-01
+End Date: 2025-01-30
+
+Notes: <p>-Gross AMI of each applicant is not to exceed 80%</p><p>-Follow all open and competitive bidding requirements on page 6 of contract</p><p>-This is a reimbursable grant</p><p>-Semi-Annual Reports Due by October 30th and April 30</p><p>-Audit report needs to be submitted to DCED for each fiscal year of this agreement.</p>
+
+Fund Number: F2975
+
+Attached Document: 6426d6a1ce618_2023HRP-NCCDBG-HomeImprovement-Program.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6426d6a5b253b_2020-CDBG-Home-Imp-CALV-3-17-2023-(1).pdf
+DCED
+Sources and Uses 
+Budget Spreadsheet
+Date:3-17-2023	Project Manager:
+Project Name:NC Home Improvement Program	Phone:
+Applicant:CALV	E-Mail:
+Total Project Cost:	Total Being Awarded 170,000
+Fy-2020 CDBG
+(Insert Funding 
+Source)
+(Insert Funding 
+Source)
+(Insert Funding 
+Source)
+(Insert Funding 
+Source)
+Total
+County Private
+-$                       
+-$                       
+-$                       	-$                       	-$                       	-$                       	-$                       	-$                       	-$                       
+-$                       
+$136,000	136,000$          
+136,000$          	-$                       	-$                       	-$                       	-$                       	-$                       	136,000$          
+-$                       
+-$                       
+-$                       
+-$                       
+-$                       
+-$                       
+-$                       
+Other Public Capital Improvement i.e Parks
+-$                       	-$                       	-$                       	-$                       	-$                       	-$                       	-$                       
+-$                       
+-$                       
+-$                       
+-$                       
+-$                       
+-$                       	-$                       	-$                       	-$                       	-$                       	-$                       	-$                       
+-$                       
+-$                       	-$                       	-$                       	-$                       	-$                       	-$                       	-$                       
+-$                       
+-$                       
+-$                       
+-$                       
+-$                       
+-$                       
+-$                       
+-$                       
+-$                       	-$                       	-$                       	-$                       	-$                       
+$34,000	34,000$            
+-$                       
+-$                       
+-$                       
+-$                       
+-$                       
+-$                       
+-$                       
+-$                       
+34,000$            	-$                       	-$                       	-$                       	-$                       	-$                       	34,000$            
+-$                       
+-$                       
+-$                       
+-$                       
+-$                       
+-$                       
+-$                       
+-$                       
+-$                       
+-$                       	-$                       	-$                       	-$                       	-$                       	-$                       	-$                       
+170,000$          	-$                       	-$                       	-$                       	-$                       	-$                       	170,000$          
+Subtotal
+Subtotal
+-Related Costs
+Project delivery costs
+Engineering
+Inspections
+Insurance
+Environmental Assessment
+Legal Costs
+Closing costs
+Contingencies
+Fees
+Subtotal
+Grand Totals
+-Other
+Promotion
+Office Equipment
+Rent
+Utilities
+Audit
+Travel
+Upgrade Existing
+Installation/Building Modification
+Vehicles
+Subtotal
+-Working Capital
+Working Capital
+Subtotal
+-Operating Costs
+Salary/Fringe Benefits
+Training/Technical Assistance
+Consumable Supplies
+Used equipment Purchase
+-Infrastructure/SitePreparation
+Roads/Streets
+Parking
+Water/Sewer
+Utilities
+Demolition
+Excavation/Grading
+Environmental Clean-up
+Subtotal
+-Machinery and Equipment
+New Equipment Purchase
+Funding Source
+-Acquisition
+Land
+Buildings
+Subtotal
+Funding Type
+-General Construction
+New Construction
+Rehabilitation/Renovation/ Home Improvements
+Subtotal
+Leasehold Improvements
+Respond to the Coronavirus
+--------------------
+Attached Document: 644175074e95b_2023HRP-NCCDBG-HomeImprovementProgram_ExecutedContract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 678ac0de70a3d_2023HRP_NCCDBG_HomeImprovementProgram-addendum.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

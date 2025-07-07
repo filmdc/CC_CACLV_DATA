@@ -1,0 +1,98 @@
+Purpose: <p>This agreement between SHFB and Carbon County establishes the terms and conditions for SHFB to provide TEFAP services to Carbon County.</p><p>SHFB must prepare a budget for the fiscal period of 10/1/2023 - 9/30/2024 identifying estimated operating costs for the distribution of Federal and State issued food commodities, using the following Allowable Costs line items as determined by PDA.</p><ul><li>Storage costs</li><li>Transportation Costs</li><li>Equipment Rental Costs</li><li>Printing/Copying Costs</li><li>Administrative Costs</li></ul><p>Services provided from 10/01/2023 - 9/30/2024 will be reimbursed at $.12 per lb distributed.</p><p>Invoices are required quarterly as follows:</p><ul><li>Invoice #1 for (10/01/2023-12/31/2023); Due: <strong>01/20/2024</strong></li><li>Invoice #2 for (01/01/2024-03/31/2024); Due: <strong>04/20/2024</strong></li><li>Invoice #3 for (04/01/2024-06/30/2024); Due: <strong>07/20/2024</strong></li><li>Invoice #4 for (07/01/2024-09/30/2024); Due: <strong>10/20/2024</strong></li></ul><p><strong>NOTE</strong>: The invoice shall be accompanied by a completed TEFAP INVENTORY/PARTICIPATION REPORT for the respective quarter's activity, to support the amount being invoiced according to TEFAP regulations. ANY INVOICE NOT ACCOMPANIED BY A "TEFAP INVENTORY/PARTICIPATION REPORT" WILL NOT BE PAID UNTIL SUCH TIME AS THE COMPLETED REPORT IS RECEIVED.</p><p>Contact:</p><p><strong>Cindy Bizarre</strong><br>401 Delaware Avenue, Third Floor<br>Palmerton, PA &nbsp;18071<br>Phone: 1-800-441-1315 ext. 4511 or 610-824-7830 ext. 4511<br>Fax: &nbsp;610-824-7836<br>Email: &nbsp;cbizarre@ptd.net</p><p>&nbsp;</p>
+Funder: Carbon County
+Program: SHFB
+Amount: 0.00
+Start Date: 2023-10-01
+End Date: 2024-09-30
+
+Notes: 
+
+Fund Number: 1189
+
+Attached Document: 65020d9a8dd2e_2023SHFB_CarbonCountyTEFAP_signed-contract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 651c5074d50ad_Carbon-County-TEFAP-Signed-&-ExecutedContract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 655cf43554a7b_5th-Payment-to-TEFAP-Counties----2023-FY.xlsx
+TEFAP 5th Payment for Federal FY2023					
+Agency Name	County	Total Pounds Disbursed	5th Payment ($0.3352569/lb.)		
+ADAMS COUNTY COMMISSIONERS	Adams	48,607.12	 $ 16,295.87 		
+ALLEGHENY COUNTY CHIEF EX	Allegheny	986,389.63	 $ 330,693.93 		
+ARMSTRONG COUNTY COMMISSIONERS	Armstrong	70,101.41	 $ 23,501.98 		
+BEAVER COUNTY COMMISSIONERS	Beaver	164,527.76	 $ 55,159.07 		
+BEDFORD COUNTY COMMISSIONERS	Bedford	35,588.45	 $ 11,931.27 		
+BERKS COUNTY COMMISSIONERS	Berks	327,122.48	 $ 109,670.07 		
+BLAIR COUNTY COMMISSIONERS	Blair	134,543.50	 $ 45,106.64 		
+BRADFORD COUNTY COMMISSIONERS	Bradford	47,709.87	 $ 15,995.06 		
+BUCKS COUNTY COMMISSIONERS	Bucks	218,374.64	 $ 73,211.60 		
+BUTLER COUNTY COMMISSIONERS	Butler	95,985.44	 $ 32,179.78 		
+CAMBRIA COUNTY COMMISSIONERS	Cambria	129,759.39	 $ 43,502.73 		
+CAMERON COUNTY COMMISSIONERS	Cameron	8,713.48	 $ 2,921.26 		
+CARBON COUNTY COMMISSIONERS	Carbon	79,727.55	 $ 26,729.21 		
+CENTRE COUNTY COMMISSIONERS	Centre	125,776.38	 $ 42,167.40 		
+CHESTER COUNTY COMMISSIONERS	Chester	163,614.30	 $ 54,852.82 		
+CLARION COUNTY COMMISSIONERS	Clarion	30,376.46	 $ 10,183.93 		
+CLEARFIELD COUNTY COMMISSIONERS	Clearfield	72,198.73	 $ 24,205.12 		
+CLINTON COUNTY COMMISSIONERS	Clinton	38,052.64	 $ 12,757.41 		
+COLUMBIA COUNTY COMMISSIONERS	Columbia	45,612.28	 $ 15,291.83 		
+CRAWFORD COUNTY COMMISSIONERS	Crawford	64,877.55	 $ 21,750.65 		
+CUMBERLAND COUNTY COMMISSIONERS	Cumberland	132,871.20	 $ 44,545.99 		
+DAUPHIN COUNTY COMMISSIONERS	Dauphin	275,390.36	 $ 92,326.52 		
+DELAWARE COUNTY EXECUTIVE	Delaware	280,992.29	 $ 94,204.60 		
+ELK COUNTY COMMISSIONERS	Elk	15,415.97	 $ 5,168.32 		
+ERIE COUNTY CHIEF EXECUTIVE	Erie	252,667.90	 $ 84,708.66 		
+FAYETTE COUNTY COMMISSIONERS	Fayette	178,955.57	 $ 59,996.09 		
+FOREST COUNTY COMMISSIONERS	Forest	6,771.06	 $ 2,270.05 		
+FRANKLIN COUNTY COMMISSIONERS	Franklin	98,151.77	 $ 32,906.06 		
+FULTON COUNTY COMMISSIONERS	Fulton	15,133.72	 $ 5,073.69 		
+GREENE COUNTY COMMISSIONERS	Greene	28,686.48	 $ 9,617.35 		
+HUNTINGDON COUNTY COMMISSIONERS	Huntingdon	34,359.63	 $ 11,519.31 		
+INDIANA COUNTY COMMISSIONERS	Indiana	69,323.86	 $ 23,241.30 		
+JEFFERSON COUNTY COMMISSIONERS	Jefferson	36,462.13	 $ 12,224.18 		
+JUNIATA COUNTY COMMISSIONERS	Juniata	20,019.73	 $ 6,711.76 		
+LACKAWANNA COUNTY COMMISSIONERS	Lackawanna	168,497.69	 $ 56,490.01 		
+LANCASTER COUNTY COMMISSIONERS	Lancaster	386,495.54	 $ 129,575.30 		
+LAWRENCE COUNTY COMMISSIONERS	Lawrence	79,548.29	 $ 26,669.11 		
+LEBANON COUNTY COMMISSIONERS	Lebanon	90,349.78	 $ 30,290.39 		
+LEHIGH COUNTY CHIEF EXEC	Lehigh	337,517.14	 $ 113,154.95 		
+LUZERNE COUNTY CHIEF EXEC	Luzerne	351,323.65	 $ 117,783.68 		
+LYCOMING COUNTY COMMISSIONERS	Lycoming	106,370.65	 $ 35,661.49 		
+MCKEAN COUNTY COMMISSIONERS	McKean	34,417.42	 $ 11,538.69 		
+MERCER COUNTY COMMISSIONERS	Mercer	231,844.28	 $ 77,727.39 		
+MIFFLIN COUNTY COMMISSIONERS	Mifflin	52,166.45	 $ 17,489.16 		
+MONROE COUNTY COMMISSIONERS	Monroe	120,523.25	 $ 40,406.25 		
+MONTGOMERY COUNTY COMMISSIONERS	Montgomery	247,148.66	 $ 82,858.29 		
+MONTOUR COUNTY COMMISSIONERS	Montour	10,311.89	 $ 3,457.14 		
+NORTHAMPTON CO CHIEF EXEC	Northampton	211,885.86	 $ 71,036.20 		
+NORTHUMBERLAND COUNTY COMMISSIONERS	Northumberland	88,353.15	 $ 29,621.00 		
+PERRY COUNTY COMMISSIONERS	Perry	23,452.79	 $ 7,862.72 		
+Philadelphia County	Philadelphia	1,467,329.47	 $ 491,932.33 		
+PIKE COUNTY COMMISSIONERS	Pike	43,997.93	 $ 14,750.61 		
+POTTER COUNTY COMMISSIONERS	Potter	12,448.59	 $ 4,173.49 		
+SCHUYLKILL COUNTY COMMISSIONERS	Schuylkill	171,469.41	 $ 57,486.30 		
+SNYDER COUNTY COMMISSIONERS	Snyder	25,621.95	 $ 8,589.95 		
+SOMERSET COUNTY COMMISSIONERS	Somerset	42,597.94	 $ 14,281.25 		
+SULLIVAN COUNTY COMMISSIONERS	Sullivan	5,871.45	 $ 1,968.45 		
+SUSQUEHANNA COUNTY COMMISSIONERS	Susquehanna	34,444.11	 $ 11,547.64 		
+TIOGA COUNTY COMMISSIONERS	Tioga	33,104.05	 $ 11,098.37 		
+UNION COUNTY COMMISSIONERS	Union	29,206.32	 $ 9,791.63 		
+VENANGO COUNTY COMMISSIONERS	Venango	21,272.67	 $ 7,131.82 		
+WARREN COUNTY COMMISSIONERS	Warren	1,940.74	 $ 650.66 		
+WASHINGTON COUNTY COMMISSIONERS	Washington	174,982.18	 $ 58,663.98 		
+WAYNE COUNTY COMMISSIONERS	Wayne	46,209.13	 $ 15,491.93 		
+WESTMORELAND COUNTY COMMISSIONERS	Westmoreland	214,704.49	 $ 71,981.16 		
+WYOMING COUNTY COMMISSIONERS	Wyoming	15,705.59	 $ 5,265.42 		
+YORK COUNTY COMMISSIONERS	York	214,031.41	 $ 71,755.51 		
+		9,428,004.65	 $ 3,160,803.78 		
+
+--------------------
+Attached Document: 655cf43808457_Additional-FY23-TEFAP-Entitlement.docx
+
+
+--------------------

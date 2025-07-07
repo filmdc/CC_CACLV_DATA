@@ -1,0 +1,95 @@
+Purpose: <p>-Donations received through the National Giving Alliance must be used for current residents and must not be given out exclusively as holiday or birthday gifts.</p><p>-Donations cannot be exchanged for money.</p><p>-Accurate records must be maintained and provided to NGA for their donations.</p><p>-NGA would also like to be acknowledged by means of a newsletter, social media, marketing materials or a letter of appreciation.</p>
+Funder: National Giving Alliance
+Program: SSS
+Amount: 0.00
+Start Date: 2024-01-31
+End Date: 
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 6671d295d9d07_2024-Agency-Registration-Form.docx---Google-Docs.pdf
+‭Founded in 1885‬
+‭Agency Name     _______________________________________________________________________‬
+‭Address               _________________________________________   County______________________‬
+‭City, State, Zip‬‭_______________________________________________________________________‬
+‭Phone                  ________________________________‬‭E-mail______________________________‬
+‭Director/CEO     ________________________________        Website ___________________________‬
+‭Federal E.I.N.     _______________________‬‭501 (C)‬‭ (3)? Yes_____   No_____‬‭	(Submit IRS Determination‬‭Letter)‬
+‭Agency contact person:‬
+‭Name           _________________________________________        Phone _____________________________‬
+‭E-mail           _________________________________________       Cell Phone: _________________________‬
+‭Name of Parent organization:‬‭(school district, county)‬
+‭Name           _____________________________________   Address __________________________________‬
+‭Please attach a copy of your organization’s mission statement‬
+‭All information provided is kept confidential‬
+‭NGA Office Use Only:‬
+‭Date rec'd _______________Ck  #___________ Amt________ Entry______ News______ e-mail_____‬Sixth Street Shelter 219 N. Sixth Street Lehigh Allentown, PA  18102 wwright@caclv.org Robbie Matthews https://www.sixthstreetshelter.org/ X 610-435-1490 Community Action Lehigh Valley 1337 E. 5th Street, Bethlehem, PA  18015 Wendy Wright wwright@caclv.org 484-821-2809 484-523-2556 X X X X X X X 23-1669589
+--------------------
+Attached Document: 6671d29be79fe_2024-Agency-Data-Form-Final.docx---Google-Docs-(1).pdf
+‭Dear Partnering Agency:‬
+‭NGA tracks data of populations served by the agencies we provide new clothing and other essential items. The data is‬
+‭used internally to project needs for the upcoming year and to report metrics to funding organizations. The data is‬
+‭reported in aggregate with data from all agencies NGA serves.‬‭	All sections must be completed.‬
+‭Please complete the requested data with‬‭	numbers only‬‭.‬
+‭1.‬‭Number of unduplicated beneficiaries (persons): ___________________‬
+‭2.‬‭Gender of unduplicated beneficiaries:‬‭Male: ________    Female: _________ Trans: __________‬
+‭3.‬‭Age of all unduplicated beneficiaries:‬
+‭0-4 years‬
+‭5-11 years‬
+‭12-19 years‬
+‭20-61 years‬
+‭62 years and older‬
+‭4.‬‭How many beneficiaries are the below listed populations presumed by HUD to be low-moderate income?‬
+‭Severely Disabled Adults‬
+‭Abused Children‬
+‭Battered Spouses‬
+‭Persons living with AIDS‬
+‭Illiterate Adults‬
+‭Migrant Farm Workers‬
+‭Homeless‬
+‭5.‬‭Below please list the income levels for all beneficiaries:‬
+‭A person’s income level is defined by the household’s gross annual income and is based on the area median‬
+‭income (AMI).‬
+‭0-30%  AMI‬
+‭31-50%  AMI‬
+‭51-80%  AMI‬
+‭81+%  AMI‬196 18 54 0 49 42 32 0 0 0 0 0 0 196 45 7 0 0 5 67 * The following numbers refers to household income. *Gender does not
+include124 children
+whose genders were
+not captured.
+
+‭6.‬‭How many beneficiaries receive the below listed benefits:‬
+‭SSI‬
+‭SNAP‬
+‭7.‬‭Race and ethnicity of persons benefited:  In accordance with HUD standards, Hispanic is an ethnic category that‬
+‭cuts across all races.  Aft	er identifying the number of beneficiaries in their corresponding race in the “All” column‬
+‭below, then enter the total number of each race that identify as Hispanic in the right hand column‬
+‭All‬‭Hispanic‬
+‭Black or African American‬
+‭American Indian or Alaska Native‬
+‭Asian‬
+‭Native Hawaiian or Other Pacific Islander‬
+‭White‬
+‭American Indian or Alaska Native and White‬
+‭Black or African American and White‬
+‭Asian and White‬
+‭Amer. Indian or Alaska Native and Black or‬
+‭Afr. Amer.‬
+‭Arab American‬
+‭Other‬
+‭TOTAL‬
+‭8.‬‭Below, please check categories that describe your agency‬‭:‬
+‭Health Care‬‭Secondary School‬‭Social Services‬
+‭Elderly‬‭Summer Camp‬‭Shelter‬
+‭Physically/Mentally‬
+‭challenged‬
+‭Pregnancy Center‬‭Other (Specify)‬
+‭Elementary School‬‭Day Care Center‬0 Unknown 35 0 0 0 0 0 0 0 50 6 12 0 0 0 0 0 0 0 0 0 18 X X 0 17 0
+--------------------
+Attached Document: 6671d2a20de88_0058_001-(3).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

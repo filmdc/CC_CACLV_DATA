@@ -1,0 +1,16 @@
+Purpose: <p>Overall funding to support the&nbsp;Housing Rehabilitation Program (HRP). The fund serves as a gap funding to cover the construction cost (partial or full cost) to assist low-income families living in Lehigh and Northampton counties, and HRP program administration. The fund does not have specific number of households to be assisted, but rather to support HRP to achieve the FY24/25 annual goals of 40 families from the work plan</p><ul><li>Total number of low-income assisted in FY24/25</li><li>A story of low-income families receiving our help (preferred but optional</li></ul><p><strong>Budget: </strong>$6,400 construction cost and $1,600 CAH staff salaries</p>
+Funder: Keystone Savings Foundation
+Program: CAH
+Amount: 8000.00
+Start Date: 2024-07-01
+End Date: 2025-06-30
+
+Notes: <ul><li>Provide Annual report to funder.</li><li>There is no reporting requirement for this grant.</li></ul>
+
+Fund Number: 
+
+Attached Document: 671276c64d810_Award-Letter-and-Check_CAH-10-17-2024.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

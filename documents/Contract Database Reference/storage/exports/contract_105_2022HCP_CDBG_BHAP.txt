@@ -1,0 +1,54 @@
+Purpose: <p>Salaries and Fringe benefits for counseling supporting downpayment assistance</p>
+Funder: City of Bethlehem -CDBG-BHAP
+Program: HCP
+Amount: 20000.00
+Start Date: 2022-01-01
+End Date: 2023-12-31
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 641c89ae18de5_2022HCP_BethlehemCDBGBHAP_signed-contract-and-amendment.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 641c89b0ee2dd_2022HCP_CityofBethlehemCDBGBHAP_award-summary.pdf
+Grant Award Summary 
+Program  HCP  
+Funder and Year  City of Bethlehem CDBG 2022 
+Time Frame Extended to December 2023 
+Amount 
+Received 
+$20,000 
+Purpose Reimbursement for Salary and Fringe Benefits for HCP 
+Reports Due -Quarterly Reports due every April 10
+th
+, July 10
+th
+, October 10
+th
+ and January 
+10
+th
+ to be completed in the Neighborly portal. 
+ 
+Data to be 
+collected 
+Total number of clients served, demographic and income information and 
+narrative surrounding accomplishment of program goals.  
+Need to Know **This is a reimbursable grant that should be billed monthly. Invoices 
+should include copy of payroll register and pay checks. 
+Budget/Grantor 
+Information 
+ This was included in the budget and is not a new funder. 
+Additional Info Reports and records are to be kept a minimum of 4 years. 
+ 
+Please let me know if you have any further questions or concerns!
+--------------------
+Attached Document: 64356144091d0_2023HCP_CityofBethlehemBHAP_executedextension.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

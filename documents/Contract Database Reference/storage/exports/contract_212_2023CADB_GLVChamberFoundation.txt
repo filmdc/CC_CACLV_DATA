@@ -1,0 +1,28 @@
+Purpose: <p>Mural to be installed somewhere in the greenway area between 3rd&nbsp;and 4th&nbsp;Streets in South Bethlehem by a local Bethlehem based artist.</p><ul><li>This grant requires a 1:1 match using Southside Tomorrow NPP Funds.</li></ul>
+Funder: GLV Chamber Foundation
+Program: CADB
+Amount: 2000.00
+Start Date: 2023-08-31
+End Date: 2024-06-24
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 64c81f98dba11_2023CADB_GLVChamberFoundation_award-email.docx
+
+
+--------------------
+Attached Document: 64c81fab8167f_2023CADB_LVChamber_MainStreetGrant_Narrative.docx
+
+Community Action Development Bethlehem – 2023 Request for Funding
+Community Action Development Bethlehem is respectfully requesting $2,000 in support of the installation of a mural painted by local, Bethlehem-based artists. In the past, South Bethlehem historically served as a gateway for city visitors through its connection to major highways and bridge to the city’s Main Street. In recent years, with the development of the south Bethlehem Greenway and the revitalization of the business district, south Bethlehem has become a hub for arts, culture, and small businesses. South Bethlehem now serves as a primary corridor where both long-term residents and newcomers live, work and play.
+As a community development organization, CADB is committed to the ongoing growth of our diverse community. This commitment is demonstrated by our implementation of the Southside’s Tomorrow Master Plan which prioritizes Public and Green Spaces as well as Communication and Connectivity. This project is central to the fulfillment of the goals and objectives associated with these key areas.
+Through this mural&#039;s installation, CADB aims to enhance the cultural vibrancy and aesthetic appeal of South Bethlehem, a neighborhood that holds significant historical and artistic value. This mural will not only beautify the neighborhood but also serve as a catalyst for community engagement. Through community events and meetings, CADB will offer an opportunity for community members to participate in the project’s execution. CADB will oversee the entire mural project from start to finish. We will engage in a thorough artist selection process, collaborate with community stakeholders to garner feedback on the mural’s design, secure necessary permissions, and ensure the project&#039;s successful completion.
+
+--------------------
+Attached Document: 64f72ccec62f3_Chambers-Grant-Reimbursement-Form.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

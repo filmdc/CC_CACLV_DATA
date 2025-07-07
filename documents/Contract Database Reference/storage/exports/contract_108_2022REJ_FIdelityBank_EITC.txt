@@ -1,0 +1,91 @@
+Purpose: <p>General operating GENX and SHE</p>
+Funder: Fidelity Bank EITC
+Program: REJ
+Amount: 6500.00
+Start Date: 2022-11-15
+End Date: 2023-06-30
+
+Notes: <p>Reporting to be determined: Information in yearly evaluation such as program impact/students served and fiscal details of how the money was spent.&nbsp;</p>
+
+Fund Number: 
+
+Attached Document: 641c809190200_2022CREJ_FidelityBankEITC_AWARD.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 641c809425ad6_Fidelity-Bank-Letter-with-Signature.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 641c809713e31_Fidelity-Bank-Agknowledgment-of-Receipt-of-Funds.pdf
+December 1 2022   
+ 
+Rose Coyne 
+Financial Reporting Specialist 
+338 N. Washington Ave. 
+Scranton, PA, 18503 
+ 
+Dear Mrs. Coyne: 
+ 
+Community Action Lehigh Valley thanks Fidelity Deposit and Discount Bank for the EITC contribution 
+of $6,500 to support our work as an Education Improvement Organization. The contribution was 
+received via check on November 22, 2022 , Reference # V0000002740, Check # 099650, in the amount 
+of $6,500, and dated November 15, 2022. 
+ 
+With this support, we will help under‐resourced students in our region from adolescence through 
+adulthood. From helping the girls in the SHE program successfully navigate the difficult transition from 
+elementary to middle school, to the prospective first‐generation college students about to begin the 
+next chapter of their lives with Generation Next, your contribution has immense impact on the journey 
+our students take as life‐long learners. 
+ 
+We take our responsibility as stewards of your investment in our students and their neighborhoods very 
+seriously. Count on that to continue. 
+ 
+It has been great to work with you. Thank you for carrying the burden of our partnership. 
+Sincerely, 
+ 
+ 
+Dawn Godshall 
+Executive Director 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+1337 East 5
+th
+ Street, Bethlehem PA 18015 | 610.691.5620 | communityactionlv.org
+--------------------
+Attached Document: 641c809b0bdd8_2022CREJ_FidelityBankEITC_Award-Summary.pdf
+Grant Award Summary 
+Program  CREJ 
+Funder and 
+Year  
+Fidelity Bank EITC 
+Time Frame Spend funds by June 30, 2023 
+Amount 
+Received 
+$6,500 
+Purpose Education Improvement activities for students in GENX and SHE. 
+General Operation support. 
+Reports 
+Due 
+TBD 
+Data to be 
+collected 
+Information in yearly evaluation such as program 
+impact/students served and fiscal details of how the money was 
+spent. 
+Need to 
+Know 
+ 
+Additional 
+Info 
+Reports and records are to be kept a minimum of 4 years. 
+ 
+Please let me know if you have any further questions or concerns!
+--------------------

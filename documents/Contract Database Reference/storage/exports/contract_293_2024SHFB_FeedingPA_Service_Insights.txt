@@ -1,0 +1,172 @@
+Purpose: <p>Feeding PA has provided a $50,000.00 grant to support implementation of Service Insights to partner agencies. This is a lump sum grant.</p><ul><li>Hire a Community Programs&nbsp;Coordinator&nbsp;who will dedicate¾&nbsp;of their time to the electronic data collection initiative (approximately&nbsp;.75 FTE).</li><li>Work through the Feeding America checklists to&nbsp;create a framework for building out an electronic data collection pilot program, identify and begin implementation with an initial cohort&nbsp;of five (S) partner&nbsp;agencies,&nbsp;and subsequently continue implementation with additional partners.</li></ul><p>A SHFB representative&nbsp;must participate in the monthly Data Project Taskforce calls hosted by FPA and&nbsp;submit two&nbsp;brief reports summarizing the&nbsp;progress of implementation.&nbsp;</p><p>Reports are due as follows: on or before <strong>June 1, 2024</strong>; and on or before <strong>December 31, 2024</strong>. Guidelines regarding the report will be forthcoming from Feeding PA.</p><p>Questions may be submitted to Shea Saman at Feeding PA (ssaman@feedingpa.org).</p>
+Funder: Feeding PA
+Program: SHFB
+Amount: 50000.00
+Start Date: 2024-01-01
+End Date: 2024-12-31
+
+Notes: 
+
+Fund Number: F8086
+
+Attached Document: 65a98a64cee5e_2023_SHFB_FeedingPA_Service-Insights-Proposal.pdf
+GRANT APPLICATION
+FEEDING PENNSYLVANIA
+FOOD BANK INFORMATION
+FUNDING REQUEST
+For more information :
+Claudia Sauers, Data Systems Project Manager
+717-710-3096 (Office) / csauers@feedingpa.org
+Food Bank Name: 
+ Applicant Name and Title: 
+ 
+Contact Phone/Email: 
+Executive Director Name: 
+Funding Amount Requested: 	Grant Period Requested: 
+Proposed Use of Funds: 
+ 
+By submitting this application you are verifying that this proposal has been approved by your Food Banks 
+leadership. 
+ 
+Please submit completed applications by email to Claudia Sauers at csauers@feedingpa.org and Erin Haafke 
+at ehaafke@feedingpa.org  
+ 
+Grant proposals will be reviewed within 30 days of receipt. 
+(Please attach an additional page to this application outlining your proposed use of the funds, including 
+any anticipated metrics for evaluating success.)
+
+Second Harvest Food Bank of the Lehigh Valley and Northeast PA   1 
+ 
+Feeding Pennsylvania Grant Application 
+Second Harvest Food Bank of the Lehigh Valley and Northeast PA 
+Project Description and Proposed Use of Funds 
+ 
+Overview of Organization 
+Second Harvest Food Bank of the Lehigh Valley and Northeast PA is a program of Community Action Lehigh 
+Valley, the region’s leading anti-poverty organization, and a member of Feeding America – the nation’s 
+largest charitable food network. Second Harvest serves Lehigh, Northampton, Carbon, Monroe, Pike, and 
+Wayne counties.  
+Last year, Second Harvest distributed 14.7 million pounds of food to our network of 200+ nonprofit 
+agencies (food pantries, schools, meal centers, shelters, childcare agencies, senior centers, veterans 
+organizations), a 44% increase from the previous year. Included in this total is 6.7 million pounds of fresh 
+produce, perishable protein, and fresh dairy products (46% of total distribution). Annually, we rescue more 
+than 8 million pounds of food from ending up in a landfill.  
+On average, the Second Harvest network serves more than 87,000 people each month - a 52% increase 
+from last year. The pantries within the Second Harvest network are operated almost solely through the 
+work of community volunteers. Our food distribution is a model of neighbors helping neighbors.  
+In addition to food distribution to our network, Second Harvest operates several programs aimed at 
+improving the health of our community and working toward a more just and equitable local food system. 
+We administer the Pennsylvania Senior Food Box Program (PASB). PASB works to improve the health of 
+low-income seniors by supplementing their diets with shelf-stable nutritious foods. We work to 
+supplement the boxes with healthy, fresh items when possible. Currently, Second Harvest provides senior 
+food boxes to 2,350 seniors across 49 sites each month. 
+Our MilitaryShare program works “to serve those who served us” by providing access to nutritious food, 
+with a goal of improving health outcomes and easing financial strain among low-income active duty, 
+reserve, and retired military members and their families. Our MilitaryShare program provides 500+ 
+military families with a share of fresh and shelf-stable food each month.  
+Our SNAP (Supplemental Nutrition Assistance Program) outreach coordinators work with local county 
+offices of Health and Human Services to offer SNAP application assistance. Our SNAP coordinators offer 
+dedicated personal application support to ensure that all eligible participants receive needed benefits. 
+We offer a dynamic community-based nutrition education program, which includes free cooking classes 
+and demonstrations for parents, kids, and childcare providers, where participants learn about cooking, 
+meal prep, grocery shopping, food budgeting, and nutrition. Through our Healthy Pantry Initiative (HPI), a 
+program of Feeding Pennsylvania, our HPI Coordinator works with pantry staff and volunteers to 
+encourage consumption of nutritious and fresh foods, and also provides direct nutrition education to 
+pantry clients.  
+Additionally, Second Harvest operates The Seed Farm, a 42-acre training farm. Because there can be no 
+access to nourishing food without farms, The Seed Farm works to support food production at all levels,
+
+Second Harvest Food Bank of the Lehigh Valley and Northeast PA   2 
+ 
+from home gardeners to community gardens to local farmers, with an emphasis on getting nutritious and 
+locally-grown food to under-resourced communities. Strong local food systems equal food security. 
+ 
+Project Description 
+It is our priority to move into more data-informed decision making. Electronic data collection at the pantry-
+level will lead to a better understanding of the people we serve and will ensure we are able to keep the 
+needs of our participants at the forefront of our strategic planning, program development, and food 
+distribution efforts. We also recognize that we will be excluded from future funding opportunities if we 
+are unable to supply the demographic data required by funders. Developing and standardizing our data 
+collection mechanisms is essential.  
+Our primary goals for pantry-level electronic data collection include: 
+• Obtain an unduplicated count of the people served by the food bank; 
+• Gain an understanding of the demographic composition of the people utilizing our pantry 
+network; 
+• Facilitate effective culturally relevant and health conscience food and nutrition information; and 
+• Streamline reporting for TEFAP requirements and other government and non-government 
+programs. 
+ 
+During fiscal year 2023, an intern worked with Second Harvest staff to develop internal communication 
+strategies; gauged interest among a pilot group of pantries; and worked with pantries to complete the 
+process that would allow them to gain access to the test site (data sharing agreement, client privacy 
+agreement). A draft workplan has been developed, along with an SOP and toolkit for food bank staff use. 
+Basic partner agency training tools have been created to assist with onboarding.  
+Our Community Programs Coordinator will build upon the work done by our intern and will oversee the 
+rollout of our electronic data collection initiative, starting with a cohort of five (5) agencies.  
+Our rollout plan aligns with Feeding America’s recommended strategy. The Second Harvest network is 
+comprised of 200+ partner agencies. Our goal is to onboard 60 agencies within our first year of 
+implementation (January – December 2024).  
+Phase one of rollout will include pantries that offer a full-choice grocery model serving the entire 
+household, participate in our retail recovery program, participate in our Healthy Pantry Initiative, and the 
+OrderAhead grocery ordering system.  
+The second phase of rollout will include pantries that do not offer full-choice and/or programs that serve 
+specific populations – kids, veterans, college students.  
+Pantries will be ranked by number of people served, with the pantries serving the greatest number of 
+people given priority. Priority will also be given to agencies that receive support from Second Harvest 
+through funders that require data-driven reporting measures (exm: United Way). This will ensure that we 
+are able to satisfy donor requirements to keep future funding secure, ultimately allowing us to expand our 
+reach and serve more neighbors.
+
+Second Harvest Food Bank of the Lehigh Valley and Northeast PA   3 
+ 
+Additionally, our Commodity Supplemental Food Program (CSFP), which serves seniors in-need, currently 
+utilizes Link2Feed through our contract with Feeding Pennsylvania. We provide CSFP food to seniors at 49 
+sites. The Community Programs Coordinator will provide electronic data collection oversight to all CSFP 
+sites, in addition to pantry sites.  
+It is our goal to onboard all partner agencies to participate in electronic data collection within four years 
+of initial implementation. The Community Programs Coordinator will dedicate about ¾ of their time to 
+electronic data collection for the initial four years. Once the entirety of our partner network has been set-
+up, the maintenance of the program will be transitioned to agency relations staff. 
+ 
+Timeline of Activities for Grant Period 
+The Community Programs Coordinator job description has been posted and we anticipate hiring to fill the 
+role by mid-January 2024. 
+Following an orientation period, the Community Programs Coordinator will immediately review the 
+research and data that was gathered and the materials and tools that were created by our intern, and will 
+work through the Feeding America checklists to create a framework for building out our electronic data 
+collection pilot program.  
+The Coordinator will conduct stakeholder meetings and interviews with our pantry network and will 
+identify the first cohort of five (5) partner agencies. 
+The Coordinator will onboard and train the first cohort, taking steps to learn best practices and hone 
+training techniques. Additional partner agencies will be continually added into the program, with the goal 
+of reaching 60 participating partners by the end of December 2024.  
+ 
+Measurement of Success 
+Success will be measured by: 
+1) Our ability to confidently report on the number of unduplicated people served, and 
+2) The consistent, complete, and timely submission of monthly reporting by our agencies.  
+ 
+Budget and Plan for Sustainability 
+Second Harvest Food Bank respectfully requests $50,000 from Feeding Pennsylvania to support the partial 
+salary and fringe benefits of the Community Programs Coordinator to build out and implement electronic 
+data collection at the pantry-level. The Community Programs Coordinator will dedicate ¾ of their time to 
+the electronic data collection initiative (approximately .75 FTE). 
+Second Harvest is sustained by a multi-faceted development strategy. Funding comes from corporations, 
+foundations, government entities, and individual donors.  Second Harvest has a 40-year history of meeting 
+our fundraising goals and supporting our programs, which will include electronic data collection.
+
+Second Harvest Food Bank of the Lehigh Valley and Northeast PA   4 
+ 
+Funding sources will be secured to support additional staff time beyond year one, and technology needs 
+for our pantry network.
+--------------------
+Attached Document: 65f9b0c956a98_2024SHFB_Svc-Insights_Award-Letter.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6602bb6d90cf7_FA-Service-Insignts-Master-License-Agreement_SHFB_LVNEPA_signed-3-22-24.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

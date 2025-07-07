@@ -1,0 +1,54 @@
+Purpose: <p>Reimbursement for Salary and Fringe Benefits for the CADA Director and Community Outreach Coordinator.&nbsp;</p>
+Funder: Allentown CDBG
+Program: CADA
+Amount: 10000.00
+Start Date: 2022-01-01
+End Date: 2023-12-31
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 641c7fbfb0890_2022-2023CADA_Allentown-CDBGYear48_Executed-contract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 641c7fd70db17_2022-2023CADA_AllentownCDBGYEar48_award-summary.pdf
+Grant Award Summary 
+Program  CADA Allentown CDBG  
+Funder and Year  48
+th
+ Year Allentown CDBG 
+Time Frame January 2022-December 2023 
+Amount 
+Received 
+$10,000 
+Purpose Reimbursement for Salary and Fringe Benefits for the CADA Director and 
+Community Outreach Coordinator. 
+Reports Due -Quarterly Reports due every April 10
+th
+, July 10
+th
+, October 10
+th
+ and January 
+10
+th
+.  
+ 
+Data to be 
+collected 
+Total number of clients served, demographic and income information and 
+narrative surrounding accomplishment of program goals. Goals as 
+described in the contract are business trainings and entrepreneurial 
+mentorship opportunities for  low-income youth ages 15-21 in the City of 
+Allentown or more specifically Center City. 
+Need to Know **This is a reimbursable grant. 
+Budget/Grantor 
+Information 
+ This was included in the budget and is not a new funder. 
+Additional Info Reports and records are to be kept a minimum of 4 years. 
+ 
+Please let me know if you have any further questions or concerns!
+--------------------

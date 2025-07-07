@@ -1,0 +1,21 @@
+Purpose: <p>-Salary and Benefits&nbsp;</p><p>-Reimbursable</p>
+Funder: NC DCED CDBG
+Program: HCP
+Amount: 21000.00
+Start Date: 2023-10-01
+End Date: 2025-09-30
+
+Notes: <ul><li>Semi- Annual Reports due October 30th and April 30th to Fbrooks@norcopa.gov.</li><li>Reporting Forms are Exhibit B-4 of contract</li></ul>
+
+Fund Number: 0753
+
+Attached Document: 65f853a5619d7_2023HCP_NCCDBG_HOusing-Counseling-Assistance-Program-signed-contract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6684148c1fc36_HCP--NC-CDBGHousing-Counseling-Program-executed.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

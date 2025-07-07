@@ -1,0 +1,21 @@
+Purpose: <p>-Use for Supportive Services for Shelter Residents including:</p><ul><li>Salary and benefits for the Overnight Caretaker, Intake Specialist, Office Administrator, Maintenance Person, Case Manager, and Housing Specialist.</li><li>Please see Scope of Services and Deliverables (Exhibit B page 18-19 of the contract attached) for detailed activities to be carried out with this grant funding.</li></ul><p><strong>Reporting:</strong></p><ul><li>Quarterly Expense Reports are required (Use exhibit C on page 20 of the contract attached and send to latarsha.brown@allentownpa.gov and grants@allentownpa.gov with all appropriate supporting back up)</li><li>Quarterly Touch base, which can be conducted by a scheduled phone call or Teams Meeting.</li><li>&nbsp;Mid-Point Report, which will measure the progress of goals and scope of services.</li><li>&nbsp;Final Report due upon the depletion of the grant allocation or end term of the grant agreement.</li><li>For all reporting requirements the city will reach out to schedule or request information.</li><li>&nbsp;If you have any questions regarding these reports, please contact grants@allentownpa.gov&nbsp;</li></ul><p><strong>******THIS MONEY WILL COME IN LUMP SUM</strong></p>
+Funder: City of Allentown
+Program: SSS
+Amount: 50000.00
+Start Date: 2024-12-30
+End Date: 2025-12-31
+
+Notes: 
+
+Fund Number: F1220
+
+Attached Document: 6761cee0321f4_2024SSS_City-of-Allentown_-Community-Reinvestment-Agreement.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 679bdf64ef3e6_2024SSS_City-of-Allentown_-Community-Reinvestment-Fund-executed.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

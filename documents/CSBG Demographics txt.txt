@@ -1,0 +1,113 @@
+
+CALV Program Reporting: 
+A. Total unduplicated number of all INDIVIDUALS about whom one or more characteristics were obtained:
+B. Total unduplicated number of all HOUSEHOLDS about whom one or more characteristics were obtained:
+C. INDIVIDUAL LEVEL CHARACTERISTICS
+1. Gender Number of Individuals 6. Ethnicity/Race Number of Individuals
+a. Male a. Ethnicity
+b. Female a.1. Hispanic, Latino or Spanish Origins
+c. Other a.2. Not Hispanic, Latino or Spanish Origins
+d. Unknown/not reported a.3. Unknown/not reported
+e. TOTAL (auto calculated) 0 a.4. TOTAL (auto calculated) 0
+2. Age Number of Individuals b. Race
+a. 0-5 b.1. American Indian or Alaska Native
+b. 6-13 b.2. Asian
+c. 14-17 b.3. Black or African American
+d. 18-24 b.4. Native Hawaiian and Other Pacific Islander 
+e. 25-44 b.5. White
+f. 45-54 b.6. Other
+g. 55-59 b.7. Multi-race (two or more of the above)
+h. 60-64 b.8. Unknown/not reported
+i. 65-74 b.9. TOTAL (auto calculated)  0
+j. 75+
+k. Unknown/not reported
+l. TOTAL (auto calculated) 0 a. Veteran
+b. Active Military
+3. Education Levels Number of Individuals c. Never Served in the Military
+[ages 14-24] [ages 25+] d. Unknown/not reported
+a. Grades 0-8 e. TOTAL (auto calculated) 0
+b. Grades 9-12/Non-Graduate
+c. High School Graduate 8. Work Status (Individuals 18+) Number of Individuals
+d. GED/Equivalency Diploma a. Employed Full-Time
+e. 12 grade + Some Post-Secondary b. Employed Part-Time
+f. 2 or 4 years College Graduate c. Migrant Seasonal Farm Worker
+g. Graduate of other post-secondary school d. Unemployed (Short-Term, 6 months or less)
+h. Unknown/not reported e. Unemployed (Long-Term, more than 6 months) 
+i. TOTAL (auto calculated) 0 0 f. Unemployed (Not in Labor Force)
+g. Retired
+4. Disconnected Youth Number of Individuals h. Unknown/not reported
+a. Youth ages 14-24 who are neither working or in school i. TOTAL (auto calculated) 0
+5. Health Number of Individuals
+Yes No Unknown
+a. Disabling Condition
+Yes No Unknown
+b. Health Insurance*
+Health Insurance Sources
+c.1. Medicaid
+c.2. Medicare
+c.3. State Children’s Health Insurance Program
+c.4. State Health Insurance for Adults
+c.5. Military Health Care
+c.6. Direct-Purchase
+c.7. Employment Based
+c.8. Unknown/not reported
+Module 4, Section C: All Characteristics Report - Data Entry Form
+Goal 1: Individuals and Families with low-incomes are stable and achieve economic security.
+*If an individual reported that they had Health Insurance please identify the source of health insurance below.
+August 2017 Module 4, Section C: All Characteristics Report
+c.9. TOTAL (auto calculated) 0
+D. HOUSEHOLD LEVEL CHARACTERISTICS
+9. Household Type Number of Households 13. Sources of Household Income Number of Households
+a. Single Person a. Income from Employment Only 
+b. Two Adults NO Children b. Income from Employment and Other Income Source  
+c. Single Parent Female c. Income from Employment, Other Income Source,
+d. Single Parent Male       and Non-Cash Benefits 
+e. Two Parent Household d. Income from Employment and Non-Cash Benefits
+f. Non-related Adults with Children e. Other Income Source Only
+g. Multigenerational Household f. Other Income Source and Non-Cash Benefits
+h. Other g. No Income
+i. Unknown/not reported h. Non-Cash Benefits Only
+j. TOTAL (auto calculated) 0 i. Unknown/not reported
+j. TOTAL (auto calculated) 0
+10. Household Size Number of Households
+a. Single Person
+b. Two
+c. Three 14. Other Income Source Number of Households
+d. Four a. TANF
+e. Five b. Supplemental Security Income (SSI)
+f. Six or more c. Social Security Disability Income (SSDI)
+g. Unknown/not reported d. VA Service-Connected Disability Compensation
+h. TOTAL (auto calculated) 0 e. VA Non-Service Connected Disability Pension
+f. Private Disability Insurance
+11. Housing Number of Households g. Worker’s Compensation
+a. Own h. Retirement Income from Social Security
+b. Rent i. Pension
+c. Other permanent housing j. Child Support
+d. Homeless k. Alimony or other Spousal Support
+e. Other l. Unemployment Insurance
+f. Unknown/not reported m. EITC
+g. TOTAL (auto calculated) 0 n. Other
+o. Unknown/not reported
+12. Level of Household Income Number of Households
+(% of HHS Guideline) 15. Non-Cash Benefits Number of Households
+a. Up to 50% a. SNAP
+b. 51% to 75%  b. WIC
+c. 76% to 100% c. LIHEAP
+d. 101% to 125% d. Housing Choice Voucher
+e. 126% to 150% e. Public Housing
+f. 151% to 175% f. Permanent Supportive Housing
+g. 176% to 200% g. HUD-VASH
+h. 201% to 250% h. Childcare Voucher
+i. 250% and over i. Affordable Care Act Subsidy
+j. Unknown/not reported j. Other
+k. TOTAL (auto calculated) 0 k. Unknown/not reported
+E. Number of Individuals Not Included in the Totals Above  (due to data collection system integration barriers) 
+a. Please list the unduplicated number of INDIVIDUALS served in each program*: Number of Individuals
+F. Number of Households Not Included in the Totals Above  (due to data collection system integration barriers) 
+a. Please list the unduplicated number of HOUSEHOLDS served in each program*: Number of Households
+*The system will add rows to allow reporting on multiple programs. 
+Below, please report the types of Other income and/or non-cash benefits received by the 
+households who reported sources other than employment 
+Program Name
+Program Name
+August 2017 Module 4, Section C: All Characteristics Report

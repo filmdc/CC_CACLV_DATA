@@ -1,0 +1,114 @@
+Purpose: <p>-Equipment purchase for AfterZone Flag Football Program</p>
+Funder: Iron Pigs Charities
+Program: CADA
+Amount: 2500.00
+Start Date: 2025-01-01
+End Date: 2025-12-31
+
+Notes: <ul><li>An end of project summary is required by November 3rd, 2025</li><li>Iron Pigs Charities would like a site visit during the grant period</li><li>Any publicity, advertisement or public comment related to this project must acknowledge and credit the participation of Iron Pigs Charities. Please use official Iron Pigs Charities logo.</li></ul><p>Contact Anne Culhane</p><p>aculhane@ironpigsbaseball.com</p><p>(610) 841- 1228</p>
+
+Fund Number: F1404
+
+Attached Document: 67800ac95914a_Iron-Pigs-Charities---Award-letter-24-25.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 67800ad3c211a_CADA-FY25-Iron-Pigs-Charities---FINAL.pdf
+Community Action Development Allentown - 
+Intramural Flag Football Program
+Iron Pigs Charities Grant
+Allentown's CORE NPP 
+(Secured)
+Non-Personnel Expense Budget
+Flag Football Equipment 2,500 0
+Competition / Tournament Registration 1,500 0
+Food For Students 1,250 0
+Referee / Officiating Costs 500 0
+Teacher / Coach Stipends 1,000
+Student Transportation 1,500
+Revenue Totals $                                                  5,750  $                                  2,500 
+Total Project Cost $                                  8,250
+
+REVENUE
+Individual Contributions                  10,000 
+Corporate/Business Contributions                    9,500 
+Events- Sponsorship                    2,500 
+Corporate/business grants                    2,400 
+NPP Contributions               650,000 
+Foundation/Trust grants                    5,000 
+SUB-TOTAL NON GOV'T FUNDING               679,400 
+Federal grants            1,130,000 
+State grants                           -   
+Local government grants                    1,000 
+SUB-TOTAL GOV'T FUNDING	1,131,000          
+TOTAL REVENUES $         1,810,400 
+EXPENSES
+Contracts - Program Related            1,293,018 
+Grants to Sub-grantees                  35,000 
+Salaries & wages                125,653 
+Pension plan contributions                  33,675 
+Employee benefits - Medical/Dental/Vision/Life                  27,081 
+Payroll taxes, etc.                  12,736 
+Accounting fees                    4,000 
+Professional fees - other                    2,817 
+Supplies                    1,600 
+Program Supplies                  15,000 
+Telephone & telecommunications                  12,000 
+Printing & copying                       150 
+Books & Subscriptions                    2,500 
+Rent, Monthly Parking Fees, Occupancy Fees                  22,999 
+Utilities                    4,000 
+Facilities Maintenance                    4,000 
+Equipment Rental & Maintenance                    3,500 
+Travel (Mileage, Parking)                    3,720 
+Conferences, conventions, meetings                    2,500 
+Insurance - non-employee related                    5,100 
+Staff development/Training                       100 
+Outside computer services                       150 
+Computer software                    3,268 
+Computer hardware                       100 
+Advertising expenses                       400 
+Other Expenses                    2,000 
+Community Action Development Allentown - FY25 Budget
+
+TOTAL EXPENSES $         1,617,067 
+ADD:  DEFERRED REVENUES CARRIED FWD FROM PREVIOUS FISCAL YEAR               283,176 
+LESS:  DEFERRED REVENUES CARRIED FWD TO NEXT FISCAL YEAR               370,592 
+Cash Excess/(Loss) before Mgt Fees                 105,917 
+Program administration allocations               105,869 
+Cash Excess/(Loss) $                      48
+
+Board of Directors - August 2024
+Name Board Title Professional Affiliation Professional Title Phone Number Email Term Start Term End
+Shalanda Riddick Board Member Visit Vans LLC Owner 484-294-7655	SLR.invests@gmail.comAug-24 Aug-25
+Megan Colon Chairperson Straight A Uniforms Owner
+610-433-4698 (W) 484-
+892-953 (Cell) megancolon519@gmail.comAug-23 Aug-26
+Monica Lynn Brooks 1st Vice-Chairperson PPL Electric Utilities
+Manager - Diversity & 
+Inclusion 703-599-5866	mbrooks15819@gmail.comAug-23 Aug-26
+Alexandra Fernandez Secretary
+Copeland Wellness and 
+Recovery Center PA Training Coordinator 484-954-0718 (C) alliefernandez58@gmail.comAug-22 Aug-25
+Iris Olivera 2nd Vice-Chairperson The Granite Guy Owner
+484-274-4001 (W)
+484-538-6195 © Olivera0580@gmail.comAug-23 Aug-26
+Juan Dipini Board Member Retired - Veteran N/A 484-714-4232 ©	dipinij66@gmail.com Aug-22 Aug-25
+Anna Barbosa Board Member Pinebrook Family Answers
+Director of Integrated 
+Behavioral Health Services 610-248-4948 ©abarbosa@pbfalv.org Aug-23 Aug-26
+Jason McFarquhar Treasurer
+Lehigh Valley Health 
+Network
+Certified Sterile Processing 
+Technician 917-476-9913 	jaym718@yahoo.com Aug-22 Aug-25
+Meilin Lazarde Board Member Truist Bank
+Assistant Vice-President, 
+Branch leader II 610-439-0446 (W) Meilin.Lazarde@truist.comAug-24 Aug-27
+--------------------
+Attached Document: 678132841c01d_2025CADA_-Iron-Pigs_-AfterZone-Football-agreement.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

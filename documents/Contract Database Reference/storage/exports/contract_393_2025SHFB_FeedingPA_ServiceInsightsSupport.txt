@@ -1,0 +1,16 @@
+Purpose: <p>This is a $75,000 lump sum grant made available by Feeding PA to support the implementation of Service Insights to partner agencies.&nbsp;</p><p>Goals:</p><ul><li>Support personnel costs who will dedicate 1/4 of their time to the electronic data collection initiative</li><li>Meet the technology needs of onboard partner agencies, including but not limited to the purchase of technology or technology incentives to support technology needs. Exact discretion of usage of funds is left to SHFB.</li><li>Provide one analysis using the data from onboarded sites demonstrating the impact of Service Insights. The anticipated completion dates for these analyses are between June 1, 2025 and June 30, 2025.</li></ul><p>As a condition of this grant, appropriate personnel must participate in the Data Project Taskforce calls hosted by FeedingPA and submit two brief reports summary the progress of implementation. The reports are due January 1, 2025 and June 30, 2025.</p><p>Grant period is July 1, 2024 - June 30, 2025.&nbsp;</p><p>Questions regarding this grant should be directed to Shea Saman, Chief Financial Officer, at <a href="mailto:ssaman@feedingpa.org">ssaman@feedingpa.org</a>.</p>
+Funder: Feeding PA
+Program: SHFB
+Amount: 75000.00
+Start Date: 2024-07-01
+End Date: 2025-06-30
+
+Notes: 
+
+Fund Number: F8087
+
+Attached Document: 671943658293f_Service-Insights-technology-grant.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

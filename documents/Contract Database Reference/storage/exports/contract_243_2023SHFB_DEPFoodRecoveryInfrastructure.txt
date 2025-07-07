@@ -1,0 +1,21 @@
+Purpose: <p>This grant is from the PA Dept of Environmental Protection, for the purchase of warehouse equipment.</p><p>This is a reimbursable grant, not to exceed <strong>$47,488.00</strong>.</p><p>Unique invoices must be submitted for every purchase. Disbursement request forms will be forwarded by Berit Case (bcase@pa.gov).</p><p>Project completion deadline is June 30, 2024. &nbsp;There is no report due.</p><figure class="image"><img src="http://10.55.0.10/storage/472/image.png"></figure>
+Funder: PA Dept of Environmental Protection
+Program: SHFB
+Amount: 47488.00
+Start Date: 2022-07-01
+End Date: 2024-06-30
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 652fd1b2154c9_2023SHFB_Food-Recovery-and-Infrastructure.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 653fa7448ce77_2023SHFB_Food-Recovery-and-Infrastructure.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

@@ -1,0 +1,434 @@
+Below is a **comprehensive** review of potential differences between the CSBG demographics report’s **expected** values and what the code currently produces. The goal is to highlight every place where the code might not match the **verbatim** CSBG categories or standard labeling, so you can refactor accordingly.
+
+---
+
+## 1. Race & Ethnicity
+
+**Where to look**:  
+Lines referencing race and ethnicity in the `prepareReportData` method. Search for:
+```php
+// Race
+if (isset($participant->race)) {
+    …
+}
+```
+and
+```php
+// Ethnicity
+if (isset($participant->ethnicity)) {
+    …
+}
+```
+
+**Potential Issues**:
+1. **Wording**:  
+   - The code uses “American Indian or Alaska Native,” “Black or African American,” etc.—but ensure these match CSBG exact wording:
+     - Some CSBG forms might say “American Indian and Alaska Native” or “Native Hawaiian or other Pacific Islander” instead of “Native Hawaiian and Other Pacific Islander.”  
+   - Confirm “Hispanic/Latino” exactly matches the standard your agency expects. Because the code lumps “hispanic,” “latino,” and “hispanic/latino” into “Hispanic/Latino,” that’s likely correct, but verify.
+
+2. **Edge Cases**:  
+   - If the code sees a race string that doesn’t match any known keywords, it defaults to “Unknown.” Some CSBG forms may say “Data not collected.” Decide which is correct.  
+
+3. **Refactor Needed**:
+   - If your official CSBG wording differs slightly, update your `if`/`elseif` blocks to produce the precise strings for the final arrays.  
+   - Verify the casing (“Black or African American” vs “Black Or African American”) and any punctuation, because official reporting might require an exact match (e.g., “American Indian or Alaska Native” vs “American Indian/Alaska Native”).
+
+---
+
+## 2. Age Brackets
+
+**Where to look**:  
+Search for:
+```php
+// Age
+$age = $participant->age;
+if ($age !== null) {
+    if ($age >= 0 && $age <= 5) {
+        $ageSummary['0-5']++;
+    } elseif …
+```
+
+**Potential Issues**:
+1. **Bracket Boundaries**: Does the CSBG form want “0-5,” “6-13,” “14-17,” “18-24,” “25-44,” and so on? Or does it want smaller increments in older ages?  
+2. **Edge Cases**: If age is negative or very high, how is that handled? The code doesn’t appear to handle invalid ages (like negative). Possibly it’s not an issue if your data never has that scenario.  
+
+3. **Refactor Needed**:  
+   - If your official CSBG bracket differs, adjust the numeric boundaries (e.g., if some references use “6-12” instead of “6-13,” or “65+” instead of “65-74” plus “75+,” etc.).
+
+---
+
+## 3. Education Levels
+
+**Where to look**:  
+Inside:
+```php
+// Education
+if (isset($participant->education_level)) {
+    $educationValue = strtolower($participant->education_level);
+    …
+}
+```
+
+**Potential Issues**:
+1. **Category Names**: The code lumps certain strings into “Grades 9-12 (Non-graduate),” “High School Graduate/GED,” “Some College,” “College Graduate,” “Graduate Degree,” “Technical/Vocational Certificate,” “Unknown.”  
+2. **Official CSBG Terms**: Some states or agencies use:
+   - “Some Postsecondary Education, No Credential”  
+   - “Associate’s Degree” vs “Bachelor’s Degree”  
+   - “High School Diploma or GED” might be separate categories in certain forms.
+
+3. **Refactor Needed**:
+   - If your official report uses more specific categories or different wording, rename the categories in the `$educationSummary` array initialization and in the checks.
+
+---
+
+## 4. Housing Status vs. Household Table
+
+**Where to look**:
+```php
+// Housing - Using household data if available
+if ($participant->household && isset($participant->household->housing_status)) {
+    …
+}
+```
+
+**Potential Issues**:
+1. **Labels**: The code checks for `'own', 'rent', 'homeless', 'other', 'data_not_collected'` and otherwise defaults to `'Data Not Collected'`.  
+2. **CSBG Terms**: Some forms might label it “Emergency Shelter,” “Hotel/Motel,” “Doubled Up,” etc. If you only track “own / rent / homeless,” that might be too broad for official CSBG definitions.
+
+3. **Refactor Needed**:
+   - Confirm the fields in `household->housing_status` match your official categories. If you store more granular statuses in the database (like “doubled_up”), you’ll need to add an `elseif` branch.
+
+---
+
+## 5. Household Types
+
+**Where to look**:  
+```php
+// Household Type
+$householdType = $household->household_type ?? 'unknown';
+$label = CSBGConstants::HOUSEHOLD_TYPES[$householdType] ?? CSBGConstants::HOUSEHOLD_TYPES['unknown'];
+$householdTypeSummary[$label]++;
+```
+
+**Potential Issues**:
+1. **CSBGConstants**: Ensure the constant array `CSBGConstants::HOUSEHOLD_TYPES` exactly reflects your official categories (e.g., “Single Person,” “Two Adults, No Children,” “Single Parent Female,” etc.).  
+2. **Mismatch**: If your database has different keys (e.g., `'two-adults-no-children'`), make sure that lines up with the constant array.
+
+---
+
+## 6. Health Insurance & Non-Cash Benefits
+
+**Where to look**:
+```php
+// Health Insurance Sources
+if (isset($participant->health_insurance_sources) && is_array($participant->health_insurance_sources)) {
+    …
+}
+// Non-Cash Benefits
+if (isset($participant->non_cash_benefits) && is_array($participant->non_cash_benefits)) {
+    …
+}
+```
+
+**Potential Issues**:
+1. **Matching Official CSBG Terms**: “Medicaid,” “State Child Health Insurance Program (SCHIP),” “Veteran’s Health Care,” etc. Some spaces rename them. If official forms say “State Children’s Health Insurance Program,” but you say “State Children’s Health Insurance Program” in one place or “SCHIP” in another, unify them.  
+2. **Combining multiple keys**: For instance, the code lumps “housing_choice_voucher,” “public_housing,” “hud_vash,” and “section-8” into “Housing Assistance.” Confirm that’s acceptable for your CSBG categories or if they need to be separated.  
+
+3. **Refactor Needed**:
+   - Review each `elseif` to see if you need finer granularity or to rename the final label.  
+   - Decide if “childcare_voucher” vs “child-support” should be separate or if they’re truly the same “Child Care Assistance.”
+
+---
+
+## 7. Income Sources
+
+**Where to look**:
+```php
+// Income Sources
+if (isset($participant->income_sources) && is_array($participant->income_sources)) {
+    foreach ($participant->income_sources as $source => $amount) {
+        …
+    }
+}
+```
+**Potential Issues**:
+1. **Keys**: The code checks for `'earned-income', 'social-security', 'ssi', 'tanf', 'child-support', 'other', 'self-employment', 'ssdi', 'retirement', 'pension', 'alimony', 'unemployment', 'workers-comp', 'veterans-benefits', 'general-assistance'`.  
+   - Then it increments `$incomeSourcesSummary['Employment']`, `$incomeSourcesSummary['Social Security']`, etc.  
+2. **CSBG Terms**: If the official forms specifically want “Self Employment” or “Worker’s Compensation” spelled out, confirm you have the identical string.  
+3. **Refactor Needed**:
+   - Make sure all these final labels (“SSDI,” “Workers Comp”) appear in your `$incomeSourcesSummary` initialization so you don’t get undefined keys.  
+   - Confirm each final label (“Self-Employment,” “Employment,” “TANF,” “SSI,” “General Assistance,” etc.) matches official CSBG wording exactly.
+
+---
+
+## 8. Disability & Veteran Status
+
+**Where to look**:
+```php
+// Disability
+if (isset($participant->has_disabling_condition)) {
+    …
+}
+// Veteran Status
+if (isset($participant->military_status)) {
+    …
+}
+```
+
+**Potential Issues**:
+1. **Wording**: The code lumps `'Veteran'` and `'Active Duty'` together as `Yes`. If CSBG wants “Veteran,” “Active Duty,” “None,” or “Unknown,” you might need more nuance.  
+2. **Unknown vs. “Data not collected”**: Check consistency with the rest of your categories.
+
+---
+
+## 9. “Unknown” vs. “Data Not Collected”
+
+**Where to look**:  
+Throughout the code whenever a category doesn’t match any known condition. Some examples:
+```php
+$raceSummary['Unknown']++;
+```
+```php
+$housingStatusSummary['Data Not Collected']++;
+```
+
+**Potential Issues**:
+1. You might have “Unknown” in some places but “Data Not Collected” in others. If CSBG strictly wants one or the other, unify them.  
+2. If your official form wants “Refused” or “Not Applicable,” consider handling that too.
+
+---
+
+## 10. Household Size & Poverty Level
+
+**Where to look**:  
+```php
+// Household Size
+$householdSizeSummary = […]
+// Poverty Level
+$povertyLevelSummary = […]
+```
+
+**Potential Issues**:
+1. **Exact Boundaries**: You have `'1', '2', '3', '4', '5+', 'Unknown'` for size, but maybe your system needs to differentiate “5,” “6,” etc. Or you might keep “5+” if that’s acceptable.  
+2. **Poverty Level**: The code lumps `< 50% FPL` as `'Below 50%'`, `50–100%` as `'50-100%'`, etc. Confirm these ranges match your official CSBG cutoffs.
+
+---
+
+## 11. Action Items / How to Fix
+
+To ensure the code matches the CSBG demographics report **verbatim**:
+
+1. **List the Official CSBG Categories**: For each demographic (e.g., Race, Ethnicity, Education, etc.), gather a reference table.  
+2. **Compare**: Compare your reference table’s exact strings to what your code and DB store.  
+3. **Normalize Input**: In the `prepareReportData` method, add or update `if/elseif` logic so that each recognized DB value gets mapped to the correct standard label.  
+4. **Adjust Uninitialized Keys**: Verify that all final labels exist in the initial summary arrays (e.g., `$incomeSourcesSummary`, `$raceSummary`, etc.).  
+5. **Decide on “Unknown” vs “Data Not Collected”**: If you must unify them, consider adding an additional check or rename the fallback label in each block.
+
+---
+
+## Conclusion
+
+You already have a good foundation. The main changes needed are **string-level refinements** and possibly some additional `elseif` branches to match **exact** CSBG label text. Focus on these areas:
+
+1. Race/Ethnicity labels (verify standard labels).  
+2. Education categories (compare to official list).  
+3. Housing status & household type definitions.  
+4. Non-cash benefits & income sources—make sure final summarizations match the official wording (e.g., “Worker’s Compensation” vs “Workers Comp”).  
+5. Revisit “Unknown” vs. “Data Not Collected” duplicates.  
+
+By auditing each of those sections and verifying your code’s final strings match what the CSBG forms anticipate, you’ll ensure your report is completely aligned with the “verbatim” CSBG demographics categories.
+
+
+
+
+
+CSBG REPORT 
+
+Module 4, Section C: All Characteristics Report - Data Entry Form
+Goal 1: Individuals and Families with low-incomes are stable and achieve economic security.
+CALV Program Reporting:
+A. Total unduplicated number of all INDIVIDUALS about whom one or more characteristics were obtained:
+B. Total unduplicated number of all HOUSEHOLDS about whom one or more characteristics were obtained:
+C. INDIVIDUAL LEVEL CHARACTERISTICS
+1. Gender
+Number of Individuals
+a. Male
+b. Female
+c. Other
+d. Unknown/not reported
+e. TOTAL (auto calculated)
+0
+2. Age
+a. 0-5
+b. 6-13
+c. 14-17
+d. 18-24
+e. 25-44
+f. 45-54
+g. 55-59
+h. 60-64
+i. 65-74
+j. 75+
+k. Unknown/not reported
+l. TOTAL (auto calculated)
+Number of Individuals
+0
+3. Education Levels
+Number of Individuals
+[ages 14-24]
+[ages 25+]
+a. Grades 0-8
+6. Ethnicity/Race
+Number of Individuals
+a. Ethnicity
+a.1. Hispanic, Latino or Spanish Origins
+a.2. Not Hispanic, Latino or Spanish Origins
+a.3. Unknown/not reported
+a.4. TOTAL (auto calculated)0
+b. Race
+b.1. American Indian or Alaska Native
+b.2. Asian
+b.3. Black or African American
+b.4. Native Hawaiian and Other Pacific Islander
+b.5. White
+b.6. Other
+b.7. Multi-race (two or more of the above)
+b.8. Unknown/not reported
+b.9. TOTAL (auto calculated)0
+a. Veteran
+b. Active Military
+c. Never Served in the Military
+d. Unknown/not reported
+e. TOTAL (auto calculated)
+0
+b. Grades 9-12/Non-Graduate
+c. High School Graduate8. Work Status (Individuals 18+)
+d. GED/Equivalency Diplomaa. Employed Full-Time
+e. 12 grade + Some Post-Secondaryb. Employed Part-Time
+f. 2 or 4 years College Graduatec. Migrant Seasonal Farm Worker
+g. Graduate of other post-secondary schoold. Unemployed (Short-Term, 6 months or less)
+h. Unknown/not reported
+Number of Individuals
+e. Unemployed (Long-Term, more than 6 months)
+i. TOTAL (auto calculated)
+0
+0
+f. Unemployed (Not in Labor Force)
+g. Retired
+4. Disconnected Youth
+Number of Individuals
+a. Youth ages 14-24 who are neither working or in school
+h. Unknown/not reported
+i. TOTAL (auto calculated)
+5. Health
+Number of Individuals
+YesNoUnknown
+YesNoUnknown
+a. Disabling Condition
+b. Health Insurance*
+*If an individual reported that they had Health Insurance please identify the source of health insurance below.
+Health Insurance Sources
+c.1. Medicaid
+c.2. Medicare
+c.3. State Children’s Health Insurance Program
+c.4. State Health Insurance for Adults
+c.5. Military Health Care
+c.6. Direct-Purchase
+c.7. Employment Based
+c.8. Unknown/not reported
+August 2017
+Module 4, Section C: All Characteristics Report
+0c.9. TOTAL (auto calculated)
+0
+D. HOUSEHOLD LEVEL CHARACTERISTICS
+9. Household Type
+Number of Households
+a. Single Person
+b. Two Adults NO Children
+c. Single Parent Female
+d. Single Parent Male
+e. Two Parent Household
+f. Non-related Adults with Children
+g. Multigenerational Household
+h. Other
+i. Unknown/not reported
+13. Sources of Household Income
+Number of Households
+a. Income from Employment Only
+b. Income from Employment and Other Income Source
+c. Income from Employment, Other Income Source,
+and Non-Cash Benefits
+d. Income from Employment and Non-Cash Benefits
+e. Other Income Source Only
+f. Other Income Source and Non-Cash Benefits
+g. No Income
+h. Non-Cash Benefits Only
+j. TOTAL (auto calculated)
+0
+i. Unknown/not reported
+j. TOTAL (auto calculated)
+10. Household Size
+a. Single Person
+0
+Number of Households
+Below, please report the types of Other income and/or non-cash benefits received by the
+households who
+reported
+sources
+other than employment
+14. Other
+Income
+Source
+Number of Households
+b. Two
+c. Three
+d. Foura. TANF
+e. Fiveb. Supplemental Security Income (SSI)
+f. Six or more
+g. Unknown/not reportedc. Social Security Disability Income (SSDI)
+d. VA Service-Connected Disability Compensation
+h. TOTAL (auto calculated)
+0
+e. VA Non-Service Connected Disability Pension
+f. Private Disability Insurance
+11. Housing
+Number of Households
+g. Worker’s Compensation
+a. Ownh. Retirement Income from Social Security
+b. Renti. Pension
+c. Other permanent housingj. Child Support
+d. Homelessk. Alimony or other Spousal Support
+e. Otherl. Unemployment Insurance
+f. Unknown/not reported
+m. EITC
+g. TOTAL (auto calculated)
+0
+n. Other
+o. Unknown/not reported
+12. Level of Household Income
+Number of Households
+(% of HHS Guideline)15. Non-Cash Benefits
+a. Up to 50%a. SNAP
+b. 51% to 75%b. WIC
+c. 76% to 100%c. LIHEAP
+d. 101% to 125%d. Housing Choice Voucher
+e. 126% to 150%e. Public Housing
+f. 151% to 175%f. Permanent Supportive Housing
+g. 176% to 200%g. HUD-VASH
+h. 201% to 250%h. Childcare Voucher
+i. 250% and overi. Affordable Care Act Subsidy
+Number of Households
+j. Other
+j. Unknown/not reported
+k. TOTAL (auto calculated)
+0
+k. Unknown/not reported
+E. Number of Individuals Not Included in the Totals Above (due to data collection system integration barriers)
+a. Please list the unduplicated number of INDIVIDUALS served in each program*:
+Program NameNumber of Individuals
+Program NameNumber of Households
+F. Number of Households Not Included in the Totals Above (due to data collection system integration barriers)
+a. Please list the unduplicated number of HOUSEHOLDS served in each program*:
+*The system will add rows to allow reporting on multiple programs.
+August 2017
+Module 4, Section C: All Characteristics Report

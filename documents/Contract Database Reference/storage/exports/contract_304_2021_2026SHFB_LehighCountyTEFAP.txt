@@ -1,0 +1,16 @@
+Purpose: <p>This is a reimbursement grant. Billing and invoicing instructions are below. Reports must be submitted according to the schedule outlined below. &nbsp;</p><p><strong>Purpose:</strong></p><p>This agreement between SHFB and Lehigh County establishes the terms and conditions for SHFB to provide TEFAP services to Lehigh County. SHFB shall accept for storage, prepare for distribution, distribute via its network of affiliated food pantries, and account for food commodities made available to Lehigh County residents via TEFAP. SHFB shall publicize availability of foods via public service announcements. &nbsp;</p><p>The following costs are allowable:</p><ul><li>Storage costs</li><li>Transportation Costs</li><li>Equipment Rental Costs</li><li>Printing/Copying Costs</li><li>Administrative Costs</li></ul><p>Services provided from 10/01/2021 - 9/30/2026 will be reimbursed at $.12 per lb distributed, unless otherwise communicated by the State or County.</p><p>Invoices are required quarterly for all program years as follows:</p><p><strong>Invoice #1</strong> for (10/01-12/31); Due: 01/30</p><p><strong>Invoice #2</strong> for (01/01-03/31; Due: 04/30</p><p><strong>Invoice #3</strong> for (04/01-06/30); Due: 07/30</p><p><strong>Invoice #4</strong> for (07/01-09/30); Due: 10/30 &nbsp;</p><p>NOTE: The invoice shall be accompanied by a completed TEFAP INVENTORY/PARTICIPATION REPORT for the respective quarter's activity, to support the amount being invoiced according to TEFAP regulations. ANY INVOICE NOT ACCOMPANIED BY A "TEFAP INVENTORY/PARTICIPATION REPORT" WILL NOT BE PAID UNTIL SUCH TIME AS THE COMPLETED REPORT IS RECEIVED.</p><p>Contact:<br>Joel Pattison<br>County of Lehigh<br>Lehigh County Aging &amp; Adult Services<br>610-782-3442<br>joelpattison@lehighcounty.org</p>
+Funder: Lehigh County
+Program: SHFB
+Amount: 0.00
+Start Date: 2021-10-01
+End Date: 2026-09-30
+
+Notes: 
+
+Fund Number: F8077
+
+Attached Document: 65d7a9d20304a_2023SHFB_LehighCountyTEFAP_signed-contract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

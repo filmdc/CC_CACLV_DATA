@@ -1,0 +1,16 @@
+Purpose: <p>-Energy Efficient Housing Rehabilitation</p>
+Funder: PHARE RTT
+Program: CAH
+Amount: 250000.00
+Start Date: 2021-08-30
+End Date: 2023-08-30
+
+Notes: 
+
+Fund Number: F0616
+
+Attached Document: 65a7e14912814_Community-Action-Lehigh-Valley-BETTER-HOMES-Grant-Agree-Full-Ex-(1).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

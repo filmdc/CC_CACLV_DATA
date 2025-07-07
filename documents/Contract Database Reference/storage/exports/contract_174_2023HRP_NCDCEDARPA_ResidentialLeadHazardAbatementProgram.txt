@@ -1,0 +1,16 @@
+Purpose: <figure class="image"><img src="http://10.55.0.10/storage/232/image.png"></figure>
+Funder: NC DCED ARP
+Program: CAH
+Amount: 1000000.00
+Start Date: 2022-05-18
+End Date: 2025-12-31
+
+Notes: <p>-<strong>Other Specifications- </strong>Property must be owner occupied, constructed before 1978, occupied by 1 child under 6 years old or a pregnant woman or visited by a child under 6 at least 60 hours per year, below 80% AMI, blood test screening or waiver/affidavit required. Up to $24,999 of lead hazard abatement assistance may be provided to any one household.&nbsp;</p><ul><li>Please see page 31- 52 Contract Clauses Required for all CDBG Construction Grants</li><li>This is a reimbursable grant.</li><li>Adherence to Domestic Content Procurement Preference (page 5)</li><li>Open and Competitive Bidding Requirements (Page 5 Section 21-26)</li><li>Fiscal Year audit results to be sent to DCED</li><li>Attachment E Section 3 Guidelines</li><li>HUD Forms at the end of the contract to be used in cases of contracts more than $24,999.</li><li>There are no reports due for this contract although&nbsp;detailed case files to be kept on each project and should include Environmental Clearance and Income Eligibility Review</li></ul>
+
+Fund Number: F0640
+
+Attached Document: 647a03ff219a0_2023HRP_NCDCEDARP_ResidentialLeadHazardAbatementProgram_executedcontract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

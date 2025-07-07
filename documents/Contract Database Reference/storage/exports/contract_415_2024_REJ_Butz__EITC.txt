@@ -1,0 +1,16 @@
+Purpose: <ul><li>50/50 split for Generation Next and SHE</li></ul>
+Funder: Butz
+Program: REJ
+Amount: 4000.00
+Start Date: 2024-12-23
+End Date: 
+
+Notes: 
+
+Fund Number: 8000
+
+Attached Document: 677e8241e17f2_2024-REJ_-Butz-EITC-check.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

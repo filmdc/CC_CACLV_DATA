@@ -1,0 +1,223 @@
+Purpose: <p>-$2,500 for wayfinding and directional signage</p><p>-$7,500 for Marketing and Advertising</p><p>-$2,500 in matching funds required</p><p>-Reimbursable grant</p>
+Funder: Northampton County
+Program: SBR
+Amount: 10000.00
+Start Date: 2021-11-01
+End Date: 2023-12-31
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 6536a081a6c97_2021-2022-Slate-Belt-Marketing-and-Promotions-2nd-Amendment-extension-(1).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6536a09d321ad_2021-Hotel-Tax-signed-grant-agreement--CACLV-(1).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6571035fa2e2d_2021-2022-Hotel-Tax-Interim-Final-Reporting-Form-(1).docx
+      
+			             Northampton County
+		             2021/2022 Hotel Tax Interim/Final     
+            	            Performance &amp; Fiscal Status Report	           
+
+--------------------
+Attached Document: 657103660355c_2021-2022-Hotel-Tax-Grant-Agreement-signed-2nd-Amendment---Slate-Belt-Marketing-&-Promo-(1).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6571036bb05d6_Hotel-Tax-Contracting-Requirements-(1).pdf
+Contracting Requirements 
+ 
+ 
+COMPETITIVE BID REQUIREMENTS 
+ 
+Any good or service purchased under the Hotel Tax grant must be done in accordance with your 
+entity's purchasing requirements or the County's, whichever is most restrictive.  Northampton 
+County's thresholds are as follows: 
+ 
+$1 to $5,000 One quote, verbal or written 
+$5,001 to $24,999 	Minimum three (3) written quotes. Written documentation must be 
+attached to the transaction, and shall indicate which qualified vendor(s) 
+were contacted, their responses, the date, and other pertinent information 
+besides price, such as delivery, etc.  
+$25,000 and above Need to be procured utilizing a formally advertised public bid 
+ 
+Competitive sealed bids must be used to procure goods or services in excess of $25,000 for 
+construction, reconstruction, demolition, alteration and/or repair, for acquisition of machinery and 
+equipment, or for engagement of services of a professional consultant, other than architectural or 
+engineering services. 
+ 
+Documented costs may include quotes or advertisements (	i.e., online cost comparisons).  
+Remember to keep copies of all quotes/costs in your project record, as this verifies you followed 
+the appropriate procurement method.  Selecting a good or service through the Commonwealth of 
+Pennsylvania's cooperative purchasing program administered by the Department of General 
+Services (DGS) Bureau of Procurement, the COSTARS Program, is an acceptable alternative to 
+the methods listed above. 
+ 
+ 
+PREPARING FOR COMPETITIVE BIDS 
+ 
+The first step in most projects is to document the specific work to be done in order to 
+competitively solicit bids from contractors.  On a small project where total construction costs are 
+not expected to exceed $25,000.00, you may only wish to use an existing estimate or 
+specifications to solicit written estimates from contractors.  Most subgrantees work with an 
+architectural, engineering (A/E) or other project management firm to develop a bid package that 
+ensures you select the most qualified contractor while complying with local, state, and federal 
+laws and regulations.   
+ 
+Construction projects require specific technical expertise and knowledge of how to comply with 
+state and federal labor requirements.  Those not accustomed to overseeing construction projects 
+are highly encouraged to hire a project manager.     
+ 
+ 
+ACQUISITION OF ARCHITECTURAL/ENGINEERING SERVICES 
+ 
+When acquiring A/E services to design your site/project, a Request for Proposals (RFP) or a 
+Request for Qualifications (RFQ) may be used.  Under an RFQ, you may use competitive 
+proposal procedures whereby the competitors’ qualifications are evaluated and the most 
+qualified competitor is selected, subject to negotiation of fair and reasonable compensation. 
+In these instances, price is not used as a selection factor	; once the most-qualified firm is 
+identified, only that firm is asked for a price proposal that is subject to negotiation of a fair
+
+and reasonable price. If negotiations with the selected firm are unsuccessful, this process is 
+repeated with the next highest-ranked firm, until a fair and reasonably priced contract can be 
+awarded.  You must document the basi s for your determination of the most qualified 
+competitor and the rationality of the contract price.  
+ 
+Note the following requirements if your project is federally funded: 
+ 
+• An RFQ may not be used to purchase other services performed by architects and 
+engineers (24 CFR 85.36(d) (3) (v)).  Additional services offered by A/E firms, such 
+as preparation of bid packets, project management or grant writing, must be selected 
+based on lowest cost (using an RFP or other appropriate small purchasing method). 
+ 
+• You cannot award a contract to any person or firm that develops or drafts specifications, 
+requirements, statements of work, invitations for bids, and/or requests for proposals (24 CFR 
+84.43).  
+ 
+• Architects or engineers selected by municipalities may be reimbursed through your grant 
+if documentation can be supplied that the firm had been selected using an appropriate 
+procurement methodology within the previous three (3) years of the Start Date of the sub-
+grant agreement and the contract specifically includes project management activities in 
+the scope of services.  Otherwise, these costs cannot be paid under the grant. 
+ 
+ 
+VENDOR PREFERENCE 
+ 
+When contracts or subcontracts are expected to exceed $25,000 and are funded in whole or in 
+part by state or federal funds, opportunities must be afforded to businesses and organizations 
+which are eligible for preferential treatment under a variety of laws, Executive Orders, etc. (e.g., 
+the Small Business Act).  Eligible organizations include: small, small disadvantaged, women-
+owned, historically underutilized business zone (HUBZone), veteran-	owned, and service 
+disabled veteran-owned small businesses.  These requirements historically included only 
+Minority Owned or Women Owned Businesses (MBE/WBE). While certain funding sources 
+(i.e.: HUD) may only ask for reporting on certain classifications of businesses, including all 
+preferred classes in your preferred bidding process will ensure that all newly emerging 
+requirements are met. 
+ 
+You and any prime contractors are required to advise and provide the maximum realistic 
+opportunity for participation to small and diverse businesses	.  For federally funded projects, t he 
+target participation levels are 5% for minority owned business enterprises and 3% for women 
+owned business enterprises.  
+ 
+Requirements under both state and federally funded projects can be met by accessing the current 
+listing of state-certified Small and Diverse Firms at the following website: 
+http://www.dgs.internet.state.pa.us/suppliersearch
+  
+ 
+Click on the Advanced Search. Choose “Northampton County from the PA Counties section.  
+Choose the Supplier Classification or check “Select All Classifications”.  Find the appropriate 
+UNSPSC Codes in the available list.  Hit Search.  You w	ill receive names of local MBE & W BE 
+vendors and Small Diverse (SD) vendors for the type(s) of businesses you are soliciting.
+
+Repeat for the following Counties: 
+ 
+• Bucks 
+• Carbon 
+• Lehigh 
+• Monroe 
+ 
+You must send the bid a	nnouncement to a ny certified business(es) that provide(s) the service 
+or goods you need and is loc ated in the five counties listed above.  You can choose to solicit 
+other classifications (i.e.: Veteran-Owned Businesses) or non-	certified businesses; however, 
+non-certified vendors must agree to register with the Commonwealth in order to receive 
+preference in bidding.   
+ 
+• Keep evidence, such as a fax cover sheet or a copy of the stamped, a ddressed envelope, 
+showing you successfully sent the bid announ cement to each registered busine	ss. 
+ 
+• If there are no relevant vendors, pr int the page showing there were no matches and keep 
+this in your records.
+--------------------
+Attached Document: 6571037112516_FINAL-In-Kind-Contribution-Form-Instructions-(1).pdf
+Northampton County Department of Community & Economic Development 
+In-Kind Contribution Form  
+Instructions 
+ 
+ 
+Use the IN-KIND CONTRIBUTION FORM template to document in-kind contributions.  In-	kind 
+contributions are third-	party donations of volunteer services, goods or facilities used to meet the 
+matching requirement of a Northampton County DCED grant award.   
+ 
+Do not include property, facilities, or services contributed by your own organization.  The third 
+party donations must be necessary and reasonable for the project. 
+ 
+On the form(s), show how the value of each contribution was determined by filling in the 
+appropriate boxes. 
+ 
+ 
+Please follow the criteria and directives listed below: 
+ 
+For Volunteer Services 
+ 
+• $20.00 per hour for Tier 1 event assistance 	volunteer services provided, i.e. cashier, ticket 
+handler, setup/breakdown, food service, groundskeeper, etc. 
+• $40.00 per hour for Tier 2 professional/specialty services provided to the entity as 
+donation, i.e. specialized legal, architectural, engineering, accounting, medical, etc.) 
+ 
+List Volunteer’s name and phone number 
+Date(s) of service 
+Hours worked and location  
+Service(s) performed 
+Value of Service/Full rate of pay 
+ 
+For donated goods 
+ 
+List Donor’s name and phone number 
+Provide description of item and number of items 
+Date provided 
+Total fair market value of the item(	s) (fair market value of goods must be 
+documented)  
+ 
+For facilities 
+ 
+List Donor’s name and phone number 
+Provide name of facility(ies) & address 
+Date provided 
+The published rental rate for date( s) the facility was used.
+
+As per DCED grant agreements, recipient shall contribute matching funds of which no more 
+than 50% of the RECIPEINT’s matching funds may be in-kind services or goods. 
+ 
+Please refer to your matching funds requirements found within your executed grant 
+agreement under “Terms of Agreement,” #8, Page 3 of 13.   
+ 
+ 
+IN-KIND CONTRIBUTION FORM templates and examples are available at 
+http://www.northamptoncounty.org
+.  
+ 
+ For questions regarding your grant agreement and in-	kind services, please contact your grant 
+administrator.
+--------------------
+Attached Document: 65710377c25f2_Updated-2021-2022-Hotel-Tax-Grant-Agreement-Compliance-Checklist-(1).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

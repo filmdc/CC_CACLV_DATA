@@ -1,0 +1,21 @@
+Purpose: <p>This agreement is between the Mid-Atlantic Regional Cooperative (MARC), a program of Feeding PA, and SHFB. The document outlines the responsibilities and expectations of both parties. <i>This agreement shall continue until terminated by either party.</i></p><p>As a member, SHFB commits to the following:</p><ul><li>Commitment to a minimum of a bi-annual ordering schedule.</li><li>Commitment to providing a signed copy of the Bill-of-Lading and Receiving Report to the MARC for all received loads upon request.</li><li>Commitment to a timely response to all MARC product inquiry communications.</li><li>Commitment to a net 30-day timely payment of all invoices.</li><li>Provide a single point of contact that can be immediately contacted by the MARC should the need arise.</li><li>Provide an annual update of current contacts for the food bank.</li></ul><p>An authorized representative from SHFB is required to serve as the primary point of contact for matters related to compliance with the Membership Agreement and represent SHFB in any votes or surveys regarding membership matters. The authorized representative is required to ensure that the member food bank meets all program and policy requirements, including:</p><ul><li>Maintain confidentiality of information garnered through participation in MARC programs and not to share information or use it to the detriment of MARC of any of its members.</li><li>Attend and participate in all required meetings.</li><li>Meet program participation agreements and program standards, including timely submittal of data.</li></ul><p>Additional stipulations and requirements are available in the Member Agreement below.</p><p>The Schedule of Fees is available in the Agreement document and is outlined below:</p><figure class="image"><img src="http://10.55.0.10/storage/1260/image.png"></figure>
+Funder: Feeding PA
+Program: SHFB
+Amount: 0.00
+Start Date: 2024-11-01
+End Date: 
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 67364529a2735_MARC-Schedule-of-Fees.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 67364529ab425_MARC-Member-Agreement-2024.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

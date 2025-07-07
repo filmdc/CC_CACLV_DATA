@@ -1,0 +1,111 @@
+Purpose: <p>Weatherization Assistance Program (WAP), as authorized</p>
+Funder: PA DCED DOE Master Agreement
+Program: WX
+Amount: 0.00
+Start Date: 2022-06-01
+End Date: 2027-06-30
+
+Notes: <p>-Reimbursable grant</p>
+
+Fund Number: 
+
+Attached Document: 642436b7b0a3e_2017-2022WX_DCEDDOE_Master-agreement-(1).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 642436ba9be00_DCED-DOE-Master-Agreement-2022-2027_executed-(2).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6500b3b64aa52_23-24-DOE-Readiness-Award-Letter---Community-Action-Comm-Lehigh-Valley.pdf
+Community Affairs and Development 
+400 North St., 4
+th
+ Floor | Commonwealth Keystone Bldg. | Harrisburg, PA 17120-0225 | 717.787.3003 | F 717.787.6866 | dced.pa.gov 
+ 
+ 
+ 
+September 12, 2023 
+ 
+Dawn Godshall  
+Executive Director  
+Community Action Committee of Lehigh Valley - Sent via email 
+ 
+Re: 2023-2024 Readiness Award Letter      CFDA#: 81.042      Federal Award #: DE-EE0009927 
+ 
+ 
+Dear Dawn: 
+ 
+On behalf of Governor Josh Shapiro, it is my pleasure to inform you that the Department of 
+Community and Economic Development (DCED) has approved a grant in the amount of $71,413 
+for the Weatherization Readiness Program.  These funds are provided by the U.S Department of 
+Energy through the DCED 2023-2024 Weatherization Assistance Program.  
+ 
+These funds have been added as a Funding Release to your Master Agreement.  If you have any 
+questions concerning this grant, please contact our office at (717) 425-7643.   
+ 
+My congratulations and best wishes for a successful program year. 
+ 
+Sincerely, 
+ 
+ 
+Richard P. Vilello, Jr. 
+Deputy Secretary 
+Community Affairs & Development 
+ 
+cc:  Mike Austin, Weatherization Director 
+       file
+--------------------
+Attached Document: 653bfd7a48afd_C000082829---FR3-LPC.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 66996918184d2_24-25-DOE-Annual-and-Readiness-Award-Letter---Lehigh.pdf
+Community Affairs and Development 
+400 North St., 4
+th
+ Floor | Commonwealth Keystone Bldg. | Harrisburg, PA 17120-0225 | 717.787.3003 | F 717.787.6866 | dced.pa.gov 
+ 
+ 
+ 
+July 18, 2024 
+ 
+ 
+Dawn Godshall 
+Executive Director 
+Community Action Committee of Lehigh Valley ‐ Sent via email 
+ 
+Re:   2024‐2025 DOE Annual & Readiness Award Letter       
+ CFDA#: 81.042       
+ Federal Award #: DE‐EE0009927 
+ 
+ 
+Dear Dawn: 
+ 
+On behalf of Governor Josh Shapiro, it is my pleasure to inform you that
+ the Department of 
+Community and Economic Development (DCED) has approved a grant in the amount of $632,477 
+for the Weatherization Assistance Program and $77,203 for Weatherization Readiness.  These 
+funds are provided by the U.S Department of Energy through the DCED 2024‐2025 Weatherization 
+program year.  
+ 
+These funds have been added
+ as a Funding Release to your Master Agreement.  If you have any 
+questions concerning this grant, please contact our office at (717) 425‐7643.   
+ 
+My congratulations and best wishes for a successful program year. 
+ 
+Sincerely, 
+ 
+ 
+Richard P. Vilello, Jr. 
+Deputy Secretary 
+Community Affairs & Development 
+ 
+cc: Mike Austin, 
+Weatherization Director 
+      file
+--------------------

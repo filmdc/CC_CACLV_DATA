@@ -1,0 +1,3955 @@
+Purpose: <p>Federal Identification number#23-1669589</p><p>Fiscal agent/pass through for NC DCED Drug and Alcohol Division. They send us invoices to be paid to other agencies and we bill a 5% administrative fee. Fee for service table of page 21 of the contract.</p><p>Invoices due by the 10th of the month when services have been rendered.</p><p>Gwen Carolan is the CALV contact.</p><p>Raveena Cheema (rkcheema@norcopa.gov) is the NC DCED Drug and Alcohol Division contact for payment.&nbsp;</p><p>&nbsp;</p>
+Funder: Northampton County
+Program: CALV
+Amount: 5000.00
+Start Date: 2023-07-01
+End Date: 2024-06-30
+
+Notes: 
+
+Fund Number: F4300
+
+Attached Document: 64b583ad23fb6_2023CALV_NCDCED_Drug&AlcoholDivision.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 64b83fa8205f1_2023CALV_NCDrug-and-Alcohol-Division-executed-contract.pdf
+1 
+CONTRACT NO. 23-505 
+ 
+COUNTY OF NORTHAMPTON 
+DEPARTMENT OF HUMAN SERVICES 
+DRUG & ALCOHOL DIVISION 
+PURCHASE OF SERVICE CONTRACT 
+ 
+ THIS CONTRACT is made effective this ____day of 
+_____________________, 20____, by and between the COU	NTY OF 
+NORTHAMPTON, with address of 669 Washington Street, Easton, 
+Pennsylvania 18042, hereinafter referred to as the “COUNTY,” 
+through the Drug & Alcohol Division, and Community Action 
+Committee of the Lehigh Valley , hereinafter referred to as the 
+“PROVIDER,” with address of 1337 East Fifth Street , Bethlehem PA 
+18015. 
+ 
+WITNESSETH: 
+ WHEREAS, COUNTY and PROVIDER have negotiated a CONTRACT 
+relative to the provision of services as more fully identified 
+in Appendix A hereto; and 
+ WHEREAS, COUNTY and PROVIDER are now desirous of entering 
+into this CONTRACT No. 23-505 in order to memorialize the 
+obligations and responsibilities of the said parties. 
+ NOW, THEREFORE, in consideration o f the mutual promises and 
+covenants contained herein, and intending to be legally bound 
+hereby, the parties hereto agree as follows: 
+(I) TERM 
+ The term of this CONTRACT between COUNTY and PROVIDER shall 
+be from July 1, 2023 to June 30, 2024. 
+ 
+(II) AMOUNT OF COMPENSATION 
+(A) The maximum amount payable to PROVIDER by COUNTY under 
+the terms of the CONTRACT is $ 5,000. 
+ 
+(B) PROVIDER shall bill COUNTY in accordance with Appendix B 
+hereto, which is incorporated herein by reference . 
+ 
+(C) Payment to PROVIDER shall be as outlined in Appendix B. 18th
+July	23
+Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+2 
+(III) RECITALS 
+ The recitals set forth above in the foregoing whereas 
+paragraphs shall be considered to provide substantive provisions 
+of the CONTRACT and are incorporated herein by this refer ence. 
+(IV) SERVICES 
+ PROVIDER hereby agrees to furnish to COUNTY those services 
+described in Appendix A hereto, which is incorporated herein by 
+reference. 
+(V) APPROPRIATION OF FUNDS 
+ This CONTRACT is contingent upon the proper appropriation 
+of funds by the Northampton County Council in accordance with 
+the Northampton County Home Rule Charter and Administrative 
+Code.  If the terms of this CONTRACT exceed a budget as adopted 
+by the Northampton County Council, then that portion of this 
+CONTRACT which exceeds a properly adopted budget shall be 
+contingent upon further appropriation by the Northampton County 
+Council.  In the event of such non -appropriation of funds at any 
+time during the term of the CONTRACT as would prevent the COUNTY 
+from making payment under th e terms and conditions of the 
+CONTRACT, the COUNTY may terminate the CONTRACT without the 
+assessment of any termination charges or financial penalties 
+against the COUNTY by providing written notice of intent to 
+terminate to the PROVIDER.  If the COUNTY ter minates a CONTRACT 
+due to the non -appropriation of funds, the COUNTY will pay 
+PROVIDER for work currently in progress, and PROVIDER shall not Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+3 
+begin any additional work on the effected CONTRACT upon receipt 
+of notification of intent to terminate by the COUN TY. 
+(VI) RIGHT TO TERMINATE 
+(A) COUNTY shall have the right to terminate the CONTRACT 
+at any time with or without cause by giving thirty (30) days’ 
+written notice to the other party at the address specified in 
+the Notice paragraph of the CONTRACT. COUNTY shal	l be liable 
+only for payment due PROVIDER for goods and services rendered to 
+COUNTY up to and including date of termination, and shall not be 
+liable for any termination charges or financial penalties.  
+PROVIDER shall not begin any additional work upon rece	ipt of 
+notification of intent to terminate by the COUNTY. 
+(B) PROVIDER shall be responsible for all commitments as 
+set forth in this CONTRACT up to and including the date of 
+termination, and upon termination of the CONTRACT, PROVIDER 
+shall forthwith deliver to COUNTY all documents and any other 
+material in any way relating to the services provided to COUNTY 
+by PROVIDER which may be in its possession. 
+(VII) BREACH OF CONTRACT 
+(A) The PROVIDER agrees that any breach of performance of 
+any covenant, representation, or warranty, indemnity, or 
+condition, or attached appendices, shall constitute default of 
+this CONTRACT. 
+(B) When a breach of CONTRACT has occurred, the COUNTY, in 
+exercise of its discretion, may allow the PROVIDER a specific Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+4 
+period of time to correct its breach of the CONTRACT. Such 
+period of time shall not exceed thirty (30) days. 
+(C) If PROVIDER does not correct its violation of the 
+CONTRACT as specified, the COUNTY may terminate the CONTRACT in 
+whole or in part if such partial termination is in the best 
+interest of the COUNTY. 
+(VIII) COVENANTS, REPRESENTATIONS, AND WARRANTIES 
+(A) PROVIDER covenants, represents and warrants: 
+1) That PROVIDER is entering into the CONTRACT in the 
+ordinary course of its business activities; 
+2) That the standard of care for all professional 
+services performed or furnished by PROVIDER under the CONTRACT 
+will be the care and skill ordinarily used by members of 
+PROVIDER’S profession. 
+(IX) INDEMNIFICATION, HOLD HARMLESS 
+1) The PROVIDER agrees to indemnify, defend and save harmless the 
+COUNTY, its offic ers, agents and employees from any and all 
+losses, claims, costs or damages, including reasonable counsel 
+fees, resulting from any: 
+a) Breach of this CONTRACT by PROVIDER 
+b) Professional error or omission, fault or negligence by the 
+PROVIDER or by its employees, servants, agents, contacts, 
+or anyone acting under its direction, control, or on its 
+behalf in connection with or incident to its performance of 
+this CONTRACT. Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+5 
+c) Malpractice claims arising in connection with the business 
+or activities of the PROVIDER in the performance of this 
+contract. 
+(X)INSURANCE 
+(A) The PROVIDER shall maintain adequate public liability, 
+property damage, malpractice and workers' compensation 
+insurances, insuring as they may appear in the interest of all 
+parties to said contract. Certificatio	n of said insurance 
+coverage shall be submitted to the County at the time of the 
+execution of the contract. COUNTY shall be named as an 
+additional insured on certificate of insurance for public 
+liability and property damage provided. The "additional 
+insured" requirement must be endorsed, and the endorsement must 
+accompany the insurance certificate. The COUNTY reserves the 
+right to review categories and levels of insurance coverage held 
+by the PROVIDER in an ongoing program of risk management. If 
+the PROVIDER fails to provide such required insurance coverage 
+and/or adequate proof of current coverage in amounts required, 
+the COUNTY shall have the right to treat such failure as a 
+material breach of the CONTRACT and to exercise all appropriate 
+rights and remedies.  Insurance requirements are as detailed in 
+Appendix D attached hereto and incorporated by reference. 
+(B) The PROVIDER shall annually provide the COUNTY with a 
+certificate of insurance, with the Contract Number clearly noted 
+on said certificate of insura nce, as noted in Appendix D, 
+physically attached hereto and incorporated by reference.  Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+6 
+(C) Each policy and certificate of insurance shall provide 
+that at least sixty (60) calendar days' prior written notice be 
+given to the COUNTY in the event coverage is can	celed, non-
+renewed, or reduced. 
+(D) If the PROVIDER desires to self insure any or all of 
+the coverage listed in this section, except where prohibited by 
+law, it shall provide to the COUNTY documentation that such self 
+insurance has received all the approvals r equired by law or 
+regulations, as well as the most recent audited financial 
+statement of the PROVIDER'S insurance. Any coverage which is 
+self insured shall provide the same coverage limits and benefits 
+as the coverage listed in this section. 
+(XI) AUDIT 
+  
+(A) PROVIDER agrees to comply with all audit requirements 
+contained in Appendix C, which is attached hereto and 
+incorporated by reference. 
+(XII) MISCELLANEOUS PROVISIONS 
+(A) To the extent that any of the funds utilized by the 
+County of Northampton in relation to t his CONTRACT are subject 
+to restrictions pursuant to the Medicare and Medicaid Patient 
+Program Act of 1987, PROVIDER herein certifies that no person(s) 
+or other entities who are excluded from the Medicare and 
+Medicaid programs and thereby from receiving Ti tle XX funds will 
+receive Title XX Social Services Block Grant funds utilized by 
+the County of Northampton for the performance of this CONTRACT. Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+7 
+(B) PROVIDER acknowledges and agrees, should PROVIDER 
+qualify under Section 501(c)(3) of the Internal Revenue Code 	of 
+1986 as a tax -exempt charitable organization established for 
+charitable services, that PROVIDER, should it solicit funds from 
+the general public either directly or through professional fund 
+raisers or professional solicitors, shall duly register and fil e 
+appropriate financial reports with the Pennsylvania Department 
+of State, Bureau of Charitable Organizations, as required under 
+the statute known as the “Solicitation of Funds for Charitable 
+Purposes Act” found in Title 10 P.S. Section 162.1, et seq. 
+(C) All appendices attached hereto are incorporated herein 
+and shall be a part of this CONTRACT. The PROVIDER agrees to 
+comply with all the terms and conditions contained in these 
+appendices. 
+(D) No waiver of any breach of this CONTRACT by COUNTY 
+shall constitute a c ontinuing waiver or waiver of any subsequent 
+breach of either the same or another provision of this CONTRACT 
+or appendices. 
+(E) This CONTRACT shall be deemed to have been made under 
+and shall be governed by the laws of the Commonwealth of 
+Pennsylvania, includi ng matters of construction, validity, and 
+performance. 
+(F) If any single provision of this Agreement is found by 
+any Court to be unenforceable or illegal, the remaining terms 
+and conditions of this Agreement shall remain in full force and 
+effect. When the pro visions of any applicable law may be Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+8 
+waived, they are hereby waived by PROVIDER, to the full extent 
+provided by law. 
+(G) Notices or notifications called for pursuant to this 
+CONTRACT shall be provided as follows: 
+PROVIDER: 
+Community Action Committ ee of 
+the Lehigh Valley 
+1337 East Fifth Street 
+Bethlehem PA 18015 
+ 
+COUNTY: 
+County of Northampton 
+Drug & Alcohol Division 
+2801 Emrick Blvd 
+Bethlehem PA 18020 
+ 
+(H) This CONTRACT and all Appendices attached hereto 
+constitutes the entire understanding between the parties, and no 
+modification or amendment to the terms herein shall be valid 
+unless in writing signed by the parties to be charged, and only 
+to the extent therein set forth. Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+9 
+IN WITNESS WHEREOF , the parties to these presents have 
+hereunto set their hands and seal the day and year first above	-
+mentioned. 
+ 
+ COUNTY OF NORTHAMPTON 
+ BY: ______________________________ 
+       County Executive 
+ 
+ Date:   
+ 
+ 
+PROVIDER: Community Action Committee of 
+the Lehigh Valley  
+ 
+ 
+ BY: ______________________________ 
+                    Name 
+ Title: _____________________________ 
+ Date:   
+ 
+ FEDERAL IDENTIFICATION # 23-1669589 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Rev. 10/14/201907 / 18 / 2023
+Executive
+Director
+07 / 18 / 2023
+Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+10 
+APPENDICES PART OF THIS CONTRACT 
+ 
+ 
+APPENDIX A – Program Description      
+ 
+APPENDIX B – Billing Instructions and Payment Provisions      
+ 
+APPENDIX C-1 – Audit Requirements       
+ 
+APPENDIX C-2 – Audit Certification      
+ 
+APPENDIX C-3 – Audit Waiver N/A 
+ 
+APPENDIX D-1 – Signed Statement Re: Insurance Coverage      
+ 
+APPENDIX D-2 – Insurance Waiver N/A 
+ 
+APPENDIX E – Reporting Requirements      
+ 
+APPENDIX F – Funding Restrictions N/A 
+ 
+APPENDIX G – Equipment Constraints N/A 
+ 
+APPENDIX H – Special Provisions       
+ 
+APPENDIX I – County Services N/A 
+ 
+APPENDIX J – General Terms and Conditions      
+ 
+APPENDIX K – Child Abuse and Criminal History Verification      
+ 
+APPENDIX L – Rate Certification Statement N/A 
+ 
+APPENDIX M – Business Associate Agreement/HIPAA Compliance      
+ 
+APPENDIX N – Lobbying Certification Form      
+     
+APPENDIX O – Nursing Evaluation N/A 
+ 
+APPENDIX P – Adult Day Care Standards N/A 
+ 
+APPENDIX Q – Subcontracted Services N/A 
+ 
+APPENDIX R – Federal Awards       
+ 
+ATTACHMENT – Insurance Certificate(s)       
+ 
+ 
+ 
+ 
+ 
+Rev. 6/15/2021  Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+11 
+APPENDIX A 
+ 
+PROGRAM DESCRIPTIONS 
+ 
+WORK STATEMENT - DRUG AND ALCOHOL SPECIFIC SERVICES 
+ 
+DESCRIPTION OF SERVICE 
+ Provision of drug and alcohol abuse treatment, as well as 
+prevention and other services, to residents of Northampton County. 
+ 
+2.03 DRUG AND ALCOHOL ACTIVITY DEFINITIONS 
+ 
+SCA Level – This level involves activities associated with either 
+the governmental or private agency in a county or several counties 
+(joinder) which is responsible for planning, administering, funding 
+and evaluating substance abuse services in that county or joinder.  
+These activities, as conducted by the SCA, do not involve the 
+direct delivery of services to clients. 
+Administration (Activity 5100) – This activity is for the 
+provision of planning, organizing, funding, and contr ol of the 
+SCA's substance use and abuse, and as applicable, problem 
+gambling programs. This activity includes general managerial 
+functions that are supportive to, but not an intrinsic part 
+of, the provision of direct services. Services include plan 
+development and program implementation, budgeting, financial 
+and data management, project and service monitoring, and 
+evaluation. Personnel costs, including salaries and 
+associated fringe benefits, are considered administrative if 
+those costs are not incurred i n the direct provision of 
+prevention; intervention; treatment; and treatment	-related 
+services. Funds budgeted and expended for Administration 
+shall not exceed twenty percent (20%) of State and Federal 
+funds issued by DDAP. 
+ 
+Reserved (Activity 5200) – This activity is currently not in 
+use. 
+Evaluation and Research (Activity 5300) - This activity is 
+reserved for DDAP -sanctioned research and evaluation projects 
+or such activities initiated by the SCA without DDAP financial 
+participation.  Projects of this natu re, unless sanctioned by 
+DDAP, would be funded from local (not matching funds), 
+Federal, or private resources. 
+ 
+Special Projects, DDAP Approved (Activity 5400) – This 
+activity is reserved for special administrative related 
+projects initiated at the discret ion of DDAP (e.g., the State 
+Epidemiological Outcomes Workgroup and the Strategic 
+Prevention Framework Advisory Council) and approved by DDAP, 
+or such projects initiated by the SCA and funded by sources Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+12 
+other than DDAP.  DDAP funds may not be used for this activity 
+without prior DDAP written approval. 
+ 
+Prevention Level: This level involves a proactive process that 
+empowers individuals and systems to deal constructively with 
+potentially difficult life situations, to keep healthy people 
+healthy and to bolster the strength of those at risk.  It requires 
+that a measurable, risk -based series of collaborative and 
+culturally relevant strategies be employed to preclude or reduce 
+those uses of drugs and alcohol that have a negative impact on the 
+individual, the famil y, and the larger society. Negative impact 
+includes the physical, mental, or social consequences that result 
+in the reduction of optimum functioning at home, in school, at 
+work, or in the community.  Positive behaviors are defined as those 
+which include increased self-understanding, improved interpersonal 
+and human relations skills, enhanced ability to relate to social 
+institutions, and effective coping behaviors to deal with stress.  
+Prevention activities are targeted at the total populations, with 
+an emphasis on delivering appropriate services prior to the 
+manifestation of inappropriate behaviors. Prevention activities 
+can be delivered through schools, media, family or community 
+agencies and groups. 
+ 
+Information Dissemination: (Activity 6100) - This strategy 
+provides awareness and knowledge on the nature and extent of 
+alcohol, tobacco and drug use, abuse and addiction, as well as 
+problem gambling, and the effects on individuals, families and 
+communities. It also provides knowledge and awareness of 
+available prevention programs and services. Information 
+dissemination is characterized by one -way communication from 
+the source to the audience, with limited contact between the 
+two groups. 
+ 
+Education: (Activity 6200) – This strategy involves two -way 
+communication and is distinguished from the Information 
+Dissemination strategy by the fact that interaction between 
+the educator/facilitator and the participants is the basis of 
+its activities. Education activities aim to affect critical 
+life and social skills, inc luding decision-making, refusal 
+skills, critical analysis (e.g. of media messages) and 
+systematic judgment abilities. 
+ 
+Alternative Activities : (Activity 6300) - This strategy 
+operates under the premise that healthy activity will deter 
+participants from the use of ATOD and participation in 
+gambling activities. The premise is that constructive and 
+healthy activities offset the attraction to, or otherwise meet 
+the needs usually filled by ATOD and gambling and would, 
+therefore, minimize or eliminate use of ATO D and participation 
+in gambling activities. Note: Alternative activities alone 
+have not been shown to be effective at preventing substance 
+abuse. Characteristics of effective alternative activities Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+13 
+include programs/activities that: are more intensive (i	.e. 
+include many hours of involvement in the program), incorporate 
+skill building, target higher risk youth, and are built into a 
+comprehensive prevention plan. 
+ 
+Problem Identification and Referral: (Activity 6400) - This 
+strategy targets those persons who have experienced first use 
+of illicit or age -inappropriate use of tobacco and those 
+individuals who have indulged in the first use of illicit 
+drugs and alcohol in order to assess if their behavior can be 
+reversed through education. This strategy also tar	gets 
+individuals who have engaged in age -inappropriate or problem 
+gambling activities. Prevention funds shall not be used for 
+SAP, EAP or DUI programs beyond the point of the educational 
+component. The educational component is inclusive of providing 
+consultation services to school district personnel, core team 
+members and parents. Funding for assessment or any other 
+activity directly linked to the initiation of treatment must 
+come from non-prevention funding sources. 
+ 
+Community-based Process: (Activity 6500) - This strategy aims 
+directly at building community capacity to enhance the ability 
+of communities to more effectively provide prevention and 
+treatment services for substance abuse and problem gambling 
+disorders.  Activities include organizing, plannin g, enhancing 
+efficiency and effectiveness of services, inter	-agency 
+collaboration, coalition building and networking. 
+ 
+Environmental: (Activity 6600) - This strategy establishes or 
+changes written and unwritten community standards, codes, 
+ordinances and at titudes thereby influencing incidence and 
+prevalence of ATOD use/abuse and problem gambling in the 
+population. This strategy is divided into two subcategories 
+to permit distinction between activities which center on legal 
+and regulatory initiatives and th ose that relate to the 
+service and action-oriented initiatives. 
+ 
+Other Prevention: (Activity 6700) - This activity is reserved 
+for DDAP sanctioned initiatives (e.g., administration of 
+Synar), activities taking place initiated by the SCA and 
+funded from sources other than DDAP, but not readily captured 
+under the previously defined prevention activities. DDAP 
+funds may not be used for this activity without prior DDAP 
+written approval. 
+ 
+Intervention Level: This level involves the provision of services 
+aimed at assisting the client in coping with a specific crisis or 
+other situation in his or her life whereby his or her customary 
+modes of adaptation have proven inadequate.  This level is aimed at 
+assisting in decision -making and supporting the client until he or 
+she can cope with the situation independently. Referral is Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+14 
+provided if the need for a structured treatment regimen or other 
+service is indicated. 
+ 
+Reserved: (Activity 7100) – This activity is currently not in 
+use. 
+ 
+ Intervention: (Activity 7200) – This activity includes: 
+ 
+ Early Intervention: As defined in the Pennsylvania Client 
+ Placement Criteria (PCPC) and the American Society of 
+Addiction Medicine Patient Placement Criteria (ASAM -PPC), 
+an organized screening and psycho -educational service 
+designed to help individuals identify and reduce risky 
+substance use behaviors. These services explore and 
+address problems or risk factors that appear to be 
+related to substance use and aim to help the individual 
+recognize the harmful consequences of inappr	opriate 
+substance use. 
+ 
+Hotline: - The provision of referral, advice, and crisis 
+intervention through a telephone service. 
+ 
+Group/Individual Discussion: - The goal of these services 
+is to get persons to critically evaluate their substance 
+use or engagement in gambling activities and the negative 
+effects their behavior is having on their personal, 
+family and societal development (e.g., impaired driving 
+programs, underage drinking offender programs, Student 
+Assistance Program groups, Employee Assistance Progr ams). 
+ 
+Outreach: - Identifying those individuals who are at high 
+risk of becoming substance abusing individuals or 
+engaging in risky behavior concerning problem gambling 
+and encouraging those individuals who are substance 
+abusers or problem gamblers to acc ess treatment. Outreach 
+also includes promoting awareness about substance abuse 
+and its relationship to contracting communicable 
+diseases. Staff persons conducting outreach provide 
+these groups with information about accessing 
+intervention and treatment s ervices. In addition to 
+outreach services to the injection drug users population, 
+as required by the Substance Abuse Prevention and 
+Treatment Block Grant, other examples are programs for 
+persons who may be exposed to HIV (e.g., client 
+Testing/Partner Noti fication) or Hepatitis C. 
+ 
+Treatment Level: This level involves the activities aimed at the 
+systematic application of social, psychological or medical service 
+methods to assist individuals to deal with patterns of substance 
+use and problem gambling disorde rs. 
+ Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+15 
+Outpatient: (Activity 861A) - An organized, non -residential 
+psychotherapy treatment service providing psychotherapy which 
+the individual resides outside the facility. These services 
+are usually provided in regularly scheduled treatment sessions 
+for, at most, five (5) hours per week. 
+ 
+Intensive Outpatient: (Activity 861B) – An organized non -
+residential treatment service in which the individual resides 
+outside the facility.    It provides structured psychotherapy 
+and stability through increased periods of staff intervention.  
+These services are provided according to a planned regimen 
+consisting of regularly scheduled treatment sessions at least 
+three (3) days per week, for at least five (5), but less than 
+ten (10) hours per week. 
+ 
+Partial Hospitalization : (Activity 852A) – Treatment consists 
+of the provision of psychiatric, psychological, and other 
+types of therapies on a planned and regularly scheduled basis 
+in which the individual resides outside of the facility.  This 
+activity does not include a residential or housing component 
+and is therefore designed for those individuals who do not 
+require 24-hour residential care, but who would nonetheless 
+benefit from more intensive treatments than are offered in 
+outpatient treatment programs. Partial Hospitaliza	tion 
+services consist of regularly scheduled treatment sessions at 
+least three (3) days per week, with a minimum of ten (10) 
+hours per week, comprised of at least 2 group and 2 individual 
+sessions. 
+ 
+Halfway House: (Activity 852B) – A treatment facility loc ated 
+in the community that is licensed by DDAP’s Division of 
+Program Licensure as a non -hospital inpatient facility and 
+requires additional approval by DDAP’s Division of Treatment.  
+This is a live in/work out environment (with school access for 
+adolescents). Unlike standard non -hospital rehabilitation 
+programs, this activity provides a live in/work out 
+environment with less intensive interaction between the 
+individuals and the provider staff than is associated with 
+activities 823B or 823C. The setting is usually an independent 
+physical structure containing no more than 25 beds. 
+ 
+Medically Monitored Inpatient Detoxification : (Activity 823A)- 
+Treatment conducted in  a residential facility that provides a 
+24-hour professionally directed evaluation and detoxif ication 
+of addicted individuals. Detoxification is the process 
+whereby a drug- or alcohol-intoxicated or dependent individual 
+is assisted through the period of time required to eliminate 
+the presence of the intoxicating substance (by metabolic or 
+other means) and any other dependency factors while keeping 
+the physiological and psychological risk to the individuals at 
+a minimum. 
+ Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+16 
+Medically Monitored Short -Term Residential Treatment: 
+(Activity 823B) – Treatment in a non -hospital setting that 
+includes 24-hour professionally directed evaluation, care, and 
+treatment for addicted individuals in acute distress.  
+Rehabilitation is a key treatment goal. 
+ 
+Medically Monitored Long -Term Residential Treatment : (Activity 
+823C)- Treatment in a non -hospital setting that in cludes 24-
+hour professionally directed evaluation, care, and treatment 
+for addicted individuals in chronic distress, whose substance 
+use disorder symptomatology is demonstrated by severe 
+impairment of social, occupational, or school functioning.  
+Habilitation is the treatment goal. 
+ 
+Medically Managed Inpatient Detoxification:  (Activity 834A)- 
+Treatment in a non -hospital setting that provides 24 -hour 
+medically directed evaluation and detoxification of 
+individuals with SUDs in an acute care setting. Facilit	ies 
+for such services must have, at a minimum, 24 -hour nursing 
+care, 24-hour access to specialized medical care and intensive 
+medical care, and 24 -hour access to physician care as a drug 
+and alcohol treatment unit.  The facility must be licensed by 
+DDAP’s Division of Program Licensure and must also have the 
+applicable license and certification from the Department of 
+Health as an acute care or general hospital, or be approved by 
+the DHS as a psychiatric hospital. Detoxification is the 
+process whereby a drug - or alcohol-intoxicated or dependent 
+individual is assisted through the period of time needed to 
+eliminate (by metabolic or other means) the presence of the 
+intoxicating substance or the dependency factors, while 
+keeping the physiological or psychological risk to the 
+individual at a minimum. 
+ 
+Medically Managed Inpatient Residential : (Activity Code 834B) - 
+Treatment provides 24 -hour medically directed evaluation, 
+care, and treatment for addicted individuals with coexisting 
+biomedical, psychiatric, and/or beh avioral conditions that 
+require frequent care. Facilities for such services must 
+have, at a minimum, 24 -hour nursing care, 24 -hour access to 
+specialized medical care and intensive medical care, and 24	-
+hour access to physician care.  (The hospital must be licensed 
+by DDAP’s Division of Program Licensure and must also have the 
+applicable license and certification from the Department of 
+Health as an acute care or general hospital, or be approved by 
+the DHS as a psychiatric hospital.) 
+ 
+Physician and Pharmacy: (Activity 8900) - This activity 
+includes the use of medications other than methadone (e.g. 
+vivitrol, buprenorphine, naltrexone, etcetera) to address 
+substance use disorders, primarily opiate and alcohol 
+addiction, where the delivery of this service occurs separate 
+from a designated treatment provider and may be applicable to Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+17 
+individuals in various levels of care.  SCAs must have written 
+approval from DDAP prior to utilizing DDAP funds for all 
+medications, with the exception of methadone. 
+ 
+Treatment Related Services Level : This level involves those 
+activities that support the Treatment Level Activities in which no 
+direct treatment is provided. These activities involve the 
+coordination of services and the provision of support services that 
+will assist the indi vidual in meeting other deficiencies inherent 
+in their life, and ultimately aid them in securing recovery and a 
+self-sufficient life style. 
+ 
+Case/Care Management: (Activity 9100) – Case management 
+determines the treatment and non -treatment needs of the cli ent 
+and ensures that arrangements are made to meet the needs 
+identified. This activity involves services associated with 
+the three primary functions of case management defined as: 
+1) Screening- the identification of emergent care needs. 
+2) Assessment (including assessment services within SAP) -  
+  determination of the appropriate level of care for 
+  referral to treatment. 
+3)Case Coordination- the administrative documentation and 
+  management of treatment and non -treatment related  
+  services recommended , referred and received by the SCA 
+  clients.  
+ 
+In addition to the administrative management of services, the 
+SCA may provide or refer for additional activities/services to 
+increase an individual’s level of self -sufficiency based on 
+the individual’s needs (e.g., intervention/discussion groups, 
+face-to face contact with the individual to assess progress in 
+addressing identified needs, intensive case management, etc.).  
+ 
+Expenditures for care management as defined by DHS or other 
+funding sources would also be reported in this activity. 
+ 
+Emergency Housing: (Activity 920E) – This activity can include  
+emergency shelter and housing assistance to homeless or near 
+homeless individuals who agree to participate in drug and 
+alcohol treatment services, self -help groups, or other 
+recovery support services. SCA authorization for emergency 
+housing may be retroactive; however, actual payment shall not 
+be made until the individual is assessed by the SCA or one of 
+its contractors.  The use of DDAP funds for emergency housing 
+shall be limited to 30 days per individual per SFY. 
+ 
+Recovery Housing: (Activity 920R) – This activity can include 
+admission into a TLF licensed by DDAP or a Recovery House that 
+meets minimum requirements identified in the DDAP Treatment 
+Manual.  Either type of housing is designed to provide a semi -
+protected home-like environment that can assist a client in 
+his or her gradual re -entry into the community. No formal Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+18 
+treatment (e.g., counseling, psychotherapy) takes place at the 
+facility. This is a live-in/work-out situation involving 
+short-term housing. The use of DDAP funds for recovery 
+housing shall be limited to 90 days per individual per SFY. 
+ 
+DDAP Approved- Other Housing: (Activity 920D) – This activity 
+can include exceptions for other tempor ary housing services 
+and requires written, pre -approval from DDAP. 
+ 
+Recovery Support Services: (Activity 930R) – This activity 
+involves the provision of non -treatment services that assist 
+individuals and families to recover from substance use and 
+problem gambling disorders and that are not included under 
+another activity, e.g., Recovery Housing. Examples include 
+but are not limited to mentoring programs, training and 
+education programs, and telephonic recovery support programs. 
+ 
+DDAP Approved- Other Recovery Support: (Activity 930D) – This 
+activity involves the provision of other client related 
+services not readily captured under the previously defined 
+treatment activities, and requires written, pre -approval from 
+DDAP when utilizing DDAP funds. 
+ 
+APPROACHES: 
+ 
+Detoxification: The process whereby a D&A intoxicated or 
+dependent client is assisted through the period of time necessary 
+to eliminate, by metabolic or other means, the presence of the 
+intoxicating substance or dependency factors while keeping the 
+physiological or psychological risk to the client at a minimum. 
+ 
+Maintenance: The prescription of methadone or other approved 
+substance in sufficient doses to achieve stabilization or prevent 
+withdrawal symptoms.  This approach differs from drug free in that 
+a maintenance substance is utilized throughout the treatment 
+regimen. Slow withdrawal or outpatient detoxification of the 
+client from the maintenance substance is considered as a part of 
+maintenance. The ultimate goal of maintenance is to assist the 
+client in permanently discontinuing the use of dependency producing 
+substances. 
+ 
+Drug Free: The provision of guidance, advice, and psychological 
+treatment as a means to deal with the client's emotional structure 
+and concurrent problems without the use of a mai ntenance substance.  
+Temporary medication for treatment of physiological conditions or 
+as an adjunct to psychosocial treatment may be utilized in this 
+approach. 
+ 
+Other Chemotherapy: A treatment approach that includes 
+chemotherapy, using a primary medicatio n for purposes other than 
+detoxification. Other chemotherapy implies continued doses of 
+medication, e.g., buprenorphine.  Any SCA that intends to pay for Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+19 
+buprenorphine services must submit written procedures to DDAP.  
+Procedures must describe how the coor dination and payment of such 
+services will occur within the SCA. If a client receives only 
+short-term medication for temporary symptomatic relief, the client 
+is entered under drug free or detoxification, as appropriate. 
+ 
+Experimental: A treatment approach not generally utilized for 
+treatment of D&A clients and innovative in nature. Projects and 
+facilities utilizing this approach must be designated, in writing, 
+as eligible by the Secretary of the Department Of Drug and Alcohol 
+Programs for funding purposes .  
+ 
+ 
+ 
+ 
+ 
+ Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+20 
+APPENDIX B 
+ 
+BILLING INSTRUCTIONS AND PAYMENT PROVISIONS 
+ 
+FEE FOR SERVICE (FFS) 
+ 
+During the term from July 1, 2023 until June 30, 2024 the 
+COUNTY'S Single County Authority (SCA) will purchase services 
+enumerated in Appendix A, titled Drug & Alco hol Activities, which 
+has been incorporated herein and made a part of CONTRACT 23-505.  
+These services have been defined by the Department of Drug and 
+Alcohol Programs (DDAP), in its contract with the SCA.  
+Furthermore, services will be delivered as specif ied on the Fee for 
+Service Table in Appendix B.  The rate(s) set out herein are either 
+below or are the prevailing SCA -approved rate. 
+ 
+The PROVIDER shall submit to COUNTY designated officials a fee 
+for service invoice for services rendered within ten (10) 	working 
+days of the end of the invoice period.  COUNTY will provide payment 
+for invoiced services within thirty (30) calendar days of receipt 
+of invoice.  COUNTY, at its sole discretion, may withhold payment 
+for any services that are held in dispute until such time as the 
+matter is resolved to the satisfaction of COUNTY officials. 
+ 
+All funding for the services listed in this contract are 
+contingent upon the COUNTY receipt of all grant awards as well as 
+federal and state allocations. 
+ 
+The terms and condition s regarding travel, lodging and 
+subsistence rates as set forth in the Office of Administration’s 
+Management Directive 230.10, Rev. 1/21/09 and any subsequent 
+revisions thereto. 
+ 
+Management Directive 230.10 may be accessed via the internet 
+at http://www.oa.state.pa.us under Records and Directives, 
+Management Directives, Management/Administrative Support (205 -260). 
+ 
+Invoices are to be submitted in accordance with the above 
+procedures and will include the: 
+(1) Names of the parties involved 
+(2) Term of the CONTRACT 
+(3) Type of service purchased 
+(4) Definition of a unit of service 
+(5) Rate of reimbursement per unit to be applied for services 
+rendered 
+ 
+ 
+Services to be rendered : SEE ATTACHED FEE SCHEDULE  
+ 
+Rate: SEE ATTACHED FEE SCHEDULE       
+ 
+Contract Amount: $5,000 Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+21 
+FEE FOR SERVICE TABLE 
+ 
+ 
+ 
+ 
+PROVIDER FACILITY 
+# 
+SERVICE TO BE DELIVERED RATE POPULATION 
+Community 
+Action 
+Committee of 
+the Lehigh 
+Valley 
+ 
+Rental Assistance 
+Activity Code 920R 
+5% 
+Administrative 
+Fee 
+Adults, 
+Adolescents, 
+Pregnant 
+Women, Women 
+with Children 
+ 
+Community 
+Action 
+Committee of 
+the Lehigh 
+Valley 
+ 
+ 
+Client Supports  
+Activity Code 930R 
+5% 
+Administrative 
+Fee 
+Adults, 
+Adolescents, 
+Pregnant 
+Women, Women 
+with Children 
+ 
+ 
+Community Action Committee of 
+the Lehigh Valley will act as a 
+fiscal agent for authorized 
+clients in their 
+rental/security fee as well as 
+client supports.  Community 
+Action Committee of the Lehigh 
+Valley will submit a check 
+written to the landlord to 
+secure housing for Northampton 
+County D&A Clients.  The fee 
+for this service will be 5% of 
+the amount of the check 
+executed and reimbursement of 
+rental amount. 
+ Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+22 
+APPENDIX C-1 
+ 
+AUDIT REQUIREMENTS 
+ 
+The PROVIDER must comply with all Federal, State and COUNTY audit 
+requirements including: the Single Audit Act as amend ed; 2 CFR Part 
+200 as amended, and any other applicable law, regulation, or policy 
+and any amendment to such other applicable law, regulation, or 
+policy which may be enacted or promulgated by these governments. If 
+any Federal statute specifically prescribe	s policies or 
+requirements that differ from those provided herein, the provisions 
+of that Federal statute shall govern. 
+ 
+Federal Audit Requirements 
+ 
+If the PROVIDER is a non -profit organization and expends total 
+Federal awards of $750,000 or more during it s fiscal year that are 
+received either directly from the Federal government or indirectly 
+from a pass-through entity, or a combination of both to carry out a 
+Federal program, the PROVIDER is required to have an audit made in 
+accordance with the provisions of 2 CFR Part 200.501. 
+ 
+A PROVIDER that is a for -profit organization is required to have an 
+audit if it expends a total of $750,000 or more of Federal awards 
+that it received directly or indirectly under one or more 
+Department of Health and Human Services (DHHS) Federal awards 
+during its fiscal year.  The audit shall be made in accordance with 
+generally accepted Government Auditing Standards as revised and 
+published by the Comptroller General of the United States (GAGAS) 
+or 2 CFR Part 200 as amended. 
+ 
+If the PROVIDER expends total Federal awards of less than $750,000 
+during its fiscal year, it is exempt from these Federal audit 
+requirements and is required to maintain auditable records of 
+Federal, State, COUNTY and other funds which supplement such 
+awards.  The PROVIDER shall provide access to such records by 
+Federal, State, and COUNTY agencies or their designees. 
+ 
+The aforementioned provisions neither limit the authority of 
+Federal, State or COUNTY agencies to conduct or arrange for 
+additional audits nor aut horize any PROVIDER to constrain these 
+agencies from carrying out additional audits. While the PROVIDER 
+may be exempt from Federal audit requirements, Pennsylvania 
+Department of Drug and Alcohol Programs (DEPARTMENT) and COUNTY 
+audit requirements may be a pplicable. 
+ 
+DEPARTMENT and COUNTY Audit Requirements 
+ 
+Non-profit and for-profit PROVIDERS must meet the DEPARTMENT'S and 
+COUNTY'S following annual audit requirements. 
+ Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+23 
+Where a single audit or program -specific audit is conducted in 
+accordance with the Feder al audit requirements detailed above, such 
+an audit will be accepted by the DEPARTMENT and COUNTY provided 
+that a full copy of the audit report is submitted as detailed 
+below.   
+ 
+The PROVIDER is required to have a DEPARTMENT mandated program	-
+specific audit made in accordance with the latest revision of GAGAS 
+as of the time of the audit; the audit requirements of the laws and 
+regulations governing the program(s) in which the PROVIDER 
+participates, and the terms of this CONTRACT when both of the 
+following conditions apply: 
+ 
+1. The PROVIDER expends less than $750,000 of total Federal 
+awards received from all sources during its fiscal year, and 
+ 
+2. The PROVIDER expends $500,000 or more of State funds under 
+this CONTRACT during the twelve successive month period 
+ending June 30
+th
+ of any year (STATE FISCAL YEAR). 
+ 
+Unless stated otherwise in the terms of this CONTRACT, the PROVIDER 
+is not required to have a DEPARTMENT mandated audit performed when 
+either of the following conditions applies: 
+ 
+1. The PROVIDER expends less than $500,000 of State funds 
+received under this CONTRACT during the STATE FISCAL YEAR and 
+its expends less than $750,000 of total Federal awards during 
+its fiscal year that are received from all sources (i.e., any 
+and all other Federal awards expended that are received 
+either directly from the Federal government or indirectly 
+from a recipient of Federal funds). 
+ 
+2. The CONTRACT is funded by either State or Federal funds and 
+all CONTRACT monies expended during the STATE FISCAL YEAR or 
+the PROVIDER'S fiscal year, re spectively, are received on a 
+strictly fee for service basis. In addition, all Federal 
+awards expended from all sources during the PROVIDER'S fiscal 
+year are received on a strictly fee for service basis, 
+regardless of the amount of Federal awards expended . 
+ 
+When the aforementioned Federal and DEPARTMENT audit requirements 
+are not applicable and the PROVIDER expends $150,000 or more in 
+Federal, State and/or COUNTY funds that are received from the 
+COUNTY during the STATE FISCAL YEAR, the PROVIDER is required to 
+have a program-specific audit of those funds made in accordance 
+with GAGAS. Where such an audit is not required to meet Federal 
+audit requirements, the costs related to this audit requirement 
+cannot be charged to Federal funding streams. 
+ 
+As applicable, the PROVIDER shall have subcontractors obtain audits 
+of their contracts in accordance with this Appendix.  The PROVIDER 
+shall make the audit requirements of this Appendix applicable to Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+24 
+any subcontractor expending $150,000 or more of the CONTRACT'S 
+funds during the STATE FISCAL YEAR, or expending $150,000 or more 
+of this CONTRACT'S funds within any successive STATE FISCAL YEAR 
+thereafter.  If the subcontract or any successive period is for a 
+period of less than the STATE FISCAL YEAR, but the subcontractor 
+expends $150,000 or more of this CONTRACT'S funds during said 
+period, the PROVIDER is also required to make the requirements of 
+this Appendix applicable to the subcontractor. The PROVIDER, not 
+the COUNTY, shall be responsible for the receipt, review and 
+resolution of such audits. The PROVIDER shall follow up on all 
+findings disclosed in the audit report(s). The PROVIDER shall 
+retain such audits for a period of time which is the greater of 
+four (4) years after the termination of the PROVIDER'S contract 
+with the subcontractor or until resolution of any audit exceptions 
+or other claims or actions involving a subcontract. 
+ 
+If the grant agreement between the COUNTY and the DEPARTMENT 
+contains language superseding the dollar threshold identified above 
+for DEPARTMENT mandated audits, the superseding language takes 
+precedence and must be used by the PROVIDER when determining 
+whether it or its subcontractors are required to have an audit 
+performed. 
+ 
+When the aforementioned Federal, DEPARTMENT and COUNTY audit 
+requirements are not applicable, the COUNTY shall have the option 
+to require that the PROVIDER submit an Agreed	-Upon Procedures 
+Report on the PROVIDER’s compliance with provisions of this   
+CONTRACT that are selected by the COUNTY. The incremental cost for 
+preparation of the AUP REPORT cannot be charged to Federal funding 
+streams. 
+ 
+PROVIDERS that are exempt from DEPARTMENT and COUNTY audit 
+requirements are required to maintain auditable records of Federal 
+awards and any State COUNTY or other funds which supplem	ent such 
+awards. The PROVIDER shall provide access to such records by 
+Federal, State and COUNTY agencies or their designees. 
+ 
+DEPARTMENT mandated audits shall be performed in accordance with 
+the requirements herein, unless the PROVIDER has been notified i	n 
+writing by the DEPARTMENT or COUNTY prior to the termination of the 
+applicable audit period that the audit requirement has been waived. 
+ 
+When a DEPARTMENT or COUNTY mandated program -specific audit is 
+performed, the audit report package shall include, at 	a minimum, 
+the following:  
+ 
+1. A Statement of Financial Position (balance sheet) for each 
+appropriation or funding stream included in the CONTRACT. Said 
+statement of financial position shall identify any unexpended 
+or unused funds at the end of the audit peri od. 
+ Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+25 
+2. A separate Schedule of Contractual Performance, which shall 
+reflect the CONTRACT'S budget and reporting period and include 
+a comparison of budgeted to actual expenditures/services, must 
+be prepared for each appropriation or funding stream included 
+in the CONTRACT. Should the audit period differ from the STATE 
+FISCAL YEAR, the schedule(s) shall be accompanied by 
+information that allows the schedule(s) to be reconciled to 
+the STATE   FISCAL YEAR(s) affected. 
+ 
+3. Notes to the financial schedule(s). The foll	owing must be 
+included: 
+ 
+a. Definition of the reporting entity 
+b. Summary of significant accounting policies used in 
+preparing the schedule(s) 
+c. Other informative disclosures, as necessary 
+ 
+4. Auditor's report on the financial statement(s) and any 
+additional schedules required in the terms of this CONTRACT.  
+The report must identify each appropriation or funding stream 
+included in the audit, as well as the CONTRACT. 
+ 
+5. Auditor's report on internal control, including where 
+applicable, references to CONTRACT require ments and DEPARTMENT 
+audit guidance. The report must identify each appropriation 
+or funding stream included in the audit, as well as the 
+CONTRACT. This report shall describe the scope of testing 
+internal control and the results of the tests, and, where 
+applicable, refer to the separate Schedule of Findings and 
+Questioned Costs described below. 
+ 
+6. Auditor's report on compliance with laws, regulations and the 
+provisions of the CONTRACT; noncompliance with which could 
+have a material effect on the financial statements. The report 
+must identify each appropriation or funding stream included in 
+the audit, as well as the CONTRACT. This report shall include, 
+where applicable, references to CONTRACT requirements and 
+DEPARTMENT audit guidance. 
+ 
+7. Schedule of Findin gs and Questioned Costs (if applicable).  
+This schedule shall include the views of responsible officials 
+of the PROVIDER concerning the auditor's findings, conclusions 
+and recommendations.  This schedule shall contain all findings 
+and questioned costs for the financial statements, which are 
+required to be reported in accordance with GAGAS.  
+Specifically, the auditor shall report the following as audit 
+findings in this schedule: 
+ 
+a. Reportable conditions in internal control over the 
+program(s) (State and/or Fed eral) that provide funding 
+under this CONTRACT.  The auditor shall identify reportable Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+26 
+conditions which are individually or cumulatively material 
+weaknesses. 
+b. Material noncompliance with provision of laws, regulations 
+and the provisions of this CONTRACT. 
+c. Questioned costs specifically identified by the auditor 
+(known questioned costs). In evaluating the effect of 
+questioned costs, the auditor shall consider the best 
+estimate of total costs questioned (likely questioned 
+costs), not just the known questioned c osts.   
+d. In reporting questioned costs, the auditor shall include 
+information to provide proper perspective for judging the 
+prevalence and consequences of the questioned costs. 
+e. Known fraud that has a material effect on the financial 
+statements. 
+  
+8. Corrective Action Plan (CAP) (if applicable). At the 
+completion of the audit, the PROVIDER shall prepare a CAP to 
+address each audit finding included in the audit report.  The 
+CAP shall provide the name(s) of the contact person(s) 
+responsible for corrective acti on(s), the corrective action(s) 
+planned and the anticipated completion date(s) for the 
+corrective action(s) planned. Further, if the PROVIDER does 
+not agree with an audit finding, it must clearly and 
+completely explain the nature of its disagreement with 	the 
+finding in the CAP. Finally, if the PROVIDER believes that 
+corrective action is not required, it must provide the 
+specific reason(s) in the CAP. 
+ 
+9. Status of Prior Audit Findings and Recommendations (if 
+applicable). The auditor shall report the stat	us of 
+uncorrected material findings and recommendations from prior 
+audits that affect the current audit. 
+ 
+10. Management Letter (if applicable).  If a letter is issued to 
+management disclosing non -reportable conditions or other 
+matters that warrant the att ention of the PROVIDER’s 
+management, it must be furnished with the audit report. 
+ 
+11.  A copy of the most recent peer review report of the certified 
+public accounting firm that performed the audit (PEER REVIEW 
+REPORT). 
+ 
+The costs of DEPARTMENT and COUNTY m	andated audits shall be 
+reimbursed when said costs are specifically budgeted in the 
+CONTRACT'S budget as audit expenses. 
+ 
+Submission of Audit Report Packages to the COUNTY 
+ 
+Federally Required Audit Report Package:  The PROVIDER shall submit 
+copies of the audit report package to the COUNTY within the earlier 
+of 30 days after receipt of the audit report(s) or 120 days after Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+27 
+the end of the audit period. The audit report package shall 
+include: 
+ 
+1. Data Collection Form. 
+ 
+2. Financial statements, schedule of expenditu res of Federal 
+awards and notes thereto. 
+ 
+3. Auditor's reports on the financial statements and schedule of 
+expenditures of Federal awards, internal control, and 
+compliance, as well as a schedule of findings and questioned 
+costs. 
+ 
+4. Summary schedule of prior aud it findings. 
+ 
+5. Corrective action plan, if applicable. 
+ 
+6. Management letter, if applicable. 
+ 
+7. PEER REVIEW REPORT 
+ 
+In addition to the audit reporting package elements identified 
+above, the DEPARTMENT requires the schedule of expenditures of 
+Federal Awards or the notes to thereto to provide the following 
+information:  
+ 
+1. Breakdown of federal funds passed through the DEPARTMENT and 
+COUNTY by federal grantor, Catalog of Federal Domestic 
+Assistance (CFDA) number and name 
+ 
+2. Grant period beginning and ending dates 
+ 
+3. Program or award amount  
+ 
+4. Total received during the year 
+ 
+5. Accrued or (deferred) revenue at beginning of year 
+ 
+6. Revenue recognized  
+ 
+7. Accrued or (deferred) revenue at end of year 
+ 
+In instances where a Federal program -specific audit guide is 
+available, the audit report package for a program -specific audit 
+may be different and should be prepared in accordance with the 
+audit guide and 2 CFR Part 200. 
+ 
+One (1) copy of the audit report package is required to be 
+submitted to each COUNTY agency which provided Federal pa ss-through 
+awards to the PROVIDER. Additionally, applicable elements of the 
+audit report package are required to be submitted to the Federal 
+Audit Clearinghouse. Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+28 
+ 
+DEPARTMENT and COUNTY Required Audit Report Packages:  In the 
+absence of a Federally require d audit, one (1) copy of the 
+DEPARTMENT and COUNTY mandated audit report package consisting of 
+the elements identified above should be submitted to each COUNTY 
+agency that contracted with the PROVIDER within the earlier of 30 
+days after receipt of the audi t reports or 120 days of the 
+expiration or termination date of the CONTRACT or 120 days 
+following the end of each STATE FISCAL YEAR. 
+ 
+Audit Requirement Exemption Certification:  If the PROVIDER is 
+exempt from the Federal, DEPARTMENT and COUNTY audit requir ements, 
+the chief financial officer or executive of the PROVIDER shall 
+submit a notification to the COUNTY certifying that: 
+ 
+1. The PROVIDER is exempt from Federal, DEPARTMENT and COUNTY 
+audit requirements as expenditures of Federal, State and 
+COUNTY funds are below the aforementioned thresholds. 
+ 
+2. The PROVIDER has complied with the terms and conditions of 
+this CONTRACT during the program year.  If a PROVIDER has not 
+complied the terms and conditions of the CONTRACT, the 
+PROVIDER should disclose its instances o f noncompliance, a 
+plan describing the actions that will be implemented to 
+correct the instances of noncompliance, a timetable for 
+implementing the planned corrective actions, a process for 
+monitoring compliance with the timetable, and the name and 
+phone number of the individual responsible for resolving the 
+instances of noncompliance. 
+ 
+One (1) copy of the audit requirement exemption certification and 
+any required plans, timetables, processes for monitoring compliance 
+with the timetables and contact informa tion shall be submitted to 
+each COUNTY agency that contracted with the PROVIDER within 90 days 
+after the end of the program year. 
+ 
+Federal, DEPARTMENT and COUNTY required audit report packages and 
+audit requirement exemption certifications should be submit ted to: 
+ 
+County of Northampton 
+Drug and Alcohol Division 
+Human Services Building 
+2801 Emrick Boulevard 
+Bethlehem, PA  18020 -8015 
+ 
+Audit Services and Additional Audits 
+ 
+The PROVIDER is responsible for obtaining the necessary audit and 
+securing the services of an independent, licensed certified public 
+accountant or other independent governmental auditor in accordance 
+with applicable Federal regulations. Those regulations preclude Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+29 
+public accountants licensed in the Commonwealth of Pennsylvania 
+from performing audits of Federal awards. 
+ 
+The COUNTY reserves the right for Federal, State and COUNTY 
+agencies or their authorized representatives to perform additional 
+audits of a financial and/or performance nature, if deemed 
+necessary by COUNTY, State or Federal agenc	ies. Any such 
+additional audit work may rely on work already performed by the 
+PROVIDER'S auditor, and the costs for any additional work performed 
+by the Federal, State or COUNTY agencies will be borne by those 
+agencies at no additional cost to the PROVIDE R. Such audits may 
+include financial audits conducted to support the information 
+utilized in the rate setting process. 
+ 
+Questioned Costs 
+ 
+Any questioned costs identified as such in audit reports of either 
+the PROVIDER or its subcontractors shall be return	ed to the 
+cognizant Federal and/or State agencies or the COUNTY agency 
+providing the financial assistance, unless resolved to the 
+satisfaction of said entities. 
+ 
+Retention of Audit Documentation, Books, Records and Other 
+Documents 
+ 
+Audit documentation and audit reports must be retained by the 
+PROVIDER'S independent auditor for a minimum of four (4) years from 
+the date of issuance of the audit report, unless the PROVIDER'S 
+auditor is notified in writing by the COUNTY, State or the 
+cognizant or oversight Fede ral agency to extend the retention 
+period. Audit documentation shall be made available upon request 
+to authorized representatives of the COUNTY, State, the cognizant 
+or oversight Federal agency, the Federal funding agency, or the 
+General Accounting Office .  Access to audit documentation includes 
+the right to obtain copies of such documentation as necessary. 
+ 
+The PROVIDER shall maintain books, records and documents of State 
+and Federal awards and COUNTY funds that support the services 
+provided, that the fee s earned are in accordance with the CONTRACT 
+and that the PROVIDER has complied with the CONTRACT terms and 
+conditions.  The PROVIDER agrees to make available, upon reasonable 
+notice, at the office of the PROVIDER, during normal business 
+hours, and for the term of this CONTRACT and the retention period 
+set forth herein, any of the books, records and documents for 
+inspection, audit or reproduction by any Federal, State or COUNTY 
+agency or its authorized representative. Such Federal, State or 
+COUNTY agency ac cess shall extend to any books, records, and 
+documents that are retained by the PROVIDER in excess of the 
+retention periods set forth herein. Additionally, such Federal, 
+State or County access shall extend to the books, records, and 
+documents of any other program or service available from the 
+PROVIDER, whether or not funded, in whole or part, by the COUNTY, Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+30 
+where such other services or activities share supportive activities 
+and/or personnel with the services being provided pursuant to this 
+CONTRACT. 
+ 
+The PROVIDER shall preserve all books, records, documents and audit 
+report packages for a period of time which is the greater of four 
+(4) years from the date of the final payment under the provisions 
+of the CONTRACT, the CONTRACT expiration date, until all ques tioned 
+costs or activities have been resolved to the satisfaction of the 
+COUNTY or State, or as required by applicable Federal laws and 
+regulations, unless the DEPARTMENT otherwise separately agrees in 
+writing to a shorter period. If this CONTRACT is comp	letely or 
+partially terminated, the records related to the work terminated 
+shall be preserved and made available for a period of five (5) 
+years from the date of any resulting financial settlement. 
+ 
+Records which relate to litigation or the settlement of cl	aims 
+arising out of performance or expenditures under this CONTRACT to 
+which exception has been taken by the auditors, shall be retained 
+by the PROVIDER or provided to the COUNTY or State at the 
+DEPARTMENT'S or COUNTY'S option until such litigation, claim, or 
+exceptions have reached final disposition. 
+ 
+Except for documentary evidence delivered pursuant to litigation or 
+settlement of claims arising out of the performance of this 
+CONTRACT, the PROVIDER may, in fulfillment of its obligation to 
+retain records a s required herein, substitute photographs, 
+microphotographs, or other authentic reproductions of such records, 
+after the expiration of the two (2) years following the last day of 
+the month reimbursement to the PROVIDER of the invoice or voucher 
+to which such records relate, was made, unless a shorter period is 
+authorized by the State or COUNTY. 
+ 
+Period Subject to Audit 
+ 
+A Federally required audit made in accordance with 2 CFR Part 200 
+encompasses the fiscal period of the PROVIDER, or any fraction 
+thereof.  The period subject to audit for DEPARTMENT or COUNTY 
+required audits is the STATE FISCAL YEAR or any fraction thereof	, 
+unless notified in writing by the DEPARTMENT or COUNTY prior to the 
+termination of the applicable audit period that the audit 
+requirement has been waived.   
+ 
+Remedies for Noncompliance With Audit Requirements 
+ 
+The PROVIDER'S failure to provide an acceptable audit report 
+package or audit requirement exemption certification in accordance 
+with the requirements herein, may result in the COUNTY 	not 
+accepting the PROVIDER'S audit report package or audit requirement 
+exemption certification and initiating sanctions against the 
+PROVIDER, which may include, but are not limited to, the following: 
+ Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+31 
+1. Disallowing the cost of the audit. 
+ 
+2. Withholding a perce ntage of the CONTRACT funding pending 
+compliance. 
+ 
+3. Withholding or disallowing overhead or administrative cost. 
+ 
+4. Suspending subsequent CONTRACT funding pending compliance. 
+ 
+5. Terminating this CONTRACT. 
+ 
+6. Suspending and/or discontinuing other contract funding w hich 
+the PROVIDER may be receiving from the COUNTY. 
+ 
+ 
+ 
+ 
+ 
+ 
+ Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+32 
+APPENDIX C-2 
+ 
+AUDIT CERTIFICATION 
+ 
+WHEN AN AUDIT IS NOT REQUIRED 
+ 
+ As a PROVIDER who expends less than $150,000 in Federal, State 
+and COUNTY funds in this CONTRACT year, we are exempt from the 
+Federal, State and COUNTY audit requirements. 
+ 
+ However, should the CONTRACT be amended so that the amount 
+payable thereunder exceeds $150,000, or if the CONTRACT, in 
+combination with other purchase of service CONTRACTS with other 
+divisions of the Department of Human Services or other offices of 
+the County of Northampton, exceeds $150,000, an audit will be 
+obtained. 
+ 
+ The PROVIDER hereby certifies that it will comply with the 
+terms and conditions of this CONTRACT, specifically including 
+Appendix C, Audit Requ irements, during the program year. If the 
+PROVIDER does not comply with the terms and conditions of the 
+CONTRACT, the PROVIDER will disclose its instances of 
+noncompliance, a plan describing the actions that will be 
+implemented to correct the instances of non-compliance, a timetable 
+for implementing the planned corrective actions, a process for 
+monitoring compliance with the timetable, and the name and 
+telephone number of the individual responsible for resolving the 
+issues of noncompliance. 
+ 
+ It is further understood that the PROVIDER will maintain its 
+books, records and documents in accordance with Generally Accepted 
+Accounting Principles.  The PROVIDER agrees to make available, upon 
+reasonable notice, at its office, during normal business hours, for 
+the term of this CONTRACT and during the retention periods 
+specified within the CONTRACT, any of the books, records and 
+documents pertaining to the CONTRACT for inspection by any Federal, 
+State or COUNTY agency or its authorized representative. It is 
+expected that this review will occur during the retention period.  
+If it cannot be scheduled during that time frame, PROVIDER will be 
+notified to retain such books, records and documents for a further 
+period. 
+ 
+PROVIDER: Community Action Committee of the Lehigh Vall ey 
+ 
+By:  
+ 
+Title:  
+ 
+Date: 
+ 
+ 
+ Executive
+Director
+07 / 18 / 2023
+Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+33 
+APPENDIX C-3 
+ 
+AUDIT WAIVER 
+ 
+ 
+ 
+N/ADoc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+34 
+APPENDIX D-1 
+ 
+INSURANCE REQUIREMENTS 
+ 
+SIGNED STATEMENT 
+ 
+INSURANCE COVERAGE - CONTRACT NUMBER 23-505 
+TO: Northampton County Department of Human Services 
+ 
+ This will co nfirm that we understand the provisions of 
+Paragraph 14 of the above -referenced Purchase of Service Contract 
+with respect to the insurance coverage we must have, namely: 
+ 
+ Commercial General Liability - Occurrence form (ISO 
+2013 or equivalent) 
+Each policy and Certificate of Insurance shall contain 
+an endorsement naming the County of Northampton as an 
+additional insured party. 
+$2,000,000 General Aggregate 
+$2,000,000 Products/Completed Operations Aggregate 
+$1,000,000 Personal/Advertising Injury 
+$1,000,000 Each Occurrence 
+(Any restrictive endorsements must be included) 
+ 
+ Workers' Compensation 
+PA Statutory Coverage 
+Employer's Liability – Basic Limits  
+ 
+ Business Automobile Policy (only if contract involves 
+transportation of goods or persons) 
+Covering "Any" Auto Pol icy Symbol #1 or combination of 
+symbols #7, 8& 9. 
+$1,000,000 Each Accident Limit 
+ 
+ Professional Errors and Omissions Liability (only if 
+contract involves performance of a recognized 
+professional service) 
+$1,000,000 Each Occurrence 
+$1,000,000 Each Aggregate 
+ 
+ Medical Malpractice Insurance (only if contract 
+involves performance of a member of the medical 
+profession. Those in the medical professions must 
+also provide evidence of participation in the MCare 
+Fund in the amounts noted below): 
+$1,000,000 Each Occurr ence 
+$3,000,000 Each Aggregate 
+ 
+ By signing this document, PROVIDER is certifying that insurance 
+coverage meeting the requirements listed above will be in force 
+during the time period of July 1, 2023 through June 30, 202 4, and 
+that PROVIDER will furnish an insurance certificate evidencing said Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+35 
+insurance to Northampton County as soon as possible after the date 
+of this contract. 
+ 
+ PROVIDER, by signing this document, further warrants that 
+PROVIDER'S insurance carrier is registered with the Pennsylvania 
+State Insurance Department and will remain so throughout this 
+contract period. 
+ 
+PROVIDER'S NAIC Number is . 
+ 
+PROVIDER:   
+                 
+ __________________________________  
+ Authorized Signature  Date 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 18058
+07 / 18 / 2023
+Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+36 
+APPENDIX D-2 
+ 
+INSURANCE WAIVER 
+ 
+ 
+N/A 
+ 
+ Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+37 
+APPENDIX E 
+ 
+REPORTING REQUIREMENTS 
+ 
+PROVIDER is responsible for providing timely, accurate, and complete 
+reports in adherence to COUNTY and DDAP reporting schedule. 
+ 
+TYPE OF REPORT 	REQUIRED DUE TO SCA  
+Admission Packets  Within 7 days 
+ASAM – Timely submission of all 
+Admissions, Continued Stay Reviews, 
+and Discharges 
+ In WITS based on DDAP 
+timeframe 
+GPRA   As per SCA request 
+Hep C Quarterly Reporting  Quarterly 
+PAIR  
+ Monthly 
+Recovery Center reports  Quarterly 
+Recovery Support Services – any data 
+requested by the SCA must be submitted 
+in accordance with the timeframes 
+provided (reports, data) 
+ 
+ As per SCA request 
+SAP Liaison time reports ( list time 
+spent and school name 
+ 
+ As per DDAP 
+requirements 
+SAP Reporting – enter data at  
+https://www.pnsas-
+sapliaisonreport.org/default.aspx 
+Email SCA upon completion of 
+reporting. 
+ 
+ Yearly 
+Transitional Housing Client Log 
+ 
+ As per SCA request 
+Trauma Training Documentation 
+ 
+ January 2, 2024 
+Warm Handoff Report  Monthly 
+WITS Data Entry – Prevention 
+ 
+ As per DDAP 
+requirements 
+WITS Data Entry – Treatment  
+ 
+ As per DDAP 
+requirements 
+ Other Reports as Requested 	Yes  
+ 
+PROVIDER is responsible for any other reports that arise due to 
+changes in Federal, State or County reporting needs. 
+ 
+Contractors are required to adhere to all applicable requirements 
+from the SCA Grant Agreement, as well as all applicable DDAP 
+manuals, and any subsequent revisions, when applicable. The Grant 
+Agreement and DDAP Manuals are accessible at http://www.ddap.pa.gov. Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+38 
+APPENDIX F 
+ 
+FUNDING RESTRICTIONS 
+ 
+N/ADoc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+39 
+APPENDIX G 
+ 
+EQUIPMENT CONSTRAINTS 
+ 
+ 
+ 
+N/ADoc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+40 
+APPENDIX H 
+ 
+SPECIAL PROVISIONS 
+ 
+Drug & Alcohol Program Specifics 
+ 
+ 
+I. Compliance with Incorporated Documents 
+a) The Grantee shall comply with the requirements, policies, 
+and procedures contai ned in the most current version, which 
+version shall be updated from time to time during the 
+course of this Agreement, of the Department of Drug & 
+Alcohol Program’s (DDAP’s) Prevention Manual, Treatment 
+Manual, Fiscal Manual, and Operations Manual, and 
+Department of Drug and Alcohol Programs Grant Agreement. 
+Provider access to applicable DDAP Manuals to review 
+requirements and obtain copies is available through 
+http://www.ddap.pa.gov All documents noted in this 
+paragraph are incorporated herein by reference	. Each 
+provision enumerated herein or incorporated by reference 
+hereto shall be deemed to be material and any breach 
+thereof may be considered a material breach of contract. 
+ 
+b) The Grantee shall access the Department of Drug & Alcohol 
+Program manuals in th eir electronic version through the 
+County of Northampton Drug & Alcohol Division website, as 
+specified in Appendix B of this contract. 
+      
+II. Grant Agreement Requirements and Restrictions 
+a) Student Assistance Program (SAP) Funding 
+State funds provided for SA P under this Grant agreement 
+shall be used for consultation, assessment, group 
+intervention or treatment services as pre -authorized by the 
+Single County Authority (SCA). SAPT Block Grant funds 
+provided for SAP under this agreement shall be used for 
+intervention and non-hospital treatment services.  
+b) Pregnant Women and Women With Children(PWWWC)Funding 
+To provide PWWWC activities and functions as required in 
+the DDAP Treatment Manual.  Providing such services to this 
+population shall take into consideration the prevention 
+needs of the children as part of the PBPS community wide 
+needs/risk assessment process.  
+c) Hepatitis C Initiative Funding 
+(1) To perform Hepatitis C Initiative activities and 
+functions as required or to coordinate the provision 
+of such services with the SCA contracted provider.   
+d) Compulsive and Problem Gambling Funding 
+i) All services shall be delivered in accord ance to the 
+stipulations defined in the FIA and the Prevention 
+Manual issued by DDAP. 
+  
+e) Act 2010-1 State Gaming Funds Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+41 
+i) Funding to be used for drug and alcohol assessments 
+including drug and alcohol addiction assessments 
+associated with or related to compulsive and problem 
+gambling. 
+ii) For related addiction treatment in DDAP licensed            
+non-hospital residential detoxification f acilities,           
+non-hospital residential rehabilitation facilities,            
+and halfway houses. 
+ 
+III. Confidentiality Provisions 
+a) The grantee agrees that all persons currently or formerly 
+screened, assessed, diagnosed, counseled, treated and 
+rehabilitated for drug and alcohol abuse and dependence, 
+shall be protected from disclosure of their names, 
+identities, patient records and the information contained 
+therein except as disclosure is permitted by state and 
+federal statute and regulation. 
+b) To assure confi dentiality of client information, the 
+grantee shall make adequate provision for system security 
+and protection of individual privacy 
+c) The grantee and its subcontractors shall store counseling 
+and testing records in locked cabinets. Coded names, 
+number sequences, and other Department -approved methods 
+that assure confidentiality shall be permitted 
+d) The grantee and its subcontractors shall be required to 
+keep all client counseling and testing information and AIDS 
+patients’ identities, records, and information i	n such 
+records confidential 
+e) The Grantee and its subcontractors shall not release HIV 
+information from these records without the specified prior 
+written and informed consent of the client in accordance 
+with the confidentiality requirements contained in Act No. 
+1990-148,35P.S. Section 7601 et seq. 
+f) The Grantee, treatment providers, and others subject to the 
+confidentiality requirements of the Pennsylvania Drug and 
+Alcohol Abuse Control Act (71P.S. Section 1690.108), the 
+Public Health Service Act (42 U.S.C. §29 0dd-3 and 290ee-3), 
+Federal Confidentiality Regulations (42CFR Part 2), 71 P.S. 
+Section 1690.108, State Confidentiality Regulations, (4Pa. 
+Code §§255.5(b) and 257.4), confidentiality provisions of 
+the Disease Prevention and Control Law of 1955 (35P.S. 
+Section 521.15), the Confidentiality of HIV Related 
+Information Act 1990 -148, the Healthcare Facility Act (35 
+P.S. Section 7601 et seq., and the Health Insurance 
+Portability and Accountability Act, and any other 
+appropriate confidentiality law, shall comply wi	th such 
+requirements, as applicable. 
+g) All staff will sign a statement indicating that all 
+information acquired through their employment duties will 
+be kept confidential. The statement must delineate 
+progressive disciplinary action will be taken if 
+confidentiality is breached. Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+42 
+ 
+IV. Audit, Inspection and Monitoring 
+a) The PROVIDER shall comply with the Audit Requirements, Rev. 
+07/15 in regard to federal and state funding, and further 
+defined in Appendix C of this agreement.  
+b) The PROVIDER must ensure that key staff are available in the 
+event that any local, state, or federal funding agency 
+conducts a site visit. 
+c) All information obtained during the period of this contract 
+by the PROVIDER through work governed by the contract shall 
+be made available to the Department a nd the SCA immediately 
+upon demand. 
+ 
+V. DDAP Requirements  (Operations Manual & Fiscal Manual) 
+a) On-Site Provider Monitoring 
+The CONTRACTOR agrees to permit on -site monitoring by the 
+DDAP-assigned SCA for administrative and program 
+performance. The CONTRACTOR will allow the SCA staff to 
+access any information requested in order to verify 
+adherence to this Agreement.  The CONTRACTOR will allow SCA 
+to monitor for all services provided on behalf of all SCAs 
+who contract with the provider. .  
+b) Fee-Splitting – The Contractor agrees that no employee, 
+board member, or representative of the Contractor, either 
+personally or through an agent, shall solicit the referral 
+of clients to any facility in a manner that offers or 
+implies an offer of rebate to persons referring clie nts or 
+other fee-splitting inducements. No person or entity 
+involved in the referral of clients may receive payment or 
+other inducement by a facility or its representatives. 
+c) Federal Lobbying Certification and Disclosure 
+Requirements whereby the Contracto r certifies, to the best 
+of Contractor’s knowledge and belief, that: 
+No federal appropriated funds have been paid or will be 
+paid, by or on behalf of the CONTRACTOR, to any person for 
+influencing or attempting to influence an officer or 
+employee of any agency, a member of Congress, an officer or 
+employee of Congress, or an employee of a member of 
+Congress in connection with the awarding of any federal 
+contract, the making of any federal grant, the making of 
+any federal loan, the entering into of any cooper	ative 
+agreement, and the extension, continuation, renewal, 
+amendment, or modification of any federal contract, grant, 
+loan, or cooperative agreement. 
+If any funds other than federal appropriated funds have 
+been paid or will be paid to any person for influe ncing or 
+attempting to influence an officer or employee of any 
+agency, a member of Congress, an officer or employee of Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+43 
+Congress, or an employee of a member of Congress in 
+connection with this federal contract, grant, loan, or 
+cooperative agreement, CONTRAC TOR shall complete and submit 
+Standard Form-LLL, (http://www. ddap.pa.gov) “Disclosure of 
+Lobbying Activities,” in accordance with its instructions, 
+attached hereto as Appendix C 
+CONTRACTOR shall require that the language of this 
+certification be included in the award documents for all 
+subawards at all tiers (including subcontracts, subgrants, 
+and contracts under grants, loans, and cooperative 
+agreements) and that all subrecipients shall certify and 
+disclose accordingly. This certification is a material 
+representation of fact upon which reliance was placed when 
+this transaction was made or entered into. Submission of 
+this certification is a prerequisite for making or entering 
+into this transaction imposed under Section 1352, Title 31, 
+U.S. Code. Any perso n who fails to file the required 
+certification shall be subject to a civil penalty of not 
+less than $10,000 and not more than $100,000 for such 
+failure. 
+Persons or entities, at whatever tier, receiving more than 
+$100,000 in federal funds hereunder, shall p romptly file 
+the certification and any necessary lobbying disclosure 
+forms with the tier providing the funding.  That tier shall 
+retain the certification but promptly file any lobbying 
+disclosure forms with the next higher tier until such 
+lobbying disclosure forms reach the federal funding source 
+agency.  There is an obligation to file an amended lobbying 
+disclosure form and pass it from tier to tier whenever 
+there is a material change to the original lobbying 
+disclosure form. See 55 Federal Register 6736	-6756 
+(February 26, 1990). Further general information may be 
+obtained by telephoning the Federal Office of Management 
+and Budget at 202-395-3254. 
+d) Block Grant Provisions 
+CONTRACTOR agrees to comply with the Block Grant 
+prohibition provisions pursuant to th e Federal SABG and in 
+accordance with 42 U.S.C. Section 300x -31 and 45 CFR 
+Section 96.135, whereby none of this contract’s funds shall 
+be used to: 
+(a) Provide inpatient hospital services unless it is 
+determined, in accordance with guidelines issued by 
+the Secretary of Health and Human Services, that such 
+treatment is a medical necessity for the individual 
+involved. In exercising this exception, a physician 
+must determine that the primary diagnosis of the 
+individual is substance abuse; the services can be 
+reasonably expected to improve the individual’s Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+44 
+condition or level of functioning; the individual 
+cannot be effectively treated in a community -based, 
+non-hospital, residential program of treatment; and 
+the hospital’s substance abuse program follows 
+national standard of substance abuse professional 
+practice. SABG funding may only be used under these 
+circumstances only to the extent that the daily rate 
+of payment provided to the hospitals for providing the 
+services to the individual shall not exceed the 
+comparable daily rate provided for community -based, 
+non-hospital, residential programs of treatment for 
+substance abuse; and that payment is only for services 
+that are medically necessary, that is, only for those 
+days that the patient cannot be safely treated in a 
+residential, community -based program. 
+(b) Make cash payments to intended recipients of health 
+services; 
+(c) Purchase or improve land, purchase, construct or 
+permanently improve (other than minor remodeling if 
+provided for in the line item budget of this 
+agreement) any building or other facility, or purchase 
+major medical equipment. (No minor equipment may be 
+purchased unless the line item budget specifically 
+provides for such purchase); 
+(d) Satisfy any requirement for the expenditure of non -
+Federal funds as a conditio n for receipt of Federal 
+funds; 
+(e)Provide financial assistance to any entity other than 
+a public or non-profit private entity; or 
+(f) Provide individuals with hypodermic needles or 
+syringes so that such individuals may use illegal 
+drugs, unless the Surge on General of the Public Health 
+Service determines in writing that a demonstration 
+needle exchange program would be effective in reducing 
+drug abuse and the risk that the public will become 
+infected with the etiologic agent for AIDS. 
+(g) Provide workforce recruitment and retention measures 
+involving staff loan repayments or tuition 
+reimbursement.   
+CONTRACTOR and all subcontractors shall comply with State 
+law, Controlled Substance, Drug Device and Cosmetic Act, 35 
+P.S. Section 780 -101 et seq., which prohib its providing 
+individuals with hypodermic needles or syringes. 
+j) Pro-Children Act of 1994 - The Contractor and all 
+subcontractors shall agree to comply with the following 
+certification required by P.L. 103 -227 Sections 1041-1044, 
+20 U.S.C. Sections 6081 -6084, also known as the Pro -
+Children Act of 1994, which requires that smoking not be Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+45 
+permitted in any portion of any indoor facility owned or 
+leased or contracted for by an entity and used routinely or 
+regularly for the provision of health, day care, early 
+childhood development services, education or library 
+services to children under the age of 18, if the services 
+are funded by federal programs either directly or through 
+state or local governments, by federal grant, contract, 
+loan, or loan guarantee.  The law also applies to 
+children's services that are provided in indoor facilities 
+that are constructed, operated, or maintained with such 
+federal funds. The law does not apply to children's 
+services provided in private residences; portions of 
+facilities used for inpatient hospital drug or alcohol 
+treatment; service providers whose sole source of 
+applicable federal funds is Medicare or Medicaid; or 
+facilities (other than clinics) where WIC coupons are 
+redeemed. Failure to comply with the provisions of the law 
+may result in the imposition of a civil monetary penalty of 
+up to $1,000 for each violation and/or the imposition of an 
+administrative compliance order on the responsible entity. 
+The Contractor certifies that it will comply with the 
+requirements of the Pro -Children Act of 1994 and will not 
+allow smoking within any portion of any indoor facility 
+used for the provision of services for children as defined 
+by the Pro-Children Act of 1994. 
+The Contractor agrees that it will require that the 
+language of this certif ication be included in any 
+subcontracts which contain provisions for children's 
+services and that all subcontractors shall certify 
+accordingly.  
+The Contractor further agrees that it will comply with and 
+require any subcontractors to comply with the requir ements 
+of the Pro-Children Act of 1994 regardless of the source of 
+funds for this contract. 
+k) Equal Employment Opportunity 
+i) CONTRACTOR shall not discriminate against any 
+employee, applicant for employment, independent 
+contractor or any other person because of race, color, 
+religious creed, ancestry, national origin, age, or 
+sex.  CONTRACTOR shall take affirmative action to 
+ensure that applicants are employed, and that 
+employees or agents are treated during employment, 
+without regard to their race, color, religi ous creed, 
+ancestry, national origin, age, or sex.  Such 
+affirmative action shall include, but is not limited 
+to:  employment, upgrading, demotion or transfer, 
+recruitment or recruitment advertising; layoff or 
+termination; rates of pay or other forms of 
+compensation; and selection for training.  CONTRACTOR Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+46 
+shall post in conspicuous places, available to 
+employees, agents, applicants for employment, and 
+other persons, a notice to be provided by the 
+contracting agency setting forth the provisions of 
+this nondiscrimination clause. 
+(i) CONTRACTOR shall, in advertisements or requests for 
+employment placed by it or on its behalf, state that 
+all qualified applicants will receive consideration 
+for employment without regard to race, color, 
+religious creed, ancestry, natio nal origin, age, or 
+sex.  
+(ii) Contractor shall send each labor union or workers’ 
+representative with which it has a collective 
+bargaining agreement or other contract or 
+understanding, a notice advising said labor union or 
+workers’ representative of its commitm ent to this 
+nondiscrimination clause.  Similar notice shall be 
+sent to every other source of recruitment regularly 
+utilized by CONTRACTOR.  
+(iii) It shall be no defense to a finding of noncompliance 
+with this nondiscrimination clause that CONTRACTOR had 
+delegated some of its employment practices to any 
+union, training program, or other source of 
+recruitment, which prevents it from meeting its 
+obligations.  However, if the evidence indicates that 
+the CONTRACTOR was not on notice of the third -party 
+discrimination or made a good faith effort to correct 
+it; such factor shall be considered in mitigation in 
+determining appropriate sanction.  
+(iv) Where the practices of a union or training program or 
+other source of recruitment will result in the 
+exclusion of minority group p ersons, so that 
+CONTRACTOR will be unable to meet its obligations 
+under this nondiscrimination clause, CONTRACTOR shall 
+then employ and fill vacancies through other 
+nondiscriminatory employment procedures.  
+(v) CONTRACTOR shall comply with all State and Federa l 
+laws prohibiting discrimination in hiring or 
+employment opportunities. In the event of CONTRACTOR’s 
+noncompliance with the nondiscrimination clause of 
+this Agreement or with any such laws, this Agreement 
+may be terminated or suspended, in whole or in par t, 
+and CONTRACTOR may be declared temporarily ineligible 
+for further Commonwealth contracts, and other 
+sanctions may be imposed and remedies invoked.  
+(vi) CONTRACTOR shall furnish all necessary employment 
+documents and records to, and permit access to its Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+47 
+books, records, and accounts by, the Department and 
+the Office of Administration, Bureau of Affirmative 
+Action, for purposes of investigation to ascertain 
+compliance with the provisions of this clause. If 
+CONTRACTOR does not possess documents or records 
+reflecting the necessary information requested, it 
+shall furnish such information on reporting forms 
+supplied by DDAP or the Bureau of Affirmative Action.  
+(vii) CONTRACTOR shall actively recruit minority sub -
+contractors or sub-contractors with substantial 
+minority representation among their employees.  
+(viii) CONTRACTOR obligations under this clause are limited 
+to the CONTRACTOR’s facilities within Pennsylvania, or 
+where the contract is for purchase of goods 
+manufactured outside of Pennsylvania, the facilities 
+at which such goods are actually produced.  
+(ix) CONTRACTOR shall include the provisions of this 
+nondiscrimination clause in every sub -contract, so 
+that such provisions will be binding on each sub -
+contractor.  
+l) Equal Opportunity for the Handicapped 
+The Contractor agrees to a bide by Section 504 of the 
+Rehabilitation Act of 1973, as amended (Public Law 93 -
+112, 29 U.S.C. Section 794, as amended) and 
+implementing Federal regulations.  The Contractor 
+assures that any benefits, services, or employment, 
+available through the Contrac tor to the public by way 
+of this Agreement’s funds, shall not be denied persons 
+with handicaps who are otherwise qualified or eligible 
+for the benefits, services, or employment available as 
+a result of this Agreement. 
+ 
+The Contractor shall be responsible f or and agree to 
+indemnify and hold harmless the Commonwealth of 
+Pennsylvania from all losses, damages, expenses, 
+claims, demands, suits, and actions brought by any 
+party against the Commonwealth of Pennsylvania as a 
+result of the Contractor’s failure to co mply with the 
+provisions of the above paragraph. 
+ 
+Contractor agrees to indemnify and hold harmless SCA 
+from all losses, damages, expenses, claims, demands, 
+suits, and actions brought by any party against the 
+SCA as a result of Contractor’s failure to compl y with 
+the provisions of this Section. 
+ Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+48 
+m) Provisions Concerning the Americans with Disabilities Act : 
+During the term of this Agreement, the Contractor agrees as 
+follows:  
+Pursuant to federal regulations promulgated under the 
+authority of the Americans With D isabilities Act, 28 C.F.R. 
+Section 35.101 et seq., the CONTRACTOR understands and 
+agrees that no individual with a disability shall, on the 
+basis of the disability, be excluded from participation in 
+this Agreement or from activities provided for under this 
+Agreement.  As a condition of accepting and executing this 
+Agreement, the CONTRACTOR agrees to comply with the 
+“General Prohibitions Against Discrimination,” 28 C.F.R. 
+§35.130, and all other regulations promulgated under Title 
+II of The Americans With Dis abilities Act which are 
+applicable to the benefits, services, programs, and 
+activities provided by the Commonwealth of Pennsylvania 
+through contracts with outside contractors. 
+ 
+CONTRACTOR agrees to indemnify and hold harmless the 
+Commonwealth of Pennsylvan ia and SCA from all losses, 
+damages, expenses, claims, demands, suits, and actions 
+brought by any party against the Commonwealth of 
+Pennsylvania as a result of CONTRACTOR’s failure to comply 
+with the provisions of the above paragraph.  
+ 
+q) Culturally and Linguistically Appropriate Services (CLAS) 
+The CONTRACTOR must provide services that are respectful of 
+and responsive to cultural and linguistic needs, cultural 
+health beliefs and practices, preferred languages, health 
+literacy levels and other communicati on needs.  
+r) Nondiscrimination/Sexual Harassment Clause 
+During the term of this Agreement, the Contractor agrees as 
+follows:  
+(i) In the hiring of any employee(s) for the manufacture 
+of supplies, performance of work, or any other 
+activity required under the gra nt agreement or any 
+subgrant agreement, contract or subcontract, the 
+Grantee, a subgrantee, a contractor, a subcontractor, 
+or any person acting on behalf of the Grantee shall 
+not discriminate by reason of race, gender, creed, 
+color, sexual orientation, gen der identity or 
+expression, or in violation of the Pennsylvania Human 
+Relations Act (PHRA) and applicable federal laws, 
+against any citizen of this Commonwealth who is 
+qualified and available to perform the work to which 
+the employment relates The Grantee, any subgrantee, 
+contractor or any subcontractor or any person on their 
+behalf shall not in any manner discriminate by reason 
+of race, gender, creed, color, sexual orientation, Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+49 
+gender identity or expression, or in violation of the 
+PHRA and applicable federa l laws, against or 
+intimidate any of its employees.  
+(ii) The Grantee, any subgrantee, contractor or any 
+subcontractor or any person on their behalf shall not 
+in any manner discriminate by reason of race, gender, 
+creed, color, sexual orientation, gender identi ty or 
+expression, or in violation of the PHRA and applicable 
+federal laws, against or intimidate any of its 
+employees. 
+(iii) Neither the Grantee nor any subgrantee nor any 
+contractor nor any subcontractor nor any person on 
+their behalf shall in any manner discr iminate by 
+reason of race, gender, creed, color, sexual 
+orientation, gender identity or expression, or in 
+violation of the PHRA and applicable federal laws, in 
+the provision of services under the grant agreement, 
+subgrant agreement, contract or subcontract . 
+(iv)  Neither the Grantee nor any subgrantee nor any 
+contractor nor any subcontractor nor any person on 
+their behalf shall in any manner discriminate against 
+employees by reason of participation in or decision to 
+refrain from participating in labor activities 
+protected under the Public Employees Relations Act, 
+Pennsylvania Labor Relations Act or National Labor 
+Relations Act, as applicable and to the extent 
+determined by entities charges with such Acts’ 
+enforcement, and shall comply with any provision of 
+law establishing organizations as employees’ exclusive 
+representatives. 
+(v) The Grantee, any subgrantee, contractor or any 
+subcontractor shall establish and maintain a written 
+nondiscrimination and sexual harassment policy and 
+shall inform their employees in writing of the policy.  
+The policy must contain a provision that sexual 
+harassment will not be tolerated and employees who 
+practice it will be disciplined.  Posting this 
+Nondiscrimination/Sexual Harassment Clause 
+conspicuously in easily -accessible and well-lighted 
+places customarily frequented by employees and at or 
+near where the grant services are performed shall 
+satisfy this requirement for employees with an 
+established work site.  
+(vi)  The Grantee, any subgrantee, contractor or any 
+subcontractor shall not discrimi nate by reason of 
+race, gender, creed, color, sexual orientation, gender 
+identity or expression, or in violation of the PHRA Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+50 
+and applicable federal laws, against any subgrantee, 
+contractor, subcontractor or supplier who is qualified 
+to perform the work to which the grant relates.  
+(vii) The Grantee and each subgrantee, contractor and 
+subcontractor represents that it is presently in 
+compliance with and will maintain compliance with all 
+applicable federal, state, and local laws and 
+regulations relating to nondiscri mination and sexual 
+harassment.  The Grantee and each subgrantee, 
+contractor, and subcontractor further represents that 
+it has filed a Standard Form 100 Employer Information 
+Report (“EEO-1”) with the U.S. Equal Employment 
+Opportunity Commission (“EEOC”) an d shall file an 
+annual EEO-1 report with the EEOC as required for 
+employers subject to Title VII of the Civil Rights Act 
+of 1964, as amended, that have 100 or more employees 
+and employers that have federal government contracts 
+or first-tier subcontracts an d have 50 or more 
+employees.  The Grantee, any subgrantee, any 
+contractor or any subcontractor shall, upon request 
+and within the time periods requested by the 
+Commonwealth, furnish all necessary employment 
+documents and records, including EEO -1 reports, and 
+permit access to their books, records and accounts by 
+the granting agency and the Bureau of Diversity, 
+Inclusion and Small Business Opportunities for the 
+purpose of ascertaining compliance with the provisions 
+of this Nondiscrimination/Sexual Harassment Clause.  
+(viii) The Grantee, any subgrantee, any contractor or 
+any subcontractor shall include the provisions of this 
+Nondiscrimination/Sexual Harassment Clause in every 
+subgrant agreement, contract or subcontract so that 
+those provisions applicable to subgrantee s, 
+contractors or subcontractors will be binding upon 
+each subgrantee, contractor or subcontractor. 
+(ix) The Grantee’s, and each subgrantee’s, contractor’s 
+and subcontractor’s obligations pursuant to these 
+provisions are ongoing from and after the effective 
+date of the grant agreement through the termination 
+date thereof.  Accordingly, The Grantee, and each 
+subgrantee, contractor and subcontractor shall have an 
+obligation to inform the commonwealth if, at any time 
+during the term of this Agreement, it becomes aw are of 
+any actions or occurrences that would result in 
+violation of these provisions. 
+(x) The commonwealth may cancel or terminate the grant 
+agreement and all money due or to become due under the 
+grant agreement may be forfeited for a violation of Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+51 
+the terms and conditions of this 
+Nondiscrimination/Sexual Harassment Clause.  In 
+addition, the granting agency may proceed with 
+debarment or suspension and may place The Grantee, 
+subgrantee, contractor or subcontractor in the 
+Contractor Responsibility File. 
+(xi)  CONTRACTOR or any person on CONTRACTOR’s behalf 
+shall not in any manner discriminate against or 
+intimidate any employee involved in the performance of 
+work or any other activity required under this 
+Agreement on account of gender, race, creed, color, 
+religion, age, sexual preference, handicap, or 
+national origin. 
+(xii) CONTRACTOR shall ensure that any services or 
+benefits available to the public or other third 
+parties by way of this Agreement shall not be denied 
+or restricted for such persons due to race, creed, 
+color, religion, sex, sexual preference, age, 
+handicap, or national origin (national origin 
+protections include persons who are limited English 
+proficient) consistent with the provisions of Federal 
+and State Laws and regulations. 
+(xiii) CONTRACTOR shall furnish all necessa ry employment 
+documents and records and permit access to its books, 
+records, and accounts by SCA for purposes of 
+investigation to ascertain compliance with the 
+provisions of this Nondiscrimination/Sexual Harassment 
+Clause.   
+t) Medical Marijuana Prohibitio n  
+The CONTRACTOR canno t use federal funds directly or 
+indirectly, to purchase, prescribe, or provide marijuana 
+or treatment using marijuana.  Treatment in this context 
+includes the treatment of opioid use disorder. See, 
+e.g., 45 C.F.R. § 75.300(a) (requi ring HHS to “ensure 
+that Federal funding is expended…in full accordance with 
+U.S. statutory…requirements.”); 21 U.S.C. §§ 812(c)(10) 
+and 841 (prohibiting the possession, manufacture, sale, 
+purchase or distribution of marijuana).  See Information 
+Bulletin 02-21 for further guidance. 
+ 
+This prohibition does not apply to those providing such 
+treatment in the context of clinical research permitted 
+by the DEA and under an FDA -approved investigational new 
+drug application where the article being evaluated is 
+marijuana or a constituent thereof that is otherwise a 
+banned controlled substance under federal law. 
+ 
+If a large system, e.g. a hospital, receives federal 
+funding, the Medical Marijuana Prohibition applies only Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+52 
+to the department that receives the funds.  Reci pients of 
+Federal Funding may continue to serve clients who use 
+medical marijuana for a mental or substance use disorder 
+as long as CONTRACTOR documents the client’s 
+understanding of the risks of marijuana use and 
+willingness to work toward other, evidence	-based 
+alternatives to treat their mental or sub	stance use 
+disorder.  
+ 
+VI. Certification Regarding Drug -Free Workplace Requirements  
+By signing this Agreement, CONTRACTOR, in accordance with 45 
+C.F.R. Part 76, certifies that it shall provide a drug	-free 
+workplace by: 
+a) Establishing a drug -free awareness program to inform 
+employees about: 
+(i) The dangers of drug abuse in the workplace; and 
+(ii) CONTRACTOR’s policy of maintaining a drug	-free      
+workplace; and 
+(iii) Any available drug counseling, rehabilitation, 
+and Employee assistance programs; and 
+(iv) The penalties that may be imposed upon employees for 
+drug abuse violations occurring in the workplace. 
+ 
+b) Publishing a statement notifying employees that the 
+unlawful manufacture, distribution, dispensing, possession 
+or use of a controlled substance is prohibited in the 
+CONTRACTOR’s workplace and specifying the actions that 
+shall be taken against employees for violation of such 
+prohibition. 
+ 
+c) Including the statement published pursuant to subparagraph 
+B above, a requirement that each empl oyee, as a condition 
+of employment, shall: 
+(i) Abide by the terms of the statement; and 
+(ii) Notify the employer of any criminal drug statute 
+conviction for a violation occurring in the 
+workplace no later than five (5) days after such 
+conviction.  
+ 
+d) Notifying DDAP and SCA within ten (10) days after receiving 
+notice under subparagraph C. (2), above, from an employee 
+or otherwise receiving actual notice of such conviction. 
+ 
+e) Taking one of the following actions, within thirty (30) 
+days of receiving notice under subparagr aph C. (2), above, 
+with respect to any employee who is so convicted: 
+(i) Taking appropriate personnel action against such an 
+employee, up to and including termination; or 
+(ii) Requiring such employee to participate 
+satisfactorily in a drug abuse assistance or 
+rehabilitation program approved for such purposes by Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+53 
+a federal, state or local health, law enforcement, 
+or other appropriate agency. 
+ 
+VII. Reporting Requirements Under The Federal Funding 
+Accountability and Transparency Act (FFATA):  
+a) Registration and Identification Information: CONTRACTOR 
+must maintain current registration in the Central 
+Contractor Registration ( www.ccr.gov) at all times during 
+which they have active Federal awards funded pursuant to 
+this Agreement. A Dun and Brads	treet Data Universal 
+Numbering System (DUNS) Number ( www.dnb.com) is one of the 
+requirements for registration in the Central Contractor 
+Registration.  
+  
+CONTRACTOR must provide its assigned DUNS number, and DUNS 
++ 4 number if applicable, to the SCA along with 
+CONTRACTOR’s return of the signed Agreement.  The SCA will 
+not process this Agreement until such time that the 
+CONTRACTOR provides this information.   
+  
+b) Primary Location: CONTRACTOR must provide to the SCA the 
+primary location of performance under this Agreement, 
+including the City, State, and Zip+4.  If performance is to 
+occur in multiple locations, then CONTRACTOR must list the 
+location where the greatest amount of the funding is to be 
+expended pursuant to this Agree ment.   
+  
+CONTRACTOR must provide this information to the SCA along 
+with the CONTRACTOR’s return of the signed Agreement.  The 
+SCA will not process this Agreement until such time that 
+CONTRACTOR provides this information.  
+  
+c) Compensation of Officers : CONTRACTOR must provide to SCA 
+the names and total compensation of the 5 most highly 
+compensated officers of the entity if: 
+(i) the entity in the preceding fiscal year received: 
+1) 80 percent or more of its annual gross revenues 
+in Federal awards; and, 
+2) $25,000,000 or more in annual gross revenues 
+from Federal awards; and, 
+  
+(ii) the public does not have access to information about 
+the compensation of the senior executives of the 
+entity through periodic reports filed under Section 
+13(a) or 15(d) of the Securities Exchang e Act of 
+1934 (15 U.S.C. Sections 78m(a), 78o(d)) or Section 
+6104 of the Internal Revenue Code of 1986 (26 U.S.C. 
+Section 6104).  
+ 
+If CONTRACTOR does not meet the conditions listed above, 
+then it must specifically affirm to the SCA that the 
+requirements of this clause are inapplicable to CONTRACTOR.  Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+54 
+ 
+CONTRACTOR must provide information responding to this 
+question along with the CONTRACTOR’s return of the signed 
+Agreement.  The SCA will not process this Agreement until 
+such time that CONTRACTOR provides su ch information in 
+response to this question. 
+ 
+VIII. The following chart outlines the types of audits that are 
+required for the Contractors.  The requirements apply to 
+local government agencies, non -profit and for-profit 
+organizations. 
+ 
+ DETERMINATION OF APPLICAB LE AUDIT REQUIREMENTS 
+ 
+ 
+Contractor 
+ 
+Expends 
+$750,000 
+or more of 
+total 
+federal 
+funds 
+Expends less 
+than $750,000 
+of total 
+federal funds 
+from all 
+sources AND 
+$500,000 or 
+more of state 
+funds 
+Expends 
+$500,000 or 
+more of state 
+funds  
+Expends less 
+than $750,000 in 
+federal funds 
+and less than 
+$500,000 in 
+state funds 
+ 
+ 
+Local Government Federally 
+Mandated 
+Audit 
+based on 
+Government
+’s fiscal 
+year 
+Department 
+Mandated 
+(Program-
+Specific) 
+Yellow Book 
+Audit based 
+on 12 month 
+period of the 
+agreement 
+ 
+ 
+Department 
+Mandated 
+(Program-
+Specific) 
+Yellow Book 
+Audit based on 
+12 month 
+period of the 
+agreement 
+No audit 
+required, unless 
+language in this 
+Agreement 
+superseding the 
+dollar threshold 
+takes precedence 
+ 
+Non-Governmental 
+Non-Profit 
+Organization 
+ (includes non-
+profit 
+institutions of 
+higher education 
+and hospitals) 
+ 
+Federally 
+Mandated 
+Audit 
+based on 
+Contractor
+’s fiscal 
+year 
+Department 
+Mandated 
+(Program-
+Specific) 
+Yellow Book 
+Audit based 
+on 12 month 
+period of the 
+agreement 
+ 
+Department 
+Mandated 
+(Program-
+Specific) 
+Yellow Book 
+Audit based on 
+12 month 
+period of the 
+agreement 
+No audit 
+required, unless 
+language in this 
+Agreement 
+superseding the 
+dollar threshold 
+takes precedence 
+ 
+For-Profit 
+Entity 
+No audit 
+required, 
+unless 
+language 
+in this 
+Agreement 
+supersedin
+g the 
+dollar 
+threshold 
+takes 
+precedence 
+ 
+Department 
+Mandated 
+(Program-
+Specific) 
+Yellow Book 
+Audit based 
+on 12 month 
+period of the 
+agreement 
+ 
+Department 
+Mandated 
+(Program-
+Specific) 
+Yellow Book 
+Audit based on 
+12 month 
+period of the 
+agreement 
+No audit 
+required, unless 
+language in this 
+Agreement 
+superseding the 
+dollar threshold 
+takes precedence 
+ Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+55 
+ 
+IX.   Medication Assisted Treatment 
+Individuals with SUD who have a disorder for which there is an FDA -
+approved medication treatment must have access to those treatments 
+based upon their individual n eeds and preferences.  CONTRACTOR must 
+ensure medication and clinical therapeutic interventions are 
+available in all levels of care, even if CONTRACTOR is not the 
+prescriber of the medication.  CONTRACTOR must ensure that the 
+individual’s needs are met dir ectly or through an appropriate 
+referral to a prescriber.  CONTRACTOR may not exclude individuals 
+on MAT from being admitted into services.  CONTRACTOR may not place 
+limits on a type of service or medication or restrict the length of 
+service.   Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+56 
+APPENDIX I 
+ 
+COUNTY SERVICES 
+ 
+N/A 
+ Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+57 
+APPENDIX J 
+ 
+GENERAL TERMS AND CONDITIONS 
+GOVERNING CONDUCT OF THIS PURCHASE 
+OF SERVICE AGREEMENT 
+ 
+ 
+1. EQUAL EMPLOYMENT OPPORTUNITY – Non-discrimination clause. 
+ 
+  During the terms of this contract, Provider agrees as 
+follows: 
+ 
+ (a) Provider shall not discriminate against any consumer, 
+employee, applicant for employment, independent contractor or 
+any other person because of race, color, religious creed, 
+ancestry, national origin, age, sex, sexual orientation or 
+handicap.  Provider shall take affirmative action to ensure that 
+applicants are employed, and that employees or agents are 
+treated during employment, without regard to their race, color, 
+religious creed, ancestry, national origin, age, sex, sexual 
+orientation or handicap.  Such affirmative action shall include, 
+but is not limited to, the following: employment, upgrading, 
+demotion, or transfer; recruitment or recruitment advertising; 
+layoff or termination; rates of pay or other forms of 
+compensation; and selection for training . Provider shall post 
+in conspicuous places, available to employees, agents, 
+applicants for employment and other persons, a notice to be 
+provided by the contracting agency setting forth the provisions 
+of this non-discrimination clause. 
+ 
+ (b) Provider shall, in advertisements or requests for 
+employment placed by it or on its behalf, state that all 
+qualified applicants will receive consideration for employment 
+without regard to race, color, religious creed, ancestry, 
+national origin, age, sex, sexual orientation or handicap. 
+ 
+ (c) Provider shall send each labor union or workers’ 
+representatives with which it has a collective bargaining 
+agreement or other contract or understanding a notice advising 
+said labor union or workers’ representative of its commitment to 
+this non-discrimination clause.  Similar notice shall be sent to 
+every other source of recruitment regularly utilized by 
+Provider. 
+ 
+ 
+Rev. 4/26/2017 
+ Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+58 
+(d) It shall be no defense to a finding of a non	-
+compliance with Contract Compliance Regulations issued by the 
+Pennsylvania Human Relations Commission or this non	-
+discrimination clause that Provider had delegated some of its 
+employment practices to any union, training program or other 
+source of recruitment which prevents it from meeting its 
+obligations. Ho wever, if the evidence indicates that the 
+Provider was not on notice of the third -party discrimination or 
+made a good faith effort to correct it, such factor shall be 
+considered in mitigation in determining appropriate sanctions. 
+ 
+ (e) Where the practices of a union or any training program 
+or other source of recruitment will result in the exclusion of 
+minority group persons so that Provider will be unable to meet 
+its obligations under the Contract Compliance Regulations issued 
+by the Pennsylvania Human Rela tions Commission or this non -
+discrimination clause, Provider shall then employ and fill 
+vacancies through other non	-discriminatory employment 
+procedures. 
+ 
+ (f) Provider shall comply with the Contract Compliance 
+Regulations of the Pennsylvania Human Relatio ns Commission, 16 
+Pa. Code Chapter 49 and with all laws prohibiting discrimination 
+in hiring or employment opportunities. In the event of 
+Provider’s non-compliance with the non -discrimination clause of 
+this contract or with any such laws, this contract ma	y, after 
+hearing and adjudication, be terminated or suspended, in whole 
+or in part, and Provider may be declared temporarily ineligible 
+for further Commonwealth or County contracts, and such other 
+sanctions may be imposed and remedies invoked as provided b y the 
+Contract Compliance Regulations. 
+ 
+ (g) Provider shall furnish all necessary employment 
+documents and records to, and permit access to its books, 
+records and accounts, by the County Department of Human Services 
+and the County Controller and the Human Relations Commission, 
+for purposes of investigation to ascertain compliance with the 
+provisions of the Contract Compliance Regulations, pursuant to 
+Section 49.35 of 16 Pa. Code Chapter 49 (relating to information 
+concerning compliance by contractors). If 	Provider does not 
+possess documents or records reflecting the necessary 
+information requested, it shall furnish such information on 
+reporting forms supplied by the County or the Pennsylvania Human 
+Relations Commission. 
+ Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+59 
+ (h) Provider shall actively recruit minority 
+subcontractors or subcontractors with substantial minority 
+representation among their employees. 
+ 
+ (i) Provider shall include the provisions of this non	-
+discrimination clause in every subcontract so that such 
+provisions will be binding upon each subcontractor. 
+ 
+ (j) The terms used in this non -discrimination clause shall 
+have the same meaning as in the Contract Compliance Regulations 
+issued by the Pennsylvania Human Relations Commission, 16 Pa. 
+Code Chapter 49. 
+ 
+ (k) Provider’s obligations under th is clause are limited 
+to the Provider’s facilities within Pennsylvania, or, where the 
+contract is for purchase of goods manufactured outside of 
+Pennsylvania, the facilities at which such goods are actually 
+produced. 
+ 
+2. EQUAL OPPORTUNITY FOR HANDICAPPED AN D DISABLED 
+ 
+ In carrying out this Agreement, Provider agrees to comply 
+with all applicable Federal laws and regulations prohibiting 
+discrimination on the basis of handicap or disability.  
+Specifically, Provider agrees to comply with the provisions of 
+the Americans with Disabilities Act and Section 504 of the 
+Federal Rehabilitation Act of 1973, 29 U.S.C. Section 794, and 
+the regulations thereunder. 
+ 
+ Provider agrees to comply with all applicable laws in its 
+business and activities which pertain to the perfor	mance or 
+funding of this Agreement including without limitation the 
+following: 
+ 
+ (a) The Fair Labor Standards Act, the Labor Management 
+Relations Act (Taft -Hartley) and the Labor Management Reporting 
+and Disclosure Act (Landrum -Griffin) as well as any othe r 
+applicable Federal laws/regulations. 
+ 
+ (b) Occupational Safety and Health Act and OSHA 
+regulations thereunder. 
+ 
+ (c) Workers’ Compensation Laws. 
+ 
+ (d) Titles VI and VII of the Civil Rights Act of 1964, all 
+EEOC regulations and all the laws relating to eq ual employment 
+opportunity, including the Age Discrimination in Employment Act. Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+60 
+ (e) The Equal Pay for Equal Work law and all other laws 
+relating to sex discrimination. 
+ 
+ (f) Those laws relating to the fiscal management of and 
+accounting for public funds. The County, in its sole 
+discretion, shall have the privilege of examining and/or 
+auditing the records of the Provider which pertain to this 
+contract to ascertain or verify compliance with this sub	-
+paragraph. 
+ 
+ (g) The Provider as a condition precedent to payment shall 
+provide certification of compliance with sub	-paragraphs (a) 
+through (f) above on all invoices and statements submitted. 
+ 
+3. REPORT OR STUDY 
+ 
+ Unless otherwise prohibited by law, a copy of any final 
+report or study delivered pursuant to this C ONTRACT shall be 
+provided by PROVIDER directly to the Northampton County Council.  
+PROVIDER agrees to publicly present the final report or study 
+should a committee of the Northampton County Council so desire. 
+ 
+4. TAXES 
+ 
+ (a) PROVIDER certifies, as a condit ion precedent to the 
+execution of the Agreement, and as an inducement for COUNTY to 
+execute same, that it is not “delinquent” on any taxes owed to 
+COUNTY.  “Delinquent” is hereby defined as the point in time at 
+which the collection of the tax becomes the r esponsibility of 
+the Northampton County Tax Claim Bureau. 
+ 
+ (b) PROVIDER further agrees, as a specific condition of 
+this CONTRACT, that it shall remain current on all of the taxes 
+it owes to COUNTY. Should PROVIDER become delinquent on any 
+taxes it owes t o COUNTY during the term of the CONTRACT, 
+PROVIDER may be deemed to be in breach of this CONTRACT by 
+COUNTY and, in addition to any other remedies at law for such 
+breach, PROVIDER hereby specifically agrees and authorizes 
+COUNTY to apply funds when due PRO VIDER directly to the taxes 
+owed to COUNTY until said taxes are paid in full. 
+ 
+ (c) In the event PROVIDER becomes delinquent, it hereby 
+authorizes COUNTY to made direct payments to the taxing 
+authority in order to bring PROVIDER’S COUNTY taxes current. 
+ 
+ 
+ Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+61 
+5. UNDUE INFLUENCE 
+ 
+ The PROVIDER agrees not to hire any COUNTY personnel who 
+has exercised discretion in the awarding, administrating or 
+continuance of this CONTRACT for up to and including one (1) 
+year following the termination of the employee from COUNT	Y 
+service.  Failure to abide by this provision shall constitute a 
+breach of the CONTRACT. 
+ 
+6. CONFLICT OF INTEREST 
+ 
+ (a) The PROVIDER agrees to notify in writing the COUNTY as 
+soon as the PROVIDER learns that: 
+ 
+ 1) A current employee of the COUNTY has com menced, 
+or is intending to commence, employment with the PROVIDER 
+while continuing to maintain COUNTY employment; or 
+ 
+ 2) A current employee of the COUNTY has performed, 
+or is intending to perform, services to the PROVIDER as an 
+independent contractor whi le continuing to maintain COUNTY 
+employment.  Any written notice required to be given under 
+this section shall specify the COUNTY employee’s 
+(associate’s) name, the nature of the COUNTY employee’s 
+(associate’s) employment, or the subject of the COUNTY 
+employee’s (associate’s) contract with the PROVIDER and the 
+date on which the COUNTY employee’s (associate’s) 
+employment or contract with the PROVIDER commenced. 
+ 
+(b) The COUNTY expects the PROVIDER to maintain 
+professional boundaries with clients, striving t o keep personal 
+and professional lives separate. This includes: 
+ 
+1)  Limiting personal self	-disclosure in 
+interactions with clients; 
+ 
+2)  Making clear distinctions between statements 
+made and actions engaged in as a private individual and 
+those undertaken as a P ROVIDER and representative of the 
+Agency; 
+ 
+3) Not engaging in dual or multiple relationships 
+with current or former clients as these relationships have 
+the potential to be harmful to the client and create 
+conflicts of interest. 
+ Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+62 
+(c) During the use of Social M edia the PROVIDER shall 
+refrain from posting or discussing any confidential, case 
+specific information or information concerning the COUNTY or its 
+operations. 
+ 
+7. SUSPENSION AND DEBARMENT 
+ 
+ The PROVIDER certifies that it is not currently under 
+suspension or debarment by the Commonwealth, any other State, or 
+the Federal government, and if the PROVIDER cannot so certify, 
+then it agrees to submit a written explanation of why such 
+certification cannot be made. 
+ 
+ If the PROVIDER enters into subcontracts or emplo ys under 
+this CONTRACT any subcontractors/individuals who are currently 
+suspended or debarred by the Commonwealth or Federal government 
+or who become suspended or debarred by the Commonwealth or 
+Federal government during the term of this CONTRACT or any 
+extension or renewal thereof, the COUNTY shall have the right to 
+require the PROVIDER to terminate such subcontracts or 
+employment. 
+ 
+ The PROVIDER agrees to reimburse the COUNTY for the 
+reasonable costs of investigation incurred by the COUNTY for 
+investigation of the PROVIDER’S compliance with terms of this or 
+any other CONTRACT between the PROVIDER and the COUNTY which 
+results in the suspension or debarment of the PROVIDER. Such 
+costs shall include, but are not limited to, salaries of 
+investigators, includi ng overtime; travel and lodging expenses; 
+and expert witness and documentary fees.  The PROVIDER shall not 
+be responsible for investigative costs for investigations which 
+do not result in the PROVIDER’S suspension or debarment. 
+ 
+8. PROPERTY AND SUPPLIES 
+ 
+ (a) Provider agrees to obtain all supplies and equipment 
+for use in the performance of this Agreement at the lowest 
+practicable cost. 
+ 
+FOR PROGRAM FUNDED AGREEMENTS: 
+ 
+ (b) Title to all property, other than real estate, 
+acquired by the PROVIDER, including p urchase by lease -purchase 
+agreement, for the cost of which the PROVIDER is to be 
+reimbursed under this Agreement, shall vest in the PROVIDER 
+during the term of this Agreement and all subsequent such 
+Agreements. Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+63 
+ 
+ (c) Upon cancellation or termination of thi s Agreement or 
+any subsequent such Agreement, disposition of such purchased or 
+leased property which has remaining useful life shall revert 
+back to the COUNTY. 
+ 
+ (d) PROVIDER shall maintain and administer, in accordance 
+with sound business practice, a prog ram for the maintenance, 
+repair, protection, preservation and insurance of property 
+furnished by the Commonwealth of Pennsylvania or the COUNTY so 
+as to assure its full availability and usefulness. 
+ 
+ (e) Commonwealth and COUNTY property and property 
+purchased under this Agreement shall, unless otherwise provided 
+herein or approved in writing by the appropriate COUNTY or 
+Commonwealth officials, be used only for the performance of this 
+Agreement or any subsequent such Agreement. 
+ 
+ (f) In the event that property acquired under this or 
+subsequent such Agreements is damaged, destroyed or otherwise 
+lost, the following procedure shall be utilized:  
+ 
+1) The COUNTY Contract Administrator shall immediately 
+be notified of the event at issue and be provided all 
+estimates for the repair or replacement of such property. 
+ 
+ 2) The COUNTY or Commonwealth shall advise the 
+PROVIDER whether to repair or replace the property 
+involved, with the contractor, (for repairs), or vendor, 
+(for replacement equipment), approved by the CO	UNTY or 
+Commonwealth. 
+ 
+ 3) If repair or replacement is not to occur, 
+PROVIDER shall be paid the sum available under insurance or 
+other reimbursement, such sum to be deducted from the cost 
+of work under this Agreement. 
+ 
+ (g) PROVIDER shall maintain a perpe tual inventory of all 
+property purchased under this Agreement, and/or any such prior 
+or subsequent Agreements.  Such inventory shall be available for 
+inspection by COUNTY officials. 
+ 
+ (h) The PROVIDER shall not claim depreciation to any 
+taxing agency for c apital equipment purchased with funds 
+provided by the COUNTY.  
+ 
+ Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+64 
+9. EXAMINATION OF RECORDS 
+ 
+ (a) Provider shall maintain books, records, documents and 
+other evidence pertaining to the costs and expenses of this 
+Agreement (hereinafter collectively referred to as “the 
+records”) to the extent and in such detail as will properly 
+reflect all net costs, direct or indirect, of labor, materials, 
+equipment, supplies and services and other costs and expenses of 
+whatever nature for which reimbursement is claimed or p ayment is 
+made under the provisions of this contract.  If Provider is not 
+a public body, Provider agrees to maintain books, records, 
+documents and other evidence and accounting procedures and 
+practices which comply with the nationally accepted Uniform 
+Standards of Accounting and Financial Reporting for Voluntary 
+Health and Welfare Organizations, as published by the National 
+Health Council and the National Social Welfare Assembly, 1974. 
+ 
+ (b) Provider agrees to make available at the office of the 
+Provider, at all reasonable times during the term of this 
+Agreement and the period set forth in Appendix C, physically 
+attached and incorporated herein by reference, any of the 
+records for inspection, audit or reproduction by any authorized 
+representative of the Coun ty, Commonwealth or Federal government 
+or other persons duly authorized by the County Department of 
+Human Services. 
+ 
+ (c) Except for documentary evidence required by Appendix 
+C, attached herein and physically incorporated by reference, and 
+any records rela ted to litigation or the settlement of claims 
+above, the Provider may, in fulfillment of its obligation to 
+retain its records as required by this paragraph, substitute 
+photographs, microphotographs, or other authentic reproductions 
+of such records, after t he expiration of two (2) years following 
+the last day of the month of reimbursement to the Provider of 
+the invoice or voucher to which such records relate, unless a 
+shorter period is authorized with the concurrence of the 
+auditors. 
+ 
+ (d) Provider agrees to collect statistical data of a 
+fiscal nature on a regular basis and to make fiscal statistical 
+reports at times prescribed by, and on forms furnished by, the 
+County Department of Human Services and the County Controller. 
+ 
+ (e) Data submitted to and accepte d by the County under 
+this Agreement, or computer software developed under this 
+Agreement, shall be the property of the Department, and it shall 
+have full right to use such data and software for any official Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+65 
+purpose in whatever manner deemed desirable and 	appropriate.  
+Such use shall be without any additional payment to or approval 
+by the Provider. 
+ 
+ (f) Provider relinquishes any and all copyrights and/or 
+privileges to data or computer software developed under this 
+Agreement. Provider shall not include in the data or computer 
+software any copyrighted matter without the written approval of 
+the County unless Provider provides the County with written 
+permission of the copyright owner for the County to use such 
+copyrighted matter in a manner provided herein.  P rovider shall 
+exert all reasonable effort to advise the County, at the time of 
+delivery of data furnished under this Agreement, of all 
+invasions of the right to privacy contained herein. 
+ 
+ (g) Provider specifically agrees that any and all computer 
+software or programs developed by Provider pursuant to, or in 
+furtherance of, the terms of this Agreement shall be solely the 
+property of the County. 
+ 
+ (h) The Provider shall defend any suit or proceeding 
+brought against the County on account of any alleged 
+infringement of any copyright arising out of the performance of 
+this Agreement, including any suit or proceeding relating to all 
+work, services, materials, reports, studies, computer programs 
+or software provided by the Provider; provided, nevertheless, 
+that the County shall provide prompt notification in writing of 
+such suit or proceedings, together with full right, 
+authorization and opportunity to conduct the defense thereof, 
+and full information and all reasonable cooperation for the 
+defense of the same. If p rinciples of governmental or public 
+law are involved, the County may participate in the defense of 
+any such action. The Provider shall pay all damages and costs 
+awarded therein against the County. If information and 
+assistance are furnished by the County at Provider’s written 
+request, it shall be at the Provider’s expense, but the 
+responsibility for such expense shall be only that within the 
+Provider’s written request. If any of the materials, reports, 
+studies, computer programs or software provided by t he Provider 
+are held to constitute infringement and the use or publication 
+thereof is enjoined in such suit or proceeding, the Provider 
+shall, at its own expense and at its option, either procure the 
+right to publish or continue use of such infringing mate	rials, 
+reports, studies, computer programs or software; replace them 
+with non-infringing items; or so modify them so that they are no 
+longer infringing. The obligations of the Provider under this 
+paragraph continue without time limit. Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+66 
+10. PROVIDER’S COMMITMENTS 
+ 
+ Any written commitment or representation of the Provider 
+made within the scope of this Agreement shall be binding upon 
+the Provider and is hereby incorporated into this Agreement. 
+ 
+11. CONFIDENTIALITY 
+ 
+ The parties shall not use or disclose any in formation about 
+a recipient of the services to be provided under this Agreement 
+for any purpose not connected with the parties’ contract 
+responsibilities except as permitted by law and with the written 
+consent of such recipient, recipient’s attorney, or re cipient’s 
+parent or guardian. 
+ 
+12. NOTICE REQUIRED 
+ 
+ All notices, informational pamphlets, press releases, 
+research reports and similar public notices prepared and 
+released by the Provider shall include the statement: “This 
+project is funded, in part, und	er a contract with the 
+Northampton County Department of Human Services through funds 
+provided by the County of Northampton and the Commonwealth of 
+Pennsylvania.” 
+ 
+13. INDEPENDENT CONTRACTOR 
+ 
+ (A) PROVIDER is deemed an Independent Contractor and shall 
+not, during the term of the CONTRACT, assign, subcontract, 
+transfer or otherwise delegate all or any part of its 
+obligations or responsibilities without prior written approval 
+of COUNTY.  No relationship of employer -employee is intended or 
+created by this CONTR ACT, it being understood that PROVIDER 
+shall render services to COUNTY on an independent contractor 
+basis. PROVIDER is not entitled to any benefits from COUNTY 
+including, but not limited to, compensation (other than that set 
+forth in Paragraph (VI), Worke r’s Compensation, unemployment 
+insurance or benefits, and professional liability insurance 
+and/or deductibles. PROVIDER expressly agrees and acknowledges 
+that COUNTY will deduct no employment taxes from any 
+compensation paid to PROVIDER, and that PROVIDER will be 
+responsible for the payment of all taxes whatsoever in 
+connection with any compensation received from COUNTY. 
+ 
+ (B) Full responsibility shall be assumed by the PROVIDER 
+for the payment of all income tax deductions, including self	-
+employment tax, a nd any other taxes or payroll deductions Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+67 
+required by law for the PROVIDER or the PROVIDER’S employees, if 
+any, who are performing services under the CONTRACT. 
+ 
+ (C) PROVIDER further agrees and acknowledges that PROVIDER 
+is not authorized under the terms of this CONTRACT to bind the 
+COUNTY in any contractual undertakings with any third parties as 
+a result of the within CONTRACT, and PROVIDER will not make any 
+representation that is capable of binding the COUNTY. 
+ 
+14. GRIEVANCE PROCEDURE 
+ 
+ If this contract is for the provision of service to 
+individuals or families, the County Department of Human Services 
+will establish a system through which applicants for and 
+recipients of service may present grievances about the operation 
+of the service program.  Provider will have a Client Grievance 
+Policy.  This Policy shall be included as part of this contract.  
+Provider will advise applicants and recipients of their right to 
+appeal denial or exclusion from the program or failure to 
+recognize the recipient’s choice of a se rvice and of his/her 
+right to a fair hearing in these respects. Whenever an 
+applicant or recipient requests a fair hearing, the County 
+Department of Human Services will make arrangements to provide 
+such a hearing through the fair hearing procedures. 
+ 
+15. SUBCONTRACTS 
+ 
+ Except for those subcontracts specifically authorized by 
+this contract, Provider shall not enter into subcontracts for 
+any of the work contemplated under this Agreement without 
+obtaining prior written approval of the County, which shall be 
+attached to the original Agreement, and subject to such 
+conditions and provisions as the Department may deem necessary. 
+ 
+ The Provider shall not assign any interest in this 
+Agreement and shall not transfer any interest in the same 
+(whether by assignment or notation) without the prior written 
+approval of the County of Northampton thereto, which shall be 
+attached to the original Agreement and subject to such 
+conditions and provisions as the County may deem necessary.  No 
+such approval by the County of any ass ignment shall be deemed in 
+any event or in any manner to provide for the incurrence of any 
+obligation of the County in addition to the total agreed	-upon 
+price; PROVIDED, however, that notwithstanding the foregoing, 
+unless otherwise provided herein, such pr ior written approval 
+shall not be required for the purchase by Provider of articles, 
+supplies, equipment and services which are both necessary for Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+68 
+and merely incidental to the performance of the work required 
+under this Agreement; and PROVIDED, further, ho wever, that no 
+provision of this clause and no such approval by the County of 
+any subcontract shall be deemed in any event or in any manner to 
+provide for the incurrence of any obligation of the County of 
+Northampton in addition to the total agreed -upon price. 
+ 
+16. COVENANT AGAINST CONTINGENT FEES 
+ 
+ The Provider warrants that no person or selling agency has 
+been employed or retained to solicit or to secure this Agreement 
+upon an agreement or understanding for a commission, percentage, 
+brokerage or contingen t fee (excepting bona fide employees or 
+bona fide established commercial or selling agencies maintained 
+by the Provider for the purpose of securing business). For 
+breach or violation of this warranty, the County of Northampton 
+shall have the right to annu l this Agreement without liability 
+or, in its discretion, to deduct from the consideration 
+otherwise due under this Agreement, or otherwise recover the 
+full amount of such commission, percentage, brokerage or 
+contingent fee. 
+ 
+17. INTEREST OF PROVIDER 
+ 
+ The Provider covenants that it presently has no interest and 
+shall not acquire any interest, direct or indirect, which would 
+conflict in any manner or degree with the performance of its 
+services hereunder. The Provider further covenants that, in the 
+performance of this Agreement, it shall not knowingly employ any 
+person having such interest. Provider further certifies that no 
+member of the board of the Provider or any of its officers or 
+directors have such an adverse interest. 
+ 
+18. ENVIRONMENTAL PROTECTION 
+ 
+ In carrying out this Agreement, the Provider shall minimize 
+pollution and shall strictly comply with all applicable 
+environmental laws and regulations. (Clean Streams Law, Act of 
+June 22, 1937, P.L. 1987, as amended; the Pennsylvania Solid Waste 
+Management Act, Act of July 31, 1968, P.L. 788, and the Water 
+Obstruction Act, Act of June 25, 1913, P.L. 555, as amended), the 
+Environmental Protection Act, EPA regulations, and all laws and 
+regulations administered by the Pennsylvania Department of 
+Environmental Protection. 
+ 
+ 
+ Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+69 
+ 
+19. AGREEMENT SUBJECT TO LAWS AND REGULATIONS 
+ 
+ This Agreement is subject to the provisions of all pertinent 
+Federal, State and local laws and regulations and all amendments 
+made thereto.  Definitions of service, eligibility of recipients of 
+service and other limitations on the purchase of the services 
+established in this Agreement are subject to modification by 
+amendments to Federal, State and local laws and regulations without 
+further notice to the Provider. 
+ 
+20. AUTHORIZATION OF SERVICE S 
+ 
+ Services provided to or for clients under this Agreement may 
+be authorized, in writing, prior to the provision of such services.  
+Exceptions to this requirement are 	placement and emergency 
+services, and/or as outlined in Appendix A. The most current 
+authorization for a client/family shall always supersede and 
+replace any previous authorization. 
+ 
+21. HUMAN EXPERIMENTATION 
+ 
+ All experimentation with human subjects involving any physical 
+or mental risk to those subjects shall be prohibited without: 
+ 
+ (a) Prior written approval of County and State authorities, 
+subject to all applicable laws, statutes, rules and regulations. 
+ 
+ (b) Prior informed and voluntary written consent of the 
+subject. 
+ 
+ (c) Prior informed and voluntary written consent of his/her 
+parents or legal guardian if subject is deemed to be a minor or 
+incompetent. 
+ 
+22. PROHIBITION AGAINST EMPLOYING ILLEGAL ALIENS 
+ 
+ Contractor shall not knowingly employ or contract with an 
+illegal alien to perform work under this Contract. Contractor 
+shall obtain certification from subcontractor(s) that no illegal 
+alien shall perform work under this contract. 
+ 
+ Any violation of this provision shall constitute a material 
+breach of the Contract, which alone shall provide a basis upon 
+which the County may terminate t he Contract.  If the Contract is so 
+terminated, the Contractor shall be liable for actual and 
+consequential damages to the County. 
+ 
+ 
+ 
+ 
+ Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+70 
+23. PROVIDER SCREENING FOR EXCLUSION FROM PARTICIPATION IN FEDERAL 
+HEALTH CARE PROGRAM 
+ 
+ When applicable, PROVIDER shall comply in full with Medical 
+Assistance Bulletin 99-11-05, and all subsequent Bulletins regarding 
+“Provider Screening of Employees and Contractors for Exclusion from 
+Participation in Federal Health Care Programs and the Effect of 
+Exclusion on Participatio n,” as applicable. COUNTY reserves the 
+right to monitor the review process of PROVIDER for all county 
+referred consumers/participants. 
+ 
+ 
+ 
+ Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+71 
+APPENDIX K 
+ 
+CHILD ABUSE AND CRIMINAL HISTORY VERIFICATION 
+ 
+ 
+ 
+We hereby certify that we have Criminal backg round clearances 
+on record for all prospective and current personnel associated with 
+this agency. Moreover, if we provide services to children, we 
+certify that clearances are on file complying with Act 33.  These 
+documents will be available to the COUNTY immediately (within 24 
+hours) upon request. 
+ 
+ 
+ 
+ 
+ 
+   PROVIDER: Community Action Committee of 
+the Lehigh Valley  
+           
+ BY: ______________________________ 
+ 
+TITLE: ______________________________ 
+ 
+DATE:  ______________________________ 
+ 
+ 
+ Executive
+Director
+07 / 18 / 2023
+Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+72 
+APPENDIX L 
+ 
+RATE CERTIFICATION STATEMENT 
+ 
+ 
+ 
+N/ADoc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+73 
+APPENDIX M 
+ 
+BUSINESS ASSOCIATE AGREEMENT/HIPAA COMPLIANCE 
+ 
+ WHEREAS, Northampton County Department of Human Services 
+(hereinafter the "Covered Entity") will make available and/or 
+transfer to Community Action Committee of the Lehigh Valley 
+(hereinafter the "Business Associate") certain Protected Health 
+Information (PHI), in conjunction with goods or services that are 
+being provided by Business Associate to or on behalf of the 
+Northampton County Department of H	uman Services, that is 
+confidential and must be afforded special treatment and protection 
+in accordance with the Health Insurance Portability and 
+Accountability Act ("HIPAA") Privacy Regulations at 45 CFR Part 
+160-164. 
+ WHEREAS, Business Associate will hav e access to and/or receive 
+from Covered Entity PHI that can be used or disclosed only in 
+accordance with this Appendix and the HIPAA Privacy Regulations at 
+45 CFR Part 160-164. 
+ NOW, THEREFORE, Covered Entity and Business Associate agree as 
+follows: 
+1. Definitions. 
+a. "Business Associate" shall have the meaning given to such 
+term under the HIPAA Regulations, including, but not 
+limited to, 45 CFR §160.103. 
+b. "Covered Entity" shall have the meaning given to such 
+term under HIPAA and the HIPAA Privacy Regulations, 
+including, but not limited to, 45 CFR §160.103. 
+c. "Protected Health Information" or "PHI" means any 
+information, whether oral or recorded in any form or 
+medium: (i) that relates to the past, present or future 
+physical or mental condition of an individual; the 
+provision of health care to an individual; or the past, 
+present or future payment for the provision of health 
+care to an individual; and (ii) that identifies the 
+individual or with respect to which there is a reasonable 
+basis to believe the information can be used to identify 
+the individual, and shall have the meaning given to such 
+term under HIPAA and the HIPAA Privacy Regulations, 
+including, but not limited to, 45 CFR §164.501. 
+d. In accordance with 45 CFR Parts 160 -164, Northampton 
+County Department of Human Services is the Covered Entity 
+and Community Action Committee of the Lehigh Valley is 
+the Business Associate. 
+e. Terms used, but not otherwise defined, in this Agreement 
+shall have the same meaning as those terms in 45 CFR 
+Parts 160-164. Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+74 
+2. Limits On Use And Disclosure Established By Terms Of Appendix. 
+Business Associate hereby agrees that it shall be prohibited 
+from using or disclosing the PHI provided or made available by 
+Covered Entity for any purpose other than as expressly 
+permitted or require d by this Appendix, in accordance with 45 
+CFR §164.504(e)(2)(i). 
+3. Stated Purposes For Which Business Associate May Use Or 
+Disclose PHI. The Parties hereby agree that Business Associate 
+shall be permitted to use and/or disclose PHI provided or made 
+available from Covered Entity in accordance with 	45 CFR 
+§164.504(e)(2)(i); and for the purposes outline	d in the 
+Program Description - Appendix A -  of this contract.   
+4. Additional Purposes For Which Business Associate May Use Or 
+Disclose Information. In addition to the Stated Purposes, 
+Business Associate may use or disclose PHI provided or made 
+available from Covered Entity for the following additional 
+purposes: 
+a. Use Of Information For Management, Administration And 
+Legal Responsibilities. Business Associate is permit ted 
+to use PHI if necessary for the proper management and 
+administration of Business Associate or to carry out 
+legal responsibilities of the Business Associate in 
+accordance with 45 CFR §164.504(e)(4)(ii). 
+b. Disclosure Of Information For Management, Administ ration 
+And Legal Responsibilities. Business Associate is 
+permitted to disclose PHI received from Covered Entity 
+for the proper management and administration of Business 
+Associate or to carry out legal responsibilities of 
+Business Associate, provided: 
+i. The disclosure is required by law: or 
+ii. The Business Associate obtains reasonable assurances 
+in writing from the person to whom the information 
+is disclosed that it will be held confidentially and 
+used or further disclosed only as required by law or 
+for the purposes for which it was disclosed to the 
+person, the person will use appropriate safeguards 
+to prevent use of disclosure of the information, and 
+the person immediately notifies the Business 
+Associate of any instance of which it is aware in 
+which the confiden tiality of the information has 
+been breached in accordance with 45 CFR 
+§164.504(e)(4)(ii). 
+c. Data Aggregation Services. Business Associate is also 
+permitted to use or disclose PHI to provide data 
+aggregation services, as that term is defined by 45 CFR 
+§164.501, relating to the health care operations of 
+Covered Entity, and by 45 CFR §164.504(e)(2)(i)(B). 
+5. BUSINESS ASSOCIATE OBLIGATIONS: 
+a. Limits On Use And Further Disclosure Established By 
+Appendix And Law. Business Associate hereby agrees that 
+the PHI provided o r made available by Covered Entity Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+75 
+shall not be further used or disclosed other than as 
+permitted or required by the Appendix or as required by 
+law or by 45 CFR §165.404(e)(2)(ii)(A). 
+b. Appropriate Safeguards. Business Associate will establish 
+and maintain appropriate safeguards to prevent any use or 
+disclosure of PHI other than as provided for by this 
+Appendix and by                                45 CFR 
+§164.504(e)(2)(ii)(B). 
+c. Reports Of Improper Use Or Disclosure. Business Associate 
+hereby agrees that it sh all report to the Northampton 
+County Department of Human Services – 610-829-4700 - 
+within two (2) days of discovery any use or disclosure of 
+PHI not provided for or allowed by this Appendix and by 
+45 CFR §164.504(e)(2)(ii)(C). 
+d. Subcontractors And Agents. Business Associate hereby 
+agrees that any time PHI is provided or made available to 
+any subcontractors or agents, Business Associate shall 
+provide only the minimum necessary PHI for the purpose of 
+the covered transaction and must enter into a subcontract 
+or contract with the subcontractor or agent that contains 
+the same terms, conditions and restrictions on the use 
+and disclosure of PHI as contained in this Appendix and 
+by 45 CFR §164.504(e)(2)(ii)(D). 
+e. Right Of Access To PHI. Business Associate hereby agrees 
+to make available to an individual who is the subject of 
+the PHI the right to access and copy that individual's 
+PHI, at the request of the individual or of the Covered 
+Entity, in the time and manner designated by the Covered 
+Entity. This right of access sh all conform with and meet 
+all of the requirements of 45 CFR §164.524 and 45 CFR 
+§164.504(e)(2)(ii)(E). 
+f. Amendment And Incorporation Of Amendments. Business 
+Associate agrees to make any amendments to PHI that have 
+been agreed to by the Covered Entity, at the request of 
+Covered Entity or of the individual, in the time and 
+manner designated by Covered Entity, in accordance with 
+45 CFR164.526 and 45 CFR §164.504(e)(2)(ii)(F). 
+g. Provide Accounting. Business Associate agrees to document 
+and make available to Covered Entity or to the individual 
+any information necessary to provide an accounting of 
+disclosures in accordance with 45 CFR §164.528 and 45 CFR 
+§164.504 (e)(2)(ii)(G) within 30 days of receipt of a 
+request for an accounting in the manner designated by the 
+Covered Entity. 
+h. Access To Books And Records. Business Associate hereby 
+agrees to make its internal practices, books, and records 
+relating to the use or disclosure of PHI received from, 
+or created or received by Business Associate on behalf of 
+the Covered Entity, available to the Secretary of Health 
+and Human Services or designee for purposes of 
+determining compliance with the HIPAA Privacy Regulations 
+embodied in 45 CFR §164.504(e)(2)(ii)(H). Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+76 
+i. Return Or Destruction Of PHI. At termination of this 
+Appendix, Business Associate hereby agrees to return or 
+destroy all PHI received from, or created or received by 
+Business Associate on behalf of Covered Entity. Business 
+Associate agrees not to retain any copies of the PHI 
+after termination of this Appendix. If return o	r 
+destruction of the PHI is not feasible, Business 
+Associate agrees to extend the protections of this 
+Appendix to limit any further use or disclosure until 
+such time as the PHI may be returned or destroyed. If 
+Business Associate elects to destroy the PHI, it shall 
+certify to Covered Entity that the PHI has been 
+destroyed. 45 CFR 
+§164.504(e)(2)(ii)(I). 
+j. Mitigation Procedures. Business Associate agrees to 
+establish and to provide to the Program and Department, 
+upon request, procedu res for mitigating, to the maximum 
+extent practicable, any harmful effect from the use or 
+disclosure of PHI in a manner contrary to this Appendix 
+or the HIPAA Privacy Regulations incorporated in 45 CFR 
+§164.530(f). Business Associate further agrees to 
+mitigate any harmful effect that is known to Business 
+Associate of a use or disclosure of PHI by Business 
+Associate in violation of this Appendix. 
+k. Sanction Procedures. Business Associate agrees that it 
+must develop and implement a system of sanctions for any 
+employee, subcontractor or agent who violates this 
+Appendix or the HIPAA Privacy Regulations noted in 45 CFR 
+§164.530(e)(1). 
+l. Grounds For Breach. Any non-compliance by Business 
+Associate with this Appendix or the HIPAA Privacy 
+Regulations will automatically be considered to be 
+grounds for breach pursuant to the underlying agreement, 
+if Business Associate knew or reasonably should have 
+known of such non -compliance and failed to immediately 
+take reasonable steps to cure the non -compliance. 
+m. Termination by Northa mpton County Department of Human 
+Services.  Business Associate authorizes termination of 
+the underlying contract by the Northampton County 
+Department of Human Services if DHS determines, in its 
+sole discretion, that the Business Associate has violated 
+a material term of this Appendix. 
+n. Privacy Practices. The Department shall provide and 
+Business Associate shall immediately begin using any 
+form, including but not limited to, any form used for 
+Consent, Notice of Privacy Practices, Accounting for 
+Disclosures, or Authorization, designated as effective by 
+the Program or Department at any given time. The Program 
+and Department retain the right to change the applicable 
+privacy practices and documents. The Business Associate 
+must implement changes as soon as practica ble, but not 
+later than 45 days from the date of notice of the change. Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+77 
+6. OBLIGATIONS OF COVERED ENTITY: 
+a. Provision of Notice of Privacy Practices. Covered Entity 
+shall provide Business Associate with the notice of 
+privacy practices that the Covered Entity pro duces in 
+accordance with 45 CFR §164.520, as well as changes to 
+such notice. 
+b. Permissions. Covered Entity shall provide Business 
+Associate with any changes in, or revocation of, 
+permission by individual to use or disclose PHI, if such 
+change affects Busines s Associate's permitted or required 
+uses and disclosures. 
+c. Restrictions. Covered Entity shall notify Business 
+Associate of any restriction to the use or disclosure of 
+PHI that the Covered Entity has agreed to in accordance 
+with 45 CFR §164.522. 
+IN WITNESS WHEREOF, the parties hereto have duly executed this 
+agreement to be effective as of the effective date of the 
+agreement.  
+Covered Entity: 
+Northampton County Department of Human Services 
+ 
+By:  
+ 
+Printed Name:  Sue Wandalowski 
+ 
+Title:  Director of Human Services  
+ 
+Date: 
+ 
+ 
+Business Associate/Covered Entity: 
+ 
+Community Action Committee of the Lehigh Valley 
+ 
+By:  
+ 
+Printed Name:  
+ 
+Title:  
+ 
+Date: 07 / 18 / 2023
+Dawn Godshall
+Executive
+Director
+07 / 18 / 2023
+Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+78 
+APPENDIX N 
+ 
+LOBBYING CERTIFICATION FORM 
+ 
+(CERTIFICATION FOR CONTRACTS, GRANTS, LOANS,  
+AND COOPERATIVE AGREEMENTS) 
+ 
+The undersigned certifies, to the best of his or her knowledge and 
+belief, that: 
+(1) No federal appropriated funds have been paid, or will be paid, 
+by or on behalf of the undersigned, to any person for 
+influencing or attempting to influence an officer or employee 
+of any agency, a member of Congress, an officer or employee of 
+Congress, or an employee of a member of Congress in connection 
+with the awarding of any Federal contract, the making of any 
+Federal grant, the making of any Federal loan, the entering 
+into of any cooperative agreement, and the extension, 
+continuation, renewal, amendment, or modification of any 
+Federal contract, grant, loan, or cooperative agreement. 
+ 
+(2) If any funds other than Federal approp riated funds have been 
+paid or will be paid to any person for influencing or 
+attempting to influence an officer or employee of any agency, a 
+member of Congress, an officer or employee of Congress, or an 
+employee of a member of Congress in connection with t	his 
+Federal contract, grant, loan, or cooperative agreement, the 
+undersigned shall complete and submit Standard Form	-LLL, 
+“Disclosure of Lobbying Activities,” in accordance with its 
+instructions. 
+ 
+(3) The undersigned shall require that the language of this 
+certification be included in the award documents for all 
+subawards at all tiers (including subcontracts, subgrants, and 
+contracts under grants, loans, and cooperative agreements) and 
+that all subrecipients shall certify and disclose accordingly. 
+This certification is a material representation of fact upon 
+which reliance was placed when this transaction was made or 
+entered into. Submission of this certification is a 
+prerequisite for making or entering into this transaction 
+imposed under Section 1352, Title 31, U.S. Code. Any person who 
+fails to file the required certification shall be subject to a 
+civil penalty of not less than $10,000 and not more than 
+$100,000 for such failure. 
+ 
+SIGNATURE: __________________________________ 
+ 
+TITLE: ________________________ ______________ 
+ 
+DATE: ______________________________ Executive
+Director
+07 / 18 / 2023
+Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+79 
+ 
+DISCLOSURE OF LOBBYING ACTIVITIES 
+Complete this form to disclose lobbying activities pursuant to 31 U.S.C. 
+1352 
+ 
+APPROVED BY OMB 
+(See reverse for public burden disclosure.)  0348-0046 
+ 
+1. Type of Federal 
+Action: 
+ 
+  a. contract 
+  b. grant 
+ c. cooperative                     
+agreement 
+  d. loan 
+  e. loan guarantee 
+  f. loan insurance 
+2. Status of Federal 
+Action: 
+     
+a. bid/offer/ 
+application 
+b. initial aware 
+c. post-award 
+   
+  
+3. Report Type: 
+     
+a. initial filing 
+b. material change 
+   
+For Material Change Only: 
+Year ________ quarter             
+date of last report                    
+ 
+4. Name and Address of     
+Reporting Entity: 
+ 
+ Prime Subawardee Tier ______                  
+if known: 
+ 
+ 
+Congressional District, if known 
+ 
+5. If Reporting entity in No. 4 
+is Subawardee, enter Name and 
+Address of Prime: 
+ 
+ 
+ 
+ 
+Congressional District, if known 
+ 
+6. Federal Department/Agency: 
+ 
+7. Federal Program Name/ 
+Description 
+ 
+ 
+   CFDA Number, if known 
+ 
+ 
+8. Federal Action Number, if 
+known 
+9.  Award Amount, if known 
+     $ 
+ 
+ 
+10. a. Name and Address of 
+Lobbying Entity 
+(if individual, last  name, first name, MI): 
+ 
+(Attach Continuation Sheets) 
+b. Individuals Performing  
+Services (including address      
+if different from No. 10a) 
+ 
+      
+SF-LLL-A,  if necessary Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+80 
+11. Amount of Payment (check all 
+that apply): 
+       
+$_______________ actual planned 
+13. Type of Payment (check all 
+that apply): 
+       
+a. retainer 
+b. one-time fee 
+c. commission 
+d. contingent fee 
+e. deferred 
+f. other, specify 
+   
+12. Form of Payment (check all 
+that apply): 
+a. cash 
+b. in-kind; specify: nature 
+value 
+                 
+ 
+14. Brief Description of Services Performed or to be Performed and Date(s) of Service, including officer(s), employee(s) or Member(s) 
+contacted, for Payment indicated in Item 11: 
+ 
+ 
+ 
+(attach Continuation Sheets) SF -LLL-A, if necessary 
+ 
+15. Continuation Sheet(s) SF -LLL-A attached  Yes  No 
+ 
+16. Information requested through this form is authorized by Title   
+31 U.S.C. Section 1352.  This disclosure of lobbying activities 
+is a material representation of fact upon which reliance was 
+placed by the tier above when this transaction was made or 
+entered into. This disclosure is required pursuant to 31 
+U.S.C. 1352.  This information will be reported to the Con gress 
+semiannually and will be available for public inspection.  Any 
+person who fails to file the required disclosure shall be 
+subject to a civil penalty of not less than $10,000 and not 
+more than $100,000 for each such failure. 
+ 
+Signature:                                                                                         
+ 
+ 
+Print Name:                                                                                       
+ 
+ 
+Title:                                                                                                 
+ 
+ 
+Telephone No.:                     Date:          
+Federal Use Only:  Authorized for Local Reproduction 
+Standard Form – LLL 
+ 
+ 
+ Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+81 
+INSTRUCTIONS FOR COMPLETION OF SF -LLL,  
+DISCLOSURE OF LOBBYING ACTIVITIES 
+ 
+This disclosure form s hall be completed by the reporting entity, 
+whether subawardee or prime Federal recipient, at the initiation or 
+receipt of a covered Federal action, or a material change to a 
+previous filing, pursuant to Title 31 U.S.C. Section 1352. The 
+filing of a form i s required for each payment or agreement to make 
+payment to any lobbying entity for influencing or attempting to 
+influence an officer or employee of any agency, a Member of 
+Congress, an officer or employee of Congress, or an employee of a 
+Member of Congress in connection with a covered Federal action.  Use 
+the SF-LLL-A Continuation Sheet for additional information if the 
+space on the form is inadequate.  Complete all items that apply for 
+both the initial filing and material change report. Refer to the 
+implementing guidance published by the Office of Management and 
+Budget for additional information. 
+ 
+1. Identify the type of covered Federal action for which lobbying 
+activity is and/or has been secured to influence the outcome of 
+a covered Federal action. 
+ 
+2. Identify the status of the covered Federal action. 
+ 
+3. Identify the appropriate classification of this report. If 
+this is a follow-up report caused by a material change to the 
+information previously reported, enter the year and quarter in 
+which the change oc curred. Enter the date of the last 
+previously submitted report by this reporting entity for this 
+covered Federal action. 
+ 
+4. Enter the full name, address, city, state and zip code of the 
+reporting entity. Include Congressional District, if known.  
+Check the appropriate classification of the reporting entity 
+that designates if it is, or expects to be, a prime or subaward 
+recipient. Identify the tier of the subawardee, e.g., the 
+first subawardee of the prime is the 1
+st
+ tier. Subawards 
+include but are not limited to subcontracts, subgrants and 
+contract awards under grants. 
+ 
+5. If the organization filing the report in item 4 checks 
+“Subawardee,” then enter the full name, address, city, state 
+and zip code of the prime Federal recipient. Include 
+Congressional district, if known. 
+ 
+6. Enter the name of the Federal agency making the award or loan 
+commitment. Include at least one organizational level below 
+agency name, if known. For example, Department of 
+Transportation, United States Coast Guard. 
+ 
+7. Enter the Federal program name or description for the covered 
+federal action (item 1).  If known, enter the full Catalog of Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+82 
+Federal Domestic Assistance (CFDA) number for grants, 
+cooperative agreements, loans, and loan commitments. 
+ 
+8. Enter the most appropriate Federal identifying number available 
+for the Federal action identified in item 1 (e.g., Request for 
+Proposal (RFP) number; Invitation for Bid (IFB) number; grant 
+announcement number; the contract, grant, or loan award number; 
+the application/proposal control numb er assigned by the Federal 
+agency). Include prefixes, e.g., “RFP -DE-90-001.” 
+ 
+9. For a covered Federal action where there has been an award or 
+loan commitment by the Federal agency, enter the Federal amount 
+of the award/loan commitment for the prime entity identified in 
+item 4 or 5. 
+  
+10.  (a) Enter the full name, address, city, state and zip code for 
+the lobbying entity engaged by the reporting entity identified 
+in item 4 to influence the covered Federal action. 
+ 
+  (b) Enter the full names of the individua	l(s) performing 
+services, and include full address if different from 10 (a).  
+Enter Last Name, First Name, and Middle Initial (MI). 
+ 
+11.  Enter the amount of compensation paid or reasonably expected to 
+be paid by the reporting entity (item 4) to the lobbyi ng entity 
+(item 10).  Indicate whether the payment has been made (actual) 
+or will be made (planned). Check all boxes that apply. If 
+this is a material change report, enter the cumulative amount 
+of payment made or planned to be made. 
+ 
+12. Check the appropriate box(es).  Check all boxes that apply.  If 
+payment is made through an in -kind contribution, specify the 
+nature and value of the in -kind payment. 
+ 
+13. Check the appropriate box(es).  Check all boxes that apply.  If 
+other, specify nature. 
+ 
+14. Provide a specific and detailed description of the services 
+that the lobbyist has performed, or will be expected to 
+perform, and the date(s) of any services rendered.  Include all 
+preparatory and related activity, not just time spent in actual 
+contact with Federal officials. Identify the Federal 
+official(s) or employee(s) contacted or the officer(s), 
+employee(s), or Member(s) of Congress that were contacted. 
+ 
+15. Check whether or not a SF -LLL-A Continuation Sheet(s) is 
+attached. 
+ 
+16. The certifying official shall sign a nd date the form, print 
+his/her name, title, and telephone number. 
+ 
+ Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+83 
+Public reporting burden for this collection of i nformation is 
+estimated to average 30 minutes per response, including time for 
+reviewing instructions, searching existing data sources, 
+gathering and maintaining the data needed and completing and 
+reviewing the collection of information.  Send comments reg arding 
+the burden estimate or any other aspect of this collection of 
+information, including suggestions for reducing this burden, to:  
+Office of Management and Budget, Paperwork Reduction Project 
+(0348-0046), Washington, D.C. 20503. 
+ Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+84 
+DISCLOSURE OF LOBBYI NG ACTIVITIES 
+CONTINUATION SHEET 
+ 
+Approved by OMB 
+0348-0046 
+ 
+ 
+ 
+ 
+ Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+85 
+APPENDIX O 
+ 
+NURSING EVALUATION 
+ 
+ 
+ 
+N/ADoc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+86 
+APPENDIX P 
+ 
+ADULT DAY CARE STANDARDS 
+ 
+N/A 
+ 
+ Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+87 
+APPENDIX Q 
+ 
+SUBCONTRACTED SERVICES 
+ 
+N/A Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+88 
+APPENDIX R 
+ 
+FEDERAL AWARDS 
+ 
+Subrecipient name (which must match registered name in Data Universal Numbering System 
+[DUNS]):  Community Action Committee of the Lehigh Valley, Inc. 
+Subrecipient’s DUNS number: 121722268 
+Federal Award Identification Number (FAIN): ________________________________ 
+Federal Award Date: July 1, 2023- June 30, 2024 
+Subaward Period of Performance Start and End Date: July 1, 2023 - June 30, 2024 
+Amount of Federal Funds obligated by this action: Undetermined  
+Total Amount of the Federal Award: Undetermined 
+Project Description: Drug and Alcohol Services 
+Name of Federal awarding agency/Pass-Through Entity: Northampton County Drug and Alcohol 
+Services 
+Contact Information for awarding agency: Drug and Alcohol Division 2801 Emrick Blvd, Bethlehem, 
+PA 18020   
+Catalog of Federal Domestic Assistance (CFDA) Number and Name; the pass-through entity must 
+identify the dollar amount made available under each Federal award and the CFDA number at time of 
+disbursement: Will be confirmed with year-end audit confirmations  
+Identification of whether the award is for research and development: YES____      NO_____ 
+Indirect Cost Rate for the Federal Award: N/A Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+89 
+ Doc ID: 95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+
+Northampton County Drug & Alcohol Contract 23-505 Community...
+23-505 Contract.doc
+95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+MM / DD / YYYY
+Signed
+06 / 30 / 2023
+15:17:37 UTC-4
+Sent for signature to Katherine Cuque (kduque@caclv.org),
+Dawn Godshall (dgodshall@caclv.org), Kathy Jiorle
+(kjiorle@norcopa.gov), Sue Wandalowski
+(swandalowski@norcopa.gov), David J. Ceraul
+(dceraul@norcopa.gov) and Lamont G. McClure
+(rsandt@norcopa.gov) from mtitus@norcopa.gov
+IP: 204.186.253.54
+07 / 03 / 2023
+11:25:06 UTC-4
+Viewed by Katherine Cuque (kduque@caclv.org)
+IP: 24.152.218.76
+07 / 17 / 2023
+14:49:52 UTC-4
+Signed by Katherine Cuque (kduque@caclv.org)
+IP: 209.173.10.242
+07 / 18 / 2023
+11:58:25 UTC-4
+Viewed by Dawn Godshall (dgodshall@caclv.org)
+IP: 209.173.10.242
+
+07 / 18 / 2023
+12:16:11 UTC-4
+Signed by Dawn Godshall (dgodshall@caclv.org)
+IP: 209.173.10.242
+07 / 18 / 2023
+12:17:14 UTC-4
+Viewed by Kathy Jiorle (kjiorle@norcopa.gov)
+IP: 204.186.253.54
+07 / 18 / 2023
+12:17:39 UTC-4
+Signed by Kathy Jiorle (kjiorle@norcopa.gov)
+IP: 204.186.253.54
+07 / 18 / 2023
+12:40:24 UTC-4
+Viewed by Sue Wandalowski (swandalowski@norcopa.gov)
+IP: 204.186.253.54
+07 / 18 / 2023
+12:40:34 UTC-4
+Signed by Sue Wandalowski (swandalowski@norcopa.gov)
+IP: 204.186.253.54
+07 / 18 / 2023
+15:32:08 UTC-4
+Viewed by David J. Ceraul (dceraul@norcopa.gov)
+IP: 216.164.249.183
+Northampton County Drug & Alcohol Contract 23-505 Community...
+23-505 Contract.doc
+95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+MM / DD / YYYY
+Signed
+
+07 / 18 / 2023
+15:32:23 UTC-4
+Signed by David J. Ceraul (dceraul@norcopa.gov)
+IP: 216.164.249.183
+07 / 18 / 2023
+15:36:46 UTC-4
+Viewed by Lamont G. McClure (rsandt@norcopa.gov)
+IP: 204.186.253.54
+07 / 18 / 2023
+15:37:29 UTC-4
+Signed by Lamont G. McClure (rsandt@norcopa.gov)
+IP: 204.186.253.54
+The document has been completed.07 / 18 / 2023
+15:37:29 UTC-4
+Northampton County Drug & Alcohol Contract 23-505 Community...
+23-505 Contract.doc
+95d5f9b0535f612c2fcb935f29d4589b5162a2c6
+MM / DD / YYYY
+Signed
+--------------------

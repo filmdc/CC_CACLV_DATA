@@ -1,0 +1,360 @@
+Purpose: <p>-general operating funds for RTCLF</p><p>-no required report</p>
+Funder: M&T Charitable Foundation
+Program: RTCLF
+Amount: 5000.00
+Start Date: 2024-08-30
+End Date: 
+
+Notes: 
+
+Fund Number: 8000
+
+Attached Document: 66e1da6d953d0_M&T-Award---RTCLF-FY25.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 66e1da7224330_M&T-RTCLF-Submission-Copy.pdf
+Status:	Submitted
+Date:	7/3/2024
+RTCLF Small Business Lending, Technical Assistance, and Marketing
+Assistance
+Contact Info
+Requesting organization name (legal name)Rising Tide Community Loan Fund
+If your organization goes by a name other than
+your legal name, enter it here:
+What type of support are you requesting? Program/Capital Support ($1,001 - $9,999)
+Please provide the name of the program or
+event for which you are requesting funding.
+RTCLF Small Business Lending, Technical Assistance, and Marketing 
+Assistance
+What type of organization is making the
+request?
+501(c)3
+Your federal taxpayer ID number 23-3079170
+(IRS): Non-profit Organization Status 501(c)3
+(IRS): Organization Legal Name	RISING TIDE COMMUNITY LOAN FUND
+(IRS): Organization Address	1337 E 5TH ST
+(IRS): Organization City	BETHLEHEM
+(IRS): Organization State	PA
+(IRS): Organization Zip Code	18015-2103
+Please attach your 501(c)3 determination letter501c3 - RTCLF update.pdf
+Guidance: Please provide us with the
+primary person within your organization
+responsible for managing and reporting
+through the grant period.
+Contact Salutation	Mr.
+Contact First Name	Chris
+Contact Last Name	Hudock
+Contact Job Title	Associate Executive Director for Business Development
+Contact Phone Number	484-893-1039
+Extension # (if applicable)
+Contact Email Address	chudock@caclv.org
+Website URL of organization	therisingtide.org
+Organization Address (line 1)	1337 E. Fifth Street
+Organization Address (line 2)
+Organization City	Bethlehem
+Organization State/Province	Pennsylvania
+Organization Zip/Postal Code	18015
+Organization Phone Number	484-893-1039
+Were you referred by an employee or executive
+of M&T or Wilmington Trust?
+Yes
+Referral Name	Gail D'Angelo
+Referral Email Address	gdangelo@mtb.com
+
+Organization Info & Financial
+How many people are served by your
+organization annually?
+150
+Please briefly outline your organization’s
+mission and purpose, as well as the service
+provided.
+The mission of the Rising Tide Community Loan Fund is to identify small 
+business and community development credit needs that stifle the 
+creation of economic opportunity in low- to moderate-income 
+communities of the Lehigh Valley and to meet those needs with 
+affordable credit products. Rising Tide Community Loan Fund, a wholly 
+owned subsidiary program of Community Action Lehigh Valley provides 
+accessible financing to business owners whose risk factors make it 
+difficult to obtain funds from traditional lenders. 
+Is this organization any of the following?Community Development Financial Institution (CDFI)
+Name and briefly describe any organization(s)
+providing the same type of service
+While RTCLF is the only CDFI headquartered in the Lehigh Valley, 
+Community First Fund is also a CDFI that offers services in our target 
+market. While Community First Fund also works with small businesses, 
+they have a wider client base than RTCLF as they also undertake 
+community development projects and affordable housing initiatives. 
+Community First Fund also works in a larger geographic footprint, 
+offering services in Adams, Berks, Bucks, Chester, Cumberland, 
+Dauphin, Delaware, Franklin, Lancaster, Lebanon, Lehigh, Montgomery, 
+Northampton, Perry, Philadelphia, and York counties in Pennsylvania and 
+Camden County in New Jersey.
+Are there any M&T/Wilmington employees who
+are actively involved with your organization?
+No
+Please provide a list of the Board of Directors of
+your organization and their affiliations
+RTCLF Board of Directors - 7.2024.pdf
+Please provide the total annual operating
+budget for your organization
+736,004.00
+What percentage of your leadership team/board 
+members are women?
+Leadership Team (Senior Staff)Board Members
+% of Women	67	29
+What percentage of individuals make up your 
+leadership team/board members for the below 
+categories?
+Leadership Team (Senior Staff)Board Members
+White	33	71
+Black or African American	67	14
+American Indian or Alaskan Native 0	0
+Asian	0	0
+Native Islander or Other Pacific Islander0	0
+Hispanic/Latinx	0	15
+What is your organization's General &
+Administrative Costs, including fundraising, as a
+percentage of Total Revenue
+15
+Change in net assets last year	858,221
+Amount of assets	6,802,134.00
+Market value of endowment (if any): 0.00
+United Way funding current year 0.00
+Is your organization currently carrying a deficit?No
+Does your organization have a reserves policy?No
+Are there any outstanding issues that could
+affect your organization’s ability to operate and
+N/A
+
+/or deliver services?
+Does your organization have a non-
+discrimination policy?
+Yes
+Please upload a copy of your organization's
+non-discrimination policy.
+Non-Discrimination Policy.pdf
+Program/Event Info
+Which of the following best represents your
+ORGANIZATION's primary mission?
+Public, Societal Benefit
+Which of the following best further represents
+your ORGANIZATION's primary mission?
+Community Improvement
+Please provide a description of the
+program/event
+RTCLF serves prospective, start-up, and established businesses in 
+Lehigh, Northampton, Carbon, Monroe, and upper Bucks counties 
+through small business loans for leasehold improvements, purchase of 
+equipment and machinery, marketing costs, working capital, and 
+inventory purchases as well as one-on-one technical assistance on 
+business plans, cash flow analysis and projections, and marketing 
+strategies. RTCLF also manages the City of Bethlehem’s Small Business 
+Loan Fund and the Lehigh and Northampton County Revolving Loan 
+Fund. RTCLF offers a line of credit for entrepreneurs as a complement to 
+its loan products and works with current and potential borrowers to 
+create business operating budgets, break-even analyses, and other 
+projections. 
+Which of the following best represents your
+PROGRAM's primary mission?
+Public, Societal Benefit
+Which of the following best further represents
+your PROGRAM's primary mission?
+Community Improvement
+What is the total amount requested? 5,000.00
+What is the total budget for this program/event?699,850.00
+For what specific purpose(s) will our funding be
+used (program materials, event expenses,
+capital campaign, etc.)
+Funds provided by the M&T Charitable Foundation would be used to 
+support the full range of RTCLF’s programming. This includes small 
+business lending, marketing assistance, and non-marketing technical 
+assistance such as business planning, cash flow analysis, cash flow 
+projections, creation of operating budgets and break-even analyses, and 
+assistance to potential applicants working to improve their credit scores. 
+Funds from M&T Charitable Foundation would also provide RTCLF with 
+administrative support such as program planning, fundraising and 
+development, and fiscal oversight. 
+Date decision is needed	9/9/2024
+Please list your largest donors (including 
+contracts with governmental agencies) and 
+amounts in the current year for this request (up 
+to 10):
+Donor Name Amount 
+(contribution to 
+this program)
+Status Other giving 
+amount
+1.	Community 
+Service Block 
+Grant (CSBG)
+50,000.00 Committed
+2.	PPL Electric 
+Utilities
+30,000.00 Pending
+3.	Wells Fargo 25,000.00 Committed
+4.	PA Council on 
+the Arts
+15,000.00 Committed
+5.	Santander Bank10,000.00 Pending
+6.	Easton 
+Community 
+Development 
+Block Grant
+8,000.00 Committed
+
+7.	Penn 
+Community 
+Bank 
+Foundation
+5,000.00 Pending
+8.	PNC Community 
+Development 
+Banking
+5,000.00 Pending
+9.	Embassy Bank 5,000.00 Pending
+10.	Alvin H Butz, Inc2,500.00 Committed
+Please indicate the number of lives impacted or
+people benefitting from this program
+150
+Please indicate how you intend to measure the
+success of the program
+Evaluation of all Community Action programs begins with recordkeeping 
+and data collection, which enables Community Action to track the 
+progress of program participants during the time they were assisted by 
+the agency and afterward. 
+Agency wide, evaluation and measurement of success begins with 
+Community Action’s Strategic Plan (2024-2026) that defines Community 
+Action’s mission, values, strategic assumptions, strategic direction, and 
+three-year strategy for mission implementation. In order to ensure that 
+the strategic plan is carried out, the agency develops an Annual Work 
+Plan. Community Action’s Annual Work Plan consists of measurable 
+goals and performance targets that guide the services and activities for 
+every one of Community Action’s programs and subsidiaries. It is 
+evaluated twice yearly in order to measure the effectiveness of services 
+and program outcomes. This evaluation is conducted by the Program 
+Development and Evaluation Committee of Community Action’s Board of 
+Directors and is then approved by Community Action’s full Board of 
+Directors. 
+Success is also measured through contract compliance activities 
+conducted by Community Action’s Planning, Compliance, and Fiscal 
+Departments. The Fiscal Department is responsible for meeting all 
+contractual fiscal obligations that may include submission of time sheets, 
+invoices, and fiscal reports to funders. The Planning and Compliance 
+Departments provide contract compliance oversight by ensuring that 
+program directors are familiar with their contracts, program objectives, 
+and reporting requirements. The Planning and Compliance Departments 
+also conduct periodic internal monitoring of all programs that includes 
+review of client files, data collection processes, and reports, and assist 
+the program director in preparing for monitoring visits by funders. Lastly, 
+the performance of all staff is evaluated annually by their immediate 
+supervisors. 
+Does this initiative support underserved
+populations?
+Yes
+What percentage of your total annual budget
+will go directly toward underserved populations?
+Over 50%
+What primary population will this program
+serve?
+Low-income
+What percentage of those served by your
+agency or this initiative would be considered of
+low-to-moderate income?
+80
+Please select one of the following that would
+best describe the effect of your program or
+agency
+Economic Development
+Please select the primary county that will be
+impacted by this program/event.
+Northampton, PA
+
+Please select all counties that are impacted by
+this program
+PA - Berks County
+PA - Carbon County
+PA - Lehigh County
+PA - Monroe County
+Gender and Sexual Identity
+Age Groups
+Ethnic and Racial Groups
+Social and Economic Status	Economically disadvantaged, low-income, and poor people
+Work Status and Occupations
+Health
+Does this project have any volunteer
+opportunities for our employees?
+Yes
+Volunteers Coordinator Contact - First NameBarbara
+Volunteers Coordinator Contact - Last NameKochard
+Volunteers Coordinator Contact - e-mail
+address
+bkochard@caclv.org
+What will participants be doing during this
+activity?
+RTCLF is happy to work with M&T Charitable Foundation to identify an 
+appropriate and mutually beneficial volunteer opportunity for M&T’s 
+employees. Potential opportunities include workshops presented by M&T 
+for established or prospective entrepreneurs centered around marketing, 
+business planning, or a similar topic. 
+Media & Advertising
+Please provide information about any marketing
+activities that will be used to publicize this
+program, including any donor recognition.
+RTCLF would be happy to work with M&T Charitable Foundation to 
+arrange a press release, in-person check presentation, or other event to 
+recognize M&T's charitable giving. In addition, M&T Charitable 
+Foundation will be publicly recognized on RTCLF’s social media 
+channels should the grant be awarded. M&T is also welcome to issue its 
+own press release or announce its contribution in whatever manner it 
+sees fit. For this purpose, our logo has been attached to this proposal for 
+use by the M&T Charitable Foundation. If possible, please allow RTCLF 
+to review a press release prior to publication to ensure accuracy of 
+content. 
+Are logo/ad opportunities available for
+sponsors?
+Yes
+Please provide specifications	RTCLF offers social media promotion through Facebook, Instagram, and 
+LinkedIn. 
+Please provide submission deadline 10/1/2024
+Please provide the email address where
+submission is to be sent
+planner-rtclf@caclv.org
+Attachment 1	RTCLF Logo.pdf
+Attachment 2
+Attachment 3
+Attachment 4
+Attachment 5
+Attachments
+Please attach any additional information
+pertinent to your request (Attachment 1)
+Annual Report - RTCLF Page.pdf
+Please attach any additional information
+pertinent to your request (Attachment 2)
+Signed Public_Inspection_-_RTCLF_-_6-30-2023_-_Form_990.pdf
+
+Please attach any additional information
+pertinent to your request (Attachment 3)
+RTCLF Issued FY23 Financial Statements.pdf
+Please attach any additional information
+pertinent to your request (Attachment 4)
+Please attach any additional information
+pertinent to your request (Attachment 5)
+Check Payee Name	Rising Tide Community Loan Fund
+Check Mailing Address (line 1)	1337 E. Fifth Street
+Check Mailing Address (line 2)
+Check City	Bethlehem
+Check State/Province	Pennsylvania
+Check Zip Code	18015
+Check Country	U.S.A.
+Grant Terms & Conditions
+Grant Terms & Conditions	"By checking this box. I hereby agree to the Grant Terms and 
+Conditions and certify that the information provided in this Grant 
+application is true, accurate, and complete. Further, by checking this 
+box, I agree that, if awarded, Grant funds will be used as stated in this 
+Grant application."
+Authorized Signature	Dawn G. Godshall
+Today’s Date	7/3/2024
+SUBMIT
+--------------------

@@ -1,0 +1,16 @@
+Purpose: <p>-Technical assistance fund, salaries, advertising, printing, travel, equipment, etc.</p><p>-Requires proof of matching funds</p><p>&nbsp;</p>
+Funder: CDFI Fund
+Program: RTCLF
+Amount: 125000.00
+Start Date: 2020-09-24
+End Date: 2023-12-31
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 652982f9340f6_2020RTCLF_CDFI_TA_executed-contract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

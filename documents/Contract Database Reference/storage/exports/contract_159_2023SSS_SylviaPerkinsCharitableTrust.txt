@@ -1,0 +1,274 @@
+Purpose: <p>Purchase furniture (2 sofas, 2 love seats) for apartments at the SSS.</p>
+Funder: Sylvia Perkin Charitable Trust
+Program: SSS
+Amount: 6456.00
+Start Date: 2023-03-31
+End Date: 
+
+Notes: 
+
+Fund Number: 1211
+
+Attached Document: 6426ee54d6b90_2023SSS_Sylvia-Perkin-Perpetual-Charitable-Trust_Award-Notification.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6426ee57cd881_2023SSS_Sylvia-Perkin-Perpetual-Charitable-Trust_Proposal-Submitted.pdf
+Sylvia Perkin Perpetual Charitable Trust 
+Primary Contact 
+Name: Julie Shoults  Phone: 484-893-1038 
+Email: planner-SSS@caclv.org  Address: 1337 East Fifth Street, Bethlehem, PA 18015 
+Grant Request 
+Amount:   $6,456 
+Project Title:   Sixth Street Shelter Sofas 
+Type of Support:   Program Support 
+Project Budget:   $8,456 
+Term in Months:   3 months 
+Start Date:   May 1, 2023 
+End Date:   July 31, 2023 
+Describe the specific purpose for which any grant funds awarded from this foundation will be used:  
+   
+Funds would be used to purchase sofas and love seats for apartments at the Sixth Street Shelter. We plan 
+to replace damaged and worn items with items that are bed bug resistant and easy to clean and sanitize 
+without causing damage to the furniture. Not only is this furniture durable enough to handle the wear 
+and tear of multiple families residing in the unit each year, but it also provides a safer, healthier 
+environment for families in terms of cleaning and sanitizing against the spread of viruses and bed bugs.
+
+This will give families a clean, safe, and comfortable place to call home during their stay at the Sixth 
+Street Shelter. 
+The Sixth Street Shelter has seen a marked increase in cases of bed bugs since the onset of the COVID-
+19 pandemic, which has impacted shelter operations. Although social distancing helped to slow the 
+spread of bed bugs nationwide during the pandemic due to strict travel restrictions, quarantines, and a 
+general anxiety around meeting in large groups, practicing social distancing can be difficult or even 
+impossible for individuals experiencing homelessness. Unsheltered families often stay wherever they 
+can find a place regardless of the health risks, which can include exposure to bed bugs. Once a family is 
+exposed to bed bugs, they then transport these to the Shelter, where they can easily spread among units. 
+The furniture we have selected is designed for easy extermination and cleaning so that we will not have 
+to regularly replace furniture that becomes infested. It also means that furniture is easier to sanitize 
+should there be another COVID surge or similar health situation.  
+Describe how a grant to your organization would further the foundation’s mission and the priorities of 
+the foundation. 
+   
+The Sixth Street Shelter shares a common goal with the Sylvia Perkin Perpetual Charitable Trust: to 
+work towards public health and welfare. The Shelter provides the opportunity and direction for all 
+people to become self-sufficient, productive members of the community. The Shelter also needs to be a 
+safe and healthy environment for children and families experiencing homelessness. These funds would 
+support us in ensuring that the furniture in the apartments is clean and sanitary, and will help to mitigate 
+instances of bed bugs.  
+Describe the objectives of the project or program to be funded: 
+   
+The mission of the Sixth Street Shelter is to assist families experiencing homelessness secure safe 
+housing through family-centered services, in-house programming, and referrals to community resources 
+while advocating to end homelessness and housing insecurity in the Lehigh Valley. The property has 25 
+private apartments, a Family Resource Center, playground, and full-choice food pantry for residents. A
+
+60- to 90-day stay in the Shelter enables families to begin to stabilize their income and address the 
+problems that led to their homelessness. The Shelter provides each family with a fully furnished 
+apartment and supportive services, including individualized case management. Staff work to connect 
+them with the necessary resources to address their individual needs, such as financial literacy and 
+parenting classes, access to childcare and healthcare, and mental health support. During their residency, 
+the family develops a Family Service Plan with their caseworker, setting household, budgeting, 
+educational, and vocational goals and seeking suitable housing and employment. Staff maintain contact 
+with the family following their move into permanent housing to offer additional assistance and 
+determine how well they are continuing to move toward self-sufficiency. In addition to the 
+comprehensive services provided to Shelter residents, the Sixth Street Shelter has become a resource 
+center for former residents and people from the surrounding neighborhood. 
+For this project specifically, the objective is to provide a clean, healthy, and comfortable environment 
+for our residents as they work towards their goals. This entails having the proper furniture in each 
+apartment to support the residents’ health and comfort and to ease the challenges of upkeep on Shelter 
+staff. This furniture will also mitigate the instances of bed bugs and decrease our expenditures on 
+extermination, deep-cleaning services, and replacing damaged furniture. 
+Describe the implementation plan for the project or program. Include at least three specific actions your 
+organization will take in order to achieve results: 
+   
+Upon receipt of funding, we would first place an order with Institutional Bedz LLC for the sofas and 
+love seats we have selected. We have ordered furniture from them in the past, which will help to 
+streamline the process. When the furniture arrives, we would prioritize apartments that are in greatest 
+need of new items to replace worn-out and/or soiled furniture. Then we would arrange to have the 
+proper staff and/or volunteers ready to assemble anything if necessary and place the furniture 
+accordingly in each apartment. We would follow up by inspecting the furniture periodically to confirm 
+that it is meeting our needs and the families’ needs in terms of comfort, utility, and durability. 
+What criteria does (or will) your organization use to measure the success of the project or program?
+
+Success of this project will be measured by whether the furniture is purchased, delivered, assembled, 
+and placed in the apartments within the grant timeline and within budget. More broadly, this project will 
+contribute to reaching our overall performance targets for the Sixth Street Shelter in our current fiscal 
+year: 1) At least 100 families will reside at the Shelter and develop Family Service Plans based on their 
+housing, educational and financial goals; 2) 50% of families will save money toward rent or a security 
+deposit upon leaving the Shelter; 3) 75% of families will achieve their Family Service Plan goals; 4) 
+100% of families will create a written budget to understand credit and money management as a part of 
+their goal plan; 5) 40% of families will move into affordable housing upon leaving.  
+Each year, a work plan is developed with measurable goals and performance targets that guide program 
+activities. In order to measure effectiveness of services and outcomes, the work plan is evaluated twice 
+yearly by the Program Development & Evaluation Committee of CALV’s Board of Directors and is then 
+approved by CALV’s full Board. In addition, Sixth Street Shelter utilizes the Homeless Management 
+Information System (HMIS) and ClientTrack to track and analyze participant data. The Shelter also 
+tracks qualitative data to document the positive long-term impact of the Shelter in the community. Staff 
+conduct follow-up evaluations with former residents that can be located at 3-, 6-, and 12-month intervals 
+to ascertain their continued progress. 
+Briefly describe any formal or informal collaborative ventures your organization has established (or will 
+establish) with other entities serving similar purposes that may be relevant to this grant request. 
+   
+The Sixth Street Shelter partners with many government entities and non-profit agencies to ensure that 
+residents receive the services and gain the skills they will need as part of a comprehensive plan to help 
+them to become self-sufficient. The Shelter has a nearly 30-year partnership with the Lehigh County 
+Office of Children and Youth Services, and many other local organizations contribute to programming 
+for our residents. For instance, Essa Bank leads financial literacy classes, CareerLink assists with job 
+searches and resume writing, and Highmark Wholecare facilitates “Wellness Friday” sessions for both 
+Shelter residents and community members. The Shelter is also a member of the Lehigh Valley Regional 
+Homelessness Advisory Board. The LVRHAB is a consortium of representatives from City and County 
+governments, social service agencies, veterans support groups, faith-based and other community 
+organizations, homeless advocates, homeless or formerly homeless people, representatives from 
+legislators, and other interested parties with the mission to prevent and end homelessness in the Lehigh 
+Valley. 
+If this grant relates to an ongoing project or program, how long has the project or program been 
+operating?
+
+Since 1984, the Sixth Street Shelter, a program of Community Action Lehigh Valley, has been offering 
+services to help prepare families for the challenges of a difficult job and rental market that too often 
+result in homelessness. It is the only family shelter in the region that admits families of any 
+configuration (with at least one child under 18) and houses them in their own private apartments. The 
+Sixth Street Shelter has proven to be a vital resource in the community, and while it has been operating 
+for almost 40 years, the program has adapted to the changing needs of the community. For instance, 
+there is currently a severe shortage of available, affordable housing units locally, and landlords have 
+been very selective in whom they rent to. Our caseworkers report that they struggle to find housing for 
+their clients despite having rental assistance and supportive services available. This means that residents 
+are experiencing longer stays in the Shelter before moving into permanent housing. We recently added a 
+Housing Innovation Specialist to our staff to work with our residents and local landlords in order to 
+identify affordable housing options and facilitate faster placements for families. 
+ 
+Provide any other relevant dates relating to the project or program for which grant funds would be used. 
+   
+Funds will be expended within three months of receipt. While supply chain issues might arise, delaying 
+delivery of the items, we plan to place an order and pay for the furniture once we receive funding.  
+ 
+Provide a concise budget for the project listing major expense categories.
+
+Furniture will be purchased from Institutional Bedz LLC. 
+ 
+2 Sofas (x $1,740 each) = $3,480 
+2 Love Seats (x $1,488 each) = $2,976 
+Shipping = $2,000 
+TOTAL = $8,456 
+ 
+List other sources that may fund this project. 
+   
+We received $3,000 from the Ruth P. Seruga Trust this fiscal year to purchase kitchen tables and chairs 
+for several units. We also applied to the Lehigh County Covid-19 Relief Block Grant Program for 
+additional funding for bed bug resistant furniture, and that request is currently pending. The Sylvia 
+Perkin Perpetual Charitable Trust is one of the first organizations we have approached with this specific 
+request for sofas and love seats. We have also applied to the Leona Gruber Trust for additional funds for 
+this furniture. If we are not successful, we will approach other foundations until we are able to obtain the 
+funds necessary to replace this furniture and provide a clean, healthy, and comfortable environment for 
+every family that resides at the Sixth Street Shelter. 
+Grant Demographics 
+Program Area:   Lehigh Valley 
+Location:   Lehigh County & Northampton County 
+Population:   683,851 
+Age Group:   All
+
+Ethnicity:   All 
+Gender:   All 
+Demographics Comments: 
+   
+Last fiscal year, 71 families consisting of 316 people (including 198 children, 18 of whom were five and 
+under) found refuge at Sixth Street Shelter. Nearly 60% of those families were headed by women. Many 
+of the heads of households that the Shelter serves are unemployed or underemployed, or recipients of 
+SSI and SSDI whose low incomes cannot support even what the U.S. Department of Housing and Urban 
+Development (HUD) has determined as the Fair Market Rent (FMR) for an apartment in the Lehigh 
+Valley. Others had come to the end of their unemployment benefits or welfare benefits and were poorly 
+equipped educationally and vocationally to find jobs in a changing labor market. Some faced additional 
+challenges, such as a disability (physical and/or mental) or experiencing domestic violence. The ongoing 
+impacts of the COVID-19 pandemic continue to exacerbate the challenges our families face, as there is a 
+disproportionate impact on low-income members of our community. 
+Organization Background 
+Tax EIN:  231669589 
+Legal Name:   Community Action Committee of the Lehigh Valley, Inc. 
+Tax Notes: 
+   
+Community Action Lehigh Valley (the Sixth Street Shelter’s parent agency) files a form 990 each year. 
+Entity Type:   Nonprofit 501(c)(3)
+
+Fiscal Agent Or Sponsor?   No 
+Physical Address:   1337 East Fifth Street, Bethlehem, PA 18015 
+Briefly summarize your organization’s current mission. 
+   
+The mission of Community Action Lehigh Valley (CALV) is to improve the quality of life in the Lehigh 
+Valley by building a community in which all people have access to economic opportunity, the ability to 
+pursue that opportunity, and a voice in the decisions that affect their lives. The mission of the Sixth 
+Street Shelter is to assist families experiencing homelessness secure safe housing through family-
+centered services, in-house programming, and referrals to community resources while advocating to end 
+homelessness and housing insecurity in the Lehigh Valley. 
+ 
+Board Members: 
+   
+Kim Capers, One Valley Realty, Insurance Agent 
+Louis Cinquino, Cinquino Direct, Owner; Board President 
+Zachariah Cobrinik, Retired 
+Yorman DeLaRosa, Lehigh County, Community Liaison 
+Charles Dertinger, Northampton County, Director of Administration 
+Linda Faust, State Rep Zach Mako, Representative of Northern Lehigh County; Board Secretary 
+Lidia Gonzalez, Lidia's Notary, Owner 
+Tomika Gould, Sequential Technology International LLC, Senior Operations Manager and Community 
+Engagement Leader 
+Justin Grimshaw, International Brotherhood of Electrical Workers (IBEW) Local Union #375, Assistant 
+Business Manager 
+John “Jack” Gross, Gross McGinley LLP, Lawyer
+
+Mark Hartney, City of Allentown, Deputy Director of Community & Economic Development 
+Shaquera Martindale, City of Easton, Deputy Director of Redevelopment Authority 
+Susan Master, Retired, Children's Book Author 
+Alicia Miller Karner, City of Bethlehem, Deputy Director of Department of Community & Economic 
+Development 
+Abby Oberbeck, National Magnetics Group, Executive Vice President; Board Treasurer 
+Luis Perez, ReciproCITY, Executive Director  
+Shalanda Riddick, Visit Vans LLC, President 
+Hilda Rivera, Lehigh Valley Health Network, Community Engagement & Public Affairs Specialist; 
+Board Vice President 
+Dr. Joseph Roy, Bethlehem Area School District, Superintendent of Schools 
+John Schwartz, Life Church, Executive Pastor & Campus Pastor 
+Stephanie Steele, Borough of Portland, Council President 
+Betty “Jean or Jeannie” Wagner, Greater Shiloh Church 
+ 
+Number Of Paid Staff, Full-Time:   104 
+Number Of Paid Staff, Part-Time:   2 
+Number Of Volunteers:   1,625 
+Organization Finances 
+Organization Annual Budget:   36,349,328 
+Budget Changes:   None 
+What Percentage of Your Budget is Allocated to Administrative 
+Expenses?   6.9% 
+For Fiscal Year Ending:   June 30, 2021 
+If Your Organization Did Not File a Tax Return for its Prior Fiscal Year, Explain Why: 
+   N/A 
+Contributions and Grants:   38,072,348
+
+Program Service Revenue:   2,441,214 
+Investment Income:   2,092 
+Other Revenue:   2,239 
+Total Revenue:   40,517,893 
+Program Services:   30,238,199 
+Administration:   3,401,051 
+Fundraising:   622,887 
+Other Expenses:   0 
+Total Expenses:   34,262,137 
+Revenue Less Expenses:   6,255,756 
+Total Assets:   24,914,072 
+Total Liabilities:  	7,056,470 
+Net Assets or Fund Balances:   17,857,602 Send 
+© 
+Application submitted 1/27/2023 @9:20pm 
+ 
+Copyright 2022 Sylvia Perkin Perpetual | All Rights Reserved | T
+--------------------
+Attached Document: 6426ee62cf251_2023SSS_Sylvia-Perkin_signedgrantagreement.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6426ee6894f21_SSS-Sylvia-Perkin-Charitable-Trust-Grant-Progress-Report.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

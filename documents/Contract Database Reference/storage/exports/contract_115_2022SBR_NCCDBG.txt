@@ -1,0 +1,54 @@
+Purpose: <p>Salary and Fringe benefits fot SBR Director.</p>
+Funder: NC DCED CDBG
+Program: SBR
+Amount: 30000.00
+Start Date: 2021-10-01
+End Date: 2023-09-30
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 641c967e63648_2021-NC-CDBG-award-letter.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 641c9681beca4_2021_NCCDBG_Executed-Contract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 641c9684da9be_SBR-NC-CDBG-Award-Summary.pdf
+Grant Award Summary 
+Program  SBR 
+Funder and Year  NC CDBG 
+Time Frame 10/1/2021-9/30/2030 
+Amount 
+Received 
+$30,000  
+Purpose Salary and Fringe benefits for SBR  
+Reports Due Semi-Annual reports due by April 30
+th
+ and October 30
+th
+. 
+Data to be 
+collected 
+Reporting Forms are included in the contract exhibit B-4.  Hours working 
+on “Direct Benefit” projects. Frank Brooks is offering a meeting with the 
+director on what specific data to compile for these reports. 
+Need to Know -Invoices may be submitted to the county, for applicable activities (salary 
+and fringe benefits), on a monthly basis once we start utilizing these grant 
+funds.  
+Budget/Grantor 
+Information 
+This grant was included in the budget. 
+-NC Contact for this grant is:  
+Frank Brooks  
+(610) 829-6311  
+fbrooks@northamptoncountry.org or fbrooks@norcopa.gov 
+Additional Info Reports and records are to be kept a minimum of 4 years. 
+ 
+Please let me know if you have any further questions or concerns!
+--------------------

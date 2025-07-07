@@ -1,0 +1,204 @@
+The below are the required metrics for the community service block grant (csbg) module 4 section c, particpant and household characterstics  report.
+
+
+
+A. Total unduplicated number of all INDIVIDUALS about whom one or more characteristics were obtained:
+B. Total unduplicated number of all HOUSEHOLDS about whom one or more characteristics were obtained:
+
+
+1. Gender
+a. Male
+b. Female
+c. Other
+d. Unknown/not reported
+e. TOTAL (auto calculated) Number of Individuals
+
+2. Age
+a. 0-5
+b. 6-13
+c. 14-17
+d. 18-24
+e. 25-44
+f. 45-54
+g. 55-59
+h. 60-64
+i. 65-74
+j. 75+
+k. Unknown/not reported
+l. TOTAL (auto calculated) Number of Individuals
+
+3. Education Levels
+a. Grades 0-8
+b. Grades 9-12/Non-Graduate
+c. High School Graduate
+d. GED/Equivalency Diploma
+e. 12 grade + Some Post-Secondary
+f. 2 or 4 years College Graduate
+g. Graduate of other post-secondary school
+h. Unknown/not reported
+i. TOTAL (auto calculated) Number of Individuals
+
+
+4. Disconnected Youth
+a. Youth ages 14-24 who are neither working or in school
+
+
+5. Health
+a. Disabling Condition: Yes | No | Unknown
+b. Health Insurance*: Yes | No | Unknown
+
+*If an individual reported that they had Health Insurance please identify the source of health insurance below.
+
+Health Insurance Sources
+c.1. Medicaid
+c.2. Medicare
+c.3. State Children’s Health Insurance Program
+c.4. State Health Insurance for Adults
+c.5. Military Health Care
+c.6. Direct-Purchase
+c.7. Employment Based
+c.8. Unknown/not reported
+
+6. Ethnicity/Race
+a. Ethnicity
+a.1. Hispanic, Latino or Spanish Origins
+a.2. Not Hispanic, Latino or Spanish Origins
+a.3. Unknown/not reported
+a.4. TOTAL (auto calculated) Number of Individuals
+
+
+b. Race
+b.1. American Indian or Alaska Native
+b.2. Asian
+b.3. Black or African American
+b.4. Native Hawaiian and Other Pacific Islander
+b.5. White
+b.6. Other
+b.7. Multi-race (two or more of the above)
+b.8. Unknown/not reported
+b.9. TOTAL (auto calculated) Number of Individuals
+
+7. Military Status
+a. Veteran
+b. Active Military
+c. Never Served in the Military
+d. Unknown/not reported
+e. TOTAL (auto calculated) Number of Individuals
+
+
+8. Work Status (Individuals 18+)
+a. Employed Full-Time
+b. Employed Part-Time
+c. Migrant Seasonal Farm Worker
+d. Unemployed (Short-Term, 6 months or less)
+e. Unemployed (Long-Term, more than 6 months)
+f. Unemployed (Not in Labor Force)
+g. Retired
+h. Unknown/not reported
+i. TOTAL (auto calculated) Number of Individuals
+
+
+D. HOUSEHOLD LEVEL CHARACTERISTICS
+9. Household Type
+a. Single Person
+b. Two Adults NO Children
+c. Single Parent Female
+d. Single Parent Male
+e. Two Parent Household
+f. Non-related Adults with Children
+g. Multigenerational Household
+h. Other
+i. Unknown/not reported
+j. TOTAL (auto calculated) Number of Households
+
+10. Household Size
+a. Single Person
+b. Two
+c. Three
+d. Four
+e. Five
+f. Six or more
+g. Unknown/not reported
+h. TOTAL (auto calculated) Number of Households
+
+11. Housing
+a. Own
+b. Rent
+c. Other permanent housing
+d. Homeless
+e. Other
+f. Unknown/not reported
+g. TOTAL (auto calculated) Number of Households
+
+12. Level of Household Income
+(% of HHS Guideline)
+a. Up to 50%
+b. 51% to 75%
+c. 76% to 100%
+d. 101% to 125%
+e. 126% to 150%
+f. 151% to 175%
+g. 176% to 200%
+h. 201% to 250%
+i. 250% and over
+j. Unknown/not reported
+k. TOTAL (auto calculated) Number of Households
+
+
+13. Sources of Household Income
+a. Income from Employment Only
+b. Income from Employment and Other Income Source
+c. Income from Employment, Other Income Source,
+and Non-Cash Benefits
+d. Income from Employment and Non-Cash Benefits
+e. Other Income Source Only
+f. Other Income Source and Non-Cash Benefits
+g. No Income
+h. Non-Cash Benefits Only
+i. Unknown/not reported
+j. TOTAL (auto calculated) Number of Households
+
+Below, please report the types of Other income and/or non-cash benefits received by the
+household
+
+14. Other reported Income sources / Sources other than employment
+ 
+a. TANF
+b. Supplemental Security Income (SSI)
+c. Social Security Disability Income (SSDI)
+d. VA Service-Connected Disability Compensation
+e. VA Non-Service Connected Disability Pension
+f. Private Disability Insurance
+g. Worker’s Compensation
+h. Retirement Income from Social Security
+i. Pension
+j. Child Support
+k. Alimony or other Spousal Support
+l. Unemployment Insurance
+m. EITC
+n. Other
+o. Unknown/not reported
+
+
+
+15. Non-Cash Benefits
+a. SNAP
+b. WIC
+c. LIHEAP
+d. Housing Choice Voucher
+e. Public Housing
+f. Permanent Supportive Housing
+g. HUD-VASH
+h. Childcare Voucher
+i. Affordable Care Act Subsidy
+j. Other
+k. Unknown/not reported
+
+
+E. Number of Individuals Not Included in the Totals Above (due to data collection system integration barriers):
+a. Please list the unduplicated number of INDIVIDUALS served in each program*:
+
+F. Number of Households Not Included in the Totals Above (due to data collection system integration barriers)
+a. Please list the unduplicated number of HOUSEHOLDS served in each program*:
+
+*The system will add rows to allow reporting on multiple programs.

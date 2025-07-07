@@ -1,0 +1,563 @@
+Purpose: <p>$2,525 for Marketing and Advertising</p><p>$1,675 for App Subscription (Interactive Map)</p><p>-25-50% matching funds required see section 8 of contract for details</p>
+Funder: NC Hotel Tax
+Program: SBR
+Amount: 4200.00
+Start Date: 2024-01-01
+End Date: 2025-06-30
+
+Notes: <p>Reports-</p><p>Semi- annual due July 31, 2024 and March 31, 2025.</p><p>Provide Fiscal Information and Activity Progress.</p><p>Complete in Neighborly Portal</p><p><a href="https://portal.neighborlysoftware.com/NORTHAMPTONCOUNTYPA/participant">Neighborly Software</a></p><p>&nbsp;</p>
+
+Fund Number: F8011
+
+Attached Document: 65eb3e9a4d4ba_2024SBR_NC-Hotel-Tax_-Slate-Belt-Public-Art-Trail-signed-contract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 660ee7c66148b_Subrecipent-User-Guide---Neighbor-Name.docx
+
+Subrecipient User Guide:[Neighbor Name]Last Updated: May 24, 2023______________       Benevate, Inc. dba Neighborly Software
+
+
+Atlanta Tech Village 3423 Piedmont Road NE Atlanta, GA 30305 www.NeighborlySoftware.com
+
+The Subrecipient Portal is hosted by Neighborly Software and is accessible available via any internet connected device.  The recommended browser is Google Chrome but will work with any modern web browser.
+Participant Portal Link: 
+
+To access the system, you&#039;ll need to create an account by first registering your email address. Select the Register tab and enter your work email address. Select “Send verification code”. To verify your email address, the system will send you an email with a verification code. 
+Note: If you do not receive the email within 2 minutes, check your spam or junk mail folders. If the email is in either folder, mark the message as &quot;Not Junk&quot; or &quot;Not Spam&quot; to ensure you receive all future system notifications.
+ 
+
+Enter the verification code into the text box and click &quot;Verify Code.&quot; 
+If the code is not accepted, you may generate a new code by selecting &quot;Send new code.&quot; Another email with a new code will be sent to your inbox.
+After verifying your email address, you&#039;ll be prompted to create a password. Passwords should be at least 12 characters long and include at least one UPPERCASE letter, lowercase letter, a number, and a special character (!@#$%^).
+Once your account has been registered, you may login (using the same link above) by entering the email address and password used during registration.  
+
+If you forget your password, select the link “Forgot your Password?” and follow the prompts to create a new password.  
+Enter the email address that was used to register your account. Then select “Send Verification Code” 
+Within a few seconds, the system will send you an email containing a 6-digit code. Enter the code into the text field and select “Verify Code”
+If after 2 minutes you have not received a code, you may repeat these steps to generate another code. 
+Be sure to check your spam and junk folders before requesting a new code. Sometimes users do not receive the code due to a simple typo when entering their email address. Verify that the email entered is indeed correct. 
+To change your password, log into the Participant Portal.  Select the icon on the top right corner of the screen and select “My Profile”.  Next, select the “Password” option on the left side of the screen.  For security purposes, you will be required to enter your email address, the system will then send you a verification code. Enter the code and follow the prompts to create a new password. 
+
+
+Upon logging in, the participant dashboard will become visible. Any case where funds have been awarded will be listed in the Grant card as shown below.  To load the Grant Viewer, select “View” to load the grant account screen. 
+The Grant Viewer has 6 main sections: Account, Reports, Accomplishments, Draw Requests, Application and Documents.  The Account screen is a summary of your Grant account, including the award amount, the funds disbursed, and the remaining account balance. 
+
+
+The Accomplishments screen provides a summary of Accomplishment data entered via Scheduled Monthly and Annual Reports.  Note that this screen is Read Only – accomplishment data can only be added/modified via the Monthly and Annual reports.  
+
+The Draw Requests allows you to request draws from your remaining account balance.  The initial screen is a summary of any existing draw requests and disbursement data.  To view an existing draw, select the  icon to the right of the draw. To render a PDF of the Draw Voucher, select the  icon. 
+
+
+To create a new draw, select the “Add a Draw” bar.
+The system will default the “Request Date” to today’s date; however you will have the ability to update the date by clicking on the text box and using the date picker to select a new date. 
+Enter a description/summary of the draw. You will have the ability to update the details further on the next page. 
+
+
+Once the draw has been created, you may update the summary and upload documents. In the “Details” portion of the page, you will then enter the funds requested from each of the budget categories listed. Once submitted, the draw request will be forwarded to a Program Administrator for review and approval. The draw will then be in a read-only mode where no further edits/changes can be made. 
+
+You may track the draw request review process by selecting the “Workflow” tab. You may also render a PDF of the Draw Request by selecting the   Icon in the upper right. 
+
+The Reports tab will indicate if any reports are Due or Past Due.  Once you click into the Reports section, you will find all the reports that have been scheduled for your organization. Most often, these will be labeled as Monthly or Quarterly Reports. 
+To start a report, select the three-dot icon to the right of the report, and then select “Start”. Note that Reports are not available to be started/completed until the reporting period has passed.
+
+
+Once inside a report, you will see multiple tabs depending on your grant program.  Usually there are at least 3 tabs – one for reporting Goal progress, one for Accomplishment data and one to certify and Submit the report.  
+Complete each tab by clicking the “Complete and Continue” button at the bottom of the screen.  You may also Save your work to return to the report later.  
+Steps can be reopened by selecting the “Reopen” button at the bottom of the page. The report is not Complete and Submitted until all tabs are individually marked Complete. Once the report has been fully completed and submitted it will no longer be available for any further edits or changes unless reopened by a Program
+
+
+You may be assigned a task by a Program Administrator. Tasks will be displayed on the Portal Dashboard. To open a task, select the  to the right of the task. 
+Once inside the task, view the details and complete the request. You may upload any supporting files by selecting the “Upload File” hyperlink. 
+
+Additionally, if there are follow up questions regarding the task, you may send a message in the task to the Program Administrator who originally assigned the task. Select the Messages Tab, enter a detailed message in the text area, then select the  icon to post the message. You will be notified via email once a response has been posted.  Once the task has been completed, select the “Mark Task Complete” button. 
+If at any point you run into technical difficulties with the software, use the help icon located in the bottom right corner of your screen to contact our Support Team. Support is available Monday – Friday from 8am to 7pm Eastern Time. 
+
+--------------------
+Attached Document: 667985e77c550_4266_2024-Hotel-Tax-signed-Grant-Agreement---CALV-(executed).pdf
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+03 / 01 / 2024
+Dawn Godshall
+02 / 29 / 2024
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+Doc ID: e5cbdbcded8dff7bba6f6710cd0901b975633509
+
+2024 Hotel Tax Grant Agreement - CACLV
+2024 Hotel Tax Gr...ment  - CACLV.pdf
+e5cbdbcded8dff7bba6f6710cd0901b975633509
+MM / DD / YYYY
+Signed
+02 / 20 / 2024
+09:33:12 UTC-5
+Sent for signature to Tina Smith (tsmith@norcopa.gov),
+Michael Corriere (mcorriere@northamptoncounty.org), Dawn
+Godshall (dgodshall@caclv.org) and Lamont McClure
+(rsandt@norcopa.gov) from kcollis@northamptoncounty.org
+IP: 204.186.253.54
+02 / 20 / 2024
+13:34:54 UTC-5
+Viewed by Tina Smith (tsmith@norcopa.gov)
+IP: 204.186.253.54
+02 / 20 / 2024
+13:35:03 UTC-5
+Signed by Tina Smith (tsmith@norcopa.gov)
+IP: 204.186.253.54
+02 / 21 / 2024
+14:22:50 UTC-5
+Viewed by Michael Corriere (mcorriere@northamptoncounty.org)
+IP: 24.229.241.43
+02 / 21 / 2024
+14:23:00 UTC-5
+Signed by Michael Corriere (mcorriere@northamptoncounty.org)
+IP: 24.229.241.43
+
+02 / 21 / 2024
+19:09:25 UTC-5
+Viewed by Dawn Godshall (dgodshall@caclv.org)
+IP: 216.164.139.163
+02 / 29 / 2024
+19:36:25 UTC-5
+Signed by Dawn Godshall (dgodshall@caclv.org)
+IP: 216.164.139.163
+03 / 01 / 2024
+08:54:06 UTC-5
+Viewed by Lamont McClure (rsandt@norcopa.gov)
+IP: 204.186.253.54
+03 / 01 / 2024
+08:54:28 UTC-5
+Signed by Lamont McClure (rsandt@norcopa.gov)
+IP: 204.186.253.54
+The document has been completed.03 / 01 / 2024
+08:54:28 UTC-5
+2024 Hotel Tax Grant Agreement - CACLV
+2024 Hotel Tax Gr...ment  - CACLV.pdf
+e5cbdbcded8dff7bba6f6710cd0901b975633509
+MM / DD / YYYY
+Signed
+--------------------
+Attached Document: 667985eddbf36_4267_2024-Hotel-Tax-Grant-Agreement-Compliance-Checklist.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 667985f3dbb07_4268_2024-Hotel-Tax-Request-for-Payment-Form-FINAL.docx
+Northampton County 2024 Hotel Tax
+Request for Payment Invoice
+For official use only:
+Vendor ID# _________________________
+Date Received _______________________
+Date Payment Requested_______________
+
+--------------------
+Attached Document: 667985fb1a850_4269_Hotel-Tax-Contracting-Requirements.docx
+Contracting Requirements
+COMPETITIVE BID REQUIREMENTS
+Any good or service purchased under the Hotel Tax grant must be done in accordance with your entity&#039;s purchasing requirements or the County&#039;s, whichever is most restrictive.  Northampton County&#039;s thresholds are as follows:
+$1 to $5,000		One quote, verbal or written
+$5,001 to $24,999	Minimum three (3) written quotes. Written documentation must be attached to the transaction, and shall indicate which qualified vendor(s) were contacted, their responses, the date, and other pertinent information besides price, such as delivery, etc. 
+$25,000 and above	Need to be procured utilizing a formally advertised public bid
+Competitive sealed bids must be used to procure goods or services in excess of $25,000 for construction, reconstruction, demolition, alteration and/or repair, for acquisition of machinery and equipment, or for engagement of services of a professional consultant, other than architectural or engineering services.
+Documented costs may include quotes or advertisements (i.e., online cost comparisons).  Remember to keep copies of all quotes/costs in your project record, as this verifies you followed the appropriate procurement method.  Selecting a good or service through the Commonwealth of Pennsylvania&#039;s cooperative purchasing program administered by the Department of General Services (DGS) Bureau of Procurement, the COSTARS Program, is an acceptable alternative to the methods listed above.
+PREPARING FOR COMPETITIVE BIDS
+The first step in most projects is to document the specific work to be done in order to competitively solicit bids from contractors.  On a small project where total construction costs are not expected to exceed $25,000.00, you may only wish to use an existing estimate or specifications to solicit written estimates from contractors.  Most subgrantees work with an architectural, engineering (A/E) or other project management firm to develop a bid package that ensures you select the most qualified contractor while complying with local, state, and federal laws and regulations.  
+Construction projects require specific technical expertise and knowledge of how to comply with state and federal labor requirements.  Those not accustomed to overseeing construction projects are highly encouraged to hire a project manager.    
+ACQUISITION OF ARCHITECTURAL/ENGINEERING SERVICES
+When acquiring A/E services to design your site/project, a Request for Proposals (RFP) or a Request for Qualifications (RFQ) may be used.   Under an RFQ, you may use competitive proposal procedures whereby the competitors’ qualifications are evaluated and the most qualified competitor is selected, subject to negotiation of fair and reasonable compensation.  In these instances, price is not used as a selection factor; once the most-qualified firm is identified, only that firm is asked for a price proposal that is subject to negotiation of a fair and reasonable price. If negotiations with the selected firm are unsuccessful, this process is repeated with the next highest-ranked firm, until a fair and reasonably priced contract can be awarded.  You must document the basis for your determination of the most qualified competitor and the rationality of the contract price. 
+Note the following requirements if your project is federally funded:
+An RFQ may not be used to purchase other services performed by architects and engineers (24 CFR 85.36(d) (3) (v)).  Additional services offered by A/E firms, such as preparation of bid packets, project management or grant writing, must be selected based on lowest cost (using an RFP or other appropriate small purchasing method).
+You cannot award a contract to any person or firm that develops or drafts specifications, requirements, statements of work, invitations for bids, and/or requests for proposals (24 CFR 84.43). 
+Architects or engineers selected by municipalities may be reimbursed through your grant if documentation can be supplied that the firm had been selected using an appropriate procurement methodology within the previous three (3) years of the Start Date of the sub-grant agreement and the contract specifically includes project management activities in the scope of services.  Otherwise, these costs cannot be paid under the grant.
+VENDOR PREFERENCE
+When contracts or subcontracts are expected to exceed $25,000 and are funded in whole or in part by state or federal funds, opportunities must be afforded to businesses and organizations which are eligible for preferential treatment under a variety of laws, Executive Orders, etc. (e.g., the Small Business Act).  Eligible organizations include: small, small disadvantaged, women-owned, historically underutilized business zone (HUBZone), veteran-owned, and service disabled veteran-owned small businesses.  These requirements historically included only Minority Owned or Women Owned Businesses (MBE/WBE).  While certain funding sources (i.e.: HUD) may only ask for reporting on certain classifications of businesses, including all preferred classes in your preferred bidding process will ensure that all newly emerging requirements are met.
+You and any prime contractors are required to advise and provide the maximum realistic opportunity for participation to small and diverse businesses.  For federally funded projects, the target participation levels are 5% for minority owned business enterprises and 3% for women owned business enterprises. 
+Requirements under both state and federally funded projects can be met by accessing the current listing of state-certified Small and Diverse Firms at the following website:  
+Click on the Advanced Search. Choose “Northampton County from the PA Counties section.  Choose the Supplier Classification or check “Select All Classifications”.  Find the appropriate UNSPSC Codes in the available list.  Hit Search.  You will receive names of local MBE &amp; WBE vendors and Small Diverse (SD) vendors for the type(s) of businesses you are soliciting. 
+Repeat for the following Counties:
+	Bucks
+	Carbon
+	Lehigh
+	Monroe
+You must send the bid announcement to any certified business(es) that provide(s) the service or goods you need and is located in the five counties listed above.  You can choose to solicit other classifications (i.e.: Veteran-Owned Businesses) or non-certified businesses; however, non-certified vendors must agree to register with the Commonwealth in order to receive preference in bidding.  
+	Keep evidence, such as a fax cover sheet or a copy of the stamped, addressed envelope, showing you successfully sent the bid announcement to each registered business.
+	If there are no relevant vendors, print the page showing there were no matches and keep this in your records.
+
+--------------------
+Attached Document: 6679860351a00_4270_2024-Hotel-Tax-Invoicing-Requirements-Checklist.docx
+Invoicing Requirements Checklist
+Completed Request for Payment Invoice Form
+Proof of payment for expenditures:
+Copy of cancelled check and/or bank statement depicting the drawdown of funds along with copy of front of check.
+Copies of credit card statements depicting the service/item purchased are acceptable.						
+All expenditures must be incurred between January 1, 2024 and December 31, 2024. Prior or post-award expenses are ineligible.
+Sales Tax is an ineligible use of grant funds.
+Please keep copies of receipts, invoices, contracts, and other grant-related documentation. 
+If yours is a marketing project, copies of advisements, press release(s), and samples of media distributed must be included with the final report to the County.
+Northampton County Hotel Tax Grant program, as per Section 38. A. of your grant agreement, along with the County seal, must be acknowledged in all publications and signage.
+If your project cannot be completed within the reporting timeframe, the grantee must notify Northampton County Department of Community &amp; Economic Development in writing, at least 60 days prior to expiration of the grant agreement. 
+Additional Requirements for Construction/Capital Improvement Projects 
+Copy(ies) of bid packets.
+Wage determinations printed 10 days or less from bid opening.
+Proof of publication for RFP.
+Copy of award information for successful bidder (bid tabulation, minutes and M/WBE)
+Copy of pre-construction conference(s) minutes/notes.
+Copy(ies) of permits, i.e. building, electrical, plumbing.
+Copy(ies) of executed (signed) contracts between grantee and contractor(s)/subcontractor(s).
+Copies of Certificate of Insurance naming grantee as additionally insured for all contractors/subcontractors
+Copies of weekly payroll certificates for each contractor/subcontractor. Payroll weeks where no activity occurs must be submitted and indicated as such “No work performed”. 
+Copy of Final Inspection/Certificate of Occupancy.
+Invoices may be submitted as costs are incurred (within reason).  The above required documentation shall be submitted with formal invoicing form. 
+Request for Payments that do not contain the above documentation will not be eligible for reimbursement of funds.
+Municipalities must follow procurement policies as per their municipal code.
+
+--------------------
+Attached Document: 6679860b5d2a4_4271_2024-Hotel-Tax-Interim-Final-Reporting-Form-FINAL.docx
+      
+			             Northampton County
+		                 2024 Hotel Tax Interim/Final     
+            	            Performance &amp; Fiscal Status Report	           
+
+--------------------
+Attached Document: 667986111333c_4273_In-Kind-Goods-Form.pdf
+Northampton County Department of Community & Economic Development 
+In-Kind Contribution Form 
+Goods or Facilities 
+ 
+Grantee Organization:  _______________________________________________________________________________ 
+Agreement ID #:  ____________________________________________________________________________________ 
+Project Title:  _______________________________________________________________________________________ 
+Chief Official: _________________________________________ Email: ________________________________________ 
+Contact Person:  ______________________________________ Email: ________________________________________ 
+ 
+Donor Data 
+ 
+Donor’s Name 	Phone # Description of Goods or 
+Facilities Donated 
+Date Provided  
+or Used 
+Fair Market 
+Value 
+   
+   
+   
+   
+   
+   
+   
+   
+  	Total Fair Market Value 
+ 
+ 
+For third-party in-kind contributions of goods or facilities, fair market value of goods/use must be 
+documented. 
+In-kind volunteer service hourly wage shall be $20.00 per hour for Tier 1 event assistance volunteer services 
+provided and $40.00 per hour for Tier 2 professional/specialty services provided to the entity as donation.  
+Additional In-kind Contribution forms and instructions are available at:  http://www.northamptoncounty.org 
+ 
+We certify that the goods/facilities listed above were provided on the specified date(s) as a donation to the listed event. 
+ 
+                                	___________________________________ 
+ 	Signature of Authorized Individual
+--------------------
+Attached Document: 667986167a0c3_4274_In-Kind-Volunteer-Form.pdf
+Northampton County Department of Community & Economic Development 
+In-Kind Contribution Form 
+Volunteer Services 
+ 
+Grantee Organization:  _______________________________________________________________________________ 
+Agreement ID #:  ____________________________________________________________________________________ 
+Project Title:  _______________________________________________________________________________________ 
+Chief Official: _________________________________________ Email: ________________________________________ 
+Contact Person: ______________________________________ Email: ________________________________________ 
+ 
+Volunteer Data 
+ 
+Volunteer’s Name Phone # Date of 
+Service 
+Total 
+Hours 
+Worked 
+Location of 
+Service 
+Service Performed Value of 
+Service 
+    
+    
+    
+    
+    
+    
+    
+    
+  	Total Value of Service 
+ 
+ 
+Rates for volunteer services shall be based on the following criteria: 
+In-kind service hourly wage used to calculate the value of the in-kind service credit towards grantee’s 
+matching grant contribution shall be $20.00 per hour for Tier 1 event assistance volunteer services provided 
+and $40.00 per hour for Tier 2 professional/specialty services provided to the entity as donation.  For third-
+party in-kind contributions of goods, fair market value of goods must be documented.  Additional 	In-kind 
+Contribution forms and form instructions are available at:  http://www.northamptoncounty.org
+ 
+ 
+We certify that the volunteers listed above performed the volunteer services(s) on the specified date(s) and times. 
+ 
+                                	___________________________________ 
+ 	Signature of Authorized Individual
+--------------------
+Attached Document: 67a252369d590_2024SBR_NCHotel-Tax_-Slate-Belt-Public-Art-Trail-executed-amendment.pdf
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+01 / 23 / 2025
+Dawn Godshall
+Executive Director
+01 / 23 / 2025
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+Doc ID: 953b2783302d9a3d9785d2193313edbbef5fa73f
+
+2024 Hotel Tax Grant Amendment - Community Action Committee...
+2024_Hotel_Tax_Am...lic_Art_Trail.pdf
+953b2783302d9a3d9785d2193313edbbef5fa73f
+MM / DD / YYYY
+Signed
+01 / 16 / 2025
+15:20:21 UTC-5
+Sent for signature to Michael Corriere
+(mcorriere@norcopa.gov), Marek Tomanek
+(mtomanek@norcopa.gov), Dawn Godshall (dgodshall@caclv.org)
+and Tina Smith (tsmith@norcopa.gov) from
+kcollis@northamptoncounty.org
+IP: 204.186.253.54
+01 / 21 / 2025
+11:08:39 UTC-5
+Viewed by Michael Corriere (mcorriere@norcopa.gov)
+IP: 204.186.253.54
+01 / 21 / 2025
+11:08:53 UTC-5
+Signed by Michael Corriere (mcorriere@norcopa.gov)
+IP: 204.186.253.54
+01 / 21 / 2025
+11:17:13 UTC-5
+Viewed by Marek Tomanek (mtomanek@norcopa.gov)
+IP: 204.186.253.54
+01 / 21 / 2025
+11:17:25 UTC-5
+Signed by Marek Tomanek (mtomanek@norcopa.gov)
+IP: 204.186.253.54
+
+01 / 22 / 2025
+21:48:04 UTC-5
+Viewed by Dawn Godshall (dgodshall@caclv.org)
+IP: 216.164.139.163
+01 / 23 / 2025
+14:55:42 UTC-5
+Signed by Dawn Godshall (dgodshall@caclv.org)
+IP: 209.173.10.242
+01 / 23 / 2025
+15:14:05 UTC-5
+Viewed by Tina Smith (tsmith@norcopa.gov)
+IP: 204.186.253.54
+01 / 23 / 2025
+15:15:06 UTC-5
+Signed by Tina Smith (tsmith@norcopa.gov)
+IP: 204.186.253.54
+The document has been completed.01 / 23 / 2025
+15:15:06 UTC-5
+2024 Hotel Tax Grant Amendment - Community Action Committee...
+2024_Hotel_Tax_Am...lic_Art_Trail.pdf
+953b2783302d9a3d9785d2193313edbbef5fa73f
+MM / DD / YYYY
+Signed
+--------------------
+Attached Document: 67a2525f5b73f_Updated-2024-Compliance-Checklist---CACLV.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

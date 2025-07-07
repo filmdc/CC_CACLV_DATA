@@ -1,0 +1,47 @@
+Purpose: <p>The Pennsylvania Local Food Purchase Assistance Cooperative Agreement Program (PA-LFPA) will work with Pennsylvania’s local food system to procure top-graded, high-quality products for distribution through the charitable food system serving all 67 of Pennsylvania’s counties. PDA will distribute food products produced in-state with a goal of reaching at least 1 million low-income households by working with at least 40 farms, producers, and food companies, including at least 10 vendors which identify as underserved and at least 10 direct-to-agency delivery partnerships.</p>
+Funder: Feeding PA
+Program: SHFB
+Amount: 0.00
+Start Date: 2023-07-27
+End Date: 2025-12-31
+
+Notes: <p>-All purchases must be made or committed to by <strong>July 31, 2025.</strong></p><p>-Final invoices to be submitted on or before <strong>August 10, 2025</strong></p><p>-All services must be complete by <strong>November 1, 2025</strong></p><p>Reports due to tmainzer@feedingpa.org by the 10th calendar day of the following month until program completion.&nbsp;</p><p>Reports should include:</p><ul><li>Expense and Reimbursement Reports in Microsoft Excel Format</li><li>Product Info (including source, types, unit cost)</li><li>Pounds of food distributed</li><li>Address and manner of distribution</li><li>Number of households served</li></ul><p>SHFB must also obtain written testimonials and feedback from member agencies, clients and agriculture partners.</p>
+
+Fund Number: 4701
+
+Attached Document: 651ed1092698c_SHFB-Lehigh_Monthly-Status-23-24.xlsx
+														
+	USDA Local Food Purchase Assistance Cooperative Program (LFPA/LFPA+)													
+														
+	Second Harvest - Lehigh Valley & NEPA						Contacts:							
+	6969 Silver Crest Road						Bradley Holub							
+	Nazareth, PA 18064						David Pulsifer							
+														
+							Monthly Reporting					Monthly Reporting		
+		Distribution					Purchases	Distributions	Percentage			Purchases	Distributions	Percentage
+		23/24	24/25			22/23 Rollover	$669,308.19				22/23 Allocation	$735,378.19		
+	Carbon 					23/24 Allocation	$726,864.74				Aug-22	-	-	0.00%
+	Lehigh					Aug-23			#DIV/0!		Sep-22	-	-	0.00%
+	Monroe 					Sep-23			#DIV/0!		Oct-22	-	-	0.00%
+	Northampton					Oct-23			#DIV/0!		Nov-22	-	-	0.00%
+	Pike 					Nov-23			#DIV/0!		Dec-22	-	-	0.00%
+	Wayne					Dec-23			#DIV/0!		Jan-23	-	-	0.00%
+						Jan-24			#DIV/0!		Feb-23	$5,400.00	$5,223.00	96.72%
+						Feb-24			#DIV/0!		Mar-23	$24,150.00	$22,739.80	94.16%
+						Mar-24			#DIV/0!		Apr-23	-	-	0.00%
+						Apr-24			#DIV/0!		May-23	-	-	0.00%
+						May-24			#DIV/0!		Jun-23	$1,080.00	$1,080.00	100.00%
+						Jun-24			#DIV/0!		Jul-23	$35,440.00	$21,024.75	59.32%
+						Jul-24			#DIV/0!		22/23 Totals	$66,070.00	$50,067.55	75.78%
+						23/24 Totals	$0.00	$0.00	#DIV/0!		Rollover to 23/24	$669,308.19		
+						Balance Remaining	$1,396,172.93							
+														
+	LFPA Group Purchase Orders													
+	Vendor	Date	Cost	Product	Notes									
+
+--------------------
+Attached Document: 6711463d6e0a9_SHFB-Lehigh_LFPA-MOU-23-24.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

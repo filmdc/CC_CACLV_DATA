@@ -1,0 +1,599 @@
+Purpose: <figure class="image"><img src="http://10.55.0.10/storage/656/image.png"></figure>
+Funder: UGI_LUIRP
+Program: WX
+Amount: 
+Start Date: 2020-01-01
+End Date: 
+
+Notes: <p>-Reimbursable grant</p>
+
+Fund Number: 7820
+
+Attached Document: 65aabd1f53e49_UGI-Assistance-Programs---2024-FPL-Guidelines.pdf
+Household Size 150% Fed Pov 200% Fed Pov 250% Fed Pov
+CAP LIURP
+Operation 
+Share
+A 1 $22,590 $30,120 $37,650
+N 2 $30,660 $40,880 $51,100
+N 3 $38,730 $51,640 $64,550
+U 4 $46,800 $62,400 $78,000
+A 5 $54,870 $73,160 $91,450
+L 6 $62,940 $83,920 $104,900
+7 $71,010 $94,680 $118,350
+8 $79,080 $105,440 $131,800
+each add'l $8,070 $10,760 $13,450
+M 1 $1,883 $2,510 $3,138
+O 2 $2,555 $3,407 $4,258
+N 3 $3,228 $4,303 $5,379
+T 4 $3,900 $5,200 $6,500
+H 5 $4,573 $6,097 $7,621
+L 6 $5,245 $6,993 $8,742
+Y 7 $5,918 $7,890 $9,863
+8 $6,590 $8,787 $10,983
+each add'l $673 $897 $1,121
+W 1	$434	$579 $724
+E 2	$590	$786 $983
+E 3	$745	$993 $1,241
+K 4	$900 $1,200 $1,500
+L 5	$1,055 $1,407 $1,759
+Y 6	$1,210 $1,614 $2,017
+7	$1,366 $1,821 $2,276
+8	$1,521 $2,028 $2,535
+each add'l $155	$207 $259
+2024 Federal Poverty Guidelines Percentages
+--------------------
+Attached Document: 65aabd271ce33_Energy-Justice-Advocates_LIURP-Comments_01162024.pdf
+412Justice
+AgencyforCommunityEmPOWERmentofNEPA
+AudubonMid-Atlantic
+CASA/CASAinAction
+CentralPennsylvaniaCommunityAction,Inc.
+CleanAirCouncil
+CommissiononEconomicOpportunity
+CommunityAction,Inc.
+CommunityActionAssociationofPennsylvania
+CommunityActionLehighValley
+CommunityJusticeProject
+CommunityProgressCouncil
+EvergreenAction
+GreenBeams
+HousingAllianceofPennsylvania
+IndianaCo.CommunityActionProgramInc.
+KeystoneEnergyEfficiencyAlliance
+LebanonCountyCommunityActionPartnership
+MobilifySouthwesternPennsylvania
+NationalHousingTrust
+NaturalResourcesDefenseCouncil
+NorthernTierCommunityAction
+NorthHillsCommunityOutreach
+OnePA
+PAJewishEarthAlliance
+PennFuture
+PennsylvaniaInterfaithPower&Light
+PennsylvaniaSolarCenter
+PennsylvaniaUtilityLawProject
+PhiladelphiaSolarEnergyAssociation
+PhysiciansforSocialResponsibilityPennsylvania
+POWERInterfaith
+SchuylkillCommunityAction
+SierraClubPennsylvaniaChapter
+St.Paul'sUnitedMethodistChurch-WorkingforJusticeMinistry
+SustainablePittsburgh
+VoteSolar
+January16,2024
+VIAeFILE
+RosemaryChiavetta,Secretary
+PennsylvaniaPublicUtilityCommission
+CommonwealthKeystoneBuilding
+400NorthStreet
+Harrisburg,PA17120
+Re:CommentsontheProposedAmendmentstoCurrentRegulationsforthe
+Low-IncomeUsageReductionProgram(LIURP),DocketNo.L-2016-2557886
+
+JointLIURPComments,EnergyJusticeAdvocates
+DearSecretaryChiavetta:
+Theundersignedenvironmentaljustice,consumer,environmental,business,andfaith-based
+organizations(collectivelyherein,EnergyJusticeAdvocates)submitthefollowingjoint
+commentsandrecommendationsregardingthePennsylvaniaPublicUtilityCommission’s
+(hereinCommissionorPUC)ProposedRulemakingtoReviewandRevisetheExisting
+Low-IncomeUsageReductionProgram(LIURP)Regulationsat52Pa.Code§§58.1–58.18.
+LIURPisafundamentaluniversalserviceprogramthatplaysacriticalroleinaddressingenergy
+insecurityforlowincomePennsylvanians.Throughtheinstallationofcomprehensiveenergy
+efficiency,conservation,andweatherizationmeasures,theprogramhelpstoreducedisparitiesin
+energyburdensforlowincomefamiliesoverthelongterm.Effectiveandefficientdeliveryof
+LIURPservicesprovidesamultitudeofbenefitsforPennsylvaniafamiliesandcommunities,
+includingimprovedhealth,safety,andhomecomfort;reducedinvoluntaryterminationrates;
+reducedcollectionscosts;reduceduniversalserviceprogramcosts;andreducedenergydemand. 
+TheCommissionmustensureLIURPisappropriatelyfundedandaccessibletoPennsylvania’s
+economicallyvulnerablehouseholds.Thisisnotonlysoundpublicpolicy,itisalsoastatutory
+mandate.
+1
+Tohelpfulfillthisoverarchinggoal,theundersignedorganizationsofferthefollowing
+recommendationstoimproveLIURPservicesforPennsylvania’slowincomefamilies.
+ProgramFunding(Section58.4)
+TheCommissionproposessubstantialamendmentstosection58.4regardingthereviewand
+approvalofautility’sLIURPbudget.
+TheEnergyJusticeAdvocatesaresupportiveoftheCommission’sproposalinsubsection(d.1)to
+requireunspentLIURPfundstorollforwardintothefollowingprogramyear.However,we
+recommendtheCommissionfurtheramendtheproposedlanguagetoclarifythatsuchfunds
+shouldbeaddedtotheoverallavailablefundingforthesubsequentyear.Withoutthis
+clarification,weareconcernedunspentfundscouldbeusedtosupplantaportionoftheLIURP
+budgetforthefollowingyear.
+1
+66Pa.C.S.§§2802-04;2202-03.
+2
+
+JointLIURPComments,EnergyJusticeAdvocates
+WearealsodeeplyconcernedwiththeCommission’sproposalinsubsections(a.1)and(c)to
+relegateLIURPfundingdeterminationstoquinquennialUniversalService&Energy
+ConservationPlan(USECP)proceedings.TheCommissionshouldnottieitsownhandsinits
+abilitytoinvestigatetheadequacyofprogramservices.USECPproceedingsare"commentonly"
+policyproceedings,whichoccureveryfiveyears.Commentproceedingsdonotprovidean
+opportunitytoinvestigateautility’sproposedneedsassessmentorbudget,andarenotalone
+sufficienttoassesstheadequacyofautility’sLIURPservicestomeettheneedsofPennsylvania
+families.Intheinterveningyears,autility’sratescouldincreasedramatically-alongwiththe
+correspondingneedforcomprehensiveenergyreductionservices.IftheCommissionapprovesa
+rateincreasewithoutassessingthenecessityofacorrespondingincreaseinthebudgetfor
+universalserviceandenergyconservationprograms,itcouldeffectivelyerodetheavailability
+andeffectivenessofLIURPservices.
+TheCommissionischargedwiththeoversightofutility-administereduniversalserviceand
+energyconservationprograms,includingLIURP,
+2
+andshouldnotadoptregulatoryrestrictions
+thatundermineitsownabilitytoinvestigateandassesstheadequacyofLIURPservicesinthe
+contextofabaserateproceeding,wheretheCommissiondeterminesthejustnessand
+reasonablenessofapublicutility’srates,termsandconditions,policies,andservices.
+TheEnergyJusticeAdvocatesarefurtherconcernedthattheCommissionproposesinsection
+(c)(8)toeliminatetherequirementthatautilitydevelopa“planforprovidingprogramservices
+toeligiblecustomerswithinareasonableperiodoftime.”TheCommissionproposestostrike
+thisreasonablenessrequirement,insteadrequiringonlythatutilitiesproposeageneraltimeline
+forservicedelivery.TheCommissionshouldrestorethisexplicitreasonablenessrequirementto
+ensurecomprehensiveenergyreductionservicesarereasonablyaccessibletoallthoseinneed.
+Finally,wenoteoursupportfortheCommission’sproposalinsection(a.2)toallowupto25%of
+autility’sLIURPbudgettosupportservicesto“specialneeds”customerswithincomebetween
+151-200%ofthefederalpovertyguidelines.Specialneedshouseholdsatthisincomelevelare
+oftenineligibleforotherassistanceprograms,regardlessofrelativeenergyburden.Atthesame
+time,theCommissionmustensurethatthisexpansiondoesnoterodetheavailabilityofservices
+tohouseholdsatlowerincomelevels.ItisimportantthattheCommissionensureutilitiesare
+2
+66Pa.C.S.§2804(9).
+3
+
+JointLIURPComments,EnergyJusticeAdvocates
+accuratelyassessingthescopeofneedatalleligibleincomelevelstodetermineappropriate
+fundinglevels.
+Recommendations:
+●Strikeproposedsections58.4(a.1)and(c),andrevisetheproposeddefinitionof“LIURP
+budget”toeliminaterestrictionsonthereviewofLIURPfundingdeterminations.
+●Restoretherequirementinsection58.4(c)(8)thatutilitiesdevelopaplanforproviding
+servicestoalleligiblecustomerswithinareasonabletime.
+●Amendproposedsection58.4(d.1)toclarifythatunspentfundsmustbeaddedtothe
+utility’sapprovedLIURPbudgetforthefollowingyear.
+FuelSwitching(Section58.11a)
+Fuelswitchingisavaluabletoolforhouseholdslookingtoswitchtheirsourceofenergyinfavor
+ofacleaner,morecost-effectiveoption.Theproposedlanguageinsection58.11a.outlinesnew
+guidanceforpublicutilitycompaniestomakefuelswitchingcostsforLIURPrecipientscovered
+byLIURPfunding.
+3
+Whilethisnewlanguageeliminatespay-backandmakesfuelswitching
+easierforsomelowincomecustomers,thoseservedbytwoseparatepublicutilitycompanies
+mustreceivebothcompanies’approvalfortheprocesstomoveforward.Choiceofhomeenergy
+fuelsourcesshouldbedrivenbyanassessmentofoverallhouseholdenergyburdenanddecided
+bythecustomer,notbycompanypreference.
+Recommendations:
+●LIURPfundsshouldbeauthorizedtosupportfuel-blindfuelswitchingwhenthenew
+sourcewouldresultinthelowestprojectedoverallannualhomeenergyburden,including
+winterheatingandsummercoolingcosts,withoutrequiringpermissionfromtheother
+utilityorfuelvendor.
+3
+NOPRAnnexat14.
+4
+
+JointLIURPComments,EnergyJusticeAdvocates
+Cooling(Sections58.3,58.11a)
+Pennsylvania’sincreasinglyhotsummersarecausingcoolingcoststomakeupagreater
+percentageofhomeenergyexpenses.TheCommissionmustadaptitsproposedlanguageto
+reflectthecoolingneedsoflowincomefamilies.
+Recommendations:
+●Amendthedefinitionof“ResidentialSpace-HeatingCustomer”insection58.3toalso
+includespacecoolingcustomerstoallowmorein-depthweatherizationservices,
+inclusiveofbuildingshellmeasures,tobeprovidedtoreducecoolingcosts.
+●Considertotalhomeenergycosts-includingsummercoolingcosts-intheassessment
+forfuelswitchingandaddlanguageprioritizingefficientcoolingmeasuresthroughoutthe
+regulation.
+StakeholderEngagement(Section58.6)
+Currentlanguagedirectspublicutilitiestoconsult“withpersonsandentitieswithexperiencein
+thedesignoradministrationofusagereduction[programs].”
+4
+Proposedlanguagefurtherclarifies
+thattheseconsultations“maytypicallybewithaUSAC,LIURPadvisorycommittee,past
+recipientsofweatherizationservices,socialserviceagencies,andcommunitygroups.”
+5
+Mostof
+thepartieslistedareunchangedfromtheoriginallanguage.Whilethesmalladditionof“may
+typicallybewith”islikelyintendedtoincludemorestakeholderswithspecificenergyefficiency
+andweatherizationexpertise,itmakesconsultationwithadvisorygroupspermissiveratherthan
+required.
+Recommendation:Furtheramendproposedregulatorylanguagetospecificallyrequire
+consultationwithautility’suniversalserviceandLIURPadvisorygroups,ratherthanmakingthe
+consultationpermissive.
+CoordinationandServiceDelivery(Sections58.7,58.11,58.14,58.16)
+TherewereanumberofeditsandadditionsmadethroughouttheAnnexrelatedtocoordination.
+TheEnergyJusticeAdvocatesagreewiththeCommission’sstrongerproposedlanguage
+5
+Id.
+4
+NOPRAnnexat9.
+5
+
+JointLIURPComments,EnergyJusticeAdvocates
+generallyincludingmorecoordinationwithcommunitygroups,
+6
+aswellasthelanguage
+requiringpublicutilitycompaniestocoordinatetheirLIURPserviceswithsimilarenergy
+efficiencyprogramsandotherservicesavailableinthecommunityandtoprovidedirect
+assistancetoLIURPparticipantstoenrollintheseprograms.
+7
+However,theproposedlanguagethroughoutmuchoftheAnnexalsodeletescurrentlanguage
+thatismoreinclusiveofrequiredinvolvementbyCommunity-BasedOrganizations(CBOs)in
+favorofEnergyServiceProviders(ESP)alone.
+8
+Asdefinedinproposedlanguage,CBOsare
+consideredasubsetofESPs.
+9
+AnESPcouldbealargeentityunknowntothecommunitieswhere
+LIURPservicesarebeingprovided,whileCBOsarelocalandtrustedbythecommunitiesthey
+serve.InordertomeaningfullyprovidecomprehensiveLIURPservicestoreachasmany
+familiesaspossible,trustedcommunitypartnersarekeyandoughttobeprioritized.
+TheCommission’sproposedamendmentsinsection58.11wouldalsorequireseparateESPsto
+performauditsandtoinstallmeasures.
+10
+Whiletheproposedlanguageiswell-intentionedto
+preventfinancialincentive,wefearthattherequirementforseparateESPstoperformthesetwo
+inter-relatedfunctionscoulddelayprojects,beaninefficientuseofLIURPdollarsandcontractor
+time,anderodecommunitytrustwithmultiplecontractorsenteringahomeforasingleprogram.
+Insteadofbifurcatingtheauditandinstallationprocess,wesubmitthattheCommissionshould
+insteadadoptregulatorylanguagethatstrengthensthepreferencefornonprofitCBOservice
+providersandimprovespost-installationinspectionproceduresandqualitycontroland
+compliancemonitoring.Theseamendmentswouldhelptostrengthenandstreamline
+coordinationofservicedelivery.
+Recommendations:
+●Developadditionaldetailedrulesrequiringutilitiestocoordinateservicedeliverywith
+programssimilartoLIURP,includingbutnotlimitedto:
+○EstablishguidelinesforutilitiestobraidLIURPresourcestoeffectivelyleverage
+otherlocal,state,andfederalefficiencydollars.
+10
+NOPRAnnexat14.
+9
+NOPRAnnexat21.
+8
+NOPRAnnexat13,14,19,20,21,and23.
+7
+NOPRAnnexat10.
+6
+NOPRAnnexat23and24.
+6
+
+JointLIURPComments,EnergyJusticeAdvocates
+○Establishrulesgoverninginter-andintra-programdatasharingandstreamlined
+enrollment.
+○Encourageutilitiestointegratecompatibleadministrativesystems,applications,
+anddatatrackingtoolsthatlocalcontractorscanutilizeacrossprograms.
+●RequireutilitiestoincludeWeatherizationAssistanceProgramprovidersonadvisory
+panelstoincreaseopportunitiesforeffectivecoordination.
+●RequireutilitiestoprioritizetheuseofCBOstodeliverLIURPservices.
+●StriketheproposedprohibitiononusingthesameESPtoconductanenergyauditand
+installprogrammeasuresidentifiedinthecompletedaudit.
+●Standardizeandstrengthenpost-installationinspectionproceduresandqualitycontrol
+andcompliancemonitoring.
+Eligibility(Section58.8)
+Currentregulatorylanguagestatesthatlandlordscannotevicttenantsorraiserentsforatleast12
+monthsafterLIURPmeasuresareinstalled.TheCommission’sproposedlanguagemakesthis
+protectionoptionalratherthanrequired.
+11
+Whilewell-intentionedtoimprovelandlordapprovalrates,weareconcernedthatthisproposal
+willservetoerodetenantprotections-increasingtheriskthatlandlordswilltakeadvantageof
+theprogramtoincreaserentpotentialand,inturn,eliminateaffordablehousingoptions.The
+currentlanguagedoesnotprohibitlandlordsfromevictingatenantorraisingrentforreasons
+unrelatedtothereceiptofLIURPservices.Thisfactiscommonlymisunderstood-leading
+landlordstorejecttheprogramoutofhand,withoutinvestigatingtherelativebenefits.
+Therearebetteroptionstoimprovelandlordparticipationwithouterodingcriticallyimportant
+tenantprotections.Indeed,therearesomecomplicatedandlengthylandlordagreementforms
+currentlyinusethatwoulddetereventhemostcompassionatelandlordfromagreeingtohave
+LIURPservicesinstalled.WeencouragetheCommissiontodevelopstandardizedpoliciesand
+proceduresforlandlordapprovalthatwillimprovelandlordparticipation,whilemaintaining
+protectionfromevictionorincreasedrentsasaresultofefficiencyandweatherizationmeasures
+installedthroughtheprogram.
+11
+NOPRAnnexat10.
+7
+
+JointLIURPComments,EnergyJusticeAdvocates
+Recommendation:
+●Restoretenantprotectionsthatpreventlandlordsfromraisingrentorevictingatenantas
+aresultoftheupgradestotheproperty.
+●Createastandardized,simplifiedlandlordagreementformthatclearlystatesbothtenant
+andlandlordprotectionsforLIURPrecipients.
+●RequireutilitiestoincludelandlordandtenantoutreachandeducationintheirUniversal
+ServiceandEnergyConservationPlans.
+●Requireutilitiestotrackandpubliclyreportonlandlordrefusals.
+Prioritization(Sections58.10,58.12)
+Proposedlanguageprioritizesservicesforhighusagelowincomecustomersandprovidesan
+expandeddefinitionofspecialneedscustomers.
+12
+Laterproposedlanguageincludesexplicit,
+strongerhealthandsafetyanddeferralnoticelanguage.
+13
+Webelievethattheseareexcellent
+additionsandamendmentstothecurrentlanguage,andwillhelptoensuretheprogramreaches
+familiesmostinneed.Below,welistafewadditionalrecommendationstofurtherstrengthenand
+clarifysomeoftheproposedlanguage.
+Recommendations:
+●Section58.10-Addprioritizationforservicesthatcanbecoordinatedwithother
+programstoleveragetheoverallresourcesinvestedineachhome.
+●Section58.12-AddaminimumrequirementforLIURPhealthandsafetybudgetsofno
+lessthan$2,000perhome,withflexibilitytoapproveadditionalspendingasnecessaryto
+ensureinstallationofavailableefficiency,weatherization,andusagereductionmeasures.
+○Requirepublicutilitycompaniestoactivelyrefercustomerstolocalhomerepair
+contractors,socialandhousingserviceproviders,and/orotherrelevantprograms
+thatcouldaddressissuescausingthehometobedeferred.
+13
+NOPRAnnexat15.
+12
+NOPRAnnexat12and13.
+8
+
+JointLIURPComments,EnergyJusticeAdvocates
+Conclusion
+Theundersignedorganizationsbelievethattheaboverecommendationswillhelptoimprove
+LIURP’sreachandcomprehensiveimpactonPennsylvania’slowincomehouseholds.Weare
+gratefulfortheopportunitytoprovideinputtotheCommissiononthiscriticalpolicyandlook
+forwardtothepublicationofthefinalrule.
+Sincerely,
+AngelGober,ExecutiveDirector
+412Justice
+JimWansacz,ExecutiveDirector
+AgencyforCommunityEmPOWERment ofNEPA
+JimBrown,PolicyDirector
+AudubonMid-Atlantic
+DanielAlvalle,PennsylvaniaStateDirector
+CASA/CASAinAction
+MichelleStiner,ExecutiveDirector
+CentralPennsylvaniaCommunityAction,Inc.
+MattWalker,AdvocacyDirector
+CleanAirCouncil
+JenniferWarabak,ExecutiveDirector
+CommissiononEconomicOpportunity
+RobertA.Cardamone,ExecutiveDirector
+CommunityAction,Inc.
+BeckMoore,CEO
+CommunityActionAssociationofPennsylvania
+JessicaReimert,DeputyExecutiveDirectorofOperations
+CommunityActionLehighValley
+9
+
+JointLIURPComments,EnergyJusticeAdvocates
+MarielleMacher,ExecutiveDirector
+CommunityJusticeProject
+RobinRohrbaugh,CEO
+CommunityProgressCouncil
+JuliaKortrey,DeputyStatePolicyDirector
+EvergreenAction
+AmyCornelius,Partner,SustainabilityConsultant
+GreenBeams
+PhyllisChamberlain,ExecutiveDirector
+HousingAllianceofPennsylvania
+MichelleFaught,ExecutiveDirector
+IndianaCo.CommunityActionProgramInc.
+JeaneenZappa,ExecutiveDirector
+KeystoneEnergyEfficiencyAlliance
+ChristineHartman,AgencyAdministrator
+LebanonCountyCommunityActionPartnership
+ChrisSandvig,ExecutiveDirector
+MobilifySouthwesternPennsylvania
+RaymondNevo,StatePolicyandEquityManager
+NationalHousingTrust
+DavidGreene,ExecutiveDirector
+NorthernTierCommunityAction
+JacqlynBoggs,ActingExecutiveDirector/DirectorofProgramsandServices
+NorthHillsCommunityOutreach
+RobertRouth,PennsylvaniaCleanEnergyStateLead
+NaturalResourcesDefenseCouncil
+10
+
+JointLIURPComments,EnergyJusticeAdvocates
+KyleTurley,PoliticalDirector
+OnePA
+PhyllisBlumberg,LeadOrganizer
+PAJewishEarthAlliance
+AbigailJones,VPofLegal&Policy
+PennFuture
+KatieRuth,ExecutiveDirector
+PennsylvaniaInterfaithPower&Light
+SharonPillar,FounderandExecutiveDirector
+PennsylvaniaSolarCenter
+ElizabethMarx,ExecutiveDirector
+PennsylvaniaUtilityLawProject
+LizRobinson,ExecutiveDirector
+PhiladelphiaSolarEnergyAssociation
+LinneaBond,EnvironmentandHealthEducationDirector
+PhysiciansforSocialResponsibilityPennsylvania
+PamelaDarville,Co-Chairperson,ClimateJusticeandJobsTeam
+POWERInterfaith
+DavidYoung,ExecutiveDirector
+SchuylkillCommunityAction
+ThomasSchuster,Director
+SierraClubPennsylvaniaChapter
+MichaelDiMonte,Convener
+St.Paul'sUnitedMethodistChurch-WorkingforJusticeMinistry
+JoylettePortlock,ExecutiveDirector
+SustainablePittsburgh
+11
+
+JointLIURPComments,EnergyJusticeAdvocates
+ElowynCorby,Mid-AtlanticRegionalDirector
+VoteSolar
+12
+--------------------
+Attached Document: 65aabd2ec6f73_efile_confirmation_LIURPCmts_EnergyJusticeAdvocates.pdf
+Commonwealth of Pennsylvania
+Pennsylvania Public Utility Commission
+Harrisburg, PA 17105-3265
+EFILING - 	FILING DETAIL
+Date Created	Filing Number
+1/16/2024	2515397
+Your filing has been electronically received. Upon review of the filing for conformity with the Commission's filing 
+requirements, a notice will be issued acknowledging acceptance or rejection (with reason) of the filing. The matter will 
+receive the attention of the Commission and you will be advised if any further action is required on your part.
+The date filed on will be the current day if the filing occurs on a business day before or at 4:30 p.m. (EST). It will be the 
+next business day if the filing occurs after 4:30 p.m. (EST) or on weekends or holidays.
+Docket Number: 	L-2016-2557886
+Case Description: 	LIURP Notice of Proposed Rulemaking
+Transmission Date: 	1/16/2024 3:57 PM
+Filed On: 	1/16/2024 3:57 PM
+eFiling Confirmation Number: 	2515397
+File Name	Document Type	Upload Date
+Energy Justice 
+Advocates_LIURP 
+Comments_01162024.pdf
+Comments	1/16/2024 3:57:13 PM
+For filings exceeding 250 pages, the PUC is requiring that filers submit one paper copy to the Secretary's Bureau within 
+three business days of submitting the electronic filing online.  Please mail the paper copy along with copy of this 
+confirmation page to Secretary, Pennsylvania Public Utility Commission, 400 North Street, Harrisburg PA 17120 a copy of 
+the filing confirmation page or reference the filing confirmation number on the first page of the paper copy.
+No paper submission is necessary for filings under 250 pages.
+You can view a record of this filing and previous filings you have submitted to the PUC by using the links in the Filings 
+menu at the top of the page. Filings that have been submitted within the last 30 days can be viewed by using the Recent 
+Filings link. Older filings can be viewed by using the search options available in the Filing History link.
+1/16/2024 3:58:06 PM	Page  1 of  1
+--------------------
+Attached Document: 65aabd3854d4c_COMMUNITY-ACTION-COMMITTEE-OF-LEHIGH_WA_LIURP-SOUTH_01.01.2024.pdf
+FORM OF WORK AUTHORIZATION 
+ 
+Contractor: Community Action 
+Committee of Lehigh 
+Phone : 484-893-1722 Date: 1/01/2024 
+Service Area Region:  UGI Utilities South State: PA    
+ 
+Reference is made to the Master Agreement for LIURP Services, dated as of January 1, 2020 
+(the “Agreement”) by and between UGI Utilities, Inc. (“Company”) and Community Action Committee of 
+Lehigh ("Contractor"). Capitalized terms used but not defined herein shall have the meanings set forth 
+in the Agreement. This Work Authorization has been agreed upon by Company and Contractor in 
+accordance with Section 5 of the Agreement. 
+2024 Budget: 
+Maximum Annual Budget: $210,000.00 
+Budget Period: January 1, 2024 through December 31, 2024 
+Performance Goals: Minimum $105,000.00 for 1
+st
+ half of 2024 
+   then $52,500.00 per quarter for remaining quarters of 2024 
+Measures Installation:   Labor Rate – $75.00/hour 
+ Material Rate – Market Price per unit 
+Household Expenditure Limits (including administration charges and Incidental Repairs): 
+$8,000 per participant property 
+Health & Safety or Incidental Repairs Expenditure Limits: 
+For households owned by ratepayer: $1,500.00 per Participant household.  
+For households owned by non-ratepayer: $750.00 per Participant household. 
+ 
+2024 FEDERAL GUIDELINES: 
+ 
+Federal Poverty Income Guidelines for Electric eligibility have increased to 200% 
+AMENDMENT REVISIONS: 
+NOW, THEREFORE, intending to be legally bound hereby, in consideration of the mutual  
+agreements contained herein and in the Agreement, Company and Contractor agree as follows:  
+ 
+ 
+1. To Exhibit A-Description of LIURP Services is hereby amended to include the following revisions: 
+Article III. INSTALLATION OF WEATHERIZATION MEASURES; paragraph 1: Contractor is 
+required to install either a separate carbon monoxide detector alarm and a smoke/fire 
+detector alarm or a combination carbon monoxide and smoke/fire detector alarm on each 
+level of the LIURP Participant’s home as a mandatory requirement.   DocuSign Envelope ID: 59F2FBA7-85ED-44E7-A48F-1EF9E926B27F
+
+All other terms and conditions of the Master Agreement for LIURP Services shall remain in full force and 
+effect. 
+IN WITNESS WHEREOF, the parties have caused this Work Authorization to be effective as of 
+January 1, 2024. 
+Agreed pursuant to the Agreement by: 
+ 
+[Company]  [Contractor] 
+ 
+ 
+By:__________________________  By:_______________________ 
+ 
+Name:________________________  Name:_____________________ 
+ 
+Title:_________________________  Title:______________________ 
+Date:_________________________  Date:______________________
+ DocuSign Envelope ID: 59F2FBA7-85ED-44E7-A48F-1EF9E926B27F
+VP Customer Relations
+1/10/2024
+Daniel Adamo
+Dawn Godshall
+Executive Director
+1/17/2024
+--------------------
+Attached Document: 678936024d224_CW2241059_-_12-24-LIURP-Work-AuthorizationCOMMUNITY_ACTION_COMMITTEE_OF_LEH-(1).pdf
+FORM OF WORK AUTHORIZATION 
+ 
+Contractor: Community Action 
+Committee of Lehigh Valley 
+Phone : 484-893-1722 Date: 12/23/2024 
+Service Area Region:   UGI Utilities South State: PA    
+ 
+Reference is made to the Master Agreement for LIURP Services, dated as of January 1, 2020 
+(the “Agreement”) by and between UGI Utilities, Inc. (“Company”) and Community Action Committee of 
+Lehigh Valley ("Contractor"). Capitalized terms used but not defined herein shall have the meanings set 
+forth in the Agreement. This Work Authorization has been agreed upon by Company and Contractor in 
+accordance with Section 5 of the Agreement. 
+2025 Budget: 
+Maximum Annual Budget: $200,000.00 
+Budget Period: January 1, 2025 through December 31, 2025 
+Performance Goals: Minimum $100,000.00 for 1
+st
+ half of 2025 
+   then $50,000.00 per quarter for remaining quarters of 2025 
+Measures Installation:   Labor Rate – $75.00/hour 
+ Material Rate – Market Price per unit 
+Household Expenditure Limits (including administration charges and Incidental Repairs): 
+$8,000 per participant property 
+Health & Safety or Incidental Repairs Expenditure Limits: 
+For households owned by ratepayer: $1,500.00 per Participant household.  
+For households owned by non-ratepayer: $750.00 per Participant household. 
+ 
+2025 FEDERAL GUIDELINES: 
+ 
+Federal Poverty Income Guidelines for Electric eligibility have increased to 200% 
+AMENDMENT REVISIONS: 
+NOW, THEREFORE, intending to be legally bound hereby, in consideration of the mutual  
+agreements contained herein and in the Agreement, Company and Contractor agree as follows:  
+ 
+ 
+1. To Exhibit A-Description of LIURP Services is hereby amended to include the following revisions: 
+Article III. INSTALLATION OF WEATHERIZATION MEASURES; paragraph 1: Contractor is 
+required to install either a separate carbon monoxide detector alarm and a smoke/fire 
+detector alarm or a combination carbon monoxide and smoke/fire detector alarm on each 
+level of the LIURP Participant’s home as a mandatory requirement.   Docusign Envelope ID: C90D7B4B-06DF-4548-A8DC-41997A5A62EB
+
+All other terms and conditions of the Master Agreement for LIURP Services shall remain in full force and 
+effect. 
+IN WITNESS WHEREOF, the parties have caused this Work Authorization to be effective as of 
+January 1, 2025. 
+Agreed pursuant to the Agreement by: 
+ 
+[Company]  [Contractor] 
+ 
+ 
+By:__________________________  By:_______________________ 
+ 
+Name:________________________  Name:_____________________ 
+ 
+Title:_________________________  Title:______________________ 
+Date:_________________________  Date:______________________Docusign Envelope ID: C90D7B4B-06DF-4548-A8DC-41997A5A62EB
+December 23, 2024
+Daniel Adamo
+VP Customer Relations
+Executive Director
+Dawn Godshall
+January 6, 2025
+--------------------

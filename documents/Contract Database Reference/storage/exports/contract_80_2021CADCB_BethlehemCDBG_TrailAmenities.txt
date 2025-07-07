@@ -1,0 +1,36 @@
+Purpose: <p>Purchase and Installation of recreational amenities along the South Bethlehem Greenway.</p>
+Funder: 2021 Bethlehem CDBG-Trail Amenities on the Greenway 
+Program: CADB
+Amount: 10650.00
+Start Date: 2021-09-24
+End Date: 2024-06-30
+
+Notes: 
+
+Fund Number: F 2143
+
+Attached Document: 641c7d4ece44e_2021CADCA_BethlehemCDBGTrailAmenitiesontheGreenway_executedextension.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 65d4daef6b2b4_2021CADCB_BethlehemCDBG_TrailAmenities-Amd-2.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 677c27bb03f14_Agt---Community-Action-Dev-Corp-of-Bethlehem---CDBG-PY-2021-Trail-Amenities-on-Greenway.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 677c27c01f716_Agt---Community-Action-Dev-Corp-of-Beth---CDBG-PY-2020-Trail-Amenities---Amd-2-(1).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 677c27c4d5c07_Agt---Community-Action-Dev-Corp-of-Bethlehem---CDBG-PY-2021-Trail-Amenities-on-Greenway---Amd-1.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

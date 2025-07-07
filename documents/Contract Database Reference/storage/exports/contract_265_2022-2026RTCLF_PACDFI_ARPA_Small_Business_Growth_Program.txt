@@ -1,0 +1,804 @@
+Purpose: <p>-Original Contract $232,944 ($184,000 for small business loans, maximum loan amount can be $35,000, $48,941 for technical assistance)</p><p>-At least 5 business loans must be provided, and technical assistance must be provided to at least 30 businesses.</p><p>-All funds must be fully obligated by December 31, 2024, and fully expended by December 31st, 2026.&nbsp;</p><p>-Grantee must attend regular CDFI network meeting and complete accurate quarterly reports.</p><p>-All compliance and program administration requirements in Appendices A, B and C of original contract must be followed.</p><p>&nbsp;</p>
+Funder: PA CDFI
+Program: RTCLF
+Amount: 232944.00
+Start Date: 2022-06-27
+End Date: 2026-12-31
+
+Notes: 
+
+Fund Number: F3590
+
+Attached Document: 657749ceeaa5d_SBG_II_Amendment_-_Rising_Tide.docx.pdf
+Amendment to Small Business Growth Program Contract C000082280 
+ 
+1 
+PENNSYLVANIA CDFI NETWORK 
+ 
+Amendment to Small Business Growth Program Contract 
+ 
+This Amendment to the Small Business Growth Program Contract is made and entered into as of 
+December 8
+th
+, 2023, by and between the PA CDFI Network, herein after referred to as the “Grantor” 
+and Rising Tide Community Loan Fund, herein after referred to as the “Grantee”. 
+WITNESSETH: 
+WHEREAS the Grantor and Grantee entered into a Contract on June 27
+th
+, 2022, for funding distributed 
+subject to the Commonwealth of Pennsylvania Department of Community and Economic Development 
+(DCED) Contract C000082280, and provided grants to Member CDFIs to offer grants, loans and/or 
+technical assistance to small businesses and nonprofit organizations. 
+WHEREAS the Grantor and Grantee desire to amend the Contract to allow the Grantee to carry out the 
+scope and services of Commonwealth of Pennsylvania Department of Community and Economic 
+Development (DCED) Contract C000086369. 
+ 
+AMENDMENT 
+ 
+NOW, THEREFORE, the parties hereto intended to be legally bound do hereby agree to the following: 
+ 
+1. The programmatic changes and modifications as detailed in the attached Appendix A. 
+2. The total amount of the Contract shall be $250,000. 
+3. All original terms and conditions of the executed Contract and attachments thereto unless 
+modified by this Amendment shall remain in full force and effect. 
+4. This Amendment and the Contract shall be read and interpreted together as one Agreement. 
+ 
+IN WITNESS WHEREOF, the parties hereunto have agreed to the foregoing terms as of the date first 
+written above. 
+ 
+Pennsylvania CDFI Network  Rising Tide Community Loan Fund 
+ 
+ 
+Signature: __________________________ Signature: __________________________ 
+ 
+Date: ______________________________ Date: ______________________________ 
+ 
+Name: _____________________________ Name: _____________________________   
+ 
+Title: ______________________________ Title: _______________________________  DocuSign Envelope ID: C9CC5AFB-5A06-47FF-9B16-D2F07F5C1064
+Varsovia Fernandez
+CEO
+12/8/2023
+AED for Business Development
+12/11/2023
+Christopher Hudock
+
+Amendment to Small Business Growth Program Contract C000082280 
+ 
+2 
+APPENDIX A 
+SMALL BUSINESS GROWTH PROGRAM II 
+ 
+The new funds granted through Pennsylvania Department of Community and Economic Development 
+Contract C000086369 and under this Amendment total $250,000. 
+ 
+These funds may only be used for providing technical assistance. While not defined by statute or 
+regulation, DCED instructed the PA CDFI Network to include that definition in materials submitted to 
+DCED. That definition is as follows: 
+ 
+Technical assistance and business counseling services include a variety of services, such as 
+business planning, marketing, accounting, finance, and strategy assistance to keep businesses 
+viable. CDFIs may also provide support completing financing applications and obtaining the 
+necessary business documents to keep their business compliant. Many small businesses are 
+unable to secure clients or financing because they lack the education, skills, or resources to 
+perform certain management tasks. CDFIs can support business owners and their staff with 
+these business function supports. DocuSign Envelope ID: C9CC5AFB-5A06-47FF-9B16-D2F07F5C1064
+--------------------
+Attached Document: 657b1a2a7433d_SBG-ARPA-2022-Rising-Tide-Fully-Executed-Contract-(2).pdf
+Appendix A 
+Small Business Growth Program 
+Internal Program Guidelines 
+As of May 12, 2022 
+ 
+1 | P a g e 
+ 
+Background Overview 
+ 
+The Pennsylvania CDFI Network received a grant of $4 million of American Rescue Plan Act (ARPA) funds 
+under the State and Local Fiscal Recovery Funds (SLFRF) program through the Pennsylvania Department 
+of Community and Economic Development (DCED).  These funds are being used for the Small Business 
+Growth Program. 
+ 
+These grant funds can be used for grants, loans, or technical assistance for small businesses or nonprofit 
+organizations. 
+ 
+The Network allocated the funds as follows to each CDFI: 
+ 
+$184,000 for lending or grants to small businesses or nonprofits 
+     48,941 for technical assistance to small businesses or nonprofits 
+$232,941 Total to each CDFI 
+ 
+The entire budget is as follows:  
+ 
+               $3,959,997  (Grants to 17 CDFIs) 
+                     40,003   (Network Administration) 
+               $4,000,000  Grant Total 
+ 
+Each CDFI is expected to assist at least 5 businesses with loans/grants and at least 30 businesses with 
+technical assistance with these funds. 
+ 
+This document outlines the primary requirements imposed by the federal SLFRF to guide CDFIs in 
+designing and describing their project. 
+ 
+ 
+Eligible Businesses (Impacted) 
+ 
+Small businesses with less than 500 employees or, if applicable, the size established by the SBA 
+Administrator for the industry.  Eligible businesses must have been impacted, which can be 
+demonstrated as experiencing financial hardship such as declines in revenues, increased costs, financial 
+insecurity, or periods of business closure. 
+ 
+CDFIs must maintain documentation or records to support an assessment of how businesses receiving 
+assistance were affected by the negative economic impacts of the pandemic and how the funds will be 
+used to mitigate these impacts. The Treasury Department has not issued guidance or procedures on 
+documentation of how funds will mitigate the negative economic impact.  The federal reporting only 
+requires that CDFIs identify the number of businesses and amounts expended on impacted businesses.
+
+Appendix A 
+Small Business Growth Program 
+Internal Program Guidelines 
+As of May 12, 2022 
+ 
+2 | P a g e 
+ 
+Eligible Businesses (Disproportionally Impacted) 
+ 
+Small businesses (also less than 500 employees or meeting SBA requirement for selected industries) 
+operating in a Qualified Census Tract are presumed to be disproportionally impacted.  Qualified Census 
+Tracts (QCTs) are the same as QCTs defined for the federal Low Income Housing Tax Credit (LIHTC).  Here 
+is a link to determine where QCTs are located:  https://www.huduser.gov/portal/sadda/sadda_qct.html  
+ 
+This group of eligible business is different in that the business does not need to demonstrate impacts 
+and may be a startup firm that was not in operation prior to the pandemic (Feb 2020). 
+ 
+CDFIs must maintain documentation or records to support an assessment that businesses operate in a 
+QCT. There is no guidance on how to document that a business is located in a QCT.  The federal 
+reporting only requires that CDFIs identify the number of businesses and amounts expended on 
+disproportionately impacted businesses. 
+ 
+(NOTE:  QCTs use a different definition of income levels than the SLFRF definition of Low and Moderate 
+Income.) 
+ 
+ 
+Eligible Uses  
+ 
+• Funds may be used for loans or grants to mitigate financial hardship such as declines in revenues 
+or impacts of periods of business closure. Specific examples identified by U.S. Treasury 
+Department include assistance such as supporting payroll, and benefits, costs to retain 
+employees, and mortgage, rent, utility, and other operating costs. Also, Treasury allows use of 
+the funds for:  COVID-19 prevention or mitigation tactics, such as physical plant changes to 
+enable social distancing, enhanced cleaning efforts, barriers or partitions, or COVID-19 
+vaccination, testing, or contact tracing programs. 
+ 
+• Funds may be used for providing technical assistance.  While not defined by statute or 
+regulation, DCED instructed the PA CDFI Network to include that definition in materials 
+submitted to DCED. That definition is as follows:   
+ 
+Technical assistance and business counseling services include a variety of services, such 
+as business planning, marketing, accounting, finance, and strategy assistance to keep 
+businesses viable. CDFIs may also provide support completing financing applications and 
+obtaining the necessary business documents to keep their business compliant.  Many 
+small businesses are unable to secure clients or financing because they lack the 
+education, skills, or resources to perform certain management tasks. CDFIs are able to 
+support business owners and their staff with these business function supports.
+
+Appendix A 
+Small Business Growth Program 
+Internal Program Guidelines 
+As of May 12, 2022 
+ 
+3 | P a g e 
+ 
+Additional Eligible Uses for Disproportionately Impacted Business 
+ 
+In addition to Eligible Uses for impacted small businesses, funds maybe used for disproportionately 
+impacted businesses as follows: 
+ 
+• Rehabilitation of commercial properties; storefront and façade improvements. 
+• Business incubators 
+• Grants for start-ups or expansion costs for small businesses 
+• Programs or services to support micro-businesses (5 or less employees, with at least one being 
+the owner) 
+Summary of SLFRF Eligible Businesses and Uses 
+ 
+ 	Impacted Businesses Disproportionately Impacted 
+Businesses 
+Maximum Size 500 or fewer employees or meeting 
+SBA definition for certain industries 
+500 or fewer employees or meeting 
+SBA definition for certain industries 
+Eligibility Criteria Demonstrate financial losses, increased 
+costs, or closures 
+(Maintain records) 
+Located in Qualified Census Tract (QCT) 
+per Low Income Housing Tax Credit 
+(LIHTC) program 
+(Maintain records on QCT location) 
+Eligible Uses Grants and Loans for: 
+• Payroll & benefits 
+• Costs to retain employees 
+• Mortgage/rent/utilities 
+• Operating Costs 
+Technical Assistance 
+Grants, Loans, Technical Assistance 
+and: 
+• Rehab properties & facades 
+• Business incubators 
+• Grants for start-ups or 
+expansion 
+• Services to support micro-
+businesses 
+ 
+ 
+Eligible Nonprofits and Uses 
+ 
+Eligible nonprofits are 501(c)(3) or 501(c)(19) tax-exempt organizations that were either impacted or 
+disproportionately impacted.  This distinction is essentially the same as for small businesses.
+
+Appendix A 
+Small Business Growth Program 
+Internal Program Guidelines 
+As of May 12, 2022 
+ 
+4 | P a g e 
+ 
+ 
+Summary of SLFRF Eligible Nonprofits and Uses 
+ 
+ 	Impacted Nonprofits Disproportionately Impacted 
+Nonprofits 
+Eligible Tax 
+Status 
+501(c)(3) or 501(c)(19) 	501(c)(3) or 501(c)(19) 
+Eligibility Criteria Demonstrate financial hardship such 
+as: 
+• Decreased revenue (donations & 
+fees) 
+• Financial insecurity 
+• Increased costs (uncompensated 
+• increases in service need) 
+• Challenges covering payroll, rent or 
+mortgage, & other operating costs 
+(Maintain records) 
+Located in Qualified Census Tract (QCT) 
+per Low Income Housing Tax Credit 
+(LIHTC) program 
+(Maintain records on QCT location) 
+Eligible Uses Grants, Loans, Technical Assistance Grants, Loans, Technical Assistance  
+ 
+and 
+ 
+Responses that are related and 
+reasonably proportional to addressing 
+disparities that led to disproportionate 
+impacts 
+ 
+ 
+ 
+Obligation and Expenditure 
+ 
+The SLFRF Final Rule requires funds must be used to cover “costs incurred” between March 3, 2021, 
+and December 31, 2024.  Funds must be obligated by this date.   
+ 
+This time restriction is clearly applicable to the initial government recipient (DCED).  Negative 
+economic impacts may have occurred prior to this time period which can be considered in 
+determining eligible businesses.   However, there is no specific guidance as to whether a grant or 
+loan can be directed for covering a business or nonprofit’s costs prior to March 3, 2021. The DCED 
+contract allows costs incurred from March 1, 2020 through December 31, 2024.
+
+Appendix A 
+Small Business Growth Program 
+Internal Program Guidelines 
+As of May 12, 2022 
+ 
+5 | P a g e 
+ 
+“Obligation means an order placed for property and services and entering into contracts, subawards, 
+and similar transactions that require payment.”  An executed loan should meet this definition.  Use of 
+funds for technical assistance should adhere to the definition provided here. 
+ 
+ 
+Funds must be fully expended in their initial use by December 31, 2026. 
+ 
+ 
+Term of Loans 
+ 
+• For loans that mature or are forgiven on or before December 31, 2026: 
+SLFRF may be used to fund the principal of the loan and must track repayment of principal and 
+interest.  (See Program Income) 
+ 
+• For loans with maturities longer than December 31, 2026: 
+SLFRF may only be used for the projected cost of the loan.   Recipients may estimate the subsidy 
+cost of the loan, which equals the expected cash flows associated with the loan discounted at 
+the recipient’s cost of funding.  A recipient’s cost of funding can be determined either: 
+ 
+Based on the interest rates of securities with a similar maturity to the cash flow being 
+discounted that were either (i) recently issued by the recipient or (ii) recently issued by a 
+unit of state, local, or Tribal government similar to the recipient.  
+ 
+Or, for recipients that have adopted the Current Expected Credit Loss (CECL) standard, 
+may also treat the cost of the loan as equal to the CECL-based expected credit losses 
+over the life of the loan. Recipients may measure projected losses either once, at the 
+time the loan is extended, or annually over the covered period. 
+ 
+ 
+Critical Dates and Time Restrictions 
+ 
+Obligate All Funds 	December 31, 2024 
+Expend All Funds – End of Performance Period December 31, 2026 
+ 
+Loans Maturing On or Before December 31, 2026 Loans Maturing after December 31, 2026 
+Can Fully Fund Loan  	Only Cover the Subsidy Cost of Loan, calculated 
+as: 
+Net Present Value of Loan 
+OR 
+CECL Expected Losses
+
+Appendix A 
+Small Business Growth Program 
+Internal Program Guidelines 
+As of May 12, 2022 
+ 
+6 | P a g e 
+ 
+ 
+Program Income Provisions 
+ 
+Repayment of principal and interest during the performance period (until December 31, 2022) are 
+treated somewhat differently.  While both must be reused for any of the eligible purposes, reuse of 
+principal repayments is subject to same timing restrictions on the use of funds as the original use of the 
+funds.  Interest payments are not subject to the timing restrictions.   
+ 
+Principal repayments that are re-issued in new loans must either mature or be forgiven by December 31, 
+2026.  If re-loaned principal funds do not mature by December 31, 2026, the CDFI must only use those 
+principal funds for the subsidy cost of the loan as described in “Term of Loans” above. 
+ 
+Therefore, CDFIs must account for principal and interest repayments separately. 
+ 
+ 
+Reuse of Funds Prior to December 31, 2026 
+ 
+ 	Principal Repayments 	Loan Interest Received 
+Use 
+ 
+Same Eligible Businesses & Uses Same Eligible Businesses & Uses 
+Time Restriction Fully Fund Loans Maturing by 12/31/2026  
+ 
+Loans Maturing after 12/31/2026, Only 
+Cover the Subsidy Cost of those Loans 
+No Restrictions 
+ 
+ 
+PA Prevailing Wage Act 
+ 
+The DCED contract imposes use of the Pennsylvania Prevailing Wage Act wage rates for ARPA funds.   
+ 
+While this added requirement has the potential to impact use of the funds for capital and construction 
+project uses, there are exemptions you should be aware of.  First, and most significantly, funds provided 
+as a loan to a business, do not trigger state prevailing wage rates.  Such projects are exempt.  Second, if 
+you provide small grants, those projects may also be exempt from state prevailing wage rates.  The use 
+of the grant must be for projects in which the total project cost (including all other funding sources, not 
+just your grant) is $25,000 or less.  Project costs exceeding $25,000 will trigger state prevailing wage 
+rates if the funds are provided to the business as a grant. 
+ 
+The federal law creating ARPA did not impose federal Davis-Bacon wage rates, but U.S. Treasury is 
+encouraging “recipients to adhere to strong labor standards, including project labor agreements and
+
+Appendix A 
+Small Business Growth Program 
+Internal Program Guidelines 
+As of May 12, 2022 
+ 
+7 | P a g e 
+ 
+community benefits agreements that offer wages at or above the prevailing rate and include local hire 
+provisions.” 
+ 
+ 
+Conflict of Interest 
+ 
+CDFIs must establish safeguards to prohibit employees from using positions for a purpose that is or gives 
+the appearance of being motivated by a desire for private gain for themselves or others, particularly 
+those with whom they have family, business, or other ties.  For further reference review 2 CFR 200.112 
+Conflict of Interest. 
+ 
+ 
+Reporting 
+ 
+CDFIs must report quarterly on number of businesses assisted by type of assistance (loan, grant, 
+assistance), type of business (impacted or disproportionately impacted), and expenditures (including 
+program income expended).  The Network will provide a reporting format, which may be modified over 
+time in response to changes made by DCED. 
+ 
+CDFIs will also need to provide additional information about entities receiving more than $50,000 in 
+assistance. That information includes: 
+ 
+• Name of Recipient 
+• Location 
+• Brief Description of Award 
+• Award ID (assigned by CDFI) 
+• Award Date 
+• Award Type (Grant/Loan) 
+• Amount 
+• Expenditure Type 
+• Targets Economically Disadvantaged Communities 
+• Sector of Employer 
+• Purpose of Funds
+
+Appendix B
+
+Appendix C 
+C000082280
+Page 1 of 5
+ 
+SPECIAL CONDITIONS AND ASSURANCES 
+COVID-19 ARPA PANDEMIC RECOVERY PROGRAM 
+ 
+ 
+Eligible Use: 
+Funds provided under this Contract may only be used to respond to the COVID-19 public health emergency or 
+its negative economic impacts, specifically assistance to small businesses, and nonprofits, or aid to impacted 
+industries such as tourism, travel, and hospitality.  The Grantee has identified a need or negative impact of 
+COVID-19 public health emergency and has identified how the grant activities address the identified need or 
+impact.  Grantee must maintain records to support their assessment of how businesses receiving assistance 
+were affected by the negative economic impacts of the pandemic and how the aid provided responds to these 
+impacts.  
+employees, or if applicable, the size standard in number of employees established by the Administrator of the 
+Small Business Administration for the industry in which the business concern or organization operates; and (2) 
+Is a small business concern as defined in section 3 of the Small Business Act (15 U.S.C. 632). 
+ 
+Expenditure of Funds: 
+Grantee must expend all grant funds by December 31, 2024. 
+ 
+Financial Requirements:   
+Administrative 
+Requirements, 
+restrictions on general provisions for selected items of cost. 
+ 
+Public Access to Records 
+Grantee shall provide citizens reasonable access to records regarding the use of grant funds, consistent with 
+applicable State and local laws regarding privacy and obligations of confidentiality.  The Grantee is subject to 
+requests for records made pursuant to the Pennsylvania Right-To-Know Law, 65 P.S. §§ 67.101-3104, when such 
+requests relate to or arise out of the grant agreement into which the Grantee has entered into with the Grantor.  
+The Pennsylvania Right-To-Know-Law provisions appear in Section (k) of Article V, Compliance with Applicable 
+Statutes and Department Regulations, of this Contract. 
+ 
+Civil Rights Compliance 
+The Grantee shall comply with the legal requirements relating to nondiscrimination and nondiscriminatory use 
+of Federal funds.  Grantee may not deny benefits or services, or otherwise discriminate on the basis of race, 
+color, national origin (including sexual orientation and gender identity), in accordance with the following 
+authorities: 
+  
+(1) Title Vl of the Civil Rights Act of 1964, P.L. 88-352 (42 U.S.C. 2000d-1 et. seq.) and the regulations 
+issued pursuant thereto (31 CFR Part 22), which provides that no person in the United States shall, 
+on the grounds of race, color, or national origin be excluded from participation in, be denied the 
+benefits of, or be otherwise subjected to discrimination under any program or activity for which the 
+Grantee receives Federal financial assistance.  
+ 
+(2) Section 504 of the Rehabilitation Act of 1973 (Section 504), Public Law 93-112, as amended by Public 
+Law 93-516, 29 U.S.C. 794, which provide that no otherwise qualified individual with a disability in 
+the United States , as defined in section 7(20) [ 29 USCS § 705(20) ], shall, solely by reason of her or 
+his disability, be excluded from the participation in, be denied the benefits of, or be subjected to 
+discrimination under any program or activity receiving Federal financial assistance.
+
+Appendix C 
+C000082280
+Page 2 of 5
+(3) Age Discrimination Act of 1975, Public Law 94-135, 42 U.S.C. 6101 et seq., and the Department 
+implementing regulations at 31 CFR part 23. no person in the United States shall, on the basis of age, 
+be excluded from participation in, be denied the benefits of, or be subjected to discrimination under, 
+any program or activity receiving Federal financial assistance. 
+ 
+(4) Pennsylvania Human Relations Act of October 27, 1957, P.L. 744, (43 P.S. 951-963) which provides 
+that no employee, applicant for employment, independent contractor, or any other person shall be 
+discriminated against because of race, color, religious creed, ancestry, national origin, age, or sex. 
+ 
+The Grantee will be required to provide a narrative describing its compliance with Title VI. 
+ 
+Hatch Act 
+Grantee will comply with the provisions of the Hatch Act, P.L. 85-554 (5 U.S.C 1501 et seq.) which limits the 
+political activity of employees. 
+ 
+PA Prevailing Wage Act 
+Grantee will comply with the PA Prevailing Wage Act of 1961, as amended (43 P.S. 165-1 through 165-17) in 
+those instances in which the federal Davis-Bacon Act (40 U.S.C. 3141-3144, and 3146-3148) either is not 
+applicable or an exception would apply to projects undertaken by the Grantee. 
+ 
+Conflict of Interest  
+It will establish safeguards to prohibit employees from using positions for a purpose that is or gives the 
+appearance of being motivated by a desire for private gain for themselves or others, particularly those with 
+whom they have family, business, or other ties.  (2 CFR 200.112 Conflict of Interest) 
+ 
+Lobbying 
+No Federal appropriated funds have been paid or will be paid, by or on behalf of the undersigned, to any person 
+for influencing or attempting to influence an officer or employee of any agency, a Member of Congress, an officer 
+or employee of Congress, or an employee of a Member of Congress in connection with the awarding of any 
+Federal grant, the making of any Federal grant, the making of any Federal loan, the entering into of any 
+cooperative agreement, and the extension, continuation, renewal, amendment, or modification of any Federal 
+contract, grant, loan, or cooperative agreement.  
+ 
+If any funds other than Federal appropriated funds have been paid or will be paid to any person for influencing 
+or attempting to influence an officer or employee of any agency, a Member of Congress, an officer or employee 
+of Congress, or an employee of a Member of Congress in connection with this Federal contract, grant, loan, or 
+cooperative agreement, the undersigned shall complete and submit Standard Form-LLL, "Disclosure Form to 
+Report Lobbying," in accordance with its instructions. 
+ 
+The undersigned shall require that the language of this certification be included in the award documents for all 
+sub-awards at all tiers (including subcontracts, sub-grants and contracts under grants, loans and cooperative 
+agreement) and that all sub-recipients shall certify and disclose accordingly. 
+ 
+This certification is a material representation of fact upon which reliance was placed when this transaction was 
+made or entered into. Submission of this certification is a prerequisite for making or entering into this transaction 
+imposed by section 1352, Title 31, U.S. Code. Any person who fails to file the required certification shall be 
+subject to a civil penalty of not less than $10,000 and not more than $100,000 for each such failure.  (2 CFR 
+200.450 Lobbying)
+
+Appendix C 
+C000082280
+Page 3 of 5
+ 
+Reporting Requirements: 
+The Grantor has made every effort to provide a concise description of all necessary federal reporting 
+requirements for this Contract.  However, it is incumbent upon the Grantee to read and understand the 
+Compliance and Reporting Guidance found at https://home.treasury.gov/system/files/136/SLFRF-Compliance-
+and-Reporting-Guidance.pdf and any updates to this guidance, as this guidance may change during the term of 
+the Contract.  The Grantor will make every effort to alert the Grantee to such changes as they occur.  
+ 
+Grantee shall submit Project and Expenditure reports for both quarterly and annual reporting to the Grantor 
+through the termination date of the Contract or until all grant activities are completed and all grant funding 
+expended.  The quarterly Project and Expenditure Reports shall include the following information: 
+ 
+ Grantee information: 
+ DUNS number and location 
+ Contract number 
+ 
+ Project information: 
+ Project name 
+ Project Identification Number (Contract number) 
+ Project expenditure category (Select from types listed below) 
+o 2:Negative Economic Impact  2.9 Small Business Economic Assistance (General) 
+o 2:Negative Economic Impact  2.11 Aid to Tourism, Travel, or Hospitality. 
+ Primary place of performance 
+ Period of performance start date 
+ Period of performance end date 
+ Description (must describe the project in sufficient detail to provide understanding of the major 
+activities that will occur, and will be required to be between 50 and 250 words.) 
+ 
+ Expenditure information: 
+ Current period obligation 
+ Cumulative obligation 
+ Current period expenditure 
+ Cumulative expenditure 
+and similar transactions that require payment. 
+ 
+ Project Status information (select category below): 
+ Not started 
+ Completed less than 50 percent 
+ Completed 50 percent or more 
+ Completed 
+ 
+Project Demographic Distribution: 
+Projects that fall under Project Expenditure Category 2.9 Small Business Economic Assistance 
+(General) will be required to identify whether or not the project is serving an economically 
+ (link is 
+https://www.huduser.gov/portal/datasets/qct.html ).  HUD 
+households with incomes below 60 percent of the Area median Gross Income (AMGI) or have a
+
+Appendix C 
+C000082280
+Page 4 of 5
+following link 
+https://data.census.gov/cedsci/table?q=ACSST1Y2019.S1903&tid=ACSST1Y2019.S1903&hidePrevi
+ew=true&moe=false.  The Grantee may assume that the funds for a project count as being 
+targeted towards economically disadvantaged communities if the project funds are spent on:  
+ 
+ A program or service is provided at a physical location in a Qualified Census Tract (for 
+multi-site projects, if a majority of sites are within Qualified Census Tracts); 
+ A program or services where the primary intended beneficiaries live within a Qualified 
+Census Trace; 
+ A program or service for which the eligibility criteria are such that the primary intended 
+beneficiaries earn less than 60 percent of the median income for the relevant 
+jurisdiction; or 
+ A program or service for which the eligibility criteria are such that over 25 percent of 
+intended beneficiaries are below the federal poverty line.   
+ 
+The Grantee may use reasonable estimates to determine if a project meets one of these criteria. 
+ 
+Programmatic performance indicators:  
+o For Small Business Economic Assistance (EC 2.9) 
+ Brief description of the structure and objectives of assistance programs 
+ Number of small businesses serviced 
+ 
+responds to a negative economic impact of COVID-19, as described in the Interim Final 
+Rule. 
+o For Aid to Travel Tourism, and Hospitality (EC 2.11) 
+ Brief narrative description of how the assistance provided responds to negative 
+economic impacts of the COVID-19 pandemic 
+ For each subaward: 
+ Section of employer 
+ Purpose of funds 
+ 
+In addition to the above reporting requirements, the Grantee must provide the following information, if not 
+already provided above, for contracts (subawards) it makes that are greater than or equal to $50,000.00: 
+ 
+ Subrecipient identifying and demographic information (e.g., DUNS number and location) 
+ Subaward, project, or contract number (created by Grantee) 
+ Award date, type, amount, and description 
+ Additional programmatic performance indicators  
+o For Small Business Economic Assistance (EC 2.9) 
+ Brief description of the structure and objectives of assistance programs 
+ Number of small businesses serviced 
+ 
+responds to a negative economic impact of COVID-19, as described in the Interim Final 
+Rule.
+
+Appendix C 
+C000082280
+Page 5 of 5
+ 
+o For Aid to Travel Tourism, and Hospitality (EC 2.11) 
+ Brief narrative description of how the assistance provided responds to negative 
+economic impacts of the COVID-19 pandemic 
+ For each subaward: 
+ Section of employer 
+ Purpose of funds 
+ 
+Aggregate reporting is required for contracts, grants, transfers made to other government entities, loans, direct 
+payments, and payments to individuals that are below $50,000.  This information will be accounted for by 
+expenditure category at the project level. 
+ 
+   REPORTING TIMETABLE 
+ 
+REPORT YEAR PERIOD COVERED DUE DATE 
+1 2021 March 3 - December 31 January 15, 2022 
+2 2022 January 1 - March 31 April 15, 2022 
+3 2022 April 1 - June 30 July 15, 2022 
+4 2022 July 1 - September 30 October 15, 2022 
+5 2022 October 1 - December 31 January 15, 2023 
+6 2023 January 1 - March 31 April 15, 2023 
+7 2023 April 1 - June 30 July 15, 2023 
+8 2023 July 1 - September 30 October 15, 2023 
+9 2023 October 1 - December 31 January 15, 2024 
+10 2024 January 1 - March 31 April 15, 2024 
+11 2024 April 1 - June 30 July 15, 2024 
+12 2024 July 1 - September 30 October 15, 2024 
+13 2024 October 1 - December 31 January 15, 2025 
+14 2025 January 1 - March 31 April 15, 2025 
+15 2025 April 1 - June 30 July 15, 2025 
+16 2025 July 1 - September 30 October 15, 2025 
+17 2025 October 1 - December 31 January 15, 2026 
+18 2026 January 1 - March 31 April 15, 2026 
+19 2026 April 1 - June 30 July 15, 2026 
+20 2026 July 1 - September 30 October 15, 2026 
+21 2026 October 1 - December 31 March 15, 2027
+--------------------
+Attached Document: 67780b8a99916_2024RTCLF-Small-Business-Growth-Porgram-no-more-reports-email.pdf
+
+  !"#$%&& '()
+*+,-.*,/01,-.*,23)4015*-6787,9
+:;*
+<=>?>@=@A<<B@<C;
+DEF75
+.G04/4F0424)4H87,9
+IJKJLMJNOPQ
+RSTUVWXQYLZ[\]]]VVTZ^VVN[_LSKJUVWYVY^RSL`RPLVSQRZKVab]JPJ]UJcbJSNJNPQJ_defKVSPYRKPRaVWSP
+VghijiOk
+lmOPQLZLZ
+PQJ]RZPnWR
+YPJY]UYJbVYPUVWo]]QRMJPVZWpaLPgVYPQLZbYV^YRa[
+
+qRTJZWYJP
+VZJSNLSPQJrsd\_dettYJbVYPpUPQJJSNVgPQLZuJJTRZuJ]][
+
+vSwVUR^YJR
+PuJJTO
+
+sU]RS
+ sU]RSxV^]JZ
+VS^
+fYV^YRaqRS
+R^JY
+f\XsxtyJP
+uVYT
+z{|}~lmlii
+k
+
+
+
+ ¡¢£¤¥¦§
+¨©ª«¬¢­®
+¯°±²³®´µ´³´¶µ³·¸
+¹º­£¢»¬¦
+£²»¦ ¼¦£²»¦¡½¢¾»²°¿¥¦§
+¨ÀÁÂ©Ã«ÄÅ¶
+ÆÇ¢££È»²É¿°·¦¢ÇÄ²½°²»²Ê°¬¢­®¯°±²ËË
+
+sU]RSO
+
+ÌJPaJTSVuLgUVWSJJNRSUPQLS^J]ZJ[
+
+rRMJR^VVNuJJTJSNO
+
+ÍÎÏÐÑÀÒÃÓÔÕ¢°²ÅÊ²Ö¤²º
+²°¼È»²º²¤²£½Ç²»°
+
+    	 ! "#$%&'#
+()*+*,-./0123,
+	
+456789:13,
+;2-10+2,-<
+%='#>!'"#?@AB%C"DE'F&'#G
+HIJK8LM0+/3
+:NOPQ2R0SNTTTTUV
+W68XS*+.,0Y
+M-M+.,0V0QS2YP.2,<
+FAZ#Z!$"?!BA"D'"BA[\&B'[G]^_S*+`M/2Pa<
+BZ%'BF?BAB>b&'#G]U3M1V3SPM+cde3PQf23,;M,
+/
+<
+@[ABZ!? 
+[@ABD!b B!&'#G]g0,,*h0S`3SS*+<
+A !?ijklmZ"%&'#G]`010,3Yee*3_XMR*n0*-_R2S_22/^2ddM,*Q:90o012ed0,Q;M,/
+<
+p@@ Al
+qZ\ ?"B%l=Z
+"%&'#G])0P2Or0,+n0*-_R2S_22/US2-S0++;M,/<
+stE"!?"@=@&'#G]
+u['"DA!?E'Bl@A&B'[]Y:3,,3^_3dR0S+<
+ABA[\
+!?E'Bl
+@A&B'[G]
+F@'
+!D?@'#!!=Z"%&'#]v3S3w0S,2,vQ0Sd3,<
+!AA&b"'"&!D[A"? "b!D["D&B'[G]X3S00dL_2d3+
+<
+qA[&'
+[A!? "b!D["D&B'[G]g3+d*,0x3S,0S<
+uA![ "?b!D% "&'#G]g3*d0YSS2:2<
+uA [?A!!D!@A&'#G]
+ >AE"B?D
+"D@ !B"D&B'[
+y8w3S+2o*3;
+0S,3,/0z<
+b="A"%{?@AB%C"DE'F&'#G
+H|}~IyK8vd3
+11M+*,0++S2rQ_US2-S3d)0e2SQ/M0,0Q;S*/3:NOPQ2R0S
+
+
+
+
+ ¡¢£¤¥¦¤§¨©ª«¬¬¨­®¯°±²³´
+²µ¶¶
+±²·´³°
+µ°³¸¹²º»¼½¾³¯²»·¯¿±³ÀÁÂÁÂÃÄÅ¶»°³¸²»±²³¹²³¯°±°²Æ»°¼·³¯³³´¯
+Æ±²³°¼·
+³±¶³Ä
+
+Ç¶°È³¯³
+±µ°²»µ°²¼²¹³¯±²³°¼·³±¶³Æ°Æ¼²³°¼´¶»Æ´³°²¼¹²¸²»³²±²³³¯É²»¼³²¹
+´»
+»¶³°µ
+¿ÊËÌ±¼
+°¼´»Æ¹²±²µ°Æ°¼·®ÍÄÇ¯µÆÆÆ´¶¶¹²¸²»Æ²³¯³°¼³¯»±Æ³Æ±²³°¼·³±¶³³
+³´¯
+Æ³²³¯°
+°¶ÄÇÆ²¼²
+³¼Æ³¯°°¼¹²³°²¼¯°³²°´¶¶¸²±´°¹°´³²³¯°Î»³ÏÐ»³´»»¶³°µÄÑÌ±¼°¼´»Æ¹
+²®Í
+»¼Æ³¯
+¿ÊËÅ²·
+¯²»¶Æ¼²³Ì´ÆÉÃÒÓÃ½Ä
+
+¡
+Ô£¤ §Õ¤¥£¤£¢Ö¤«§ ¤
+Ö §­
+
+®¯¼×¸²»Ø
+
+¸¶¼
+¸¶¼Ù²·¶²¼·
+Å²·¼·
+ÅÍÚÙÇÛ³Ü²×
+
+ 	
+--------------------

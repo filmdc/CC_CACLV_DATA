@@ -1,0 +1,21 @@
+Purpose: <p>This $10,000.00 grant will support food purchase and distribution costs to partner agencies in <strong>Wayne County</strong>.&nbsp;</p><figure class="image"><img src="http://10.55.0.10/storage/1000/image.png"></figure><p>There will be a request for an impact statement sent to the planner-SHFB@caclv.org email. No other reporting is required.</p><p>There is no explicit requirement for publicity.</p>
+Funder: The John and Helen Villaume Foundation
+Program: SHFB
+Amount: 10000.00
+Start Date: 2024-05-28
+End Date: 2024-12-31
+
+Notes: 
+
+Fund Number: 8000
+
+Attached Document: 668570154cf8f_2024_SHFB_Villaume_Award-Letter.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 66857026be279_2024_SHFB_VillaumeFdn_ProposalSubmitted.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

@@ -1,0 +1,402 @@
+Purpose: <p>-11 apartments pre-paid at $70 per day. Ability to fill up to 15 apartments based on availability.</p><p>-Supportive Services billed at $65 per hour.&nbsp;</p><ul><li>Charge for case management and weekly apartment inspections (client facing). Be sure to obtain participant signature on the Children and Youth log.</li><li>Charge 1 hour per day every day for curfew checks</li></ul><p>-Extraordinary Expenses for damage to apartments. Upon exit inspection note and photograph damage. Bill Children and Youth for the cost of repair and provide the evidence. They will assess and reimburse us if approved.</p><p>-CAP for the Contract is $406,050</p>
+Funder: Lehigh County Children & Youth
+Program: SSS
+Amount: 0.00
+Start Date: 2024-07-01
+End Date: 2025-06-30
+
+Notes: <p><strong>Billing:</strong></p><p>Invoices must be submitted by the 5th working day of the month following the month of service. A 2% late submission fee may be applied to invoices received past the 20th day of the month.</p><p><strong>Reporting:</strong></p><p>-Monthly report/invoicing to go along with billing to be submitted to fiscal staff. This includes apartments that are filled and supportive services hours along with required back up.</p><p>-Quarterly reports are to be submitted to Lehigh County. An email will be sent out by the county, typically from Sharon Dunn sharondunn@lehighcounty.org, informing you when the report is due.</p><p>-Annual Report to be submitted to Lehigh County and follows the same protocol as the quarterly report listed above.</p><p><strong>Other Requirements:</strong></p><p>-Shelter staff must attend 12 hours of training per year</p><p>-Retain all records 7 years post completion of audit</p><p>-All shelter staff must have PA State Criminal History, Child Abuse Clearance, and Fingerprints with Federal Criminal History check. These clearances mut be renewed every 60 months.</p>
+
+Fund Number: 1300
+
+Attached Document: 66b627b365379_2024SSS_-LC-Children-and-Youth-contract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 66b627b830738_Children-and-Youth-CALV-contract-documents.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 67081eb1e1432_2024SSS_-Lehigh-County-Children-and-Youth-Executed.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6751f8c656d7c_66b22b876cade_APPENDIX-D--audit-for-non-profit---2425----03-12-24.docx
+  
+AUDIT CLAUSE A- SUBRECIPIENT
+ 	Local Governments and Nonprofit Organizations 	
+The Commonwealth of Pennsylvania, Department of Human Services (DHS}, distributes federal and state funds to local governments, non-profit, and for-profit organizations. Federal expenditures are subject to federal audit requirements, and federal and state funding passed through DHS are subject to DHS audit requirements. If any federal statute specifically prescribes policies or specific requirements that differ from the standards provided herein, the provisions of the subsequent statute shall govern.  The DHS provides the following audit requirements in accordance with the Commonwealth of Pennsylvania, Governor&#039;s Office, Management Directive 325.9, as amended December 23, 2014.
+Sub recipient means a non-federal entity that expends federal awards received from a pass­ through entity to carry out a federal program, but does not include an individual that is a beneficiary of such a program. A sub recipient may also be a recipient of other federal awards received directly from a federal awarding agency. For purposes of this audit clause, a sub recipient is not a contractor that receives a procurement contract to provide goods or services that are required to provide the administrative support to carry out a federal program.
+A.  Federal Audit Requirements – Local Governments and Nonprofit Organizations
+A local government and nonprofit organization must comply with all federal audit requirements, including: The Single Audit Act Amendments of 1996; 2 CFR Part 200 as amended; and any other applicable law or regulation, as well as any other applicable law or regulation that may be enacted or promulgated by the federal government.
+For years beginning on or after December 26, 2014, a local government or nonprofit organization that expends federal awards of $750,000 or more during its fiscal year, received either directly from the federal government, indirectly from a pass-through entity, or a combination of both, to carry out a federal program, is required to have an audit made in accordance with the
+provisions outlined in 2 CFR Part 200.501. Please note that for periods prior to this, the threshold is still $500,000.
+If a local government or nonprofit organization expends total federal awards of less than
+$750,000 during its fiscal year, it  is exempt from these federal  audit requirements, but  is required to maintain auditable records of federal or state funds that supplement such awards. Records must be available for review by appropriate officials. Although an audit may not be necessary under the federal requirements, DHS audit requirements may be applicable.
+B.  Department of Human Services Audit Requirements
+A local government or nonprofit provider must meet the DHS audit requirements.
+Where a Single Audit or program-specific audit is conducted in accordance with the federal audit requirements detailed above, such an audit will be accepted by the DHS provided that:
+1.  A full copy of the audit report is submitted as detailed below; and
+2.  The sub recipient shall ensure that the audit requirements are met for the terms of this contract; i.e., the prescribed Agreed-Upon Procedures (AUP) Report(s) and applicable schedule requirement(s). The incremental cost for preparation of the AUP Report(s) and the schedule cannot be charged to the federal funding stream.
+AUDIT CLAUSE A- SUBRECIPIENT
+ 	Local Governments and Nonprofit Organizations 	
+The local government or nonprofit organization must comply with all federal and state audit requirements including: the Unlfonn Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards contained at 2 CFR 200 and any other applicable law or regulation and any amendment to such other applicable law or regulation which may be enacted or promulgated by the federal government. In the absence  of a federally  required audit, the entity is responsible for the following annual audit requirements, which are based upon the program year specified in this agreement.
+Organizations that expend  $750,000 or more in combined state and federal funds,but less than $750,000 in federal funds,during the program year are required to have an audit of those funds made in accordance with generally accepted Government Auditing Standards (The Yellow Book), revised, as published by the Comptroller General of the United States. Where such an audit is  not required to meet the federal requirements, the costs related to  DHS audit requirements may not be charged to federal funding streams.
+If in connection with the agreement, a local government or nonprofit organization expends
+$500,000  or  more  in combined state  and  federal  funds,  but  less  than  $750,000  in combined state and federal funds, during the program year, the sub recipient shall ensure that, for the tenn of the contract, an independent auditor conducts annual examinations of its compliance  with  the  terms  and  conditions  of  this  contract. These  examinations  shall  be conducted in accordance with the American Institute of Certified Public Accountants&#039; Statements on Standards for Attestation Engagements,No. 10,Compliance Attestation (SSAE 10), and shall be of a scope acceptable to the DHS.The initial compliance attestation shall be completed for the program year specified in the contract and conducted annually thereafter. The incremental cost for preparation of the SSAE 10 report cannot be charged to federal funding streams.
+The sub recipient shall submit the compliance attestation reports (if applicable) to the DHS within
+90 days after the program year has been completed. When the compliance attestation reports are  other  than  unqualified, the  sub  recipient shall  submit  to  the DHS, in  addition  to  the
+compliance attestation reports,a plan describing what actions the sub recipient will implement to correct the situation that caused the auditor to issue other than an unqualified report, a timetable for implementing the planned corrective actions, and a process for monitoring compliance with the timetable and a contact person who is responsible for the resolution of the situation
+If the sub recipient enters into an agreement with a subcontractor(s) for the performance of any primary contractual duties, the audit requirements are applicable to the subcontractor(s) with whom the sub recipient has entered into an agreement. Consequently, the audit requirements should be incorporated into the sub--contractual document as entered by the sub recipient.
+A local government or nonprofit entity that expends less than $500,000 combined state and federal funds  during the program year is exempt from DHS audit requirements, but is required to maintain auditable records for each contract year. Records must be available for review by appropriate officials of the DHS or a pass-through entity.
+AUDIT CLAUSE A- SUBRECIPIENT
+ 	LocalGovernments and Nonprofit Organizations 	
+GENERAL AUDIT PROVISIONS
+A local government  or nonprofit  organization  is responsible  for obtaining  the necessary  audit and securing the services of an independent, licensed certified public accountant or other independent governmental  auditor.  Federal  regulations  preclude  public  accountants  licensed  in  the Commonwealth of Pennsylvania from performing audits of federal awards.
+The   Commonwealth  reserves   the   right  for  federal   and   state  agencies,  or  their  authorized representatives, to perform  additional audits of a financial and/or performance  nature, if deemed necessary  by Commonwealth or federal agencies. Any such additional audit work may rely on the work  already  performed  by  the  sub  recipient&#039;s  auditor,  and  the  costs  for  any  additional  work performed by the federal or state agency will be borne by those agencies at no additional expense to the sub recipient.
+If it is decided that an audit of this contract will be performed, the sub recipient will be given advance notice. The sub  recipient  shall maintain  books, records, and documents  that support the services provided, that the fees earned  are in accordance  with the contract, and that the sub recipient  has complied with the contract terms and conditions. The sub recipient agrees to make available, upon reasonable  notice, at the office of the sub recipient, during normal business hours, for the term of this contract and the retention period set forth in this Audit Clause, any of the books, records, and documents  for inspection, audit, or reproduction  by any state or federal agency  or its authorized representative.
+The sub recipient  shall preserve  all books, records, and documents  related to this contract  for a period of time that is the greater of five years from the contract expiration date, until all questioned costs or activities have been resolved to the satisfaction  of the Commonwealth, or as required  by applicable federal laws and regulations, whichever Is longer. If this contract is completely or partially terminated, the records relating to the work terminated shall be preserved and made available  for a period of five years from the date of any resulting final settlement.
+Audit documentation  and audit reports must be retained by the sub recipient&#039;s independent  auditor for a minimum of five years from the date of issuance of the audit report, unless the sub recipient&#039;s auditor is notified in writing by the Commonwealth or the cognizant  or oversight  federal agency  to extend  the  retention   period.  Audit  documentation   must  be  made  available   upon  request   to authorized  representatives  of the Commonwealth,  the cognizant  or oversight  agency, the federal funding agency, or the Government Accountability Office.
+Records that relate to litigation of the settlement of claims arising out of performance or expenditures under this contract to which exception has been taken by the auditors shall be retained by the sub recipient  or  provided   to  the  Commonwealth at  the  DHS&#039;  option  until  such  litigation,  claim,  or exceptions have reached final disposition.
+Except for documentary  evidence  delivered pursuant to litigation or the settlement  of claims arising out of the performance of the contract, the sub recipient may, in fulfillment of its obligation to retain records  as  required  by  this  Audit  Clause,  substitute  photographs,   microphotographs,   or  other authentic reproductions of such records after the expiration of two years following the last day of the month of reimbursement  to the contractor  of the invoice or voucher to which such records  relate, unless a shorter period is authorized by the Commonwealth.
+AUDIT CLAUSE A- SUBRECIPIENT
+Local Governments and Nonprofit Organizations
+SUBMISSION OF AUDIT REPORTS TO THE COMMONWEALTH A.   Federally Required Audit Reports
+For  years beginning prior to December 26. 2014:  submit  an  electronic copy of federally required audit reports to the Commonwealth, which shall include:
+1.Auditor&#039;s reports
+a. Independent  auditor&#039;s  report on the financial statements,  which expresses  an opinion on whether the financial statements are presented fairly in all material respects in conformity with the stated basis of accounting.
+b. Independent  auditor&#039;s  report  on the supplementary  Schedule  of Expenditures  of Federal Awards (SEFA), which should express an opinion on whether the SEFA is fairly stated in all materialrespects in relation to the sub recipient&#039;s basic financial statements taken as a whole. This  report can be combined  with the independent  auditor&#039;s  report on the basic financial statements or may appear separately in the auditor-submitted document.
+c.   Report  on  internal  control  over  financial reporting  and  compliance  and  other  matters based  on an  audit  of  financial  statements  performed  in accordance   with  Government Auditing Standards.
+d.  Report  on  compliance  and  internal control over  compliance applicable  to  each  major program in accordance  with OMB Circular A-133.
+e. Schedule of findings and questioned costs.
+2. Financial statements and notes thereto
+3. SEFA and notes thereto
+4. Summary schedule of prior audit findings
+5. Corrective action plan (if applicable)
+6. Data collection form
+7. Management  letter (if applicable)
+In instances  where a federal program-specific  audit guide is available, the audit report package for a program-specific  audit may  be different  and should be prepared  in accordance  with the audit guide and OMB Circular A-133.
+AUDIT CLAUSE A- SUBRECIPIENT
+ 	LocalGovernments and Nonprofit Organizations 	
+Instructions and information regarding submission of the single audit/program-specific audit reporting package are available to the public on the Single Audit Submissions page of the Office of the Budget website (http://www.budget.state.pa.us). The reporting package must be submitted electronically in single Portable Document Format (PDF) file to 
+Steps for submission:
+1. Complete the Single Audit/Program Specific Audit Reporting Package Checkilst available on the Single Audit Submissions page of the Office of the Budget website ( us).   The  Single  Audit/Program  Specific  Audit   Reporting Package Checklist ensures the sub recipient&#039;s reporting package contains all required elements.
+2.   Upload the completed Single Audit/Program-Specific Audit Reporting Package along with the Single Audit/Program Specific Audit Reporting Package Checklist in a single PDF file In an e-mail addressed to In the subject line of the e-mail the sub recipient must identify the exact name on the Single Audit/Program-Specific Audit Reporting Package and the period end date to which the reporting package applies.
+The sub recipient will receive an email to confirm the receipt of the Single Audit/Program­ Specific Audit Reporting Package, including the completed Single Audit/Program Specific Audit Reporting Package Checklist.
+For years beginning on or after December 26.2014:submit an electronic copy of the audit report package to the Federal Audit Clearinghouse, which shall include the elements outlined in 2 CFR Part 200,Subpart F- Audit Requirements (Subpart F).
+In addition, the sub recipient must send a copy of the confirmation from the Federal Audit
+Clearinghouse to the resource account 
+B.  DHS Required Audit Reports and AdditionalSubmission by Sub recipients
+1.   Independent Accountant&#039;s Report on Applying Agreed-Upon Procedures - which consist of the following procedures for the funding provided by this agreement for the contract year ending within the entity&#039;s fiscal year end under audit:
+(a) Verify by comparison of the amounts and classifications that the supplemental financial schedules listed below, which summarize amounts reported to DHS for fiscal year ended
+{CONTRACT YEAR END},have been accurately compiled, and reflect the audited books and records of (Auditee). Also verify by comparison to the example schedules that these schedules are presented, at a minimum, at the level of detail that directly mirrors the budget page (Rider 3) of the contract. The Schedule of Revenues and Expenditures should mirror the line items on the budget pages of the contract and include a budget and an actual expenditure column pertaining to this period.
+Program Name/ Contract Number 	Referenced Schedule/Exhibit
+(List each individual schedule for all contracts in which the auditee participated.)
+AUDIT CLAUSE A- SUBRECIPIENT
+ 	Local Governments and Nonprofit Organizations 	
+(b) Inquire  of management regarding adjustments to reported revenues or expenditures, which were not reflected on the reports submitted to DHS for the period in question.
+(c) Based on the procedures detailed in paragraphs (a) and (b) above, disclose any adjustments and/or findings and identify which have (have not) been reflected on the corresponding schedules.
+(List each separately. Indicate whether it has/has not been reflected on the schedule.)
+2.   Independent Accountant&#039;s Report on Applying Agreed-Upon Procedures- which consist of the following procedures for the entity&#039;s fiscal year end under audit. All Local Governments and Nonprofit Organizations who are submitting a single audit in accordance with 2 CFR Part
+200,  Subpart F  are  also  required to  include  in  their  single audit  reporting package  a
+supplemental schedule, which is to  be subjected to an Agreed-Upon Procedures engagement. The schedule, for which an example is included in this audit clause as Enclosure I, is a reconciliation of the expenditures listed on the Schedule of Expenditures of Federal Awards (SEFA) to the Federal award income received from the Pennsylvania Department of Human Services (DHS), as noted in the revenue audit confirmation received from the Commonwealth of Pennsylvania. The procedures to be performed on the reconciliation schedule are as follows:
+(a) Agree the expenditure amounts listed on the reconciliation schedule under the &quot;Federal Expenditures per the SEFA&quot; column to the audited Schedule of Expenditures of Federal Awards (SEFA).
+(b) Agree the receipt  amounts listed on the  reconciliation schedule under the &quot;Federal Awards Received per the audit confirmation reply from Pennsylvania&quot; column to the sub recipient Federal amounts that were reflected in the audit confirmation reply from the Office of Budget,Comptroller Operations.
+(c) Recalculate the amounts listed under the &quot;Difference&quot; column.
+(d) Agree the amounts listed under the &quot;Difference&quot; column to the audited books and records of the Provider.
+(e) Agree the &quot;Detailed Explanation of the Differences&quot; to the audited books and records of the Provider.
+(f)  Based on the procedures detailed in paragraphs (a) through (e) above, disclose any adjustments and/or findings which have not been reflected on the corresponding schedules (List each separately.).
+AUDIT CLAUSE A - SUBRECIPIENT
+                            LocalGovernments and Nonprofit Organizations                            
+PERIOD SUBJECT TO AUDIT
+A federally required audit, conducted in accordance  with Subpart F, encompasses  the fiscal period of the provider. Therefore, the period of the federally required audit may differ from the official reporting period as  specified  in  this  agreement. Where  these  periods  differ,  the  required supplementalschedule(s) of Revenues and Expenditures and the related Independent Accountanfs Report  on Applying  Agreed-Upon  Procedures  must be completed  for the official annual reporting period of this agreement that ended during the period under audit and shall accompany the federally required audit.
+CORRECTIVE ACTION PLAN
+The provider  shall prepare a corrective action plan (CAP) to address all findings of noncompliance, internal control weaknesses, and/or  reportable  conditions  disclosed  In the audit  report. For each finding noted, the CAP should include: (1) a brief description identifying the findings; (2) whether the provider agrees with the finding; (3) the specific steps taken or to be taken to correct the deficiency or specific  reasons  why corrective  action  is not necessary; (4) a timetable  for completion  of the corrective action steps; (5) a description of monitoring to be performed to ensure that the steps are taken; and (6) the responsible party for the CAP.
+REMEDIES FOR NONCOMPLIANCE
+The provider&#039;s  failure to provide  an acceptable  audit, in accordance  with  the requirements  of the Audit Clause Requirements, may result in the DHS&#039; not accepting the report and initiating sanctions against the provider that may include the following:
+• Disallowing the cost of the audit.
+• Withholding a percentage of the contract funding pending compliance.
+• Withholding or disallowing administrative costs.
+• Suspending subsequent contract funding pending compliance. TECHNICAL ASSISTANCE
+Technical assistance on the DHS&#039; audit requirements and the integration of those requirements with the federalSingle Audit requirements will be provided by:
+Department of Human Services Bureau of Financial Operations Division of Audit and Review Audit Resolution Section
+1st Floor, Forum Place
+555 Walnut Street
+P.O.Box 2675
+Harrisburg, Pennsylvania 17105-2675
+
+SUBRECIPIENT I CONTRACTOR AUDITS
+AUDIT CLAUSE A- SUBRECIPIENT
+Local Governments and Nonprofit Organizations
+ENCLOSURE I
+Entity Name
+Year Ended {ORGANIZATION&#039;S FINANCIAL STATEMENT DATE} SUPPLEMENTAL SCHEDULE
+RECONCILIATION
+Federal Awards Passed through the Pennsylvania Department of Human Services
+Expenditures per the SEFA to Revenue Received per the Pennsylvania Audit Confirmation  Reply
+
+--------------------
+Attached Document: 6751f8cc00bfb_66b22b8e533e7_APPENDIX-E--special-provisions-for-in-home-or-community----2425------04-25-24.docx
+Section 1   ( Pages 1-3 )
+STATUTORY BASIS:
+The Service Provider, when appropriate, is certified and approved by the Pennsylvania Department of Public Welfare to provide child welfare services for children and youth and is desirous of making such services available to the County.
+The County has the authority and duty to provide child welfare services to children and youth by reason of:
+Section 216E of the Act of August 9, 1955, P.L. 323, known as the County Code as amended (16 P.S. Section 2169);
+Article VII and Article IX of the Act of June 1967, P.L. 31, known as the Public Welfare Code, as amended; by the Act of July 5, 1976, P.L. 846, No. 148 (62 P.S. Article IV and VII);
+The Juvenile Act, 42 PA C.S. Sections 6301-6365, as amended (relating to Juvenile Matters);
+Section 405, Act of June 24, 1937, P.L. 2017, as amended (16 P.S. Section 2163 and 62 P.S. Section 2035, respectively), known as the County Institutions District Law;
+Act of November 1976, P.L. 438, No. 124 as amended (11 P.S. Sec. 2201-2224) known as the Child Protective Services Law, and further amended by Act 42 of 1983, Act 80 of 1985, Act 80 of 1987, Act 151 of 1995, and Act 153 of 2014;
+23 PaCS 2101 et seq. known as The Adoption Act and 23 PaCS 2910, known as The Revised Uniform Reciprocal Enforcement of Support Act of 1968.
+GENERAL PROVISIONS:
+Family Focus
+The Service Provider ensures that its services enhance the dignity of the child and his or her family, by providing each child with the service needed.  Priority must at all times be given to strengthening the child’s relationship with family members, and the use of appropriate services to reunite families or otherwise achieve a permanent living plan.
+Program Description
+The Service Provider, for an in consideration of the compensation set forth in Appendix B, agrees to provide child welfare services, as set forth in Appendix A – Program Description, pursuant to Chapter 3680.41, to children and youth referred to it by the County and accepted by the Service Provider pursuant to a mutually agreed upon Individual Service Plan between the Service Provider and County.
+When the services being provided are non-placement services, those aspects of this agreement, which are specific to placement services, are not applicable.  Non-placement services contracted for by the County are described in Appendix A – Program Description.
+The service provider is required to follow all requirements under section 6344 of the Pennsylvania child protective service laws as outlined in the Pennsylvania Department of Human Services directive included in this appendix. In addition, a written certification by the service provider’s director shall be attached verifying:
+ 
+the policy is currently being adhered to;
+all current employees have had the checks completed; 
+future employees will be subject to completing prior to start date; and 
+all records are maintained and filed with the provider. 
+The provider shall provide any record upon request of the County.  Lehigh County Office of Children and Youth Services must be informed about any employee who does not have a cleared record. Failure to inform the County of non- cleared record may result in immediate termination of the employee in question.  
+Failure to maintain the policy will result in a contractual violation and the County may terminate the contract, at its discretion.
+   See pages 09 through 11 for additional information on clearances.
+Experimental Research and Treatment
+All experimental research and treatment of children and youth in County custody and care shall be prohibited without the prior written consent of 1) parent and/or legal guardian, the County Office of Children and Youth Services supervisor representative, and juvenile court, and 2) the child of age fourteen or older.
+Training
+Provider staff is expected to enroll in 12 hours of training per year. Provider administrative staff will determine the training needs and enroll staff accordingly.
+PROGRAM ASSESSMENT:
+The County will conduct site assessments for each Service Provider including reviewing of client records and fiscal controls.  Service Providers are expected to cooperate with this evaluation.  The County will be utilizing a standardized monitoring tool.  Once the monitoring is completed, the County will provide a written report of findings and recommendations.
+    Section 2      ( Pages 4-8 )    Limited English Proficiency
+Background
+Title VI of the Civil Rights Act of 1964 prohibits discrimination on the basis
+of race, color, or national origin in any program or activity receiving federal
+funds. It requires programs providing federally funded services to provide
+language assistance to persons with Limited English Proficiency (LEP) in an
+effort to ensure meaningful access to needed services. Any organization or
+individual that receives Federal financial assistance, either directly or
+indirectly, through a grant, contract or subcontract, is covered by Title VI.
+Policy
+No person will be denied equal access to services based on his/her inability,
+or limited ability, to communicate in the English language. Therefore, each
+agency or provider under contract with the County of Lehigh must ensure
+meaningful access to LEP persons by; developing and implementing a
+comprehensive written language assistance program that includes policies
+and procedures for identifying and assessing the language needs of its LEP
+applicants/clients; providing for a range of oral language assistance options;
+providing notice to LEP persons of the right to language assistance;
+providing periodic training of staff; monitoring of the program for
+compliance; and, in certain circumstances, the translation of written
+materials.
+Guidelines
+The LEP person will be made aware, at each entry point for services, that
+he/she may request the services of an interpreter, or other communication
+aids provided by the facility. This notification will be made verbally by
+staff, posted at entry points throughout the facility, and/or, be printed on
+forms and brochures. A person&#039;s request for communication assistance will
+be noted in his or her record. The procedure and information necessary for
+securing qualified foreign language interpreters will be readily available to
+all staff members, especially those who are in direct contact with patients or
+consumers.
+Staff members will be instructed that it is the facility&#039;s obligation to ensure
+effective communication with LEP persons, not the LEP individuals&#039;
+responsibility. If the facility utilizes in-house staff as interpreters, these staff
+members will be appropriately trained. The facility will ensure ready access
+to community and/or contract interpreter resources. These resources will be
+utilized in the event the facility does not have sufficient and/or competent in-house interpreter resources and in the event in house interpreter 
+resources are not available for a specific language or at a specific time.
+All costs incurred through the use of contract interpreter will be paid by the facility.
+All staff members will be instructed not to require/request that LEP persons
+utilize family members, especially children or friends as foreign language
+interpreters. Family or friends’ emotional involvement with an LEP person
+can jeopardize interpretation/translation of critical information.
+Additionally, family or friends may not be adequately versed in the
+specialized terminology required for communication between the LEP and
+the provider. A person&#039;s own interpreter should only be used at the request
+of the LEP person, and when use of that Individual would not compromise
+the effectiveness of services or violate the LEP person&#039;s confidentiality. An
+LEP person&#039;s request to use his/her own interpreter will be noted in the
+person&#039;s record.
+Similarly, staff members will be instructed not to utilize another person
+awaiting services in the waiting area as interpreters. In addition to the issue
+of interpreter competency, LEP persons, like all members of the general
+public, have a right to keep medical or personal information about
+themselves confidential.
+All vital documents will be translated into appropriate languages and made
+readily available to LEP persons. Site translation of written materials
+available only in English will be provided as needed.
+The language assistance program developed by the facility will be monitored
+on a periodic basis to measure its effectiveness. Modifications to the
+program will be made whenever necessary to ensure that LEP persons have
+meaningful access to the facility&#039;s services.
+Agencies and providers have a number of options for providing oral
+language assistance. Which option to use will depend on a variety of factors
+including frequency of need and size of the population (s) served. Examples
+of the options available include:
+ Hiring bilingual staff for applicant, patient and client 
+                                                               contact positions
+ Hiring staff interpreters
+ Contracting for interpreter services
+ Engaging community volunteers
+ Contracting with a telephone interpreter service
+The necessity to translate written documents also may vary depending on
+several factors, including the size of the population (s) being served m1d the
+size of the agency or provider. As part of its overall language assistance
+program, an agency or provider must develop and implement a plan to
+provide written materials in languages other than English where a significant
+number or percentage of the population eligible to be served, or likely to be
+directly affected, by the program needs services or information in a language
+other than English to communicate effectively. If the number or percentage
+of the population eligible to be served is not significant, then the agency or
+provider may not need to translate written documents. Even when written
+translations are not dictated by need, agencies and providers still must
+provide oral interpretation of written documents, if necessary, to ensure
+meaningful access for a LEP person.
+Examples of Prohibited Practices
+ Providing services to LEP persons that are more limited in scope or
+     are lower in quality than those provided to other persons
+ Subjecting LEP persons to unreasonable delays in the delivery of
+     services
+ Limiting participation in a program or activity on the basis of
+     English proficiency
+ Providing services to LEP persons that are not as effective as those
+     provided to those who are proficient in English
+ Failing to inform LEP persons of the right to receive free interpreter
+     services and/or requiring LEP persons to provide their own interpreter.
+Compliance and Enforcement
+The Office of Civil Rights (OCR) will enforce recipients&#039; responsibilities to
+LEP beneficiaries through procedures provided for in the Title VI
+regulations. These procedures include complaint investigations, compliance
+reviews, efforts to secure voluntary compliance and technical assistance.
+OCR will always provide recipients with the opportunity to come into
+voluntary compliance prior to initiating formal enforcement proceedings. In
+determining compliance with Title VI, OCR&#039;s concern will be whether the
+recipients&#039; policies and procedures allow LEP persons to overcome language
+barriers and participate meaningfully in programs, services and benefits.
+OCR will view a recipient&#039;s appropriate use of the methods and options
+discussed in the guidance as evidence of a recipient&#039;s intent to comply with
+Title VI.
+Additional Information
+All Recipients Must Take Reasonable Steps to Provide Meaningful
+Access to LEP Persons
+Title VI and Title VI regulations require that recipients take reasonable
+steps to ensure meaningful access to the information, programs, and services
+they provide. Recipients of federal assistance have considerable flexibility
+in determining precisely how to fulfill this obligation.
+The DHS&#039;s guidance on Title VI of the Civil Rights act of 1964, 42 U.S.C
+2000d and Executive Order 13166, &quot;Improving Access to Services for
+Persons with Limited English Proficiency&quot; outlines a four-factor analysis to
+determine the required level of services required for Limited English
+Proficiency (LEP) persons. 
+These factors include:
+1. The number or proportion of LEP persons eligible to be served or
+likely to be encountered by the program or grantee.
+2. The frequency with which LEP individuals come in contact with
+the program.
+3. The nature and importance of the program or service provided by
+the program to people&#039;s lives.
+4. The resources available to the grantee/recipient and costs.
+Translation services to be provided can include oral interpretation either in
+person or via telephone interpretation service or a written translation.
+However, certain documents deemed vital to the operation of services 
+may require complete translations for frequently encountered 
+languages. Eligible forms include:
+  • Consent and complaint forms;
+ • Intake forms with the potential for important consequences;
+ • Written notices of eligibility criteria, rights, denial, loss or decreases
+in benefits or services, actions affecting parental custody or child
+support and other hearings;
+ • Notices advising LEP persons of free language assistance;
+ • Written tests that do not assess English language competency, but test
+competency for a particular license, job or skill for which knowing
+English is not required;
+ • Applications to participate in a recipient&#039;s program or activity or to
+receive recipient benefits or services.
+Anyone who believes that he/she has been discriminated against because of
+race, color, or national origin may file a complaint with OCR within 180
+days of the date on which the discrimination took place.
+The OCR Regional office for this area is:
+PA Department of Human Services
+Bureau of Equal Opportunity
+Room 223 Health and Welfare Building
+P.O. Box 2675
+Harrisburg, PA 17120
+Telephone: (717) 787-1127
+FAX: (717)772-4366
+TDD: (717) 705-7772
+P A Human Relations Commission
+301 Chestnut Street, Suite 300
+Harrisburg, PA 17101
+Telephone: (717) 787-4410
+FAX: (717) 787-0420
+TDD: (717-787-4087)
+Regional Manager, Office of Civil Rights
+U.S. Department of Health and Human Services
+150 S. Independence Mall West
+Suite 372, Public Ledger Building
+Philadelphia, PA 19106-9111
+Voice Line (2 15) 861-4441
+FAX (2 15) 861-4431
+TDD (2 15) 861-4440
+U.S. Department of Agriculture
+Office for Civil Rights
+Room 326-W, Whitten Building
+1400 Independence Avenue, SW
+Washington, D.C. 20250-9410
+Telephone: (202) 720-5964
+                                             FAX:
+                                             TDD:
+
+Section 3 ( pages 10-12 ) Child Protective Service Laws
+Provider is to comply with all Child Protective Service Laws as outlined below and subsequent changes to the law.  
+Employees Having Contact with Children  (01/16/15)
+Frequently Asked Questions
+Who needs clearances? 
+ An employee of child-care services. 
+ A self-employed family day-care provider. 
+ An individual 14 years of age or older applying for a paid position as an employee responsible for the welfare of a child or having direct contact with children. 
+ Any individual seeking to provide child-care services under contract with a child-care facility or program. 
+An individual who applies to the department for a certificate of compliance or a registration certificate to provide child day care in a residence shall include criminal history record and child abuse record information required under section 6344(b) for every individual 18 years of age or older who resides in the home for at least 30 days in a calendar year
+. 
+What is the definition of child? 
+For purposes of clearances, a child is an individual under 18 years of age.
+ 
+How is direct contact with children defined? 
+Direct contact with children is defined in § 6303 (relating to definitions) as the care, supervision, guidance or control of children or routine interaction with children. 
+How do I determine who in my agency needs clearances? 
+In order to determine who in your agency is required to obtain clearances as a condition of hire you should carefully consider who within your agency, organization or institution has direct contact with children. To make this determination, think about the employee’s role within your agency and the contact they have with children. This determination has two avenues to consider. 
+These avenues for consideration are whether the employee has direct contact with children because they provide care, supervision, guidance or control of children or have routine interaction with children. As these terms are not defined in the statute, we suggest that the common meaning of these terms be used, with child safety serving as the paramount consideration. If you determine that they do provide care, supervision, guidance or control of children, they need clearances. If, however, you determine that they do not provide care, supervision, guidance or control of children, you then move on to the second consideration; whether they have routine interaction with children. 
+With regard to routine interaction, consideration should be given to what the employee’s role is within the agency and based on that role determine if their contact with children is regular, ongoing contact that is integral to their day-to-day job responsibilities.  
+If you determine that they do have direct contact with children, they need clearances. If a determination is made that the employee does not have direct contact with children, clearances are not required. 
+Please be sure to consult your legal counsel when making these determinations. You should also consult with your insurer regarding possible insurance coverage implications. 
+Which clearances are needed? 
+Employees having contact with children must obtain the following three clearances: 
+ Report of criminal history from the Pennsylvania State Police (PSP); 
+ Child Abuse History Clearance from the Department of Human Services (Child Abuse); and 
+ Fingerprint based federal criminal history submitted through the Pennsylvania State Police or its authorized agent (FBI). 
+When are clearances needed? 
+Clearances must be submitted prior to the commencement of employment or service. 
+What is the renewal requirement for clearances? 
+Beginning Dec. 31, 2014, clearances must be obtained every 60 months. Timeframes for renewed clearances are based upon the date of each individual clearance. If an individual or agency elected to renew all clearances at the same time, the date of the oldest clearance rather than the most recent would be used. 
+Who pays for clearances? 
+The applicant or employee is responsible for paying the cost of the required clearances. However, some employers choose to pay for these clearances and are able to establish business accounts to pay for clearances. The only time an employer is required to bear the cost of the clearances is when there is reasonable belief that the employee was arrested or convicted of an offense that would deny employment or named as a perpetrator in an indicated or founded report. In these situations, the employer must immediately require the employee to obtain their clearances. 
+Are there any other requirements? 
+If an employee is arrested for or convicted of an offense that would constitute grounds for denying employment or participation in a program, activity or service, or is named as a perpetrator in a founded or indicated report, the employee must provide the administrator or their designee with written notice not later than 72 hours after the arrest, conviction or notification that the person has been listed as a perpetrator in the statewide database. 
+An employee who willfully fails to disclose information as required above commits a misdemeanor of the third degree and shall be subject to discipline up to and including termination or denial of employment. 
+Is my employer required to keep a copy of my clearances? 
+Yes, pursuant to § 6344 (b.1), the employer, administrator, supervisor or other person responsible for employment decisions or acceptance of the individual to serve in any capacity requiring clearances, shall maintain copies of the required information and require the individual to produce the original documents prior to employment or acceptance to serve in any such capacity, except provisional employees for limited periods as described in § 6344 (m) and outlined above. An employer, administrator, supervisor or other person responsible for employment decisions that intentionally fails to require an applicant to submit the required clearances before the applicant’s hiring commits a misdemeanor of the third degree. 
+Agencies are reminded that the Child Abuse clearance information is confidential and may not be released to other individuals.  
+Can an employer or organization institute additional standards? 
+Yes, nothing prohibits the employer, program, activity or service from making employment, discipline or termination decisions or establishing additional clearance standards. 
+Can my clearances be transferred? 
+Clearances can be transferred if they meet the Requirements set forth by Section 6344.3 (f).
+Section 4 (Page 13) Discrimination Clause
+This agreement is subject to all applicable provision of State and Federal law related to the provision, delivery and funding of Child Welfare Services.  PROVIDER agrees to provide contracted services in accordance with the regulations applicable to such public social services to children and youth as may be promulgated and revised from time to time by DEPAERTMENT.
+PROVIDER shall be responsible for and agrees to indemnify and hold harmless COUNTY from all losses, damages, expenses, claims, demands, suits and actions brought by any party against COUNTY as a result of the PROVIDER’s
+failure to comply with any State and Federal law.
+
+--------------------

@@ -1,0 +1,21 @@
+Purpose: <p>This is a <strong>$25,000.00 lump sum</strong> grant, awarded by Starbucks to support it's <a href="https://stories.starbucks.com/stories/hunger-relief/">FoodShare program</a>; delivering frozen product daily directly to partner agencies. This program is designed to provide necessary infrastructure to those partner agencies who receive Starbucks product.</p><p>An itemized list of requested equipment has been submitted and accepted by Starbucks (see below). Once funds are received, the Retail Recovery Coordinator will work with partner agencies to purchase and install equipment. Funds must be spent before July 30, 2024.</p><p>A report is due on or before July 30, 2024, outlining the itemized expenditures, providing an Impact Statement on use of funds and social media coverage. Additional details are below.&nbsp;</p><figure class="image"><img src="http://10.55.0.10/storage/824/image.png"></figure>
+Funder: Starbucks
+Program: SHFB
+Amount: 25000.00
+Start Date: 2024-05-01
+End Date: 2024-07-30
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 663b9f4f80cde_2024SHFB_Starbucks_Food-Share.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 663ba2ea20472_Starbucks-Food-Share-Itemized-Pricing.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

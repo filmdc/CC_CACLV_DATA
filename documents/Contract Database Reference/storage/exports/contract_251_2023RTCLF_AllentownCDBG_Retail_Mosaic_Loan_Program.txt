@@ -1,0 +1,163 @@
+Purpose: <p>-CDBG Year 49</p><p>-Underwriting applications for a maximum of 5 qualified loan recipients (up to $15,000 of self-forgiving loans) and partial salary for Rising Tide Staff (up to 50 hours per grant year).</p><p>-Reimbursable grant</p><p>-Income verification forms included in contract need to be filled out for each applicant</p><p>-Applicant must hire one low-moderate-income full-time employee amongst other qualifications. Please see program guidelines uploaded here.</p>
+Funder: Allentown CDBG
+Program: RTCLF
+Amount: 85000.00
+Start Date: 2023-01-01
+End Date: 2026-12-01
+
+Notes: <p>-Quarterly CDBG reports will be due each April, July, October and January for the life of the program. Please reach out to Megan Brehm megan.brehm@allentownpa.gov or Daniel Diaz daniel.diaz@allentownpa.gov for reporting form/required information. &nbsp;</p>
+
+Fund Number: 0501
+
+Attached Document: 654a7bf98cb56_2023RTCLF_AllentownCDBG_Retail-Mosaic.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 654a7bfb368e2_2023RTCLF_-ALlentownCDBG_Retail-Mosaic_environmentalreview.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 654a7c1e291e8_Retail-Mosaic-Program-Guidelines-Exhibit-Final-(10.31.23).pdf
+1 
+ 
+City of Allentown 
+Retail Mosaic Self-Forgiving Loan Program  
+ 
+Pre-Cursor –  To be considered for participation in the program, an applicant must agree to 
+hire one low-moderate income full time equivalent (FTE) job; hiring from within 
+the City-wide area, (as per Allentown Five Year Consolidated Plan 2019-2024) 
+(Demonstrate in application)- 22 points 
+ 
+Eligible Businesses Retail, Mercantile, Service, Commercial (Restaurants and other establishments 
+that prepare made to order food are ineligible) 
+Businesses must demonstrate a positive, direct community impact and choose 
+to open within the City-wide area (as per Allentown Five Year Consolidated Plan 
+2019-2024). Businesses must agree to create one full time equivalent job which 
+can be held by individuals residing within the City-wide area who meet the 
+low/moderate income guidelines found on page 4. 
+Entrepreneurs interested in establishing retail businesses within city limits.  
+ 
+Pre-Screening 
+Staff will pre-screen applications based on the below criteria (point system) (excluding credit history) 
+ 
+Criteria 	Points 
+ Matching equity and other sources of funds 
+(85%) 
+15 
+Fit into downtown (size/market) 17 
+Meeting job creation requirements – 
+creation of 2 low-mod income jobs; hiring 
+from neighborhood* 
+22 (see above) 
+Quality of Business Plan 	12 
+3 years of financial proformas and 
+appropriate assumptions/ Positive Cash 
+flow 
+12 
+Use of funds  	12 
+Sale of Made in America Products 10 
+Total Pre-Screening Points 	100
+
+2 
+ 
+All applications will be pre-screened for completeness and adherence to the 
+above by City Staff.   Applications will be forwarded to Rising for underwriting 
+and recommendation.  Rising Tide will solicit credit reports on all prospective 
+borrowers. 
+Rising Tide will administer the credit underwriting of the Retail Mosaic Self-
+forgiving Loan Program in adherence to CDBG program guidelines.  Rising Tide 
+will underwrite referred applications and will submit their recommendation to 
+City staff.  The City Staff person will forward these recommendations to a Retail 
+Mosaic Award Committee.  The Retail Mosaic Award Committee will review the 
+recommendations and awards will be made to prospects based on fit/need for 
+services and uniqueness to the city wide business landscape.  All awards are 
+contingent upon final approval and underwriting by Rising Tide.  
+ 
+Loan Closing Rising Tide will prepare all loan documents and perform loan closings, in 
+concurrence with CDBG’s job creation requirements.  A clawback will exist in the 
+loan documentation that requires payment of loan in full for any recipient that 
+moves their business within five years, does not meet the job creation 
+requirements, or closes the business. 
+  
+Eligible Use of funds Acquisition and installation of new or used machinery, equipment which is 
+directly related to the business process.  Upgrading existing machinery and 
+equipment which is directly related to the business process is also eligible. 
+ 	Successful award recipients must obtain one to three written quotes for 
+equipment purchases.  If only one quote is obtained, the award recipient shall 
+provide reasonable documentation justifying why only one quote could be 
+obtained.  
+ 	This loan program is a reimbursement program.  Applicants will need to utilize 
+bridge or other financing to acquire equipment prior to the distribution of loan 
+proceeds. 
+ 	Please note:  Repair costs for existing machinery and equipment, labor costs and 
+refinancing and related party transactions are not eligible for loan 
+reimbursement. 
+ 
+Job Monitoring Rising Tide will annually monitor all companies for meeting program 
+requirements.  City of Allentown HUD Office will monitor Rising Tide annually.
+
+3 
+ 
+ 
+Loan amount $15,000 ** 
+Interest Rate 0% 
+Term 	5 year forgivable loan (lien remains for 5 years; reporting requirements 
+conclude 
+Collateral 1
+st
+ or 2
+nd
+ lien on equipment; maximum Loan to Value ratio of 75% 
+Public Benefit The use of these funds will enable the applicant to create a permanent full time 
+equivalent job held by and made available to low/moderate income person.  
+The applicant/owner must create one permanent full time equivalent job that 
+meet income guidelines.  Employees must reside in the City-wide area, (as per 
+Allentown Five Year Consolidated Plan 2019-2024) 
+Reporting Quarterly reporting is required for one year after the creation of required job.* 
+Requirements Applicant must document all jobs created and distinguish which are considered 
+low/moderate income jobs.  Documentation must be provided to Rising Tide 
+annually during a program monitoring. Program monitoring will occur for a 
+period of one year following the creation of required job.  
+Clawback In the event a company closes or relocates its operations within five years. 
+(exception: economic hardship).  For reasons other than economic hardship, if 
+the company chooses to re-locate, the company must pay back the loan in full. 
+Loan Committee Santo Napoli (Chamber); Daniel Diaz (City); DJ Kormanik (SBDC); Chris Hudock 
+(Rising Tide) 
+Technical Assistance Megan Brehm, HUD Grants Manager; Daniel Diaz Business Development 
+Manager presents applications to committee. 
+*Company has up to three years to create the job; however monitoring may 
+stop after one year if job creation is met. Meaning that if there is turnover of 
+staff during the first year, subsequent employees must meet the low to 
+moderate income guidelines until the one-year monitoring is complete.  If 
+owner is considered the employee and does not meet the low and moderate 
+income guidelines, the owner must create an additional LMI full time job to 
+ensure threshold is met.  
+ 	**Subject to credit underwriting by business development staff/sub-contracted 
+entity and credit history review.
+
+4 
+ 
+ 
+CITY OF ALLENTOWN 
+COMMUNITY DEVELOPMENT BLOCK GRANT PROGRAM 
+LOW AND MODERATE INCOME GUIDELINES 
+2023-2024 
+ 
+FAMILY SIZE 	MAXIMUM GROSS FAMILY INCOME 
+80% AMI 
+1 	$53,700 
+2 	$61,400 
+3 	$69,050 
+4 	$76,700 
+5 	$82,850 
+6 	$89,000 
+7 	$95,150 
+8 	$101,250
+--------------------
+Attached Document: 65a00ac002ea3_2023RTCLF_AllentownCDBG_Retail-Mosaic-Loan-Programexecutedcontract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

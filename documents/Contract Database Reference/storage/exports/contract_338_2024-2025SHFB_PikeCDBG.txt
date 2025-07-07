@@ -1,0 +1,99 @@
+Purpose: <p>Pike County has awarded SHFB a CDBG grant for $34,508.00 for the purchase of fresh food for Pike County. This is a <strong>reimbursable grant</strong> with the grant period running from <strong>May 9, 2024 - August 31, 2025</strong>. Food will be distributed to partner agencies serving Pike county.&nbsp;</p><p>Fresh food includes dairy, meat, eggs, fruits, and vegetables. Whenever possible, fresh food shall be procured from farmers located in Pike County.</p><p>Food pantries serviced with CDBG funds must prepare and submit a letter on letterhead stating they will collect a Self Declaration of Need form from each individual served and that no food or non-food items purchased through this grant will be distributed to individuals who have not completed a Self Declaration of need form or who are deemed to be ineligible due to income. A template for this letter can be found in Exhibit B of the contract attached.</p><p>Reports are due bi-monthly, according to the chart below. Completed reports should be sent to Katie Blake at Hailstone Economic, LLC which administers the CDBG funds: <a href="kblake@hailstoneeconomic.com">kblake@hailstoneeconomic.com</a></p><figure class="image"><img src="http://10.55.0.10/storage/936/image.png"></figure><figure class="image"><img src="http://10.55.0.10/storage/938/image.png"></figure>
+Funder: Pike County
+Program: SHFB
+Amount: 34508.00
+Start Date: 2024-05-09
+End Date: 2025-08-31
+
+Notes: 
+
+Fund Number: 8069
+
+Attached Document: 6658d0c104eb8_2024SHFB_Pike-CountyCDBG_Executed.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6658d1facfc1f_2023-2024-Declaration-of-Need-FormEnglish.pdf
+Children (0-17)
+Adults
+Seniors (60 and up)
+1	26,973$                   	2,248$                 	519$                          
+2	36,482$                   	3,040$                 	702$                          
+3	45,991$                   	3,833$                 	884$                          
+4	55,500$                   	4,625$                 	1,067$                       
+5	65,009$                   	5,417$                 	1,250$                       
+6	74,518$                   	6,210$                 	1,433$                       
+7	84,027$                   	7,002$                 	1,616$                       
+8	93,536$                   	7,795$                 	1,799$                       
+9,509$                     	792$                    	183$                          
+The Emergency Food Assistance Program is operated in accordance with United States Department of Agriculture (USDA) policy, 
+which prohibits discrimination on the basis of race, color, national origin, sex, age or disability.  Eligibility is based upon the income 
+guidelines listed below.  The recipient circles the entire line
+ that applies to their Household Size, understanding they must be at, or 
+below, the income level indicated to be eligible for program benefits.
+Household Size            
+Circle One
+I understand the household income limitations and hereby certify that my household size and income make me eligible for participation 
+in the program.  I also certify that, as of today, my household lives in the area served by Pennsylvania in The Emergency Food 
+Assistance Program.  This certification form is being completed in connection with the receipt of Federal assistance.
+I UNDERSTAND THAT MAKING A FALSE STATEMENT MAY RESULT IN MY HAVING TO PAY FOR THE VALUE OF THE FOOD 
+IMPROPERLY ISSUED TO ME AND MAY SUBJECT ME TO CRIMINAL PROSECUTION UNDER STATE AND FEDERAL LAW.
+Recipient Signature	Date
+                       
+                        Return completed form to your designated county agency.  If you are unsure of the correct agency,                                                                                                                                       
+                        please call the Bureau at 1-800-468-2433.
+Bureau of Food Assistance
+The Emergency Food Assistance Program (TEFAP)
+“Self Declaration of Need"
+Effective July 1, 2023 to June 30, 2024
+Recipient Name
+Street Address
+City                           State                              Zip             Distribution Site Location
+Agency Representative Signature                       Date
+Distribution Site Name                                        Number
+Total Household Income (based on 185% of Poverty)
+Annual	Monthly	Weekly
+For each additional family member add:
+THIS FORM IS NOT TO BE ALTERED OR CHANGED IN ANY WAY.
+PLEASE  REFER TO THE REVERSESIDE OF THIS DOCUMENT FOR AN IMPORTANT USDA NON-DISCRIMINATION STATEMENT
+
+USDA Nondiscrimination Statement
+In accordance with federal civil rights law and U.S. Department of Agriculture (USDA) civil rights 
+regulations and policies, this institution is prohibited from discriminating on the basis of race, color, 
+national origin, sex (including gender identity and sexual orientation), disability, age, or reprisal or 
+retaliation for prior civil rights activity.
+Program information may be made available in languages other than English. Persons with disabilities 
+who require alternative means of communication to obtain program information (e.g., Braille, large print, 
+audiotape, American Sign Language), should contact the responsible state or local agency that 
+administers the program or USDA’s TARGET Center at (202) 720-2600 (voice and TTY) or contact 
+USDA through the Federal Relay Service at (800) 877-8339.
+To file a program discrimination complaint, a Complainant should complete a Form AD-3027, USDA 
+Program Discrimination Complaint Form which can be obtained online at: 
+https://www.usda.gov/sites/default/files/documents/USDA-OASCR%20P-Complaint-Form-0508-0002-
+508-11-28-17Fax2Mail.pdf, from any USDA office, by calling (866) 632-9992, or by writing a letter 
+addressed to USDA. The letter must contain the complainant’s name, address, telephone number, and a 
+written description of the alleged discriminatory action in sufficient detail to inform the Assistant 
+Secretary for Civil Rights (ASCR) about the nature and date of an alleged civil rights violation. The 
+completed AD-3027 form or letter must be submitted to USDA by:                                                                                                                                                                                                                                                                                                             
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+1. mail: U.S. Department of Agriculture
+Office of the Assistant Secretary for Civil Rights
+1400 Independence Avenue, SW
+Washington, D.C. 20250-9410; or
+2. fax:
+(833) 256-1665 or (202) 690-7442; or                                                                                                                                                                                                
+3. email:
+program.intake@usda.gov
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+This institution is an equal opportunity provider.
+
+Date
+I______________________________ hereby authorize _________________________________ to pick up my 
+TEFAP Food Package and deliver it to me.
+Client Signature	Proxy Signature
+Pantry Representative
+The Emergency Food Assistance Program                                                                                                                                                                                              
+Pennsylvania TEFAP Proxy Form
+        Proxy ID Verified
+--------------------

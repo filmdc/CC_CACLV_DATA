@@ -1,0 +1,158 @@
+Purpose: <p>-Supportive Services fund for residents: &nbsp;used for a variety of expenses that may arise for residents during their stay at the Shelter. This may include tuition assistance, books and course materials, computers, rental application fees, establishing renters’ insurance, the acquisition or replacement of documents (Social Security cards, birth certificates, and driver’s licenses), childcare, food, transportation costs, hygiene items, cleaning supplies, emergency assistance, and diapers and other supplies for children.</p><p>-There are no reporting requirements.&nbsp;</p>
+Funder: St. Paul's UCC
+Program: SSS
+Amount: 1500.00
+Start Date: 2024-04-17
+End Date: 
+
+Notes: 
+
+Fund Number: 8000
+
+Attached Document: 662ff9295514c_2024SSS_StPaulsUCCGrant_AwardNotification.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 662ff93ce83e4_2024SSS_StPaulsUCCGrant_ProposalSubmitted.pdf
+1 
+ 
+St. Paul’s United Church of Christ, Trexlertown 
+APPLICATION FOR ENDOWMENT FUNDS 
+Date of Application:  December 20, 2023 / January ___, 2024 
+Applicant: (Name of Individual or Group applying on behalf of an Organization)  
+Julie Shoults, Planner, Community Action Lehigh Valley; planner-SSS@caclv.org 
+ 
+Contact Person and Phone Number: Robbie Matthews, Director, 610-435-1490 
+Funds Requested for: 
+  Name of Organization: Community Action Lehigh Valley: Sixth Street Shelter 
+  Address of Organization: 219 North Sixth Street, Allentown, PA 18102 
+Amount Requested: $2,000 
+Please give a brief description of project or service, indicating its value to the 
+ministry of the church: 
+Please circle: Category 1  2  3  4  5 (see description on back of this page) 
+Description: 
+St. Paul’s United Church of Christ works for “righteousness, justice, and peace” in our community and 
+has been a vital partner to Community Action Lehigh Valley for many years. The Sixth Street Shelter, a 
+long-standing program of Community Action, also pursues these values by providing an essential service 
+to the community as a place for families experiencing homelessness to find a temporary home and 
+supportive services as they increase their self-sufficiency and stability on their path forward.  
+ 
+Located in Center City Allentown, the Sixth Street Shelter provides safe, short-term housing for low-
+income families with at least one child under the age of 18 who have become homeless. The property has 
+25 private apartments, a Family Resource Center, playground, and full-choice food pantry for residents. 
+The Sixth Street Shelter is unique because it is the only shelter in the area where entire families of any 
+configuration (including those with fathers and teenaged boys, multi-generational families, and those from 
+the LGBTQ+ community) stay together in their own apartments. Each family is afforded the dignity of 
+having their own kitchen, bathroom, and bedroom rather than having to share facilities with other families, 
+as is common with traditional shelters. Through coordinated efforts as part of the Lehigh Valley Regional 
+Homeless Advisory Board (LVRHAB), the Sixth Street Shelter meets the needs of the community by 
+providing shelter housing specifically for families. 
+ 
+For many families, the stay at the Sixth Street Shelter enables them to begin to stabilize their income and 
+address the problems that led to their homelessness. The families who come to the Shelter do so for various
+
+2 
+ 
+reasons: low-paying jobs, lack of affordable housing, mental and/or physical health crises, domestic 
+violence, and lack of access to reliable transportation, healthcare, and/or childcare. The Shelter provides 
+each family with a fully furnished apartment and supportive services, including individualized case 
+management. Staff work to connect them with the necessary resources to address their individual needs, 
+such as financial literacy and parenting classes, access to childcare and healthcare, and mental health 
+support. The Shelter has a comprehensive network of community partners where we can refer residents 
+for additional services and resources. During their residency, the family develops a Family Service Plan 
+with their caseworker, setting household, budgeting, educational, and vocational goals and seeking 
+suitable housing and employment. We have started a new Benchmark Family Care Initiative, which aims 
+to ensure that all residents have or obtain medical insurance and are connected to appropriate providers so 
+that they can achieve a list of benchmarks related to their relevant medical, dental, and mental health care, 
+as well as track financial goals. Other recent initiatives include adding a Housing Innovation Specialist to 
+our staff to work with our residents and local landlords in order to identify affordable housing options and 
+facilitate faster placements for families, and expanding our educational and vocational programming at 
+the Sixth Street Shelter to increase residents’ earning capacity, which will help them to remain stably 
+housed when they move out of the Shelter and into permanent housing. Staff maintain contact with the 
+family following their move into permanent housing to offer additional assistance and determine how well 
+they are continuing to move toward self-sufficiency.  
+ 
+Housing is a key social determinant of health, as it influences one’s mental and physical health, well-
+being, and quality of life. The negative health impacts of homelessness are well documented, including 
+short- and long-term adverse health outcomes. According to the Housing Alliance of Pennsylvania, 
+“Experiencing homelessness leads to new and exacerbates existing health problems,” through the lack of 
+access to “clean water, refrigeration, shelter from the elements, and safety from harm.” Long-term impacts 
+include chronic illness, over-reliance on costly and acute health care services, and significantly higher 
+morbidity. The National Low Income Housing Coalition cites that “People experiencing homelessness die 
+on average 12 years sooner than people in the general population in the U.S.” Case Managers at the Shelter 
+work to ensure that all residents have or obtain medical insurance and are connected to appropriate health 
+care providers. We collaborate with local partners and health professionals to offer educational sessions 
+on healthy eating and general wellness, and provide access to free health services, such as vaccinations 
+and comprehensive eye exams and prescription glasses. Each family has access to an on-site, full-choice 
+food pantry and their own kitchen in their apartment so that they can store fresh foods and prepare their 
+own meals. These supportive services offered to residents aim to increase knowledge, answer questions, 
+facilitate access to resources, and improve health outcomes, which sets a foundation for achieving stable 
+housing and greater well-being. Homelessness is often traumatic, and the Sixth Street Shelter provides 
+resources and services to help mitigate these impacts and set families on a path out of homelessness. 
+ 
+We are seeking a grant from St. Paul’s UCC for our Supportive Services Fund for residents. These funds 
+are used for a variety of expenses that may arise for residents during their stay at the Shelter. This may 
+include tuition assistance, books and course materials, computers, rental application fees, establishing 
+renters’ insurance, the acquisition or replacement of documents (Social Security cards, birth certificates, 
+and driver’s licenses), childcare, food, transportation costs, hygiene items, cleaning supplies, emergency 
+assistance, and diapers and other supplies for children. In short, the Supportive Services Fund removes 
+barriers to self-sufficiency to assist our families in securing housing and achieving greater stability.
+
+3 
+ 
+Since 1985, the Sixth Street Shelter has been helping families on their path out of homelessness. In 
+addition to the comprehensive services provided to Shelter residents, Sixth Street Shelter has become a 
+resource center for former residents and people from the surrounding neighborhood. Community members 
+drop by regularly looking for information regarding community programs and resources, which are always 
+readily available. We also welcome volunteers from the community. The Sixth Street Shelter has proven 
+to be a vital resource in the community, and we value our partners who help us in this endeavor. 
+ 
+(Applications will be accepted by the Endowment Committee 
+between December 1, 2023 and January 31, 2024) 
+St. Paul’s United Church of Christ, Trexlertown 
+ 
+RETURN TO: 
+ St. Paul’s UCC, PO Box 336, Trexlertown 18087 
+Attention: Gary Gehman
+
+4 
+ 
+ENDOWMENT FUND 
+ 
+1. Christian Education 
+Grants for special programs for children, youth and adults enabling them to 
+grow in their understanding of the Christian faith. Scholarships and/or 
+grants for the purpose of attending college and seminary to prepare for a 
+church related vocation. Funding for church camping, retreats, and 
+leadership conferences. 
+ 
+2. Community Service and Outreach 
+Programs and services through social service agencies, community action 
+groups, and ecumenical agencies relating to the spiritual, social and 
+economic needs of persons in the community the church serves. 
+ 
+3. Wider Mission of the UCC 
+Providing for work of the UCC in the USA and overseas in such areas as 
+new church development, professional leadership, educational ministries, 
+evangelism, and world mission. 
+ 
+4. Capital Improvements 
+To provide for major capital improvement of facilities, building programs 
+and debt reduction that cannot adequately be expected to be raised by 
+annual giving and capital campaign efforts. 
+ 
+5. Annual Church Program 
+To provide for expansion or growth of annual, operational expenses of the 
+congregation’s ministry which are not underwritten by annual giving of the 
+congregation nor provided for in the annual budget of the church. 
+ 
+The Committee shall evaluate all requests for program support; those 
+programs that are deemed to be in the best interest of this congregation and 
+the level of financial support available shall be recommended by the 
+COMMITTEE to the Council and then determined and approved by 
+Council for funding. 
+ 
+THE ENDOWMENT COMMITTEE SHALL ACCEPT APPLICATIONS 
+DURING THE MONTH OF DECEMBER OF EACH CALENDAR YEAR.
+--------------------

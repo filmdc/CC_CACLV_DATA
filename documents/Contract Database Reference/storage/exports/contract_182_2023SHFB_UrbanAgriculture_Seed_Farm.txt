@@ -1,0 +1,64 @@
+Purpose: <p>Capacity building for the Seed Farm. Greenhouse purchase and construction, growing partner materials, seeds, transplants, construction of raised beds, delivery of transplants to growing partners.</p><p><strong>Equipment: $12,953.90</strong></p><p><strong>Supplies: $6,501</strong></p><p><strong>Contractual: $8,300</strong></p>
+Funder: Urban Agriculture
+Program: SHFB
+Amount: 27754.00
+Start Date: 2022-07-01
+End Date: 2024-06-30
+
+Notes: <p>**This is a reimbursable grant.</p><p>*** Grant funds may not exceed 85% of the total project cost a minimum match of $4, 897.93 must be shown.</p><p>****Upon completion of your project, you must submit a final report with your invoice. Invoice will not be paid without a report. Final Report template and reimbursement template is attached. Reimbursement request must come with the receipts showing the expenses and must be dated within terms of the contract. These items will only be accepted electronically via a PDF. Reimbursement and reports must be sent to this email address for prompt review and process of reimbursements. <a href="mailto:ra-agpafarmbillgrant@pa.gov">ra-agpafarmbillgrant@pa.gov</a></p>
+
+Fund Number: 
+
+Attached Document: 646b951fd01f7_2023SF_UrbanAgriculture_executedcontract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 646e4f9aabc49_PDA_UrbanAG_Reporting.docx
+PA Department of Agriculture 
+Urban Agriculture Infrastructure Grant 
+ Reporting Template 
+Name of your project: ________________________
+Your Name:_________________________________
+Your Title:___________________________________
+Your project was completed on ____________________ 
+(Please use 00/00/0000 format)
+Below, please list the names of your photos below and provide a few sentences to describe the impact of this grant seen in each photo. Please provide between four and ten photos. (Do not put pictures in this document. Please attach them to the same email that you will be submitting with this document.)
+Photos:
+[Name]
+[Description]
+[Name]
+[Description]
+[Name]
+[Description]
+[Name]
+[Description]
+By signing the line below, you are verifying that your project is completed or implemented.  
+       
+              ________________________________________________________________
+
+--------------------
+Attached Document: 646e4f9f62c0c_Urban-Ag-Reimbursment-Template.docx
+Urban Agriculture 
+Reimbursement Template
+Business Name: (_________)
+Name of Individual Submitting Request: (__________)
+Contract Number: (_________)
+Invoice Date: (_________)
+Instructions:
+In the below chart, please fill out the information regarding your receipts. You will need to fill in the vendor name, total of the receipt, and the amount of funds you are seeking reimbursement for from the receipt (If you are seeking reimbursement for everything you purchased from a receipt, put the total in the “Amount Requested” column). You must attach all receipts you are seeking reimbursement for.
+Below is an example of a filled-out chart 
+Please place your information below:
+Total Reimbursement Request ($): (__________)
+**Please note that your total reimbursement request cannot be more than what you were awarded**
+Total Match Amount ($): (__________) 
+Is this all funding you are requesting reimbursement for (Yes or No)? (_______)
+**Please note that saying yes to the above question means that you have no more receipts to submit. **
+
+--------------------
+Attached Document: 646f99b412787_646b9538c19dc_2022-2023SF_UrbanAGriculture_grant-award-summary.docx
+
+Grant Award Summary
+Please let me know if you have any further questions or concerns!
+
+--------------------

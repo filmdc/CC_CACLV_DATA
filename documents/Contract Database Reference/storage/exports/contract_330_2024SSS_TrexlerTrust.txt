@@ -1,0 +1,132 @@
+Purpose: <p>-$20,000 for general operating</p><p>*There will be a report prior to November 1, 2024. The Stewardship Report Guidelines can be found on www.TrexlerTrust.org.&nbsp;</p><p><strong>**Failure to file a timely report will result in the elimination of the Grantee's eligibility for any grant in 2025.&nbsp;</strong></p><p>&nbsp;</p>
+Funder: Harry Trexler Trust
+Program: SSS
+Amount: 20000.00
+Start Date: 2024-04-16
+End Date: 
+
+Notes: 
+
+Fund Number: 1215
+
+Attached Document: 6633d505b532b_2024SSS_-TrexlerTrust.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6633d60f89131_2024SSS_TrexlerTrust_ProposalSubmitted.pdf
+according to the U.S. Department of Education, have three times the rate of emotional and behavioral problems. 
+The National Alliance to End Homelessness states that they face increased school mobility, exhibit lower 
+academic performance, and are more likely to experience separations from their families. The Sixth Street Shelter 
+works to keep families housed together and to offer greater stability and a supportive environment to children and 
+their families while they navigate the challenges they face. Homelessness is traumatic for children, and the Shelter 
+provides resources and services to help mitigate these impacts and set families on a path out of homelessness. 
+ 
+How the need will be met  
+The Sixth Street Shelter assists families experiencing homelessness secure safe housing through family-centered 
+services, in-house programming, and referrals to community resources while advocating that affordable housing 
+is a human right. Located in Center City Allentown, the Sixth Street Shelter provides safe, short-term housing 
+for families of any configuration experiencing homelessness. The property has 25 private apartments, a Family 
+Resource Center, a playground, and a full-choice food pantry for residents. 
+ 
+The Shelter provides each family with a furnished apartment and supportive services, including individualized 
+case management. Staff work to connect them with the necessary resources to address their individual needs, such 
+as financial literacy and parenting classes, access to childcare and healthcare, and mental health support. The 
+Shelter has a comprehensive network of community partners where we can refer residents for additional support. 
+During their residency, the family develops a Family Service Plan with their case manager, setting household, 
+budgeting, educational, and vocational goals and seeking suitable housing and employment. Our Benchmark 
+Family Care Initiative aims to ensure that all residents have or obtain medical insurance and are connected to 
+appropriate providers so that they can achieve a list of benchmarks related to their relevant medical, dental, and 
+mental health care, as well as track financial goals. We have expanded our educational and vocational 
+programming at the Shelter to increase residents’ earning capacity, which will help them to remain stably housed 
+when they move out of the Shelter and into permanent housing. Following the family’s move back into the 
+community, the Shelter staff maintain contact with them whenever possible to offer additional assistance and to 
+determine how well they are continuing to move toward self-sufficiency.  
+ 
+Methods and Measurement Standards for Success 
+Objectives to be accomplished by June 30, 2024 include: Goal: Sixth Street Shelter will provide short-term 
+transitional housing, case management and other supportive services for families with children who are 
+experiencing homelessness and help them achieve their self-sufficiency goals. 
+ 
+Performance Targets: 
+A. 85 families will reside at the Shelter and will develop Family Service Plans based on their housing, 
+educational, and financial goals; 
+B. 50% of families will save money toward rent or a security deposit upon leaving the Shelter; 
+C. 75% of families will achieve their Family Service Plan goals; 
+D. 100% of families will create a written budget to understand credit and money management as part of their 
+goal plan; 
+E. 15% of families will be referred to CareerLink and obtain services to assist with vocational development 
+and the job search; 
+F. 25% of families will move into affordable housing upon leaving the Shelter. 
+ 
+Each year, a Work Plan is developed with measurable goals and performance targets (listed above) that guide the 
+activities of the program and are designed to have a positive impact on Shelter families and the larger community. 
+The Work Plan is evaluated twice a year and then approved by Community Action’s full Board of Directors. 
+ 
+The Sixth Street Shelter utilizes the Homeless Management Information System (HMIS) to track and analyze 
+data. HMIS is used by the Eastern Pennsylvania Continuum of Care/Lehigh Valley Regional Homeless Advisory 
+Board (of which the Shelter is an active member) and administered by the Pennsylvania Department of 
+Community and Economic Development. Sixth Street Shelter also participates in Connect to Home: the
+
+Coordinated Entry (CE) System of the Eastern PA Continuum of Care, which coordinates access, assessment, 
+prioritization and referral for housing and supports for people experiencing and at imminent risk of homelessness 
+in the community. A component of the CE System is designed to capture data on people experiencing 
+homelessness across the Lehigh Valley and develop community-wide strategies to meet that need. The information 
+gathered from HMIS becomes the beginning of a confidential case file that contains basic information on the 
+family and documents the history of their progression through the program; all such files are always secured in 
+locked filing cabinets. Sixth Street Shelter also utilizes a client management information system called 
+ClientTrack (which interfaces with HMIS) to track information not encompassed by HMIS.  
+ 
+In addition to the data collection methods noted above, Sixth Street Shelter gathers qualitative data as part of a 
+strategy to document the positive long-term impact of the Shelter in the community. The Shelter is able to track 
+the progress of former residents because staff check in and continue to work with them. One example is Yasmin 
+and her husband Ben (not their real names), who arrived at the Shelter with their two sons after a wrongful eviction 
+left them homeless and couch-surfing. Determined to move forward, they worked hard to save $3,000. Their case 
+manager helped to secure a unit for the family at a local apartment complex, arrange school transportation for the 
+boys, and ensure that they had necessities for their new place. The family’s commitment and the support of the 
+Shelter team enabled the family to settle into their new home, finally finding stability after a year of uncertainty.  
+ 
+How the organization is best positioned to meet the need  
+The Sixth Street Shelter has been helping families experiencing homelessness since 1984. It is the largest family 
+shelter in the City of Allentown. It is unique because it is the only shelter in the region where entire families of 
+any configuration (including those with fathers and teenaged boys, multi-generational families, and those from 
+the LGBTQ+ community) stay together in their own private apartments. The assistance detailed above helps each 
+family begin to address the challenges that led to their homelessness. We added a Housing Innovation Specialist 
+to our staff to work with local landlords to identify affordable housing options and facilitate faster placements for 
+families. The Sixth Street Shelter participates in the community effort to end homelessness as an active member 
+of the Lehigh Valley Regional Homeless Advisory Board and the Eastern Pennsylvania Continuum of Care. 
+ 
+The tools needed to affect the solution 
+Sixth Street Shelter is seeking $20,000 in operating support from the Harry C. Trexler Trust to help provide crucial 
+casework and supportive services to families at the Shelter as they search for permanent housing and work their 
+way toward self-sufficiency. The total operating budget for the Sixth Street Shelter (including the Ferry Street 
+Apartments transitional housing program) is $1,224,517. The Shelter has a comprehensive fundraising strategy 
+that will be utilized to reach our fundraising goals, which we have accomplished successfully for nearly 40 years.  
+ 
+Timeframe 
+CADCLV operates on a July1-June 30 fiscal year; any operating funds will be used during the fiscal year in which 
+they are received.  
+ 
+We affirm that we share the Harry C. Trexler Trust’s commitment to creating a welcoming and affirming 
+environment for all as they are, respecting without hesitation all of the elements of their identity including religion, 
+age, race, ethnicity, gender identity, and sexual orientation. We further affirm that our organization seeks to 
+promote diversity and inclusion in our governance policies as well as in our efforts for our staff to be representative 
+of the diverse nature of the communities that we serve. Thank you for your ongoing partnership and the 
+opportunity to submit this request. If you have any questions or require further information, please do not hesitate 
+to contact me at 610-691-5620. 
+ 
+Sincerely, 
+ 
+Dawn Godshall  
+Executive Director
+--------------------
+Attached Document: 6633d615957a1_2024SSS_TrexlerTrust_AwardNotification.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 66a7af999a6b5_2024-Trexler-Trust-Aknowledgement-.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

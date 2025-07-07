@@ -1,0 +1,234 @@
+Purpose: <p>LIHEAP Crisis and Weatherization, as authorized</p><p>-Reimbursable grant</p>
+Funder: LIHEAP Master Agreement
+Program: WX
+Amount: 0.00
+Start Date: 2020-10-01
+End Date: 2025-09-20
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 6424371e111d3_C000073877-LPC-(1).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6424372d876f6_2022WX_LIHEAP_Reduction-of-Funding-Document.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 648b65fb6f347_C000073877---FR11-LPC-(1).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 64da19377be49_C000073877---FR12-LPC.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 653bfd5d17adb_C000073877---FR12-LPC-(1).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6581be8bf3417_eSignatureDocument0810106a-5866-494f-acf7-45dc63045f8d_C000073877---FR13.pdf
+FUNDING RELEASE FORM 
+(Reduction in Funding) 
+ 
+Date: 	12/19/2023 
+Grantee Name: 	COMMUNITY ACTION COMMITTEE OF LEHIGH 
+VALLEY 
+Vendor Number: 	119431 
+Contract Number: 	C000073877 
+Funding Release Form Number: 	C000073877-13 
+Total Prior Funding Released  	$5,042,965 
+Current Funding Reduction Amount: 	$-12,004 
+Total Amount of All Funding Available under the 
+Contract, including the Current Funding Reduction 
+Amount. 
+ 
+ 
+$5,030,961 
+ 
+CODING INFORMATION TOTALING CURRENT FUNDING REDUCTION AMOUNT 
+ 
+7021300000 2430103000 P32341004200 6600700 2023 -  $-12,004 
+ -  
+ -  
+ 
+The Department of Community and Economic Development hereby reduces, by the Current Funding Reduction Amount 
+specified above, the amount of funds made available to the Grantee, subject to the condition that the remaining funds 
+shall be used by the Grantee to carry out the activities specified in the Work Plan and Budget attached hereto and 
+incorporated herein. 
+ 
+ATTEST: COMMUNITY ACTION COMMITTEE OF LEHIGH VALLEY 
+ 
+ 
+(x) [Signature Affixed Electronically – see last page]  _____  (x)_ [Signature Affixed Electronically – see last page]__ 
+Title_[Affixed Electronically – see last page]____Date Title[Affixed Electronically – see last page]        Date 
+ 
+ 
+Approved:  Commonwealth of Pennsylvania 
+ Acting through the Department of  
+ Community & Economic Development 
+ 
+ 
+[Signature Affixed Electronically – see last page]___ 
+Secretary or designee                                   Date 
+ 
+ 
+Approved as to Legality and Form:  _________ [Signature Affixed Electronically – see last page] ____ 
+Office of Chief Counsel                    Date 
+Approved as to fiscal responsibility,  
+budgetary appropriateness and  
+nonavailability of funds: _______[Signature Affixed Electronically – see last page]______ 
+Comptroller       Date
+
+Application #: 202005151457 	SAP Contract #: C000073877 
+Applicant Name: Community Action Committee Of Lehigh Valley 
+PROJECT BUDGET 
+ 
+22-23 LIHEAP and C&T Budget Reductions 
+   
+     
+20-21 LIHEAP 
+10/1/20-9/30/21 
+   
+ 
+ 
+20-21 ARPA 
+C&T  
+9/1/21-9/30/22  
+Federal  
+   
+ 
+ 
+21-22 LIHEAP 
+Crisis  
+10/1/21-9/30/22  
+Federal  
+   
+ 
+ 
+21-22 ARPA 
+LIHEAP 
+10/1/21-9/30/22  
+Federal  
+   
+ 
+21-22 Deferral 
+10/1/21-9/30/22  
+Federal  
+   
+ 
+ 
+21-22 LIHEAP 
+Cooling  
+6/1/22-9/30/22  
+Federal  
+   
+ 
+22-23 LIHEAP 
+10/1/22-9/30/23  
+Federal  
+   
+ 
+ 
+22-23 LIHEAP 
+C&T  
+10/1/22-9/30/23  
+Federal  
+   
+ 
+23-24 LIHEAP 
+10/1/23-9/30/24  
+Federal  
+   
+Total  
+   
+   
+Miscellaneous  	$874,905.00  $230,366.00  $222,697.00  $685,671.00  $32,250.00  $355,101.00  $1,628,299.00  $280,690.00  $720,982.00  
+Health & Safety  	$.00  $.00  $.00  $.00  $.00  $.00  $.00  $.00  $7,484.00  $7,484.00  
+Direct Services  	$826,600.00  $200,088.00  $211,562.00  $626,767.00  $29,520.00  $335,534.00  $1,518,540.00  $259,770.00  $655,819.00  $4,664,200.00  
+Liability  	$4,310.00  $.00  $.00  $3,838.00  $.00  $.00  $.00  $.00  $.00  $8,148.00  
+Admin  	$39,246.00  $30,278.00  $11,135.00  $51,066.00  $2,730.00  $19,567.00  $109,759.00  $20,920.00  $57,679.00  $342,380.00  
+Financial Audit  	$4,749.00  $.00  $.00  $4,000.00  $.00  $.00  $.00  $.00  $.00  $8,749.00  
+Total  	$874,905.00  $230,366.00  $222,697.00  $685,671.00  $32,250.00  $355,101.00  $1,628,299.00  $280,690.00  $720,982.00  
+         
+Budget 
+Total:  
+$5,030,961.00
+--------------------
+Attached Document: 65941a32adc2c_C000073877---FR13-LPC.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 65d5105e7f19e_C000073877-FR14-LPC.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 65f09301d704d_C000073877-FR14-LPC-(1).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 66d9b57400702_C000073877-FR17-LPC.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6709345473676_23-24-LIHEAP-Award-Letter---Lehigh-(1).pdf
+September 25, 2024 
+ 
+ 
+ 
+Ms. Dawn Godshall 
+Executive Director 
+Community Action Committee of Lehigh Valley - Sent via email 
+ 
+ 
+                  Re: 2023-2024 LIHEAP Award Letter   CFDA#: 93.568 Federal Award #: 2201PALIEA 
+ 
+ 
+Dear Ms. Godshall, 
+ 
+On behalf of Governor Josh Shapiro, it is my pleasure to inform you that the Department of Community and 
+Economic Development (DCED) has approved a grant in the amount of $2,172,405 for the Low-Income Home 
+Energy Assistance Program (LIHEAP). These funds were provided by the PA Department of Human 
+Services to DCED for the 2023-2024 LIHEAP Program. 
+ 
+These funds have been added as Funding Releases to your Master Agreement. If you have any questions 
+concerning this grant, please contact our office at (717) 425-7643. 
+ 
+Sincerely, 
+ 
+Richard P. Vilello, Jr. 
+Deputy Secretary 
+Community Affairs & Development 
+ 
+cc: Mike Austin, Weatherization Director 
+     file 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Community Affairs and Development 
+400 North St., 4
+th
+ Floor | Commonwealth Keystone Bldg. | Harrisburg, PA 17120-0225 | 717.787.3003 | F 717.787.6866 | dced.pa.gov
+--------------------

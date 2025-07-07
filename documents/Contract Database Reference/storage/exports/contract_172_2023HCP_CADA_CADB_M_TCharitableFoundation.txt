@@ -1,0 +1,21 @@
+Purpose: <p>General Operating Support for HCP ($5,000), CADA ($5,000) and CADB ($5,000).&nbsp;</p>
+Funder: M&T Charitable Foundation
+Program: Multi
+Amount: 15000.00
+Start Date: 2023-05-16
+End Date: 
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 6463825790187_2023CALV_M&TCharitableFoundation_awardnotification.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6463825b5244f_2023CALV_M&TCharitableFoundation_Check.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

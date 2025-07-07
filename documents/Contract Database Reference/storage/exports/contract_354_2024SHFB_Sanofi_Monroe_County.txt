@@ -1,0 +1,601 @@
+Purpose: <p>This grant is intended to cover transportation costs to distribute food to our Monroe County partner agencies.</p><p>This is a lump sum grant.</p><p>There is no report due.</p>
+Funder: Sanofi
+Program: SHFB
+Amount: 5000.00
+Start Date: 2024-06-11
+End Date: 2025-06-10
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 6687f98d861ce_2024_SHFB_SAnofi_SignedContract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6687f9e000060_SHFB-Proposal-to-Sanofi-2024-on-LH.pdf
+May 28, 2024 
+ 
+Mr. Phillip St. James 
+Associate Director, US CSR & Community Relations  
+Sanofi U.S. 
+1 Discovery Drive, Bldg. 60 
+Swiftwater, PA 18370 
+ 
+Dear Mr. St. James: 
+Second Harvest Food Bank respectfully requests $5,000 from Sanofi Pasteur to support the distribution of 
+food to Monroe County food pantries.  
+ 
+Mission and History of Organization  
+The Community Action Committee of the Lehigh Valley (CALV) was established in 1965 as a part of Lyndon 
+B. Johnson’s War on Poverty.  The mission of CALV is “to improve the quality of life in the Lehigh Valley by 
+building a community in which all people have access to economic opportunity, the ability to pursue that 
+opportunity, and a voice in the decisions that affect their lives.” Today, CALV operates 13 programs and 3 
+subsidiary corporations. As a Community Action Agency (CAA), CALV is committed to ensuring that the 
+community plays an active role in identifying needs, developing, and implementing solutions to improve 
+the quality of life in the region. Toward that end, CAAs have a tripartite Board of Directors comprised of 
+at least one-third of its members from the low-income community, one-third from the public sector, and 
+one-third from the private sector.  
+The mission of Second Harvest Food Bank of the Lehigh Valley and Northeast Pennsylvania is to obtain 
+food and distribute it to people in need through area non-profits and to provide resources for education 
+and advocacy to end hunger. We provide nutritious food, offer nutrition education, advocate to end food 
+insecurity, dismantle barriers to create access, and work to attain food justice. We respect and preserve 
+the dignity of each of our neighbors.  
+Second Harvest, a program of Community Action Lehigh Valley, began its mission to end food insecurity 
+in 1982, as the Lehigh Valley Food Bank. Initially, distributions were made from the back of a rented truck 
+to a network of about 15 nonprofit agencies. Since September 2015, Second Harvest Food Bank has been 
+operating from a 65,000 square-foot warehouse in East Allen Township.
+
+Programs and Services 
+Second Harvest Food Bank, a member of Feeding America – the nation’s largest charitable food network, 
+serves Lehigh, Northampton, Carbon, Monroe, Pike, and Wayne counties. Last year, Second Harvest 
+distributed 14.7 million pounds of food to our network of 200+ nonprofit agencies, (food pantries, schools, 
+meal centers, shelters, childcare agencies, addiction treatment programs), a 44% increase from the 
+previous year. Included in this total is 6.7 million pounds of fresh produce, perishable protein, and fresh 
+dairy products (46% of total distribution). Annually, we rescue more than 3 million pounds of food from 
+ending up in a landfill.  
+ 
+On average, the Second Harvest network serves more than 87,000 people each month - a 52% increase 
+from last year. The pantries within the Second Harvest network are operated almost solely through the 
+work of community volunteers. Our food distribution is a model of neighbors helping neighbors.  
+ 
+In addition to food distribution to our network, Second Harvest operates several programs aimed at 
+improving the health of our community and working toward a more just and equitable local food system. 
+We administer the Pennsylvania Senior Food Box Program (PASB). PASB works to improve the health of 
+low-income seniors by supplementing their diets with shelf-stable nutritious foods. Eligible participants 
+include low-income individuals who are at least 60 years old and whose household income is at or below 
+130% of the U.S. poverty level. We work to supplement boxes with healthy, fresh items when possible. 
+Currently, Second Harvest provides senior food boxes to nearly 2,350 seniors across 49 sites each month. 
+Our MilitaryShare program works “to serve those who served us” by providing access to nutritious food, 
+with a goal of improving health outcomes and easing financial strain among low-income active duty, 
+reserve, and retired military members and their families. Our MilitaryShare program provides 500+ 
+military families with a share of fresh and shelf-stable food each month.  
+Our SNAP (Supplemental Nutrition Assistance Program) outreach coordinators work with local county 
+offices of Health and Human Services to offer SNAP application assistance. Our SNAP coordinators offer 
+dedicated personal application support to ensure that all eligible participants receive needed benefits. 
+We offer dynamic, community-based nutrition education. We provide free cooking classes and 
+demonstrations for parents, kids and childcare providers where participants learn about cooking, meal 
+prep, grocery shopping, food budgeting, and nutrition. Through our Healthy Pantry Initiative (HPI), a 
+program of Feeding Pennsylvania, our HPI Coordinator works with pantry coordinators and volunteers to 
+encourage consumption of nutritious and fresh foods, and also provides direct nutrition education to 
+pantry clients. 
+Additionally, Second Harvest operates The Seed Farm, a 42-acre training farm. Because there can be no 
+access to nourishing food without farms, The Seed Farm works to support food production at all levels, 
+from home gardeners to community gardens to local farmers, with an emphasis on getting nutritious and 
+locally-grown food to under-resourced communities. Strong local food systems equal food security.
+
+Monroe County Food Insecurity 
+Monroe County has a population of 168,128. According to Feeding America’s Map the Meal Gap (2022), 
+one in nine Monroe County residents faces food insecurity. This means that more than 19,220 individuals 
+(11.7%) do not have certain access to adequate food throughout the year. 
+Child Nutrition 
+• 17.8% children in Monroe County face food insecurity. 
+• An estimated 5,830 children face food insecurity, with 64% of children in households earning less 
+than 185% of the federal poverty level facing food insecurity and 36% of children in households 
+earning more than 185% of the federal poverty level facing food insecurity. 
+Senior Nutrition 
+• Data from Feeding America’s State of Senior Hunger 2021 report estimates that in Pennsylvania 
+4.7% of seniors are food insecure with 1.7% facing extremely high levels of food insecurity.
+2 
+While 
+the data set does not drill down to the county level, U.S. Census data show 3,081 adults older than 
+age 65 (9.6%) live below the poverty level in Monroe County. 
+Racial and Ethnic Disparities 
+• Over 60% of the Monroe County population is non-Hispanic white; however, food insecurity is 
+higher among Hispanic (19%) residents, compared with 10% of white residents and 13% of Black 
+residents. 
+SNAP 
+• Map the Meal Gap 2022 estimates that 41% of food insecure Monroe County residents are above 
+the income threshold to qualify for SNAP benefits or other food assistance programs (200% of the 
+federal poverty level), while 59% are below the threshold and may qualify for supplemental 
+nutrition benefits and programs. 
+ 
+Monroe County Impact 
+ 
+Second Harvest distributes food to 20 emergency food sites (pantries and meal centers), six senior box 
+sites, and two MilitaryShare sites within Monroe County. Collectively, these agencies continue to serve a 
+rising number of people.  
+Overall, the number of people served at Monroe County agencies increased by 53% from FY 2022 to FY 
+2023. On average, pantries were serving 17,308 people per month in FY23, compared with 11,297 per
+
+month in FY22. At meal centers, the number of people served increased drastically by 108% from 1,997 
+people to 4,164 people during the same period.  
+From FY 2022 to FY 2023, Second Harvest increased food distribution to Monroe County by 29%, from 
+2,916,504 lbs. in FY22 to 3,766,192 lbs. in FY23 [meal equivalent = 2,430,420 meals vs. 3,138,493 meals, 
+respectively).  
+ 
+ 
+Goals, Measurable Outcomes, and Evaluation 
+Annually, each program of Community Action, including Second Harvest, develops a work plan with 
+measurable performance targets that guide the activities of our programs and are designed to have a 
+positive impact on the community. Performance targets are monitored and evaluated by the Community 
+Action Board of Directors. Progress is monitored at the six-month mark, and all performance targets are 
+fully evaluated at the end of the program year.  
+Additionally, Second Harvest solicits feedback from its partner agencies and food pantry participants, in 
+the form of formal surveys, conversational feedback, and committee work. The results and feedback guide 
+Second Harvest’s strategic planning, program development, and service provision. We are working toward 
+a more participant-centric model of operation. We are taking the necessary, often tough, steps to shift 
+power to the people we serve.   
+ 
+Partnership with Sanofi Pasteur 
+Funding from Sanofi will allow us to cover transportation costs to distribute food to our Monroe County 
+partners. We are grateful for the opportunity to submit this proposal and look forward to growing our 
+partnership with Sanofi. We know our community will benefit greatly.  
+ 
+ 
+Allison Czapp 
+Associate Executive Director of Second Harvest Food Bank
+--------------------
+Attached Document: 6687f9dff3d94_2024_SHFB_Sanofi_ProposalSubmitted.pdf
+ 
+Your Submitted Application
+The application you previously submitted appears below. No further changes may be made to this
+application. Click here to return to the Welcome page.
+Introduction/ Transparency
+Financial Disclosure
+ 
+*Organizational
+Independence
+No - We are not a healthcare organization or payer.
+ 
+*Sanofi Customer? No 
+*Are you a Teaching
+Hospital?
+No 
+*Affiliated with Providers? No 
+*Sanofi Product
+Purchase/Usage/Prescription?
+We Do Not Purchase, Use, or Prescribe Sanofi Products
+ 
+Currency for this application:USD - US Dollar
+ 
+Transparency
+ 
+*Transparency Agreement I agree
+ 
+*Transparency Reportable No 
+ 
+*Patient GroupNo 
+
+ 
+*Payment to Covered
+Recipient?
+No 
+*Covered Recipients StateNone of the Above
+ 
+*Third Party Vendor(s)N/A 
+*Number of
+Attendees/Participants
+Not Applicable
+ 
+*Food or Beverage?No 
+Contact Information
+*First NameBriana 
+Middle Name  
+*Last NameMcGonagle 
+*TitlePlanner 
+*CountryUnited States
+ 
+*Address6969 Silver Crest Road 
+*CityNazareth 
+*StatePennsylvania
+ 
+*Zip/Postal Code18064 
+*Primary Telephone484 287 4015 
+*Email Addressplanner-shfb@caclv.org 
+*Contact TypePrimary Contact
+ 
+Organization Information
+Official Name COMMUNITY ACTION COMMITTEE OF THE LEHIGH VALLEY INC 
+*Legal NameCommunity Action Committee of the Lehigh Valley 
+Legal Name 2 
+
+AKA Name Second Harvest Food Bank of Lehigh Valley and Northeast PA 
+*CountryUnited States
+ 
+*Address1337 E Fifth Street 
+*CityBETHLEHEM 
+*StatePennsylvania
+ 
+*Zip/Postal Code18015-2103 
+*Organization TypeOther
+ 
+*Main Telephone4842874015 
+*Website Addresssecondharvestlv.org 
+*Mission StatementThe mission of Second Harvest Food Bank of the Lehigh Valley and
+Northeast Pennsylvania is to obtain food and distribute it to
+people in need through area non-profits and to provide resources
+for education and advocacy to end hunger. We provide nutritious
+food, offer nutrition education, advocate to end food insecurity,
+dismantle barriers to create access, and work to attain food
+justice. We respect and preserve the dignity of each of our
+neighbors.  
+Organization Structure
+If you selected "Other" as the Organization Type within the Organization Information section,
+this section will remain blank. Please click on the "Save and Proceed" button.
+ 
+Organization Details
+*Total Organization Revenue52943464.00USD  
+*W9 CACLV W-9 unsigned and undated.pdf (144.18 K), uploaded
+by Briana McGonagle on 2024-05-28
+*Public/Government
+Officials or Employees on
+Board?
+Yes 
+Please list the names of
+these officials or employees
+Charles Dertlinger - Director of Administration, Northampton
+County
+
+Mark Hartney - Deputy Director of Community & Economic
+Development, Allentown
+Shaquera Martindale - Deputy Director of Redevelopment
+Authority, Easton
+Alicia Miller Karner - Deputy Director of Economic Development,
+Bethlehem
+Stephanie Steele - Council President, Portland 
+*Sanofi Employees on Board? Yes 
+Sanofi Employee Board
+Member Name
+Phillip St. James 
+*Board Of Directors Upload CALV and SHFB Board Lists 2024.pdf (80.15 K), uploaded by
+Briana McGonagle on 2024-05-28
+*Event Recognition - Federal
+Official
+No 
+*Government
+Employee/Organization
+Involvement?
+No 
+*Government
+Employee/Organization
+Benefit?
+No 
+Request Summary
+*Project TitleSecond Harvest Food Bank of Lehigh Valley and Northeast PA 
+*Project/Program DescriptionThe mission of Second Harvest Food Bank of the Lehigh Valley
+and Northeast Pennsylvania is to obtain food and distribute it to
+people in need through area non-profits and to provide
+resources for education and advocacy to end hunger. We
+provide nutritious food, offer nutrition education, advocate to
+end food insecurity, dismantle barriers to create access, and
+work to attain food justice. We respect and preserve the dignity
+of each of our neighbors.
+Second Harvest, a program of Community Action Lehigh Valley,
+began its mission to end food insecurity in 1982, as the Lehigh
+Valley Food Bank. Initially, distributions were made from the
+back of a rented truck to a network of about 15 nonprofit
+agencies. Since September 2015, Second Harvest Food Bank has
+been operating from a 65,000 square-foot warehouse in East
+Allen Township.
+
+Programs and Services
+Second Harvest Food Bank, a member of Feeding America -- the
+nation's largest charitable food network, serves Lehigh,
+Northampton, Carbon, Monroe, Pike, and Wayne counties. Last
+year, Second Harvest distributed 14.7 million pounds of food to
+our network of 200+ nonprofit agencies, (food pantries, schools,
+meal centers, shelters, childcare agencies, addiction treatment
+programs), a 44% increase from the previous year. Included in
+this total is 6.7 million pounds of fresh produce, perishable
+protein, and fresh dairy products (46% of total distribution).
+Annually, we rescue more than 3 million pounds of food from
+ending up in a landfill.
+On average, the Second Harvest network serves more than
+87,000 people each month - a 52% increase from last year. The
+pantries within the Second Harvest network are operated
+almost solely through the work of community volunteers. Our
+food distribution is a model of neighbors helping neighbors.
+In addition to food distribution to our network, Second Harvest
+operates several programs aimed at improving the health of our
+community and working toward a more just and equitable local
+food system. We administer the Pennsylvania Senior Food Box
+Program (PASB). PASB works to improve the health of low-
+income seniors by supplementing their diets with shelf-stable
+nutritious foods. Eligible participants include low-income
+individuals who are at least 60 years old and whose household
+income is at or below 130% of the U.S. poverty level. We work to
+supplement boxes with healthy, fresh items when possible.
+Currently, Second Harvest provides senior food boxes to nearly
+2,350 seniors across 49 sites each month.
+Our MilitaryShare program works "to serve those who served
+us" by providing access to nutritious food, with a goal of
+improving health outcomes and easing financial strain among
+low-income active duty, reserve, and retired military members
+and their families. Our MilitaryShare program provides 500+
+military families with a share of fresh and shelf-stable food each
+month.
+Our SNAP (Supplemental Nutrition Assistance Program)
+outreach coordinators work with local county offices of Health
+and Human Services to offer SNAP application assistance. Our
+SNAP coordinators offer dedicated personal application support
+to ensure that all eligible participants receive needed benefits.
+We offer dynamic, community-based nutrition education. We
+provide free cooking classes and demonstrations for parents,
+
+kids and childcare providers where participants learn about
+cooking, meal prep, grocery shopping, food budgeting, and
+nutrition. Through our Healthy Pantry Initiative (HPI), a program
+of Feeding Pennsylvania, our HPI Coordinator works with pantry
+coordinators and volunteers to encourage consumption of
+nutritious and fresh foods, and also provides direct nutrition
+education to pantry clients.
+Additionally, Second Harvest operates The Seed Farm, a 42-acre
+training farm. Because there can be no access to nourishing
+food without farms, The Seed Farm works to support food
+production at all levels, from home gardeners to community
+gardens to local farmers, with an emphasis on getting nutritious
+and locally-grown food to under-resourced communities. Strong
+local food systems equal food security.
+Monroe County Impact
+Second Harvest distributes food to 20 emergency food sites
+(pantries and meal centers), six senior box sites, and two
+MilitaryShare sites within Monroe County. Collectively, these
+agencies continue to serve a rising number of people.
+Overall, the number of people served at Monroe County
+agencies increased by 53% from FY 2022 to FY 2023. On average,
+pantries were serving 17,308 people per month in FY23,
+compared with 11,297 per month in FY22. At meal centers, the
+number of people served increased drastically by 108% from
+1,997 people to 4,164 people during the same period.
+From FY 2022 to FY 2023, Second Harvest increased food
+distribution to Monroe County by 29%, from 2,916,504 lbs. in
+FY22 to 3,766,192 lbs. in FY23 [meal equivalent = 2,430,420
+meals vs. 3,138,493 meals, respectively).
+ 
+*Primary Area of InterestVaccines - Other
+ 
+*What Type of Program are
+you Proposing?
+Other
+ 
+Other Proposed Program Second Harvest Food Bank of Lehigh Valley and Northeast PA 
+*Funding Start Date2024-07-01 
+*Funding End Date2025-06-30 
+*Requested Amount 5000.00USD  
+
+*Total Program Budget5551782.00USD  
+*Project/Program Budget File SHFB FY24 Budget.pdf (148.4 K), uploaded by Briana
+McGonagle on 2024-05-28
+*Level of Funding RequestedN/A
+ 
+*Describe All Funding Levels
+and Benefits Available
+N/A 
+Describe All Funding Levels and
+Benefits Available Upload
+Prospectus/Flyer
+*Product Promotion Benefits	No 
+*Funding SourcesNo 
+Additional Funding Sources Worksheet
+ 
+*RecognitionAdditional branding opportunities exist
+ 
+Proposed Timeline and Key
+Deliverable Dates
+Proposed Plan for
+Dissemination of Results
+*Public Program?Yes 
+*Event Support?No 
+Additional Event Details
+Upload
+*Are you a patient advocacy
+group?
+No 
+*Sanofi Contact Phillip St. James 
+Name Committed Amount	Pending Amount	Total Amo
+
+*Primary AudienceGeneral Public
+ 
+Convention or Congress?No 
+*Percentage of Sanofi
+Financial Support
+1% 
+*Previous Funding?Yes 
+Previous Sanofi Funding Worksheet
+ 
+Journal or Advertising
+Specifications
+ 
+*Sanofi Logo Required? no 
+*Formal Proposal SHFB Proposal to Sanofi 2024 on LH.pdf (325.6 K),
+uploaded by Briana McGonagle on 2024-05-28
+*Agenda SHFB Proposal to Sanofi 2024 on LH.pdf (325.6 K),
+uploaded by Briana McGonagle on 2024-05-28
+Additional Files
+Corporate Membership Information
+ 
+*Corporate Membership
+Request?
+No 
+Social Impact
+*Project Name *Amount Granted
+Second Harvest Food Bank	5000
+Second Harvest Food Bank	9000
+Total: 14000.00
+
+*Local Sanofi Community
+Area
+Swiftwater
+ 
+Swiftwater Q2/Q3
+ 
+*Social Impact AreasHealth Equity
+ 
+Health EquityOther
+ 
+*Number of participants
+impacted by this program
+90000 
+*Societal Need(s)Monroe County Food Insecurity
+Monroe County has a population of 168,128. According to Feeding
+America's Map the Meal Gap (2022), one in nine Monroe County
+residents faces food insecurity. This means that more than 19,220
+individuals (11.7%) do not have certain access to adequate food
+throughout the year.
+Child Nutrition
+* 17.8% children in Monroe County face food insecurity.
+* An estimated 5,830 children face food insecurity, with 64% of
+children in households earning less than 185% of the federal
+poverty level facing food insecurity and 36% of children in
+households earning more than 185% of the federal poverty level
+facing food insecurity.
+Senior Nutrition
+* Data from Feeding America's State of Senior Hunger 2021 report
+estimates that in Pennsylvania 4.7% of seniors are food insecure
+with 1.7% facing extremely high levels of food insecurity.2 While
+the data set does not drill down to the county level, U.S. Census
+data show 3,081 adults older than age 65 (9.6%) live below the
+poverty level in Monroe County.
+Racial and Ethnic Disparities
+* Over 60% of the Monroe County population is non-Hispanic
+white; however, food insecurity is higher among Hispanic (19%)
+residents, compared with 10% of white residents and 13% of Black
+residents.
+SNAP
+
+* Map the Meal Gap 2022 estimates that 41% of food insecure
+Monroe County residents are above the income threshold to
+qualify for SNAP benefits or other food assistance programs (200%
+of the federal poverty level), while 59% are below the threshold
+and may qualify for supplemental nutrition benefits and
+programs.
+ 
+*Impact on Target
+Population
+Second Harvest distributes food to 20 emergency food sites
+(pantries and meal centers), six senior box sites, and two
+MilitaryShare sites within Monroe County. Collectively, these
+agencies continue to serve a rising number of people.
+Overall, the number of people served at Monroe County agencies
+increased by 53% from FY 2022 to FY 2023. On average, pantries
+were serving 17,308 people per month in FY23, compared with
+11,297 per month in FY22. At meal centers, the number of people
+served increased drastically by 108% from 1,997 people to 4,164
+people during the same period.
+From FY 2022 to FY 2023, Second Harvest increased food
+distribution to Monroe County by 29%, from 2,916,504 lbs. in FY22
+to 3,766,192 lbs. in FY23 [meal equivalent = 2,430,420 meals vs.
+3,138,493 meals, respectively).
+ 
+*Measuring SuccessAnnually, each program of Community Action, including Second
+Harvest, develops a work plan with measurable performance
+targets that guide the activities of our programs and are designed
+to have a positive impact on the community. Performance targets
+are monitored and evaluated by the Community Action Board of
+Directors. Progress is monitored at the six-month mark, and all
+performance targets are fully evaluated at the end of the program
+year.
+Additionally, Second Harvest solicits feedback from its partner
+agencies and food pantry participants, in the form of formal
+surveys, conversational feedback, and committee work. The
+results and feedback guide Second Harvest's strategic planning,
+program development, and service provision. We are working
+toward a more participant-centric model of operation. We are
+taking the necessary, often tough, steps to shift power to the
+people we serve.
+ 
+*Use of FundsFunding from Sanofi will allow us to cover transportation costs to
+distribute food to our Monroe County partners. We are grateful
+
+for the opportunity to submit this proposal and look forward to
+growing our partnership with Sanofi. We know our community will
+benefit greatly.  
+Inclusion and DiversityCulture and Origins
+Disability Inclusion
+Gender
+Generations
+Pride
+ 
+*Volunteer Opportunities?Yes 
+Describe Volunteer
+Opportunities
+Second Harvest would be delighted to host Sanofi employees for a
+day of volunteering in our warehouse. Our MilitaryShare and
+Senior Food Boxes are packaged utilizing the help of many
+generous volunteers. All volunteer opportunities can be found on
+Second Harvest's website:
+https://www.volunteermark.com/shfband further information
+regarding volunteer days can be obtained by contacting Amour
+Inman, at ainman@caclv.org 
+*Discrimination?No 
+Demographics
+ 
+*Ethnicities ServedAll
+ 
+*Local Community Support
+Areas
+Food Insecurity
+ 
+*Genders ServedAll Genders
+ 
+*US Geographic Area ServedPennsylvania
+ 
+Certification
+*Potential Conflicts of
+Interest
+There are no conflicts of interest. 
+*AuthorizationI certify
+ 
+
+*True and CompleteI certify
+ 
+*No Transfer of Value to
+Government Official
+I certify
+ 
+*Funds will be used for
+Project
+I certify
+ 
+*Please note that no funds
+from your request can be
+applied towards honoraria,
+the cost of gifts, travel &
+lodging of Customers, and
+entertainment (excluding
+entertainment activities that
+are modest in nature and not
+the primary support of the
+event).
+I understand that no funds from this request can be applied
+ 
+*Electronic Signature First
+Name
+Briana 
+*Electronic Signature Last
+Name
+McGonagle 
+Organization Signatory
+ 
+*Organization Signatory TitleExecutive Director 
+*Organization Signatory
+Name
+Dawn Godshall 
+*Organization Signatory
+Email
+dgodshall@caclv.org 
+Need Support?
+Copyright © 2024 Sanofi
+--------------------

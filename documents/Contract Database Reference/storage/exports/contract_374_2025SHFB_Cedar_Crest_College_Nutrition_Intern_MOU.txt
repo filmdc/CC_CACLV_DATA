@@ -1,0 +1,16 @@
+Purpose: <p>The purpose of this MOU is to define the roles and responsibilities of Cedar Crest College (the College) and SHFB. SHFB has agreed to provide the clinical education necessary among the requirements for registration as a dietitian and to educate personnel at the post-baccalaureate level who can function effectively in a professional environment.</p><p>The College will administer the program, curriculum content, evaluation, faculty appointments, admission requirements, promotion and graduation and such other matters as are internal to the College. The College will maintain the necessary records of the students.</p><p>SHFB will provide access to the food bank's facilities and direct supervision by the Nutrition Educator, who will be directing the interns in 1,200 hours of practical study.</p><p>Additional stipulations are set out in the attached contract.</p><p>The SHFB points of contact for this MOU are the Nutrition Educator, who will be implementing the program, and the Volunteer Coordinator, who will recruit and retain the College interns.</p><p>There is no reporting due for this program.</p>
+Funder: Cedar Crest College
+Program: SHFB
+Amount: 0.00
+Start Date: 2024-08-01
+End Date: 2029-08-01
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 66bf5504b54b9_PA-2024-SHFB-Dietetic-Intern-Nutrition.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

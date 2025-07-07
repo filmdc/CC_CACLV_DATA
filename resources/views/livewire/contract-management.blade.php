@@ -86,12 +86,17 @@
                         </div>
 
                         <div>
-                            <label for="funder" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            <label for="funder_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 Funder <span class="text-red-500">*</span>
                             </label>
-                            <input type="text" wire:model="funder" id="funder" 
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500">
-                            @error('funder') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            <select wire:model="funder_id" id="funder_id" 
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <option value="">Select Funder</option>
+                                @foreach($funders as $funder)
+                                    <option value="{{ $funder->id }}">{{ $funder->display_name }}</option>
+                                @endforeach
+                            </select>
+                            @error('funder_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 
                         <div>
@@ -176,7 +181,7 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{{ $contract->title }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $contract->contract_number ?? 'N/A' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $contract->program->name ?? 'N/A' }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $contract->funder }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $contract->funder->name ?? 'N/A' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${{ number_format($contract->amount, 2) }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $contract->start_date?->format('M j, Y') ?? 'N/A' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $contract->end_date?->format('M j, Y') ?? 'N/A' }}</td>

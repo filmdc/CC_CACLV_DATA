@@ -1,0 +1,266 @@
+Purpose: <p>The purpose of this $25,000 grant is to support improvements to "brick and mortar" food pantries in Northampton County. Anticipated use is for capital improvements to the Whole Life Center in Wilson, with the end result of building out a food hub.</p><p><strong>Updated SOW and approval email attached to allow for improvements to SHFB such as Fire alarm system or new generator.</strong></p><p>This is a reimbursable grant.</p><p>There are no reporting requirements other than invoicing. Invoicing forms are below.</p><p>Restrictions and requirements follow HUD funding guidelines, including the below.</p><figure class="image"><img src="http://10.55.0.10/storage/1047/image.png"></figure><figure class="image"><img src="http://10.55.0.10/storage/1048/image.png"></figure><figure class="image"><img src="http://10.55.0.10/storage/1049/image.png"></figure><p>&nbsp;</p><figure class="image"><img src="http://10.55.0.10/storage/1051/image.png"></figure><figure class="image"><img src="http://10.55.0.10/storage/1057/image.png"></figure><p>&nbsp;</p>
+Funder: Northampton County
+Program: SHFB
+Amount: 25000.00
+Start Date: 2024-06-10
+End Date: 2024-12-31
+
+Notes: 
+
+Fund Number: F8071
+
+Attached Document: 66a2900e05dfd_Northampton-County-RE_-Question---reporting-deadlines-for-2023-2025-CDBG-Funding.pdf
+From:	Frank Brooks
+To:	Kelsey Miller
+Subject: Northampton County RE: Question - reporting deadlines for 2023-2025 CDBG Funding
+Date:	Monday, April 22, 2024 1:21:57 PM
+Hi Kelsey: What Northampton County has done in the past
+which seems to work with the funder. Was to have Second Harvest just submit
+the invoices for the food purchase towards reimbursement.
+We realize that our funding is a smaller amount in your total program, so
+asking Second Harvest to provide documentation on participants seems to be
+not a productive way to report.
+ 
+Regards
+Frank
+ 
+Frank Brooks | Administrator
+Northampton County Community & Economic Development 2801 Emrick Blvd, 1st floor, Bethlehem, PA 18020
+| Direct: 610-829-6311 |
+fbrooks@norcopa.gov
+“What helps you also helps us” 
+ 
+ 
+From: Kelsey Miller <k.miller@caclv.org> 
+Sent: Thursday, April 18, 2024 3:06 PM
+To: Frank Brooks <fbrooks@norcopa.gov>
+Subject: Question - reporting deadlines for 2023-2025 CDBG Funding
+ 
+WARNING: This email message is from an external sender! Please exercise caution when clicking links or
+opening attachments.
+ 
+Hi Frank –
+ 
+I hope all is well. I wanted to ask a quick clarification question regarding the 2023-2025 CDBG
+funding for fresh food distribution. The contract period is from Oct 2023 – Sept 30, 2025 – obviously
+we are well into the period. The contract lists the below report schedule but it does not seem to
+match up.
+ 
+
+ 
+ 
+Can you provide some clarification on dates? Does the below make sense to keep it within the date
+range of the grant?
+Report period April 1 – Oct 31, 2024 due Nov 15, 2024
+Nov 1, 2024 – Sept 30, 2025 due Oct 15, 2025
+ 
+Or is there a more appropriate schedule?
+I thank you in advance for your guidance.
+ 
+Best,
+Kelsey
+ 
+ 
+Kelsey Miller | Compliance/Grants Coordinator
+Second Harvest Food Bank of Lehigh Valley & Northeast PA
+a Program of Community Action Committee of the Lehigh Valley 
+6969 Silver Crest Road | Nazareth, PA 18064
+T: (610) 750-9592 | E: k.miller@caclv.org
+Member of Feeding America, Distributing food to 200 member agencies in 6 Counties 
+  ________________________________  
+Visit us at shfblv.org | Subscribe to our executive Director's Blog | Like us on Facebook | Follow Us
+@SHFBLV
+This e-mail may contain Community Action Committee or CACLV Subsidiary proprietary information intended for the sole use of the
+recipient(s). Any use by others is prohibited. If you are not the intended recipient, please contact the sender and delete all copies of the
+
+message.
+CONFIDENTIALITY NOTICE: This e-mail message, including any attachments, is for the sole use of the intended recipient(s) and may
+contain confidential and privileged information. Any unauthorized review, use, disclosure, or distribution is prohibited. If you are not the
+intended recipient, please contact the sender by reply e-mail and destroy all copies of the original message.
+--------------------
+Attached Document: 66a2904c997ce_NC-CDBG-Invoice-Template.xlsx
+		Second Harvest Food Bank of the Lehigh Valley and Northeast PA		
+ 			6969 Silver Crest Rd, Nazareth, PA, 18064	
+INVOICE #			 (484) 287-4015 | (484) 287-4011	
+Date: 				
+County of Northampton				FOR
+Dept of Community and Economic Development				Northampton Country CDBG-CV
+2801 Emrick Blvd, 1st Floor, Bethlehem, PA 18020				June 10, 2024 - December 31, 2024
+610-829-6311 				Drawdown
+Date	Invoice #	Vendor name	Total Spent	
+				
+				
+				
+				
+				
+				
+				
+				
+Total			#REF!	
+				
+Make all checks payable to Community Action Committee Lehigh Valley				
+If you have any questions concerning this invoice, use the following contact information:				
+Allison Czapp, 484-821-2408, aczapp@caclv.org				
+
+--------------------
+Attached Document: 66a3be0c8747e_2024SHFB_NC-CDBG-CV-Food-Pantry-Improvement-Program.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 673cb3795d87a_2024_SHFB_NCCDBG_ScopeOfWork_Add25.pdf
+October 16, 2024 
+ 
+Second Harvest Food Bank Infrastructure Upgrades  
+Northampton County CDBG Program  
+  
+Scope of Work  
+The need in Northampton County is great. According to Feeding America’s Map the Meal Gap 2022, the 
+food insecurity rate for Northampton County is 10.7% (33,750 people). The rate is higher for children, at 
+13.9% (8,490 children). Populations facing food insecurity are strongly correlated with those that have 
+been impacted by systemic racism and economic exploitation. The food insecurity rate across 
+Northampton County is higher for Black (15%) and Hispanic (21%) individuals, as compared to their white 
+counterparts (11%).  
+The Second Harvest network continues to serve historic volumes of people. In FY 2023-2024, our 
+Northampton County pantries served an average of 24,150 people each month. Second Harvest is 
+committed to meeting the food access needs of the residents of Northampton County, with an emphasis 
+on fresh and nutritious foods.  Our increased acquisition, storage, and distribution of additional food to 
+meet the rising needs of our community, has caused stress on our warehouse facility.  
+Second Harvest will utilize $25,000 of Northampton County CDBG funding to support infrastructure 
+upgrades to our food bank facility, located at 6969 Silver Crest Road, Nazareth, PA 18064. The necessary 
+upgrades will ensure the safety of the food we provide to the community, as well as the safety of the food 
+bank team that distributes the food.
+--------------------
+Attached Document: 673cb38628b7d_Approval-of-new-SOW-for-Food-Pantry-Improvement-25K.pdf
+
+  
+ !"#$%"&'"()'"*+ +,-#./
+01#$2232345467899:;
+<"=">;$"#(-?$"#*+ +,-#./@;+A% ."BC#$ % (D?+.% ."*+ +,-#./@:?>C++ )#( D++ )#*+ +,-	#./
+E$+"1$%(E1$%*+ +,-#./@;"$== F%G >(?+%G >*+ +,-#./
+HIJKLMKNO
+PQRSRTUKLIKVKTWXTXQQKSQYZIM[R\TWK]^_`
+PMKSTa\XS_RVK\MRZKRTWK\KZXILM\KbX\QISbQIcK\KSTb\XSTMTWXTX\KKdeI\KQ`
+fKTZKISVKMgbXTKXSQPhILLTX_KiX\KR[IT`
+aR\TWKgZKUKISbeLKXMKYeLRXQTWKSKhjklTRTWKQXTXUXMKXSQThKX_TWKQKMi\IegRS`
+mWXS_NRYn
+opqrstuvswxyxs
+zRZeLIXSiK{I\KiTR\
+|}~~
+
+~ *F??%$>:+$%
+
+
+
+ t¡¢£JKLMKN¤ILLK\¥_`ZILLK\¦iXiLV`R\b§
+¨svq£mWY\MQXNOkiTRUK\O]]]©¤
+ª¡£¤i«RSXbLKO¬\IXSX¥UZibRSXbLK¦iXiLV`R\b§­JXTWK\ISK{Y®YK¥_QY®YK¦iXiLV`R\b§­¯ZN¬RiiXQR\R¥XURiiXQR\R¦iXiLV`	R\b§
+°±£²IiRLKaRLISR¥²aRLISR¦iXiLV`R\b§­¤KLIMMXzRShXN¥ZiRShXN¦iXiLV`R\b§
+¨x³´s±q£µ¶²R\TWXZeTRSzRYSTNµ¶jKiRSQHX\VKMT
+
+·¸¹ºº»
+
+¼½¾¿ÀÁÂÃ
+¸Ä¿ÅÆÇ¿ÈÀÁÉ¿ÁÊËÁÌÍÎÌ¸¹Ä¹ÏÐÃÂ¸ÆÆ¿ÅÑ¸ÆÇÆÇ¿¹ÅÅ¿ÄÅÐÂÆÁÏ¸ÒÄÆÇ¹ÆÓÌ¹ÄÍÏ¿ÄÆÁ¾¿ÌÔÕ¹ÆÇ¿Ì¸Ä¿»¸ÊÖ	ÁÐ¹Ì¿ÀÁÂÊÁÌÆ¹Ãº¿×¼Ñ¸ººÇ¹¾¿Ø¹ÑÄÏ¸ÒÄ
+ÑÇ¿ÄÏÇ¿½ÏÃ¹ÀÍ¹ÆÆÇ¿ÊÁÁÅÃ¹ÄÍÔ
+
+ÙÇ¹ÄÍÏÚ
+
+ÛÕ
+
+ t¡¢£a\X
+S_¬\RR_M¥Ü\RR_M¦SR\iReX`bRV§
+¨svq£mWY\MQXNOkiTRUK\O]]]©¤
+ª¡£¤i«RSXbLKO¬\IXSX¥UZibRSXbLK¦iXiLV`R\b§
+°±£¯ZN¬RiiXQR\R¥XURiiXQR\R¦iXiLV`R\b§­JXTWK\ISK{Y®YK¥_QY®YK¦iXiLV`R\b§­JKLMKN¤ILLK\¥_`ZILLK\¦iXiLV`R\b§­²	IiRLKaRLISR¥²aRLISR¦iXiLV`R\b§­¤KLIMMXzRShXN
+¥ZiRShXN¦iXiLV`R\b§
+¨x³´s±q£²R\TWXZeTRSzRYSTNµ¶jKiRSQHX\VKMT
+
+HI¯LL¯ÝK\X\KVIKhR[TWIMXb\KKZKST²R\TWXZeTRSzRYSTNXee\RVKMTWK
+YMKR[TWKMK[YSQMTRhX\QMTWK\KVIMKQjiReKR[hR\_Þjklß`mWKXb\KKZKSThXMTRhX\QM
+aXiILITNPZe\RVKZKSTMOMRTWK\KVIMKQjklIMIS_KKeISbhITWTWKISTKSTR[TWK[YSQISb`
+
+mWKTK\ZISXgRSQXTXR[TWKXb\KKZKSTIMMKT[R\]àà]]`P[XSKdTKSMIRSR[XQQIgRSXLgZK
+IMSKKQKQTRiRZeLKTKTWIMe\RáKiTXS¯QQKSQYZZXNUK\K®YKMTKQ`
+
+kSXSRTWK\ZXâK\hRYLQNRYLRR_RVK\TWK¯QQKSQYZTRKdTKSQTWKTK\ZISXgRS
+QXTKR[TWKz{¬«Xb\KKZKST`
+
+lRYLQNRY_ISQLNWXVKXMIbSXTY\KRSTWKXQQKSQYZXSQ\KTY\SITZNXâKSgRS`
+mWIMhILL\KMTR\KTWKR\IbISXLXb\KKZKSTXSQhKiXSTWKSe\RiKMMXSNVRYiWK\MTWXT
+X\KRYTMTXSQISb`
+
+µKbX\QM
+a\XS_
+
+     !"
+#$%& '()(* +,- ./ 0/01 .23/ 4
+5 67 7) 8!9:!; "
+<= >?* ( @! !"A B,C DEFE 9@GHG !"A B)*  9 I! !"A J 6 KLI !"A )) MN*
+OP !"
+#QRS$=& 6N2 T( UV), TW X '7 X Y0Z///
+ 
+ ( [ 67\
+ 
+] CW *E  ( N\ ]^? C E, , ) X *E CV C(  ??, , VN ,C _C( )W X N7 X	 ,C Y0Z///  MD  XE( ,C, N) *
+(),( , ,C 'C `X M, Wa,b  ]X *E CV * FE)c) W) , ? 7N\
+ 
+'   , , ,C) XE() ( CW , )  ,, )\
+ 
+dC7 *E ) ?ECe
+ 
+
+ 
+ 
+ 
+ 
+       	 
+fghiji klmnjiopqr kst u vpijjqg 
+swq x yqg 
+z{ |}|~~ 
+ u sqlnjyigq 
+ 
+ 
+ 
+ 
+     !"
+#$%& 6(* +,- 3 0/01 2/0 >
+5 8!9:!;  8!9:!; "
+<= >?* ( @! !"A B,C DEFE 9@GHG !"A B)*  9 I! !"A J 6 KLI !"A )) MN*
+OP !"
+#QRS$=& T( UV), TW X '7 X Y0Z///
+ 
+ ( ? 67\
+ 
+] CW ,C) ?)) () *E ( N\ ] 7N ,C, ??-) X E M??E,* >c ,? ?, N,C *E  ,C) N	7\ ] )W) , ,C, ?c  WcE ,C
+Y0Z///  JM MD  XE( ,C, N) * (),( X ,C 'C `X Wa, ] NE( 7 , )E-?, ,C 	_C( )W X N7\ ' NE( 7 , E) ,C) XE( X
+))* X),E,E EW() , E NCE)  J,C\ 
+ 
+]X ,C  * FE)c) W) , ? 7N\ dC) XE( N CV  ??(, ?W,  E -,* , )E ,	C )X,* X X(  E NCE) (  ??-) X E
+),\ 
+ 
+>[ *E
+ VN N 7 XN( , ) ,C ,, (  ,C, V , ,C ME,* >T>4\
+ 
+dC7 *E X *E  ¡-,* ¢ , ) V* ?EC WW,(\
+ 
+
+ 
+ 
+ 
+ 
+ 
+ 
+       	 
+fghiji klmnjiopqr kst u vpijjqg 
+swq x yqg 
+£¤¥¦¥  
+z{ |}|~~ 
+ u sqlnjyigq 
+ 
+ 
+ 
+ 
+§¨©ª«¬­©®«¯°«®± ©¨®«§­² ®³´µ ¶·¸¹´º ¸¶µµ¹»¶¼ ´½¾º¿À´½» ¹½Á ¹ÂÂ¹¾³¸¶½Âµ¼ ´µ ÃÄÅ Â³¶ µÄº¶ ¿µ¶ ÄÃ Â³¶ ´½Â¶½À¶À	 Å¶¾´Æ´¶½ÂÇµÈ ¹½À ¸¹Á ¾Ä½Â¹´½ ¾Ä½Ã´À¶½Â´¹º ¹½À ÆÅ´É´º¶»¶À ´½ÃÄÅ¸¹Â´Ä½Ê ¯½Á ¿½¹¿Â³ÄÅ´Ë¶À Å¶É´¶Ì¼ ¿µ¶¼ À´	µ¾ºÄµ¿Å¶¼ ÄÅ
+À´µÂÅ´Í¿Â´Ä½ ´µ ÆÅÄ³´Í´Â¶ÀÊ «Ã ÁÄ¿ ¹Å¶ ½ÄÂ Â³¶ ´½Â¶½À¶À Å¶¾´Æ´¶½Â¼ Æº¶¹µ¶ ¾Ä½Â¹¾Â Â³¶ µ¶½À¶Å ÍÁ Å¶ÆºÁ ¶·	¸¹´º ¹½À À¶µÂÅÄÁ ¹ºº ¾ÄÆ´¶µ ÄÃ Â³¶ ÄÅ´»´½¹º ¸¶µµ¹»¶Ê
+--------------------

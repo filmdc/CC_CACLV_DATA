@@ -1,0 +1,873 @@
+Purpose: <p>-$5,000 for general operating&nbsp;</p><p>-A <strong>report</strong> will be due at least one year of the paid date a notification will be sent via email once the report is available</p>
+Funder: PNC Foundation
+Program: RTCLF
+Amount: 5000.00
+Start Date: 2024-12-23
+End Date: 2025-08-30
+
+Notes: 
+
+Fund Number: 8000
+
+Attached Document: 67857ed8492cc_PNC---RTCLF-FY25-Grant-Agreement---Signed-(1).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 67857edce483b_PNC---Confirmation-of-Application-Receipt---REVISED.pdf
+ 
+Logout
+Confirmation of Application Receipt:
+Your proposal was successfully submitted to PNC. No further action on your part is required. Please understand that this process does take a period of time. Please be
+aware that we will reach out to you should we have questions and will make you aware of our ultimate decision. To print a copy of this completed application go to 'File',
+then 'Print' on your browser toolbar. Click here to return to the homepage when you are finished.
+Contact Information
+*First Name
+Colton 
+*Middle Name
+C 
+*Last Name
+Krial 
+Suffix 
+*Address
+1337 East 5th Street 
+*City
+Bethlehem 
+*State
+Pennsylvania
+ 
+*Zip
+18105 
+*E-mail Address
+planner-rtclf@caclv.org 
+*Title
+Senior Planner 
+Organization Information
+Official NameRISING TIDE COMMUNITY LOAN FUND 
+*Address
+1337 E 5TH STREET 
+*City
+BETHLEHEM 
+*State
+Pennsylvania
+ 
+*Zip
+18015-2103 
+*E-mail Address
+chudock@caclv.org 
+Website Addresstherisingtide.org 
+*Year Founded
+2001 
+*Organization Mission
+The mission of the Rising Tide Community Loan Fund (RTCLF, or Rising Tide) is to identify small business and
+community development credit needs that may stifle the creation of economic opportunity in low- to moderate-
+income communities of the Lehigh Valley and to meet those needs with affordable credit products. 
+*Organization History
+RTCLF is a 501(c)(3) nonprofit corporation and a subsidiary of Community Action Lehigh Valley. Formed in 2001
+and certified by the U.S. Treasury as a Community Development Financial Institution (CDFI), RTCLF was
+established to provide accessible and flexible financing options for business owners whose risk factors make it
+difficult to obtain funds from traditional lenders.
+Since 2012, RTCLF has administered and managed the City of Bethlehem’s Small Business Loan Fund, which
+provides entrepreneurs with access to up to $100,000 for property or equipment on condition that one full time
+equivalent position is created for every $35,000 that is borrowed. In 2019, RTCLF began administering and
+managing the Lehigh and Northampton Counties Revolving Loan Fund (LNCRLF). The LNCRLF offers small
+businesses in the Lehigh Valley access to mezzanine financing for their start-up and expansion projects.
+RTCLF originally served only Lehigh and Northampton Counties, but expanded its territory to also serve Carbon,
+Monroe, and upper Bucks counties in 2015 in response to requests for assistance. RTCLF added a line of credit
+product to provide entrepreneurs with access to $3,000 to $15,000 in working capital.
+In response to the pandemic, RTCLF delivered $249 million in COVID-19 emergency grant funds as a member
+of the PA CDFI network, along with 16 other community development financial institutions, to businesses across
+the commonwealth. Since its formation in 2001, Rising Tide has awarded 335 loans to 274 unique businesses,
+totaling $12,774,050 in disbursed loan funds. Of those loans, 195 have been awarded to women-owned
+businesses, 131 have been award to minority-owned businesses, and 226 have been awarded to low-to-
+moderate income entrepreneurs or to businesses located in a low-to-moderate income census tract. Rising
+Tide’s loans have led to the creation of at least 423 jobs, and the retention of at least 909 jobs.
+ 
+PNC Foundation
+8/23/24, 1:31 PM	PNC - Confirmation of Application Receipt
+https://www.cybergrants.com/pls/cybergrants/ao_application.submit_app	1/6
+
+*Organization Description
+Rising Tide serves prospective, start-up, and established businesses in Lehigh, Northampton, Carbon, Monroe
+and upper Bucks counties by providing a full range of one-to-one business technical assistance and small
+business loans to business owners whose resources and opportunities for growth are limited. Rising Tide offers
+four loan products: start-up businesses are eligible to apply for up to $50,000; businesses in operation at least
+one year are eligible for the Small Business Opportunity Loan Fund, which has a maximum loan amount of
+$150,000; a line of credit is available in amounts from $3,000 to $15,000; and in partnership with the City of
+Bethlehem, businesses located within the city limits are eligible to apply for up to $100,000 under the Bethlehem
+Small Business Loan Fund.
+Rising Tide also partners with the City of Allentown to help facilitate a self-forgiving loan program for
+entrepreneurs committed to creating jobs in the Neighborhood Improvement Zone. The Bethlehem and
+Allentown loan programs require borrowers to create jobs for low- to moderate-income people. Proceeds from a
+Rising Tide loan may be used for lease-hold improvements, the purchase of equipment/machinery, marketing
+costs, working capital, and inventory purchases. Rising Tide also provides technical and marketing assistance to
+current and prospective entrepreneurs and business owners, both of which are tailored to meet the needs of the
+individual. Technical assistance may include helping entrepreneurs develop a business plan, create financial
+projections, and prepare their loan application. Marketing assistance may include website development, social
+media marketing, graphic design, and branding.
+Rising Tide is funded through loans, grants, and private contributions. Sources include local, state, and federal
+government funds, bank grants, businesses grants, and individual donations.
+ 
+*Organization Purpose
+Rising Tide promotes economic opportunity and development in targeted neighborhoods throughout
+Northampton, Lehigh, Carbon, Monroe, and upper Bucks counties. Rising Tide envisions a future with self-
+sustaining community neighborhoods thriving throughout the greater Lehigh Valley. Rising Tide aims to achieve
+this vision in three distinct ways. Primarily, Rising Tide empowers low-income residents to become self-
+sustaining by creating their own jobs. Residents are encouraged to use their own specialized skill-set to
+construct meaningful employment for themselves. Secondly, a thriving small business developed and maintained
+by a low-income community resident has the potential of employing additional community members. This can
+become critically important as the community begins to feel that it has a stake in the success of the business.
+Finally, Rising Tide attempts to bring business to target areas of the cities where economic development is of the
+utmost importance. A proliferation of strategically placed small businesses can revitalize a neighborhood and
+build a strong sense of community among residents. 
+Details of Tax Exempt Status
+ 
+*IRS Letter of Determination
+501c3 - RTCLF update.pdf (377.93 K), uploaded by Sharol Lilly on 2018-11-26
+*509(a)(3) Tax Status
+No 
+Demographic Information
+*What percentage of the individuals do you
+anticipate being served by this grant identify as
+the following?
+3%  Asian/Asian-American
+30%  Black/African-American
+29%  Hispanic/Latinx
+12%  Multi-Racial
+1%  Native American
+25%  White/Caucasian
+ 
+Other 
+What percentage of the individuals do you
+anticipate being served by this grant identify as
+the following?
+55%  Female
+45%  Male
+ 
+What percentage of your entire staff identifies as
+the following?
+25%  Hispanic/Latinx
+75%  White/Caucasian
+ 
+Other 
+What percentage of your entire staff identifies as
+the following?
+50%  Female
+50%  Male
+ 
+What percentage of your management staff
+identifies as the following?
+67%  Black/African-American
+33%  White/Caucasian
+ 
+Other 
+What percentage of your management staff
+identifies as the following?
+67%  Female
+33%  Male
+ 
+What percentage of your Board identifies as the
+following?
+14%  Black/African-American
+15%  Hispanic/Latinx
+71%  White/Caucasian
+ 
+Other 
+8/23/24, 1:31 PM	PNC - Confirmation of Application Receipt
+https://www.cybergrants.com/pls/cybergrants/ao_application.submit_app	2/6
+
+What percentage of your Board identifies as the
+following?
+29%  Female
+71%  Male
+ 
+What percentage of the population served by your
+organization identifies as the following?
+3%  Asian/Asian-American
+30%  Black/African-American
+29%  Hispanic/Latinx
+12%  Multi-Racial
+1%  Native American
+25%  White/Caucasian
+ 
+Other 
+What percentage of the population served by your
+organization identifies as the following?
+55%  Female
+45%  Male
+ 
+Is your organization primarily focused on serving
+the LGBTQIA+ population?
+No
+ 
+Is your organization primarily focused on serving
+persons with a disability?
+No
+ 
+Is your organization primarily focused on serving
+military veterans?
+No
+ 
+Does your organization have a written Diversity,
+Equity and Inclusion policy?
+Yes
+ 
+Geographic Area Served
+*Primary State Served
+Pennsylvania
+ 
+Primary Pennsylvania CountyNorthampton
+ 
+Do you serve additional locations other than the
+county listed above?
+Yes 
+Additional States ServedPennsylvania
+ 
+Additional Pennsylvania CountiesBucks
+Carbon
+Lehigh
+Monroe
+ 
+Request Information
+*List of Highest Ranking Officers
+Dawn Gaye Godshall
+Stephen Alexander Broome 
+*Board of Directors File
+RTCLF Board of Directors - 8.2024.pdf (6.8 K), uploaded by Vincent Behe on 2024-08-23
+*Addressing PNC Foundation's Funding Priorities
+Rising Tide devotes its efforts entirely to economic development in Lehigh, Northampton, Carbon, Monroe, and
+upper Bucks counties with the goal of enhancing the overall quality of life in the region through neighborhood
+revitalization. More specifically, Rising Tide addresses the community development aspect of economic
+development by: 1) offering technical and marketing assistance to, and loan programs for, small businesses
+located in low- and moderate-income areas; and 2) supporting small businesses that are started by and employ
+low- and moderate-income individuals. 
+*Problem to be Addressed
+Rising Tide serves Lehigh, Northampton, Carbon, and Monroe counties and 21 municipalities in upper Bucks
+County. This large, diverse region with a population of over one million people has a median household income
+of approximately $78,597. Economic inequality is pervasive throughout the region. According to 2018-2022
+American Community Survey 5-year estimates, approximately 10.4% of households in the target market are
+below the poverty level. There are several census tracts with poverty rates exceeding 50% throughout the target
+market.
+Since the COVID-19 pandemic, small businesses have continued to face challenges that highlight the
+importance of CDFI lending. The Federal Reserve Bank’s 2023 Small Business Credit Survey shows that 77% of
+firms report the rising cost of goods and services as their primary financial challenge, and 29% reported credit
+availability as their primary financial challenge. CDFI’s and online lenders were the only two credit sources that
+received more applications from firms with a medium/high credit risk than firms with low credit risk. CDFI’s were
+significantly more likely to fully approve these loans than were online lenders.
+The main reasons for microenterprise loan denial are insufficient credit history and insufficient collateral. The
+Federal Reserve Bank’s 2022 Small Business Credit Survey found that in the last 12 months, 52% of businesses
+obtained loans in response to financial challenges. Of businesses that did not apply for assistance, 44%
+responded that they did not think their business would qualify. Of “discouraged” firms that did not apply, 56%
+cited weak businesses financials, and 32% cited strict lender requirements as their reason for not applying for
+the funding they need.
+ 
+Note: 
+8/23/24, 1:31 PM	PNC - Confirmation of Application Receipt
+https://www.cybergrants.com/pls/cybergrants/ao_application.submit_app	3/6
+
+*Project/Program Description
+Rising Tide provides financing to business owners whose risk factors make it difficult to obtain funds from
+traditional lenders. Rising Tide serves prospective, start-up, and established businesses in Lehigh, Northampton,
+Carbon, Monroe and upper Bucks counties through loans for leasehold improvements, the purchase of
+equipment/machinery, marketing costs, working capital and inventory purchases as well as one-on-one technical
+assistance on business plans, marketing strategies, cash flow analysis and projections. Rising Tide also
+manages the City of Bethlehem’s Small Business Loan Fund as well as the Lehigh and Northampton Revolving
+Loan Fund.
+As the only CDFI headquartered in the Lehigh Valley, Rising Tide has an expansive understanding of the capital
+and capacity gaps facing low- to moderate-income entrepreneurs in the area and adapts financial products and
+services to suit the needs of individual qualified borrowers. Other sources of loans in the target market are
+typically more rigid and less responsive to the variable needs of borrowers. Many lenders are reluctant to work
+with individuals with past credit problems or little collateral. Rising Tide works with current and potential
+borrowers to create business operating budgets, break-even analyses and other projections. Staff works with
+potential borrowers to improve credit scores. As a CDFI, at least 60% of the loans provided and at least 60% of
+the total dollars loaned must go to businesses operated by LMI owners or to businesses that are located within
+an LMI census area in order to maintain CDFI certification.
+Rising Tide’s Loan Committee evaluates requests of a detailed business plan and financial projections
+developed with assistance from staff. Successful loan applicants must be current on all existing credit obligations
+but past credit problems do not necessarily disadvantage an applicant. Collateral is important, although not
+always required.
+ 
+*Evaluation
+RTCLF’s goals are derived from its Annual Work Plan, which guides program activities and is evaluated twice
+yearly. Goals for FY25 include:
+Strategies:
+•Offer small business loans, microloans, and lines of credit to prospective and existing small business owners.
+•Offer no-cost non-marketing technical assistance to prospective and existing small business owners.
+•Offer no-cost marketing assistance to prospective and existing small business owners.
+Outcomes:
+•At least 50 potential borrowers will initiate an application with RTCLF.
+•At least 20 applications will be approved for financing
+•Provide non-marketing technical assistance (coaching, referrals, trouble-shooting, and advocacy) to at least 120
+prospective or existing entrepreneurs, including all borrowers
+•Provide marketing assistance to at least 50 entrepreneurs
+•Conduct at least 10 sessions of the Marketing Committee
+Measurement:
+•Program Director and RTCLF staff will track loan data using DownHome Solutions loan tracking software.
+Annually, participants will be surveyed to track sales, profitability, and overall satisfaction with being a business
+owner.
+•Program director and RTCLF staff will track non-marketing technical assistance provided to entrepreneurs.
+Annually, participants will be surveyed to track sales, profitability, and overall satisfaction with being a business
+owner.
+•RTCLF staff will track marketing assistance provided to entrepreneurs. Annually, participants will be surveyed to
+track sales, profitability, and overall satisfaction with being a business owner. 
+*Low- to Moderate-Income (LMI)
+51% - 74%
+ 
+CRA Documentation
+*Estimated Number of Individuals Served
+150 
+*Sustainability
+RTCLF anticipates increased loan applications and approvals due to a favorable economic climate as the move
+further away from the impacts of the COVID-19 pandemic. This will generate new interest income to strengthen
+organizational sustainability as well as the ability to develop innovative products in response to emerging needs
+in the target market.
+By performing careful due diligence on loan applications, RTCLF further shores up program sustainability. Loans
+are reviewed and rated based on policies and procedures outlined in the RTCLF lending policies. Due diligence
+is ultimately the responsibility of the loan committee. Final loan decisions are made by the loan committee and
+reported to the board of directors. Once loans are approved and disbursed, the director carefully monitors
+repayment. When entrepreneurs fall behind, the director proactively engages with them and, if necessary,
+initiates collections related to their loan collateral.
+RTCLF also remains sustainable by adjusting in response to community needs. The recent expansion of
+marketing and technical assistance services, including the rejuvenation of a marketing committee to serve the
+business community, is just one example of how the RTCLF has developed new products and services to
+provide greater opportunities for entrepreneurs. RTCLF also has strong working relationships with other small
+business support providers; these relationships are leveraged to meet the diverse needs of entrepreneurs
+served by RTCLF.
+As a subsidiary of Community Action Lehigh Valley, RTCLF benefits from the stability of an established, larger
+organization that maximizes limited resources and provides a backbone of federal funding through the
+Community Services Block Grant program. Community Action also provides management, administrative, and
+systems support including administrative, fiscal, human resources, fundraising and grant writing, organizational
+planning, research, and program development and evaluation. 
+8/23/24, 1:31 PM	PNC - Confirmation of Application Receipt
+https://www.cybergrants.com/pls/cybergrants/ao_application.submit_app	4/6
+
+*Community Involvement History
+Community Action Lehigh Valley is the leading regional advocate for low- and moderate-income people in the
+Lehigh Valley and as such has actively engaged and mobilized thousands of residents in the fight against
+poverty since 1965. Rising Tide has a history of actively reaching out to financial institutions, small business
+owners, and prospective entrepreneurs to educate them about lending opportunities for small business launch or
+expansion.
+As a subsidiary of Community Action, Rising Tide formerly collaborated with two other subsidiaries—Community
+Action Development Allentown (CADA) and Community Action Development Bethlehem (CADB)—in providing
+marketing and technical assistance to businesses. However, under the strategic direction of Community Action’s
+Executive Director, it was determined that Rising Tide would gradually assume full responsibility for provision of
+these services, a transition that was formalized in July 2020. Rising Tide’s full-time staff has now grown from two
+to four people, including a Marketing and Communications Coordinator. With our dramatically increased capacity,
+we have expanded our outreach into the community to ensure that aspiring entrepreneurs get the help they need
+to be successful.
+Rising Tide still closely partners with CADA and CADB in many endeavors. CADA and CADB enhance the
+success of Rising Tide both by providing development services that are beyond the capacity of Rising Tide and
+by acting as an additional presence in the communities served. With offices in downtown Allentown and south
+Bethlehem, prospective and existing business owners have the opportunity to access walk-in services in
+locations that may be more convenient and accessible to them. 
+*Fundraising Plan
+Rising Tide has a strong history of raising private and public support to meet strategic goals. The Rising Tide has
+received, and will continue to receive, federal funding through the CDFI Fund, Community Development Block
+Grant funding administered by local municipalities, and the Community Service Block Grant program.
+Community Action’s Executive Director also serves as the Executive Director of Rising Tide. Community Action’s
+annual budget has grown from $500,000 to over $30 million. This experience will position Rising Tide to continue
+developing partnerships with businesses and foundations throughout our target market. Current donors will
+continue to be engaged with the work of the organization and this pool of supporters will continually be cultivated
+and expanded.
+Rising Tide raises its entire operating budget each fiscal year, less any earned income it receives through
+interest payments and loan fees. Rising Tide receives fundraising services through a management contract with
+Community Action which includes: identification of funding opportunities; communication with funders;
+management of a funding calendar; writing and submission of grant proposals; tracking progress of funding
+requests in a database; and ensuring contract compliance by assisting with contractual obligations, conducting
+internal program monitoring, and assisting with external monitoring.
+ 
+Funding Information
+*Project Title
+Rising Tide Community Loan Fund - Program Support 
+*Requested Cash Amount
+$5,000.00 
+*Funding Category
+Community Development
+ 
+Community Development Categories Community Development
+ 
+*Years of Funding
+1
+ 
+Payment Requested for Year 1$5,000.00 
+For Programs Related to PNC Grow Up Great Only
+ 
+Year 1
+Total 0.00
+ 
+Total Children Served 
+Total Teachers Served 
+Total Parents/Caregivers Served 
+Attachments
+*Project Schedule
+RTCLF Project Schedule.pdf (97.4 K), uploaded by Vincent Behe on 2024-08-23
+* Project Budget
+PNC_Foundation_Project_Budget_ RTCLF 2025 - REVISION.pdf (115.05 K), uploaded by Vincent Behe
+on 2024-08-23
+*Organization Budget
+ALL CACLV BUDGET '25 - PDF.pdf (72.81 K), uploaded by Vincent Behe on 2024-
+*Financial Statements
+RTCLF Issued FY23 Financial Statements.pdf (493.24 K), uploaded by Vincent Behe on 2024-08-23
+8/23/24, 1:31 PM	PNC - Confirmation of Application Receipt
+https://www.cybergrants.com/pls/cybergrants/ao_application.submit_app	5/6
+
+Staff Resumés/Bios
+RTCLF Staff Bios - 8.2024.pdf (197.31 K), uploaded by Vincent Behe on 2024-08-23
+Strategic Plan
+Strategic Plan 2022-2024.pdf (237.51 K), uploaded by Vincent Behe on 2024-08-23
+Additional Materials
+Annual Report - RTCLF Page.pdf (496.52 K), uploaded by Vincent Behe on 2024-08-23
+RTCLF One-Page Flyer.pdf (1.28 MB), uploaded by Vincent Behe on 2024-08-23
+Verification of Good Legal Standing
+*Has the entity or any Key Person been subject to
+any criminal legal proceedings involving a felony
+offense?
+No 
+*Has the entity been subject to any regulatory or
+governmental investigations, audits, or inquiries,
+whether resolved, pending, or threatened?
+No 
+*Has the entity or any Key Person been party to
+any resolved, pending, or threatened legal
+proceeding in which the entity or Key Person was
+either a party adverse to PNC, or in which the
+entity had a material interest adverse to PNC?
+No 
+*Authorized Electronic Signature
+Dawn G. Godshall 
+Need Support?
+© 2024 PNC FoundationHome | PNC Foundation | PNC Charitable Trusts | © 2024 PNC All Rights Reserved.
+8/23/24, 1:31 PM	PNC - Confirmation of Application Receipt
+https://www.cybergrants.com/pls/cybergrants/ao_application.submit_app	6/6
+--------------------
+Attached Document: 67857ee18eeef_PNC---Confirmation-of-Application-Receipt---REVISED-(1).pdf
+ 
+Logout
+Confirmation of Application Receipt:
+Your proposal was successfully submitted to PNC. No further action on your part is required. Please understand that this process does take a period of time. Please be
+aware that we will reach out to you should we have questions and will make you aware of our ultimate decision. To print a copy of this completed application go to 'File',
+then 'Print' on your browser toolbar. Click here to return to the homepage when you are finished.
+Contact Information
+*First Name
+Colton 
+*Middle Name
+C 
+*Last Name
+Krial 
+Suffix 
+*Address
+1337 East 5th Street 
+*City
+Bethlehem 
+*State
+Pennsylvania
+ 
+*Zip
+18105 
+*E-mail Address
+planner-rtclf@caclv.org 
+*Title
+Senior Planner 
+Organization Information
+Official NameRISING TIDE COMMUNITY LOAN FUND 
+*Address
+1337 E 5TH STREET 
+*City
+BETHLEHEM 
+*State
+Pennsylvania
+ 
+*Zip
+18015-2103 
+*E-mail Address
+chudock@caclv.org 
+Website Addresstherisingtide.org 
+*Year Founded
+2001 
+*Organization Mission
+The mission of the Rising Tide Community Loan Fund (RTCLF, or Rising Tide) is to identify small business and
+community development credit needs that may stifle the creation of economic opportunity in low- to moderate-
+income communities of the Lehigh Valley and to meet those needs with affordable credit products. 
+*Organization History
+RTCLF is a 501(c)(3) nonprofit corporation and a subsidiary of Community Action Lehigh Valley. Formed in 2001
+and certified by the U.S. Treasury as a Community Development Financial Institution (CDFI), RTCLF was
+established to provide accessible and flexible financing options for business owners whose risk factors make it
+difficult to obtain funds from traditional lenders.
+Since 2012, RTCLF has administered and managed the City of Bethlehem’s Small Business Loan Fund, which
+provides entrepreneurs with access to up to $100,000 for property or equipment on condition that one full time
+equivalent position is created for every $35,000 that is borrowed. In 2019, RTCLF began administering and
+managing the Lehigh and Northampton Counties Revolving Loan Fund (LNCRLF). The LNCRLF offers small
+businesses in the Lehigh Valley access to mezzanine financing for their start-up and expansion projects.
+RTCLF originally served only Lehigh and Northampton Counties, but expanded its territory to also serve Carbon,
+Monroe, and upper Bucks counties in 2015 in response to requests for assistance. RTCLF added a line of credit
+product to provide entrepreneurs with access to $3,000 to $15,000 in working capital.
+In response to the pandemic, RTCLF delivered $249 million in COVID-19 emergency grant funds as a member
+of the PA CDFI network, along with 16 other community development financial institutions, to businesses across
+the commonwealth. Since its formation in 2001, Rising Tide has awarded 335 loans to 274 unique businesses,
+totaling $12,774,050 in disbursed loan funds. Of those loans, 195 have been awarded to women-owned
+businesses, 131 have been award to minority-owned businesses, and 226 have been awarded to low-to-
+moderate income entrepreneurs or to businesses located in a low-to-moderate income census tract. Rising
+Tide’s loans have led to the creation of at least 423 jobs, and the retention of at least 909 jobs.
+ 
+PNC Foundation
+8/23/24, 1:31 PM	PNC - Confirmation of Application Receipt
+https://www.cybergrants.com/pls/cybergrants/ao_application.submit_app	1/6
+
+*Organization Description
+Rising Tide serves prospective, start-up, and established businesses in Lehigh, Northampton, Carbon, Monroe
+and upper Bucks counties by providing a full range of one-to-one business technical assistance and small
+business loans to business owners whose resources and opportunities for growth are limited. Rising Tide offers
+four loan products: start-up businesses are eligible to apply for up to $50,000; businesses in operation at least
+one year are eligible for the Small Business Opportunity Loan Fund, which has a maximum loan amount of
+$150,000; a line of credit is available in amounts from $3,000 to $15,000; and in partnership with the City of
+Bethlehem, businesses located within the city limits are eligible to apply for up to $100,000 under the Bethlehem
+Small Business Loan Fund.
+Rising Tide also partners with the City of Allentown to help facilitate a self-forgiving loan program for
+entrepreneurs committed to creating jobs in the Neighborhood Improvement Zone. The Bethlehem and
+Allentown loan programs require borrowers to create jobs for low- to moderate-income people. Proceeds from a
+Rising Tide loan may be used for lease-hold improvements, the purchase of equipment/machinery, marketing
+costs, working capital, and inventory purchases. Rising Tide also provides technical and marketing assistance to
+current and prospective entrepreneurs and business owners, both of which are tailored to meet the needs of the
+individual. Technical assistance may include helping entrepreneurs develop a business plan, create financial
+projections, and prepare their loan application. Marketing assistance may include website development, social
+media marketing, graphic design, and branding.
+Rising Tide is funded through loans, grants, and private contributions. Sources include local, state, and federal
+government funds, bank grants, businesses grants, and individual donations.
+ 
+*Organization Purpose
+Rising Tide promotes economic opportunity and development in targeted neighborhoods throughout
+Northampton, Lehigh, Carbon, Monroe, and upper Bucks counties. Rising Tide envisions a future with self-
+sustaining community neighborhoods thriving throughout the greater Lehigh Valley. Rising Tide aims to achieve
+this vision in three distinct ways. Primarily, Rising Tide empowers low-income residents to become self-
+sustaining by creating their own jobs. Residents are encouraged to use their own specialized skill-set to
+construct meaningful employment for themselves. Secondly, a thriving small business developed and maintained
+by a low-income community resident has the potential of employing additional community members. This can
+become critically important as the community begins to feel that it has a stake in the success of the business.
+Finally, Rising Tide attempts to bring business to target areas of the cities where economic development is of the
+utmost importance. A proliferation of strategically placed small businesses can revitalize a neighborhood and
+build a strong sense of community among residents. 
+Details of Tax Exempt Status
+ 
+*IRS Letter of Determination
+501c3 - RTCLF update.pdf (377.93 K), uploaded by Sharol Lilly on 2018-11-26
+*509(a)(3) Tax Status
+No 
+Demographic Information
+*What percentage of the individuals do you
+anticipate being served by this grant identify as
+the following?
+3%  Asian/Asian-American
+30%  Black/African-American
+29%  Hispanic/Latinx
+12%  Multi-Racial
+1%  Native American
+25%  White/Caucasian
+ 
+Other 
+What percentage of the individuals do you
+anticipate being served by this grant identify as
+the following?
+55%  Female
+45%  Male
+ 
+What percentage of your entire staff identifies as
+the following?
+25%  Hispanic/Latinx
+75%  White/Caucasian
+ 
+Other 
+What percentage of your entire staff identifies as
+the following?
+50%  Female
+50%  Male
+ 
+What percentage of your management staff
+identifies as the following?
+67%  Black/African-American
+33%  White/Caucasian
+ 
+Other 
+What percentage of your management staff
+identifies as the following?
+67%  Female
+33%  Male
+ 
+What percentage of your Board identifies as the
+following?
+14%  Black/African-American
+15%  Hispanic/Latinx
+71%  White/Caucasian
+ 
+Other 
+8/23/24, 1:31 PM	PNC - Confirmation of Application Receipt
+https://www.cybergrants.com/pls/cybergrants/ao_application.submit_app	2/6
+
+What percentage of your Board identifies as the
+following?
+29%  Female
+71%  Male
+ 
+What percentage of the population served by your
+organization identifies as the following?
+3%  Asian/Asian-American
+30%  Black/African-American
+29%  Hispanic/Latinx
+12%  Multi-Racial
+1%  Native American
+25%  White/Caucasian
+ 
+Other 
+What percentage of the population served by your
+organization identifies as the following?
+55%  Female
+45%  Male
+ 
+Is your organization primarily focused on serving
+the LGBTQIA+ population?
+No
+ 
+Is your organization primarily focused on serving
+persons with a disability?
+No
+ 
+Is your organization primarily focused on serving
+military veterans?
+No
+ 
+Does your organization have a written Diversity,
+Equity and Inclusion policy?
+Yes
+ 
+Geographic Area Served
+*Primary State Served
+Pennsylvania
+ 
+Primary Pennsylvania CountyNorthampton
+ 
+Do you serve additional locations other than the
+county listed above?
+Yes 
+Additional States ServedPennsylvania
+ 
+Additional Pennsylvania CountiesBucks
+Carbon
+Lehigh
+Monroe
+ 
+Request Information
+*List of Highest Ranking Officers
+Dawn Gaye Godshall
+Stephen Alexander Broome 
+*Board of Directors File
+RTCLF Board of Directors - 8.2024.pdf (6.8 K), uploaded by Vincent Behe on 2024-08-23
+*Addressing PNC Foundation's Funding Priorities
+Rising Tide devotes its efforts entirely to economic development in Lehigh, Northampton, Carbon, Monroe, and
+upper Bucks counties with the goal of enhancing the overall quality of life in the region through neighborhood
+revitalization. More specifically, Rising Tide addresses the community development aspect of economic
+development by: 1) offering technical and marketing assistance to, and loan programs for, small businesses
+located in low- and moderate-income areas; and 2) supporting small businesses that are started by and employ
+low- and moderate-income individuals. 
+*Problem to be Addressed
+Rising Tide serves Lehigh, Northampton, Carbon, and Monroe counties and 21 municipalities in upper Bucks
+County. This large, diverse region with a population of over one million people has a median household income
+of approximately $78,597. Economic inequality is pervasive throughout the region. According to 2018-2022
+American Community Survey 5-year estimates, approximately 10.4% of households in the target market are
+below the poverty level. There are several census tracts with poverty rates exceeding 50% throughout the target
+market.
+Since the COVID-19 pandemic, small businesses have continued to face challenges that highlight the
+importance of CDFI lending. The Federal Reserve Bank’s 2023 Small Business Credit Survey shows that 77% of
+firms report the rising cost of goods and services as their primary financial challenge, and 29% reported credit
+availability as their primary financial challenge. CDFI’s and online lenders were the only two credit sources that
+received more applications from firms with a medium/high credit risk than firms with low credit risk. CDFI’s were
+significantly more likely to fully approve these loans than were online lenders.
+The main reasons for microenterprise loan denial are insufficient credit history and insufficient collateral. The
+Federal Reserve Bank’s 2022 Small Business Credit Survey found that in the last 12 months, 52% of businesses
+obtained loans in response to financial challenges. Of businesses that did not apply for assistance, 44%
+responded that they did not think their business would qualify. Of “discouraged” firms that did not apply, 56%
+cited weak businesses financials, and 32% cited strict lender requirements as their reason for not applying for
+the funding they need.
+ 
+Note: 
+8/23/24, 1:31 PM	PNC - Confirmation of Application Receipt
+https://www.cybergrants.com/pls/cybergrants/ao_application.submit_app	3/6
+
+*Project/Program Description
+Rising Tide provides financing to business owners whose risk factors make it difficult to obtain funds from
+traditional lenders. Rising Tide serves prospective, start-up, and established businesses in Lehigh, Northampton,
+Carbon, Monroe and upper Bucks counties through loans for leasehold improvements, the purchase of
+equipment/machinery, marketing costs, working capital and inventory purchases as well as one-on-one technical
+assistance on business plans, marketing strategies, cash flow analysis and projections. Rising Tide also
+manages the City of Bethlehem’s Small Business Loan Fund as well as the Lehigh and Northampton Revolving
+Loan Fund.
+As the only CDFI headquartered in the Lehigh Valley, Rising Tide has an expansive understanding of the capital
+and capacity gaps facing low- to moderate-income entrepreneurs in the area and adapts financial products and
+services to suit the needs of individual qualified borrowers. Other sources of loans in the target market are
+typically more rigid and less responsive to the variable needs of borrowers. Many lenders are reluctant to work
+with individuals with past credit problems or little collateral. Rising Tide works with current and potential
+borrowers to create business operating budgets, break-even analyses and other projections. Staff works with
+potential borrowers to improve credit scores. As a CDFI, at least 60% of the loans provided and at least 60% of
+the total dollars loaned must go to businesses operated by LMI owners or to businesses that are located within
+an LMI census area in order to maintain CDFI certification.
+Rising Tide’s Loan Committee evaluates requests of a detailed business plan and financial projections
+developed with assistance from staff. Successful loan applicants must be current on all existing credit obligations
+but past credit problems do not necessarily disadvantage an applicant. Collateral is important, although not
+always required.
+ 
+*Evaluation
+RTCLF’s goals are derived from its Annual Work Plan, which guides program activities and is evaluated twice
+yearly. Goals for FY25 include:
+Strategies:
+•Offer small business loans, microloans, and lines of credit to prospective and existing small business owners.
+•Offer no-cost non-marketing technical assistance to prospective and existing small business owners.
+•Offer no-cost marketing assistance to prospective and existing small business owners.
+Outcomes:
+•At least 50 potential borrowers will initiate an application with RTCLF.
+•At least 20 applications will be approved for financing
+•Provide non-marketing technical assistance (coaching, referrals, trouble-shooting, and advocacy) to at least 120
+prospective or existing entrepreneurs, including all borrowers
+•Provide marketing assistance to at least 50 entrepreneurs
+•Conduct at least 10 sessions of the Marketing Committee
+Measurement:
+•Program Director and RTCLF staff will track loan data using DownHome Solutions loan tracking software.
+Annually, participants will be surveyed to track sales, profitability, and overall satisfaction with being a business
+owner.
+•Program director and RTCLF staff will track non-marketing technical assistance provided to entrepreneurs.
+Annually, participants will be surveyed to track sales, profitability, and overall satisfaction with being a business
+owner.
+•RTCLF staff will track marketing assistance provided to entrepreneurs. Annually, participants will be surveyed to
+track sales, profitability, and overall satisfaction with being a business owner. 
+*Low- to Moderate-Income (LMI)
+51% - 74%
+ 
+CRA Documentation
+*Estimated Number of Individuals Served
+150 
+*Sustainability
+RTCLF anticipates increased loan applications and approvals due to a favorable economic climate as the move
+further away from the impacts of the COVID-19 pandemic. This will generate new interest income to strengthen
+organizational sustainability as well as the ability to develop innovative products in response to emerging needs
+in the target market.
+By performing careful due diligence on loan applications, RTCLF further shores up program sustainability. Loans
+are reviewed and rated based on policies and procedures outlined in the RTCLF lending policies. Due diligence
+is ultimately the responsibility of the loan committee. Final loan decisions are made by the loan committee and
+reported to the board of directors. Once loans are approved and disbursed, the director carefully monitors
+repayment. When entrepreneurs fall behind, the director proactively engages with them and, if necessary,
+initiates collections related to their loan collateral.
+RTCLF also remains sustainable by adjusting in response to community needs. The recent expansion of
+marketing and technical assistance services, including the rejuvenation of a marketing committee to serve the
+business community, is just one example of how the RTCLF has developed new products and services to
+provide greater opportunities for entrepreneurs. RTCLF also has strong working relationships with other small
+business support providers; these relationships are leveraged to meet the diverse needs of entrepreneurs
+served by RTCLF.
+As a subsidiary of Community Action Lehigh Valley, RTCLF benefits from the stability of an established, larger
+organization that maximizes limited resources and provides a backbone of federal funding through the
+Community Services Block Grant program. Community Action also provides management, administrative, and
+systems support including administrative, fiscal, human resources, fundraising and grant writing, organizational
+planning, research, and program development and evaluation. 
+8/23/24, 1:31 PM	PNC - Confirmation of Application Receipt
+https://www.cybergrants.com/pls/cybergrants/ao_application.submit_app	4/6
+
+*Community Involvement History
+Community Action Lehigh Valley is the leading regional advocate for low- and moderate-income people in the
+Lehigh Valley and as such has actively engaged and mobilized thousands of residents in the fight against
+poverty since 1965. Rising Tide has a history of actively reaching out to financial institutions, small business
+owners, and prospective entrepreneurs to educate them about lending opportunities for small business launch or
+expansion.
+As a subsidiary of Community Action, Rising Tide formerly collaborated with two other subsidiaries—Community
+Action Development Allentown (CADA) and Community Action Development Bethlehem (CADB)—in providing
+marketing and technical assistance to businesses. However, under the strategic direction of Community Action’s
+Executive Director, it was determined that Rising Tide would gradually assume full responsibility for provision of
+these services, a transition that was formalized in July 2020. Rising Tide’s full-time staff has now grown from two
+to four people, including a Marketing and Communications Coordinator. With our dramatically increased capacity,
+we have expanded our outreach into the community to ensure that aspiring entrepreneurs get the help they need
+to be successful.
+Rising Tide still closely partners with CADA and CADB in many endeavors. CADA and CADB enhance the
+success of Rising Tide both by providing development services that are beyond the capacity of Rising Tide and
+by acting as an additional presence in the communities served. With offices in downtown Allentown and south
+Bethlehem, prospective and existing business owners have the opportunity to access walk-in services in
+locations that may be more convenient and accessible to them. 
+*Fundraising Plan
+Rising Tide has a strong history of raising private and public support to meet strategic goals. The Rising Tide has
+received, and will continue to receive, federal funding through the CDFI Fund, Community Development Block
+Grant funding administered by local municipalities, and the Community Service Block Grant program.
+Community Action’s Executive Director also serves as the Executive Director of Rising Tide. Community Action’s
+annual budget has grown from $500,000 to over $30 million. This experience will position Rising Tide to continue
+developing partnerships with businesses and foundations throughout our target market. Current donors will
+continue to be engaged with the work of the organization and this pool of supporters will continually be cultivated
+and expanded.
+Rising Tide raises its entire operating budget each fiscal year, less any earned income it receives through
+interest payments and loan fees. Rising Tide receives fundraising services through a management contract with
+Community Action which includes: identification of funding opportunities; communication with funders;
+management of a funding calendar; writing and submission of grant proposals; tracking progress of funding
+requests in a database; and ensuring contract compliance by assisting with contractual obligations, conducting
+internal program monitoring, and assisting with external monitoring.
+ 
+Funding Information
+*Project Title
+Rising Tide Community Loan Fund - Program Support 
+*Requested Cash Amount
+$5,000.00 
+*Funding Category
+Community Development
+ 
+Community Development Categories Community Development
+ 
+*Years of Funding
+1
+ 
+Payment Requested for Year 1$5,000.00 
+For Programs Related to PNC Grow Up Great Only
+ 
+Year 1
+Total 0.00
+ 
+Total Children Served 
+Total Teachers Served 
+Total Parents/Caregivers Served 
+Attachments
+*Project Schedule
+RTCLF Project Schedule.pdf (97.4 K), uploaded by Vincent Behe on 2024-08-23
+* Project Budget
+PNC_Foundation_Project_Budget_ RTCLF 2025 - REVISION.pdf (115.05 K), uploaded by Vincent Behe
+on 2024-08-23
+*Organization Budget
+ALL CACLV BUDGET '25 - PDF.pdf (72.81 K), uploaded by Vincent Behe on 2024-
+*Financial Statements
+RTCLF Issued FY23 Financial Statements.pdf (493.24 K), uploaded by Vincent Behe on 2024-08-23
+8/23/24, 1:31 PM	PNC - Confirmation of Application Receipt
+https://www.cybergrants.com/pls/cybergrants/ao_application.submit_app	5/6
+
+Staff Resumés/Bios
+RTCLF Staff Bios - 8.2024.pdf (197.31 K), uploaded by Vincent Behe on 2024-08-23
+Strategic Plan
+Strategic Plan 2022-2024.pdf (237.51 K), uploaded by Vincent Behe on 2024-08-23
+Additional Materials
+Annual Report - RTCLF Page.pdf (496.52 K), uploaded by Vincent Behe on 2024-08-23
+RTCLF One-Page Flyer.pdf (1.28 MB), uploaded by Vincent Behe on 2024-08-23
+Verification of Good Legal Standing
+*Has the entity or any Key Person been subject to
+any criminal legal proceedings involving a felony
+offense?
+No 
+*Has the entity been subject to any regulatory or
+governmental investigations, audits, or inquiries,
+whether resolved, pending, or threatened?
+No 
+*Has the entity or any Key Person been party to
+any resolved, pending, or threatened legal
+proceeding in which the entity or Key Person was
+either a party adverse to PNC, or in which the
+entity had a material interest adverse to PNC?
+No 
+*Authorized Electronic Signature
+Dawn G. Godshall 
+Need Support?
+© 2024 PNC FoundationHome | PNC Foundation | PNC Charitable Trusts | © 2024 PNC All Rights Reserved.
+8/23/24, 1:31 PM	PNC - Confirmation of Application Receipt
+https://www.cybergrants.com/pls/cybergrants/ao_application.submit_app	6/6
+--------------------
+Attached Document: 67857f0c12a18_2024RTCLF_-PNC-Check.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

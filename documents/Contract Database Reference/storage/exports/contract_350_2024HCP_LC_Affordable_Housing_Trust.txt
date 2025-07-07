@@ -1,0 +1,16 @@
+Purpose: <p>-Salary, benefits and program supplies for HCP.</p><p>-Can be used for work on Homebuyer seminars, pre-purchase counseling, pre-settlement counseling, loss mitigation services, applications for Homeowner emergency Mortgage Assistance program and foreclosure mitigation services.</p><p>-See Exhibit A for more details.</p>
+Funder: Lehigh County
+Program: HCP
+Amount: 40000.00
+Start Date: 2023-07-01
+End Date: 2025-06-30
+
+Notes: <p>-Invoices and reimbursement requests can be sent to Laurie Moyer via email at lauriemoyer@lehighcounty.org&nbsp;</p><p>-Grantee must include "This project is supported in part by a grant from the County of Lehigh" in all publications relating to this project.</p><p>-See page 3 Administrative Requirements part A, Section I for document retention requirements.</p><p>-This contract can be renewed for an additional year and must be requested in writing.</p>
+
+Fund Number: 4100
+
+Attached Document: 6685581a495dc_2024HCP_LCAffordableHousingTrust-executed-contract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

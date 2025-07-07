@@ -1,0 +1,160 @@
+Purpose: <p>CSBG approved activities which may cover admin costs, office supplies, printing/copying, equipment and furniture purchases, utilities, telephone, general maintenance, computer support/ software, funding for subcontract costs associated with CADCA, CADCB, and RTCLF, as authorized.</p>
+Funder: CSBG
+Program: CALV
+Amount: 0.00
+Start Date: 2022-01-01
+End Date: 2026-12-31
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 6411e10485464_CSBG-Master-Agreement_-Contract--C000082084_Executed-1.1.22-12.31.27-(1).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 64a6e808cd81c_C000082084---FR5-LPC.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6504a3ddede4b_Quarter-2-2023-C000082084-FR4-LPC-(1).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6504a3e270bfa_Quarter-1-2023-CSBG-Funding-Release.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6504a3e4b8136_Quarter-3-4-2023_CSBG-Funding-Release_C000082084---FR5-LPC-(1).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6644ac3c02251_C000082084---FR7-LPC.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 67339e337caee_eSignatureDocument0b53f7e5-9704-476a-8e39-431f98f87021_C000082084---FR10-(1).pdf
+FUNDING RELEASE FORM 
+(Reduction in Funding) 
+ 
+Date: 	11/6/2024 
+Grantee Name: 	COMMUNITY ACTION COMMITTEE OF LEHIGH 
+VALLEY 
+Vendor Number: 	119431 
+Contract Number: 	C000082084 
+Funding Release Form Number: 	C000082084-10 
+Total Prior Funding Released  	$4,453,046 
+Current Funding Reduction Amount: 	$-265 
+Total Amount of All Funding Available under the 
+Contract, including the Current Funding Reduction 
+Amount. 
+ 
+ 
+$4,452,781 
+ 
+CODING INFORMATION TOTALING CURRENT FUNDING REDUCTION AMOUNT 
+ 
+7022800000 2430103000 P33240225200 6600700 2023 - $-265 
+ 
+The Department of Community and Economic Development hereby reduces, by the Current Funding Reduction 
+Amount specified above, the amount of funds made available to the Grantee, subject to the condition that the 
+remaining funds shall be used by the Grantee to carry out the activities specified in the Work Plan and Budget 
+attached hereto and incorporated herein. 
+ 
+ATTEST: COMMUNITY ACTION COMMITTEE OF LEHIGH VALLEY 
+ 
+ 
+(x) :  [Signature Affixed Electronically – see last page]_____  (x)_ [Signature Affixed Electronically – see last page]__ 
+Title [Affixed Electronically – see last page ]               Date  Title_ Affixed Electronically – see last page         Date 
+ 
+ 
+Approved:  Commonwealth of Pennsylvania 
+ Acting through the Department of  
+ Community & Economic Development 
+ 
+ 
+[Signature Affixed Electronically – see last page]______ 
+Secretary or designee                                   Date 
+ 
+ 
+Approved as to Legality and Form:  _________ [Signature Affixed Electronically – see last page]______ 
+Office of Chief Counsel                    Date 
+Approved as to fiscal responsibility,  
+budgetary appropriateness and  
+nonavailability of funds: _______[Signature Affixed Electronically – see last page]______ 
+Comptroller       Date
+
+Application #: 202111309737 	SAP Contract #: C000082084 
+Applicant Name: Community Action Committee Of Lehigh Valley 	Appendix B 
+PROJECT BUDGET 	Page 1 of 1 
+ 
+Reducing 2023 Discretionary Budget 
+     
+2022 CSBG 
+Expenditure Period 
+1/1/22-12/31/22  
+Federal  
+   
+2023 CSBG 
+Expenditure Period 
+1/1/23-12/31/23  
+Federal  
+   
+2023 Discretionary 
+Expenditure Period 
+10/1/23-9/30/24  
+Federal  
+   
+2024 CSBG 
+Expenditure Period 
+1/1/24-12/31/24  
+Federal  
+   
+Total  
+   
+   
+Machinery & Equipment  	$.00  	$.00  	$.00  	$.00   
+New Equipment Purchase  	$.00  	$.00  	$.00  	$.00  	$.00  
+Operating Costs / Working Capital  	$1,052,877.00  $1,092,540.00  $735.00  $1,170,829.00   
+Salary/Fringe Benefits  	$953,977.00  $991,640.00  	$.00  $1,078,776.00  $3,024,393.00  
+Training/Technical Assistance  	$3,900.00  	$.00  	$.00  $16,353.00  $20,253.00  
+Consumable Supplies  	$11,400.00  $12,300.00  	$.00  $12,300.00  $36,000.00  
+Travel  	$800.00  $1,200.00  	$.00  $1,200.00  $3,200.00  
+Promotion  	$.00  	$.00  	$.00  	$.00  	$.00  
+Office Equipment  	$2,000.00  $2,000.00  $735.00  $2,000.00  $6,735.00  
+Space Costs  	$64,000.00  $68,600.00  	$.00  $56,000.00  $188,600.00  
+Audit  	$16,800.00  $16,800.00  	$.00  $4,200.00  $37,800.00  
+Indirect Costs  	$.00  	$.00  	$.00  	$.00  	$.00  
+Related Costs  	$30,200.00  $30,200.00  $114,000.00  $30,200.00   
+Professional Services/Consultants  	$19,800.00  $20,600.00  $114,000.00  $20,600.00  $175,000.00  
+Inspections  	$.00  	$.00  	$.00  	$.00  	$.00  
+Insurance  	$9,600.00  $9,600.00  	$.00  $9,600.00  $28,800.00  
+Legal Costs  	$800.00  	$.00  	$.00  	$.00  $800.00  
+Miscellaneous  	$310,400.00  $310,400.00  	$.00  $310,400.00   
+Subcontract CADCA  	$.00  $130,000.00  	$.00  $130,000.00  $260,000.00  
+Subcontract CADB  	$.00  $130,000.00  	$.00  	$.00  $130,000.00  
+CADCB Subsidiary  	$130,000.00  	$.00  	$.00  	$.00  $130,000.00  
+CADCA Subsidiary  	$130,000.00  	$.00  	$.00  	$.00  $130,000.00  
+Dues & Subscriptions  	$400.00  $400.00  	$.00  $400.00  $1,200.00  
+Subcontract RTCLF  	$.00  $50,000.00  	$.00  $50,000.00  $100,000.00  
+RTCLF Subsidiary  	$50,000.00  	$.00  	$.00  	$.00  $50,000.00  
+Subcontract CADCB  	$.00  	$.00  	$.00  $130,000.00  $130,000.00  
+Total  	$1,393,477.00  $1,433,140.00  $114,735.00  $1,511,429.00   
+    Budget Total: $4,452,781.00
+--------------------
+Attached Document: 67375a794a979_C000082084---FR10-LPC.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 67815ea45c714_2022-2026CALV_CSBG-signed-amendment.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

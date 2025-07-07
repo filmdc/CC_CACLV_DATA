@@ -1,0 +1,16 @@
+Purpose: <p>-Used for acquisition, rehabilitation and resale and soft costs for 723 Broadway</p><p>-Reimbursable grant</p>
+Funder: HOME CHDO City of Bethlehem
+Program: CAH
+Amount: 111700.00
+Start Date: 2022-11-01
+End Date: 2025-12-31
+
+Notes: 
+
+Fund Number: F2980
+
+Attached Document: 65a814cbe15a2_2022-2025CABH_BethlehemRedevelopmentAuthority723Broadway_ExecutedSubagreement.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

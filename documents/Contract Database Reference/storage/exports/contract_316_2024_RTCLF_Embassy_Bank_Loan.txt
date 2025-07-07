@@ -1,0 +1,16 @@
+Purpose: <p>-Money to be used to finance LC and NC local small businesses</p><p>-2% interest (Principal and balance due and payable 7 years from receipt of investment)</p><p>-We may pre-pay the loan in whole or part at any time without penalty</p><p>-Investor will be allowed to attend RTCLF Board meetings as an observer</p><p>-Embassy requires audited Financial Statements</p><p>-Annual Report of Loan activity due upon request of the investor</p><p>&nbsp;</p>
+Funder: Embassy Bank
+Program: RTCLF
+Amount: 100000.00
+Start Date: 2024-03-15
+End Date: 2031-03-15
+
+Notes: 
+
+Fund Number: 0100
+
+Attached Document: 6606dcaac9185_2024RTCLF_EmbassyBank.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

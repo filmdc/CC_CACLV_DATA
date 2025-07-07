@@ -1,0 +1,186 @@
+Purpose: <p>-To provide housing counseling services and first-time homebuyer savings account programs</p><p>-Semi-annual reporting including financial statements, grant expenditures and Houshold and client demographics.</p><ul><li>Remained of funds to be spent by HRP as per memo uploaded below. 9/26/24</li></ul>
+Funder: PHFA PHARE/RTT
+Program: HCP
+Amount: 83000.00
+Start Date: 2017-07-24
+End Date: 2024-10-31
+
+Notes: 
+
+Fund Number: 0610
+
+Attached Document: 6524547dbd94b_CAFS-and-PHFA-PHARE_83,000-executed-contract_07.24.2017-(3).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 652454832e03f_Community-Action-Lehigh-Valley_grant-mod.pdf
+211
+ N. Front St.  •  PO Box 8029  •  Harrisburg, PA 17105-8029  	www.phfa.org 
+ 717.780.3800  •  TTY 717.780.3924  
+ 
+ 
+September 27, 2023 
+ 
+Mike Handzo 
+Senior Director of Capital and Special Projects 
+Community Action Lehigh Valley 
+1337 E. 5
+th
+ Street 
+Bethlehem, PA  18015 
+ 
+RE: 2016/17 PHARE Grant Modification and Extension Request  
+ Community Action Financial Services Program 
+ 
+Dear Bret,  
+ 
+Thank you for submitting your request to modify and extend the contract terms the use of 2016/17 
+PHARE grant funds that were previously awarded to Community Action Lehigh Valley for the 
+Community Action Financial Services Program. 
+ 
+We are aware that Community Action Lehigh Valley has had difficulty expending the awarded 
+PHARE grant for its original Home Ownership Savings Account program and there currently re-
+mains a substantial amount of grant funds.  We have processed your request to extend the terms 
+of CALV’s grant until September 30, 2024, with remaining funds to be used for both the existing 
+savings match program and the organization’s owner-occupied rehab program.   
+ 
+Please accept this letter as confirmation that the request from Community Action Lehigh Valley 
+to reallocate the remaining 16/17 PHARE funds, has been approved.  
+ 
+Please remember to submit all required semi-annual reports until all funds have been expended. A 
+close-out report will be due to PHFA no later than September 30, 2024.  
+ 
+If you have any questions, please feel free to contact me at clambert@phfa.org.  
+ 
+ 
+ Sincerely,  
+ 
+Clay Lambert  
+ 
+Clay Lambert  
+ Senior Program Administrator 
+ PA Housing Finance Agency 
+ 
+  
+cc: Leidy Ramos, Program Compliance Officer
+--------------------
+Attached Document: 66f579541856d_Memo-to-PHFA-re-HCP-PHARE-25SEP23-(2).docx
+M E M O R A N D U M
+To:	Clay Lambert, Senior Program Administrator, Pennsylvania Housing Finance Agency
+	Gabrielle Barger, Program Officer, Pennsylvania Housing Finance Agency
+From:	Mike Handzo, Senior Director of Capital and Special Projects, Community Action Lehigh Valley
+Date:	September 25, 2023
+CC:	Susan Gottwald, Director, Housing Counseling Program, Community Action Lehigh Valley
+	Chuck Weiss, Associate Executive Director for Housing, Community Action Lehigh Valley
+	Katherine Duque, Compliance Director, Community Action Lehigh Valley
+	Julie Shoults, Planner, Community Action Lehigh Valley
+Re:	Reprogramming of 2017 PHARE grant
+Community Action’s Housing Counseling Program (HCP), formerly known as Community Action Financial Services, received an $83,000 2017 PHARE grant to operate a Home Ownership Savings Account Program and to provide other pre-purchase counseling services.
+The program has involved participants saving funds for a home purchase in the amount of $2,000 to earn a $2,000 savings match funded through the PHARE grant.  While the program has been a success in terms of promoting savings habits, not enough participants went on to purchase a home.  This has hindered the use of grant funds.
+HCP seeks to ensure this grant can be fully expended by September 30, 2024.  As of the last semi-annual report submitted, $50,361 remained as of June 30, 2023.  Toward the goal of timely spending, HCP respectfully requests PHFA’s permission to use these funds for either the original Home Ownership Savings Account Program and related pre-purchase services or for owner-occupied housing rehabilitation activities.HCP’s sister program, Community Action Homes, operates owner-occupied housing rehab programs throughout Lehigh and Northampton County.  This program provides health, safety, and code compliance improvements to low-income homeowners’ residences.  Community Action Homes has a waiting list of over 400 interested participants, so it would not be difficult to reprogram the funds to owner-occupied rehabilitation.  Projects are typically capped at $24,999 to avoid the need for prevailing wage.  
+Community Action Homes proposes to immediately complete one (1) job, with another job completed by September 30, 2024.  Community Action Homes income-certifies all participating households.  Owner-occupied rehab funded through this grant will prioritize households with incomes below $34,450, and in no cases will serve households with incomes above $55,120, to honor the terms of the original grant.
+Please note HCP is unable to determine the exact allocation of funds between the Home Ownership Savings Account Program and owner-occupied rehab at the moment.  There are currently three active savers in the Home Ownership Savings Account Program, that could potentially earn the $2,000 savings match if they purchase a home.  HCP estimates spending $39,000 of the remaining grant funds on owner-occupied rehab, but this is subject to change.
+If you have any questions on the original PHARE grant, activities to date under this grant, or the Home Ownership Savings Account Program, please do not hesitate to contact HCP Director Susan Gottwald (; 484-893-1036).  If you have any questions on Community Action Homes’ owner-occupied rehab activities, please do not hesitate to contact me (; 484-893-1061).
+Thank you for your consideration of this request, and for Pennsylvania Housing Finance Agency’s continued support of Community Action Lehigh Valley through the PHARE program.  This funding source, and PHFA’s partnership, is greatly beneficial to our agency.
+
+--------------------
+Attached Document: 66fac90118d0e_Community-Action-Lehigh-Valley_grant-mod-(1).pdf
+211
+ N. Front St.  •  PO Box 8029  •  Harrisburg, PA 17105-8029  	www.phfa.org 
+ 717.780.3800  •  TTY 717.780.3924  
+ 
+ 
+September 27, 2023 
+ 
+Mike Handzo 
+Senior Director of Capital and Special Projects 
+Community Action Lehigh Valley 
+1337 E. 5
+th
+ Street 
+Bethlehem, PA  18015 
+ 
+RE: 2016/17 PHARE Grant Modification and Extension Request  
+ Community Action Financial Services Program 
+ 
+Dear Bret,  
+ 
+Thank you for submitting your request to modify and extend the contract terms the use of 2016/17 
+PHARE grant funds that were previously awarded to Community Action Lehigh Valley for the 
+Community Action Financial Services Program. 
+ 
+We are aware that Community Action Lehigh Valley has had difficulty expending the awarded 
+PHARE grant for its original Home Ownership Savings Account program and there currently re-
+mains a substantial amount of grant funds.  We have processed your request to extend the terms 
+of CALV’s grant until September 30, 2024, with remaining funds to be used for both the existing 
+savings match program and the organization’s owner-occupied rehab program.   
+ 
+Please accept this letter as confirmation that the request from Community Action Lehigh Valley 
+to reallocate the remaining 16/17 PHARE funds, has been approved.  
+ 
+Please remember to submit all required semi-annual reports until all funds have been expended. A 
+close-out report will be due to PHFA no later than September 30, 2024.  
+ 
+If you have any questions, please feel free to contact me at clambert@phfa.org.  
+ 
+ 
+ Sincerely,  
+ 
+Clay Lambert  
+ 
+Clay Lambert  
+ Senior Program Administrator 
+ PA Housing Finance Agency 
+ 
+  
+cc: Leidy Ramos, Program Compliance Officer
+--------------------
+Attached Document: 66fefd352944a_Community-Action-Lehigh-Valley_grant-extension.pdf
+211
+ 
+N. Front St.  •  PO Box 8029  •  Harrisburg, PA 17105-8029 	www.phfa.org 
+ 717.780.3800  •  TTY 717.780.3924 
+ 
+ 
+ 
+October 3, 2024 
+ 
+ 
+ 
+Community Action Lehigh Valley 
+1337 E. 5
+th
+ Street 
+Bethlehem, PA  18015 
+ 
+ 
+RE: 2016/17 PHARE Grant Extension 
+ Community Action Financial Services Program 
+ 
+Dear grantee,  
+ 
+ The Pennsylvania Housing Finance Agency (PHFA) is in receipt of your organization’s 
+request for an extension on the terms of the 2016/17 Pennsylvania Housing Affordability and Re-
+habilitation Enhancement (PHARE) award for the Community Action Financial Services pro-
+gram.  
+ 
+ We understand that the Community Action Lehigh Valley would like to extend the origi-
+nal grant agreement expiration was September 30, 2024, in order to implement this program in 
+order to assist more households in the most effective way possible. For that reason, your request 
+for a contract extension has been approved. The new contract deadline will be October 31, 2024. 
+ 
+Please keep the Agency informed as this program progresses. Also be aware that semi-
+annual reporting guidelines remain in pace and a final PHARE close-out report will be due to 
+PHFA within 30 days of the final expenditure of PHARE funds. 
+ 
+Should you have any inquiries, please do not hesitate to reach out to me at 717.780.3901 
+or via email at lramos@phfa.org (preferred). 
+ 
+Sincerely,  
+ 
+Leidy Ramos 
+Program Compliance Officer, 
+Office of Strategic Planning and Policy 
+Pennsylvania Housing Finance Agency
+--------------------

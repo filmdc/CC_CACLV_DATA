@@ -1,0 +1,21 @@
+Purpose: <ul><li>Salary and benefits for the HCP to conduct First Time Homebuyer seminars, Pre-purchase counseling, Pre-settlement counseling (Homeownership Counseling Program)</li><li>Home ownership savings account program for down payment and closing costs.</li><li>See performance measures and goals on page 20 Exhibit A</li></ul>
+Funder: City of Bethlehem -CDBG-BHAP
+Program: HCP
+Amount: 25000.00
+Start Date: 2024-01-01
+End Date: 2024-12-31
+
+Notes: <ul><li>Monthly reimbursement instructions page 20 Attachment A.</li><li>Quarterly Reports to be submitted in the Neighborly portal.</li></ul>
+
+Fund Number: F0550
+
+Attached Document: 675871866c8d2_2024HCP_-City-of-Bethlehem_-CDBG_-BHAP.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6793b4fe24245_2024HCP_-City-of-Bethlehem-CDBG_-BHAP-executed-.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

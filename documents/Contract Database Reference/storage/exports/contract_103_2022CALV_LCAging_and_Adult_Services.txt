@@ -1,0 +1,82 @@
+Purpose: <p>TEFAP-as authorized at .12 cents per pound of food.</p><p>HAP-Rental Assistance Payments- $704,000</p><p>HAP-Rental Assistance Care Management- $27,108 (Admin to process rental assistance checks)</p><p>HAP-Aftercare Management at the SSS- $34,012</p>
+Funder: LC Aging and Adult Services-Clearinghouse Services for Housing Programs
+Program: Multi
+Amount: 
+Start Date: 2022-07-01
+End Date: 2023-06-30
+
+Notes: <p>-Invoices to be sent to the county monthly for all services.</p><p>-TEFAP to be billed Quarterly.</p>
+
+Fund Number: 
+
+Attached Document: 641c630ce3603_LC-Clearinghouse-2021-2022-Executed-Contract-(1).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 641c631060312_2023CALV_LCAgingAdultServices_budgetsheet.pdf
+County of Lehigh Area Agency on Aging / Adult Services Appendix B (Budget and Rates)
+1
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+AB C DEFGH
+Vendor Program Contracted General Service TypeFrom Date To Date
+ Contract for 
+2022 / 2023 
+Unit of Service
+Community Action Committee of the 
+L.V., Inc.-       Allocation - TEFAP (As authorized by AAA/AS) -                                          01-Jul-2022 30-Jun-2023 As Auth'd * * *
+Community Action Committee of the 
+L.V., Inc.-       Allocation - HAP - Rental Assistance (Rental Payments) -                                          01-Jul-2022 30-Jun-2023 704,000.00      * * *
+Community Action Committee of the 
+L.V., Inc.-       Allocation - HAP - Rental Assistance Care Management -                                          01-Jul-2022 30-Jun-2023 27,108.00        * * *
+Community Action Committee of the 
+L.V., Inc.-       Allocation - HAP - Aftercare Care Management -                                          01-Jul-2022 30-Jun-2023 24,012.00        * * *
+Community Action Committee of the 
+L.V., Inc.HAP Housing  - Rental Assistance (Rental Payments at Cost) At Cost 01-Jul-2022 30-Jun-2023 As Auth'd At Cost
+Community Action Committee of the 
+L.V., Inc.HAP Housing  - Rental Assistance Care Management Hours Worked Base Rate 01-Jul-2022 30-Jun-2023 25.74             Hour
+Community Action Committee of the 
+L.V., Inc.HAP Housing  - Aftercare Care Management Hours Worked Base Rate 01-Jul-2022 30-Jun-2023 29.80             Hour
+Community Action Committee of the 
+L.V., Inc.TEFAP Food Storage & Distribution - TEFAP Lesser of .10/lb. or Actual Cost 01-Jul-2022 30-Jun-2023 As Auth'd Per Pound
+Community Action Committee of the 
+L.V., Inc.Note: The total contract expenditures are not to exceed the total of $755,120 ($704,000 plus $24,012 plus $27,108) for the term of the agreement for the services described in Appendix A. 
+Community Action Committee of the 
+L.V., Inc.These contract totals are not intended to be a guaranteed maximum, and the above allocations are considered to be a guide only. It is the responsibility of the PROVIDER to ensure
+Community Action Committee of the 
+L.V., Inc.the invoices do not exceed the maximum total of this contract. Any invoices that exceed this total of $755,120 will not be paid	.
+2022-2023 Budget and Rates (Appendix B).xls 2022-2023 Rate Sheet 3/15/2023  8:53 AM  1/1
+--------------------
+Attached Document: 64219fb71f34c_2023CALV_LCAAA_executed-amendment.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 646b875f042bd_2022CALV_LCAAA_executed2ndamendment.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 646fc0b29d19b_2022-LC-AAA-Compliance-Monitoring-Report.docx
+Failed to extract text from Word document: Invalid image: zip:///var/www/Contracts_Database_Laravel_Gen/storage/app/public/263/646fc0b29d19b_2022-LC-AAA-Compliance-Monitoring-Report.docx#word/media/image1.emf
+--------------------
+Attached Document: 646fc12ce1b7a_FY-2022-LC-AAA-Compliance-Checklist-Supporting-Documentation.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 646fc12fd746d_FY-2022-LC-AAA-Compliance-Checklist.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

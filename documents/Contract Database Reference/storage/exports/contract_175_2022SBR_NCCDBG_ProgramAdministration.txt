@@ -1,0 +1,16 @@
+Purpose: <p>Slate Belt Rising Program Administration-Salary and Fringe</p>
+Funder: NC DCED CDBG
+Program: SBR
+Amount: 30000.00
+Start Date: 2022-10-01
+End Date: 2024-09-30
+
+Notes: <p>-DCED Requires our audit&nbsp;</p><p>-Semi Annual Reports due by October 30th and April 30th. Report forms can be found at the end of the contract and sent to:</p><figure class="image"><img src="http://10.55.0.10/storage/235/image.png"></figure><p>&nbsp;</p>
+
+Fund Number: 
+
+Attached Document: 64b04776cbb0f_2023SBR_NCCDBG_ProgramAdministration_executedcontract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

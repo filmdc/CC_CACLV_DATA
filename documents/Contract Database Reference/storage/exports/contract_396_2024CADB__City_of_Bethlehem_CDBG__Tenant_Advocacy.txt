@@ -1,0 +1,21 @@
+Purpose: <p>-Personnel Costs for the Tenant Advocate.&nbsp;</p><ul><li>Tenant advocate to conduct tenant advocacy, LL/Tenant mediations, Program Coordination, and Tenant Education and Empowerment. See detailed Scope of Activity (Exhibit A-on page 19 of the contract).</li><li>Goals and Performance (see page 20 of the contract) specifies what to track and keep record of.</li><li>Specified qualifications for tenant advocate to include obtaining HUD certification (see Exhibit A-1- on page 21 of the contract).</li></ul><p><strong>Grantee Recognition:</strong> Must include reference to the support provided from the City of Bethlehem CDBG in all the publications made possible with funds made available under this agreement.</p><p><strong>Record Retention:</strong> Hold all records until HUD formally closes the program year with the City of Bethlehem.</p><p><strong>Client Data to collect: </strong>Demonstrate client eligibility for services provided. Collect name, address, income level and household size data and description of services provided.</p><figure class="image"><img src="http://10.55.0.10/storage/1253/image.png"></figure><p>&nbsp;</p><p>&nbsp;</p>
+Funder: City of Bethlehem
+Program: CADB
+Amount: 50000.00
+Start Date: 2024-01-01
+End Date: 2024-12-31
+
+Notes: <p>&nbsp;</p><ul><li>Request for Reimbursement Instruction:</li></ul><figure class="image"><img src="http://10.55.0.10/storage/1252/image.png"></figure>
+
+Fund Number: F2147
+
+Attached Document: 67336ae879b24_2024CADB_-Bethlehem-CDBG_-Tenant-Advocacy.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6793b4b403d70_2024CADB_-City-of-Bethlehem-CDBG_-Tenant-Advocacy-executed.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

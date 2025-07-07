@@ -1,0 +1,21 @@
+Purpose: <p>Daily Apartment Rate=$65</p><p>Supportive Services Rate/Case Management=$62 per hour</p><p>Extraordinary Expenses for damages per agreed cost (must get prior approval and provide receipt for damages or repair)</p><p>Curfew Cheks-1 hour per day at $62</p><p>SHIFT rate= $60 per hour</p><p>Family Emergency Fund- $9,375 per receipt for move in expenses for SHIFT clients.</p><p><strong>*This grant is reimbursable.</strong>&nbsp;</p><p>**Daily apartment rate, Supportive Services, Curfew Checks and SHIFT rate <strong>billed monthly</strong> with appropriate signed logs and back up</p><p>*** Family Emergency fund reimbursable per instance with proper receipts and backup</p><p>****Extraordinary Expenses reimbursable per instance with proper receipts and backup</p>
+Funder: Lehigh County Children & Youth
+Program: SSS
+Amount: 0.00
+Start Date: 2023-07-01
+End Date: 2024-06-30
+
+Notes: <p><strong>Other requirements</strong>-Case Workers are required to take 12 hours of training per year.</p><p><strong>Reporting Requirements:</strong></p><p>-Monthly reports with invoice as usual with apartment occupancy and case managements times accompanies by signed logs</p><p>-Quarterly Numbers as requested by Children and Youth (they send out an email request)</p><p>-Semi-Annual Reports and Final Report (they send out an email request)</p><p>-Outcome reports due Mid-January for July 1-December 2023 and July 1st for January- June 2024 (send this to Sharon Dunn)</p>
+
+Fund Number: 1300
+
+Attached Document: 64bedbe158f6e_2023SS_C&Y.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 64de178b7198c_2023SSS_C&Y_executed-contract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

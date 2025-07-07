@@ -1,0 +1,1679 @@
+Purpose: <p>The purpose of this grant is to support the purchase and distribution of fresh foods to Monroe County. This is a lump sum grant. Grant funds are outlined as below.&nbsp;</p><p>Food Purchase: <strong>$5,000</strong><br>Fuel and Vehicle Maintenance: <strong>$5,00</strong><br>Staff Wage and Benefits: <strong>$10,000</strong> (agency relations coordinator for Monroe County)</p><p>The proposal states a service goal of 17,000 individuals.</p><p>A final report will be due approximately one month after the grant period ends. Reporting information will be sent to the planner-SHFB@caclv.org.</p>
+Funder: Pocono Mountain United Way
+Program: SHFB
+Amount: 20000.00
+Start Date: 2024-07-01
+End Date: 2025-06-30
+
+Notes: 
+
+Fund Number: F8065
+
+Attached Document: 66981f5c19a93_2024SHFB_Pocono-Mountain-United-Way_executed.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 66981f5c1b496_2024_SHFB_PMUW_ProposalSubmitted.pdf
+COMMUNITY ACTION COMMITTEE OF THE LEHIGH VALLEY INC - Agency Information - 2024-2025
+Application
+Community Impact
+FY 2024-2025 - Application
+Application Status: Submitted
+Application Submission Details
+Executive Director: Dawn Godshall
+Board President: Louis Cinquino
+Board Treasurer: Jon Schwartz
+Submission Confirmation Email Sent To: planner-SHFB@caclv.org
+Submitted By: Briana McGonagle on 1/31/2024 at 7:33 PM (CST)
+COMMUNITY ACTION COMMITTEE OF THE LEHIGH VALLEY INC
+Agency Information
+You may save your work at any time by clicking on the "Save My Work" link/icon at the bottom or top
+of the page. 
+When you have completed all questions on the form, select the "Save My Work and Mark as
+Completed" link/icon at the bottom or top of this page.
+You may also SWITCH between forms in this application by using the SWITCH FORMS feature in the
+upper right corner. When switching forms, any updates to the existing form will automatically be
+saved.
+General Information
+Agency Name	COMMUNITY ACTION COMMITTEE OF THE LEHIGH VALLEY INC
+Previous Agency Name
+EIN #	231669589
+Website Address www.caclv.org
+Agency Mission Statement
+The mission of Community Action Lehigh Valley is to improve the quality of life by building a community in
+which all people have access to economic opportunity, the ability to pursue that opportunity, and a voice in
+the decisions that affect their lives.
+The mission of Second Harvest Food Bank of the Lehigh Valley and Northeast Pennsylvania, a program of
+Community Action Lehigh Valley, is to obtain food and distribute it to people in need through area non-
+profits and to provide resources for education and advocacy to end hunger. We provide nutritious food, offer
+nutrition education, advocate to end food insecurity, dismantle barriers to create access, and work to attain
+food justice. We respect and preserve the dignity of each of our neighbors.
+Primary Address 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 1 of 35
+
+Address Line 1 1337 E Fifth Street
+Address Line 2
+City	Bethlehem
+State	PA
+Zip	18015
+Main Phone	(610) 691-5620
+Main Fax
+Main Email	planner-SHFB@caclv.org
+Primary Contact
+Primary Contact Briana McGonagle, phone: (610) 691-5620, email: planner-SHFB@caclv.org
+Contact Title Planner
+ 
+Executive Director / CEO
+Executive Director Dawn Godshall, phone: (610) 691-5620, email: planner-CACLV@caclv.org
+Board President
+Salutation
+Name	Louis Cinquino
+Title
+Phone Number	(610) 762-3078
+Email	cinquino@yahoo.com
+Budget Information
+Total amount requested
+from PMUW for all
+programs 
+25,000.00
+Amount requested as a
+percentage of total
+agency budget 
+(typically 1-6%)
+1.30
+Geographic Area served
+by your organization
+Carbon, Lehigh, Monroe, Northampton, Pike, and Wayne Counties
+Fiscal Year Dates July - June 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 2 of 35
+
+1/31/2024 7:34 PM CST	© 2024 e-CImpact page 3 of 35
+
+Agency Status - 2024-2025 Application
+COMMUNITY ACTION COMMITTEE OF THE LEHIGH VALLEY INC
+Agency Status
+Purpose: To provide a status report of your organization at the time of application submission.
+Instructions: Each narrative response should be brief and clearly written so as to be understood by
+Review Panel Volunteers. As volunteers reviewing the proposal change from year to year, please
+respond as if the reviewer has no knowledge of your organization.
+Significant Impact
+Outline significant changes, accomplishments and challenges (e.g. funding, programming, board
+and/or staff, etc.) your organization has experienced in the past and/or current year or are
+anticipated in the coming year.
+Significant changes
+In 2023, Second Harvest Food Bank continued to build capacity to meet the growing demand for food
+resources, while focusing more fully on meeting the nutritional needs of the community.
+To meet the demand for additional food resources, we purchased and leased two new trucks that doubled
+our load capacity. These investments have allowed us to more efficiently provide high volumes of food to
+pantries while significantly reducing the need to make multiple deliveries to the same location on a given
+day. We also increased our cold storage capacity by piloting different solutions, such as leasing
+refrigerated trailers when large orders of cold/frozen product are delivered to the food bank. Having
+resources like additional reefer trailers has enabled us to source more fresh, perishable produce and
+proteins. 
+We are also collaborating on a project with our neighboring Feeding America partner food banks to ensure
+we are able to solicit as many donations as possible. Our state association, Feeding Pennsylvania, will
+assist with solicitation and donor stewardship as we work to build capacity in our warehouse and on our
+sourcing team. The result of this collaboration is maintaining a high-level of donated product at a time when
+other food banks across the nation have reported a significant decline in product donation. 
+Another exciting opportunity that launched in 2023 was the Local Food Purchasing Agreement, a grant
+program through USDA that allows us to pair local farms with food pantries and pay a fair wholesale price
+for local agricultural products. We have connected with farms in each of the six counties we serve to provide
+high-quality, nutrient-dense local foods to people in need while supporting the local agriculture economy.
+Funding for that program continues through July 2025. 
+Lastly, we formally adopted a Food and Nutrition Policy at the food bank in 2023, which sets ambitious
+goals to ensure the food we are providing is healthful and beneficial to our neighbors. The policy is based
+on the Healthy Eating Research (HER) guidelines and follows a “stop light” model for ranking foods as
+Choose Often, Choose Sometimes, and Choose Rarely. We are currently implementing phase 3 of the
+policy, which allows us to have a better understanding of our inventory and how it supports community
+health. 
+As we move purposefully into 2024, we are looking forward to completing a new strategic plan, fully
+implement digital statistic reporting that will allow us to examine deeper customer-level data, and refining
+program objectives for school pantries and SNAP outreach. We will also pilot home delivery of senior
+boxes throughout the service area (expanding on our 2023 deliveries in Lehigh and Northampton counties). 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 4 of 35
+
+Significant accomplishments
+During the last program year, Second Harvest:
+• Distributed 14.7 million pounds of food (an equivalent of 12,260,492 meals) – a 44% increase from the
+previous year. 
+o Included in this total is 6.7 million pounds of fresh produce, perishable protein, and fresh dairy products
+(46% of total distribution). This is a 46% increase in fresh foods in the SHFB inventory compared to the
+previous FY. 
+• Rescued 8 million pounds of food from ending up in a landfill.
+• Distributed 28,311 boxes of nutritious food to low-income seniors through the PA Senior Food Box
+Program – a 16% increase from the previous year.
+• Provided a monthly share of shelf-stable and fresh foods to more than 500 military families partic-ipating
+in our MilitaryShare program.
+• Provided food to 87,030 individuals, on average, each month, including 22,556 children and 32,401
+seniors – a 52% increase over the previous year. 
+• Utilized the help of 1,077 unique volunteers, who provided a collective of 3,367 volunteer hours.
+Significant challenges experienced by agency?
+The increasing demand for more food has stressed Second Harvest at a time when we are also being
+impacted by rising food and fuel costs. During the last program year, we distributed 44% more food than the
+year prior, and provided food to an average of 87,000 people each month – a 52% increase in one year. 
+Challenges have also been exacerbated by staffing shortages and capacity constraints as we adjust to the
+increased need and demand on resources.
+Agency Impact on Disparities: Trends and Data
+What disparities has your organization identified in the populations you serve? Examples may
+include: "people without a high school diploma are seeking services at a higher rate than high
+school graduates"; "women take longer than men to obtain employment". At a minimum please
+provide trends and/or include data if available.
+In December 2022, we completed our Neighborhood Experience Survey. Our team of staff an volunteers
+worked with pantry coordinators to capture feedback from pantry participants. Results show that 75% of
+pantry customers in Monroe County said they ate fresh fruits and vegetables less often than once per day.
+Despite the low rate of fresh produce consumption, more than half (52%) of customers said they had
+special dietary needs due to chronic health disorders. A total of 73% percent of participants with diet-
+related diseases would benefit from increased consumption of fresh produce. About a third of customers
+said they “Always” or “Often” get enough fruits and vegetables at the pantry they visit. These customers also
+reported higher rates of fresh produce consumption compared with those who only “Sometimes” or “Rarely”
+received enough produce (48% of customers).
+What barriers to data collection does your organization face? Examples could include lack of
+centralized system, limited staff capacity, concerns about confidentiality, discomfort in asking
+certain questions, etc. 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 5 of 35
+
+Current barriers to data collection include:
+• Limited staff/volunteer capacity at the pantry level,
+• Limited staff capacity at Second Harvest to train pantry volunteers in preferred data collection practices,
+• Lack of technology at the pantry level to easily collect and organize participant data, and
+• Fear that a participant might not return for additional needed food if they feel alienated from having to
+answer too many questions. 
+It is our priority to move into more data-informed decision making. Electronic data collection at the pantry-
+level will lead to a better understanding of the people we serve and will ensure we are able to keep the
+needs of our participants at the forefront of our strategic planning, program development, and food
+distribution efforts. We also recognize that we will be excluded from future funding opportunities if we are
+unable to supply the demographic data required by funders. Developing and standardizing our data
+collection mechanisms is essential. 
+We are eager to report that in 2024, with funding through Feeding Pennsylvania, we will pilot an electronic
+data collection initiative at the pantry level. We will have a dedicated staff position to work with pantry
+coordinators to implement standardized data collection. This will be an ongoing initiative. We will start with
+a cohort of five pantries, with the goal of onboarding all 200+ pantry partners by the end of year four. 
+Access to timely data will deeply impact our ability to understand the people we serve, and to react
+accordingly.
+Is there a specific demographic group that is under-represented or over-represented in the group
+you serve? For example, "This program serves all ages but 80% of clients are 18-24."
+According to data from Feeding America, 8.6% of Monroe County residents are food insecure, but
+disparities exist Hispanic households (15% food insecure). Thirty-five percent of the people Second
+Harvest serves in Monroe County are children younger than 18 years old, though children represent only
+19% of the total population in the County. Seniors (60+) comprise 18% of the people Second Harvest
+serves within the county, but represent 27% of the total population.
+Agency Board Information
+Please outline all the ways that your Board of Directors contributes to your agency
+(agency governance, policy development, fundraising, etc.)
+Board Participation
+Second Harvest’s Advisory Board includes representatives from emergency food providers, other nonprofit
+organizations, food industry companies, financial institutions, and other local businesses. The advisory
+board provides oversight, expertise, and connections to Second Harvest while also assisting with program
+development and strategic planning. In January 2024, the Second Harvest Advisory embarked on the first
+steps of creating the strategic plan that will guide Second Harvest’s operations through 2026.
+As a program of Community Action Lehigh Valley, Second Harvest is governed by its active and diverse
+board of directors. The board is comprised of one-third each private corporations, public sector represent-
+atives, and community residents. The board monitors Second Harvest’s performance through biannual work
+plan evaluations, monthly reports, and two liaison representatives from the Board of Directors who sit on
+Second Harvest's advisory board.
+Site Visit Information 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 6 of 35
+
+Is your agency able to
+accept Program Review
+Volunteers 
+conducting a site visit?
+Yes
+If yes, does your agency have any restrictions on visitors? Please specify parameters such as
+masks required, maximum number of people, visits only on specific days or times, etc.
+Second Harvest is open to receiving visitors during normal business hours: 8:00 am – 4:00 pm, Monday
+through Friday. We request that visitors wear closed-toed shoes for their own personal safety within the
+warehouse. 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 7 of 35
+
+Agency Budget - 2024-2025 Application
+COMMUNITY ACTION COMMITTEE OF THE LEHIGH VALLEY INC
+Agency Budget
+You may save your work at any time by clicking on the "Save My Work” link/icon at the bottom or top
+of the page.  You also must click on "Save My Work" to make sure the numbers total on the page.
+When you have completed all questions on the form, select the "Save My Work and Mark as
+Completed” link/icon at the bottom or top of this page.
+You may also SWITCH between forms in this application by using the SWITCH FORMS feature in the
+upper right corner. When switching forms, any updates to the existing form will automatically be
+saved.
+Income
+For Prior Year Budget, please provide organization's last full fiscal year budget.
+Prior Year
+Budget 
+Prior Year
+Actual 
+Prior Year
+Percent 
+Change
+Current
+Budget
+Current Year
+Percent 
+Change
+a. Government 25,572,105.0
+0
+21,081,143.0
+0
+-17.5612,089,209.0
+0
+-42.65
+b. Foundations /
+Corporations
+1,276,432.001,051,970.00 -17.592,472,500.00 135.04
+c. Individual Donations3,591,558.003,010,041.00 -16.191,057,800.00 -64.86
+d. Events	0.00 0.00 0.00 0.00 0.00
+e. Fees paid by outside
+sources
+2,346,117.002,454,492.00 4.62153,200.00 -93.76
+f. Pocono Mountains United
+Way
+0.00 23,000.00 0.00 25,000.00 8.70
+g. Other United Way(s) 0.00 18,000.00 0.00	-100.00
+h. Interest / Investments 700.00 38,985.00 5,469.29 48,600.00 24.66
+i. Program Fees 1,300,572.00964,072.00 -25.87673,944.00 -30.09
+j. Other - Click Here to Add561,440.00509,900.00 -9.18260,000.00 -49.01
+   Other - House Sales 540,990.00509,900.00	260,000.00
+   Other - Shared
+Maintenance Fees and
+Misc. Revenue
+20,450.00
+Total Income	34,648,924.0
+0
+29,151,603.0
+0
+-15.8716,780,253.0
+0
+-42.44
+Expenses 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 8 of 35
+
+Prior Year
+Budget 
+Prior Year
+Actual 
+Prior Year
+Percent 
+Change
+Current
+Budget
+Percent
+Change
+k. Salaries	5,858,248.005,375,332.00 -8.245,876,170.00 9.32
+l. Employee benefits &
+payroll taxes
+2,658,140.002,127,440.00 -19.972,777,365.00 30.55
+m. Professional fees /
+Training
+1,705,840.001,850,384.00 8.471,362,153.00 -26.39
+n. Supplies / Equipment 797,159.001,200,011.00 50.54936,732.00 -21.94
+o. Printing / Publications132,325.00108,489.00 -18.01 76,925.00 -29.09
+p. Utilities / Phone / Postage317,047.00317,878.00 0.26257,528.00 -18.99
+q. Occupancy	257,415.00361,073.00 40.27280,000.00 -22.45
+r. Equipment Maintenance 267,507.00216,053.00 -19.23250,000.00 15.71
+s. Travel / Conferences 203,357.00267,195.00 31.39 79,050.00 -70.41
+t. Dues / Fees	54,082.00 49,312.00 -8.82 49,312.00 0.00
+u. Insurance Costs 112,863.00154,043.00 36.49 2,000.00 -98.70
+v. Direct Client Grants19,063,052.0
+0
+16,585,861.0
+0
+-12.993,939,970.00 -76.25
+w. Other - Click Here to Add3,303,239.002,561,846.00 -22.442,939,465.00 14.74
+   Other - House Costs,
+Allocations, Depreciation
+2,839,034.002,146,011.00	2,601,353.00
+   Other - Computer,
+Advertising, Staff
+Development, Interest
+464,205.00415,835.00	338,112.00
+Total Expenses 34,730,274.0
+0
+31,174,917.0
+0
+-10.2418,826,670.0
+0
+-39.61
+Surplus / Deficit
+Prior Year
+Budget 
+Prior Year
+Actual 
+Prior Year
+Percent 
+Change
+Current
+Budget
+Current Year
+Percent 
+Change
+Surplus / Deficit -81,350.00-2,023,314.00 2,387.17-2,046,417.00 1.14 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 9 of 35
+
+Agency Fiscal Abstract - 2024-2025 Application
+COMMUNITY ACTION COMMITTEE OF THE LEHIGH VALLEY INC
+Agency Fiscal Abstract
+You may save your work at any time by clicking on the "Save My Work" link/icon at the bottom or top
+of the page. 
+When you have completed all questions on the form, select the "Save My Work and Mark as
+Completed" link/icon at the bottom or top of this page.
+You may also SWITCH between forms in this application by using the SWITCH FORMS feature in the
+upper right corner. When switching forms, any updates to the existing form will automatically be
+saved.
+Budget Narrative
+In reference to the budget form, explain any major difference(s) from year to year, as well as large
+surpluses or deficits.
+The major budget differences from FY23 to FY24 include the following categories:
+Federal Grants, Corporate/ Business Grants, Salary & Wages, and Program Supplies.
+Major differences are mainly due to the sunsetting of COVID-era surplus funding, the close of our
+Emergency Rental Assistance Program (ERAP), and general inflation which has raised the cost of program
+supplies, food, and utilities.
+Key Financial Information
+Overhead rate: 12.30
+Does the agency expect
+any major capital
+improvements 
+over the next year?
+Yes
+If Yes, please list cost of project and brief description
+We plan to install air conditioning in the Second Harvest Food Bank warehouse, as a measure of ensuring
+food and worker safety. The project is estimated $340,000.
+Net Assets at end of last
+fiscal year:
+12,512,735.00
+In the past fiscal year, have United Way funds been leveraged to increase funding from other
+sources for your organization?
+Yes
+If Yes, amount and description
+Funding from United Way was leveraged with funds from Pennsylvania Agricultural Surplus System (PASS),
+Local Food Purchasing Agreement (LFPA), nonentitlement TEFAP, Feeding America, and private donors
+to purchase fresh food. 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 10 of 35
+
+Is any portion of the current funding request going to be leveraged to increase funding from other
+sources for your organization?
+Yes
+If Yes, indicate amount and describe
+We will leverage funds from United Way with funds from the Pennsylvania Agricultural Surplus System
+(PASS), nonentitlement TEFAP, Feeding America, and private donors to purchase fresh food. The exact
+amount has not been determined because Community Action has not yet started its budgeting process for
+2024-2025, but we anticipate $100,000 to $300,000. 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 11 of 35
+
+Patriot Act 2024-2025 Application
+COMMUNITY ACTION COMMITTEE OF THE LEHIGH VALLEY INC
+Counterterrorism Compliance
+In compliance with the spirit and intent of the USA PATRIOT Act and other counter-terrorism laws,
+each funded agency (“Organization”) must certify that it is in compliance with Pocono Mountains
+United Way and United Way Worldwide’s ("UWW") compliance program.
+You may save your work by clicking on the "Save My Work" link/icon at the bottom or top of the
+page. 
+When you have completed all questions on the form, select the "Save My Work and Mark as
+Completed" link/icon at the bottom or top of this page.
+You may also SWITCH between forms in this application by using the SWITCH FORMS feature in the
+upper right corner. When switching forms, any updates to the existing form will automatically be
+saved.
+COUNTER-TERRORISM COMPLIANCE
+Indicate Your Compliance With Each of the Following:
+Organization Name: COMMUNITY ACTION COMMITTEE OF THE LEHIGH VALLEY INC
+This Organization is not on any federal terrorism “watch lists,” including the list in Executive
+Order 13224, the master list of specially designated nationals and blocked persons maintained by
+the Treasury Department, and the list of Foreign Terrorist Organizations maintained by the State
+Department.
+Comply
+This Organization does not, will not and has not knowingly provided or collected funds or
+provided material support or resources with the intention that such funds or material support or
+resources be used to carry out acts of terrorism.
+Comply
+This Organization does not, will not and has not knowingly provided financial, technical, in-kind
+or other material support or resources* to any individual or entity that is a terrorist or terrorist
+organization, or that supports or funds terrorism.
+Comply
+This Organization does not, will not and has not knowingly provided financial or material support
+or resources to any entity that has knowingly concealed the source of funds used to carry out
+terrorism or to support Foreign Terrorist Organizations.
+Comply
+This Organization does not regrant to organizations, individuals, programs and/or projects
+outside of the United States of America with out compliance with IRS guidelines.
+Comply 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 12 of 35
+
+This Organization takes reasonable, affirmative steps to ensure that any funds or resources
+distributed or processed do not fund terrorism or terrorist organizations.
+Comply
+This Organization takes reasonable steps to certify against fraud with respect to the provision of
+financial, technical, in-kind or other material support or resources to terrorists and terrorist
+organizations.
+Comply
+* In this form, “material support and resources” means currency or monetary instruments or
+financial securities, financial services, lodging, training, expert advice or assistance, safehouses,
+false documentation or identification, communications equipment, facilities, weapons, lethal
+substances, explosives, personnel, transportation, and other physical assets, except medicine or
+religious materials.
+I certify on behalf of the
+Organization listed above 
+that the foregoing is true.
+Yes 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 13 of 35
+
+Board Demographics Updated
+COMMUNITY ACTION COMMITTEE OF THE LEHIGH VALLEY INC
+Board Demographics
+This information is being requested to help Pocono Mountains United Way better understand what
+types of information agencies are currently collecting. Please complete as much information as you
+have access to. All fields are optional. 
+You may save your work at any time by clicking on the “Save My Work” link/icon at the bottom or top
+of the page. 
+When you have completed all questions on the form, select the “Save My Work and Mark as
+Completed” link/icon at the bottom or top of this page.
+You may also SWITCH between forms in this application by using the SWITCH FORMS feature in the
+upper right corner. When switching forms, any updates to the existing form will automatically be
+saved.
+Gender Identification
+Gender Identification 	# of Board Members 
+Females	12
+Males	10
+Non-binary
+Transgender
+Unknown/not reported
+Age Range
+Age Range	# of Board Members 
+0-17 Years
+18 - 30 Years
+31 - 49 Years	8
+50-64 Years	6
+65+ Years	8
+Unknown/not reported
+Education Level
+Highest Education 
+Level	# of Board Members 
+Grades 9-12/Non-Graduate
+High School Graduate/ GED 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 14 of 35
+
+Highest Education 
+Level	# of Board Members  12 grade + Some Post-
+Secondary
+Professional/Trade
+Certificate
+Associate Degree
+Bachelors Degree
+Masters or Doctorate
+Degree
+Unknown/not reported	22
+Race Demographics
+Race	# of Board Members 
+American Indian or Alaska
+Native
+Asian
+Black or African American	8
+Native Hawaiian and Other
+Pacific Islander
+White	11
+Multi-race(two or more of the
+above)
+1
+Unknown/not reported	2
+Ethnicity
+Ethnicity	# of Board Members 
+Hispanic, Latino or Spanish
+Origins
+5
+Not Hispanic, Latino or
+Spanish Origins
+14
+Unknown/not reported	2
+Military Status
+Military Status 	# of Board Members 
+Veteran
+Active Military
+No Military Service
+Unknown/not reported	22 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 15 of 35
+
+1/31/2024 7:34 PM CST	© 2024 e-CImpact page 16 of 35
+
+Staff Demographics Updated
+COMMUNITY ACTION COMMITTEE OF THE LEHIGH VALLEY INC
+Staff Demographics
+This information is being requested to help Pocono Mountains United Way better understand what
+types of information agencies are currently collecting. Please complete as much information as you
+have access to. All fields are optional. 
+You may save your work at any time by clicking on the “Save My Work” link/icon at the bottom or top
+of the page. 
+When you have completed all questions on the form, select the “Save My Work and Mark as
+Completed” link/icon at the bottom or top of this page.
+You may also SWITCH between forms in this application by using the SWITCH FORMS feature in the
+upper right corner. When switching forms, any updates to the existing form will automatically be
+saved.
+Gender Identification
+Gender Identification 	# of Staff
+Females	65
+Males	45
+Non-binary
+Transgender
+Unknown/not reported
+Age Range
+Age Range	# of Staff
+0-17 Years
+18 - 30 Years	15
+31 - 49 Years	50
+50-64 Years	38
+65+ Years	7
+Unknown/not reported
+Education Level
+Highest Education 
+Level	# of Staff
+Education Level
+Grades 9-12/Non-Graduate
+High School Graduate/ GED 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 17 of 35
+
+Highest Education 
+Level	# of Staff 12 grade + Some Post-
+Secondary
+Professional/Trade
+Certificate
+Associate Degree
+Bachelors Degree
+Masters or Doctorate
+Degree
+Unknown/not reported	110
+Race Demographics
+Race	# of Staff
+American Indian or Alaska
+Native
+1
+Asian	1
+Black or African American	17
+Native Hawaiian and Other
+Pacific Islander
+White	59
+Multi-race(two or more of the
+above)
+3
+Unknown/not reported	29
+Ethnicity
+Ethnicity	# of Staff
+Hispanic, Latino or Spanish
+Origins
+28
+Not Hispanic, Latino or
+Spanish Origins
+53
+Unknown/not reported	29
+Military Status
+Military Status 	# of Staff
+Military Status
+Veteran
+Active Military
+No Military Service 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 18 of 35
+
+Military Status 	# of Staff Unknown/not reported	110 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 19 of 35
+
+Client Demographics Updated
+COMMUNITY ACTION COMMITTEE OF THE LEHIGH VALLEY INC
+Client Demographics
+This information is being requested to help Pocono Mountains United Way better understand what
+types of information agencies are currently collecting. Please complete as much information as you
+have access to. All fields are optional. 
+You may save your work at any time by clicking on the “Save My Work” link/icon at the bottom or top
+of the page. 
+When you have completed all questions on the form, select the “Save My Work and Mark as
+Completed” link/icon at the bottom or top of this page.
+You may also SWITCH between forms in this application by using the SWITCH FORMS feature in the
+upper right corner. When switching forms, any updates to the existing form will automatically be
+saved.
+Gender Identification
+Gender Identification 	# of Clients
+Females
+Males
+Non-binary
+Transgender
+Unknown/not reported	87,000
+Age Range
+Age Range	# of Clients
+0-17 Years	29,197
+18 - 30 Years
+31 - 49 Years
+50-64 Years
+65+ Years	16,119
+Unknown/not reported	41,683
+Education Level
+Client Highest Education 
+Level	# of Clients
+Grades 9-12/Non-Graduate
+High School Graduate/ GED 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 20 of 35
+
+Client Highest Education 
+Level	# of Clients 12 grade + Some Post-
+Secondary
+Professional/Trade
+Certificate
+Associate Degree
+Bachelors Degree
+Masters or Doctorate
+Degree
+Unknown/not reported	87,000
+Race Demographics
+Race	# of Clients
+American Indian or Alaska
+Native
+Asian
+Black or African American
+Native Hawaiian and Other
+Pacific Islander
+White
+Multi-race(two or more of the
+above)
+Unknown/not reported	87,000
+Ethnicity
+Ethnicity	# of Clients
+Hispanic, Latino or Spanish
+Origins
+Not Hispanic, Latino or
+Spanish Origins
+Unknown/not reported	87,000
+Military Status
+Military Status 	# of Clients
+Veteran
+Active Military
+No Military Service
+Unknown/not reported	87,000 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 21 of 35
+
+1/31/2024 7:34 PM CST	© 2024 e-CImpact page 22 of 35
+
+COMMUNITY ACTION COMMITTEE OF THE LEHIGH VALLEY INC - Second Harvest Food Bank of Lehigh
+Valley and Northeast Pennsylvania - Program Overview - 2024-2025 Application
+COMMUNITY ACTION COMMITTEE OF THE LEHIGH VALLEY INC - Second Harvest Food Bank
+of Lehigh Valley and Northeast Pennsylvania
+Program Overview
+You may save your work at any time by clicking on the "Save My Work" link/icon at the bottom or top
+of the page.
+When you have completed all questions on the form, select the "Save My Work and Mark as
+Completed" link/icon at the bottom or top of this page.
+You may also SWITCH between forms in this application by using the SWITCH FORMS feature in the
+upper right corner. When switching forms, any updates to the existing form will automatically be
+saved.
+Each narrative response should be BRIEF and clearly written so as to be understood by the
+volunteer review panels.  Because the persons
+reviewing the proposals change from year to year, please respond as if the reviewer has no
+knowledge of your program.
+General Information
+Program Name	Second Harvest Food Bank of Lehigh Valley and Northeast Pennsylvania
+Program Summary
+Second Harvest Food Bank of the Lehigh Valley and Northeast Pennsylvania is requesting $25,000 to
+distribute nutritious food to our network of member agencies in Monroe County, ensuring that pantry
+participants have access to the foods needed to keep themselves and their families healthy.
+Priority Need Basic Needs (including Food, Utilities, Healthcare, Technology Access and
+Transportation)
+Program Contact
+Primary Contact Briana McGonagle, phone: (610) 691-5620, email: planner-SHFB@caclv.org
+Statement of Need
+Describe the specific Priority Need that the proposed program is planning to address. Be sure to
+describe how this program prioritizes the ALICE population in Monroe County. 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 23 of 35
+
+Our program addresses the Priority Need: Basic Needs – Food. Second Harvest will address the need by
+providing fresh food for distribution in Monroe County.
+Access to nutritious food for under-resourced populations is an immediate need. Nationally, the emergen-cy
+food network is serving historic volumes of people. Current inflation, coupled with the close of federal-ly-
+funded COVID-related supplemental programs, is causing many families to visit food pantries for the first
+time. Often, the only fresh, nutritious foods a family facing food insecurity has access to come from the
+emergency food network. 
+A pre-pandemic study published in the Journal of Nutrition Education and Behavior, titled, “The Affordabil-ity
+of MyPlate: An Analysis of SNAP Benefits and the Actual Cost of Eating According to the Dietary Guide-
+lines”, found that following the USDA’s MyPlate Dietary Guidelines would cost a family of four between
+$1,000-$1,200 a month ($12,000-$14,400 annually) depending on the age of the family members. For a
+comparison, the average middle-income family in the United States spends roughly $6,224 on food each
+year with the average lower-income family spending even less at roughly $3,862 per year. Eating healthy
+food consistently is simply out of reach for many families. 
+Historically, grocery prices typically increase by about 2% each year, on average. According to the Bureau
+of Labor Statistics (BLS), the cost of groceries has increased by 23.5% from February 2020 to May 2023.
+For comparison, the average hourly wage for all workers in the private sector has risen only 17% during the
+same timeframe. Wages are being outpaced by increased cost of living, and many must turn to the
+charitable food network for help. 
+When money is tight, often the first things cut from the family budget are fresh, nutritious foods. Second
+Harvest provides food to 23 emergency food sites within Monroe County. Through partnership with our
+member agencies, we work to ensure that all people have access to the foods needed to keep themselves
+and their families healthy. If a family can visit our food pantries and bring home groceries at no-cost, it frees
+up money to be spent elsewhere, eliminating touch choices such as buying groceries versus paying rent or
+utilities.
+Describe the data and relevant data sources used to identify and document the specific need to
+be addressed. 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 24 of 35
+
+Second Harvest uses numerous data sources to identify and document needs. As a member of the
+Feeding America network, we have access to a variety of data, including the Map the Meal Gap, the Meals
+per Person in Need (MPIN), and the data site, Tableau. In addition, we use data from local Health Needs
+Assessments, U.S. Census’ American Community Survey, the USDA, and the Food Research & Action
+Center to help us determine the needs in our community.
+What this data indicates in Monroe County is as follows. Feeding America’s Map the Meal Gap indicated
+that in 2021, 8.6% of the Monroe County population (14,420 people), including 13.3% of children (4,410),
+were food insecure. The U.S. Census American Community Survey (2022) indicates that the individual
+poverty rate for Monroe County is 13.1% and 17.2% for children. This is higher than the Pennsylvania
+poverty rate of 11.8%. According to the Pocono Mountains Economic Development Corporation, the current
+unemployment rate in the County is 4.7% (as compared to 3.4% for all of Pennsylvania). 
+Lehigh Valley Health Network’s 2022 Community Health Needs Assessment Health Profile in Monroe
+County reported that 33% of Monroe County adults are considered obese (which is higher than the national
+average of 29.5%). LVHN’s Health Needs Assessment also indicates that 86% of Monroe County residents
+enrolled in Medicare have a diabetes diagnosis. The high incidence of obesity and diabetes may be due, in
+part, to lack of access to fresh and healthy foods. The U.S. Department of Agriculture further reports that
+there are two low-income, low food access areas, as well as several limited supermarket areas in more
+rural parts of Monroe County.
+Additionally, during the months of August through November 2022, Second Harvest administered our
+“Neighbor Experience Survey” on-site at food pantries across the Second Harvest network. Monroe County
+residents comprised 246 of the responses. The survey was administered with the goal of gaining a better
+understanding of the people we serve and their relationship with their local pantry, and to identify ways to
+strengthen our network. 
+Results show that Monroe County pantry participants are not consuming adequate amounts of fresh fruits or
+vegetables. When asked, “During the past week, how many times did you eat fresh fruits?”, 41% of Monroe
+County participants responded with, “1-3 times per week”, and 13% responded with, “I did not eat any fresh
+fruits in the past week.” A parallel question was asked regarding fresh vegetable consumption. 47% of
+Monroe County survey participants reported consuming fresh vegetables only 1-3 times per week, and 13%
+reported they did not eat any fresh vegetables in the past week. 
+It is also important to note that 63% of respondents in Monroe County reported having one or more dietary
+restrictions, with the majority saying they need foods that help them manage diabetes, such as fresh fruits
+and vegetables.
+These data indicate a need for access to fresh, nutritious foods in Monroe County.
+Identify the target population to be served by this program.
+The target population is low-income households, who do not have access to affordable, nutritious foods.
+Currently, our pantry network serves more than 17,540 residents of Monroe County each month.
+Are the services proposed in this program being provided by any other organization(s) in the
+community?
+No
+Indicate the number of individuals or households expected to be served through this program in
+FY 2024-2025.
+We anticipate serving 17,000 individuals during FY 2024-2025. 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 25 of 35
+
+Approach and Results
+Describe the proposed program and how it will achieve the goal and outcome(s) that you
+describe in the Performance Measurement Form.
+If awarded, funds from Pocono Mountains United Way will support the sourcing and distribution of fresh,
+nutritious foods to our network of emergency food providers in Monroe County.
+At Second Harvest, we apply a nutrition-focused approach to all aspects of our operation – sourcing,
+producing, distributing, and educating. Our approach entails prioritizing the sourcing of fresh, nutritious
+foods; innovating distribution strategies to help more people access food, such as through our pop-up and
+school pantry programs; leveraging our resources at The Seed Farm to grow food for pantries and to
+establish community gardens in urban areas; and educating participants about the importance of healthy
+eating and providing them tools to make healthier choices.
+Last year, we distributed a total of 3.85 million pounds of food to agencies in Monroe County (the equivalent
+of 3.2 million meals), including 2.29 million pounds of perishable protein, fruits and vegetables, and dairy
+items. Feeding America developed the F2E framework to align with recommendations from USDA's
+MyPlate and Dietary Guidelines for Americans. The framework promotes the consumption of fruits,
+vegetables, lean protein, whole grains, and low-fat dairy products.
+To increase our distribution of fresh and nutritious foods, and as part of our larger nutrition strategy, we
+developed and implemented a Food and Nutrition Policy based on Healthy Eating Research (HER)
+guidelines (which were created in partnership between the Robert Wood Johnson Foundation, Duke
+University, and the charitable food network). Our Nutrition Policy prioritizes and deprioritizes food by
+categorizing them as “choose often”, “choose sometimes”, and “choose rarely”. “Choose often” foods
+coincide with Feeding America’s Foods to Encourage. Our Nutrition Policy informs all aspects of our food
+sourcing and distribution strategies. 
+Because research shows that nutrition education is a critical component in changing food purchasing and
+eating behaviors in people with lower-incomes, we implement our Healthy Pantry Initiative (HPI) in tandem
+with our Nutrition Policy. HPI is a program of Feeding Pennsylvania that works to encourage pantry
+customers to choose healthier food items. Second Harvest’s Nutrition Educator / Healthy Pantry
+Coordinator works intimately with pantry directors and volunteers to help them create pantry spaces that are
+client-centered and promote the consumption of healthy foods. Our Nutrition Educator also works closely
+with pantry participants to ensure that the foods available to take home are prepared and consumed in
+healthy ways. Our Nutrition Educator coordinates taste-testing events, cooking demonstrations, and
+provides educational materials and recipes cards. Currently, our cohort of HPI sites includes two sites within
+Monroe County. 
+It is our mission to provide access to food to the increasing number of individuals and families facing food
+insecurity, with a distinct focus on fresh and nutritious options. Funding from Pocono Mountains United Way
+will make it possible for Second Harvest to distribute fresh foods to our network of 23 pantries in Monroe
+County. Collectively, these pantries serve more than 17,540 people each month.
+List the specific activities to be implemented under the proposed program and how they relate to
+the stated outcome(s) and output(s) for the program. 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 26 of 35
+
+Second Harvest will source and distribute fresh, nutritious foods to our network of emergency food
+providers within Monroe County. 
+Upon receiving food, our nutrition and inventory control staff rank each product as “choose often”, “choose
+sometimes”, and “choose rarely”. This information is entered into Primarius, a web-based inventory
+management system designed specifically for food banks, The ranking system gives our pantry
+coordinators greater detail and insight into the nutritional content of the foods they order for their
+participants. 
+Second Harvest member agencies use Primarius to place their orders online. Second Harvest warehouse
+crew members pick the order and schedule for delivery. Second Harvest drivers deliver the food directly to
+the food pantry. By timing our delivery to align with pantry open hours, we implement a “Just in Time” (JIT)
+delivery method, when possible. JIT delivery eliminates storage constraints at the pantry-level, which leads
+to the pantry accepting more fresh, refrigerated, and frozen products, resulting in more families gaining
+access to these nutritious foods. 
+Our food pantry coordinators work with their teams of volunteers to serve participants. Pantries are re-
+sponsible for submitting monthly reports, stating the number of people served. Collectively, our network of
+pantries in Monroe County serves 17,540 people each month.
+Describe the best practices, evidence-based strategies, and/or innovative approaches that your
+organization would be using in the delivery of the proposed program.
+In developing our nutrition-focused approach, we conducted extensive research that included working with
+staff at Feeding America and interviewing peers from the Feeding America network of food banks about
+their best practices in delivering fresh, perishable food to their communities. We also conducted a survey
+with our pantry network to determine their needs and incorporated that information into our sourcing and
+distribution strategy.
+As outlined in the answer to the preceding question, we are committed to providing healthy food to the
+communities that need it, utilizing innovative methods of sourcing and delivery that promote efficiency and
+provide ease of access to individuals and families.
+Describe any strategic partnerships used by your organization to deliver the proposed program.
+Our primary partners are the 200+ nonprofits that make up our charitable food network. They are
+unequivocally the backbone of our operation and make it possible for us to reach over 87,000 people each
+month. 
+As a member of the Feeding America network, we are able to tap into resources that help support our daily
+operations and guide best practices. Similarly, our membership with Feeding Pennsylvania (a consortium
+of nine Feeding America-affiliated food banks across the state) has been crucial to our program
+development and service provision efforts. We further benefit from our affiliation with Feeding Pennsylvania
+in that we purchase food through their Mid-Atlantic Regional Cooperative (MARC) initiative, a regional
+produce distribution system. Additionally, we have strong partnerships with many local farms that result in
+our ability to purchase fresh, local products at reasonable prices
+Organizational Capacity
+Describe your organization's capacity and experience to implement the proposed program and
+meaningfully address the selected Priority Need. 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 27 of 35
+
+Second Harvest, a program of Community Action Lehigh Valley, began its mission to end food insecurity in
+1982, as the Lehigh Valley Food Bank. Initially, distributions were made from the back of a rented truck to a
+network of about 15 nonprofit agencies. Since September 2015, Second Harvest Food Bank has been
+operating from a 65,000 square-foot warehouse in East Allen Township, which includes 96,000 cubic feet of
+space for refrigerated and frozen foods. Second Harvest operates a fleet of trucks and sprinter vans.
+Refrigerated delivery vehicles enable Second Harvest to transport food in compliance with food safety
+regulations. 
+Second Harvest is the only Feeding America partner food bank serving Monroe County. Last year, Second
+Harvest distributed 14.7 million pounds of food to 200+ nonprofit agencies, including 3.76 million pounds to
+23 agencies within Monroe County. 
+Second Harvest has distributed food to meet the needs of the community for more than 40 years. There has
+never been a pause to our distribution efforts, even during the height of the COVID-19 pandemic.
+List the financial, human and capital resources dedicated to the proposed program.
+Our nutrition-focused approach to food sourcing, producing, distributing, and providing education is
+integrated into our general operation and daily logistics. 
+Second Harvest will leverage funds from the United Way with other funds to be allocated from the
+Pennsylvania Agricultural Surplus System (PASS), non-entitlement TEFAP, Feeding America, and private
+donors to purchase fresh, nutritious food.
+We will use our fleet of trucks to pick up donated food and to also distribute food to member agencies. We
+will use our 65,000 square foot warehouse to store and stage food for distribution. 
+The Second Harvest team is committed to sourcing and distributing the most nutritious foods possible. Our
+approach is collaboratively coordinated through the work of Second Harvest’s nutrition, agency relations,
+food sourcing, inventory control, warehouse / driver, and community programs staff.
+Please list any constraints on the program or requirements for the successful implementation of
+the program.
+As aforementioned, our network of emergency food providers is the backbone of our operation and make it
+possible for us to reach over 87,000 people each month. Successful implementation requires solid
+partnership with our pantry network. 
+The rising cost of food, and unforeseen supply chain issues pose potential constraints to our ability to
+acquire and distribute fresh, nutritious foods. However, Second Harvest is positioned to continue to meet
+the increasing demand for food.
+Budget Information
+Total amount requested
+from PMUW for this
+program 
+25,000.00
+Amount requested as a
+percentage of program
+budget 
+1
+How will United Way funds be used to address the need or problem? 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 28 of 35
+
+Funds from Pocono Mountains United Way will be used to support the purchase and distribution of fresh
+foods (including produce, meat, dairy, and eggs) for emergency food providers in Monroe County. 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 29 of 35
+
+Program Budget - 2024-2025 Application
+COMMUNITY ACTION COMMITTEE OF THE LEHIGH VALLEY INC - Second Harvest Food Bank
+of Lehigh Valley and Northeast Pennsylvania
+Program Budget
+You may save your work at any time by clicking on the "Save My Work” link/icon at the bottom or top
+of the page.  You also must click on "Save My Work" to have the numbers total on the page.
+When you have completed all questions on the form, select the "Save My Work and Mark as
+Completed” link/icon at the bottom or top of this page.
+You may also SWITCH between forms in this application by using the SWITCH FORMS feature in the
+upper right corner. When switching forms, any updates to the existing form will automatically be
+saved.
+PLEASE NOTE THAT YOU WILL BE ASKED TO REPORT AGAINST THIS BUDGET THROUGHOUT THE
+FUNDING YEAR.
+Income
+Proposed Program 
+Budget (FY2024-2025) 
+a. Government	2,297,471.00
+b. Foundations /
+Corporations
+1,009,850.00
+c. Individual Donations	2,418,500.00
+d. Pocono Mountains United
+Way
+25,000.00
+e. Other United Way(s)
+f. Program Fees	250,000.00
+g. Other - Click Here to Add	17,000.00
+   Miscellaneous revenue	17,000.00
+Total	6,017,821.00
+Expenses
+Proposed Program 
+Budget (FY 2024-2025) 
+h. Salaries	1,798,430.00
+i. Employee benefits &
+payroll taxes
+965,009.00
+j. Professional fees / Training	269,950.00
+k. Supplies / Equipment	190,740.00
+l. Printing / Publications	45,000.00 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 30 of 35
+
+Proposed Program 
+Budget (FY 2024-2025)  m. Utilities / Phone /
+Postage
+110,064.00
+n. Occupancy	100,040.00
+o. Equipment Maintenance	144,000.00
+p. Travel / Conferences	77,145.00
+q. Dues / Fees	22,060.00
+r. Insurance Costs	26,000.00
+s. Direct Client Grants	180,000.00
+t. Other - Click Here to Add	2,243,034.00
+   Purchased Commodities	2,160,503.00
+   Miscellaneous	82,531.00
+Total	6,171,472.00
+Surplus / Deficit
+Proposed Program 
+Budget (FY 2024-2025) 
+Surplus / Deficit	-153,651.00 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 31 of 35
+
+Program Budget Narrative FY 2023 2024 Application
+COMMUNITY ACTION COMMITTEE OF THE LEHIGH VALLEY INC - Second Harvest Food Bank
+of Lehigh Valley and Northeast Pennsylvania
+Program Budget Narrative
+You may save your work at any time by clicking on the "Save My Work" link/icon at the bottom or top
+of the page.
+When you have completed all questions on the form, select the "Save My Work and Mark as
+Completed" link/icon at the bottom or top of this page.
+You may also SWITCH between forms in this application by using the SWITCH FORMS feature in the
+upper right corner. When switching forms, any updates to the existing form will automatically be
+saved.
+Budget Narrative
+In reference to the Program Budget form, explain any major differences from year to year.
+N/A
+What activities does the Program Budget cover? Please list specifics such as program scope of
+service, geographic area covered, staff members or a subset of program activities (if applicable).
+Our comprehensive nutrition-focused approach to food sourcing, producing, distributing, and providing
+education is incorporated into Second Harvest’s general operation and daily logistics and is therefore
+integrated into the general Second Harvest operating budget. 
+On average, we make a minimum of 25 deliveries to Monroe County food pantries a month. Using United
+Way funds to help support our distribution and delivery services reduces costs and burdens on agencies
+that do not have funds or staffing capacity to drive vehicles large enough to supply the pantries’ needs. To
+provide this service, we also need drivers, insurance, and fuel, as well as a dedicated agency relations
+coordinator who provides guidance and troubleshooting to agency partners.
+Although we are able to leverage federal and state funding to purchase some food, and receive a high level
+of donations, available resources are never enough to meet the real demand. We will use funds from United
+Way to source more food for Monroe County, either through bulk purchases to stretch dollars further, or
+through freight charges on high-quality loads that might be offered to us at no cost.
+Funds from Pocono Mountains United Way will be used to support the purchase and distribution of food for
+emergency food providers in Monroe County as follows:
+Food Purchase: $10,000
+Fuel and Vehicle Maintenance: $5,000
+Staff Wage and Benefits: $10,000 (drivers and agency relations coordinator)
+Total: $25,000 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 32 of 35
+
+Program Success Story - 2024-2025 Application
+COMMUNITY ACTION COMMITTEE OF THE LEHIGH VALLEY INC - Second Harvest Food Bank
+of Lehigh Valley and Northeast Pennsylvania
+Program Success Story
+A personal success story of someone who has been helped by a program is one of the most effective
+ways of showing the benefit of a program and encouraging support for its continuity. This section is
+particularly helpful to volunteer reviewers to understand the impact of your program. If you are able,
+please share a success story of how your clients' lives have been impacted this past year through
+your program.
+Please note that this story may be used in print or shared in oral presentations. If real names are
+used, it is essential that you have received written permission to do so. Please indicate if permission
+was given and whether or not the names have been changed to protect anonymity.
+* This form is optional for all programs whether they have been previously funded by Pocono
+Mountains United Way or not.
+Agency Contact for
+Success Story:
+Debbie Campbell, Director of Christ Episcopal Food Pantry (205 N. 7th
+Street, Stroudsburg 18360)
+Phone Number for
+Success Story:
+(845) 820-6598
+Geographic community
+represented by the
+success story: 
+Stroudsburg and surrounding areas
+State the outcome the story links to:
+Increased access to fresh and nutritious foods for families facing food insecurity.
+Success Story:
+The Christ Episcopal Food Pantry serves the Stroudsburg community, providing nourishment to people fac-
+ing food insecurity. Pantry Director, Debbie Cambell, states that the neighbors she serves choose fresh
+food and perishable proteins first. Debbie also takes pride in educating neighbors on how to stretch their
+selections by juicing or making sauce out of fruits and vegetables.
+Christ Episcopal Food Pantry will join Second Harvest’s Healthy Pantry Initiative (HPI) this year. HPI is a
+pro-gram of Feeding Pennsylvania that works to encourage pantry customers to choose healthier food
+items. Second Harvest’s Nutrition Educator / Healthy Pantry Coordinator works intimately with pantry
+directors and volunteers to help them create pantry spaces that are client-centered and promote the
+consumption of healthy foods. Our Nutrition Educator also works closely with pantry participants to ensure
+that the foods available to take home are prepared and consumed in healthy ways.
+Permission to Use Publicly
+Pocono Mountains United Way is granted permission to use the information provided on this
+form publicly.
+Yes 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 33 of 35
+
+How Your Gift Works - 2024-2025 Application
+COMMUNITY ACTION COMMITTEE OF THE LEHIGH VALLEY INC - Second Harvest Food Bank
+of Lehigh Valley and Northeast Pennsylvania
+How Your Gift Works
+Many donors give at specific levels: Examples might be $3,000 or $1,500 annually, $50.00 per month,
+$5 every two weeks, etc. Using the examples listed below as a guide, please provide four (4)
+statements of how donor dollars of the following amounts (assuming payroll deduction of 52 weeks
+per year) would achieve impact through your proposed program.
+Examples
+- Lawton Family YMCA can provide 5 youth an opportunity to participate in Y Access with an annual
+gift of $500 (~$520, or $10 x 52 weeks).
+- Teen Court can provide one juvenile offender a chance to expunge his or her court record through
+counseling and community service with an annual gift of $260 ($5 x 52 weeks).
+- Salvation Army Boys and Girls Club can provide the Sports Fitness program to 2 students for one
+full year with a donation of $100 (~ $104, or $2 x 52 weeks) per year.
+$1 per week
+Second Harvest Food Bank can provide 156 meals to families-in-need with an annual gift of $52.
+$2 per week
+Second Harvest Food Bank can provide 312 meals to families-in-need with an annual gift of $104.
+$5 per week
+Second Harvest Food Bank can provide 780 meals to families-in-need with an annual gift of $260.
+$10 per week
+Second Harvest Food Bank can provide 1,560 meals to families-in-need with an annual gift of $520. 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 34 of 35
+
+Input - i.e. resources dedicated to or consumed by the program:
+Second Harvest inputs include fresh and nutritious foods, staff time, utilization of dry and
+refrigerated storage space within the Second Harvest warehouse, vehicle maintenance, fuel
+costs, and engagement and collaboration with our pantry network.
+Activity - i.e. what the program does with the inputs to fulfill its mission:
+Second Harvest activities include sourcing fresh and nutritious foods, analysis of nutritional
+content, logging items into inventory management system, storing and staging the food within
+our warehouse, picking and preparing orders, delivering orders to partner agencies, and tracking
+data.
+Output - i.e. the direct products of the program activities:
+Second Harvest outputs include the distribution of fresh food (perishable protein, fruits and
+vegetables, and dairy items) to our network of agencies in Monroe County, which is measured in
+pounds.
+Outcome - i.e. benefits for participants during or after program activities:
+Second Harvest outcomes include increased access to nutritious food among low- and
+moderate- income individuals and families in Monroe County.
+Performance Measures FY 2024-2025
+COMMUNITY ACTION COMMITTEE OF THE LEHIGH VALLEY INC - Second Harvest Food Bank
+of Lehigh Valley and Northeast Pennsylvania
+Performance Measures FY 2024-2025
+Inputs
+Activities
+Output
+Projected	Mid-Year End of Year
+Number	2,000,000
+Outcome
+Indicators
+Projected
+Mid-
+Year
+End of
+Year
+Number of low- and moderate- income
+individuals receiving fresh and
+nutritious food.
+Number of Clients Served 17,540
+Number of Clients Acheiving
+Goal
+17,540
+Percentage of Clients
+Achieving Goal
+100 1/31/2024 7:34 PM CST	© 2024 e-CImpact page 35 of 35
+--------------------
+Attached Document: 66981f5c2a477_PMUW-2024-Proposal-Narrative.pdf
+1 
+ 
+Pocono Mountain United Way 2024  
+Due 1/31/24 
+bmcgonagle / Caclv1337$$ https://agency.e-cimpact.com/login.aspx?org=40570U  
+*All text limits are 4,000 characters unless otherwise noted 
+ 
+AGENCY STATUS 
+Significant Impact 
+Describe significant changes  
+In 2023, Second Harvest Food Bank continued to build capacity to meet the growing demand for food 
+resources, while focusing more fully on meeting the nutritional needs of the community.  
+To meet the demand for additional food resources, we purchased and leased two new trucks that 
+doubled our load capacity. These investments have allowed us to more efficiently provide high volumes 
+of food to pantries while significantly reducing the need to make multiple deliveries to the same location 
+on a given day.  We also increased our cold storage capacity by piloting different solutions, such as 
+leasing refrigerated trailers when large orders of cold/frozen product are delivered to the food bank. 
+Having resources like additional reefer trailers has enabled us to source more fresh, perishable produce 
+and proteins.  
+We are also collaborating on a project with our neighboring Feeding America partner food banks to 
+ensure we are able to solicit as many donations as possible. Our state association, Feeding Pennsylvania, 
+will assist with solicitation and donor stewardship as we work to build capacity in our warehouse and on 
+our sourcing team. The result of this collaboration is maintaining a high-level of donated product at a 
+time when other food banks across the nation have reported a significant decline in product donation.  
+Another exciting opportunity that launched in 2023 was the Local Food Purchasing Agreement, a grant 
+program through USDA that allows us to pair local farms with food pantries and pay a fair wholesale 
+price for local agricultural products. We have connected with farms in each of the six counties we serve 
+to provide high-quality, nutrient-dense local foods to people in need while supporting the local 
+agriculture economy. Funding for that program continues through July 2025.  
+Lastly, we formally adopted a Food and Nutrition Policy at the food bank in 2023, which sets ambitious 
+goals to ensure the food we are providing is healthful and beneficial to our neighbors. The policy is 
+based on the Healthy Eating Research (HER) guidelines and follows a “stop light” model for ranking 
+foods as Choose Often, Choose Sometimes, and Choose Rarely. We are currently implementing phase 3 
+of the policy, which allows us to have a better understanding of our inventory and how it supports 
+community health.  
+As we move purposefully into 2024, we are looking forward to completing a new strategic plan, fully 
+implement digital statistic reporting that will allow us to examine deeper customer-level data, and 
+refining program objectives for school pantries and SNAP outreach. We will also pilot home delivery of 
+senior boxes throughout the service area (expanding on our 2023 deliveries in Lehigh and Northampton 
+counties).
+
+2 
+ 
+ 
+Describe significant accomplishments 
+During the last program year, Second Harvest: 
+• Distributed 14.7 million pounds of food (an equivalent of 12,260,492 meals) – a 44%  increase 
+from the previous year.  
+o Included in this total is 6.7 million pounds of fresh produce, perishable protein, and 
+fresh dairy products (46% of total distribution). This is a 46% increase in fresh foods in 
+the SHFB inventory compared to the previous FY.   
+• Rescued 8 million pounds of food from ending up in a landfill. 
+• Distributed 28,311 boxes of nutritious food to low-income seniors through the PA Senior Food 
+Box Program – a 16% increase from the previous year. 
+• Provided a monthly share of shelf-stable and fresh foods to more than 500 military families par-
+ticipating in our MilitaryShare program. 
+• Provided food to 87,030 individuals, on average, each month, including 22,556 children and 
+32,401 seniors – a 52% increase over the previous year.  
+• Utilized the help of 1,077 unique volunteers, who provided a collective of 3,367 volunteer hours.   
+ 
+Describe significant challenges experienced by the agency 
+The increasing demand for more food has stressed Second Harvest at a time when we are also being 
+impacted by rising food and fuel costs. During the last program year, we distributed 44% more food than 
+the year prior, and provided food to an average of 87,000 people each month – a 52% increase in one 
+year.  
+Challenges have also been exacerbated by staffing shortages and capacity constraints as we adjust to 
+the increased need and demand on resources.  
+Agency Impact on Disparities: Trends and Data 
+What disparities has your organization identified in the populations you serve? Examples may include: 
+"people without a high school diploma are seeking services at a higher rate than high school graduates"; 
+"women take longer than men to obtain employment". At a minimum please provide trends and/or 
+include data if available. 
+In December 2022, we completed our Neighborhood Experience Survey. Our team of staff an volunteers 
+worked with pantry coordinators to capture feedback from pantry participants.  Results show that 75% 
+of pantry customers in Monroe County said they ate fresh fruits and vegetables less often than once per 
+day. Despite the low rate of fresh produce consumption, more than half (52%) of customers said they 
+had special dietary needs due to chronic health disorders. A total of 73% percent of participants with 
+diet-related diseases would benefit from increased consumption of fresh produce. About a third of 
+customers said they “Always” or “Often” get enough fruits and vegetables at the pantry they visit. These 
+customers also reported higher rates of fresh produce consumption compared with those who only 
+“Sometimes” or “Rarely” received enough produce (48% of customers).
+
+3 
+ 
+What barriers to data collection does your organization face? Examples could include lack of centralized 
+system, limited staff capacity, concerns about confidentiality, discomfort in asking certain questions, etc. 
+Current barriers to data collection include: 
+• Limited staff/volunteer capacity at the pantry level, 
+• Limited staff capacity at Second Harvest to train pantry volunteers in preferred data collection 
+practices, 
+• Lack of technology at the pantry level to easily collect and organize participant data, and 
+• Fear that a participant might not return for additional needed food if they feel alienated from 
+having to answer too many questions.  
+It is our priority to move into more data-informed decision making. Electronic data collection at the 
+pantry-level will lead to a better understanding of the people we serve and will ensure we are able to 
+keep the needs of our participants at the forefront of our strategic planning, program development, and 
+food distribution efforts. We also recognize that we will be excluded from future funding opportunities if 
+we are unable to supply the demographic data required by funders. Developing and standardizing our 
+data collection mechanisms is essential.  
+We are eager to report that in 2024, with funding through Feeding Pennsylvania, we will pilot an 
+electronic data collection initiative at the pantry level. We will have a dedicated staff position to work 
+with pantry coordinators to implement standardized data collection. This will be an ongoing initiative. 
+We will start with a cohort of five pantries, with the goal of onboarding all 200+ pantry partners by the 
+end of year four.  
+Access to timely data will deeply impact our ability to understand the people we serve, and to react 
+accordingly.  
+ 
+Is there a specific demographic group that is under-represented or over-represented in the group you 
+serve? For example, "This program serves all ages but 80% of clients are 18-24." 
+According to data from Feeding America, 8.6% of Monroe County residents are food insecure, but 
+disparities exist Hispanic households (15% food insecure). Thirty-five percent of the people Second 
+Harvest serves in Monroe County are children younger than 18 years old, though children represent only 
+19% of the total population in the County. Seniors (60+) comprise 18% of the people Second Harvest 
+serves within the county, but represent 27% of the total population.  
+ 
+Agency Board Information 
+Please outline all the ways that your Board of Directors contributes to your agency (agency governance, 
+policy development, fundraising, etc.) 
+Second Harvest’s Advisory Board includes representatives from emergency food providers, other non-
+profit organizations, food industry companies, financial institutions, and other local businesses. The ad-
+visory board provides oversight, expertise, and connections to Second Harvest while also assisting with 
+program development and strategic planning. In January 2024, the Second Harvest Advisory embarked 
+on the first steps of creating the strategic plan that will guide Second Harvest’s operations through 2026.
+
+4 
+ 
+As a program of Community Action Lehigh Valley, Second Harvest is governed by its active and diverse 
+board of directors. The board is comprised of one-third each private corporations, public sector repre-
+sentatives, and community residents. The board monitors Second Harvest’s performance through bian-
+nual work plan evaluations, monthly reports, and two liaison representatives from the Board of Direc-
+tors who sit on Second Harvest's advisory board. 
+ 
+Does your agency have any restrictions on visitors? Please specify parameters such as masks required, 
+maximum number of people, visits only on specific days or times, etc.  
+Second Harvest is open to receiving visitors during normal business hours: 8:00 am – 4:00 pm, Monday 
+through Friday. We request that visitors wear closed-toed shoes for their own personal safety within the 
+warehouse. 
+ 
+AGENCY BUDGET 
+Completed. 
+ 
+AGENCY FISCAL ABSTRACT 
+Fiscal request sent 1.9.24. Waiting to hear 
+ 
+Budget Narrative 
+In reference to the budget form, explain any major difference(s) from year to year, as well as large 
+surpluses or deficits. 4,000 characters 
+The major budget differences from FY23 to FY24 include the following categories: 
+Federal Grants, Corporate/ Business Grants, Salary & Wages, and Program Supplies. 
+ Major differences are mainly due to the sunsetting of  COVID-era surplus funding, the close of our 
+Emergency Rental Assistance Program (ERAP), and general inflation which has raised the cost of 
+program supplies, food, and utilities. 
+ 
+Key Financial Information 
+Overhead rate: 12.3%  
+Does the agency expect any major capital improvements over the next year? 
+Yes  
+If Yes, please list cost of project and brief description. 4,000 characters 
+We plan to install air conditioning in the Second Harvest Food Bank warehouse, as a measure of 
+ensuring food and worker safety. The project is estimated $340,000.
+
+5 
+ 
+Net Assets at end of last fiscal year: 
+$12,512,735.27 
+In the past fiscal year, have United Way funds been leveraged to increase funding from other sources for 
+your organization? 
+Yes  
+If Yes, amount and description. 4,000 characters  
+Funding from United Way was leveraged with funds from Pennsylvania Agricultural Surplus System 
+(PASS), Local Food Purchasing Agreement (LFPA), nonentitlement TEFAP, Feeding America, and private 
+donors to purchase fresh food. 
+Do you have totals for these buckets? 
+Is any portion of the current funding request going to be leveraged to increase funding from other 
+sources for your organization? 
+Yes / No 
+If Yes, indicate amount and describe 
+We will leverage funds from United Way with funds from the Pennsylvania Agricultural Surplus System 
+(PASS), nonentitlement TEFAP, Feeding America, and private donors to purchase fresh food. The exact 
+amount has not been determined because Community Action has not yet started its budgeting process 
+for 2024-2025, but we anticipate $100,000 to $300,000. 
+PATRIOT ACT COMPLIANCE 
+Completed. 
+ 
+CLIENT DEMOGRAPHICS 
+Completed. 
+ 
+STAFF DEMOGRAPHICS 
+Completed. 
+ 
+BOARD DEMOGRAPHICS 
+Completed. 
+AGENCY SUPPORTING DOCUMENTS 
+Completed.
+
+6 
+ 
+PROGRAM OVERVIEW 
+ 
+General Information 
+ 
+Program Name  
+Second Harvest Food Bank of Lehigh Valley and Northeast Pennsylvania 
+Program Summary 1500 characters 
+Second Harvest Food Bank of the Lehigh Valley and Northeast Pennsylvania is requesting $25,000 to 
+distribute nutritious food to our network of member agencies in Monroe County, ensuring that pantry 
+participants have access to the foods needed to keep themselves and their families healthy.  
+ 
+Statement of Need 
+Priority Need: Basic Need (including food) 
+Describe the specific Priority Need that the proposed program is planning to address. Be sure to 
+describe how this program prioritizes the ALICE population in Monroe County. 
+Our program addresses the Priority Need: Basic Needs – Food. Second Harvest will address the need by 
+providing fresh food for distribution in Monroe County. 
+ 
+Access to nutritious food for under-resourced populations is an immediate need. Nationally, the emer-
+gency food network is serving historic volumes of people. Current inflation, coupled with the close of 
+federally-funded COVID-related supplemental programs, is causing many families to visit food pantries 
+for the first time. Often, the only fresh, nutritious foods a family facing food insecurity has access to 
+come from the emergency food network.   
+ 
+A pre-pandemic study published in the Journal of Nutrition Education and Behavior, titled, “The Afforda-
+bility of MyPlate: An Analysis of SNAP Benefits and the Actual Cost of Eating According to the Dietary 
+Guidelines”, found that following the USDA’s MyPlate Dietary Guidelines would cost a family of four be-
+tween $1,000-$1,200 a month ($12,000-$14,400 annually) depending on the age of the family members. 
+For a comparison, the average middle-income family in the United States spends roughly $6,224 on food 
+each year with the average lower-income family spending even less at roughly $3,862 per year. Eating 
+healthy food consistently is simply out of reach for many families.  
+ 
+Historically, grocery prices typically increase by about 2% each year, on average. According to the 
+Bureau of Labor Statistics (BLS), the cost of groceries has increased by 23.5% from February 2020 to May 
+2023. For comparison, the average hourly wage for all workers in the private sector has risen only 17% 
+during the same timeframe. Wages are being outpaced by increased cost of living, and many must turn 
+to the charitable food network for help.  
+When money is tight, often the first things cut from the family budget are fresh, nutritious foods. Sec-
+ond Harvest provides food to 23 emergency food sites within Monroe County. Through partnership with
+
+7 
+ 
+our member agencies, we work to ensure that all people have access to the foods needed to keep them-
+selves and their families healthy. If a family can visit our food pantries and bring home groceries at no-
+cost, it frees up money to be spent elsewhere, eliminating touch choices such as buying groceries versus 
+paying rent or utilities.  
+ 
+Describe the data and relevant data sources used to identify and document the specific need to be 
+addressed.  
+Second Harvest uses numerous data sources to identify and document needs. As a member of the 
+Feeding America network, we have access to a variety of data, including the Map the Meal Gap, the 
+Meals per Person in Need (MPIN), and the data site, Tableau. In addition, we use data from local Health 
+Needs Assessments, U.S. Census’ American Community Survey, the USDA, and the Food Research & 
+Action Center to help us determine the needs in our community. 
+What this data indicates in Monroe County is as follows. Feeding America’s Map the Meal Gap indicated 
+that in 2021, 8.6% of the Monroe County population (14,420 people), including 13.3% of children 
+(4,410), were food insecure. The U.S. Census American Community Survey (2022) indicates that the 
+individual poverty rate for Monroe County is 13.1% and 17.2% for children. This is higher than the 
+Pennsylvania poverty rate of 11.8%. According to the Pocono Mountains Economic Development 
+Corporation, the current unemployment rate in the County is 4.7% (as compared to 3.4% for all of 
+Pennsylvania).   
+Lehigh Valley Health Network’s 2022 Community Health Needs Assessment Health Profile in Monroe 
+County reported that 33% of Monroe County adults are considered obese (which is higher than the 
+national average of 29.5%). LVHN’s Health Needs Assessment also indicates that 86% of Monroe County 
+residents enrolled in Medicare have a diabetes diagnosis. The high incidence of obesity and diabetes 
+may be due, in part, to lack of access to fresh and healthy foods. The U.S. Department of Agriculture 
+further reports that there are two low-income, low food access areas, as well as several limited 
+supermarket areas in more rural parts of Monroe County. 
+Additionally, during the months of August through November 2022, Second Harvest administered our 
+“Neighbor Experience Survey” on-site at food pantries across the Second Harvest network. Monroe 
+County residents comprised 246 of the responses. The survey was administered with the goal of gaining 
+a better understanding of the people we serve and their relationship with their local pantry, and to 
+identify ways to strengthen our network.  
+Results show that Monroe County pantry participants are not consuming adequate amounts of fresh 
+fruits or vegetables. When asked, “During the past week, how many times did you eat fresh fruits?”, 
+41% of Monroe County participants responded with, “1-3 times per week”, and 13% responded with, “I 
+did not eat any fresh fruits in the past week.” A parallel question was asked regarding fresh vegetable 
+consumption. 47% of Monroe County survey participants reported consuming fresh vegetables only 1-3 
+times per week, and 13% reported they did not eat any fresh vegetables in the past week.  
+It is also important to note that 63% of respondents in Monroe County reported having one or more 
+dietary restrictions, with the majority saying they need foods that help them manage diabetes, such as 
+fresh fruits and vegetables. 
+These data indicate a need for access to fresh, nutritious foods in Monroe County.
+
+8 
+ 
+Identify the target population to be served by this program. 
+The target population is low-income households, who do not have access to affordable, nutritious foods. 
+Currently, our pantry network serves more than 17,540 residents of Monroe County each month.  
+ 
+Are the services proposed in this program being provided by any other organization(s) in the 
+community? 
+No 
+ 
+If yes, please list the program(s) and state the reason(s) why your program is not duplicative in nature. 
+Established in 1982, Second Harvest is the only Feeding America-affiliated food bank serving Monroe 
+County. Second Harvest provided food to 23 emergency food providers within the County, distributing 
+3.85 million pounds in 2023. In partnership with our member agencies, we are able to distribute fresh, 
+healthy foods to the residents of Monroe County.  
+ 
+Indicate the number of individuals or households expected to be served through this program in FY 
+2024-2025. 100 characters  
+We anticipate serving 17,000 individuals during FY 2024-2025.  
+Can’t get the Primarius report … something is wrong with it 
+  
+Approach and Results 
+Describe the proposed program and how it will achieve the goal and outcome(s) that you describe in the 
+Performance Measurement Form. 
+If awarded, funds from Pocono Mountains United Way will support the sourcing and distribution of 
+fresh, nutritious foods to our network of emergency food providers in Monroe County. 
+At Second Harvest, we apply a nutrition-focused approach to all aspects of our operation – sourcing, 
+producing, distributing, and educating. Our approach entails prioritizing the sourcing of fresh, nutritious 
+foods; innovating distribution strategies to help more people access food, such as through our pop-up 
+and school pantry programs; leveraging our resources at The Seed Farm to grow food for pantries and to 
+establish community gardens in urban areas; and educating participants about the importance of 
+healthy eating and providing them tools to make healthier choices. 
+Last year, we distributed a total of 3.85 million pounds of food to agencies in Monroe County (the 
+equivalent of 3.2 million meals), including 2.29 million pounds of perishable protein, fruits and 
+vegetables, and dairy items. Feeding America developed the F2E framework to align with 
+recommendations from USDA's MyPlate and Dietary Guidelines for Americans. The framework 
+promotes the consumption of fruits, vegetables, lean protein, whole grains, and low-fat dairy products.
+
+9 
+ 
+To increase our distribution of fresh and nutritious foods, and as part of our larger nutrition strategy, we 
+developed and implemented a Food and Nutrition Policy based on Healthy Eating Research (HER) 
+guidelines (which were created in partnership between the Robert Wood Johnson Foundation, Duke 
+University, and the charitable food network). Our Nutrition Policy prioritizes and deprioritizes food by 
+categorizing them as “choose often”, “choose sometimes”, and “choose rarely”. “Choose often” foods 
+coincide with Feeding America’s Foods to Encourage. Our Nutrition Policy informs all aspects of our food 
+sourcing and distribution strategies.  
+Because research shows that nutrition education is a critical component in changing food purchasing 
+and eating behaviors in people with lower-incomes, we implement our Healthy Pantry Initiative (HPI) in 
+tandem with our Nutrition Policy. HPI is a program of Feeding Pennsylvania that works to encourage 
+pantry customers to choose healthier food items. Second Harvest’s Nutrition Educator / Healthy Pantry 
+Coordinator works intimately with pantry directors and volunteers to help them create pantry spaces 
+that are client-centered and promote the consumption of healthy foods. Our Nutrition Educator also 
+works closely with pantry participants to ensure that the foods available to take home are prepared and 
+consumed in healthy ways. Our Nutrition Educator coordinates taste-testing events, cooking 
+demonstrations, and provides educational materials and recipes cards. Currently, our cohort of HPI sites 
+includes two sites within Monroe County.  
+It is our mission to provide access to food to the increasing number of individuals and families facing 
+food insecurity, with a distinct focus on fresh and nutritious options. Funding from Pocono Mountains 
+United Way will make it possible for Second Harvest to distribute fresh foods to our network of 23 
+pantries in Monroe County. Collectively, these pantries serve more than 17,540 people each month.  
+ 
+List the specific activities to be implemented under the proposed program and how they relate to the 
+stated outcome(s) and output(s) for the program. 
+Second Harvest will source and distribute fresh, nutritious foods to our network of emergency food 
+providers within Monroe County.  
+Upon receiving food, our nutrition and inventory control staff rank each product as “choose often”, 
+“choose sometimes”, and “choose rarely”. This information is entered into Primarius, a web-based 
+inventory management system designed specifically for food banks, The ranking system gives our pantry 
+coordinators greater detail and insight into the nutritional content of the foods they order for their 
+participants.  
+Second Harvest member agencies use Primarius to place their orders online. Second Harvest warehouse 
+crew members pick the order and schedule for delivery. Second Harvest drivers deliver the food directly 
+to the food pantry. By timing our delivery to align with pantry open hours, we implement a “Just in 
+Time” (JIT) delivery method, when possible. JIT delivery eliminates storage constraints at the pantry-
+level, which leads to the pantry accepting more fresh, refrigerated, and frozen products, resulting in 
+more families gaining access to these nutritious foods.  
+Our food pantry coordinators work with their teams of volunteers to serve participants. Pantries are re-
+sponsible for submitting monthly reports, stating the number of people served. Collectively, our net-
+work of pantries in Monroe County serves 17,540 people each month.
+
+10 
+ 
+Describe the best practices, evidence-based strategies, and/or innovative approaches that your 
+organization would be using in the delivery of the proposed program. 
+In developing our nutrition-focused approach, we conducted extensive research that included working 
+with staff at Feeding America and interviewing peers from the Feeding America network of food banks 
+about their best practices in delivering fresh, perishable food to their communities. We also conducted a 
+survey with our pantry network to determine their needs and incorporated that information into our 
+sourcing and distribution strategy. 
+As outlined in the answer to the preceding question, we are committed to providing healthy food to the 
+communities that need it, utilizing innovative methods of sourcing and delivery that promote efficiency 
+and provide ease of access to individuals and families.  
+ 
+Describe any strategic partnerships used by your organization to deliver the proposed program. 
+Our primary partners are the 200+ nonprofits that make up our charitable food network. They are 
+unequivocally the backbone of our operation and make it possible for us to reach over 87,000 people 
+each month.  
+As a member of the Feeding America network, we are able to tap into resources that help support our 
+daily operations and guide best practices.  Similarly, our membership with Feeding Pennsylvania (a 
+consortium of nine Feeding America-affiliated food banks across the state) has been crucial to our 
+program development and service provision efforts. We further benefit from our affiliation with Feeding 
+Pennsylvania in that we purchase food through their Mid-Atlantic Regional Cooperative (MARC) 
+initiative, a regional produce distribution system. Additionally, we have strong partnerships with many 
+local farms that result in our ability to purchase fresh, local products at reasonable prices. 
+ 
+Organizational Capacity 
+Describe your organization's capacity and experience to implement the proposed program and 
+meaningfully address the selected Priority Need. 
+Second Harvest, a program of Community Action Lehigh Valley, began its mission to end food insecurity 
+in 1982, as the Lehigh Valley Food Bank. Initially, distributions were made from the back of a rented 
+truck to a network of about 15 nonprofit agencies. Since September 2015, Second Harvest Food Bank 
+has been operating from a 65,000 square-foot warehouse in East Allen Township, which includes 96,000 
+cubic feet of space for refrigerated and frozen foods. Second Harvest operates a fleet of trucks and 
+sprinter vans.  Refrigerated delivery vehicles enable Second Harvest to transport food in compliance 
+with food safety regulations.  
+Second Harvest is the only Feeding America partner food bank serving Monroe County. Last year, 
+Second Harvest distributed 14.7 million pounds of food to 200+ nonprofit agencies, including 3.76 
+million pounds to 23 agencies within Monroe County.  
+Second Harvest has distributed food to meet the needs of the community for more than 40 years. There 
+has never been a pause to our distribution efforts, even during the height of the COVID-19 pandemic.
+
+11 
+ 
+List the financial, human and capital resources dedicated to the proposed program. 
+Our nutrition-focused approach to food sourcing, producing, distributing, and providing education is 
+integrated into our general operation and daily logistics.  
+Second Harvest will leverage funds from the United Way with other funds to be allocated from the 
+Pennsylvania Agricultural Surplus System (PASS), non-entitlement TEFAP, Feeding America, and private 
+donors to purchase fresh, nutritious food. 
+We will use our fleet of trucks to pick up donated food and to also distribute food to member agencies. 
+We will use our 65,000 square foot warehouse to store and stage food for distribution.  
+The Second Harvest team is committed to sourcing and distributing the most nutritious foods possible. 
+Our approach is collaboratively coordinated through the work of Second Harvest’s nutrition, agency 
+relations, food sourcing, inventory control, warehouse / driver, and community programs staff.  
+ 
+Please list any constraints on the program or requirements for the successful implementation of the 
+program. 
+As aforementioned, our network of emergency food providers are the backbone of our operation and 
+make it possible for us to reach over 87,000 people each month. Successful implementation requires 
+solid partnership with our pantry network.  
+The rising cost of food, and unforeseen supply chain issues pose potential constraints to our ability to 
+acquire and distribute fresh, nutritious foods. However, Second Harvest is positioned to continue to 
+meet the increasing demand for food.  
+ 
+Budget Information 
+Total amount requested from PMUW for this program: 
+$25,000 
+Amount requested as a percentage of program budget: 
+1.4% 
+How will United Way funds be used to address the need or problem? 
+Funds from Pocono Mountains United Way will be used to support the purchase and distribution of 
+fresh foods (including produce, meat, dairy, and eggs) for emergency food providers in Monroe County.
+
+12 
+ 
+ 
+ 
+ 
+ 
+PROGRAM BUDGET 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Expenses 	Proposed Program 
+h. salaries 	$1,798,430 
+i. Employee benefits & payroll taxes $965,009.30 
+ 
+j. Professional fees / Training $332,855.00 
+k. Supplies / Equipment $190,740.00 
+l. Printing / Publications $62,100.00 
+p. Travel / Conferences $77,145.00 
+r. Insurance Costs 	$26,000.00 
+s. Direct Client Grants $0.00 
+t. Other – purchased commodities $2,160,503.00 
+Other – vehicle expenses $144,000.00 
+Other - facilities expenses $176,040.00 
+Other - grants to subgrantees $                             180,000.00  
+Other - miscellaneous $43,651.12 
+Total 	$6,156,473.42 
+ 
+Surplus / Deficit 
+-$138,652 
+ 
+BUDGET NARRATIVE 
+Income 	Proposed Program 
+  	Budget (FY2024-2025) 
+a. Government 	$2,297,471 
+b. Foundations / Corporations $1,009,850.00 
+c. Individual Donations $2,418,500.00 
+d. Pocono Mountains United Way $25,000.00 
+e. Other United Way(s) 0 
+f. Program Fees 	$250,000.00 
+g. Other – Misc revenue $17,000.00 
+Total 	$6,017,821
+
+13 
+ 
+ 
+In reference to the Program Budget form, explain any major differences from year to year. 
+N/A 
+ 
+What activities does the Program Budget cover? Please list specifics such as program scope of service, 
+geographic area covered, staff members or a subset of program activities (if applicable). 
+Our comprehensive nutrition-focused approach to food sourcing, producing, distributing, and providing 
+education is incorporated into Second Harvest’s general operation and daily logistics and is therefore 
+integrated into the general Second Harvest operating budget.  
+On average, we make a minimum of 25 deliveries to Monroe County food pantries a month. Using 
+United Way funds to help support our distribution and delivery services reduces costs and burdens on 
+agencies that do not have funds or staffing capacity to drive vehicles large enough to supply the 
+pantries’ needs. To provide this service, we also need drivers, insurance, and fuel, as well as a dedicated 
+agency relations coordinator who provides guidance and troubleshooting to agency partners. 
+Although we are able to leverage federal and state funding to purchase some food, and receive a high 
+level of donations, available resources are never enough to meet the real demand. We will use funds 
+from United Way to source more food for Monroe County, either through bulk purchases to stretch 
+dollars further, or through freight charges on high-quality loads that might be offered to us at no cost. 
+Funds from Pocono Mountains United Way will be used to support the purchase and distribution of food 
+for emergency food providers in Monroe County as follows: 
+Food Purchase: $10,000 
+Fuel and Vehicle Maintenance: $5,000 
+Staff Wage and Benefits: $10,000 (drivers and agency relations coordinator) 
+Total: $25,000 
+ 
+SUCCESS STORY (Optional) 
+Agency Contact for Success Story: Debbie Campbell, Director of Christ Episcopal Food Pantry (205 N. 7th 
+Street, Stroudsburg 18360) 
+Phone Number for Success Story: 845-820-6598  
+Geographic community represented by the success story: Stroudsburg and surrounding areas  
+State the outcome the story links to: Increased access to fresh and nutritious foods for families facing 
+food insecurity.  
+Success Story: 
+The Christ Episcopal Food Pantry serves the Stroudsburg community, providing nourishment to people 
+facing food insecurity. Pantry Director, Debbie Cambell, states that the neighbors she serves choose
+
+14 
+ 
+fresh food and perishable proteins first. Debbie also takes pride in educating neighbors on how to 
+stretch their selections by juicing or making sauce out of fruits and vegetables. 
+ 
+Christ Episcopal Food Pantry will join Second Harvest’s Healthy Pantry Initiative (HPI) this year. HPI is a 
+program of Feeding Pennsylvania that works to encourage pantry customers to choose healthier food 
+items. Second Harvest’s Nutrition Educator / Healthy Pantry Coordinator works intimately with pantry 
+directors and volunteers to help them create pantry spaces that are client-centered and promote the 
+consumption of healthy foods. Our Nutrition Educator also works closely with pantry participants to en-
+sure that the foods available to take home are prepared and consumed in healthy ways. 
+ 
+HOW YOUR GIFT WORKS – 350 characters each 
+$1 per week 
+Second Harvest Food Bank can provide 156 meals to families-in-need with an annual gift of $52. 
+$2 per week 
+Second Harvest Food Bank can provide 312 meals to families-in-need with an annual gift of $104. 
+$5 per week 
+Second Harvest Food Bank can provide 780 meals to families-in-need with an annual gift of $260. 
+$10 per week 
+Second Harvest Food Bank can provide 1,560 meals to families-in-need with an annual gift of $520. 
+ 
+PERFORMANCE MEASURES  
+Inputs 
+Input - i.e. resources dedicated to or consumed by the program 2,000 characters 
+Second Harvest inputs include fresh and nutritious foods, staff time, utilization of dry and refrigerated 
+storage space within the Second Harvest warehouse, vehicle maintenance, fuel costs, and engagement 
+and collaboration with our pantry network. 
+ 
+Activities 
+Activity - i.e. what the program does with the inputs to fulfill its mission 2,000 characters  
+Second Harvest activities include sourcing fresh and nutritious foods, analysis of nutritional content, 
+logging items into inventory management system, storing and staging the food within our warehouse, 
+picking and preparing orders, delivering orders to partner agencies, and tracking data. 
+ 
+Outputs
+
+15 
+ 
+Output - i.e. the direct products of the program activities 2,000 characters 
+Second Harvest outputs include the distribution of food to our network of agencies, which is measured 
+in pounds.  
+Number: <insert number of pounds of food> Last year, we projected 1,830,485 pounds 
+For healthy food? We could make the target 2 million. For all food? We could make the target 3.9 
+million 
+ 
+Outcomes 
+Outcome - i.e. benefits for participants during or after program activities 2,000 characters  
+Second Harvest outcomes include increased access to nutritious food among low- and moderate- 
+income individuals and families in Monroe County. 
+Indicators: 
+Number of low- and moderate- income individuals receiving fresh and nutritious food. 
+ 
+Number of clients served: 17,540  
+Number of clients achieving goal: 17,540
+--------------------

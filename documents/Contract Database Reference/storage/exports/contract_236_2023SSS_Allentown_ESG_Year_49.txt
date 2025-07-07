@@ -1,0 +1,21 @@
+Purpose: <p>-$12,500 for utilities</p><p>-$12,500 for maintenance</p>
+Funder: Allentown DCED CDBG ESG
+Program: SSS
+Amount: 25000.00
+Start Date: 2023-01-01
+End Date: 2024-12-31
+
+Notes: 
+
+Fund Number: 1200
+
+Attached Document: 6525a509e0956_2023SSS_Allentown-ESG.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 65285714f0dd2_1619_001.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

@@ -1,0 +1,1203 @@
+Purpose: <p>All funds must be expended by September 30, 2023.</p><p>To be used for CADB NPP.</p>
+Funder: PA DCED
+Program: CADB
+Amount: 325000.00
+Start Date: 2021-07-01
+End Date: 2027-07-30
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 6564bce251ecb_2022CADCB_DCEDTaxCreditAgreement_Signed.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 659ea1b30ae07_Embassy-MOU.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 659ea1b8cb977_Peoples-MOU.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 659ea1bf2e24d_Provident-MOU.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 659ea1c5335e2_Univest-MOU.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 66f2f4c350174_CADCB-amendment-letter.pdf
+Center for Community Services 
+400 North St., 4
+th
+ Floor | Commonwealth Keystone Bldg. | Harrisburg, PA 17120-0225 | 717.787.1984 | dced.pa.gov 
+ 
+ 
+ 
+August 15, 2024 
+ 
+ 
+Dawn Godshall 
+Executive Director 
+Community Action Development Corporation of Bethlehem 
+1337 East Fifth Street 
+Bethlehem, PA 18015 
+ 
+ 
+RE:  Neighborhood Assistance Program (NAP/NPP)  
+       NAP Agreement #C000086784 
+       Application #202306294599 
+ 
+Dear Dawn Godshall:   
+ 
+Your request to amend the above referenced agreement, which was dated August 9, 2024, is 
+approved.  A copy of this letter and the attachment must be maintained with your current 
+agreements, as it is a binding part of your award. 
+ 
+Thank you for your interest in the Neighborhood Assistance Program.  If you have any further 
+questions about your project, please contact Fadia Halma at the Lehigh Valley Regional Office 
+at (717) 877-8481.  
+ 
+Sincerely,  
+ 
+ 
+Melissa Tabb, Deputy Director 
+Center for Community Services 
+ 
+Cc:  File 
+      Mike Shorr
+--------------------
+Attached Document: 66f2f4c7d2ae3_CADCB-Budget-Amendment-(Complete)---SIGNED.pdf
+CADCB Budget Justification 2023-2024 (Amended)
+N/A
+DCED Other
+Cost Cost
+23,000$           $27,000
+Subtotal Renovations	23,000$           $27,000
+TOTAL CONSTRUCTION	23,000$           $27,000
+N/A
+N/A
+GENERAL CONSTRUCTION TOTAL	23,000$           27,000$           
+Number of	HourlyHours on	DCED Other 
+Persons Title Rate Project Total Cost Cost
+1 Director	34.66$            2080 72,093$        48,478$           23,615$           
+1 Community Organizer -$                0 -$               -$                 -$                 
+1 Office Coordinator 18.36$            2080 38,189$        19,094$           19,094$           
+Fringe Benefits @ 38%	41,907$        24,927$           16,980$           
+Subtotal Salaries & Fringes	152,189$      92,500$           59,689$           
+DCED Other 
+Cost Cost
+Business Development
+Façade Coordination	2,500$             
+Façade Construction Management	2,500$             $3,000
+Professional Fees
+Books/Subscriptions	$500
+$1,400
+Subtotal Other	5,000$             $4,900
+DCED Other 
+Cost Cost
+OPERATING COSTS / WORKING CAPITAL
+     Salaries and Fringes
+Consumable Supplies
+Training & Technical Assistance
+Conferences/Staff Development
+MACHINERY & EQUIPMENT
+ACQUISITION
+GENERAL CONSTRUCTION
+     Renovations
+2 Facades
+INFRASTRUCTURE / SITE PREPARATION
+
+$1,500
+Subtotal Consumable Supplies	-$                 $1,500
+DCED Other 
+Cost Cost
+$400
+Subtotal Other	-$                 $400
+DCED Other 
+Cost Cost
+Advertising Expenses	$2,625
+$500
+Subtotal Other	-$                 $3,125
+DCED Other 
+Cost Cost
+Computer/Equipment	6,433$             
+8,924$             
+Subtotal Other	-$                 15,357$           
+     
+DCED Other 
+Cost Cost
+Rent	17,200$           
+Utilities	3,982$             
+Facilities Maintenance	5,500$             
+Subtotal Other	-$                 26,682$           
+DCED Other 
+Cost Cost
+Audit	5,250$             
+Subtotal Other	-$                 5,250$             
+DCED Other 
+Cost Cost
+Administration	32,500$           102,454$        
+Subtotal Other	32,500$           102,454$        
+TOTAL OPERATING COSTS	130,000$        219,357$        
+DCED Other 
+Cost Cost
+Insurance	1,020$             
+Subtotal Related Costs	-$                 1,020$             
+TOTAL RELATED COSTS	-$                 1,020$             
+DCED Other 
+Cost Cost
+Office/Program Supplies
+Audit
+Postage/Copying
+Promotion
+Travel
+Local Travel
+Office Equipment
+RELATED COSTS
+    Miscellaneous/Additional Project Activities
+Telephone
+Indirect Costs
+Space Costs
+
+10,000$           
+Community Clean Ups	1,500$             
+Community Garden Improvements	3,500$             
+Green Space Preservation and Maintenance	6,000$             $2,000
+Greenway Healthy Fresh Produce	5,000$             	$0
+Greenway Public Mini Meadows	-$                 $0
+Parham Park Landscaping	-$                 
+Plant Therapy is Real	6,750$             
+Saturdays in the Park	5,000$             
+Sidewalk and Tree Mini Grants	14,000$           
+Southside Ambassadors Extension Program	25,000$           	$0
+Southside Community Gardening	18,000$           
+Lynfield Community Center Garden	8,517$             
+Big Plans	4,000$             
+Change Agents: Community Pop Up Workshops	5,000$             
+9,500$             	$0
+Community Meetings	4,000$             
+Fostering Intergenerational Connections	8,000$             
+Lynfield Youth Summer Program	9,233$             
+Push Ahead Lehigh Valley Skateboarding Program	12,000$           
+Youth Advisory Council	17,000$           	$0
+172,000$        $2,000
+DCED Other 
+Cost Cost
+GRAND TOTAL	325,000$        249,377$        
+SUBTOTAL MISCELLANEOUS/ADDITIONAL PROJECT ACTIVITIES
+Community Building Events
+Festival UnBound
+
+CADCB Budget Justification 2023-2024 (Original)
+N/A
+DCED Other
+Cost Cost
+23,000$           $27,000
+Subtotal Renovations	23,000$           $27,000
+TOTAL CONSTRUCTION	23,000$           $27,000
+N/A
+N/A
+GENERAL CONSTRUCTION TOTAL	23,000$           27,000$           
+Number of	HourlyHours on	DCED Other 
+Persons Title Rate Project Total Cost Cost
+1 Director	34.66$            2080 72,093$        36,046$           36,046$           
+1 Community Organizer 22.25$            455 10,124$        10,124$           	-$                 
+1 Office Coordinator 18.36$            2080 38,189$        19,094$           19,094$           
+Fringe Benefits @ 38%	45,754$        27,235$           18,519$           
+Subtotal Salaries & Fringes	166,159$      92,500$           73,659$           
+DCED Other 
+Cost Cost
+Business Development
+Façade Coordination	2,500$             
+Façade Construction Management	2,500$             $3,000
+Professional Fees
+Books/Subscriptions	$500
+$1,400
+Subtotal Other	5,000$             $4,900
+DCED Other 
+Cost Cost
+OPERATING COSTS / WORKING CAPITAL
+     Salaries and Fringes
+Consumable Supplies
+Training & Technical Assistance
+Conferences/Staff Development
+MACHINERY & EQUIPMENT
+ACQUISITION
+GENERAL CONSTRUCTION
+     Renovations
+2 Facades
+INFRASTRUCTURE / SITE PREPARATION
+
+$1,500
+Subtotal Consumable Supplies	-$                 $1,500
+DCED Other 
+Cost Cost
+$400
+Subtotal Other	-$                 $400
+DCED Other 
+Cost Cost
+Advertising Expenses	$2,625
+$500
+Subtotal Other	-$                 $3,125
+DCED Other 
+Cost Cost
+Computer/Equipment	6,433$             
+8,924$             
+Subtotal Other	-$                 15,357$           
+     
+DCED Other 
+Cost Cost
+Rent	17,200$           
+Utilities	3,982$             
+Facilities Maintenance	5,500$             
+Subtotal Other	-$                 26,682$           
+DCED Other 
+Cost Cost
+Audit	5,250$             
+Subtotal Other	-$                 5,250$             
+DCED Other 
+Cost Cost
+Administration	32,500$           102,454$        
+Subtotal Other	32,500$           102,454$        
+TOTAL OPERATING COSTS	130,000$        233,327$        
+DCED Other 
+Cost Cost
+Insurance	1,020$             
+Subtotal Related Costs	-$                 1,020$             
+TOTAL RELATED COSTS	-$                 1,020$             
+DCED Other 
+Cost Cost
+Office/Program Supplies
+Audit
+Postage/Copying
+Promotion
+Travel
+Local Travel
+Office Equipment
+RELATED COSTS
+    Miscellaneous/Additional Project Activities
+Telephone
+Indirect Costs
+Space Costs
+
+10,000$           
+Community Clean Ups	1,500$             
+Green Space Preservation and Maintenance	5,000$             $2,000
+Greenway Healthy Fresh Produce	5,000$             	$0
+Greenway Public Mini Meadows	5,000$             	$0
+Parham Park Landscaping	13,500$           
+Plant Therapy is Real	6,750$             
+Saturdays in the Park	5,000$             
+Southside Ambassadors Extension Program	25,000$           	$0
+Southside Community Gardening	18,000$           
+Lynfield Community Center Garden	8,517$             
+Big Plans	4,000$             
+Change Agents: Community Pop Up Workshops	5,000$             
+9,500$             	$0
+Community Meetings	4,000$             
+Fostering Intergenerational Connections	8,000$             
+Lynfield Youth Summer Program	9,233$             
+Push Ahead Lehigh Valley Skateboarding Program	12,000$           
+Youth Advisory Council	17,000$           	$0
+172,000$        $2,000
+DCED Other 
+Cost Cost
+GRAND TOTAL	325,000$        263,347$        
+SUBTOTAL MISCELLANEOUS/ADDITIONAL PROJECT ACTIVITIES
+Community Building Events
+Festival UnBound
+
+CADCB Budget 2023-2024 (Amended)	NPP CSBG Bethlehem CDBGIndividual/Foundation ContributionsTOTAL
+General Construction
+   Renovations	23,000 0 27,000	50,000
+Operating/Working Capital
+    Salary/Fringe Benefits	92,500 73,659	0	166,159
+    Training/Technical Asst. 	5,000 0 3,000	1,900 9,900
+    Consumable Supplies 	0 1000	500 1,500
+    Travel	0 400	0	400
+    Promotion	0 500	0	2625 3,125
+    Space Costs	0 24,982	0	1,70026,682
+   Office Equipment/Phone	0 9,657	0	5,70015,357
+    Audit	0 5,250	0	0 5,250
+    Indirect Costs (Admin.)	32,500 0	0	102,454134,954
+Related Costs
+    Insurance	0 0	0	1020 1,020
+ Other (Miscellaneous)
+Festival UnBound	10,000$          	10,000
+Community Clean Ups	1,500$            	1,500
+Community Garden Improvements	3,500$            	3,500
+Green Space Preservation and Maintenance	6,000$            	2000 8,000
+Greenway Healthy Fresh Produce	5,000$            	5,000
+Greenway Public Mini Meadows	-$                 	0
+Parham Park Landscaping	-$                 	0
+Plant Therapy is Real	6,750$            	6,750
+Saturdays in the Park	5,000$            	5,000
+Sidewalk and Tree Mini Grants	14,000$          	14,000
+Southside Ambassadors Extension Program	25,000$          	25,000
+Southside Community Gardening	18,000$          	18,000
+Lynfield Community Center Garden	8,517$            	8,517
+Big Plans	4,000$            	4,000
+Change Agents: Community Pop Up Workshops	5,000$            	5,000
+Community Building Events	9,500$            	9,500
+Community Meetings	4,000$            	4,000
+Fostering Intergenerational Connections	8,000$            	8,000
+Lynfield Youth Summer Program	9,233$            	9,233
+Push Ahead Lehigh Valley Skateboarding Program	12,000$          	12,000
+Youth Advisory Council	17,000$          	17,000
+TOTAL	325,000 115,448 30,000	117,899588,347
+
+CADCB Budget 2023-2024 (Original)	NPP CSBG Bethlehem CDBGIndividual/Foundation ContributionsTOTAL
+General Construction
+   Renovations	23,000 0 27,000	50,000
+Operating/Working Capital
+    Salary/Fringe Benefits	92,500 73,659	0	166,159
+    Training/Technical Asst. 	5,000 0 3,000	1,900 9,900
+    Consumable Supplies 	0 1000	500 1,500
+    Travel	0 400	0	400
+    Promotion	0 500	0	2625 3,125
+    Space Costs	0 24,982	0	1,70026,682
+   Office Equipment/Phone	0 9,657	0	5,70015,357
+    Audit	0 5,250	0	0 5,250
+    Indirect Costs (Admin.)	32,500 0	0	102,454134,954
+Related Costs
+    Insurance	0 0	0	1020 1,020
+ Other (Miscellaneous)
+Festival UnBound	10,000$         	10,000
+Community Clean Ups	1,500$            	1,500
+Green Space Preservation and Maintenance	5,000$            	2000 7,000
+Greenway Healthy Fresh Produce	5,000$            	5,000
+Greenway Public Mini Meadows	5,000$            	5,000
+Parham Park Landscaping	13,500$         	13,500
+Plant Therapy is Real	6,750$            	6,750
+Saturdays in the Park	5,000$            	5,000
+Southside Ambassadors Extension Program	25,000$         	25,000
+Southside Community Gardening	18,000$         	18,000
+Lynfield Community Center Garden	8,517$            	8,517
+Big Plans	4,000$            	4,000
+Change Agents: Community Pop Up Workshops	5,000$            	5,000
+Community Building Events	9,500$            	9,500
+Community Meetings	4,000$            	4,000
+Fostering Intergenerational Connections	8,000$            	8,000
+Lynfield Youth Summer Program	9,233$            	9,233
+Push Ahead Lehigh Valley Skateboarding Program	12,000$         	12,000
+Youth Advisory Council	17,000$         	17,000
+TOTAL	325,000 115,448 30,000	117,899588,347
+
+PROPOSED PROJECTS FOR NPP YEAR 3 (FY 2023 -2024) (Amended) 
+  
+The NPP Steering Committee has identified the following priorities for implementation in YEAR THREE: 
+  
+• Housing Affordability and Quality  
+• Public and Green Spaces  
+• Communication and Connectivity  
+  
+From January through March 2023, the working committees of Southside’s Tomorrow met to discuss the 
+development of projects for CADCB’s Neighborhood Partnership Program. With the recommendations 
+from the plan’s community input process and of staff from Community Action Development Corporation 
+of Bethlehem, the Steering Committee drafted a schedule of activities for the third year. In April 2023, 
+Steering Committee members deliberated on these proposed activities and arrived at the following projects 
+to align with funding priorities for implementation in FY 2023-2024 (NPP Year 3): 
+ 
+HOUSING AFFORDABILITY AND QUALITY ($38,000) 
+Façade Improvements ($28,000) 
+Due to the large shift toward renter-occupied housing in south Bethlehem and community concerns, as well 
+as data indicating a lack of quality housing stock, efforts are needed to stabilize homeownership and 
+improve the housing stock. There is evidence that investment in façade improvements has a stabilizing 
+impact on a neighborhood by restoring its historic architecture and enhancing property values of homes that 
+have façade work and those that surround it. CADCB will complete residential façade improvements and 
+efforts will be made to coordinate with Community Action Lehigh Valley’s Community Action Homes 
+program to leverage funds and pair façade improvements with owner-occupied housing rehab and 
+acquisition-rehab-resale for low- to moderate-income families in a targeted geographic area. 
+Objective #1: By September 30, 2024, at least two (2) façade improvements will be completed in targeted 
+areas of south Bethlehem. 
+Festival Unbound: Most Beautiful Home, Maybe ($10,000) 
+Festival UnBound will continue its focus on fostering a vibrant, healthy, equitable, and inclusive community 
+through embracing and raising the voices of those often marginalized in society. Through this five-day event 
+of art generation, performance, and conversation, Touchstone Theatre aims to creatively generate the 
+understanding necessary to move our community forward. Festival UnBound is comprised of a series of 
+varied performances and happenings. Supporting these core events is a series of auxiliary panel discussions, 
+public meals, social media exchanges, surveys, workshops, and post-performance talkbacks. In this iteration 
+of the program, the festival will focus on the local ramifications of the national housing crisis, engaging 
+policy makers, advocates, and activists, as well as local residents in round-table discussions about issues of 
+housing inequities and how to address them. 
+Objective #2: By September 30, 2024, 5,000 members of the Lehigh Valley community will be engaged 
+through Festival UnBound’s programming. 
+Objective #3: By September 30, 2024, Festival UnBound will yield a net positive change in response to 
+survey questions regarding shifting perceptions of the Bethlehem community.
+
+Objective #4: By September 30, 2024, Festival UnBound will forge channels of communication between 
+previously siloed groups within the Bethlehem community, as well as between community members and 
+decision-makers (such as local government representatives and officials). 
+ 
+PUBLIC AND GREEN SPACES ($93,267) 
+Community Cleanups ($1,500) 
+CADCB will host monthly community cleanups from October to November 2023 and April through 
+September 2024. Each cleanup will start in a different public space and will convene volunteers to pick up 
+trash and beautify the public space before expanding into the surrounding neighborhoods. In addition, 
+committee members will identify one location for a "dumpster day," in which a dumpster will be provided 
+to haul away significant quantities of waste that occupy public or heavily transited areas of the Southside. 
+Objective #5: By September 30, 2024, at least eight (8) neighborhood cleanups will be held at public 
+locations throughout the Southside. 
+Objective #6: By September 30, 2024, at least 75 Southside residents will participate in neighborhood 
+cleanups. 
+Community Garden Improvements ($3,500) 
+To enhance the programming at Martin Luther King Jr. Park, infrastructure upgrades are being implemented 
+in the community garden. This year, CADB is allocating funds to install a deer fence around the garden to 
+replace the aging wooden barrier. This new fence will shield the cultivated produce from deer and various 
+pests. The initiative stems from regular discussions with community members active in the gardening 
+program, notably with Nia Watson, Head Gardener. 
+Objective #5: By September 30, 2024, one deer fence will be installed at Martin Luther King Jr. Park. 
+Green Space Maintenance and Preservation ($5,000) ($6,000) 
+Regular maintenance is required to ensure that the physical improvements achieve their original goals in 
+the areas of neighborhood beautification and placemaking. On an annual basis, Lopes International Park 
+requires grass cutting, weeding, shrub pruning and snow removal. CADCB contracted with the owner of 
+the land several years ago, with the agreement that CADCB would continue to maintain the park in 
+exchange for use of the land. This project will ensure regular maintenance of public spaces including parks 
+and community gardens as well as engaging residents to adopt a local park or segment of the Greenway. 
+Funding will purchase materials needed by residents to maintain beautification and maintenance of parks. 
+Objective #7: By September 30, 2024, Lopes International Park and Tranquility Park will be maintained 
+throughout the 2023-2024 program year. 
+Objective #8: By September 30, 2024, at least 50 plants or shrubs will be installed. 
+Objective #9: By September 30, 2024, at least two (2) community gardens in south Bethlehem will be 
+expanded and improved. 
+Objective #10: By September 30, 2024, at least 30 children and youth will be engaged to participate in 
+enrichment activities at a community garden.
+
+Greenway Healthy Fresh Produce ($5,000) 
+The Kellyn Foundation has been serving the Southside with fresh local and non-local produce since 2016. 
+Through their Mobile Market, they have provided a source of nutritious food to south Bethlehem residents 
+by operating on the South Bethlehem Greenway. In the coming year, Kellyn will initiate the coordination 
+of a larger South Bethlehem Community Market, engaging local vendors and community members. The 
+expanded market will provide additional support for combating food insecurity and increase non-resident 
+visits to the Southside, increasing foot traffic for local businesses. 
+Objective #11: By September 30, 2024, an expanded South Bethlehem Community Market will be planned. 
+Greenway Public Mini Meadows ($5,000) 
+This project will create public gardens along selected areas of the South Bethlehem Greenway. These areas 
+are currently occupied by weeds and brush that are difficult to maintain throughout the year. Installing a 
+public mini meadow will beautify the space and provide a location for residents to gather and interact with 
+plants and wildlife. Abundant flowers, a variety of textures, trees providing shade, and low-maintenance 
+design will help to maximize the garden’s impact on the community.  
+Objective #12: By September 30, 2024, one (1) mini meadow will be installed along the South Bethlehem 
+Greenway. 
+Parham Park Landscaping ($13,500) 
+This project will provide landscaping improvements at Parham Park on Fourth Street between Taylor and 
+Polk Streets. Parham Park, situated adjacent to Touchstone Theatre, serves as a connecting pathway from 
+Fourth Street, a main thoroughfare, to the Greenway's outdoor stage. The landscaping improvements aim 
+to enhance the aesthetics of the park, creating an inviting and vibrant atmosphere that encourages 
+pedestrians to utilize the space. By beautifying the park, the project will improve pedestrian’s sense of 
+safety, increasing walkability and foot traffic. Additionally, the enhanced landscaping will help promote 
+the use of the outdoor stage as a versatile venue for events, further enhancing the community's 
+engagement with the park. 
+Objective #13: By September 30, 2024, Parham Park will undergo landscaping improvements beautifying 
+the space and increasing walkability.  
+Plant Therapy is Real ($6,750) 
+The “Plant Therapy is Real” program aims to promote personal wellness through the practice of plant care. 
+By integrating nature and greenery into our living spaces, individuals can experience numerous benefits 
+such as stress relief, anxiety reduction, and improved mood. Exposure to greenery has proven to evoke 
+happiness, abundance, and relaxation. This initiative will provide plant therapy sensory spaces in three 
+affordable housing communities and workshops on the benefits of plant therapy. Subsequent months will 
+feature repeat plant therapy and wellness sessions, encouraging participants to embrace both indoor and 
+outdoor green spaces, with added physical activities to promote mindfulness and exercise. 
+Objective #14: By September 30, 2024, at least three (3) plant therapy sensory spaces will be installed in 
+affordable housing communities. 
+Objective #15: By September 30, 2024, at least three (3) workshops will be held to teach the benefits of 
+plant therapy and green spaces. 
+Saturdays in the Park ($5,000)
+
+The Saturdays in the Park program aims to address the lack of access to quality mental health care and 
+support in the community. Recognizing that the demand for mental health care exceeds the available 
+infrastructure, the program focuses on prevention and strengthening protective factors for individuals 
+experiencing high levels of stress, anxiety, depression, and trauma. The project organizes regular pop-ups 
+in community green spaces, offering community members opportunities to reduce stress, foster 
+connections, develop skills, and access community resources. 
+Objective #16: By September 30, 2024, at least seven (7) pop-up workshops will be held in local parks. 
+Sidewalk and Tree Mini Grants ($14,000) 
+The Public and Green Spaces Mini Grants project is an initiative by Community Action Development 
+Bethlehem to address the need for increased tree coverage in south Bethlehem. The program offers flexible 
+funding to support various projects related to tree planting, including installation, maintenance, and 
+sidewalk repair. Through the allocation of Southside Tomorrow funding for these mini-grants, residents of 
+south Bethlehem can apply for small grants throughout the year to address urgent needs in their 
+neighborhoods. By addressing the need for more trees and greenery, the program contributes to improving 
+the cleanliness and appearance of neighborhoods, thus enhancing the overall community image. 
+Community Action Development Bethlehem will provide administrative support with the City Forester's 
+office to ensure this program's effectiveness. 
+Objective #13: By September 30, 2024, at least 2 mini grants will be disbursed to south Bethlehem residents 
+to support tree planting and other green neighborhood beautification efforts. 
+Southside Ambassadors Extension ($25,000) 
+This project will continue funding for the Southside Ambassadors extension area from Taylor Street to 
+Hayes Street along the Fourth Street “4 Blocks International” business corridor, in addition to the north-
+south side streets between Third and Fourth Streets. For years, business owners and residents complained 
+about trash and leaf debris along Fourth Street, and overgrown brush on side streets. Since January 2016, 
+the Southside Ambassadors have provided “clean” services to the extension area through Hayes Street. 
+From January through December 2017, the Southside Ambassadors removed 29,098 pounds of trash from 
+the extension area, and removed 39 instances of graffiti, made 292 contacts with business owners, and 
+provided 429 instances of hospitality assistance. A community meeting was held to gather feedback and 
+provide information to the extension area community about the Southside Ambassadors program, and 
+resident and business owner responses were overwhelmingly positive. Since then, the Southside 
+Ambassadors have invested in equipment to improve leaf and snow removal, installed cigarette butt 
+containers throughout the neighborhood, worked with businesses to remove trash cans from the street, and 
+taken care of pocket parks. 
+Objective #17: By September 30, 2024, the Southside Ambassadors Program will maintain the 
+neighborhood along Fourth Street between Taylor and Hayes streets, as well as along north-south side 
+streets between Third and Fourth streets. 
+Southside Community Gardening ($18,000) 
+Community gardens are a widely recognized strategy for improving urban food access, engaging 
+community members in collaborative projects that build community pride and preserving green spaces for 
+public use and enjoyment. However, successful community gardens require ongoing maintenance and 
+support from committed gardeners to function effectively. Through programming offered on a twice weekly 
+basis, community gardeners work to engage community members in learning the basics of gardening while 
+providing free produce to local residents. To support and expand community gardens during the 2023
+
+growing season, funding will compensate a head gardener, as well as assist in purchasing equipment and 
+supplies needed to expand activities and educational opportunities. 
+Objective #18: By September 30, 2024, at least three (3) existing community gardens will be supported, 
+maintained, and developed as centers for education and community engagement.  
+Lynfield Community Center Garden ($8,517) 
+In order to foster ownership of public green space and combat food insecurity, the Lynfield Community 
+Center will refresh, plant, and tend its community and pollinator gardens. An additional composter and two 
+additional pollinator garden modules will be added this year to expand the capacity for residents to connect 
+with their shared green space and learn about the importance of pollinators and returning nutrients to the 
+soil. Youth attending the Lynfield Community Center summer activities will connect to this public green 
+space through education and activities surrounding the gardens. 
+Objective #19: By September 30, 2024, one (1) vegetable and pollinator garden will be planted and 
+maintained. 
+ 
+COMMUNICATION AND CONNECTIVITY ($55,233) 
+“Big Plans!” Workshop Series ($4,000) 
+This project, “Big Plans!”, addresses vocational ambition and encouragement through the applied arts. The 
+goal of this project is to create an alternative option to the usual lectures, stories, and video presentations 
+on this subject. These events will offer a physical and personal approach to addressing the future workforce, 
+one that will become an important moment in the student’s life. Just as important is the effect public 
+testimony – in the form of poetry, theater, puppetry, and music – will have on the peer group audience 
+attending a culminating assembly program. The question-and-answer session following the student 
+performances will have a great impact on the students in the audience. 
+Objective #20: By September 30, 2024, at least two (2) schools on the Southside will be engaged to host 
+the Big Plans! series of workshops and public assembly program. 
+Objective #21: By September 30, 2024, at least 200 students will participate in an in-school workshop. 
+Change Agents: Community Pop-up Workshops ($5,000) 
+Starting in August 2024, Lehigh University Art Galleries (LUAG) will present “Change Agents”, the latest 
+in an ongoing series of community-centered public exhibitions. In addition to being displayed across 
+campus gallery spaces, this selection of diverse images and videos will be mounted on a series of billboards 
+along a 1.9-mile stretch of Bethlehem’s Greenway path. “Change Agents” is designed to engage viewers 
+around civic engagement– providing a platform for participants to share their perspectives and bringing 
+people together around key issues. Throughout the series, participants will explore strategies for making 
+meaningful change in their communities. 
+Objective #22: By September 30, 2024, at least eight (8) “Change Agent” pop-up workshops will be hosted 
+with community partners. 
+Objective #23: By September 30, 2024, at least 275 residents will participate in story-sharing and/or hands-
+on activities.
+
+Community Building Events ($9,500) 
+This project will engage local residents and organizations to host and/or sponsor events such as block 
+parties, cultural celebrations, potlucks, etc. These events will include a festival, movie nights, and pop-up 
+events (spontaneous dance, arts, and sports parties that will “pop up” across the Southside). Events like the 
+ones proposed help build community and mitigate the effects of poverty. They will have a focus on building 
+a sense of belonging, pride, and fellowship among neighbors. The events will also serve to introduce 
+Southside residents and visitors to the businesses, restaurants, amenities, services, and programs available 
+in the community. 
+Objective #24: By September 30, 2024, at least four (4) block gatherings will be planned and facilitated.  
+Objective #25: By September 30, 2024, at least one (1) cultural event will be planned and facilitated. 
+Objective #26: By September 30, 2024, at least one (1) event identified by the community’s vision will be 
+planned and facilitated.  
+Objective #27: By September 30, 2024, at least 2,500 residents will be engaged in community building 
+events.  
+Objective #28: By September 30, 2024, at least five (5) community organizations will partner with CADCB 
+to host community building events. 
+Community Meetings ($4,000) 
+CADB will hold a series of neighborhood meetings that will take place in the Southside community from 
+October 2023 to September 2024. These meetings aim to achieve several goals, including building 
+relationships among community members, raising awareness about opportunities for community 
+engagement, planning meetings and events based on community needs. In addition, these meetings will 
+gather feedback on community priorities for future projects and establish a leadership development pathway 
+for community members. To ensure accessibility, the meetings will be held at distinct locations within the 
+Southside community. Additionally, CADB staff will provide meals, childcare, and bilingual facilitation at 
+each meeting. 
+Objective #29: By September 30, 2024, a minimum of 150 south Bethlehem residents will participate in 
+neighborhood meetings. 
+Objective #30: By September 30, 2024, a minimum of ten (10) new south Bethlehem residents will become 
+engaged in project development and/or committees. 
+Fostering Intergenerational Connections among Southside Residents ($8,000) 
+This initiative aims to address the loss of intergenerational connections and community building in society 
+by facilitating conversation and interaction between individuals of different age groups and backgrounds. 
+The program operates within the Basilio Huertas Senior Center at the Hispanic Center Lehigh Valley, which 
+provides resources for seniors to stay active and independent. The program participants express a desire to 
+strengthen ties with the broader Southside community. This program will provide an opportunity for 
+students to engage with seniors at monthly themed events. These events will also provide education to all 
+participants regarding Hispanic/Latino traditions. 
+Objective #31: By September 30, 2024, at least ten (10) intergenerational community building events will 
+be held.
+
+Objective #32: By September 30, 2024, at least 275 seniors and children will be engaged in 
+intergenerational community building events. 
+Lynfield Youth Summer Program ($9,233) 
+Lynfield Community Center will build on its successful youth summer programming during the months of 
+June, July, and August 2024. During these months students enjoy daily activities at the center, periodic field 
+trips, and educational programs all delivered by caring and positive role models. Youth also receive snacks 
+and meals during this programming. 
+Objective #33: By September 30, 2024, provide safe, educational summer programming to 35 youth 
+through partnerships with local youth serving organizations. 
+Push Ahead Lehigh Valley Skateboarding Program ($12,000) 
+Push Ahead Lehigh Valley is a skateboarding mentorship program that teaches fundamental skateboarding 
+skills, including riding, maintenance, safety, and skatepark etiquette. Beyond these physical aspects, the 
+program also focuses on fostering valuable social and emotional skills such as empathy and resilience. 
+Understanding the significance of developing these emotional skills to self-regulate during challenging 
+times, adversity, and fear of failure is crucial for children. The Push Ahead program takes a unique approach 
+by allowing children to internalize these skills through the organic process of skateboarding, where they 
+learn to navigate self-doubt and overcome obstacles. Additionally, the program provides intentional tools 
+and a supportive environment that enables children to fully experience both challenges and victories, 
+building a sense of trust in themselves throughout the learning process.  
+Objective #34: By September 30, 2024, at least 20 Southside youth will participate in skateboarding 
+programming. 
+Youth Advisory Council ($17,000) 
+This project will support the creation of a youth-led committee of the NPP where youth can have a voice in 
+the decisions being made in their community and create programming that aligns with their interests. Youth 
+engagement and programming was a common theme through all avenues of community input, recognizing 
+the need for more activities, play spaces, and recreational opportunities. The Youth Advisory Council will 
+give youth and young adults the opportunity to share their voice, providing them with leadership, 
+organizational, and other positive skills useful to their personal and professional development. By investing 
+in the youth of Bethlehem, we are providing them with a platform to become invested in their own 
+community and giving them a seat at the table of decision-makers. 
+Objective #35: By September 30, 2024, at least ten (10) Southside youth, from ages 13 to 18, will be 
+recruited to participate in a Youth Advisory Council. 
+Objective #36: By September 30, 2024, at least one (1) sponsored youth-friendly event will be organized 
+and facilitated to showcase the interests of the Youth Advisory Council. 
+ 
+ORGANIZATION AND MANAGEMENT ($125,000) 
+Administration ($32,500)
+
+NPP funds will support the cost of the administration of the Southside’s Tomorrow Neighborhood 
+Partnership Program through the efforts of Community Action Development Corporation of Bethlehem 
+(CADCB) and Community Action Lehigh Valley.  
+Objective #37: By September 30, 2024, CADCB and Community Action Lehigh Valley will continue to 
+provide proficient administration of the Neighborhood Partnership Program. 
+ 
+Implementation Team and Capacity ($92,500) 
+  
+NPP funds will be used to support (in part) the salary and fringes of the following persons: 
+  
+Director, Anna Smith, supervises the CADCB staff and manages the day-to-day activities of the office. Mrs. 
+Smith will provide staff support to CADCB’s Neighborhood Partnership Program.  
+  
+Community Organizer for the Southside, Samantha Mravlag, will support neighborhood community 
+development by working to expand residents’ capacity to collectively represent themselves as they seek 
+incentives and resources to strengthen their neighborhoods. The Community Organizer for the Southside 
+will work with residents and key stakeholders to organize, build partnerships, and develop community 
+cohesion in order to advocate for the affordability of designated Southside neighborhoods. The Community 
+Organizer for the Southside will also serve as a liaison between residents and the City of Bethlehem to 
+support housing market stability and to ensure a vibrant public realm. The Community Organizer for the 
+Southside will provide staff support to CADCB’s Neighborhood Partnership Program.  
+  
+Office Coordinator, Jennifer Labrador, assists the director in event planning, including budgeting, 
+purchasing and promotion; and assists with updating social media, websites, and contact groups for 
+CADCB. In this work, Ms. Labrador prides herself on excellent customer service and works diligently to 
+provide the community with information. Ms. Labrador will provide staff support to CADCB’s 
+Neighborhood Partnership Program.
+
+PROPOSED PROJECTS FOR NPP YEAR 3 (FY 2023 -2024) (Original) 
+  
+The NPP Steering Committee has identified the following priorities for implementation in YEAR THREE: 
+  
+• Housing Affordability and Quality  
+• Public and Green Spaces  
+• Communication and Connectivity  
+  
+From January through March 2023, the working committees of Southside’s Tomorrow met to discuss the 
+development of projects for CADCB’s Neighborhood Partnership Program. With the recommendations 
+from the plan’s community input process and of staff from Community Action Development Corporation 
+of Bethlehem, the Steering Committee drafted a schedule of activities for the third year. In April 2023, 
+Steering Committee members deliberated on these proposed activities and arrived at the following projects 
+to align with funding priorities for implementation in FY 2023-2024 (NPP Year 3): 
+ 
+HOUSING AFFORDABILITY AND QUALITY ($38,000) 
+Façade Improvements ($28,000) 
+Due to the large shift toward renter-occupied housing in south Bethlehem and community concerns, as well 
+as data indicating a lack of quality housing stock, efforts are needed to stabilize homeownership and 
+improve the housing stock. There is evidence that investment in façade improvements has a stabilizing 
+impact on a neighborhood by restoring its historic architecture and enhancing property values of homes that 
+have façade work and those that surround it. CADCB will complete residential façade improvements and 
+efforts will be made to coordinate with Community Action Lehigh Valley’s Community Action Homes 
+program to leverage funds and pair façade improvements with owner-occupied housing rehab and 
+acquisition-rehab-resale for low- to moderate-income families in a targeted geographic area. 
+Objective #1: By September 30, 2024, at least two (2) façade improvements will be completed in targeted 
+areas of south Bethlehem. 
+Festival Unbound: Most Beautiful Home, Maybe ($10,000) 
+Festival UnBound will continue its focus on fostering a vibrant, healthy, equitable, and inclusive community 
+through embracing and raising the voices of those often marginalized in society. Through this five-day event 
+of art generation, performance, and conversation, Touchstone Theatre aims to creatively generate the 
+understanding necessary to move our community forward. Festival UnBound is comprised of a series of 
+varied performances and happenings. Supporting these core events is a series of auxiliary panel discussions, 
+public meals, social media exchanges, surveys, workshops, and post-performance talkbacks. In this iteration 
+of the program, the festival will focus on the local ramifications of the national housing crisis, engaging 
+policy makers, advocates, and activists, as well as local residents in round-table discussions about issues of 
+housing inequities and how to address them. 
+Objective #2: By September 30, 2024, 5,000 members of the Lehigh Valley community will be engaged 
+through Festival UnBound’s programming. 
+Objective #3: By September 30, 2024, Festival UnBound will yield a net positive change in response to 
+survey questions regarding shifting perceptions of the Bethlehem community.
+
+Objective #4: By September 30, 2024, Festival UnBound will forge channels of communication between 
+previously siloed groups within the Bethlehem community, as well as between community members and 
+decision-makers (such as local government representatives and officials). 
+ 
+PUBLIC AND GREEN SPACES ($93,267) 
+Community Cleanups ($1,500) 
+CADCB will host monthly community cleanups from October to November 2023 and April through 
+September 2024. Each cleanup will start in a different public space and will convene volunteers to pick up 
+trash and beautify the public space before expanding into the surrounding neighborhoods. In addition, 
+committee members will identify one location for a "dumpster day," in which a dumpster will be provided 
+to haul away significant quantities of waste that occupy public or heavily transited areas of the Southside. 
+Objective #5: By September 30, 2024, at least eight (8) neighborhood cleanups will be held at public 
+locations throughout the Southside. 
+Objective #6: By September 30, 2024, at least 75 Southside residents will participate in neighborhood 
+cleanups. 
+Green Space Maintenance and Preservation ($5,000) 
+Regular maintenance is required to ensure that the physical improvements achieve their original goals in 
+the areas of neighborhood beautification and placemaking. On an annual basis, Lopes International Park 
+requires grass cutting, weeding, shrub pruning and snow removal. CADCB contracted with the owner of 
+the land several years ago, with the agreement that CADCB would continue to maintain the park in 
+exchange for use of the land. This project will ensure regular maintenance of public spaces including parks 
+and community gardens as well as engaging residents to adopt a local park or segment of the Greenway. 
+Funding will purchase materials needed by residents to maintain beautification and maintenance of parks. 
+Objective #7: By September 30, 2024, Lopes International Park and Tranquility Park will be maintained 
+throughout the 2023-2024 program year. 
+Objective #8: By September 30, 2024, at least 50 plants or shrubs will be installed. 
+Objective #9: By September 30, 2024, at least two (2) community gardens in south Bethlehem will be 
+expanded and improved. 
+Objective #10: By September 30, 2024, at least 30 children and youth will be engaged to participate in 
+enrichment activities at a community garden.  
+Greenway Healthy Fresh Produce ($5,000) 
+The Kellyn Foundation has been serving the Southside with fresh local and non-local produce since 2016. 
+Through their Mobile Market, they have provided a source of nutritious food to south Bethlehem residents 
+by operating on the South Bethlehem Greenway. In the coming year, Kellyn will initiate the coordination 
+of a larger South Bethlehem Community Market, engaging local vendors and community members. The 
+expanded market will provide additional support for combating food insecurity and increase non-resident 
+visits to the Southside, increasing foot traffic for local businesses.
+
+Objective #11: By September 30, 2024, an expanded South Bethlehem Community Market will be planned. 
+Greenway Public Mini Meadows ($5,000) 
+This project will create public gardens along selected areas of the South Bethlehem Greenway. These areas 
+are currently occupied by weeds and brush that are difficult to maintain throughout the year. Installing a 
+public mini meadow will beautify the space and provide a location for residents to gather and interact with 
+plants and wildlife. Abundant flowers, a variety of textures, trees providing shade, and low-maintenance 
+design will help to maximize the garden’s impact on the community.  
+Objective #12: By September 30, 2024, one (1) mini meadow will be installed along the South Bethlehem 
+Greenway. 
+Parham Park Landscaping ($13,500) 
+This project will provide landscaping improvements at Parham Park on Fourth Street between Taylor and 
+Polk Streets. Parham Park, situated adjacent to Touchstone Theatre, serves as a connecting pathway from 
+Fourth Street, a main thoroughfare, to the Greenway's outdoor stage. The landscaping improvements aim 
+to enhance the aesthetics of the park, creating an inviting and vibrant atmosphere that encourages 
+pedestrians to utilize the space. By beautifying the park, the project will improve pedestrian’s sense of 
+safety, increasing walkability and foot traffic. Additionally, the enhanced landscaping will help promote 
+the use of the outdoor stage as a versatile venue for events, further enhancing the community's 
+engagement with the park. 
+Objective #13: By September 30, 2024, Parham Park will undergo landscaping improvements beautifying 
+the space and increasing walkability.  
+Plant Therapy is Real ($6,750) 
+The “Plant Therapy is Real” program aims to promote personal wellness through the practice of plant care. 
+By integrating nature and greenery into our living spaces, individuals can experience numerous benefits 
+such as stress relief, anxiety reduction, and improved mood. Exposure to greenery has proven to evoke 
+happiness, abundance, and relaxation. This initiative will provide plant therapy sensory spaces in three 
+affordable housing communities and workshops on the benefits of plant therapy. Subsequent months will 
+feature repeat plant therapy and wellness sessions, encouraging participants to embrace both indoor and 
+outdoor green spaces, with added physical activities to promote mindfulness and exercise. 
+Objective #14: By September 30, 2024, at least three (3) plant therapy sensory spaces will be installed in 
+affordable housing communities. 
+Objective #15: By September 30, 2024, at least three (3) workshops will be held to teach the benefits of 
+plant therapy and green spaces. 
+Saturdays in the Park ($5,000) 
+The Saturdays in the Park program aims to address the lack of access to quality mental health care and 
+support in the community. Recognizing that the demand for mental health care exceeds the available 
+infrastructure, the program focuses on prevention and strengthening protective factors for individuals 
+experiencing high levels of stress, anxiety, depression, and trauma. The project organizes regular pop-ups 
+in community green spaces, offering community members opportunities to reduce stress, foster 
+connections, develop skills, and access community resources.
+
+Objective #16: By September 30, 2024, at least seven (7) pop-up workshops will be held in local parks. 
+Southside Ambassadors Extension ($25,000) 
+This project will continue funding for the Southside Ambassadors extension area from Taylor Street to 
+Hayes Street along the Fourth Street “4 Blocks International” business corridor, in addition to the north-
+south side streets between Third and Fourth Streets. For years, business owners and residents complained 
+about trash and leaf debris along Fourth Street, and overgrown brush on side streets. Since January 2016, 
+the Southside Ambassadors have provided “clean” services to the extension area through Hayes Street. 
+From January through December 2017, the Southside Ambassadors removed 29,098 pounds of trash from 
+the extension area, and removed 39 instances of graffiti, made 292 contacts with business owners, and 
+provided 429 instances of hospitality assistance. A community meeting was held to gather feedback and 
+provide information to the extension area community about the Southside Ambassadors program, and 
+resident and business owner responses were overwhelmingly positive. Since then, the Southside 
+Ambassadors have invested in equipment to improve leaf and snow removal, installed cigarette butt 
+containers throughout the neighborhood, worked with businesses to remove trash cans from the street, and 
+taken care of pocket parks. 
+Objective #17: By September 30, 2024, the Southside Ambassadors Program will maintain the 
+neighborhood along Fourth Street between Taylor and Hayes streets, as well as along north-south side 
+streets between Third and Fourth streets. 
+Southside Community Gardening ($18,000) 
+Community gardens are a widely recognized strategy for improving urban food access, engaging 
+community members in collaborative projects that build community pride and preserving green spaces for 
+public use and enjoyment. However, successful community gardens require ongoing maintenance and 
+support from committed gardeners to function effectively. Through programming offered on a twice weekly 
+basis, community gardeners work to engage community members in learning the basics of gardening while 
+providing free produce to local residents. To support and expand community gardens during the 2023 
+growing season, funding will compensate a head gardener, as well as assist in purchasing equipment and 
+supplies needed to expand activities and educational opportunities. 
+Objective #18: By September 30, 2024, at least three (3) existing community gardens will be supported, 
+maintained, and developed as centers for education and community engagement.  
+Lynfield Community Center Garden ($8,517) 
+In order to foster ownership of public green space and combat food insecurity, the Lynfield Community 
+Center will refresh, plant, and tend its community and pollinator gardens. An additional composter and two 
+additional pollinator garden modules will be added this year to expand the capacity for residents to connect 
+with their shared green space and learn about the importance of pollinators and returning nutrients to the 
+soil. Youth attending the Lynfield Community Center summer activities will connect to this public green 
+space through education and activities surrounding the gardens. 
+Objective #19: By September 30, 2024, one (1) vegetable and pollinator garden will be planted and 
+maintained. 
+ 
+COMMUNICATION AND CONNECTIVITY ($55,233)
+
+“Big Plans!” Workshop Series ($4,000) 
+This project, “Big Plans!”, addresses vocational ambition and encouragement through the applied arts. The 
+goal of this project is to create an alternative option to the usual lectures, stories, and video presentations 
+on this subject. These events will offer a physical and personal approach to addressing the future workforce, 
+one that will become an important moment in the student’s life. Just as important is the effect public 
+testimony – in the form of poetry, theater, puppetry, and music – will have on the peer group audience 
+attending a culminating assembly program. The question-and-answer session following the student 
+performances will have a great impact on the students in the audience. 
+Objective #20: By September 30, 2024, at least two (2) schools on the Southside will be engaged to host 
+the Big Plans! series of workshops and public assembly program. 
+Objective #21: By September 30, 2024, at least 200 students will participate in an in-school workshop. 
+Change Agents: Community Pop-up Workshops ($5,000) 
+Starting in August 2024, Lehigh University Art Galleries (LUAG) will present “Change Agents”, the latest 
+in an ongoing series of community-centered public exhibitions. In addition to being displayed across 
+campus gallery spaces, this selection of diverse images and videos will be mounted on a series of billboards 
+along a 1.9-mile stretch of Bethlehem’s Greenway path. “Change Agents” is designed to engage viewers 
+around civic engagement– providing a platform for participants to share their perspectives and bringing 
+people together around key issues. Throughout the series, participants will explore strategies for making 
+meaningful change in their communities. 
+Objective #22: By September 30, 2024, at least eight (8) “Change Agent” pop-up workshops will be hosted 
+with community partners. 
+Objective #23: By September 30, 2024, at least 275 residents will participate in story-sharing and/or hands-
+on activities. 
+Community Building Events ($9,500) 
+This project will engage local residents and organizations to host and/or sponsor events such as block 
+parties, cultural celebrations, potlucks, etc. These events will include a festival, movie nights, and pop-up 
+events (spontaneous dance, arts, and sports parties that will “pop up” across the Southside). Events like the 
+ones proposed help build community and mitigate the effects of poverty. They will have a focus on building 
+a sense of belonging, pride, and fellowship among neighbors. The events will also serve to introduce 
+Southside residents and visitors to the businesses, restaurants, amenities, services, and programs available 
+in the community. 
+Objective #24: By September 30, 2024, at least four (4) block gatherings will be planned and facilitated.  
+Objective #25: By September 30, 2024, at least one (1) cultural event will be planned and facilitated. 
+Objective #26: By September 30, 2024, at least one (1) event identified by the community’s vision will be 
+planned and facilitated.  
+Objective #27: By September 30, 2024, at least 2,500 residents will be engaged in community building 
+events.
+
+Objective #28: By September 30, 2024, at least five (5) community organizations will partner with CADCB 
+to host community building events. 
+Community Meetings ($4,000) 
+CADB will hold a series of neighborhood meetings that will take place in the Southside community from 
+October 2023 to September 2024. These meetings aim to achieve several goals, including building 
+relationships among community members, raising awareness about opportunities for community 
+engagement, planning meetings and events based on community needs. In addition, these meetings will 
+gather feedback on community priorities for future projects and establish a leadership development pathway 
+for community members. To ensure accessibility, the meetings will be held at distinct locations within the 
+Southside community. Additionally, CADB staff will provide meals, childcare, and bilingual facilitation at 
+each meeting. 
+Objective #29: By September 30, 2024, a minimum of 150 south Bethlehem residents will participate in 
+neighborhood meetings. 
+Objective #30: By September 30, 2024, a minimum of ten (10) new south Bethlehem residents will become 
+engaged in project development and/or committees. 
+Fostering Intergenerational Connections among Southside Residents ($8,000) 
+This initiative aims to address the loss of intergenerational connections and community building in society 
+by facilitating conversation and interaction between individuals of different age groups and backgrounds. 
+The program operates within the Basilio Huertas Senior Center at the Hispanic Center Lehigh Valley, which 
+provides resources for seniors to stay active and independent. The program participants express a desire to 
+strengthen ties with the broader Southside community. This program will provide an opportunity for 
+students to engage with seniors at monthly themed events. These events will also provide education to all 
+participants regarding Hispanic/Latino traditions. 
+Objective #31: By September 30, 2024, at least ten (10) intergenerational community building events will 
+be held. 
+Objective #32: By September 30, 2024, at least 275 seniors and children will be engaged in 
+intergenerational community building events. 
+Lynfield Youth Summer Program ($9,233) 
+Lynfield Community Center will build on its successful youth summer programming during the months of 
+June, July, and August 2024. During these months students enjoy daily activities at the center, periodic field 
+trips, and educational programs all delivered by caring and positive role models. Youth also receive snacks 
+and meals during this programming. 
+Objective #33: By September 30, 2024, provide safe, educational summer programming to 35 youth 
+through partnerships with local youth serving organizations. 
+Push Ahead Lehigh Valley Skateboarding Program ($12,000) 
+Push Ahead Lehigh Valley is a skateboarding mentorship program that teaches fundamental skateboarding 
+skills, including riding, maintenance, safety, and skatepark etiquette. Beyond these physical aspects, the 
+program also focuses on fostering valuable social and emotional skills such as empathy and resilience.
+
+Understanding the significance of developing these emotional skills to self-regulate during challenging 
+times, adversity, and fear of failure is crucial for children. The Push Ahead program takes a unique approach 
+by allowing children to internalize these skills through the organic process of skateboarding, where they 
+learn to navigate self-doubt and overcome obstacles. Additionally, the program provides intentional tools 
+and a supportive environment that enables children to fully experience both challenges and victories, 
+building a sense of trust in themselves throughout the learning process.  
+Objective #34: By September 30, 2024, at least 20 Southside youth will participate in skateboarding 
+programming. 
+Youth Advisory Council ($17,000) 
+This project will support the creation of a youth-led committee of the NPP where youth can have a voice in 
+the decisions being made in their community and create programming that aligns with their interests. Youth 
+engagement and programming was a common theme through all avenues of community input, recognizing 
+the need for more activities, play spaces, and recreational opportunities. The Youth Advisory Council will 
+give youth and young adults the opportunity to share their voice, providing them with leadership, 
+organizational, and other positive skills useful to their personal and professional development. By investing 
+in the youth of Bethlehem, we are providing them with a platform to become invested in their own 
+community and giving them a seat at the table of decision-makers. 
+Objective #35: By September 30, 2024, at least ten (10) Southside youth, from ages 13 to 18, will be 
+recruited to participate in a Youth Advisory Council. 
+Objective #36: By September 30, 2024, at least one (1) sponsored youth-friendly event will be organized 
+and facilitated to showcase the interests of the Youth Advisory Council. 
+ 
+ORGANIZATION AND MANAGEMENT ($125,000) 
+Administration ($32,500) 
+NPP funds will support the cost of the administration of the Southside’s Tomorrow Neighborhood 
+Partnership Program through the efforts of Community Action Development Corporation of Bethlehem 
+(CADCB) and Community Action Lehigh Valley.  
+Objective #37: By September 30, 2024, CADCB and Community Action Lehigh Valley will continue to 
+provide proficient administration of the Neighborhood Partnership Program. 
+ 
+Implementation Team and Capacity ($92,500) 
+  
+NPP funds will be used to support (in part) the salary and fringes of the following persons: 
+  
+Director, Anna Smith, supervises the CADCB staff and manages the day-to-day activities of the office. Mrs. 
+Smith will provide staff support to CADCB’s Neighborhood Partnership Program.  
+  
+Community Organizer for the Southside, Samantha Mravlag, will support neighborhood community 
+development by working to expand residents’ capacity to collectively represent themselves as they seek
+
+incentives and resources to strengthen their neighborhoods. The Community Organizer for the Southside 
+will work with residents and key stakeholders to organize, build partnerships, and develop community 
+cohesion in order to advocate for the affordability of designated Southside neighborhoods. The Community 
+Organizer for the Southside will also serve as a liaison between residents and the City of Bethlehem to 
+support housing market stability and to ensure a vibrant public realm. The Community Organizer for the 
+Southside will provide staff support to CADCB’s Neighborhood Partnership Program.  
+  
+Office Coordinator, Jennifer Labrador, assists the director in event planning, including budgeting, 
+purchasing and promotion; and assists with updating social media, websites, and contact groups for 
+CADCB. In this work, Ms. Labrador prides herself on excellent customer service and works diligently to 
+provide the community with information. Ms. Labrador will provide staff support to CADCB’s 
+Neighborhood Partnership Program.
+
+Project Timeline for NPP Year 3 (Amended) 
+SCHEDULE OF ACTIVITIES 
+4th 
+Qtr. 
+2023 
+1st 
+Qtr. 
+2024 
+2nd 
+Qtr. 
+2024 
+3rd 
+Qtr. 
+2024 
+Complete at least two (2) façade improvements in targeted areas of 
+south Bethlehem.    X X 
+Engage 5,000 members of the Lehigh Valley community through 
+Festival UnBound’s programming.     X 
+Yield a net positive change in response to survey questions 
+regarding shifting perceptions of the Bethlehem community.    X 
+Forge channels of communication between previously siloed groups 
+within the Bethlehem community, as well as between community 
+members and decision-makers (such as local government 
+representatives and officials). 
+    X 
+Hold at least eight (8) neighborhood cleanups at public locations 
+throughout the Southside.    X X X 
+Engage at least 75 Southside residents in neighborhood cleanups. 
+  X X X 
+Install one deer fence at Martin Luther King Jr. Park. 
+ X 
+Maintain Lopes International Park and Tranquility Park throughout 
+the 2023-2024 program year.  X X X X 
+Install at least 50 plants or shrubs. 
+   X X 
+Expand and improve at least two (2) community gardens in south 
+Bethlehem.  X  X X 
+Engage at least 30 children and youth to participate in enrichment 
+activities at a community garden. 	X  X X 
+Plan for an expanded South Bethlehem Community Market. 
+X X X X  
+Install one (1) mini meadow along the South Bethlehem Greenway. 
+   X X  
+Perform landscape improvements to beautify Parham Park and 
+increase walkability.    X X 
+Install at least three (3) plant therapy sensory spaces in affordable 
+housing communities.   X X X
+
+Hold at least 3 workshops to teach the benefits of plant therapy and 
+green spaces.   X X X 
+Host at least seven (7) pop-up workshops in local parks. 
+   X  X 
+Disburse 2 mini grants to south Bethlehem residents to support tree 
+planting and other green neighborhood beautification efforts. X 
+Maintain the neighborhood along Fourth Street between Taylor and 
+Hayes streets, as well as along north-south side streets between Third 
+and Fourth streets through the Southside Ambassadors Program. 
+ X X X X 
+Support, maintain, and develop at least three (3) existing community 
+gardens as centers for education and community engagement. X  X X 
+Plant and maintain one (1) vegetable and pollinator garden. 
+ X  X X 
+Engage at least two (2) schools on the Southside to host the Big Plans! 
+series of workshops and public assembly program.  X X X  
+Engage at least 200 students to participate in an in-school workshop. 
+X X X  
+Host at least eight (8) "Change Agent" pop-up workshops with 
+community partners.    X X 
+Engage at least 275 residents in story-sharing and/or hands-on 
+activities.    X X 
+Plan and facilitate at least four (4) block gatherings. 
+ X X X X 
+Plan and facilitate at least one (1) cultural event. 
+X X X X 
+Plan and facilitate at least one (1) event identified by the community's 
+vision. 	X X X X 
+Engage at least 2,500 residents in community building events. 
+X X X X 
+Partner with at least ten (10) community organizations to host 
+community building events. 	X X X X 
+Engage a minimum of 150 south Bethlehem residents in 
+neighborhood meetings. 	X X X X 
+Involve a minimum of ten (10) new south Bethlehem residents in 
+project development and/or committees. 	X X X X
+
+Hold at least ten (10) intergenerational community building events. 
+X X X X 
+Engage at least 275 seniors and children in intergenerational 
+community building events. 	X X X X 
+Provide safe, educational summer programming to 35 youth through 
+partnerships with local youth serving organizations.    X X 
+Engage at least 20 Southside youth in skateboarding programming. 
+   X X 
+Recruit at least ten (10) Southside youth, aged 13 to 18, to participate 
+in a Youth Advisory Council.  X X X  
+Organize and facilitate at least one (1) sponsored youth-friendly event 
+to showcase the interests of the Youth Advisory Council. X X X  
+Continue to provide proficient administration of the Neighborhood 
+Partnership Program by CADCB and Community Action Lehigh 
+Valley.at least two (2) community gardens in south Bethlehem will be 
+expanded and improved.  
+X X X X
+
+Project Timeline for NPP Year 3 (Original) 
+ 
+SCHEDULE OF ACTIVITIES 
+4th 
+Qtr. 
+2023 
+1st 
+Qtr. 
+2024 
+2nd 
+Qtr. 
+2024 
+3rd 
+Qtr. 
+2024 
+Complete at least two (2) façade improvements in targeted areas of 
+south Bethlehem.    X X 
+Engage 5,000 members of the Lehigh Valley community through 
+Festival UnBound’s programming.     X 
+Yield a net positive change in response to survey questions 
+regarding shifting perceptions of the Bethlehem community.    X 
+Forge channels of communication between previously siloed groups 
+within the Bethlehem community, as well as between community 
+members and decision-makers (such as local government 
+representatives and officials). 
+    X 
+Hold at least eight (8) neighborhood cleanups at public locations 
+throughout the Southside.    X X X 
+Engage at least 75 Southside residents in neighborhood cleanups. 
+  X X X 
+Maintain Lopes International Park and Tranquility Park throughout 
+the 2023-2024 program year.  X X X X 
+Install at least 50 plants or shrubs. 
+   X X 
+Expand and improve at least two (2) community gardens in south 
+Bethlehem.  X  X X 
+Engage at least 30 children and youth to participate in enrichment 
+activities at a community garden. 	X  X X 
+Plan for an expanded South Bethlehem Community Market. 
+X X X X  
+Install one (1) mini meadow along the South Bethlehem Greenway. 
+   X X  
+Perform landscape improvements to beautify Parham Park and 
+increase walkability.    X X 
+Install at least three (3) plant therapy sensory spaces in affordable 
+housing communities.   X X X 
+Hold at least 3 workshops to teach the benefits of plant therapy and 
+green spaces.   X X X
+
+Host at least seven (7) pop-up workshops in local parks. 
+   X  X 
+Maintain the neighborhood along Fourth Street between Taylor and 
+Hayes streets, as well as along north-south side streets between Third 
+and Fourth streets through the Southside Ambassadors Program. 
+ X X X X 
+Support, maintain, and develop at least three (3) existing community 
+gardens as centers for education and community engagement. X  X X 
+Plant and maintain one (1) vegetable and pollinator garden. 
+ X  X X 
+Engage at least two (2) schools on the Southside to host the Big Plans! 
+series of workshops and public assembly program.  X X X  
+Engage at least 200 students to participate in an in-school workshop. 
+X X X  
+Host at least eight (8) "Change Agent" pop-up workshops with 
+community partners.    X X 
+Engage at least 275 residents in story-sharing and/or hands-on 
+activities.    X X 
+Plan and facilitate at least four (4) block gatherings. 
+ X X X X 
+Plan and facilitate at least one (1) cultural event. 
+X X X X 
+Plan and facilitate at least one (1) event identified by the community's 
+vision. 	X X X X 
+Engage at least 2,500 residents in community building events. 
+X X X X 
+Partner with at least ten (10) community organizations to host 
+community building events. 	X X X X 
+Engage a minimum of 150 south Bethlehem residents in 
+neighborhood meetings. 	X X X X 
+Involve a minimum of ten (10) new south Bethlehem residents in 
+project development and/or committees. 	X X X X 
+Hold at least ten (10) intergenerational community building events. 
+X X X X 
+Engage at least 275 seniors and children in intergenerational 
+community building events. 	X X X X
+
+Provide safe, educational summer programming to 35 youth through 
+partnerships with local youth serving organizations.    X X 
+Engage at least 20 Southside youth in skateboarding programming. 
+   X X 
+Recruit at least ten (10) Southside youth, aged 13 to 18, to participate 
+in a Youth Advisory Council.  X X X  
+Organize and facilitate at least one (1) sponsored youth-friendly event 
+to showcase the interests of the Youth Advisory Council. X X X  
+Continue to provide proficient administration of the Neighborhood 
+Partnership Program by CADCB and Community Action Lehigh 
+Valley.at least two (2) community gardens in south Bethlehem will be 
+expanded and improved.  
+X X X X
+--------------------
+Attached Document: 66fef88793e0b_CADCB---Southside-Tomorrow-Agreement-Letter-LPC.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

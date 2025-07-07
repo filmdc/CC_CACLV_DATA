@@ -1,0 +1,26 @@
+Purpose: <p>South Bethlehem Residential Facades improvement- $1,500 personnel, $28,500 construction for 2 facades</p><figure class="image"><img src="http://10.55.0.10/storage/776/image.png"></figure>
+Funder: 2021 Bethlehem CDBG-Southside Facades
+Program: CADB
+Amount: 30000.00
+Start Date: 2021-09-24
+End Date: 2023-12-31
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 641c7d060b3dc_Bethlehem-CDBG-CADCB-Facades-2021-UPDATED_Re-Signed-at-City's-request-11.15.2021-(1).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 641c7d093118e_2021CADCB_BethlehemCDBGSouthsideFacades_executedextension.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 66140e001fcd5_Amd-No.-3-CADCB-SS-Residential-Facades-PY2021.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

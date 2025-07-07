@@ -1,0 +1,500 @@
+Purpose: <p><strong>The funds are to be used for the following:</strong></p><p><strong>Expense</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>Budget Amount</strong>&nbsp;</p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 Refrigerators (x 750 each)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $1,500&nbsp;</p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 Stoves (x $650 each) &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $1,300&nbsp;</p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 Microwaves (x $65 each) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $130&nbsp;</p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Delivery &amp; Installation Fees&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $70&nbsp;</p><p><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TOTAL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $3,000&nbsp;</strong></p>
+Funder: Ruth P Seruga
+Program: SSS
+Amount: 3000.00
+Start Date: 2024-01-08
+End Date: 
+
+Notes: 
+
+Fund Number: F6320
+
+Attached Document: 659c2d50d37f4_2023SSS_RuthPSerugaTrust_AwardNotification.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 659c2d57bdabe_2023SSS_RuthPSerugaTrust_ProposalSubmitted.pdf
+LOGOUT
+Confirmation of Application Receipt:
+Your proposal was successfully submitted to Wells Fargo Philanthropic Services. No further
+action on your part is required and you can expect to receive notice of your proposal's
+status shortly. To print a copy of this completed application go to 'File', then 'Print' on your
+browser toolbar. Click here to return to the homepage when you are finished.
+Foundation Selection
+Grant Guidelines
+ 
+General Criteria and Limitations
+ 
+Communication
+ 
+Recommendations for the Application Process
+ 
+*Foundation----Ruth P. Seruga Trust
+ 
+Organization Information
+Tax Exempt Status Details
+ 
+Registered NameCOMMUNITY ACTION COMMITTEE OF THE LEHIGH VALLEY
+INC 
+Tax ID231669589 
+
+Organization Tax Status----170(b)(1)(A)(vi)
+ 
+Tax Exemption Date10/03/2006 
+Tax Exemption Comments  
+Tax Exempt Status Note: 
+Organization Name and Mailing Address
+ 
+*Organization NameCommunity Action Committee Of The Lehigh Valley Inc 
+Also Known As/Doing
+Business As
+Community Action Lehigh Valley 
+*Organization CountryUnited States
+ 
+*Organization Address 11337 East Fifth Street 
+Organization Address 2 
+Organization Address 3 
+*Organization CityBethlehem 
+* Organization StatePennsylvania
+ 
+*Organization Zip/Postal
+Code
+18015 
+Organization Additional Details
+ 
+Physical Address 
+Website Addresshttp://https://www.communityactionlv.org/ 
+*Organization TypeHuman Services
+ 
+
+	
+Organization Details
+*Mission StatementThe mission of Community Action Lehigh Valley (CALV) is
+to improve the quality of life in the Lehigh Valley by
+building a community in which all people have access to
+economic opportunity, the ability to pursue that
+opportunity, and a voice in the decisions that affect their
+lives. The mission of the Sixth Street Shelter is to assist
+families experiencing homelessness secure safe housing
+through family-centered services, in-house programming,
+and referrals to community resources while advocating to
+end homelessness and housing insecurity in the Lehigh
+Valley. 
+*Fiscal Agent/Sponsor?Not Applicable
+ 
+Leadership, Staff, and Volunteers
+ 
+*Organization Leadership
+*Full Name *Position/Title	*Name of Employer
+Anna Barbosa	Board Member	Pinebrook Family Answers
+Karen Beck-Pooley	Board Member	Bethlehem Area School Dist
+Sandra Bieber	Board Member	Discover Lehigh Valley
+Kim Capers	Board Member	State Farm Insurance
+Louis Cinquino	Board President	Cinquino Direct
+Zachariah Cobrinik	Past President	Community Resident
+Yorman DeLaRosa	Board Member	Lehigh County
+
+	
+ 
+*Number of Paid Full Time
+Staff
+103 
+*Number of Paid Part Time
+Staff
+7 
+*Number of Volunteers1625 
+Current Fiscal Year Finances
+ 
+*Total Annual Budget$22,079,958.00 
+*Organization Budget Detail
+ 
+*Budget ChangesThere have been no significant changes in our current
+year budget since it was initially established. 
+*Administrative Expenses - %
+of Budget
+7% 
+*Budget Category	*Budget Amount
+Contracts – Program Related	$2,979,705.00
+Grants to other organizations	$215,000.00
+Inter-Agency Grants	$37,444.00
+Specific Assistance Individuals	$1,071,362.00
+Salaries & wages	$6,368,993.00
+Pension plan contributions	$385,365.00
+Employee benefits (not
+pension)
+$2,144,103.00
+
+	
+Prior Fiscal Year Finances
+ 
+*Fiscal Year End Date06/30/2022 
+*Tax Return Filed?Yes 
+Organization Revenue and Expenses
+ 
+*Revenue Worksheet
+ 
+*Expense Worksheet
+*Revenue Type *Revenue Amount
+Contributions and
+Grants
+$36,037,794.00
+Program Service
+Revenue
+$2,918,990.00
+Investment Income	$4,483.00
+Other Revenue	$6,073.00
+Total: 38,967,340.00
+*Expense Type *Expense Amount
+Program Services	$24,421,426.00
+Administration	$6,272,829.00
+Fundraising	$769,889.00
+
+	
+ 
+*Revenue Less Expenses$269,789.00 
+Organization Assets & Liabilities
+ 
+*Total Assets$20,978,264.00 
+*Total Liabilities$2,686,890.00 
+*Net Assets or Fund Balances$18,291,374.00 
+*Endowment Net Assets$0.00 
+Additional Finance-Related
+Comments
+ 
+Request Summary
+*Requested Amount$3,000.00 
+*Support TypeProject/Program Support
+ 
+*Project TitleSixth Street Shelter Kitchen Appliances 
+*Project/Program
+Description
+Funds would be used to install new kitchen appliances in
+two apartments at the Sixth Street Shelter. The funds would
+be used to purchase a new refrigerator, stove, and
+microwave for each apartment and to cover the necessary
+delivery and installation fees. Each family residing at the
+Shelter has their own apartment with a kitchen. On
+average, each apartment at the Sixth Street Shelter houses
+four to six families each year, and appliances must be
+replaced periodically. This will give families a clean and
+sanitary space to store fresh foods and prepare meals. 
+Other Expenses	$7,233,407.00
+Total: 38,697,551.00
+
+*Common Goals Mrs. Seruga wanted to help serve the needs of the citizens
+of Lehigh County, PA, where the Sixth Street Shelter is
+located. The Sixth Street Shelter provides an essential local
+program that addresses the specific needs of families with
+children that are facing homelessness. The Sixth Street
+Shelter is unique because it is the only shelter in the area
+where entire families of any configuration (including those
+with fathers and teenaged boys, multi-generational
+families, and those from the LGBTQ+ community) stay
+together in their own apartments. The Shelter's programs
+help families learn to stand on their own through its
+mission to provide the opportunity and direction for all
+people to become self-sufficient, productive members of
+the community. Specifically, the Shelter helps families set
+and reach their goals through intensive and effective case
+management, in-house programming, and referrals to
+appropriate services. 
+Demographics
+ 
+*Primary Program Area
+Served
+Human Services
+ 
+*Primary Geographic Area
+Served
+USA
+ 
+* Primary State ServedPennsylvania
+ 
+Primary County ServedLehigh County 
+*Primary Population
+Served
+Homeless
+ 
+*Primary Age Group ServedGeneral/Unspecified
+ 
+Demographics Comments The Eastern Pennsylvania Continuum of Care (CoC)
+manages the Coordinated Entry (CE) system for individuals
+experiencing or at imminent risk of homelessness in the
+region. The CoC reported 1,055 CE enrollments in Lehigh
+County in 2022, with the next highest county enrollment at
+
+533. This demonstrates the great need for homelessness
+services in Lehigh County.
+Last fiscal year, 52 families consisting of 197 people
+(including 123 children, 50 of whom were five and under)
+found refuge at Sixth Street Shelter. Many heads of
+households that the Shelter serves are unemployed or
+underemployed, or recipients of SSI and SSDI whose low
+incomes cannot support even what HUD has determined as
+Fair Market Rent for an apartment in the Lehigh Valley.
+Others have come to the end of their unemployment or
+welfare benefits and are poorly equipped educationally and
+vocationally to find jobs in a changing labor market. Some
+face additional challenges, such as a disability or
+experiencing domestic violence. 
+Request Details
+Primary Request Contact
+ 
+*Contact SalutationDr. 
+*Contact First NameJulie 
+Contact Middle Name/Initial 
+*Contact Last NameShoults 
+Contact Suffix  
+*Contact TitlePlanner 
+*Contact Phone Number484-893-1038 
+*Contact Email Addressplanner-SSS@caclv.org 
+Project Details
+ 
+*Project/Program ObjectivesThe Sixth Street Shelter assists families
+experiencing homelessness secure safe
+housing through family-centered services,
+
+in-house programming, and referrals to
+community resources while advocating to
+end homelessness and housing insecurity
+in the Lehigh Valley. Located in Center City
+Allentown, the property has 25 private
+apartments, a Family Resource Center,
+playground, and full-choice food pantry for
+residents. A stay at the Shelter enables
+families to begin to stabilize their income
+and address the problems that led to their
+homelessness. The Shelter provides each
+family with a fully furnished apartment and
+supportive services, including individualized
+case management. Staff work to connect
+them with the necessary resources to
+address their individual needs, such as
+financial literacy and parenting classes,
+access to childcare and healthcare, and
+mental health support. During their
+residency, the family develops a Family
+Service Plan with their caseworker, setting
+household, budgeting, educational, and
+vocational goals and seeking suitable
+housing and employment. Staff maintain
+contact with the family following their move
+into permanent housing to offer additional
+assistance and determine how well they are
+continuing to move toward self-sufficiency.
+In addition to the comprehensive services
+provided to Shelter residents, the Sixth
+Street Shelter has become a resource
+center for former residents and people
+from the surrounding neighborhood.
+For this project specifically, the objective is
+to provide a clean and healthy environment
+for our residents as they work towards their
+goals. This entails having the proper
+appliances in each apartment to support
+the residents' health and well-being. Each
+family residing at the Sixth Street Shelter
+has access to an on-site, full-choice food
+pantry and their own kitchen in their
+apartment so that they can store fresh
+
+foods and prepare their own meals. We
+collaborate with local partners and health
+professionals to offer educational sessions
+on healthy cooking and eating and on
+general wellness. Parents and children
+learn to cook alongside each other. These
+programs and services are essential
+because the negative health impacts of
+homelessness are well documented,
+including short- and long-term adverse
+health outcomes. According to the Housing
+Alliance of Pennsylvania, "Experiencing
+homelessness leads to new and
+exacerbates existing health problems,"
+through the lack of access to "clean water,
+refrigeration, shelter from the elements,
+and safety from harm." Long-term impacts
+include chronic illnesses, over-reliance on
+costly and acute health care services, and
+significantly higher morbidity. The National
+Low Income Housing Coalition cites that
+"People experiencing homelessness die on
+average 12 years sooner than people in the
+general population in the U.S." Housing is a
+key social determinant of health, as it
+influences one's mental and physical health,
+well-being and quality of life. By providing
+residents with shelter, a kitchen, food, and
+educational resources, we support them in
+developing healthier habits to improve their
+health and well-being, which ultimately
+supports their housing stability. 
+*Implementation PlanUpon receipt of funding, we would first
+place an order with Home Depot for the
+refrigerators, stoves, and microwaves we
+have selected. We have ordered appliances
+from them in the past, which will help to
+streamline the process. When the
+appliances arrive, we would ensure that
+they are properly installed in the
+apartments. We would follow up by
+inspecting the appliances periodically to
+
+confirm that they are safe and remain in
+good shape for each family's use. 
+*Measuring SuccessSuccess of this project will be measured by
+whether the appliances are purchased,
+delivered, and installed in the apartments
+within the grant timeline and within budget.
+More broadly, this project will contribute to
+reaching our overall performance targets
+for the Sixth Street Shelter in our current
+fiscal year: 1) At least 85 families will reside
+at the Shelter and develop Family Service
+Plans based on their housing, educational
+and financial goals; 2) 50% of families will
+save money toward rent or a security
+deposit upon leaving the Shelter; 3) 75% of
+families will achieve their Family Service
+Plan goals; 4) 100% of families will create a
+written budget to understand credit and
+money management as a part of their goal
+plan; 5) 20% of families will move into
+affordable housing upon leaving.
+Each year, a work plan is developed with
+measurable goals and performance targets
+that guide program activities. In order to
+measure effectiveness of services and
+outcomes, the work plan is evaluated twice
+yearly by the Program Development &
+Evaluation Committee of CALV's Board of
+Directors and is then approved by CALV's
+full Board. In addition, Sixth Street Shelter
+utilizes the Homeless Management
+Information System (HMIS) and ClientTrack
+to track and analyze participant data. The
+Shelter also tracks qualitative data to
+document the positive long-term impact of
+the Shelter in the community. Staff conduct
+follow-up evaluations with former residents
+that can be located at 3-, 6-, and 12-month
+intervals to ascertain their continued
+progress. 
+*CollaborationThe Sixth Street Shelter partners with many
+government entities and non-profit
+
+agencies to ensure that residents receive
+the services and gain the skills they will
+need as part of a comprehensive plan to
+help them to become self-sufficient. The
+Shelter has a nearly 30-year partnership
+with Lehigh County Office of Children and
+Youth Services, and many other local
+organizations contribute to programming
+for our residents. For instance, ESSA Bank
+leads financial literacy classes, CareerLink
+assists with job searches and resume
+writing, and Highmark Wholecare facilitates
+"Wellness Friday" sessions for both Shelter
+residents and community members. The
+Shelter is also a member of the Lehigh
+Valley Regional Homeless Advisory Board.
+The LVRHAB is a consortium of
+representatives from City and County
+governments, social service agencies,
+veterans support groups, faith-based and
+other community organizations, homeless
+advocates, homeless or formerly homeless
+people, representatives from legislators,
+and other interested parties with the
+mission to prevent and end homelessness
+in the Lehigh Valley. 
+*Project/Program BackgroundSince 1984, the Sixth Street Shelter, a
+program of Community Action Lehigh
+Valley, has been offering services to help
+prepare families for the challenges of a
+difficult job and rental market that too often
+result in homelessness. It is the only family
+shelter in the region that admits families of
+any configuration (with at least one child
+under 18) and houses them in their own
+private apartments. The Sixth Street Shelter
+has proven to be a vital resource in the
+community, and while it has been operating
+for almost 40 years, the program has
+adapted to the changing needs of the
+community. For instance, there is currently
+a severe shortage of available, affordable
+housing units locally, and landlords have
+
+been very selective in whom they rent to.
+Our caseworkers report that they struggle
+to find housing for their clients despite
+having rental assistance and supportive
+services available. This means that
+residents are experiencing longer stays in
+the Shelter before moving into permanent
+housing. We recently added a Housing
+Innovation Specialist to our staff to work
+with our residents and local landlords in
+order to identify affordable housing options
+and facilitate faster placements for families.
+We have also been expanding our
+educational and vocational programming at
+the Sixth Street Shelter to increase
+residents' earning capacity, which will help
+them to remain stably housed when they
+move out of the Shelter and into
+permanent housing.  
+Timeline
+ 
+*Project/Program Start Date11/01/2023 
+*Project/Program End Date01/31/2024 
+Project/Program TimelineFunds will be expended within three
+months of receipt. While supply chain
+issues might arise, delaying delivery of the
+items, we plan to place an order and pay for
+the appliances once we receive funding. 
+Project Finances
+ 
+*Total Project Budget$3,000.00 
+Project Budget Detail Worksheet
+*Expense	*Budget Amount
+Refrigerator	$750.00
+
+	
+ 
+*Other Project FundingThe Ruth P. Seruga Trust is one of the first
+organizations we have approached with this
+specific request for kitchen appliances.
+Given the need at the Shelter to replace
+appliances in multiple units beyond the two
+requested here, we have also applied to the
+Dermody Properties Foundation and the
+Kentucky Fried Wishes Program for
+additional funds for appliances. Those
+applications are still pending. If we are not
+successful, we will approach other
+foundations until we are able to obtain the
+funds necessary to replace these appliances
+and provide a clean, safe, and healthy
+environment for every family that resides at
+the Sixth Street Shelter. 
+Technical Support
+PRIVACY, Cookies, Security & Legal   |   Notice of Data Collection   |   Contact Us   |   Search for Foundations   
+© 2023 Wells Fargo Bank, N.A. | WCR-0322-00247
+g
+Refrigerator	$750.00
+Stove	$650.00
+Stove	$650.00
+Microwave	$65.00
+Microwave	$65.00
+Delivery & Installation Fees	$70.00
+--------------------
+Attached Document: 659efe31a4d2c_2024SSS_Ruth-P-Seruga-signed.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

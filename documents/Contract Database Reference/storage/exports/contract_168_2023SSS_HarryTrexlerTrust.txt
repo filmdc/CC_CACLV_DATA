@@ -1,0 +1,21 @@
+Purpose: <p>Salary and Fringe Benefits for Casework and supportive services.</p>
+Funder: Harry Trexler Trust
+Program: SSS
+Amount: 20000.00
+Start Date: 2023-05-05
+End Date: 
+
+Notes: <p>-Restricted grant (Needs a fund code)</p><p>-Stewardship Report due by November 1st, 2023</p><p>Reporting form to be found at the site below:</p><p><a href="https://trexlertrust.org/">Home – Harry C. Trexler Trust</a></p>
+
+Fund Number: 1215
+
+Attached Document: 645568eb72dab_2023SSS_HarryTrexlerTrust_executed-contract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6499d849cbbf6_Trexler-Trust-Court-of-Common-Pleas.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

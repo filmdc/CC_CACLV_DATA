@@ -1,0 +1,16 @@
+Purpose: <p>SHFB Warehouse HVAC Upgrades, salary, labor, supplies, permits, construction, renovation, air conditioning installation.</p>
+Funder: High Foundation
+Program: SHFB
+Amount: 30000.00
+Start Date: 2023-01-12
+End Date: 
+
+Notes: <p>The High Foundation is asking for the following:</p><ol><li><strong>Mission Statement &amp; Success Story</strong> | In approximately 100 words summarize your mission and include any success stories.</li><li><strong>Testimonial</strong> | A testimonial from your leadership about the impact of your work due to your partnership with the High Foundation.</li><li><strong>3-5 High Resolution Photos </strong>| These photos should tell the story of the High Foundation funding in action. Please note that all photos must have signed photo releases on file.</li></ol><p>How to upload content</p><p><a href="https://app.smartsheet.com/b/form/94ec8a7a2b294661a2287d9918b7fb5e">Community Partner Content Request (smartsheet.com)</a></p><p>This is a lump sum grant.&nbsp;</p><p>Deadline</p><ul><li><strong>Friday, April 21, 2023</strong></li></ul>
+
+Fund Number: 
+
+Attached Document: 6419ac3a15c68_2023SHFB_HighFoundation_AwardNotification.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

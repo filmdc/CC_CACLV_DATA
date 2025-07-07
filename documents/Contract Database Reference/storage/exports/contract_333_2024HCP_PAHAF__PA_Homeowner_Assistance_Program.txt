@@ -1,0 +1,16 @@
+Purpose: <p>-Agreement in reference to the HCA Master Agreement (2022- MCA-054)</p><p>-See eligibility requirements <strong>page</strong> <strong>4 section "Eligible Homeowners"</strong> and <strong>page 5 section " Eligible Expenses"</strong></p><p>-See<strong> page 7 section "Housing Counseling Agencies" </strong>for roles and responsibilities of HCP.</p><p>-Eligible counseling hours = 4 hours of counseling per client (one Houshold = 1 client)</p><ul><li>Time spent completing HEMAP application is not eligible for reimbursement</li></ul>
+Funder: PAHAF
+Program: HCP
+Amount: 0.00
+Start Date: 2024-05-01
+End Date: 
+
+Notes: <p>-Request for payment requires PAHAF one -on-one invoice in excel format and PAHAF report from RX office in excel format. PAHAF application must be submitted for the client prior to request for reimbursement. Reimbursement in 1 hours increments at $100 per hour.</p>
+
+Fund Number: F0603
+
+Attached Document: 6638d7aea7654_2024HCP_-PAHAF_-PA-Homeowner-Assistance-Fund.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

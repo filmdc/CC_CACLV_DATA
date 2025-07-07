@@ -1,0 +1,457 @@
+Purpose: <p><strong>Purpose:</strong> Wayne County has awarded SHFB a CDBG grant for $39,993.00 for the purchase of fresh food for Wayne County. This is a <strong>reimbursable grant</strong> with the grant period running from May 9,2024 - August 31, 2025. Food will be distributed to partner agencies serving Wayne County.</p><p>Fresh food includes dairy, meat, eggs, fruits, and vegetables. Whenever possible, fresh food shall be procured from farmers located in Pike County.</p><p>Food pantries serviced with CDBG funds must prepare and submit a letter on letterhead stating they will collect a Self Declaration of Need form from each individual served and that no food or non-food items purchased through this grant will be distributed to individuals who have not completed a Self Declaration of need form or who are deemed ineligible due to income. A template for this letter can be found in Exhibit B of the contract attached.</p><p><strong>Reports </strong>are due bi-monthly, according to the chart below. Completed reports should be sent to Katie Blake at Hailstone Economic, LLC which administers the CDBG funds: kblake@hailstoneeconomic.com</p><figure class="image"><img src="http://10.55.0.10/storage/1159/image.png"></figure><figure class="image"><img src="http://10.55.0.10/storage/1160/image.png"></figure>
+Funder: Wayne County
+Program: SHFB
+Amount: 39993.00
+Start Date: 2024-09-24
+End Date: 2025-08-21
+
+Notes: 
+
+Fund Number: F8084
+
+Attached Document: 66f30582d38bd_2024SHFB_WayneCounty-CDBG.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 674f0c36095e1_2023_SHFB_WayneCoCDBG_ProposalSubmitted.pdf
+Wayne County has received your CDBG application
+Jotform <noreply@jotform.com>
+Thu 7/20/2023 2:04 PM
+To:planner-SHFB <planner-shfb@caclv.org>   
+1 attachments (11 KB)
+5656854601421545720_signature_8.png;
+Some people who received this message don't often get email from noreply@jotform.com. Learn why this is important
+ 
+ 
+Wayne County Community Development Block Grant
+Application FFY2023
+ 
+Name of Applicant (i.e.
+Municipality, Nonprofit
+Organization)
+Second Harvest Food Bank of the Lehigh
+Valley and Northeast Pennsylvania
+Mailing Address Street Address: 6969 Silver Crest Road
+City: Nazareth
+State / Province: PA
+Postal / Zip Code: 18064
+Contact Person Allison Czapp
+Phone Number (484) 287-4015
+Email	planner-shfb@caclv.org
+Tax ID# (EIN) 23-1669589
+President or ChairpersonLouis Cinquino
+Project/Activity NameIncreasing Food Access in Wayne County
+Total Project/Activity
+Budget
+105000
+Amount of Funding
+Requested
+60000
+Provide a brief
+description and history of
+your
+municipality/organization.
+Community Action of the Lehigh Valley
+(CALV) was established in 1965 as a part of
+Lyndon B. Johnson’s War on Poverty.  The
+mission of CALV is to improve the quality of
+life in the Lehigh Valley by building a
+community in which all people have access
+to economic opportunity, the ability to
+pursue that opportunity, and a voice in the
+decisions that affect their lives. Today, CALV
+operates 13 programs and 3 subsidiary
+corporations. As a Community Action
+Agency (CAA), CALV is committed to
+ensuring that the community plays an active
+role in identifying needs, developing, and
+implementing solutions to improve the
+ 
+
+quality of life in the region. Toward that end,
+CAAs have a tripartite Board of Directors
+comprised of at least one-third of its
+members from the low-income community,
+one-third from the public sector, and one-
+third from the private sector.
+The mission of Second Harvest Food Bank of
+the Lehigh Valley and Northeast
+Pennsylvania, a program of Community
+Action Lehigh Valley, is to obtain food and
+distribute it to people in need through area
+non-profits and to provide resources for
+education and advocacy to end hunger. We
+provide nutritious food, offer nutrition
+education, advocate to end food insecurity,
+dismantle barriers to create access, and work
+to attain food justice. We respect and
+preserve the dignity of each of our
+neighbors.
+Second Harvest began its mission to end
+food insecurity in 1982, as the Lehigh Valley
+Food Bank. Initially, distributions were made
+from the back of a rented truck to a network
+of about 15 nonprofit agencies. Since
+September 2015, Second Harvest Food Bank
+has been operating from a 65,000 square-
+foot warehouse in East Allen Township.
+Today, Second Harvest distributes 14+
+million pounds of food a year to 200+
+nonprofit agencies across Carbon, Lehigh,
+Monroe, Northampton, Pike, and Wayne
+Counties.  Last year, 41% of this food was
+fresh produce, perishable protein, and fresh
+dairy, and 1.9 million pounds of food was
+rescued from ending up in a landfill. Second
+Harvest also assists people with SNAP
+(Supplemental Nutrition Assistance Program)
+applications; offers nutrition education to
+promote self-sufficiency and positive health
+outcomes; provides supplemental food to
+nearly 2,500 low-income seniors each month;
+distributes supplemental food to
+approximately 560 military households a
+month; and operates an incubator farm to
+help train a new generation of farmers while
+also increasing the amount of fresh food in
+the local economy.
+Collectively, the Second Harvest network
+
+serves more than 100,000 people each
+month. The pantries within the Second
+Harvest network are operated almost solely
+through the work of community volunteers.
+Our food distribution is a model of
+neighbors helping neighbors.
+Provide a brief
+description of the
+project/activity.
+Second Harvest Food Bank is committed to
+providing the resource of food to people
+who need it, with an emphasis on more
+nutritious, fresh options. We know that the
+first thing cut from a household budget
+when funds are tight are healthy foods
+(including fresh fruit and vegetables, eggs,
+milk and other dairy, and meat), which are
+more expensive than their highly processed
+counterparts. Food insecurity and poverty
+are social determinants of health and poor
+health outcomes make it nearly impossible
+for people to thrive. According to the Food
+Research and Action Center (FRAC), “people
+living in or near poverty have
+disproportionately worse health outcomes
+and less access to health care than those
+who do not.”
+Feeding America estimates that there are
+over 5,140 food insecure people in Wayne
+County, which is 10% of the population. Data
+from Second Harvest last fiscal year indicates
+that we served 2,768 Wayne County
+residents. That means we are potentially only
+reaching roughly 50% of people who need
+food assistance. We strive to expand our
+reach and provide more fresh, nutritious
+foods to the people who need it most.  
+As part of our larger nutritional strategy,
+Second Harvest recently developed and
+implemented a Food and Nutrition policy
+based on Healthy Eating Research (HER)
+guidelines (which were created in
+partnership between the Robert Wood
+Johnson Foundation, Duke University, and
+the charitable food network). These
+guidelines prioritize and deprioritize food by
+categorizing them as “choose often”,
+“choose sometimes”, and “choose rarely”.
+Second Harvest will place an emphasis on
+sourcing from local Wayne County growers
+and producers when possible. We currently
+partner with the following Wayne County
+
+growers and producers to bring fresh, local
+foods to our food pantries: Valley View Farm,
+Willow Wisp Organic Farm, Lato Sud Farms,
+and Creamworks Creamery, Inc. Funds from
+the Wayne County CDBG program will allow
+us to strengthen these partnerships to bring
+more fresh foods to people in need.
+Wayne County CDBG funds will be used to
+purchase and distribute fresh, nutritious food
+to our pantry network in Wayne County.
+Fresh Food Purchase: $40,000
+Agency Relations Coordinator Salary and
+Fringe: $10,000
+Warehouse Worker/Driver Salary and Fringe:
+$5,000
+Fuel Expense: $5,000
+Total Request: $60,000
+What specific community
+needs does this
+project/activity address?
+This project addresses food insecurity of low-
+income members of the community. The
+need in Wayne County is great. In 2021, data
+from Feeding America’s Map the Meal Gap
+indicated that 5,140 people, or 10% of the
+population in Wayne County was facing food
+insecurity; that number increased to 12.7%
+for children.
+Populations facing food insecurity are
+strongly correlated with those that have
+been impacted by systemic racism and
+economic exploitation. The food insecurity
+rate across Wayne County is higher for Black
+(14%) and Hispanic (19%) individuals, as
+compared to their white counterparts (8%).
+A pre-pandemic study found that following
+the USDA’s MyPlate Dietary Guidelines
+would cost a family of four between
+$1,000-$1,200 a month ($12,000-$14,400
+annually) depending on the age of the family
+members. For a comparison, the average
+middle-income family in the United States
+spends roughly $6,224 on food each year
+with the average lower-income family
+spending even less at roughly $3,862 per
+year. Eating healthy food consistently is
+simply out of reach for many families.
+Inflation continues to have a devastating
+impact. According to the USDA, the cost of
+groceries rose 11.8% from December 2021 to
+
+December 2022. The cost of specific items
+rose even higher – the price of eggs
+increased by 60%.
+The Second Harvest network of member
+agencies continues to serve historic volumes
+of people – currently 100,000+ each month.
+Elevated food prices have caused many
+families to turn to the charitable food
+network for the first time. And often, the only
+fresh, healthy foods that a family consumes
+come from our food pantries - they simply
+do not have access otherwise. Second
+Harvest plays an integral role in ensuring all
+people have access to the healthy foods
+needed to thrive.
+What specific geographic
+area does this
+project/activity serve?
+This project will serve Wayne County.
+According to the U.S. Census’ 2021 American
+Community Survey 5-Year Estimates, the
+population of Wayne County is 51,173 and
+11% of people (and 15% of children) live in
+poverty and 12% have relied on SNAP
+benefits in the previous twelve months.
+ALICE (Asset Limited, Income Constrained,
+Employed) data paints a stark picture,
+indicating that in 2021, 37% of families in
+Wayne County were struggling to survive
+(ALICE focuses on working families and the
+perilous gap between thriving and surviving).
+The Massachusetts Institute of Technology
+Living Wage Calculator indicates that a living
+wage in 2021 for a Wayne County household
+consisting of one adult and two children is
+$33.78 an hour ($70,262 annually). Median
+household income in Wayne County is
+$56,744, which illustrates the gap between a
+living wage and not being able to afford
+nutritious food and other necessities,
+including appropriate housing and proper
+clothing.
+Who is eligible to benefit
+from this project? How
+are participants and the
+public educated and
+informed about the
+project/activity? How
+many people will benefit?
+Anyone in need of food for themselves or
+their families is eligible to benefit from this
+project. Food distribution will occur
+throughout the county, so, at a minimum,
+the 2,768 people currently served each year
+by Second Harvest’s network of member
+pantries in the County will benefit.
+Feeding America’s Map the Meal Gap
+
+estimates that in 2021, 10% of the
+population in Wayne County was food
+insecure, so it is reasonable to estimate that
+over 5,140 people have the potential to
+benefit from this project.
+Second Harvest provides outreach and
+marketing via billboards, yard signs, website,
+social media, Find Food outreach materials,
+SNAP outreach materials, and, perhaps most
+strongly, through word of mouth.
+What are the specific
+goals of this
+project/activity?
+Last year, Second Harvest distributed
+152,000 pounds of fresh produce, perishable
+protein, fresh dairy, and eggs in Wayne
+County. During the term of the grant, Second
+Harvest will continue the distribution of
+these “choose often” foods (as defined in the
+HER guidelines described above) by our
+pantry network in Wayne County.
+In the last fiscal year, Second Harvest served
+2,768 people in Wayne County. We will
+continue to provide fresh foods to the
+people of Wayne County to ensure that
+everyone has access to the nutritious foods
+needed to keep themselves and their families
+healthy.
+List all other funding
+related to the
+project/activity.
+Funding SourceAmount
+Committed
+or
+Requested
+USDA’s Local Food
+Purchase
+Assistance
+Cooperative
+Agreement
+Program
+5000 committed
+Pennsylvania
+Agricultural
+Surplus System
+15000committed
+Local
+Contributions
+25000committed
+Who will be responsible
+for administration of this
+grant? Describe your
+staff's and organization's
+experience managing
+federal funding or similar
+projects.
+This grant will be administered by Second
+Harvest’s Director, Allison Czapp, who joined
+Second Harvest in March 2022. Ms. Czapp
+provides oversight to all aspects of Second
+Harvest’s operation. Under her leadership,
+Second Harvest has sharpened our focus on
+reducing barriers and providing food when,
+where and how people need it – a more
+
+client-centric and data-driven approach to
+food banking.
+Bradley Holub serves as Second Harvest’s
+Food Sourcing Coordinator. He is
+responsible for managing the acquisition of
+food, including the purchase of fresh foods,
+for all programs of Second Harvest.
+Ms. Czapp and Mr. Holub have experience in
+administering the USDA’s TEFAP (The
+Emergency Food Assistance Program), LFPA
+(Local Food Purchase Assistance Cooperative
+Agreement Program), and Commodity
+Supplemental Food Program (CSFP) grants
+and Pennsylvania Department of
+Agriculture’s State Food Purchase Program
+(SFPP) and Agriculture Surplus System
+(PASS).
+Which of the following
+CDBG objectives does
+this project meet?
+Benefit low- and moderate-income
+individuals
+Explain how the
+project/activity meets this
+CDBG objective.
+This project meets the CDBG objective of
+“Benefit to low- and moderate- income (LMI)
+persons,” specifically “persons who use food
+banks or meal programs” by providing
+access to nutritious food to people
+experiencing food insecurity.
+When will the project
+begin and end? What are
+the key milestones for
+this project? 
+Second Harvest operates on a July 1-June 30
+fiscal year. The distribution of food is
+ongoing and will continue throughout the
+grant period. The key milestones of the
+program will be primarily quantitative –
+number of people served and pounds of
+food distributed.
+For public services only: Is
+this a new program or
+service, or will there be a
+25% increase in people
+served?
+25% increase in people served
+Do your facilities, policies,
+and operations comply
+with the Americans with
+Disabilities Act?
+Yes
+Upload Articles of
+Incorporation (nonprofit
+organizations)
+CACLV Articles of Incorporation.pdf
+Upload IRS
+Determination Letter
+501c3 - CACLV.pdf
+
+(nonprofit organizations)
+Upload Most Recent
+Audit or Review
+CACLV Financial Report 06-30-21 (Final) with
+disclosure.pdf
+Upload Documentation
+of General Liability
+Insurance
+CACLV-Insured Copy.pdf
+Upload Documentation
+of Workers'
+Compensation Insurance
+CALV WC Insurance.docx
+Upload Documentation
+of Fidelity Bond Coverage
+ACORD Forms.pdf
+Upload Detailed
+Project/Activity Budget
+and/or Cost Estimate
+SHFB Wayne CDBG Budget.pdf
+Upload Current Municipal
+or Organizational Annual
+Budget
+SHFB FY24 Budget.pdf
+Upload Resolution or
+Meeting Minutes
+Showing 1) Name of
+Person Authorized to
+Submit Application; 2)
+Amount of Funding
+Requested; and 3)
+Purpose of Funding
+CALV Board Resolution Wayne CDBG.pdf
+Upload Board of
+Directors List (nonprofit
+organizations)
+CALV BoD 6.24.23.docx
+Signature
+Name	Dawn Godshall
+Title	Executive Director
+Today's Date 07/20/2023
+  	 
+ 	 
+Now create your own Jotform - It’s free! Create a Jotform
+ 
+|
+| ,
+T: | F:
+--------------------

@@ -1,0 +1,21 @@
+Purpose: <p>The Clif Family Foundation has awarded a $15,000 grant to The Seed Farm for general operating purposes. The grant period begins on 12/18/2023 and ends 12/18/2024. The Foundation will send information regarding the final report to the <a href="mailto:planner-shfb@caclv.org">planner-shfb@caclv.org</a> email. Last year the Foundation requested a general Seed Farm <a href="https://caclv.sharepoint.com/:b:/s/SecondHarvestFoodBank/EYKNuEp_XYtAoKBJPY6hZJQBALrQxoJvuQEPg7EfDqDksA?e=GLtfU3">Impact Statement</a> as the final report.</p><p>This is a lump sum award and is unrestricted.</p><p>The email linked below contains important information regarding the Clif Family Foundation's support of The Seed Farm.</p><p>&nbsp;</p>
+Funder: Clif Family Foundation
+Program: SHFB
+Amount: 15000.00
+Start Date: 2023-12-18
+End Date: 2024-12-18
+
+Notes: 
+
+Fund Number: 8040
+
+Attached Document: 6582ef3a8bea4_2023SHFB_CLifFamilyFoundation.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6582fb7d37b25_Clif-Family-Foundation-2023-Award-Email.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

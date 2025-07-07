@@ -1,0 +1,16 @@
+Purpose: <p>-To be used to purchase a sofa/loveseat for the SSS</p>
+Funder: Leona Gruber Trust
+Program: SSS
+Amount: 1000.00
+Start Date: 2023-10-09
+End Date: 
+
+Notes: <p>-No report required</p>
+
+Fund Number: 
+
+Attached Document: 652409b98d008_1598_001.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

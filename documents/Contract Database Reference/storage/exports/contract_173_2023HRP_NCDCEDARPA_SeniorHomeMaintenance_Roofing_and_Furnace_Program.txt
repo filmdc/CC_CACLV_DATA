@@ -1,0 +1,21 @@
+Purpose: <p>-Maintenance on 12 Senior Homes to include roof replacements, heating units, electrical panel/circuit breaker, removal of mold and mildew from leaky roofs and mobility concerns.&nbsp;</p><p>-Budget-$250,000 for Rehabilitation and Renovation-<strong>from this we may invoice, using the term "Program Delivery", 15-20% for HRP staff that deal directly with the project and up to 5% for admin. such as fiscal staff, compliance, etc...</strong></p>
+Funder: NC DCED ARP
+Program: CAH
+Amount: 250000.00
+Start Date: 2023-05-18
+End Date: 2025-12-31
+
+Notes: <ul><li>This is a reimbursable grant.</li><li>Adherence to Domestic Content Procurement Preference (page 5)</li><li>Open and Competitive Bidding Requirements (Page 5 Section 21-26)</li><li>Fiscal Year audit results to be sent to DCED</li><li>HUD Forms at the end of the contract to be used in cases of contracts more than $24,999.</li><li>There are no reports due for this contract although&nbsp;detailed case files to be kept on each project and should include Environmental Clearance and Income Eligibility Review</li></ul>
+
+Fund Number: F2985
+
+Attached Document: 647a031785636_2023HRP_NCDCEDARP_SeniorHomeMaintenanceProgram_executedcontract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6536aa8c83bb5_HRP_2023NCDCEDARP_SeniorHomeMaintenanceProgram_executedcontract-(1).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

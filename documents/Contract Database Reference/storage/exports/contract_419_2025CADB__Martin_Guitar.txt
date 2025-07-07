@@ -1,0 +1,106 @@
+Purpose: <ul><li>CADB General operating</li></ul>
+Funder: Martin Guitar Foundation
+Program: CADB
+Amount: 10000.00
+Start Date: 2024-12-16
+End Date: 
+
+Notes: <p>-One page report due by November 21, 2025:&nbsp;</p><ul><li>Last year's report submitted is attached for reference</li><li>Foundation Guidelines attached also provide information as to what needs to be included in the report.</li></ul>
+
+Fund Number: 8000
+
+Attached Document: 67867f285685b_2025CADB_-Martin-Guitar.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6787c32518926_Martin-Guitar-FY24-25-Report.docx
+REPORT TO THE MARTIN GUITAR CHARITABLE FOUNDATION – FY23-24
+Year-End Evaluation of Annual Work Plan 2023-2024
+Community Action Development Bethlehem
+Goal 1: Serve the Bethlehem community as a community hub for information and referral services, neighborhood advocacy, and community problem-solving:
+Performance Outcomes:
+128 Bethlehem residents received information and referral services.
+16 residents were referred to New Bethany&#039;s Housing Advocate program for rental assistance and/or housing search support.
+111 south Bethlehem residents were engaged in neighborhood meetings to identify and discuss community concerns.
+CADB staff have participated in 8 initiatives external to the organization including the Most Beautiful Lehigh Valley event planning, Choice Neighborhoods Steering Committee, the Bethlehem Opening Doors Steering Committee, Nurture Nature Center&#039;s CREATE Resilience, Better Blocks for Bethlehem committees, the Southside Arts District Advisory Committee, and the Southside Community Center planning process, among others.
+CADB staff have spoken at 9 events, including City Council meetings, conferences, and summits.
+Goal 2: Improve the quality of Bethlehem’s housing stock by implementing targeted rehabilitation programs in partnership with Community Action Homes:
+Performance Outcomes:
+3 residential façades improvements were completed on the Southside.
+3 residential facades improvements were completed on the Northside.
+5 south Bethlehem households were referred to Community Action Homes and/or City of Bethlehem housing rehabilitation programs.
+Goal 3: Advocate for affordable, quality, and stable housing for all City of Bethlehem residents through community organizing, trainings, policy advocacy, and program development:
+Performance Outcomes:
+1 training regarding landlord-tenant law and Fair Housing was held at the Southside Lofts for 10 individuals.
+CADB staff provided ongoing support for the Alley House pilot program. 
+CADB staff identified two opportunities to support program and/or policy development to address the housing crisis in Bethlehem – the Choice Neighborhoods Community Ambassador training program and development of a landlord/tenant mediation program.
+CADB funded Touchstone Theatre’s artist residency “The Most Beautiful Home…Maybe?”, which was designed to foster community conversations surrounding the housing crisis.
+Goal 4: Preserve the integrity of public and green spaces in south Bethlehem while investing in practical and creative utilization of those spaces to foster community engagement:
+Performance Outcomes:
+3 gardens were supported through the 2023 growing season (MLK, Esperanza, and Lynfield).
+200 native plants were installed at Madison Park in September 2023.
+A pollinator garden was installed on the South Bethlehem Greenway.
+98 residents have been engaged through gardening and outdoor wellness activities. 
+Southside Ambassadors have provided continuous cleaning services to the south Bethlehem neighborhood.
+19 cleaning and weeding sessions of Lopes International Park were provided by landscaping services.
+9 neighborhood cleanup events were held.
+80 residents and business owners have been engaged in neighborhood cleanups.
+800 residents were engaged through 4 community building events.
+The Southside Tomorrow NPP supported the Kellyn Foundation’s ongoing produce distribution on the Greenway.
+Goal 5: Create, maintain, and build on existing initiatives that enhance community connectivity:
+Performance Outcomes:
+Two interns worked in July and August on developing original content for the “Southside Proud” marketing campaign.
+16 posts have been shared on “Southside Proud” social media platforms.
+75 contacts have been added to the neighborhood contact list.
+Funding was provided to support 3 youth programs – the Shooting Stars Basketball program, the Push Ahead Skateboarding program and the Lynfield Community Center.
+56 youth were engaged through the 3 youth programs during summer 2023.
+The Southside Tomorrow NPP funded the installation of a bike rack at New Bethany Ministries to improve access to the Mollard Hospitality Center and the New Bethany Food Pantry.
+The Southside Tomorrow NPP funded “Talento Local” the Hispanic Center Lehigh Valley’s senior music ensemble.
+Goal 6: Support the development of leadership and community problem-solving skills, knowledge, and abilities among Bethlehem residents to enhance civic engagement and equitable representation in community decision-making processes:
+Performance Outcomes:
+The Southside Tomorrow NPP funded a comprehensive survey conducted by YWCA Bethlehem focusing on program development to increase leadership opportunities.
+CADB Staff secured funding from the City of Bethlehem Choice Neighborhoods program and launched a pilot leadership development program in Pembroke in spring 2024.
+
+--------------------
+Attached Document: 6787c32763666_FoundationGuidelines_2024.pdf
+THE MARTIN GUITAR CHARITABLE FOUNDATION  
+The Martin Guitar Charitable Foundation was established in 1996 by Christian Frederick Martin IV to serve the charitable interests of 
+Martin Guitar Company. The Foundation supports 501(c)(3) nonprofit organizations with programs in Foundation target areas. 
+The Foundation’s core principles are to support Martin Guitar’s engagement with non-profit music, arts, education, and environmental 
+action organizations. The Foundation does not fund political or religious organizations or activity. The Trustees manage the 
+Foundation’s assets conservatively to allow for long term planning, and seek best value from Foundation grant-making for the people 
+and causes that their grantees serve. 
+The Foundation supports the best work of effective 501(c)(3) nonprofit organizations offering programs in one or more of the 
+following areas: 
+• Performance. Participation, and education in acoustic steel string guitar music 
+• Community activity in the Nazareth, PA region 
+• Study and preservation of America’s acoustic guitar heritage 
+• Arts education programs emphasizing acoustic guitar 
+• Educational institutions in the Lehigh Valley 
+• Promotion of arts and culture, mainly in the Lehigh Valley 
+• Help for the poor, hungry, sick, and homeless in the Lehigh Valley 
+• Environmental action related to guitar-making materials and processes 
+The Foundation does not provide any Martin Guitar products or make grants to individuals. 
+The Foundation accepts requests for grant funding during the period of June 1 to August 31. Requests must be received before 
+September 1 to be considered for funding.  Foundation grants are typically given in the range of $1,000 to $10,000. Please make 
+your request no longer than two pages. Please include: 
+• A brief overview of the organization, mission statement and total budget for the organization 
+• Description of the program seeking funding and the impact that program will have on the greater community that you serve.  
+Please include a budget for the program and the amount you are requesting.  
+• Prior grantees should submit a one page report on the impact their prior grant has had on the community and how the 
+foundation has been recognized throughout the year. 
+• Please include contact name, position, organization name, organization address, phone number, website address and phone 
+number. 
+• 501(c)(3) determination letter. 
+• List of current board members and their affiliation. 
+• First two pages of the organization’s 990 
+ 
+Renewal of Foundation grants is not automatic. Requests from prior year grantees should be sent prior to September 1 and should 
+include a separate one-page report of how the Foundation’s funds were used, the impact of Foundation support, and how the 
+Foundation was recognized. Please email your materials to martinguitarfoundation@gmail.com or to C.F. Marin Inc., Attn: Martin 
+Guitar Charitable Foundation, 510 Sycamore Street, PO Box 329, Nazareth, PA 18064. 
+ 
+We receive many requests for funding. Telephoning or emailing company representatives concerning grant requests will not increase 
+the likelihood of funding. Our decision process is competitive, and we are not able to fund every request.
+--------------------

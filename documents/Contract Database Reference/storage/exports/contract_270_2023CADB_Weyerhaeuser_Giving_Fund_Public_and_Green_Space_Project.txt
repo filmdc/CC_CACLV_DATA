@@ -1,0 +1,23 @@
+Purpose: <p>-Community Action Development Bethlehem's Public and Green Spaces projects (gardening supplies and equipment only).</p><p>-Funds may not be used for general administrative costs.</p><p>-12-month progress report required. An automated generated request will be sent when the report is due.</p>
+Funder: Weyerhaeuser Giving Fund
+Program: CADB
+Amount: 3000.00
+Start Date: 2023-12-14
+End Date: 
+
+Notes: 
+
+Fund Number: 3500
+
+Attached Document: 657b28d98c083_CADB_-Weyerhaeuser-Giving-Fund_Public-and-Green-Spaces-projects.docx
+
+
+
+
+
+--------------------
+Attached Document: 6580b9b865a56_2023CADB_Weyerhaeuser_ApplicationASSUBMITTED.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

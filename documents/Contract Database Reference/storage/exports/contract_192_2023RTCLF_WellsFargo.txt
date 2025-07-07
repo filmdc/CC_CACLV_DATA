@@ -1,0 +1,956 @@
+Purpose: <p>General operating expenses.</p>
+Funder: Wells Fargo
+Program: RTCLF
+Amount: 25000.00
+Start Date: 2023-06-23
+End Date: 
+
+Notes: <p>-Report for this grant TBD.</p><p>-Restricted Funds due to reporting requirement.</p><p>&nbsp;</p>
+
+Fund Number: 
+
+Attached Document: 6495dd1a7b09b_2023RTCLF_WellsFargo_terms-and-conditions.pdf
+Grant Terms and Conditions 
+These Terms and Conditions (“Terms and Conditions”) govern the terms by which the Wells 
+Fargo Foundation, Wells Fargo Bank N.A., or one of its related entities (“Wells Fargo”), offers 
+your organization (“Grantee”) a grant for the specific amount (“Grant Funds”) and for the 
+specific funding purposes (“Grantee Programs”) as set forth in the e-mail sent to your 
+organization by Wells Fargo entitled “WELLS FARGO GRANT PAYMENT NOTIFICATION” 
+(“Funding Confirmation Email”).  By accepting or depositing the check sent to you by 
+Wells Fargo, you are indicating your acceptance of these Terms and Conditions. 
+A.  Representations, Warranties and Covenants:  Grantee hereby represents, warrants and 
+covenants that: 
+1. Grantee maintains tax-exempt status as either a 501(c)(3) charitable organization, a 
+tax exempt educational institution or tax exempt qualifying tribal entity, and such 
+status has not been suspended or revoked, nor has Grantee been notified of any such 
+suspension;   
+2. Grantee will use the Grant Funds solely for charitable purposes that advance its 
+mission, and for no other purpose; 
+3. Grantee has not filed, nor has had filed against it, any petition under any federal or 
+State bankruptcy law, nor been adjudicated bankrupt or insolvent, nor has any 
+trustee in bankruptcy or receiver been appointed for its business or property; and 
+4. Grantee, at its sole cost and expense, will maintain and keep in force adequate 
+insurance coverage in amounts necessary to protect any potential liability that may 
+arise from the Grantee Programs. 
+B.  Request for Information.  Upon the request of Wells Fargo, Grantee will promptly, and 
+in all cases within 30 days, provide any information and/or documentation related to Grantee’s 
+use of the Grant Funds, and other evidence satisfactory to Wells Fargo that it is maintaining its 
+representations, warranties and covenants set forth above. Grantee must notify Wells Fargo 
+immediately if Grantee is unable to use some or all of the Grant Funds for the Grantee Programs 
+as indicated in the Funding Confirmation Email. Failure to provide requested documentation 
+may result in Grantee not being considered for future grants from Wells Fargo.  
+C.  Publicity.  Grantee agrees to publicly acknowledge the grant by Wells Fargo and to refer 
+to Wells Fargo’s support in public campaigns promoting the Grantee Programs.  Wells Fargo 
+may include your organization’s name, logo and photos in announcements, articles, reports, 
+brochures, and similar items which list recipients of grants offered by Wells Fargo. Any 
+acknowledgement or external communication by Grantee of this grant in announcements or 
+publications, including any press release, should identify the donor as “Wells Fargo,” and should 
+be coordinated with, and approved prior to use (which approval will not be unreasonably 
+withheld) by Wells Fargo.  Grantee will use its best efforts to cooperate with the internal review 
+and approval requirements of Wells Fargo for any public announcements or publications, and 
+will comply with Wells Fargo’s naming, logo, trademark, service mark and branding standards 
+in effect from time to time. 
+
+D.  Administration of Grantee Programs and Indemnification.  You hereby irrevocably and 
+unconditionally agree, to the fullest extent permitted by law, to defend, indemnify and hold 
+harmless Wells Fargo, its affiliates, officers, directors, trustees, employees and agents, from and 
+against any and all claims, liabilities, losses and expenses (including reasonable attorneys' fees) 
+directly, indirectly, wholly or partially arising from or in connection with any act or omission of 
+you or any of your employees or agents, in applying for or accepting the grant, in expending or 
+applying the funds furnished pursuant to the grant or in carrying out the Grantee Programs.  
+E.  No Warranty of Future Grants. Wells Fargo makes no express or implied representations 
+or warranties as to the availability or award of any future grants. Future funding consideration is 
+contingent upon you meeting all of the terms and conditions of these Terms and Conditions.  
+F.  Return of Funds. Wells Fargo reserves the right to require a total or partial refund of any 
+Grant Funds if, in Wells Fargo sole discretion, such action is necessary (i) because you have not 
+fully complied with these Terms and Conditions, (ii) to protect the purpose and objectives of 
+Wells Fargo making this grant, or (iii) to comply with any law or regulation applicable to you, 
+Wells Fargo, or the grant.  
+G.  Basis for Non-Payment: Wells Fargo shall have no obligation to make a payment 
+pursuant to these Terms and Conditions if, as of the scheduled payment date, it is Wells Fargo’s 
+determination that Grantee is in default under these Terms and Conditions, including any 
+failure by Grantee to submit any requested reporting on the use of the Grant Funds. Wells Fargo 
+shall not unreasonably refuse to make any payment required by these Terms and Conditions. 
+H.  Fiscal Sponsorship.  To the extent that Grantee acts as a fiscal sponsor in the course of 
+administering the Grantee Programs, Grantee warrants that i) It has undertaken the proper 
+legal, tax, documentation, and oversight procedures to ensure that the Grant Funds are being 
+lawfully distributed and ii) the mission and charitable purpose of any organization receiving a 
+portion of the Grant Funds, and the use by such organization of any such Grant Funds, is 
+consistent with the charitable purpose of this Grant. 
+I.  Multiyear Payments (if applicable): To the extent Grantee was approved for a multi-year 
+grant payment schedule, Grantee acknowledges that each payment installment of the grant is 
+conditioned upon Wells Fargo’s receipt of an Impact and Performance Report detailing the use 
+of the Grant Funds.  Wells Fargo will periodically provide Grantee with a template of such 
+report, and will notify Grantee when such Impact and Performance Reports are requested and 
+due. 
+ 
+If you have any questions, please contact wffound@wellsfargo.com  prior to 
+cashing your grant check. 
+--------------------
+Attached Document: 6495dd1c83555_2023RTCLF_WellsFargo_awardemail.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6495dd1ea5275_2023RTCLF_WellsFargo_proposal.pdf
+4/15/23, 9:35 AM	Wells Fargo - Review Your Application
+https://www.cybergrants.com/pls/cybergrants/ao_application.review_app?x_gm_id=1958&x_source_flag=&x_style_id=&x_org_id=14506777&x_req_i…1/23
+Back to Corporate Giving | Home | Customer Service | Contact Us | Locations
+Your Submitted Application
+The application you previously submitted appears below. No further
+changes may be made to this application. Click here to return to the
+Welcome page.
+Contact Information
+*First NameColton 
+*Last NameKrial 
+Title 
+*Address1337 East 5th Street 
+*CityBethlehem 
+*StatePennsylvania
+ 
+*ZIP Code18015 
+*E-mail Addressplanner-rtclf@caclv.org 
+
+4/15/23, 9:35 AM	Wells Fargo - Review Your Application
+https://www.cybergrants.com/pls/cybergrants/ao_application.review_app?x_gm_id=1958&x_source_flag=&x_style_id=&x_org_id=14506777&x_req_i…2/23
+*Telephone(484) 893-1074 
+Contact TypeEmployee
+ 
+Organization Profile
+ORGANIZATION
+PROFILE
+INFORMATION
+ 
+Official Name RISING TIDE COMMUNITY LOAN FUND 
+*Legal NameRISING TIDE COMMUNITY LOAN FUND 
+AKA NameRTCLF 
+*Mailing Address1337 East Fifth Street 
+CityBethlehem 
+StatePennsylvania
+ 
+*ZIP Code18015 
+*Address change
+required?
+No 
+*Telephone(484) 893-1039 
+*Website Addresshttps://therisingtide.org/ 
+Social Media
+information
+Facebook:
+https://www.facebook.com/risingtideloan/
+Instagram:
+https://www.instagram.com/RisingTideCLF/
+ 
+
+4/15/23, 9:35 AM	Wells Fargo - Review Your Application
+https://www.cybergrants.com/pls/cybergrants/ao_application.review_app?x_gm_id=1958&x_source_flag=&x_style_id=&x_org_id=14506777&x_req_i…3/23
+*Year Organization
+was Established
+2001 
+*Mission StatementThe mission of the Rising Tide Community Loan
+Fund is to identify small business and
+community development credit needs that
+stifle the creation of economic opportunity in
+low- to moderate-income communities of the
+Lehigh Valley and to meet those needs with
+affordable credit products. 
+Brief History of
+Organization
+Rising Tide Community Loan Fund (RTCLF) is a
+501(c)(3) nonprofit corporation and a subsidiary
+of Community Action Lehigh Valley. Formed in
+2001 and certified by the U.S. Treasury as a
+Community Development Financial Institution,
+RTCLF was established to provide accessible
+and flexible financing options for business
+owners whose risk factors make it difficult to
+obtain funds from traditional lenders.
+Since 2012, RTCLF has administered/managed
+the City of Bethlehem's Small Business Loan
+Fund, which provides entrepreneurs with
+access to up to $100,000 for property or
+equipment on condition that one full time
+equivalent position is created for every $35,000
+that is borrowed. In 2019, RTCLF began
+administering/managing the Lehigh and
+Northampton County Revolving Loan Fund
+(LNCRLF). The LNCRLF offers small businesses
+in the Lehigh Valley access to mezzanine
+financing for their start-up and expansion
+projects.
+RTCLF originally served only Lehigh and
+Northampton Counties, but expanded its
+
+4/15/23, 9:35 AM	Wells Fargo - Review Your Application
+https://www.cybergrants.com/pls/cybergrants/ao_application.review_app?x_gm_id=1958&x_source_flag=&x_style_id=&x_org_id=14506777&x_req_i…4/23
+territory to also serve Carbon, Monroe, and
+upper Bucks counties in 2015 in response to
+requests for assistance. RTCLF added a line of
+credit product to provide entrepreneurs with
+access to $3,000 to $15,000 in working capital.
+Since its inception, RTCLF has granted a total of
+310 loans to 253 different businesses. 179 of
+these loans have been granted to wholly or
+partially woman-owned businesses, 126 have
+been granted to wholly or partially minority-
+owned businesses, and 212 have been granted
+to low- to moderate-income 	individuals or
+businesses located in a low- to 	moderate-
+income census tract. These loans have led to
+the creation of at least 399 	jobs and the
+retention of 861 jobs.
+In July 2020, RTCLF's Business Unit was created,
+consolidating the administration of technical
+and marketing assistance previously provided
+by fellow Community Action subsidiaries
+Community Action Development Corporation of
+Allentown and Community Action Development
+Corporation of Bethlehem.  
+*Is your organization
+a U.S. Department of
+the Treasury certified
+Community
+Development
+Financial Institution
+(CDFI)?
+Yes 
+*GuideStar by Candid
+profile Seal of
+Transparency level
+Platinum
+ 
+
+4/15/23, 9:35 AM	Wells Fargo - Review Your Application
+https://www.cybergrants.com/pls/cybergrants/ao_application.review_app?x_gm_id=1958&x_source_flag=&x_style_id=&x_org_id=14506777&x_req_i…5/23
+ORGANIZATION
+DEMOGRAPHICS
+ 
+*LMI and/or Small
+Businesses Served by
+organization?
+Yes 
+% of low- to
+moderate- income
+(LMI) populations
+served by
+organization:
+67%  LMI
+33%  Non-LMI
+ 
+% of Small Businesses
+served by
+organization:
+100%  of small businesses served
+ 
+LMI/Small Business
+data:
+Actual
+ 
+LMI/Small Business
+data is current as of:
+04/21/2022 
+*Data contact at
+organization:
+Chris Hudock, Associative Executive Director of
+Business Development, chudock@caclv.org 
+DOCUMENTATION
+REQUIREMENTS
+ 
+*IRS W-9 Form W-9 RTCLF_7.12.2022.pdf (120.87 K),
+uploaded by Emily Folenta on
+04/14/2023
+Is your organization
+classified as a 509(a)3
+supporting
+organization by the
+IRS?
+No 
+
+4/15/23, 9:35 AM	Wells Fargo - Review Your Application
+https://www.cybergrants.com/pls/cybergrants/ao_application.review_app?x_gm_id=1958&x_source_flag=&x_style_id=&x_org_id=14506777&x_req_i…6/23
+Organization Information
+*Top Executive
+Ethnicity
+Not Hispanic or Latino
+ 
+*Top Executive RaceBlack/African American
+ 
+*Top Executive
+Persons with
+Disabilities (PWD)
+Prefer not to respond
+ 
+*Top Executive
+Military Service
+Member and/or
+Veteran
+Prefer not to respond
+ 
+*Top Executive
+Gender
+Female
+ 
+*Top Executive Sexual
+Orientation
+Heterosexual/Straight
+ 
+*Number of Board
+Members
+13 
+*Organization's
+Current Board
+Members with
+Affiliations, including
+Corporate Affiliations
+RTCLF Board Roster 4.14.23.pdf (62.5 K),
+uploaded by Emily Folenta on
+04/14/2023
+*Board Members
+Ethnicity
+92%  Hispanic or Latino
+8%  Not Hispanic or Latino
+ 
+*Board Members
+Race
+77%  Caucasian/White
+15%  Black/African American
+
+4/15/23, 9:35 AM	Wells Fargo - Review Your Application
+https://www.cybergrants.com/pls/cybergrants/ao_application.review_app?x_gm_id=1958&x_source_flag=&x_style_id=&x_org_id=14506777&x_req_i…7/23
+8%  Two or More Races
+ 
+*Board Members
+Persons with
+Disabilities (PWD)
+62%  Non-PWD
+38%  Prefer not to respond
+ 
+*Board Members
+Military Service
+Member and/or
+Veteran
+100%  Unknown/Not Tracked Service
+Member/Veteran
+ 
+*Board Members
+Gender
+54%  Male
+38%  Female
+8%  Prefer not to respond
+ 
+*Board Members
+Sexual Orientation
+85%  Heterosexual/Straight
+15%  Prefer not to respond
+ 
+*Non-discriminationNo 
+*Organization's Goals
+and Accomplishments
+At least 50 potential borrowers will initiate an
+application with RTCLF
+Approve at least 20 applications for financing
+Provide technical assistance to at least 120
+prospective or existing entrepreneurs, including
+all borrowers
+At least 40 of the above-mentioned 120
+prospective or existing entrepreneurs will be
+from the City of Allentown
+At least 40 of the above-mentioned 120
+prospective or existing entrepreneurs will be
+from the City of Bethlehem
+
+4/15/23, 9:35 AM	Wells Fargo - Review Your Application
+https://www.cybergrants.com/pls/cybergrants/ao_application.review_app?x_gm_id=1958&x_source_flag=&x_style_id=&x_org_id=14506777&x_req_i…8/23
+At least 2 of the above-mentioned 120
+prospective or existing entrepreneurs will be
+farmers receiving assistance through The Seed
+Farm's incubator program
+At least 5 of those prospective or existing
+businesses will be from the Slate Belt
+At least 25 of the above-mentioned 120
+prospective or existing entrepreneurs will start
+their own business
+Provide marketing assistance to at least 50
+entrepreneurs
+Conduct at least 1 session of the Marketing
+Committee
+Advise at least 15 business owners on the value
+of obtaining Pennsylvania's Small Diverse
+Business certification
+Assist at least 7 business owners to obtain
+Pennsylvania's Small Diverse Business
+certification
+At least 50% of a random sample of current
+business owners will report increased sales in a
+one-year time period
+At least 50% of a random sample of current
+business owners will report that their business
+was profitable in the past year
+At least 50% of a random sample of current
+business owners will report expected business
+growth in the next year
+
+4/15/23, 9:35 AM	Wells Fargo - Review Your Application
+https://www.cybergrants.com/pls/cybergrants/ao_application.review_app?x_gm_id=1958&x_source_flag=&x_style_id=&x_org_id=14506777&x_req_i…9/23
+At least 50% of the businesses receiving
+financing will increase assets, increase or
+replace lost income, and/or report pride of
+ownership
+Contact at least 100 key staff of referral sources
+providing current information about RTCLF
+Increase referral sources list from to 215
+Email prospective referral sources at least 10
+different times with pertinent program news
+Generate income sufficient to attain a 45% self-
+sufficiency ratio 
+Proposal Information
+*Requested Grant
+Amount
+$25,000.00 
+Request Funding
+Administrative
+Expense Amount
+0
+Program Expense 25000
+Fundraising Expense0
+ 
+*Project TitleRising Tide Community Loan Fund - General
+Operating 
+*Funding Purpose -
+Program/Project
+Description
+RTCLF provides accessible financing to
+business owners whose risk factors make it
+difficult to obtain funds from traditional
+lenders. RTCLF serves prospective, start-up,
+and established businesses in Lehigh,
+Northampton, Carbon, Monroe, and upper
+Bucks counties through small business loans
+
+4/15/23, 9:35 AM	Wells Fargo - Review Your Application
+https://www.cybergrants.com/pls/cybergrants/ao_application.review_app?x_gm_id=1958&x_source_flag=&x_style_id=&x_org_id=14506777&x_req…10/23
+for leasehold improvements, purchase of
+equipment/machinery, marketing costs,
+working capital, and inventory purchases as
+well as one-on-one technical assistance on
+business plans, cash flow analysis and
+projections, and marketing strategies. RTCLF
+also manages the City of Bethlehem's Small
+Business Loan Fund and the Lehigh and
+Northampton County Revolving Loan Fund.
+RTCLF offers a line of credit for entrepreneurs
+as a complement to its loan products. RTCLF
+works with current and potential borrowers
+to create business operating budgets, break-
+even analyses, and other projections while
+staff works with potential borrowers to
+improve credit scores.
+As the only CDFI headquartered in the Lehigh
+Valley, Rising Tide has an expansive
+understanding of the capital and capacity
+gaps facing low- to moderate-income
+entrepreneurs in the area and adapts
+financial products and services to suit the
+needs of individual qualified borrowers. Other
+sources of loans in the target market are
+typically more rigid and less responsive to the
+variable needs of borrowers. Many lenders
+are reluctant to work with individuals with
+past credit problems or little collateral. Rising
+Tide works with current and potential
+borrowers to create business operating
+budgets, break-even analyses and other
+projections. Staff works with potential
+borrowers to improve credit scores. As a CDFI,
+at least 60% of the loans provided and at least
+60% of the total dollars loaned must go to
+
+4/15/23, 9:35 AM	Wells Fargo - Review Your Application
+https://www.cybergrants.com/pls/cybergrants/ao_application.review_app?x_gm_id=1958&x_source_flag=&x_style_id=&x_org_id=14506777&x_req…11/23
+businesses operated by LMI owners or to
+businesses that are located within an LMI
+census area in order to maintain CDFI
+certification. 
+Detailed
+Program/Project
+Information
+*Benefits Wells Fargo name and/or logo recognition
+ 
+*Is this a request for
+sponsorship?
+No 
+*Membership?No 
+*Sub-grantingNo 
+Measure of ProgressRTCLF's Annual Work Plan consists of
+measurable goals and performance targets
+that guide the services and activities of the
+program. It is evaluated twice a year as a
+means of measuring the effectiveness of
+services and program outcomes. This
+evaluation is conducted in three stages: first
+by RTCLF's Board of Directors, then by the
+Program Development and Evaluation
+Committee of Community Action's (CALV)
+Board of Directors, and it is then approved by
+CALV's full board. In addition to the work plan
+evaluation, RTCLF's Director submits a
+monthly summary report of program
+activities to CALV's Executive Director that is
+presented to CALV's Board of Directors at
+their monthly board meeting. This serves the
+purpose of monitoring program performance
+
+4/15/23, 9:35 AM	Wells Fargo - Review Your Application
+https://www.cybergrants.com/pls/cybergrants/ao_application.review_app?x_gm_id=1958&x_source_flag=&x_style_id=&x_org_id=14506777&x_req…12/23
+on a monthly basis to ensure that program
+objectives are on schedule.
+RTCLF utilizes DownHome Solutions, a loan
+management software, to maintain our
+portfolio. Further oversight of the portfolio is
+provided by RTCLF's Board of Directors, who
+are provided with a monthly portfolio report.
+At least once per month, the Associate
+Executive Director of Business Development
+updates the Board of Directors on all
+"troubled" accounts, keeping them informed
+of any potential issues.
+Intake forms are completed, signed, and
+dated in the presence of RTCLF staff upon
+initial contact with a participant. RTCLF utilizes
+a client management information system,
+ClientTrack, a complete software application
+that provides human service organizations
+the ability to collect, track, analyze and report
+data on program participants. Detailed
+progress notes are placed in case files and
+electronically recorded into ClientTrack
+software. ClientTrack is then used to
+document progress and generate reports
+required by funders. 
+*Low to Moderate
+Income Group and/or
+Small Businesses
+Served?
+Yes 
+% of low- to moderate-
+income clients served
+68%  LMI
+32%  Non-LMI
+ 
+
+4/15/23, 9:35 AM	Wells Fargo - Review Your Application
+https://www.cybergrants.com/pls/cybergrants/ao_application.review_app?x_gm_id=1958&x_source_flag=&x_style_id=&x_org_id=14506777&x_req…13/23
+% of small businesses
+served:
+100%  Small businesses served
+ 
+Description of LMI/SB
+populations served:
+Of RTCLF's most recent participants, 68% are
+LMI and 100% are small businesses. As a
+Community Development Financial Institution
+(CDFI), a minimum of 60% of loans and 60% of
+dollars loaned must go to businesses
+operated by LMI owners or businesses in LMI
+census areas. 
+*Homeless served by
+program/project?
+No 
+*Disaster/COVID-19
+Relief Efforts?
+No 
+*Form 990 and
+Financial Statement
+RTCLF 990 6-30-21 (Final).pdf (3.52 MB),
+uploaded by Emily Folenta on
+04/14/2023
+Resizing Instructions 
+*Organization's Total
+Operating Budget:
+$958,592.00 
+*Organizations Total
+Operating Budget
+Revenues:
+$958,592.00 
+*Organizations Total
+Operating Budget
+Expenses:
+$958,592.00 
+*Organization's Most
+Recent Approved
+Operating Budget
+RTCLF FY'23 Budget WF Corrected.pdf
+(73.95 K), uploaded by Emily Folenta on
+04/14
+
+4/15/23, 9:35 AM	Wells Fargo - Review Your Application
+https://www.cybergrants.com/pls/cybergrants/ao_application.review_app?x_gm_id=1958&x_source_flag=&x_style_id=&x_org_id=14506777&x_req…14/23
+*Is your organization
+operating in a deficit?
+No 
+*Total Program/Project
+Budget
+$908,592.00 
+*Detailed
+Program/Project Budget
+RTCLF FY'23 Budget WF Corrected.pdf
+(73.95 K), uploaded by Emily Folenta on
+04/14
+*Other Funding Sources:
+ 
+*Public Sector PartnersYes 
+If yes, please list the
+public sector entities
+below.
+PA DCED
+City of Bethlehem
+Northampton County
+*Funding Source Entity Name *Entity Classification	*Amount *Status
+Community Services Block
+Grant - 2021
+Governmental entity	$25,000.00 Reques
+Community Services Block
+Grant - 2022
+Governmental entity	$25,000.00 Reques
+CSBG CARES	Governmental entity	$49,267.00 Reques
+CDFI Rapid Response Program Governmental entity	$300,000.00 Reques
+City of Allentown CDBG Governmental entity	$10,000.00 Reques
+Schyler Kemps Foundation Foundation	$3,000.00 Reques
+PNC Foundation	Foundation	$7,500.00 Pending
+
+4/15/23, 9:35 AM	Wells Fargo - Review Your Application
+https://www.cybergrants.com/pls/cybergrants/ao_application.review_app?x_gm_id=1958&x_source_flag=&x_style_id=&x_org_id=14506777&x_req…15/23
+Lehigh County 
+*Sustainable
+Development Goals
+No Poverty
+Decent Work and Economic Growth
+Sustainable Cities and Communities
+ 
+*Notification
+Information
+Gwen Carolan, gcarolan@caclv.org 
+*Wells Fargo Contact?Stephen Briggs
+stephen.briggs1@wellsfargo.com
+ 
+Additional
+Documentation
+Metrics
+*Focus Area SelectionSmall Business and Entrepreneurship
+ 
+*MeasurementEstimated
+ 
+Measured or
+Estimated:
+RTCLF bases its projections on numbers
+derived from its annual work plan. The work
+plan consists of target goals and metrics to be
+achieved in the current fiscal year. It is
+developed by the RTCLF director with input
+from both RTCLF's and CALV's Board of
+Directors. The estimated metrics for
+achievement are grounded in many factors,
+including RTCLF's current capacity and
+expectations from previous levels of success. 
+Small Business Services
+
+4/15/23, 9:35 AM	Wells Fargo - Review Your Application
+https://www.cybergrants.com/pls/cybergrants/ao_application.review_app?x_gm_id=1958&x_source_flag=&x_style_id=&x_org_id=14506777&x_req…16/23
+# of unique aspiring
+entrepreneurs served
+(entrepreneurs in the ideation
+phase or planning for a business
+that hasn’t yet launched)
+60
+# of unique small businesses
+served
+140
+# of unique small businesses
+receiving loans
+20
+Total $ disbursed to small
+businesses receiving loans
+1500000
+# of unique small businesses
+receiving grants
+0
+Total $ disbursed to small
+businesses receiving grants
+0
+# of unique small businesses
+receiving loan modifications,
+payment deferrals or loan
+forgiveness
+10
+Total loan $ modified, deferred, or
+forgiven
+310000
+# of unique small businesses
+receiving technical assistance
+services
+120
+# of hours of technical assistance
+provided
+240
+What $ amount of the total grant
+has been spent (inclusive of all
+0
+
+4/15/23, 9:35 AM	Wells Fargo - Review Your Application
+https://www.cybergrants.com/pls/cybergrants/ao_application.review_app?x_gm_id=1958&x_source_flag=&x_style_id=&x_org_id=14506777&x_req…17/23
+programmatic and operations
+expenses funded by the grant)
+ 
+Small Business Loans Disbursed - Responses for loans that were
+"0-$50,000" and "greater than $50,000" should equal the "# of loans
+disbursed"
+# of loans disbursed 20
+# of loans disbursed that were
+$0-$50,000
+12
+# of loans disbursed that were
+greater than $50,000
+8
+ 
+Small Business NAICS Codes - Provide the 5 most frequently served
+industries by six digit NAICS codes (e.g., 722511). Refer to
+Enter the 1st most frequently
+served NAICS Code
+484110
+Enter the 2nd most frequently
+served NAICS Code
+624110
+Enter the 3rd most frequently
+served NAICS Code
+722330
+Enter the 4th most frequently
+served NAICS Code
+812112
+Enter the 5th most frequently
+served NAICS Code
+312120
+ 
+Small Business Size - Responses in this section should total to "# of
+unique small businesses served"
+# of small businesses served that60
+
+4/15/23, 9:35 AM	Wells Fargo - Review Your Application
+https://www.cybergrants.com/pls/cybergrants/ao_application.review_app?x_gm_id=1958&x_source_flag=&x_style_id=&x_org_id=14506777&x_req…18/23
+are sole proprietors
+# of small businesses served with
+1-9 employees (not sole
+proprietors)
+75
+# of small businesses served with
+10 or more employees
+5
+# of small businesses served with
+employee number not tracked
+0
+ 
+Small Business Annual Revenue - Responses in this section should
+total to "# of unique small businesses served"
+# of small businesses served with
+annual revenue between
+$0-$100,000
+20
+# of small businesses served with
+annual revenue between
+$100,001-$250,000
+50
+# of small businesses served with
+annual revenue between
+$250,001-$1,000,000
+60
+# of small businesses served with
+annual revenue greater than
+$1,000,000
+10
+# of small business served with
+revenue not tracked
+0
+ 
+Small Business Growth
+# of small business served that
+experienced a growth in revenue
+120
+
+4/15/23, 9:35 AM	Wells Fargo - Review Your Application
+https://www.cybergrants.com/pls/cybergrants/ao_application.review_app?x_gm_id=1958&x_source_flag=&x_style_id=&x_org_id=14506777&x_req…19/23
+since receiving capital and or
+services
+# of small business served that
+experienced a growth in the
+number of employees
+0
+# of unique new small businesses
+created
+60
+# of jobs preserved	185
+# of new jobs created 185
+ 
+General Outcomes
+# of people receiving emergency
+cash assistance
+0
+--- Of the people that received
+emergency cash assistance,
+indicate average amount $
+0
+# of individuals attaining other
+positive outputs or outcomes
+140
+-----Specify the custom metric(s)
+for other positive outputs or
+outcomes reported in the
+previous question (text limit-2000
+characters)
+0
+ 
+Building Capacity and Knowledge
+# of white papers/publications,
+patents, advancements resulting
+from influential research
+0
+
+4/15/23, 9:35 AM	Wells Fargo - Review Your Application
+https://www.cybergrants.com/pls/cybergrants/ao_application.review_app?x_gm_id=1958&x_source_flag=&x_style_id=&x_org_id=14506777&x_req…20/23
+# of innovative/inclusive products,
+services, or businesses developed
+or launched
+1
+# of training sessions, workshops
+- skill-building, knowledge for
+practitioners
+1
+# of technology enhancements,
+new infrastructure or systems
+built, deployed or scaled
+0
+# of resources, curricula, or
+programs developed and
+deployed
+1
+# of nonprofits/centers pivoted to
+virtual services (COVID)
+0
+# of unique visitors for campaigns
+and website resources (annual)
+0
+ 
+Policy Initiatives
+# of peer convening, networking,
+education, or information
+sessions facilitated to highlight
+best practices and policy
+responses
+1
+# of collaborations, coalitions, or
+partnerships formed to facilitate
+response or proposals
+2
+# of campaigns to increase issue
+awareness (i.e. promotions, public
+service announcements,
+brochures, websites, etc.)
+1
+
+4/15/23, 9:35 AM	Wells Fargo - Review Your Application
+https://www.cybergrants.com/pls/cybergrants/ao_application.review_app?x_gm_id=1958&x_source_flag=&x_style_id=&x_org_id=14506777&x_req…21/23
+---# of total individuals reached by
+campaigns
+500
+ 
+*Track Additional
+Success Metrics?
+No 
+Demographics
+*Number of People
+Impacted
+185 
+*Clients Served
+Ethnicity
+42%  Hispanic or Latino
+58%  Not Hispanic or Latino
+ 
+*Clients Served Race33%  Caucasian/White
+36%  Black/African American
+3%  Asian
+1%  American Indian/Alaskan Native
+27%  Two or More Races
+ 
+*Clients Served Age
+Group
+4%  Young Adults (18-24 years)
+91%  Adults (25-64 yrs)
+5%  Senior Citizens (65 yrs+)
+ 
+*Clients Served
+Persons with
+Disabilities (PWD)
+3%  PWD
+97%  Non-PWD
+ 
+*Clients Served
+Military Service
+Member and/or
+Veteran
+100%  Unknown/Not Tracked Service
+Member/Veteran
+ 
+*Clients Served
+Sexual Orientation
+100%  Unknown/Not Tracked Sexual
+Orientation
+
+4/15/23, 9:35 AM	Wells Fargo - Review Your Application
+https://www.cybergrants.com/pls/cybergrants/ao_application.review_app?x_gm_id=1958&x_source_flag=&x_style_id=&x_org_id=14506777&x_req…22/23
+ 
+*Clients Served
+Gender
+45%  Male
+55%  Female
+ 
+*Rural served by
+program/project?
+Yes 
+*Rural Clients Served2%  Rural
+98%  Non-Rural
+ 
+Geo-Tracking
+*GEO TRACKING -
+Domestic or
+International
+Domestic
+ 
+GEO TRACKING -
+Single or Multi State
+Single State
+ 
+Pennsylvania
+Zip: 18018 - 12 %
+Zip: 18042 - 14 %
+Zip: 18052 - 6 %
+Zip: 18101 - 6 %
+Zip: 18102 - 11 %
+Zip: 18103 - 9 %
+Zip: 18104 - 7 %
+Zip: 18106 - 16 %
+Zip: 18109 - 8 %
+Administrative & Fundraising Expense Zip:
+18015 - 11 %
+Please only click on the Save and Proceed button below once. Thank
+you!
+
+4/15/23, 9:35 AM	Wells Fargo - Review Your Application
+https://www.cybergrants.com/pls/cybergrants/ao_application.review_app?x_gm_id=1958&x_source_flag=&x_style_id=&x_org_id=14506777&x_req…23/23
+ 
+Acknowledgement
+*Acknowledgement
+I agree
+ 
+Need Support?
+PRIVACY, Cookies, Security & Legal
+Notice of Data Collection
+©2020 Wells Fargo Bank, N.A. All rights reserved.
+--------------------

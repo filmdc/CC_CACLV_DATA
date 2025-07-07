@@ -1,0 +1,90 @@
+Purpose: <p>Northampton County has awarded $35,000 "to purchase and distribute fresh foods (produce, dairy, eggs, and meat)" to the 19 Northampton County pantry sites listed in the attached contract, Exhibit A.</p><p><i><strong>This is a reimbursable grant.</strong></i></p><p>There is no reporting due for this grant (See excerpt below). Itemized invoices must be submitted to the county contact listed below.</p><figure class="image"><img src="http://10.55.0.10/storage/807/image.png"></figure><p>The budget allowance is as follows:</p><figure class="image"><img src="http://10.55.0.10/storage/805/image.png"></figure><p>&nbsp;</p><p>Questions regarding the program can be addressed to:</p><p>Frank Brooks<br>Northampton County Community &amp; Economic Development<br>610-829-6311<br>fbrooks@norcopa.gov</p>
+Funder: Northampton County
+Program: SHFB
+Amount: 35000.00
+Start Date: 2023-10-01
+End Date: 2025-09-30
+
+Notes: 
+
+Fund Number: F8074
+
+Attached Document: 66280b08d55db_Northampton-County-RE_-Question---reporting-deadlines-for-2023-2025-CDBG-Funding.pdf
+From:	Frank Brooks
+To:	Kelsey Miller
+Subject: Northampton County RE: Question - reporting deadlines for 2023-2025 CDBG Funding
+Date:	Monday, April 22, 2024 1:21:57 PM
+Hi Kelsey: What Northampton County has done in the past
+which seems to work with the funder. Was to have Second Harvest just submit
+the invoices for the food purchase towards reimbursement.
+We realize that our funding is a smaller amount in your total program, so
+asking Second Harvest to provide documentation on participants seems to be
+not a productive way to report.
+ 
+Regards
+Frank
+ 
+Frank Brooks | Administrator
+Northampton County Community & Economic Development 2801 Emrick Blvd, 1st floor, Bethlehem, PA 18020
+| Direct: 610-829-6311 |
+fbrooks@norcopa.gov
+“What helps you also helps us” 
+ 
+ 
+From: Kelsey Miller <k.miller@caclv.org> 
+Sent: Thursday, April 18, 2024 3:06 PM
+To: Frank Brooks <fbrooks@norcopa.gov>
+Subject: Question - reporting deadlines for 2023-2025 CDBG Funding
+ 
+WARNING: This email message is from an external sender! Please exercise caution when clicking links or
+opening attachments.
+ 
+Hi Frank –
+ 
+I hope all is well. I wanted to ask a quick clarification question regarding the 2023-2025 CDBG
+funding for fresh food distribution. The contract period is from Oct 2023 – Sept 30, 2025 – obviously
+we are well into the period. The contract lists the below report schedule but it does not seem to
+match up.
+ 
+
+ 
+ 
+Can you provide some clarification on dates? Does the below make sense to keep it within the date
+range of the grant?
+Report period April 1 – Oct 31, 2024 due Nov 15, 2024
+Nov 1, 2024 – Sept 30, 2025 due Oct 15, 2025
+ 
+Or is there a more appropriate schedule?
+I thank you in advance for your guidance.
+ 
+Best,
+Kelsey
+ 
+ 
+Kelsey Miller | Compliance/Grants Coordinator
+Second Harvest Food Bank of Lehigh Valley & Northeast PA
+a Program of Community Action Committee of the Lehigh Valley 
+6969 Silver Crest Road | Nazareth, PA 18064
+T: (610) 750-9592 | E: k.miller@caclv.org
+Member of Feeding America, Distributing food to 200 member agencies in 6 Counties 
+  ________________________________  
+Visit us at shfblv.org | Subscribe to our executive Director's Blog | Like us on Facebook | Follow Us
+@SHFBLV
+This e-mail may contain Community Action Committee or CACLV Subsidiary proprietary information intended for the sole use of the
+recipient(s). Any use by others is prohibited. If you are not the intended recipient, please contact the sender and delete all copies of the
+
+message.
+CONFIDENTIALITY NOTICE: This e-mail message, including any attachments, is for the sole use of the intended recipient(s) and may
+contain confidential and privileged information. Any unauthorized review, use, disclosure, or distribution is prohibited. If you are not the
+intended recipient, please contact the sender by reply e-mail and destroy all copies of the original message.
+--------------------
+Attached Document: 664e4393be378_6621727693dc9_2023SHFB_NCCDBG_Fresh-Produce-Distribution_signed.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 66841411c30d8_SHFB--Fresh-Produce-Distribution-executed.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

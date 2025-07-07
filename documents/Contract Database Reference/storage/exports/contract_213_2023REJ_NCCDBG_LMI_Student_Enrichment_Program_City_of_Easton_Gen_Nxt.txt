@@ -1,0 +1,145 @@
+Purpose: <ul><li>Used for salaries for Generation Next facilitators and supplies to perform Generation Next Instruction for students in the City of Easton proper (Easton Area Highschool)</li><li>We must income qualify students and keep these records on file for 7 years.</li><li>Semi Annual Reporting due on May 15th (October 1- April 30) and November 15, 2023 (May 1-October 31st). Reporting forms found at the end of the contract and are to be sent to Frank Brooks fbrooks@norcopa.gov.</li></ul>
+Funder: Northampton County
+Program: REJ
+Amount: 10000.00
+Start Date: 2022-10-01
+End Date: 2024-09-30
+
+Notes: <p>-This is a reimbursable grant. Payroll logs and demographic forms are required for reimbursement. Reimbursement requests are to be sent to Shaquera Martindale at smartindale@easton-pa.gov</p><p>-Correspondence, invoicing and reporting to be sent to seddings@rda.easton-pa.gov&nbsp;</p>
+
+Fund Number: 6411
+
+Attached Document: 64c906aa10664_2022-2023REJ_NCCDBG_City-of-Easton_GenNXT.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 65a17ac07763c_65a14e108d418_2022REJ_CIty-of-Easton_CDBG_GenNxt_Student-Enrichment.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 65a17b1957991_Public-Service-Accomplishment-Form-(1).pdf
+CDBG SUBRECIPIENT:
+PROJECT NAME:
+REPORTING PERIOD:
+NATIONAL OBJECTIVE:IDIS ACTIVITY NUMBER: 
+CDBG – PUBLIC SERVICE
+DIRECT BENEFIT - ACCOMPLISHMENT FORM
+ACCOMPLISHMENT: Describe specific public and private improvements of services provided.
+MATRIX CODE: 
+CDBG YEAR:
+--------------------
+Attached Document: 65a17b1e69a2b_Demographic.pdf
+REDEVELOPMENT AUTHORITY OF EASTON, PA 
+COMMUNITY DEVELOPMENT BLOCK GRANT PROGRAM 
+DEMOGRAPHIC REPORT 
+ 
+Sub-Recipient 
+Name: 	Contract Year:  
+Address: 
+Reporting 
+Period: 
+ 	Activity Name:  
+Preparer’s 
+Name: 	Email Address:  
+ 
+TYPE 	COUNT 
+Total People Assisted :  
+Total Female Head Of Household:  
+Total Persons With Disability:  
+INCOME LEVELS  
+Total Low Income(Eligible):  
+ETHNIC ORIGIN OF ASSISTED PEOPLE  
+Hispanic or Latino:  
+Non Hispanic or Latino:  
+RACE  
+American Indian / Alaskan Native:  
+Black or African American:  
+Native Hawaiian or Pacific Islander:  
+White:  
+Other Specify Hispanic or Latino:
+--------------------
+Attached Document: 65a17b2424e98_CDBG-Census-Tract-(2).pdf
+Activity Eligibility/National Objective Matrix Co
+□	□
+□	□
+□	□
+□	□
+Type of Public Service:
+(       )	(       )	(       )
+CERTIFIED BY:	DATE:
+□ APPROVED
+□ DENIED
+Activity Specific:
+Service Provider:
+Local Project ID #
+Year Funded:
+REDEVELOPMENT AUTHORITY OF EASTON, PA
+CDBG FORM : PUBLIC SERVICES
+Services Site Location:
+New Service	Increased Existing Service Other (Attach Explanation)
+Census Tract 142, Block Group 3
+Census Tract 143 Block Group 3
+Census Tract 143 Block Group 2
+Census Tract 143 Block Group 1
+Census Tract 145, Block Group 2
+Census Tract 144, Block Group 3
+Census Tract 144, Block Group 2
+Census Tract 144, Block Group 1
+*If an Increased Exisiting Service, Initial Year of Funding:
+Amount Budgeted :
+Actual Total Cost : 	Date Completed:
+DATE	SIGNITURE / TITLE
+Action Plan in which the activity was initially funded.
+existing service beyong that which had been provided by or on behalf of the City, in the twelve months prior to submission of t
+Certification: This public service activity is either a new activity or a quantifiable increase in the level of an 
+If Appropriate, Service Area (Attach map, boundary description, family income & % low/mod information)
+****OFFICIAL USE ONLY ****
+Other (Attach description/rationale)
+Census Tract 146, All Blocks
+--------------------
+Attached Document: 65a17b2bae5cf_Subrecipient-Pymt-Req-(1).xlsx
+						
+						
+ATTACHMENT A: SUB-RECIPIENT PAYMENT REQUEST						
+						
+AGENCY NAME:			MONTH/YEAR:			
+						
+PROGRAM NAME:						
+						
+PREPARER'S NAME:			E-MAIL:			
+						
+Approved CDBG Budget						
+CDBG Disbursements To Date						
+Available PI Balance						
+PI Expended To Date						
+Available CDBG Balance			 $ -   			
+						
+						
+Budget Line Item			Amount Requested For CDBG Reimbursement			
+						
+						
+			 $ -   			
+			 $ -   			
+			 $ -   			
+Total Request			 $ -   			
+Less CDBG Funds On Hand						
+Less Program Income On Hand			 $ -   			
+Net Payment Requested			 $ -   			
+PI Balance						
+						
+						
+						
+						
+Fiscal Officer Signature				Date		
+						
+						
+Deputy Director Signature				Date		
+
+--------------------
+Attached Document: 65b15e0ce9c58_2023REJ_NCCDBG_LMI-Student-Enrichment-Program_City-of-Easton-Gen-Nxt-executed-subricipient-agreem.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

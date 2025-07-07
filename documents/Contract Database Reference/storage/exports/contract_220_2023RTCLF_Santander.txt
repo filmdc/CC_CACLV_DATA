@@ -1,0 +1,126 @@
+Purpose: <p>General Operating RTCLF</p>
+Funder: Santander
+Program: RTCLF
+Amount: 10000.00
+Start Date: 2023-10-01
+End Date: 2024-09-30
+
+Notes: <p>-6-month grant report due April 30, 2024</p><p>-Final report- November 15, 2024</p><p>-Recognition of Santander through social media or other publications is highly recommended. Please see Consent to Use Trademark uploaded here.</p>
+
+Fund Number: 
+
+Attached Document: 64f776e502e73_2023RTCLF_Santander_permission-to-use-trademark.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 64f776eaefed5_2023RTYCLF_Santander_executed-contract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 651c4ede90921_23204.RTCLF_ConsentLetter.pdf
+Confidential 
+ 
+Confidential 
+ 
+ 
+Community Action Lehigh Valley 
+ 
+1337 E 5
+th 
+Street, 
+Bethlehem, Pa, 18015
+ 
+ 
+ 
+ 
+Date: 8/28/23 
+ 
+ 
+To whom it may concern 
+ 
+Permission to use registered Santander trademark 
+ 
+In this letter of Consent ("Consent") Santander Holdings USA, Inc. a company incorporated under 
+the laws of Virginia, with its office at 75 State Street, Boston, MA 02109, USA ("SHUSA") authorizes 
+Community Action Committee Lehigh Valley ("Company") of 1337 E 5
+th
+ Street, Bethlehem, PA, 
+18015 (jointly referred to as the 	Parties) to use the trademark(s) listed in Schedule 1 (the 
+"Trademark") within the United States ("Territory") on the following terms:
+ 
+ 
+1.  SHUSA is the licensee of the Trademark and the goodwill in the Trademark, which 	are owned 
+by SHUSA 's parent company Banco 	Santander S.A. ("Parent Company"). Under the terms of 
+its license agreement SHUSA has the limited power to sub-license the Trademark. Exercising 
+this power, SHUSA grants this Company a non- exclusive, non- transferable, non-assignable, 
+royalty-free, revocable permission to use the Trademark solely for the purposes and in the 
+manner described in Schedule 2 Permitted Uses.
+ 
+ 
+2. The Company agrees and undertakes (and 	indemnifies and shall continue to indemnify SHUSA· 
+for any breach of the same) that:
+ 
+ 
+2.1. It shall only use the Trademark for the Permitted Uses as shown in Schedule 2 and comply 
+with the directions of SHUSA regarding the manner and form of the application 	of the 
+Trademark including the directions contained in the brand guidelines provided by SHUSA.
+ 
+ 
+2.2. It shall not apply to register any trademarks, designs or domain names which are the same 
+as or similar to the Trademark;
+ 
+ 
+2.3. It will not use the 	Trademark in such a way as may affect its validity or may lead to 
+revocation of the Trademark or otherwise injure the reputation or distinctiveness of the 
+Trademark; and
+ 
+ 
+2.4.  It shall not act nor purport to act as agent of SHUSA or the Parent Company and shall not 
+in using the Trademark make any representation nor give any warranty on behalf of 
+SHUSA or the Parent Company.
+ 
+ 
+3.  Company is authorized to 	use the Trademarks solely and exclusively in the Territory, on the 
+understanding that the Trademarks may be used on the internet and 	other media which may 
+be accessible outside the Territory. In no event shall the Company use the Trademark in a 
+manner that targets any market or public outside the Territory.
+ 
+ 
+4.  If the Company becomes aware of infringement by any third party, Company shall promptly 
+notify SHUSA in writing, explaining the known facts in reasonable detail, and the Parent
+
+Confidential 
+-2 - 
+ 
+Confidential 
+Company shall have the exclusive right how to react to the infringement, including the 
+commencement of legal proceedings.
+ 
+5.The Company is authorized to use the Trademark from the completion date of this letter until
+the earliest occurrence of any of the following: (a) the expiration date which is 9/30/2024; or (b)
+the termination of this Consent by giving 30 days' written notice to 	the Company.
+6.Additionally, and 	notwithstanding the provisions of the preceding paragraph, this Consent will
+be automatically revoked in any cases of misuse of the Trademark which could compromise
+the goodwill, public image or reputation of the holder of the Trademark.
+7.On termination of this Consent for whatever reason the Company shall remove the Trademark
+from the Permitted Uses and shall immediately cease to use the Trademark or any trading
+style, trademarks, trade name or get up which is similar to the Trademark.
+8.This Consent is personal to Company. The Company shall not assign or transfer all or any part
+of its rights, benefits or obligations under this letter and shall not sub-	licence the Consent to
+third parties.
+9. No variation of this Consent shall be effective unless it is in writing and signed by the 	Parties
+(or their authorized representatives).
+10.This Consent and its terms shall be governed by, construed and interpreted in accordance with
+the laws of the State of New York and the Parties submit to the non-exclusive jurisdiction of the
+courts of the Southern District of New York.
+Respectfully yours, 
+Signed: 
+Printed name:S ofia Muskus 
+Intellectual P roperty Officer 
+Authorized Signatory 
+Date: October 2, 2023 
+For and on behalf of Santander 	Holdings USA, INC. 
+We hereby acknowledge receipt and accept the contents of this letter:
+--------------------

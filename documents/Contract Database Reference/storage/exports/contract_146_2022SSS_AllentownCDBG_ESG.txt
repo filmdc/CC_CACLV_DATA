@@ -1,0 +1,52 @@
+Purpose: <p>$25,000 for maintenance and $15,000 for utilities</p>
+Funder: Allentown DCED CDBG ESG
+Program: SSS
+Amount: 40000.00
+Start Date: 2022-01-01
+End Date: 2023-12-31
+
+Notes: 
+
+Fund Number: F1200
+
+Attached Document: 642435643b5cc_2022SSS_AllentownCDBGESGYEar-48_grantawardsummary.pdf
+Grant Award Summary 
+Program  SSS 
+Funder and 
+Year  
+2022/2023 Year 48 Allentown CDBG ESG 
+Time Frame January 1, 2022-December 31, 2023 
+ 
+Amount 
+Received 
+$40,000  
+Purpose $25,000 for maintenance and $15,000 for utilities 
+Reports Due -Quarterly Reports due every April 10
+th
+, July 10
+th
+, October 10
+th
+ and January 10
+th
+ 
+They will send out an email with the reporting form to be completed when 
+the report is due. 
+Data to be 
+collected 
+Resident demographics, income qualifications, services provided, HMIS 
+privacy consent forms and self-declaration forms should be kept on file at 
+the shelter for each household. 
+Need to Know *Invoices for maintenance and utilities can be billed monthly. All backup 
+(bills, invoices, statements) must be provided to the city with the 
+corresponding request for payment. 
+**This is a reimbursable grant 
+Additional Info Reports and records are to be kept a minimum of 4 years. 
+ 
+Please let me know if you have any further questions or concerns!
+--------------------
+Attached Document: 642435674e2a4_2022SSS_Allentown-CDBGESG-YEar-48_executed-contract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

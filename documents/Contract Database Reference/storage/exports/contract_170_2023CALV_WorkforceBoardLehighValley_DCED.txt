@@ -1,0 +1,16 @@
+Purpose: <p>MOU to set up terms of PA Career Link Partner. Partner referral from CALV to PA Career Link site and vice versa.</p><p>&nbsp;</p><p>We do not pay anything, nor do we receive payment.</p><p>&nbsp;</p>
+Funder: PA DCED
+Program: CALV
+Amount: 0.00
+Start Date: 2023-07-01
+End Date: 2026-06-30
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 64623402a0458_2023-2026-Workforce-Board-Lehigh-Valley-DCED-MOU.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

@@ -1,0 +1,37 @@
+Purpose: <p>-For use to support Sistah Seeds, a farm incubator program member at the Seed Farm.</p><ul><li>Monthly Stipends to be paid to Sistah Seeds by the 10th of the month.</li><li>Sistah Seeds will provide appropriate backup by the 15th of the following month.</li><li>Report due to Ceres Trust by 10/31/2024.</li></ul><p>Please see MOA attached for more details.</p>
+Funder: Ceres Trust
+Program: SHFB
+Amount: 50000.00
+Start Date: 2023-11-27
+End Date: 2024-10-31
+
+Notes: 
+
+Fund Number: F8066
+
+Attached Document: 65a046d2a6555_2024SHFB_Ceres-Trust_Sistah-Seeds.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 65a046de8c7c2_Cere-Trust_Sistah-Seeds_-Signed-Contract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 65a046e1532bc_Ceres-Trust-Bank-Info.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 65a171497e855_Sistah-Seeds-Executed-MOA.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6684305c6746a_CERES-TRUST-Sista-Seeds-executed-pages-2.jpg
+Unsupported file format: image/jpeg
+--------------------
+Attached Document: 668430603eeca_CERES-TRUST-Sista-Seeds-executed-pages-1.jpg
+Unsupported file format: image/jpeg
+--------------------

@@ -1,0 +1,20 @@
+Purpose: <p>-To construct an affordable housing unit located at 1604 W Broad Street, Bethlehem, PA</p><p><strong>-Reimbursable Grant:</strong></p><ul><li>Section 5, page 3<strong> Disbursement of Subaward Funds, </strong>including financial reports to be submitted by e-mail to Sara Satullo at ssatullo@bethlehem-pa.gov for reimbursement. Requests for reimbursement every 30 calendar days.</li><li>Program Budget is the last three pages of the uploaded contract</li><li>20% markup of construction costs will cover CALV staff salary as previously agreed upon with the City. Email uploaded here.</li></ul><p><strong>Other Provisions of Importance:</strong></p><ul><li>Contractors COIs must name "The City of Bethlehem" and " Community Action Lehigh Valley" with coverages shown on page 5 section 13 of the contract.</li><li>Contractor Contracts must include the section 16 Subrecipient Integrity Provisions on pages 6-9 of the contract.</li><li>Contractor Contracts must include section 18 Nondiscrimination and Sexual Harassment provision on pages 10-12 of the contract.</li><li>Follow formal Bidding procedures</li><li>PA Prevailing wage requirement over $24,999</li></ul><p>&nbsp;</p>
+Funder: City of Bethlehem
+Program: CAH
+Amount: 372447.05
+Start Date: 2024-12-04
+End Date: 2026-12-09
+
+Notes: 
+
+Fund Number: F0622
+
+Attached Document: 6750a0b509f2c_2024-Alley-House-Project-email-about-salary.docx
+
+
+--------------------
+Attached Document: 675877d12007a_Alley_house_CALV_PHARE_Execution.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

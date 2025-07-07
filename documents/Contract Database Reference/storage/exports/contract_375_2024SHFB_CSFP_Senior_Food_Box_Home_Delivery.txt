@@ -1,0 +1,26 @@
+Purpose: <p>This agreement outlines the usage of funding for the Senior Food Box Home Delivery Program. The funding is to support the Senior Food Box Program and to assist lead agencies with costs incurred in recruiting and ultimately providing service to more seniors in PA via home delivery.</p><p>The main contract was issued in December 2023, with an allowable reimbursement of $65,275. In July 2024, additional funding for Home Delivery was announced, with an allowable reimbursement of $58,152.00.</p><p>This is a reimbursement program; reimbursement requests are to be submitted 10 days after the reimbursement period (monthly) using <a href="https://docs.google.com/document/d/19XUeJyhCgkuCNkYVCIC_Uxk9r5YfAYQJerlr6Ryd3eM/edit?usp=drive_link">Form 502069</a>. If SHFB anticipates not being able to utilize all of the allocation, Hunger Free PA must be alerted as soon as possible.</p><figure class="image"><img src="http://10.55.0.10/storage/1112/image.png"></figure><p>Capital expenditures are only available with prior approval:</p><figure class="image"><img src="http://10.55.0.10/storage/1113/image.png"></figure><figure class="image"><img src="http://10.55.0.10/storage/1154/image.png"></figure><p>The FoodConnect contract is available <a href="http://contracts.caclv.org/contracts/341">here</a>.</p><p>Contact for the program is Sean Kerins (skerins@pafoodbanks.org).</p>
+Funder: PA Dept of Agriculture
+Program: SHFB
+Amount: 123427.00
+Start Date: 2024-07-01
+End Date: 2025-06-30
+
+Notes: 
+
+Fund Number: F8073
+
+Attached Document: 66c4b5df7e330_2024SHFB_CSFP_HFPA_-Senior-Box-Delivery.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 66ed7e9f62a89_2024_SHFB_HFPA_Home-Delivery-Funds_Lead-Agency-addendum.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 66fadff5a8639_Form-502062A-Agreement-between-HFPA-and-Lead-Agency-Addendum---SHFBLV---SIGNED.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

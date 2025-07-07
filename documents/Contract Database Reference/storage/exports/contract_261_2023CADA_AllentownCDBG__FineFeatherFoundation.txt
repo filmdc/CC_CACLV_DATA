@@ -1,0 +1,21 @@
+Purpose: <p>-Program Director-30 hours per grant year ($10,000)</p><p>-Community Outreach Coordinator- 20 hours per grant year ($5,000)</p><p>-Professional Fees and Service charges ($10,000) -Educational training workshops, youth entrepreneurship, afterschool programs, mentorship, summer camp, etc.</p><p>-Rent/building maintenance ($1,500)</p><p>-Travel/ Feild trips ($1,500)</p><p>-Program supplied ($2,000)</p><p>&nbsp;</p><p>&nbsp;</p>
+Funder: Allentown CDBG
+Program: CADA
+Amount: 30000.00
+Start Date: 2023-01-01
+End Date: 2024-12-31
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 656de5c373710_2023CADA_CDBGYear49_Fine-Feather-Foundation.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 65bbd0403a381_2023CADA_AllentownCDBG-YEar40_FineFeatherFoundation-executed-contract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

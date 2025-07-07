@@ -1,0 +1,16 @@
+Purpose: <p>Tables and chairs for the SSS kitchen.</p>
+Funder: Ruth P Seruga
+Program: SSS
+Amount: 3000.00
+Start Date: 2022-07-01
+End Date: 2023-06-30
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 64243449dd848_Award-Letter-Signed---Oct-25-2022.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

@@ -1,0 +1,102 @@
+<?php
+
+namespace App\Http\Controllers\Frontend;
+
+use LaravelDaily\LaravelCharts\Classes\LaravelChart;
+
+class HomeController
+{
+    public function index()
+    {
+        $settings1 = [
+            'chart_title'           => 'Recently Added',
+            'chart_type'            => 'latest_entries',
+            'report_type'           => 'group_by_date',
+            'model'                 => 'App\Models\Contract',
+            'group_by_field'        => 'created_at',
+            'group_by_period'       => 'day',
+            'aggregate_function'    => 'count',
+            'filter_field'          => 'created_at',
+            'group_by_field_format' => 'Y-m-d H:i:s',
+            'column_class'          => 'col-md-12',
+            'entries_number'        => '10',
+            'fields'                => [
+                'title'           => '',
+                'program'         => 'program_name',
+                'contract_number' => '',
+                'created_at'      => '',
+                'amount'          => '',
+                'start_date'      => '',
+                'end_date'        => '',
+                'funder'          => 'funder_name',
+                
+            ],
+            'translation_key' => 'contract',
+        ];
+
+        $settings1['data'] = [];
+        if (class_exists($settings1['model'])) {
+            $settings1['data'] = $settings1['model']::latest()
+                ->take($settings1['entries_number'])
+                ->get();
+        }
+
+        if (!array_key_exists('fields', $settings1)) {
+            $settings1['fields'] = [];
+        }
+
+        $settings2 = [
+            'chart_title'           => 'Dollars Awarded',
+            'chart_type'            => 'number_block',
+            'report_type'           => 'group_by_date',
+            'model'                 => 'App\Models\Contract',
+            'group_by_field'        => 'created_at',
+            'group_by_period'       => 'year',
+            'aggregate_function'    => 'sum',
+            'aggregate_field'       => 'amount',
+            'filter_field'          => 'created_at',
+            'group_by_field_format' => 'Y-m-d H:i:s',
+            'column_class'          => 'col-md-6',
+            'entries_number'        => '5',
+            'translation_key'       => 'contract',
+        ];
+
+        $settings2['total_number'] = 0;
+        if (class_exists($settings2['model'])) {
+            $settings2['total_number'] = $settings2['model']::when(isset($settings2['filter_field']), function ($query) use ($settings2) {
+                if (isset($settings2['filter_days'])) {
+                    return $query->where($settings2['filter_field'], '>=',
+                now()->subDays($settings2['filter_days'])->format('Y-m-d'));
+                }
+                if (isset($settings2['filter_period'])) {
+                    switch ($settings2['filter_period']) {
+                case 'week': $start = date('Y-m-d', strtotime('last Monday')); break;
+                case 'month': $start = date('Y-m') . '-01'; break;
+                case 'year': $start = date('Y') . '-01-01'; break;
+            }
+                    if (isset($start)) {
+                        return $query->where($settings2['filter_field'], '>=', $start);
+                    }
+                }
+            })
+                ->{$settings2['aggregate_function'] ?? 'count'}($settings2['aggregate_field'] ?? '*');
+        }
+
+        $settings3 = [
+            'chart_title'        => 'Programs',
+            'chart_type'         => 'bar',
+            'report_type'        => 'group_by_string',
+            'model'              => 'App\Models\Contract',
+            'group_by_field'     => 'program_name',
+            'aggregate_function' => 'count',
+            'filter_field'       => 'created_at',
+            'column_class'       => 'col-md-6',
+            'entries_number'     => '5',
+            'translation_key'    => 'contract',
+        ];
+
+        $chart3 = new LaravelChart($settings3);
+
+        return view('/frontend/home', compact('chart3', 'settings1', 'settings2'));
+    }
+}

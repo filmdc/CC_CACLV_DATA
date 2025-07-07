@@ -1,0 +1,40 @@
+Purpose: <p>General operating <strong>GENX ONLY.</strong></p><p>&nbsp;</p><p><strong>Reporting TBD.</strong></p>
+Funder: Stabler Foundation
+Program: REJ
+Amount: 25000.00
+Start Date: 2022-12-14
+End Date: 2023-12-14
+
+Notes: 
+
+Fund Number: 
+
+Attached Document: 641c82d04540b_2022CREJ_StablerFoundation_Award-summary-notification.pdf
+Grant Award Summary 
+Program  REJ-GenX 
+Funder and 
+Year  
+2022 Stabler Foundation 
+Time Frame Money must be spent by December 2023 
+Amount 
+Received 
+$25,000 
+Purpose Support general operation Generation Next  
+Reports Due  Notification must be sent to the Stabler Foundation once the funds have 
+been expended 
+ 
+Data to be 
+collected 
+TBD 
+Need to Know **This is a restricted grant. Money must be maintained separately, and 
+all charges must be shown against the money from this grant on our 
+books.  
+Additional Info Reports and records are to be kept a minimum of 4 years. 
+ 
+Please let me know if you have any further questions or concerns!
+--------------------
+Attached Document: 641c82d3724e7_2022CREJ_StablerFoundation_AwardLetter.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

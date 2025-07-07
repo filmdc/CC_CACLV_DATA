@@ -1,0 +1,21 @@
+Purpose: <p>-General operating for Generation Next only</p><p>-Report due to the foundation before next grant cycle which usually would be in August. Please see uploaded report from last year to use as a guideline of what is needed.</p>
+Funder: Stabler Foundation
+Program: REJ
+Amount: 30000.00
+Start Date: 2024-01-01
+End Date: 2024-06-30
+
+Notes: 
+
+Fund Number: F6410
+
+Attached Document: 65a17e3a04351_StablerFoundation_Award.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 65a17f1761c0e_2023REJ_StablerFoundation_Report-(1).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

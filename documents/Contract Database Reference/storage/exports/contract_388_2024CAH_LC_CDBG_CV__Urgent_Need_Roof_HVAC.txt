@@ -1,0 +1,718 @@
+Purpose: <p>CDBG COVID money to provide new roof and/ or HVAC unit to approximately 10 properties.</p><p><strong>Compliance Requirements: </strong>Pay attention to <strong>all Special Conditions</strong> outlined in section VI. starting on page 3. Some of them are outlined below:</p><ul><li>Each applicant must certify financial hardship due to COVID.<ul><li>Being elderly makes someone vulnerable to COVID and therefore they qualify. They still must self-certify.</li></ul></li><li>LMI Qualify all applicants and adult family members</li><li>Only Lehigh County residents living outside the city limits of Allentown and Bethlehem and not residents of Lower Milford Township qualify.</li><li>Environmental Review to be conducted and submitted to Lehigh County for review and approval prior to beginning work on any home.<ul><li>Environmental Review paperwork is attached</li></ul></li><li>Follow 3 bid procurement process with proper documentation</li><li>A lien must be filed on each property (five-year self-forgiving lien based on the job cost, with forgiveness of 20% per year)</li><li>If the subrecipient receives income from the satisfaction of liens prior to the completion of the forgiveness period, the program income must be returned to Lehigh County.</li><li>Follow HUD Lead Based Paint Regulations</li><li>Follow Historic Preservation requirements</li><li>Contractors must produce COIs naming CALV and Lehigh County as additionally insured.</li><li>Best effort to provide bidding opportunity to Women and Minority Owned Business (W/MBE)</li><li>Staff who have salary reimbursed trough this grant must keep detail on duties performed during working hour to justify hours billed</li></ul>
+Funder: Lehigh County
+Program: CAH
+Amount: 250000.00
+Start Date: 2021-05-01
+End Date: 2025-09-30
+
+Notes: <p><strong>Reimbursement Process -</strong>please read page 4 of the contract subsection I for full details.&nbsp;</p><ul><li>Reporting and Invoicing Deadlines are attached.</li></ul><p><strong>Reporting:</strong></p><ul><li>Required Quarterly and Annual reports to be submitted to cyndiking@lehighcounty.org<ul><li>Reporting forms are attached.</li></ul></li></ul>
+
+Fund Number: F4205
+
+Attached Document: 66fee303202b8_Tier-2-Site-Specific-Review-Strategy-and-Checklist---Lehigh-Co---CV-Urgent-Rehab---FINAL-(1).pdf
+County of Lehigh’s Strategy for Tiered Review for County-wide 
+Urgent Need Roof and HVAC Replacement Program 
+FY 2020 CDBG-CV 
+Enter Applicant Name | Enter Structure Address  	Page 1 
+This written strategy describes the method for the phased environmental review of urgent 
+housing rehabilitation activities as detailed in the Tier 1 Broad-Level Environmental Review (Tier 
+1 ER) project description.  	Each site will be evaluated using this Tier 2 Site-Specific Environmental 
+Review (Tier 2 ER) strategy and checklist.  The Tier 2 ER must be used ONLY for activities described 
+in the attached project description.  All documentation for the compliance factors included in 
+the site-specific review must be completed prior to committing funds for the individual sites. 
+A. Airport Hazards: 
+There are no military airports within Lehigh County or within 15,000 feet of Lehigh 
+County.  There are three (3) FAA regulated civil airports within Lehigh County or within 	2,500 feet of the county boundary – Lehigh Valley International Airport (ABE), Allentown 
+Queen City Municipal Airport (XLL), and Slatington Airport (69N).  Dwelling units located 
+within a Runway Protection Zone/Clear Zone (RPZ/CZ) will not be eligible for assistance 
+under this urgent need rehabilitation program. 
+The Tier 2 ER for each project site shall include a map illustrating the distance between 
+the project site and the end of the nearest runway of the closest civilian airport, which 
+will either be Dulles International Airport (IAD) or the Leesburg Executive Airport (JYO).  If 
+the project site is within 2,500 feet of one of the noted civilian airports, the Tier 2 ER must 
+include a map demonstrating that the project site is not located in a Runway Protection 
+Zone / Clear Zone (RPZ/CZ) of either of the respective identified civilian airports.  Federal 
+assistance may not be used for rehabilitation of a structure located in an RPZ/CZ. 
+Documentation confirming compliance under this factor must be included in Attachment 
+A of the Tier 2 Site -Specific ER. 
+B. Flood Insurance: 
+Applicants whose property to be rehabilitated is located in the 1	-Percent-Annual Chance 
+Floodplain Special Flood Hazard Area 	will be required to purchase and maintain a policy 
+under the National Flood Insurance Program (NFIP).  The amount of Flood Insurance 
+Coverage must be equal to the total project cost (less the estimated land cost) or to the 
+maximum limit of coverage made available by the NFIP.  Property owners must maintain 
+coverage for the life of the subsidy tied to the rehabilitation of the property or the life of 
+the property if funds are granted.  The Tier 2 ER must contain one of the following: 
+1. Documentation supporting the determination that the project does not require flood 
+insurance or is excepted from flood insurance.
+
+County of Lehigh’s Strategy for Tiered Review for County-wide 
+Urgent Need Roof and HVAC Replacement Program 
+FY 2020 CDBG-CV 
+Enter Applicant Name | Enter Structure Address  	Page 2 
+2. A FEMA Flood Insurance Rate Map (FIRMette) showing that the project is not located in 
+a 1-Percent-Annual Chance Floodplain Special Flood Hazard Area. 
+3. A FEMA Flood Insurance Rate Map (FIRMette) showing that the project is located in a 
+1-Percent-Annual Chance Floodplain Special Flood Hazard Area along with a copy of the 
+flood insurance policy declaration or a paid receipt for the current annual flood 
+insurance premium and a copy of the application for flood insurance in the review. 
+Federal assistance may not be used for rehabilitation of a structure located in a floodway. 
+Documentation confirming compliance under this factor must be included in Attachment 
+B of the Tier 2 Site -Specific ER. 
+C. Contamination and Toxic Substance: 
+The County of Lehigh may rehabilitate homes that contain toxic substances such as lead-
+based paint, asbestos, radon, mold, 	etc.  Each site must be inspected and tested for 
+hazards and nuisances, including soil and water if applicable, prior to finalizing the 
+rehabilitation scope of work 	and committing to the project.  At a minimum, the dwelling 
+unit must be inspected for lead-	based paint, asbestos, radon, mold, etc. and related 
+report(s) and testing results must be included in the Tier 2 ER.  Information will be 
+gathered, and remediation will occur to ensure that the site is safe for the intended users 
+of the project as required at 24 CFR 58.5(i).  All F	ederal and S tate lead-based paint and 
+asbestos regulations must be followed.  The contractor will be required to perform all 
+requisite notifications and obtain all necessary permits related to lead-based paint and/or 
+asbestos remediation.  As needed, additional testing and mitigation will be done on a site-
+specific basis. 
+For structures where asbestos-containing materials (ACMs) must be properly removed, 
+transported, and disposed as a part of rehabilitation	, the contractor must provide copies 
+of contractor’s ACM certification, Asbestos Abatement and Demolition/Renovation 
+Notification Form, permitting, disposal manifest, etc.  Said documentation must be 
+included in Attachment C of the Tier 2 ER. 
+The Tier 2 ER will include a U.S. EPA online generated NEPAssist map and report 
+identifying Recognized Environmental Conditions (RECs) within 0.5 miles of the project 
+site.  The Tier 2 ER must also contain the completed HUD Contamination and Toxic 
+Substances Worksheet for the property and one of the following to document 
+compliance:
+
+County of Lehigh’s Strategy for Tiered Review for County-wide 
+Urgent Need Roof and HVAC Replacement Program 
+FY 2020 CDBG-CV 
+Enter Applicant Name | Enter Structure Address  	Page 3 
+1. Evidence supporting a determination that the identified hazard(s) will not affect 
+health and safety of the occupants or conflict with the intended use of the site, 
+including any mitigation measures used. 
+2. Evidence supporting a determination that the identified hazard(s) will not affect 
+health and safety of the occupants or conflict with the intended use of the site, 
+including any mitigation measures used. 
+3. Documentation that the proposed project site has been cleaned up according to EPA 
+or State standards for residential properties, which requires a letter of ''No Further 
+Action'' (NFA) or similar documentation. 
+In addition, the Tier 2 ER 	must include the following: 
+1. Documentation supporting the determination that lead-based paint is or is not 
+present and will or will not be disturbed during rehabilitation.  If present and will be 
+disturbed during rehabilitation, documentation that safe renovations procedures are 
+planned and have been ensured. 
+2. Documentation supporting the determination that asbestos-containing materials 
+(ACM) are or are not present.  If present, documentation that the hazard has been 
+properly mitigated. 
+3. Documentation supporting the determination that elevated levels of radon are or are 
+not present (4 pCi/L or more).  If present, documentation that the hazard has been 
+properly mitigated. 
+4. Documentation supporting the determination that any other contamination, toxic 
+substance nuisance is or is not present.  If present, documentation that the hazard(s) 
+has/have been properly mitigated. 
+Documentation confirming compliance under this factor must be included in Attachment 
+C of the Tier 2 Site -Specific ER. D. Floodplain Management: 
+The County’s Housing Rehabilitation Assistance Program does not fall under one of the 
+24 CFR Part 55 compliance exemptions 	at § 55.12.  The County may rehabilitate housing 
+units in the Federal Floodplain Risk Management Standard (FFRMS) floodplain. However, 
+Federal funds cannot be used under the County’s Housing Rehabilitation Assistance 
+Program for projects located in a floodway. 
+The 8-Step Decision- Making Process required under 24 CFR 55.20 for this urgent housing 
+rehabilitation has been completed and made a part of the Tier-1 Broad-Level Review. The
+
+County of Lehigh’s Strategy for Tiered Review for County-wide 
+Urgent Need Roof and HVAC Replacement Program 
+FY 2020 CDBG-CV 
+Enter Applicant Name | Enter Structure Address  	Page 4 
+Early and Final Floodplain Notices required under the 8-Step Process were published 
+under and made a part of the Tier-1 Board-Level Review for all properties identified for 
+urgent housing rehabilitation 	located in a FFRMS Floodplain. 
+24 CFR Part 55, per Executive Orders 11988 and 13690, distinguishes rehabilitation within 
+a FFRMS floodplain as either “minor improvements” or “substantial improvements.”  A 
+“Substantial Improvement” is any repair, reconstruction, modernization, or improvement 
+of a structure, including a manufactured housing unit, the cost of which equals or exceeds 
+50% of the market value of the structure either, a.) Before the improvement or repair is 
+started; or, b.) If the structure has been damaged, and is being restored, before the 
+damage occurred 
+[55.2(b)(12)]. 
+The County shall use one of the following methods when determining whether a property 
+receiving urgent housing rehabilitation is located in the FFRMS F	loodplain and include the 
+determination and documentation in Attachment D. 
+• Climate-Informed Science Approach (CISA).  	If using a local tool, data, or resources, 
+ensure that the FFRMS elevation is higher than would have been determined using 
+the 0.2 PFA or the FVA. The Federal Flood Standard Support Tool available online 
+should be used to document this determination. 
+• 0.2-Percent-Annual Chance Floodplain Approach (0.2PFA).  Where FEMA has defined 
+the 0.2- percent-annual-chance floodplain, the FFRMS floodplain is the area that 
+FEMA has designated as within the 0.2-percent-annual- chance floodplain. The FEMA 
+Flood Map Service Center available online should be used to document this 
+determination. 
+• Freeboard Value Approach (FVA).  If neither CISA nor 0.2-PFA is available, for non-
+critical actions, the FFRMS floodplain is the area that results from adding two feet to 
+the base flood elevation as established by the effective FIRM or FIS or - if available - a 
+FEMA- provided preliminary or pending FIRM or FIS or advisory base flood elevations, 
+whether regulatory or informational in nature. However, an interim or preliminary 
+FEMA map cannot be used if it is lower than the current FIRM or FIS. The Federal 
+Flood Standard Support Tool available online should be used to document this 
+determination. 
+When using the Federal Flood Standard Support Tool available online, the Service 
+Criticality for this urgent housing rehabilitation 	activity is be “Non-Critical” [see 24 CFR 
+Part 55.2(b)(3)(i)].  The expected service life must be at least 30 years out in accordance 
+with HUD related guidance.
+
+County of Lehigh’s Strategy for Tiered Review for County-wide 
+Urgent Need Roof and HVAC Replacement Program 
+FY 2020 CDBG-CV 
+Enter Applicant Name | Enter Structure Address  	Page 5 
+Documentation confirming compliance under this factor must be included in Attachment 
+D of the Tier 2 Site -Specific ER. 
+E. Historic Preservation: 
+The County of Lehigh 	will consult with the Pennsylvania State Historic Preservation Officer 
+(PA SHPO) for each site -specific property to be demolished and cleared.  The PA SHPO will 
+decide if the property is historic or if it is contributory to a historic district.  If the identified 
+property is considered by the PA SHPO to be historic or contributory and the action of 
+urgent housing rehabilitation 	of the subject property is determined to be an “Adverse 
+Effect,” urgent housing rehabilitation assistance may not proceed using federal funds 
+under this environmentally cleared activity. 
+The following historic review determination and supporting documentation must be 
+included Attachment E of the Tier 2 Site -Specific ER. 
+• “NO EFFECT” – Letter from PA SHPO that concurs with the County’s determination of 
+''No Effect" on historic properties, with documentation on 1) the undertaking and the 
+Area of Potential Effect (APE), including photographs, maps, and drawings, as 
+necessary, 2) steps taken to identify historic properties, 3) the basis for determining 
+that no historic properties are present or affected, 4) evidence of tribal consultation 
+if required; and 5) copies or summaries of any views provided by consulting parties 
+and the public.  If the PA SHPO has not responded to a properly documented request 
+for concurrence within 30 days of receipt of the request, the request will be 
+documented, and the lack of response made part of the ERR. 
+• “NO ADVERSE EFFECT” – Letter from PA SHPO that concurs with the County’s finding 
+of ''No Adverse Effect” on historic properties, with documentation on 1) the 
+undertaking and the Area of Potential Effect (APE), including photographs, maps, and 
+drawings, as necessary, 2) steps taken to identify historic properties, 3) affected 
+historic properties (including characteristics qualifying them for the National Register 
+of Historic Places), 4) the undertaking's effects on historic properties, 5) why the 
+criteria of adverse effect were not applicable (Section 800.5), 6) evidence of tribal 
+consultation if required, and 7) copies or summaries of any views provided by 
+consulting parties and the public. 
+Documentation confirming compliance under this factor must be included in Attachment 
+E of the Tier 2 Site-Specific ER.
+
+County of Lehigh’s Strategy for Tiered Review for County-wide 
+Urgent Need Roof and HVAC Replacement Program 
+FY 2020 CDBG-CV 
+Enter Applicant Name | Enter Structure Address  	Page 6 
+F. Noise Abatement and Control: 
+The County may rehabilitate housing units within proximity of the 24 CFR Part 51, Subpart 
+B potential noise generators; specifically, within 1,000 of a major roadway, 3,000 feet of 
+a railroad, or 15 miles of an airport. The civilian airports within the 15-mile radius of 
+potential project sites in Lehigh 	County are the Lehigh Valley International Airport (ABE), 
+Allentown Queen City Municipal Airport (XLL), and Slatington Airport (69N). 
+The owners of properties to be rehabilitated that are located within the proximity of a 
+major roadway, railroad, and/or airport noise generator(s) will be notified that the noise 
+generated nearby may exceed the average acceptable noise level as determined by HUD. 
+If any of the urgent housing rehabilitation projects are located in a noise sensitive area of 
+the County, the owner will be notified of the implication of the location and may be 
+required to sign a standard notification form.  	The level of noise will be determined, and 
+noise mitigation measures will be encouraged in the rehabilitation of the homes that have 
+elevated noise levels, but final discretion will depend on the homeowner. 
+The Tier 2 ER must contain at least the completed HUD Noise Abatement and Control 
+Worksheet, maps illustrating the proximity of the project site to potential noise 
+generators, and HUD’s Day/Night Noise Level Electronic Assessment Tool if the project 
+site is within one or more of the potential noise generator distance thresholds. 
+Documentation confirming compliance under this factor must be included in Attachment 
+F of the Tier 2 Site-Specific ER. 
+Note: Because the County of Lehigh 	documented compliance with the following Statutes, 
+Executive Orders, and Regulations listed at 24 CFR 58.5 and 58.6 in the completed 	Tier 1 Broad-
+Level Review, the County did not include these in this strategy: 
+• Coastal Barrier Resources 
+• Air Quality 
+• Coastal Zone Management 
+• Endangered Species 
+• Explosive and Flammable Hazards 
+• Farmlands Protection 
+• Sole Source Aquifers 
+• Wetlands Protection 
+• Wild and Scenic Rivers 
+• Environmental Justice
+The Tier 2 Site -Specific ER will utilize the following checklist to evaluate sites prior to the 
+commitment of funds.  A copy of the 	checklist and associated documentation for each site 	will 
+be added to and made a part of the 	completed Tier 1 Broad-Level Environmental Review Record.
+
+County of Lehigh’s Strategy for Tiered Review for County-wide 
+Urgent Need Roof and HVAC Replacement Program 
+FY 2020 CDBG-CV 
+Enter Applicant Name | Enter Structure Address  	Page 7 
+CDBG GRANT NO: 	Enter CDBG Grant Number and Fiscal Year 
+STRUCTURE ADDRESS: 	Enter Structure Address 
+TIER 1 BROAD-LEVEL REVIEW THRESHOLDS 
+1. Will the rehabilitation increase the capacity or density of 
+the structure by more than 20%? 
+☐ Yes 
+☐ No 
+If “YES,” treat as a separate project and 
+prepare separate ERR. 
+2. Will rehabilitation involve a change in land use? ☐ Yes 
+☐ No 
+If “YES,” treat as a separate project and 
+prepare separate ERR. 
+3. Will the cost of rehabilitation exceed replacement cost 
+after rehabilitation by more than 75%? 
+☐ Yes 
+☐ No 
+If “YES,” treat as a separate project and 
+prepare separate ERR. 
+FEDERAL LAWS AND AUTHORITIES  
+A. AIRPORT HAZARDS  
+1. Is the project site located within 2,500 feet of a civilian 
+airport? 
+☐ Yes 
+☐ No 
+If “NO,” project is in compliance with 
+Airport Hazards requirements. 
+2. If “YES” to A.1., is the project site located within the 
+Runway Protection Zone / Clear Zone (RPZ/CZ)? 
+☐ Yes 
+☐ No 
+☐ N/A 
+If “NO,” project is in compliance with 
+Airport Hazards requirements. 
+If “YES,” project may not proceed. 
+­ NOTE:  Federal assistance may not be used for rehabilitation of a structure located in an RPZ/CZ. 
+­ Include in Attachment A. a map illustrating the distance of the project site from the closest civilian airport and, 
+if applicable, a map illustrating the project site is NOT located in an RPZ/CZ. 
+B. FLOOD INSURANCE  
+1. Is the project site located in a 1-Percent-Annual Chance Floodplain? ☐ Yes ☐ No 
+If “NO” to B.1., the project is in compliance with Flood Insurance requirements. 
+If “YES” to B.1., applicants whose property to be rehabilitated is located in the 1-Percent-Annual 
+Chance Floodplain must purchase, maintain, and provide proof of an adequate policy under the 
+National Flood Insurance Program (NFIP). 
+­ NOTE:  Federal assistance may not be used for rehabilitation of a structure located in the floodway. 
+­ Include in Attachment B. the FIRMette documenting the location of the project site in relation to 1-Percent-
+Annual Chance Floodplain 	and the floodway. 
+­ If applicable, include in Attachment B. a copy of the applicant’s 	flood insurance policy declaration or a paid receipt 
+for the current annual flood insurance premium and a copy of the application for flood insurance in the review. 
+­ Resource:  FEMA Flood Map Service Center 
+C. CONTAMINATION AND TOXIC SUBSTANCES 
+1. Are there visible dumps, landfills, industrial sites, or other locations containing or releasing 
+toxic, hazardous, or radioactive materials, chemicals, or hazardous wastes on or within 0.5 
+miles of the subject site? 
+☐ Yes 
+☐ No
+
+County of Lehigh’s Strategy for Tiered Review for County-wide 
+Urgent Need Roof and HVAC Replacement Program 
+FY 2020 CDBG-CV 
+Enter Applicant Name | Enter Structure Address  	Page 8 
+Document the source of information used to make this determination and include in Attachment C. 
+Enter documentation source(s) 
+2. Does this project site contain an underground storage tank (excludes residential fuel 
+tank)? 
+☐ Yes 
+☐ No 
+Document the source of information used to make this determination and include in Attachment C. 
+Enter documentation source(s) 
+3. Do Federal, State, or local environmental records sources reveal on or nearby sites (within 
+0.5 miles) that may pose threats to the subject site occupants’ health or safety? 
+☐ Yes 
+☐ No 
+Document the source of information used to make this determination and include in Attachment C. 
+Enter documentation source(s) 
+4. Is Lead-Based Paint present? 
+If “YES,” mitigation plan and implementation documentation 	must be included in Attachment A	. 
+☐ Yes 
+☐ No 
+Document the source of information used to make this determination and include in Attachment C. 
+Enter documentation source(s) 
+5. Is Asbestos-Containing Materials (ACM) present? 
+If “YES,” mitigation plan and implementation documentation 	must be included in Attachment A	. 
+☐ Yes 
+☐ No 
+Document the source of information used to make this determination and include in Attachment C. 
+Enter documentation source(s) 
+6. Are Elevated Levels of Radon present (4 pCi/L or more)? 
+If “YES,” mitigation plan and implementation documentation 	must be included in Attachment C. 
+☐ Yes 
+☐ No 
+Document the source of information used to make this determination and include in Attachment C. 
+Enter documentation source(s) 
+7. Were any other contamination and toxic substances present (e.g. combustible materials 
+like oil tanks or gas lines, solvents, pesticides, and other hazardous substances)? 
+If “YES,” mitigation plan and implementation documentation must be included in Attachment A. 
+☐ Yes 
+☐ No 
+Document the source of information used to make this determination and include in Attachment C. 
+Enter documentation source(s) 
+­ Resource:  HUD Contamination and Toxic Substances Worksheet 
+­ Resource:  NEPAssist Tool 
+­ Resource:  Underground Storage Tank (UST) Finder  
+D. FLOODPLAIN MANAGEMENT  
+1. Identify the project’s expected Service Life (mark which applies): 
+ ☐ 2050 ☐ 2060 ☐ 2070 ☐ 2080 ☐ 2090 ☐ 2100+ 
+The expected service life shall be no less than 30 years. 
+2. Is the structure to receive urgent housing rehabilitation located in an FFRMS 
+floodplain or wetland? 
+☐ Yes ☐ No
+
+County of Lehigh’s Strategy for Tiered Review for County-wide 
+Urgent Need Roof and HVAC Replacement Program 
+FY 2020 CDBG-CV 
+Enter Applicant Name | Enter Structure Address  	Page 9 
+Identify which of the following three (3) methods were used to determine FFRMS. 
+☐ Climate-Informed Science Approach (CISA). 
+☐ 0.2-Percent-Annual Chance Floodplain Approach (0.2PFA). 
+☐ Freeboard Value Approach (FVA). 
+Include determination documentation in Attachment D. 
+If “NO” to D.2., the proposed project is in compliance with Floodplain Management requirements, and 
+no further review is required under this factor. 
+If “YES” to D.2., refer to the 8-Step Decision-Making Process and the Early and Final Floodplain Notice 
+published as a part of this urgent housing rehabilitation activity Tier 1 Broad-Level Review.  No further 
+review is required under this factor for urgent housing rehabilitation activities unless exterior HVAC 
+equipment, electrical connections, etc. must be floodproofed. 
+­ NOTE: Include in Attachment D. mapping and supporting documentation of FFRMS determination and mitigation 
+measures if applicable. 
+­ Resource: FEMA Flood Map Service Center (0.2PFA and floodway) 
+­ Resource:  Federal Flood Standard Support Tool (FFRMS floodplain based on CISA or FVA) 
+E. HISTORIC PRESERVATION  
+ 
+1. What is the year of construction and age of structure? 
+Year Constructed:  Enter Year 	Age (in years):  Enter Age 
+2. Is the structure located in a Historic District? 	☐ Yes ☐ No 
+3. Is the structure located in an area eligible to be listed on the national Register? ☐ Yes ☐ No 
+4. Is the structure listed on or eligible to be listed on the National Register? ☐ Yes ☐ No 
+5. Date Section 106 Historic Review request submitted to PA SHPO ........................... Enter date 
+6. Date concurrent from PA SHPO provided ................................................................. Enter date 
+7. Historic Review Determination (mark which applies): 
+☐ “NO EFFECT” – Letter from PA SHPO that concurs with the County’s determination of ''No Effect" 
+on historic properties, with documentation on 1) the undertaking and the Area of Potential Effect 
+(APE), including photographs, maps, and drawings, as necessary, 2) steps taken to identify historic 
+properties, 3) the basis for determining that no historic properties are present or affected, 4) 
+evidence of tribal consultation if required; and 5) copies or summaries of any views provided by 
+consulting parties and the public.  If the PA SHPO has not responded to a properly documented 
+request for concurrence within 30 days of receipt of the request, the request will be documented, 
+and the lack of response made part of the ERR. 
+☐ “NO ADVERSE EFFECT” – Letter from PA SHPO that concurs with the County’s finding of ''No 
+Adverse Effect” on historic properties, with documentation on 1) the undertaking and the Area 
+of Potential Effect (APE), including photographs, maps, and drawings, as necessary, 2) steps taken
+
+County of Lehigh’s Strategy for Tiered Review for County-wide 
+Urgent Need Roof and HVAC Replacement Program 
+FY 2020 CDBG-CV 
+Enter Applicant Name | Enter Structure Address  	Page 10 
+to identify historic properties, 3) affected historic properties (including characteristics qualifying 
+them for the National Register of Historic Places), 4) the undertaking's effects on historic 
+properties, 5) why the criteria of adverse effect were not applicable (Section 800.5), 6) evidence 
+of tribal consultation if required, and 7) copies or summaries of any views provided by consulting 
+parties and the public. 
+☐ “ADVERSE EFFECT” – If the identified property is considered by the PA SHPO to be historic or 
+contributory and the action of urgent 	housing rehabilitation of the subject property is determined 
+to be an “Adverse Effect,” urgent housing rehabilitation of the subject property may not proceed 
+using federal funds. 
+­ NOTE:  Include in Attachment E. the County’s historic review determination, Section 106 Historic Review request 
+documentation to PA SHPO, and PA SHPO’s written determination. 
+­ Resource: PA-SHARE 
+F. NOISE ABATEMENT AND CONTROL  
+1. Is the site located within 1,000 feet of a major roadway, 3,000 feet of a railroad, or 
+within 15 miles of an airport? 
+☐ Yes ☐ No 
+If “NO,” project is in compliance with Noise Abatement and Control requirements and no further review is required 
+under this factor. 
+2. If “YES” to F.1., do noise levels at the site exceed 65 decibels? 	☐ Yes ☐ No 
+3. If “YES” to F.2., noise mitigation measures must be utilized in rehabilitation OR applicant must sign 
+noise disclosure. 
+­ NOTE:  The HUD Noise Abatement and Control Worksheet must be completed and included in Attachment F, 
+along with supporting documentation	. 
+­ Resource: HUD Noise Abatement and Control Worksheet 
+­ Resource:  PennDOT Traffic Volume Mapping 
+­ Resource:  Federal Railroad Administration Safety Mapping 
+­ Resource:  Federal Railroad Administration Crossing Inventory Reports 
+­ Resource:  HUD Day/Night Noise Level Electronic Assessment Tool
+
+County of Lehigh’s Strategy for Tiered Review for County-wide 
+Urgent Need Roof and HVAC Replacement Program 
+FY 2020 CDBG-CV 
+Enter Applicant Name | Enter Structure Address  	Page 11 
+CDBG GRANT NO: 	Enter CDBG Grant Number and Fiscal Year 
+STRUCTURE ADDRESS: 	Enter Structure Address 
+TIER 2 SITE-SPECIFIC REVIEW DETERMINATION 
+☐ This Tier 2 Site-Specific Environmental Review (Tier 2 ER) for the above listed structure is 
+COMPLETE and the proposed urgent housing rehabilitation 	activity may proceed; or 
+☐ A Separate Environmental Review Record (ERR) must be prepared for the above	-listed 
+structure. 
+ 
+ 
+ 
+  Enter Title 	Enter Date 
+Signature of Preparer Title 	Date
+
+County of Lehigh’s Strategy for Tiered Review for County-wide 
+Urgent Need Roof and HVAC Replacement Program 
+FY 2020 CDBG-CV 
+Enter Applicant Name | Enter Structure Address 
+REHABILITATION SCOPE OF WORK
+
+County of Lehigh’s Strategy for Tiered Review for County-wide 
+Urgent Need Roof and HVAC Replacement Program 
+FY 2020 CDBG-CV 
+Enter Applicant Name | Enter Structure Address 
+PROJECT LOCATION MAPPING
+
+County of Lehigh’s Strategy for Tiered Review for County-wide 
+Urgent Need Roof and HVAC Replacement Program 
+FY 2020 CDBG-CV 
+Enter Applicant Name | Enter Structure Address 
+PHOTOGRAPHS
+
+County of Lehigh’s Strategy for Tiered Review for County-wide 
+Urgent Need Roof and HVAC Replacement Program 
+FY 2020 CDBG-CV 
+Enter Applicant Name | Enter Structure Address 
+ATTACHMENT A – AIRPORT HAZARDS 
+Clear Zones and Accident Potential Zones; 24 CFR Part 51 Subpart D
+
+County of Lehigh’s Strategy for Tiered Review for County-wide 
+Urgent Need Roof and HVAC Replacement Program 
+FY 2020 CDBG-CV 
+Enter Applicant Name | Enter Structure Address 
+ATTACHMENT B – FLOOD INSURANCE 
+Flood Disaster Protection Act of 1973 and National Flood Insurance Reform Act of 1994 [42 USC 
+4001-4128 and 42 USC 5154a]
+
+County of Lehigh’s Strategy for Tiered Review for County-wide 
+Urgent Need Roof and HVAC Replacement Program 
+FY 2020 CDBG-CV 
+Enter Applicant Name | Enter Structure Address 
+ATTACHMENT C – CONTAMINATION AND TOXIC SUBSTANCES 
+24 CFR 50.3(i) & 58.5(i)(2)] (HUD Standard)
+
+County of Lehigh’s Strategy for Tiered Review for County-wide 
+Urgent Need Roof and HVAC Replacement Program 
+FY 2020 CDBG-CV 
+Enter Applicant Name | Enter Structure Address 
+ATTACHMENT D – FLOODPLAIN MANAGEMENT 
+Executive Orders 11988 and 13690; 24 CFR Part 55
+
+County of Lehigh’s Strategy for Tiered Review for County-wide 
+Urgent Need Roof and HVAC Replacement Program 
+FY 2020 CDBG-CV 
+Enter Applicant Name | Enter Structure Address 
+ATTACHMENT E – HISTORIC PRESERVATION 
+National Historic Preservation Act of 1966, particularly sections 106 & 110; 36 CFR Part 800
+
+County of Lehigh’s Strategy for Tiered Review for County-wide 
+Urgent Need Roof and HVAC Replacement Program 
+FY 2020 CDBG-CV 
+Enter Applicant Name | Enter Structure Address 
+ATTACHMENT F – NOISE ABATEMENT AND CONTROL 
+Noise Control Act of 1972, as amended by the Quiet Communities Act of 1978; 24 CFR Part 51 
+Subpart B
+
+County of Lehigh, PA 
+Major Road/Railroad/Airport 
+NOISE DISCLOSURE – Page 1 of 2 
+I (We) Enter Applicant’s Name, the Owner(s) of Enter Property Address (“the Property”), acknowledge 
+the receipt of the following which was reviewed with me by a representative of the Lehigh County 
+Department of Community and Economic Development. 
+The above referenced property is located approximately Enter distance to major road feet from a major 
+road, approximately Enter distance to railroad feet from a railroad, and approximately Enter distance 
+to airport feet from an airport.  This is shown on the attached map(s).  The property may be in the 
+vicinity of a potential noise generator that may produce significant noise.  As a result, the noise 
+generated by the major road, railroad, and/or airport may exceed the average acceptable noise level 
+as determined by the U.S. Department of Housing and Urban Development (HUD). 
+HUD’s environmental regulations require, for federally financed housing rehabilitation projects, that measures be taken to reduce noise to an acceptable level.  HUD’s “Acceptable Noise Level” is less than 65 dBs.  HUD’s goal, however, is 55 dBs outdoors and 45 dBs indoors.  HUD suggests that housing 
+incorporate noise attenuation features, give the extent and nature of the rehabilitation being undertaken and the level of exterior noise exposure.  The noise mitigation measures may involve 
+modifying a structure and/or altering the rehabilitation design to reduce interior noise. 
+Due to the noise decibel level, it is recommended that noise buffering materials be used.  The following 
+measures may be taken: 
+Measures that may be made as part of the project: 
+• Double-Pane Windows 
+• Weather stripping around Windows and Doors 
+• Construct Ceilings and Floors with Dense Materials 
+• Construct Walls with Sound Transmission Class (STC) materials rated to reduce 
+• noise 
+• Use of Heavy Weight Roofing Materials 
+Measures that you may take on your own: 
+• Use Heavy Drapes 
+• Provide Air Conditioning 
+• Close Windows and Doors When Possible
+
+County of Lehigh, PA 
+Major Road/Railroad/Airport 
+NOISE DISCLOSURE – Page 2 of 2 
+These materials are an increased expense and may exceed funding limits.  	By signing below, the 
+“Owner” acknowledges the impact and exposure to noise.  	The “Owner” may, at his/her own expense, 
+upgrade to noise control materials prior to the execution of the “Owner and Contractor Agreement”. 
+ 
+      
+Owner Name Owner Signature  Date 
+ 
+ 
+ 
+ 
+      
+Owner Name Owner Signature  Date 
+ 
+      
+Witness Name Witness Signature  Date
+--------------------
+Attached Document: 66fee307c6cca_Tier-2-Site-Specific-Review-Strategy-and-Checklist---Lehigh-Co---CV-Urgent-Rehab---FINAL-(1).docx
+This written strategy describes the method for the phased environmental review of urgent housing rehabilitation activities as detailed in the Tier 1 Broad-Level Environmental Review (Tier 1 ER) project description.  Each site will be evaluated using this Tier 2 Site-Specific Environmental Review (Tier 2 ER) strategy and checklist.  The Tier 2 ER must be used ONLY for activities described in the attached project description.  All documentation for the compliance factors included in the site-specific review must be completed prior to committing funds for the individual sites.
+Airport Hazards:
+There are no military airports within Lehigh County or within 15,000 feet of Lehigh County.  There are three (3) FAA regulated civil airports within Lehigh County or within 2,500 feet of the county boundary – Lehigh Valley International Airport (ABE), Allentown Queen City Municipal Airport (XLL), and Slatington Airport (69N).  Dwelling units located within a Runway Protection Zone/Clear Zone (RPZ/CZ) will not be eligible for assistance under this urgent need rehabilitation program.
+The Tier 2 ER for each project site shall include a map illustrating the distance between the project site and the end of the nearest runway of the closest civilian airport, which will either be Dulles International Airport (IAD) or the Leesburg Executive Airport (JYO).  If the project site is within 2,500 feet of one of the noted civilian airports, the Tier 2 ER must include a map demonstrating that the project site is not located in a Runway Protection Zone / Clear Zone (RPZ/CZ) of either of the respective identified civilian airports.  Federal assistance may not be used for rehabilitation of a structure located in an RPZ/CZ.
+Documentation confirming compliance under this factor must be included in Attachment A of the Tier 2 Site-Specific ER.
+Flood Insurance:
+Applicants whose property to be rehabilitated is located in the 1-Percent-Annual Chance Floodplain Special Flood Hazard Area will be required to purchase and maintain a policy under the National Flood Insurance Program (NFIP).  The amount of Flood Insurance Coverage must be equal to the total project cost (less the estimated land cost) or to the maximum limit of coverage made available by the NFIP.  Property owners must maintain coverage for the life of the subsidy tied to the rehabilitation of the property or the life of the property if funds are granted.  The Tier 2 ER must contain one of the following:
+Documentation supporting the determination that the project does not require flood insurance or is excepted from flood insurance.
+A FEMA Flood Insurance Rate Map (FIRMette) showing that the project is not located in a 1-Percent-Annual Chance Floodplain Special Flood Hazard Area.
+A FEMA Flood Insurance Rate Map (FIRMette) showing that the project is located in a 1-Percent-Annual Chance Floodplain Special Flood Hazard Area along with a copy of the flood insurance policy declaration or a paid receipt for the current annual flood insurance premium and a copy of the application for flood insurance in the review.
+Federal assistance may not be used for rehabilitation of a structure located in a floodway.
+Documentation confirming compliance under this factor must be included in Attachment B of the Tier 2 Site-Specific ER.
+Contamination and Toxic Substance:
+The County of Lehigh may rehabilitate homes that contain toxic substances such as lead-based paint, asbestos, radon, mold, etc.  Each site must be inspected and tested for hazards and nuisances, including soil and water if applicable, prior to finalizing the rehabilitation scope of work and committing to the project.  At a minimum, the dwelling unit must be inspected for lead-based paint, asbestos, radon, mold, etc. and related report(s) and testing results must be included in the Tier 2 ER.  Information will be gathered, and remediation will occur to ensure that the site is safe for the intended users of the project as required at 24 CFR 58.5(i).  All Federal and State lead-based paint and asbestos regulations must be followed.  The contractor will be required to perform all requisite notifications and obtain all necessary permits related to lead-based paint and/or asbestos remediation.  As needed, additional testing and mitigation will be done on a site-specific basis.
+For structures where asbestos-containing materials (ACMs) must be properly removed, transported, and disposed as a part of rehabilitation, the contractor must provide copies of contractor’s ACM certification, Asbestos Abatement and Demolition/Renovation Notification Form, permitting, disposal manifest, etc.  Said documentation must be included in Attachment C of the Tier 2 ER.
+The Tier 2 ER will include a U.S. EPA online generated NEPAssist map and report identifying Recognized Environmental Conditions (RECs) within 0.5 miles of the project site.  The Tier 2 ER must also contain the completed HUD Contamination and Toxic Substances Worksheet for the property and one of the following to document compliance:
+Evidence supporting a determination that the identified hazard(s) will not affect health and safety of the occupants or conflict with the intended use of the site, including any mitigation measures used.
+Evidence supporting a determination that the identified hazard(s) will not affect health and safety of the occupants or conflict with the intended use of the site, including any mitigation measures used.
+Documentation that the proposed project site has been cleaned up according to EPA or State standards for residential properties, which requires a letter of &#039;&#039;No Further Action&#039;&#039; (NFA) or similar documentation.
+In addition, the Tier 2 ER must include the following:
+Documentation supporting the determination that lead-based paint is or is not present and will or will not be disturbed during rehabilitation.  If present and will be disturbed during rehabilitation, documentation that safe renovations procedures are planned and have been ensured.
+Documentation supporting the determination that asbestos-containing materials (ACM) are or are not present.  If present, documentation that the hazard has been properly mitigated.
+Documentation supporting the determination that elevated levels of radon are or are not present (4 pCi/L or more).  If present, documentation that the hazard has been properly mitigated.
+Documentation supporting the determination that any other contamination, toxic substance nuisance is or is not present.  If present, documentation that the hazard(s) has/have been properly mitigated.
+Documentation confirming compliance under this factor must be included in Attachment C of the Tier 2 Site-Specific ER.
+Floodplain Management:
+The County’s Housing Rehabilitation Assistance Program does not fall under one of the 24 CFR Part 55 compliance exemptions at § 55.12.  The County may rehabilitate housing units in the Federal Floodplain Risk Management Standard (FFRMS) floodplain.  However, Federal funds cannot be used under the County’s Housing Rehabilitation Assistance Program for projects located in a floodway.
+The 8-Step Decision-Making Process required under 24 CFR 55.20 for this urgent housing rehabilitation has been completed and made a part of the Tier-1 Broad-Level Review.  The Early and Final Floodplain Notices required under the 8-Step Process were published under and made a part of the Tier-1 Board-Level Review for all properties identified for urgent housing rehabilitation located in a FFRMS Floodplain.
+24 CFR Part 55, per Executive Orders 11988 and 13690, distinguishes rehabilitation within a FFRMS floodplain as either “minor improvements” or “substantial improvements.”  A “Substantial Improvement” is any repair, reconstruction, modernization, or improvement of a structure, including a manufactured housing unit, the cost of which equals or exceeds 50% of the market value of the structure either, a.) Before the improvement or repair is started; or, b.) If the structure has been damaged, and is being restored, before the damage occurred [55.2(b)(12)].
+The County shall use one of the following methods when determining whether a property receiving urgent housing rehabilitation is located in the FFRMS Floodplain and include the determination and documentation in Attachment D.
+Climate-Informed Science Approach (CISA).  If using a local tool, data, or resources, ensure that the FFRMS elevation is higher than would have been determined using the 0.2 PFA or the FVA.  The Federal Flood Standard Support Tool available online should be used to document this determination.
+0.2-Percent-Annual Chance Floodplain Approach (0.2PFA).  Where FEMA has defined the 0.2-percent-annual-chance floodplain, the FFRMS floodplain is the area that FEMA has designated as within the 0.2-percent-annual-chance floodplain.  The FEMA Flood Map Service Center available online should be used to document this determination.
+Freeboard Value Approach (FVA).  If neither CISA nor 0.2-PFA is available, for non-critical actions, the FFRMS floodplain is the area that results from adding two feet to the base flood elevation as established by the effective FIRM or FIS or - if available - a FEMA-provided preliminary or pending FIRM or FIS or advisory base flood elevations, whether regulatory or informational in nature. However, an interim or preliminary FEMA map cannot be used if it is lower than the current FIRM or FIS.  The Federal Flood Standard Support Tool available online should be used to document this determination.
+When using the Federal Flood Standard Support Tool available online, the Service Criticality for this urgent housing rehabilitation activity is be “Non-Critical” [see 24 CFR Part 55.2(b)(3)(i)].  The expected service life must be at least 30 years out in accordance with HUD related guidance.
+Documentation confirming compliance under this factor must be included in Attachment D of the Tier 2 Site-Specific ER.
+Historic Preservation:
+The County of Lehigh will consult with the Pennsylvania State Historic Preservation Officer (PA SHPO) for each site-specific property to be demolished and cleared.  The PA SHPO will decide if the property is historic or if it is contributory to a historic district.  If the identified property is considered by the PA SHPO to be historic or contributory and the action of urgent housing rehabilitation of the subject property is determined to be an “Adverse Effect,” urgent housing rehabilitation assistance may not proceed using federal funds under this environmentally cleared activity.
+The following historic review determination and supporting documentation must be included Attachment E of the Tier 2 Site-Specific ER.
+“NO EFFECT” – Letter from PA SHPO that concurs with the County’s determination of &#039;&#039;No Effect&quot; on historic properties, with documentation on 1) the undertaking and the Area of Potential Effect (APE), including photographs, maps, and drawings, as necessary, 2) steps taken to identify historic properties, 3) the basis for determining that no historic properties are present or affected, 4) evidence of tribal consultation if required; and 5) copies or summaries of any views provided by consulting parties and the public.  If the PA SHPO has not responded to a properly documented request for concurrence within 30 days of receipt of the request, the request will be documented, and the lack of response made part of the ERR.
+“NO ADVERSE EFFECT” – Letter from PA SHPO that concurs with the County’s finding of &#039;&#039;No Adverse Effect” on historic properties, with documentation on 1) the undertaking and the Area of Potential Effect (APE), including photographs, maps, and drawings, as necessary, 2) steps taken to identify historic properties, 3) affected historic properties (including characteristics qualifying them for the National Register of Historic Places), 4) the undertaking&#039;s effects on historic properties, 5) why the criteria of adverse effect were not applicable (Section 800.5), 6) evidence of tribal consultation if required, and 7) copies or summaries of any views provided by consulting parties and the public.
+Documentation confirming compliance under this factor must be included in Attachment E of the Tier 2 Site-Specific ER.
+
+Noise Abatement and Control:
+The County may rehabilitate housing units within proximity of the 24 CFR Part 51, Subpart B potential noise generators; specifically, within 1,000 of a major roadway, 3,000 feet of a railroad, or 15 miles of an airport. The civilian airports within the 15-mile radius of potential project sites in Lehigh County are the Lehigh Valley International Airport (ABE), Allentown Queen City Municipal Airport (XLL), and Slatington Airport (69N).
+The owners of properties to be rehabilitated that are located within the proximity of a major roadway, railroad, and/or airport noise generator(s) will be notified that the noise generated nearby may exceed the average acceptable noise level as determined by HUD. If any of the urgent housing rehabilitation projects are located in a noise sensitive area of the County, the owner will be notified of the implication of the location and may be required to sign a standard notification form.  The level of noise will be determined, and noise mitigation measures will be encouraged in the rehabilitation of the homes that have elevated noise levels, but final discretion will depend on the homeowner.
+The Tier 2 ER must contain at least the completed HUD Noise Abatement and Control Worksheet, maps illustrating the proximity of the project site to potential noise generators, and HUD’s Day/Night Noise Level Electronic Assessment Tool if the project site is within one or more of the potential noise generator distance thresholds.
+Documentation confirming compliance under this factor must be included in Attachment F of the Tier 2 Site-Specific ER.
+Note:  Because the County of Lehigh documented compliance with the following Statutes, Executive Orders, and Regulations listed at 24 CFR 58.5 and 58.6 in the completed Tier 1 Broad-Level Review, the County did not include these in this strategy:
+
+Coastal Barrier Resources
+Air Quality
+Coastal Zone Management
+Endangered Species
+Explosive and Flammable Hazards
+Farmlands Protection
+Sole Source Aquifers
+Wetlands Protection
+Wild and Scenic Rivers
+Environmental Justice
+The Tier 2 Site-Specific ER will utilize the following checklist to evaluate sites prior to the commitment of funds.  A copy of the checklist and associated documentation for each site will be added to and made a part of the completed Tier 1 Broad-Level Environmental Review Record.
+CDBG GRANT NO:	
+STRUCTURE ADDRESS:	
+
+CDBG GRANT NO:	
+STRUCTURE ADDRESS:	
+REHABILITATION SCOPE OF WORK
+
+PROJECT LOCATION MAPPING
+
+PHOTOGRAPHS
+
+ATTACHMENT a – Airport Hazards
+Clear Zones and Accident Potential Zones; 24 CFR Part 51 Subpart D
+ATTACHMENT B – Flood Insurance
+Flood Disaster Protection Act of 1973 and National Flood Insurance Reform Act of 1994 [42 USC 4001-4128 and 42 USC 5154a]
+ATTACHMENT C – Contamination and Toxic Substances
+24 CFR 50.3(i) &amp; 58.5(i)(2)] (HUD Standard)
+ATTACHMENT D – Floodplain Management
+Executive Orders 11988 and 13690; 24 CFR Part 55
+ATTACHMENT E – Historic Preservation
+National Historic Preservation Act of 1966, particularly sections 106 &amp; 110; 36 CFR Part 800
+ATTACHMENT F – Noise Abatement and Control
+Noise Control Act of 1972, as amended by the Quiet Communities Act of 1978; 24 CFR Part 51 Subpart B
+County of Lehigh, PA
+Major Road/Railroad/Airport
+NOISE DISCLOSURE – Page 1 of 2
+I (We) , the Owner(s) of  (“the Property”), acknowledge the receipt of the following which was reviewed with me by a representative of the Lehigh County Department of Community and Economic Development.
+The above referenced property is located approximately  feet from a major road, approximately  feet from a railroad, and approximately  feet from an airport.  This is shown on the attached map(s).  The property may be in the vicinity of a potential noise generator that may produce significant noise.  As a result, the noise generated by the major road, railroad, and/or airport may exceed the average acceptable noise level as determined by the U.S. Department of Housing and Urban Development (HUD).
+HUD’s environmental regulations require, for federally financed housing rehabilitation projects, that measures be taken to reduce noise to an acceptable level.  HUD’s “Acceptable Noise Level” is less than 65 dBs.  HUD’s goal, however, is 55 dBs outdoors and 45 dBs indoors.  HUD suggests that housing incorporate noise attenuation features, give the extent and nature of the rehabilitation being undertaken and the level of exterior noise exposure.  The noise mitigation measures may involve modifying a structure and/or altering the rehabilitation design to reduce interior noise.
+Due to the noise decibel level, it is recommended that noise buffering materials be used.  The following measures may be taken:
+Measures that may be made as part of the project:
+Double-Pane Windows
+Weather stripping around Windows and Doors
+Construct Ceilings and Floors with Dense Materials
+Construct Walls with Sound Transmission Class (STC) materials rated to reduce
+noise
+Use of Heavy Weight Roofing Materials
+Measures that you may take on your own:
+Use Heavy Drapes
+Provide Air Conditioning
+Close Windows and Doors When Possible
+
+County of Lehigh, PA
+Major Road/Railroad/Airport
+NOISE DISCLOSURE – Page 2 of 2
+These materials are an increased expense and may exceed funding limits.  By signing below, the “Owner” acknowledges the impact and exposure to noise.  The “Owner” may, at his/her own expense, upgrade to noise control materials prior to the execution of the “Owner and Contractor Agreement”.
+					
+Owner Name		Owner Signature		Date
+					
+Owner Name		Owner Signature		Date
+					
+Witness Name		Witness Signature		Date
+
+--------------------
+Attached Document: 66fee31f54b2b_2024CAH_-LC-CDBG-CV-_-Urgent-Need-Roof-HVAC.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 67211bc372203_CACLV-Urgent-Need-Roof-&-HVAC-System-Replacement-FULLY-EXECUTED-Subgrant-Agreement.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 67211bca2dec6_APR-LMC2---Beneficiary-Data.docx
+ATTACHMENT C
+FORM APR LMC2
+  Please complete and remit this annual report, along with Form APR LMC1.	 	
+  Reports are to be emailed to Cyndi King at cyndiking@lehighcounty.org.						DATE:      
+  Reports are to be emailed to Cyndi King at cyndiking@lehighcounty.org.						DATE:      
+For use by LCDCED:  IDIS Accom. Entry Date: ___________Comments:
+
+--------------------
+Attached Document: 67211bd1e7a54_PR-CP-Form---Perf-Report-Construction-Projects.doc
+Unsupported file format: application/msword
+--------------------
+Attached Document: 67211bd89ff72_Reporting-and-Invoicing-Deadlines.xlsx
+																
+	Construction Projects			Public Service Projects												
+Due Date	Report		Invoice	Reports		Invoice										
+January 15, 2025	None		None	Grantee Check-In Zoom Meeting
+Contact CyndiKing@lehighcounty.org to schedule meeting.  Meeting to occur by due date.		None										
+January 31, 2025	None		None	None		Invoice for expenses encumbered 10/1/24 - 12/31/24.  Email to lauriemoyer@lehighcounty.org										
+April 15, 2025	Grantee Check-In Zoom Meeting
+Contact CyndiKing@lehighcounty.org to schedule meeting.  Meeting to occur by due date.		None	Performance Report for Public Service Projects (Form PR-PSP)
+ reflecting activity from 10/1/24 to 3/31/25.  Email to CyndiKing@lehighcounty.org.		None										
+April 30, 2025	None		Invoice for expenses encumbered 1/1/25 to 3/31/25.  Email to lauriemoyer@lehighcounty.org	None		Invoice for expenses encumbered 1/1/25 to 3/31/25.  Email to lauriemoyer@lehighcounty.org										
+July 15, 2025	Performance Report for Construction Projects 
+(Form PR-CP) reflecting activity from 10/1/24 to 6/30/25.  Email to CyndiKing@lehighcounty.org 		None	Grantee Check-In Zoom Meeting
+Contact CyndiKing@lehighcounty.org to schedule meeting.  Meeting to occur by due date.		None										
+July 31, 2025	None		Invoice for expenses encumbered from 4/1/25 to 6/30/25	None		Invoice for expenses encumbered from 4/1/25 to 6/30/25.  Email to lauriemoyer@lehighcounty.org										
+October 15, 2025	Annual Report 
+(Form APR LMA) summarizing activity from 1/1/25 to 9/30/25	New Bethany and CALV Urgent Repair must also complete Form APR LMC2	Invoice for expenses encumbered from 7/1/25 to 9/30/25	Annual Report 
+(Form APR LMC1) summarizing activity from 10/1/24 to 9/30/25	Annual Report 
+(Form APR LMC2) reflecting beneficiary data from 10/1/24 to 9/30/25	Invoice for expenses encumbered from 7/1/25 to 9/30/25										
+																
+
+--------------------
+Attached Document: 67211bdd2578f_APR-LMA.doc
+Unsupported file format: application/msword
+--------------------

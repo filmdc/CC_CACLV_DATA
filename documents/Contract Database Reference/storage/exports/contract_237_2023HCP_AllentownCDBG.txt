@@ -1,0 +1,26 @@
+Purpose: <p>-Salaries for Housing Counseling Staff&nbsp;</p><p>-Reimbursable grant</p>
+Funder: Allentown CDBG
+Program: HCP
+Amount: 20000.00
+Start Date: 2023-01-01
+End Date: 2024-12-31
+
+Notes: 
+
+Fund Number: F0500
+
+Attached Document: 65285754cb6a1_1620_001-(1).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 652970488b7a3_2023HCP_-Allentown-CDBG_-Year-49.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 65afd8e0cd601_2023HCP_Allentown-CDBG_year-49-executed-contract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

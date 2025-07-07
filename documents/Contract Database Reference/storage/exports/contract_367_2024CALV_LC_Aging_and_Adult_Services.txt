@@ -1,0 +1,16 @@
+Purpose: <p>TEFAP-as authorized (.10 cents/lb. or actual cost)&nbsp;</p><p>HAP Rental Assistance- $317,680</p><p>HAP Rental Assistance Care Management (Salary for Fiscal staff to process HAP Checks)-$28,328- $38.17 hourly rate</p><p>HAP Aftercare Managment (SSS Case Management)- $35,543- $39.58 hourly rate (Reimbursable for weekly case management prior to discharge from the shelter, weekly apartment inspections, and follow up case management post discharge at 30,60, and 90 days)</p>
+Funder: LC Aging and Adult Services-Clearinghouse Services for Housing Programs
+Program: Multi
+Amount: 0.00
+Start Date: 2024-07-01
+End Date: 2025-06-30
+
+Notes: <p>-See Appendix B in contract for Budget and Rates (program CAP is set at $381,551)</p><p>-Reimbursable Grant</p><p>-Invoices for SSS Aftercare and Clearinghouse Services to be received on or before the 10th day following the month services were provided (monthly basis). This includes statistical information required as back up of each unduplicated person served. Billing statements not received by the 20th day of the month, following a month of service, <strong>can be subject to a late submission fee totaling 2% of the invoice.</strong></p><p>-TEFAP reimbursement to be submitted quarterly for distribution costs at .10 cents per pound of food distributed.</p><p>-Audit report required by March 31st-sent to Lehigh County Aging and Adult Services</p><p>-Record retention must be no less than 4 years post final payment under the agreement.</p>
+
+Fund Number: 4200
+
+Attached Document: 66a8d824ae703_2024CALV_LCAAA_executed-contract.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

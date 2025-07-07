@@ -1,0 +1,31 @@
+Purpose: <p>Rent for 9 apartments at rate of $55 per day, salary for supportive services at $52 an hour and salary for Shift Housing Innovation Specialist $29.26 per hour. Program Cap not to exceed $301,000.</p>
+Funder: LC OCYS
+Program: SSS
+Amount: 0.00
+Start Date: 2022-07-01
+End Date: 2023-06-30
+
+Notes: <p>-Reimbursable grant to be invoiced and billed monthly for all qualifying services and apartment fees.</p><p>Contacts for this grant:</p><p>Catherine Squires (610) 782-3482 &nbsp;catherinesquires@lehighcounty.org (grants administrator)</p><p>Bonnie Danubio (610) 782-3638 (Fiscal)</p><p>&nbsp;</p><p>MOU with Pinebrook Family Answers for SHIFT Rental funds. Please see below for protocol:</p><figure class="image"><img src="https://attachments.office.net/owa/kduque%40caclv.org/service.svc/s/GetAttachmentThumbnail?id=AAMkADEzY2IwOTQ2LWQwODgtNGRkYS04NzgwLTE1ZTExNTM3ODliZgBGAAAAAADvIYDMVQ%2FkSYZKiIJtMLqKBwCLDrT7NMCuQLc6NcmVT2PIAAAAAAEJAADqBCfyhcqRSqXw%2F%2BBsh6ADAAFCpJIOAAABEgAQAO1TO12AtdZIrHR1oB%2Ffl30%3D&amp;thumbnailType=2&amp;token=eyJhbGciOiJSUzI1NiIsImtpZCI6IjczRkI5QkJFRjYzNjc4RDRGN0U4NEI0NDBCQUJCMTJBMzM5RDlGOTgiLCJ0eXAiOiJKV1QiLCJ4NXQiOiJjX3VidnZZMmVOVDM2RXRFQzZ1eEtqT2RuNWcifQ.eyJvcmlnaW4iOiJodHRwczovL291dGxvb2sub2ZmaWNlLmNvbSIsInVjIjoiMzA0ZjY0ZTc5YmM3NDg4ZTkxODBhMjc0NTRmNjg2OWUiLCJzaWduaW5fc3RhdGUiOiJbXCJkdmNfbW5nZFwiLFwia21zaVwiXSIsInZlciI6IkV4Y2hhbmdlLkNhbGxiYWNrLlYxIiwiYXBwY3R4c2VuZGVyIjoiT3dhRG93bmxvYWRAZTZhNjJmODgtNWVlYi00Njc1LTllOGItYTdiZmIyZDMwNGQ0IiwiaXNzcmluZyI6IldXIiwiYXBwY3R4Ijoie1wibXNleGNocHJvdFwiOlwib3dhXCIsXCJwdWlkXCI6XCIxMTUzODAxMTIxNTY3MjQyODgwXCIsXCJzY29wZVwiOlwiT3dhRG93bmxvYWRcIixcIm9pZFwiOlwiNDBjOGE0ZTItNzFmZi00MmExLTg4ZmEtZDc0MDg2ZmVmZjY0XCIsXCJwcmltYXJ5c2lkXCI6XCJTLTEtNS0yMS02MTI0NjIzMTQtMzY3ODI3OTQ4Mi0zNTE1ODg5NzQ4LTMxMDY5Mjc4XCJ9IiwibmJmIjoxNjgzNjU4NzcxLCJleHAiOjE2ODM2NTkzNzEsImlzcyI6IjAwMDAwMDAyLTAwMDAtMGZmMS1jZTAwLTAwMDAwMDAwMDAwMEBlNmE2MmY4OC01ZWViLTQ2NzUtOWU4Yi1hN2JmYjJkMzA0ZDQiLCJhdWQiOiIwMDAwMDAwMi0wMDAwLTBmZjEtY2UwMC0wMDAwMDAwMDAwMDAvYXR0YWNobWVudHMub2ZmaWNlLm5ldEBlNmE2MmY4OC01ZWViLTQ2NzUtOWU4Yi1hN2JmYjJkMzA0ZDQiLCJoYXBwIjoib3dhIn0.PGEqAXm0bO_Xovpkiq51vpzY9kwVmOSCGLjummUrBCuM5UcaTE8pTS3FTd4Pj3ASa2ftaYvlJ8mkg8c820B7o1qv5HCeyeoCIy5H4vi8VvkE3kE9qtMMYpX9PcU8GvEqHKXOn0iGBkV5D4XjyZ-TxNWaLRujtQyne7BSEomMb7oAxKC6VXmPTZoFz0ccnEEzM6GbD4Arn_Pf0KRxvJGCK-v1OCjetGjJZS9XH3MbMN_v_icDT09BFf0V1n00g-0iJ_mGHLdq1bKMyYXdnTwo9xkLbk0ATH4LEiXXSWpI3ZJuT2wrauP-2POOu_aNyG-2FIxxptHDfAwTjXm8sufBKw&amp;X-OWA-CANARY=362G4dog_0qoqYtpH3-X5pDyIuq_UNsYpo0_4AHNwMmPf38iI8qrNDqye8cIUiaJQ_2ERaW72tY.&amp;owa=outlook.office.com&amp;scriptVer=20230428009.14&amp;animation=true"></figure>
+
+Fund Number: 
+
+Attached Document: 642434e1a11fd_2022SSS_LCOCYS_Executed-Contract-(1).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 642434e476729_2022SSS_LCOCYS_signed-amendment-(2).pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 6426ec0a5443e_2023SSS_C&YSHIFT_Amendment.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------
+Attached Document: 645bbe264c147_MOU-(Community-Action-Lehigh-Valley)-05-05-23-EXECUTED.pdf
+Failed to extract text with OCR: Error! The image "Error converting PDF to images: attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426" was not found.
+
+The current __DIR__ is /var/www/Contracts_Database_Laravel_Gen/vendor/thiagoalessio/tesseract_ocr/src
+--------------------

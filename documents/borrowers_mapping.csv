@@ -1,0 +1,35 @@
+,
+Class Name,Use this field to match or create a new service for the housing counseling program
+Class ID,
+Class Status,
+Class Date,date of service recorded
+Class Hours,note in participant notes
+Instructor,staff member username
+Class Max Capacity,
+Number of Users Registered,
+Class Close Date,
+HUD Category,
+Attendance,
+Location,
+Client Name,first_name last_name
+Intake Client ID,
+Client Address,"household.street_address household.city, household.state-household.zip_code"
+Client Phone Number,participant.telephone
+Client Email,participant.email
+Race,participant.race
+Ethnicity,participant.ethnicity
+Income Level,note in participant notes
+Rural Area Status,note in participant notes
+Family Size,household.household_size
+Household Type,household.household_type
+Language,"lets add a primary language field to the participant record, and reference data system, and then map this field to it"
+Gender,participant.gender
+Client Registration Date,enrollment.enrollment_date
+Disabled,participant.disability_status
+Birth Date,participant.date_of_birth
+Dependents,note in participant notes
+Monthly Income,household.monthly_income
+Veteran,participant.military_status
+Age,"date of birth is used to calculate csbg age category for field, participant.csbg_age_group"
+Military Status,participant.military_status
+Referral Source,note in participant notes
