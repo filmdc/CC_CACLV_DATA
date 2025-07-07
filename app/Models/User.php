@@ -23,6 +23,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'active',
     ];
 
     /**
@@ -45,6 +46,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'active' => 'boolean',
         ];
     }
 
@@ -154,5 +156,21 @@ class User extends Authenticatable
             ->pluck('permissions')
             ->flatten()
             ->unique('id');
+    }
+
+    /**
+     * Scope to get active users.
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('active', true);
+    }
+
+    /**
+     * Scope to get inactive users.
+     */
+    public function scopeInactive($query)
+    {
+        return $query->where('active', false);
     }
 }
