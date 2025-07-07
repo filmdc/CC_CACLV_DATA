@@ -43,7 +43,7 @@ class ContractReportDueDateManagement extends Component
 
     public function mount()
     {
-        $this->authorizeAction('contract_report_due_dates.view');
+        $this->authorizeAction('due_dates.view');
         $this->loadFormData();
         $this->reminder_intervals = [30, 15, 7, 3, 1];
     }
@@ -71,7 +71,7 @@ class ContractReportDueDateManagement extends Component
 
     public function showCreateDueDate()
     {
-        $this->authorizeAction('contract_report_due_dates.create');
+        $this->authorizeAction('due_dates.create');
         $this->showCreateForm = true;
         $this->showEditForm = false;
         $this->selectedDueDate = null;
@@ -80,7 +80,7 @@ class ContractReportDueDateManagement extends Component
 
     public function showEditDueDate($dueDateId)
     {
-        $this->authorizeAction('contract_report_due_dates.edit');
+        $this->authorizeAction('due_dates.edit');
         $this->selectedDueDate = ContractReportDueDate::with('assignedUsers')->findOrFail($dueDateId);
         $this->showEditForm = true;
         $this->showCreateForm = false;
@@ -113,7 +113,7 @@ class ContractReportDueDateManagement extends Component
 
     public function createDueDate()
     {
-        $this->authorizeAction('contract_report_due_dates.create');
+        $this->authorizeAction('due_dates.create');
 
         $this->validate([
             'contract_id' => 'required|exists:contracts,id',
@@ -160,7 +160,7 @@ class ContractReportDueDateManagement extends Component
 
     public function updateDueDate()
     {
-        $this->authorizeAction('contract_report_due_dates.edit');
+        $this->authorizeAction('due_dates.edit');
 
         $this->validate([
             'contract_id' => 'required|exists:contracts,id',
@@ -209,7 +209,7 @@ class ContractReportDueDateManagement extends Component
 
     public function deleteDueDate($dueDateId)
     {
-        $this->authorizeAction('contract_report_due_dates.delete');
+        $this->authorizeAction('due_dates.delete');
 
         try {
             $dueDate = ContractReportDueDate::findOrFail($dueDateId);
@@ -223,7 +223,7 @@ class ContractReportDueDateManagement extends Component
 
     public function toggleStatus($dueDateId)
     {
-        $this->authorizeAction('contract_report_due_dates.edit');
+        $this->authorizeAction('due_dates.edit');
 
         try {
             $dueDate = ContractReportDueDate::findOrFail($dueDateId);
