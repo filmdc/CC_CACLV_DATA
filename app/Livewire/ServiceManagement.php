@@ -170,7 +170,7 @@ class ServiceManagement extends Component
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        $programs = Program::where('active', true)->orderBy('name')->get();
+        $programs = Program::active()->regularPrograms()->orderBy('name')->get();
 
         return view('livewire.service-management', [
             'services' => $services,

@@ -16,6 +16,7 @@ class Program extends Model
         'program_manager_id',
         'active',
         'housing_module_enabled',
+        'contract_management_only',
         'start_date',
         'end_date',
         'notes'
@@ -24,6 +25,7 @@ class Program extends Model
     protected $casts = [
         'active' => 'boolean',
         'housing_module_enabled' => 'boolean',
+        'contract_management_only' => 'boolean',
         'start_date' => 'date',
         'end_date' => 'date'
     ];
@@ -76,5 +78,29 @@ class Program extends Model
     public function hasHousingModule(): bool
     {
         return $this->housing_module_enabled;
+    }
+
+    /**
+     * Scope to get only contract management programs
+     */
+    public function scopeContractManagementOnly($query)
+    {
+        return $query->where('contract_management_only', true);
+    }
+
+    /**
+     * Scope to get only regular (non-contract management) programs
+     */
+    public function scopeRegularPrograms($query)
+    {
+        return $query->where('contract_management_only', false);
+    }
+
+    /**
+     * Scope to get active programs (with optional contract management filter)
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('active', true);
     }
 }

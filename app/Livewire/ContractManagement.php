@@ -317,7 +317,7 @@ class ContractManagement extends Component
             });
 
         $contracts = $query->orderBy('created_at', 'desc')->paginate(10);
-        $programs = Program::where('active', true)->orderBy('name')->get();
+        $programs = Program::active()->contractManagementOnly()->orderBy('name')->get();
         $funders = Funder::active()->orderBy('name')->get();
 
         return view('livewire.contract-management', [

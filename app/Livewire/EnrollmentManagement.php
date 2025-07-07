@@ -291,7 +291,7 @@ class EnrollmentManagement extends Component
         }
 
         $participants = Participant::orderBy('first_name')->get();
-        $programs = Program::where('active', true)->orderBy('name')->get();
+        $programs = Program::active()->regularPrograms()->orderBy('name')->get();
         $services = Service::where('active', true)->with('program')->orderBy('name')->get();
 
         return view('livewire.enrollment-management', [

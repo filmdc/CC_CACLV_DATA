@@ -22,6 +22,7 @@ class ProgramManagement extends Component
     public $program_manager_id = '';
     public $active = true;
     public $housing_module_enabled = false;
+    public $contract_management_only = false;
     public $start_date = '';
     public $end_date = '';
     public $notes = '';
@@ -56,6 +57,7 @@ class ProgramManagement extends Component
         $this->program_manager_id = '';
         $this->active = true;
         $this->housing_module_enabled = false;
+        $this->contract_management_only = false;
         $this->start_date = '';
         $this->end_date = '';
         $this->notes = '';
@@ -69,6 +71,7 @@ class ProgramManagement extends Component
             $this->program_manager_id = $this->selectedProgram->program_manager_id;
             $this->active = $this->selectedProgram->active;
             $this->housing_module_enabled = $this->selectedProgram->housing_module_enabled;
+            $this->contract_management_only = $this->selectedProgram->contract_management_only;
             $this->start_date = $this->selectedProgram->start_date ? $this->selectedProgram->start_date->format('Y-m-d') : '';
             $this->end_date = $this->selectedProgram->end_date ? $this->selectedProgram->end_date->format('Y-m-d') : '';
             $this->notes = $this->selectedProgram->notes;
@@ -83,6 +86,7 @@ class ProgramManagement extends Component
             'program_manager_id' => 'nullable|exists:users,id',
             'active' => 'boolean',
             'housing_module_enabled' => 'boolean',
+            'contract_management_only' => 'boolean',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'notes' => 'nullable|string',
@@ -95,6 +99,7 @@ class ProgramManagement extends Component
                 'program_manager_id' => $this->program_manager_id ?: null,
                 'active' => $this->active,
                 'housing_module_enabled' => $this->housing_module_enabled,
+                'contract_management_only' => $this->contract_management_only,
                 'start_date' => $this->start_date ?: null,
                 'end_date' => $this->end_date ?: null,
                 'notes' => $this->notes,
@@ -117,6 +122,7 @@ class ProgramManagement extends Component
             'program_manager_id' => 'nullable|exists:users,id',
             'active' => 'boolean',
             'housing_module_enabled' => 'boolean',
+            'contract_management_only' => 'boolean',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'notes' => 'nullable|string',
@@ -129,6 +135,7 @@ class ProgramManagement extends Component
                 'program_manager_id' => $this->program_manager_id ?: null,
                 'active' => $this->active,
                 'housing_module_enabled' => $this->housing_module_enabled,
+                'contract_management_only' => $this->contract_management_only,
                 'start_date' => $this->start_date ?: null,
                 'end_date' => $this->end_date ?: null,
                 'notes' => $this->notes,

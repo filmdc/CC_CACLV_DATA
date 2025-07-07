@@ -83,9 +83,22 @@
                             @error('end_date') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 
-                        <div class="md:col-span-2 flex items-center">
-                            <input type="checkbox" wire:model="active" id="active" class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800">
-                            <label for="active" class="ml-2 block text-sm text-gray-900 dark:text-white">Program is active</label>
+                        <div class="md:col-span-2 space-y-3">
+                            <div class="flex items-center">
+                                <input type="checkbox" wire:model="active" id="active" class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800">
+                                <label for="active" class="ml-2 block text-sm text-gray-900 dark:text-white">Program is active</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" wire:model="housing_module_enabled" id="housing_module_enabled" class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800">
+                                <label for="housing_module_enabled" class="ml-2 block text-sm text-gray-900 dark:text-white">Enable housing module</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" wire:model="contract_management_only" id="contract_management_only" class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800">
+                                <label for="contract_management_only" class="ml-2 block text-sm text-gray-900 dark:text-white">
+                                    <span class="text-orange-600 dark:text-orange-400 font-medium">Contract management only</span>
+                                    <span class="block text-xs text-gray-500 dark:text-gray-400">Internal program for contract management - hidden from end users</span>
+                                </label>
+                            </div>
                         </div>
                     </div>
 
@@ -136,7 +149,19 @@
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div>
-                                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $program->name }}</div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-sm font-medium text-gray-900 dark:text-white">{{ $program->name }}</span>
+                                        @if($program->contract_management_only)
+                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-orange-100 dark:bg-orange-900/20 text-orange-800 dark:text-orange-300" title="Contract Management Only - Hidden from end users">
+                                                Contract Only
+                                            </span>
+                                        @endif
+                                        @if($program->housing_module_enabled)
+                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300" title="Housing Module Enabled">
+                                                Housing
+                                            </span>
+                                        @endif
+                                    </div>
                                     @if($program->description)
                                         <div class="text-sm text-gray-500 dark:text-gray-400">{{ Str::limit($program->description, 50) }}</div>
                                     @endif

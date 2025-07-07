@@ -50,7 +50,12 @@ class ContractReportDueDateManagement extends Component
 
     public function loadFormData()
     {
-        $this->contracts = Contract::active()->with('program', 'funder')->get();
+        $this->contracts = Contract::active()
+            ->whereHas('program', function($query) {
+                $query->where('contract_management_only', true);
+            })
+            ->with('program', 'funder')
+            ->get();
         $this->users = User::active()->orderBy('name')->get();
     }
 

@@ -443,7 +443,7 @@ class ParticipantIntake extends Component
 
     public function render()
     {
-        $programs = Program::where('active', true)->orderBy('name')->get();
+        $programs = Program::active()->regularPrograms()->orderBy('name')->get();
         $services = collect();
         
         // Get services for selected program
