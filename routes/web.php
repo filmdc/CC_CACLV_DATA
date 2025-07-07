@@ -34,6 +34,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('service-management', App\Livewire\ServiceManagement::class)->name('service.management');
     Route::get('contract-management', App\Livewire\ContractManagement::class)->name('contract.management');
     Route::get('funder-management', App\Livewire\FunderManagement::class)->name('funder.management');
+    Route::get('contract-report-due-dates', App\Livewire\ContractReportDueDateManagement::class)->name('contract-report-due-dates.management');
     Route::get('work-plan-management', App\Livewire\WorkPlanManagement::class)->name('work-plan.management');
     Route::get('work-plan-goal-management', App\Livewire\WorkPlanGoalManagement::class)->name('work-plan-goal.management');
     Route::get('role-permission-management', App\Livewire\RolePermissionManagement::class)->name('role-permission.management');

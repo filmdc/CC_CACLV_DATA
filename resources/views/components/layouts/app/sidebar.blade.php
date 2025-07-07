@@ -47,6 +47,12 @@
                     @if(auth()->user()->hasPermission('contracts.view') || auth()->user()->isAdmin())
                         <flux:navlist.item icon="document-text" :href="route('contract.management')" :current="request()->routeIs('contract.management')" wire:navigate>{{ __('Contract Management') }}</flux:navlist.item>
                     @endif
+                    @if(auth()->user()->hasPermission('funders.view') || auth()->user()->isAdmin())
+                        <flux:navlist.item icon="building-office" :href="route('funder.management')" :current="request()->routeIs('funder.management')" wire:navigate>{{ __('Funder Management') }}</flux:navlist.item>
+                    @endif
+                    @if(auth()->user()->hasPermission('contract_report_due_dates.view') || auth()->user()->isAdmin())
+                        <flux:navlist.item icon="calendar-days" :href="route('contract-report-due-dates.management')" :current="request()->routeIs('contract-report-due-dates.management')" wire:navigate>{{ __('Contract Report Due Dates') }}</flux:navlist.item>
+                    @endif
                     @if(auth()->user()->hasPermission('work_plans.view') || auth()->user()->isAdmin())
                         <flux:navlist.item icon="calendar" :href="route('work-plan.management')" :current="request()->routeIs('work-plan.management')" wire:navigate>{{ __('Work Plans') }}</flux:navlist.item>
                     @endif
