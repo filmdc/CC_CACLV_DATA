@@ -81,7 +81,8 @@ class Program extends Model
     }
 
     /**
-     * Scope to get only contract management programs
+     * Scope to get only contract management only programs
+     * (Programs that are ONLY for contract management and hidden from end users)
      */
     public function scopeContractManagementOnly($query)
     {
@@ -89,7 +90,8 @@ class Program extends Model
     }
 
     /**
-     * Scope to get only regular (non-contract management) programs
+     * Scope to get regular programs (available to end users)
+     * (Excludes contract management only programs, but regular programs can be used for contracts too)
      */
     public function scopeRegularPrograms($query)
     {

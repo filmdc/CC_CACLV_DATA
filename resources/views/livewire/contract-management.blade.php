@@ -118,7 +118,12 @@
                                     class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500">
                                 <option value="">Select Program</option>
                                 @foreach($programs as $program)
-                                    <option value="{{ $program->id }}">{{ $program->name }}</option>
+                                    <option value="{{ $program->id }}">
+                                        {{ $program->name }}
+                                        @if($program->contract_management_only)
+                                            (Contract Only)
+                                        @endif
+                                    </option>
                                 @endforeach
                             </select>
                             @error('program_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
