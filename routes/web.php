@@ -103,11 +103,29 @@ Route::middleware(['auth'])->group(function () {
         $mimeType = mime_content_type($fullPath);
         $fileName = basename($fullPath);
         
-        // Return file response
-        return response()->file($fullPath, [
+        // Check if download is requested
+        $isDownload = request()->has('download') && request()->get('download') == '1';
+        
+        // Set appropriate headers based on file type and download preference
+        $headers = [
             'Content-Type' => $mimeType,
-            'Content-Disposition' => 'inline; filename="' . $fileName . '"',
-        ]);
+            'Cache-Control' => 'private, max-age=300', // 5 minutes cache
+        ];
+        
+        if ($isDownload) {
+            $headers['Content-Disposition'] = 'attachment; filename="' . $fileName . '"';
+        } else {
+            // For inline viewing, set appropriate content disposition based on file type
+            if (str_contains($mimeType, 'pdf') || str_contains($mimeType, 'image')) {
+                $headers['Content-Disposition'] = 'inline; filename="' . $fileName . '"';
+            } else {
+                // For other file types, force download for security
+                $headers['Content-Disposition'] = 'attachment; filename="' . $fileName . '"';
+            }
+        }
+        
+        // Return file response
+        return response()->file($fullPath, $headers);
     })->where('path', '.*')->name('storage.authenticated');
 });
 

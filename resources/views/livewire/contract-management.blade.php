@@ -214,8 +214,10 @@
                                                 <span class="text-sm text-gray-700 dark:text-gray-300">{{ $document->name }}</span>
                                             </div>
                                             <div class="flex space-x-2">
-                                                <a href="{{ $document->getUrl() }}" target="_blank" 
+                                                <a href="{{ $document->getAuthenticatedUrl() }}" target="_blank" 
                                                    class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm">View</a>
+                                                <a href="{{ $document->getDownloadUrl() }}" 
+                                                   class="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 text-sm">Download</a>
                                                 <button type="button" wire:click="removeDocument({{ $document->id }})" 
                                                         onclick="return confirm('Are you sure you want to remove this document?')"
                                                         class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm">Remove</button>
@@ -359,20 +361,40 @@
                         @if($selectedContract->documents && $selectedContract->documents->count() > 0)
                             <div class="mt-6 pt-6 border-t border-gray-200 dark:border-zinc-600">
                                 <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Documents</h4>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <div class="space-y-3">
                                     @foreach($selectedContract->documents as $document)
-                                        <div class="flex items-center p-3 bg-gray-50 dark:bg-zinc-700 rounded-lg">
+                                        <div class="flex items-start p-4 bg-gray-50 dark:bg-zinc-700 rounded-lg border border-gray-200 dark:border-zinc-600">
                                             <div class="flex-shrink-0">
-                                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg class="w-8 h-8 {{ $document->getFileTypeIcon() }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                                 </svg>
                                             </div>
-                                            <div class="ml-3 flex-1">
-                                                <a href="{{ $document->getUrl() }}" target="_blank" 
-                                                   class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">
-                                                    {{ $document->name }}
-                                                </a>
-                                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ $document->human_readable_size }}</p>
+                                            <div class="ml-3 flex-1 min-w-0">
+                                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                                                    <div class="flex-1 min-w-0">
+                                                        <p class="text-sm font-medium text-gray-900 dark:text-white break-words">{{ $document->name }}</p>
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                            {{ $document->getFileTypeLabel() }} • {{ $document->human_readable_size }}
+                                                        </p>
+                                                    </div>
+                                                    <div class="flex space-x-3 mt-2 sm:mt-0 sm:ml-4 flex-shrink-0">
+                                                        <a href="{{ $document->getAuthenticatedUrl() }}" target="_blank" 
+                                                           class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50 transition-colors">
+                                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                            </svg>
+                                                            View
+                                                        </a>
+                                                        <a href="{{ $document->getDownloadUrl() }}" 
+                                                           class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50 transition-colors">
+                                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                            </svg>
+                                                            Download
+                                                        </a>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     @endforeach
