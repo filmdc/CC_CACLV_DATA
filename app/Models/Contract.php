@@ -58,6 +58,16 @@ class Contract extends Model implements HasMedia
     ];
 
     /**
+     * Register media collections
+     */
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('documents')
+            ->acceptsMimeTypes(['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'image/jpeg', 'image/png'])
+            ->useDisk('public');
+    }
+
+    /**
      * Register media conversions
      */
     public function registerMediaConversions(Media $media = null): void

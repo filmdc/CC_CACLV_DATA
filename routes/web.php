@@ -84,6 +84,31 @@ Route::middleware(['auth'])->group(function () {
     Route::get('property-management', App\Livewire\PropertyManagement::class)->name('property.management');
     Route::get('contractor-management', App\Livewire\ContractorManagement::class)->name('contractor.management');
     Route::get('housing-job-management', App\Livewire\HousingJobManagement::class)->name('housing-job.management');
+    
+    // Custom storage route for authenticated users
+    Route::get('storage/{path}', function ($path) {
+        // Check if user is authenticated
+        if (!auth()->check()) {
+            abort(403, 'Unauthorized access to file');
+        }
+        
+        $fullPath = storage_path('app/public/' . $path);
+        
+        // Check if file exists
+        if (!file_exists($fullPath)) {
+            abort(404, 'File not found');
+        }
+        
+        // Get file info
+        $mimeType = mime_content_type($fullPath);
+        $fileName = basename($fullPath);
+        
+        // Return file response
+        return response()->file($fullPath, [
+            'Content-Type' => $mimeType,
+            'Content-Disposition' => 'inline; filename="' . $fileName . '"',
+        ]);
+    })->where('path', '.*')->name('storage.authenticated');
 });
 
 require __DIR__.'/auth.php';
