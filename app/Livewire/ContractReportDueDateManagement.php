@@ -239,7 +239,7 @@ class ContractReportDueDateManagement extends Component
 
     public function render()
     {
-        $dueDates = ContractReportDueDate::with(['contract.program', 'contract.funder', 'assignedUsers'])
+        $dueDates = ContractReportDueDate::with(['contract.program', 'contract.funder', 'emails'])
             ->when($this->search, function ($query) {
                 $query->where('report_name', 'like', '%' . $this->search . '%')
                       ->orWhereHas('contract', function ($q) {

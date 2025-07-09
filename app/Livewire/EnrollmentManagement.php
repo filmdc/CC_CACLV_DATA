@@ -23,6 +23,8 @@ class EnrollmentManagement extends Component
     // Program Enrollment Form
     public $showProgramEnrollmentForm = false;
     public $selectedProgramEnrollment = null;
+    public $showViewModal = false;
+    public $selectedViewEnrollment = null;
     public $participant_id = '';
     public $program_id = '';
     public $enrollment_date = '';
@@ -93,6 +95,7 @@ class EnrollmentManagement extends Component
         $this->selectedProgramEnrollment = ProgramEnrollment::with(['participant', 'program'])->find($enrollmentId);
         if ($this->selectedProgramEnrollment) {
             $this->showProgramEnrollmentForm = true;
+            $this->showViewModal = false;
             $this->fillProgramEnrollmentForm();
         }
     }
@@ -107,6 +110,8 @@ class EnrollmentManagement extends Component
         $this->exit_reason = '';
         $this->exit_notes = '';
         $this->notes = '';
+        $this->showViewModal = false;
+        $this->selectedViewEnrollment = null;
     }
 
     public function fillProgramEnrollmentForm()
@@ -246,6 +251,30 @@ class EnrollmentManagement extends Component
         $this->showProgramEnrollmentForm = false;
         $this->selectedProgramEnrollment = null;
         $this->resetProgramEnrollmentForm();
+    }
+
+    public function viewEnrollment($enrollmentId)
+    {
+        if ($this->enrollmentType === 'program') {
+            $this->selectedViewEnrollment = ProgramEnrollment::with([
+                'participant.household',
+                'program',
+                'serviceEnrollments' => function($query) {
+                    $query->with('service', 'participant')->orderBy('enrollment_date', 'desc');
+                }
+            ])->find($enrollmentId);
+        } else {
+            $this->selectedViewEnrollment = ServiceEnrollment::with([
+                'participant.household',
+                'service.program',
+                'programEnrollment.program'
+            ])->find($enrollmentId);
+        }
+        
+        if ($this->selectedViewEnrollment) {
+            $this->showViewModal = true;
+            $this->showProgramEnrollmentForm = false;
+        }
     }
 
     public function render()

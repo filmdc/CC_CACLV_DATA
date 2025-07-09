@@ -19,6 +19,8 @@ class RolePermissionManagement extends Component
     public $selectedRole = null;
     public $showCreateRoleForm = false;
     public $showEditRoleForm = false;
+    public $showViewRoleModal = false;
+    public $viewRole = null;
     public $roleName = '';
     public $roleDisplayName = '';
     public $roleDescription = '';
@@ -28,6 +30,8 @@ class RolePermissionManagement extends Component
     public $selectedPermission = null;
     public $showCreatePermissionForm = false;
     public $showEditPermissionForm = false;
+    public $showViewPermissionModal = false;
+    public $viewPermission = null;
     public $permissionName = '';
     public $permissionDisplayName = '';
     public $permissionDescription = '';
@@ -54,6 +58,20 @@ class RolePermissionManagement extends Component
         $this->resetRoleForm();
     }
 
+    public function closeRoleForms()
+    {
+        $this->showCreateRoleForm = false;
+        $this->showEditRoleForm = false;
+        $this->showViewRoleModal = false;
+    }
+
+    public function closePermissionForms()
+    {
+        $this->showCreatePermissionForm = false;
+        $this->showEditPermissionForm = false;
+        $this->showViewPermissionModal = false;
+    }
+
     public function showEditRole($roleId)
     {
         $this->selectedRole = Role::with('permissions')->find($roleId);
@@ -70,6 +88,8 @@ class RolePermissionManagement extends Component
         $this->roleDisplayName = '';
         $this->roleDescription = '';
         $this->selectedPermissions = [];
+        $this->showViewRoleModal = false;
+        $this->viewRole = null;
     }
 
     public function fillRoleForm()
@@ -182,6 +202,8 @@ class RolePermissionManagement extends Component
         $this->permissionDisplayName = '';
         $this->permissionDescription = '';
         $this->permissionCategory = '';
+        $this->showViewPermissionModal = false;
+        $this->viewPermission = null;
     }
 
     public function fillPermissionForm()
@@ -262,6 +284,45 @@ class RolePermissionManagement extends Component
             }
         } catch (\Exception $e) {
             session()->flash('error', 'Cannot delete permission: ' . $e->getMessage());
+        }
+    }
+
+    public function viewRole($roleId)
+    {
+        $this->viewRole = Role::with([
+            'permissions' => function($query) {
+                $query->orderBy('category')->orderBy('display_name');
+            },
+            'users' => function($query) {
+                $query->orderBy('name');
+            }
+        ])->find($roleId);
+        
+        if ($this->viewRole) {
+            $this->showViewRoleModal = true;
+            $this->showCreateRoleForm = false;
+            $this->showEditRoleForm = false;
+            $this->showCreatePermissionForm = false;
+            $this->showEditPermissionForm = false;
+            $this->showViewPermissionModal = false;
+        }
+    }
+
+    public function viewPermission($permissionId)
+    {
+        $this->viewPermission = Permission::with([
+            'roles' => function($query) {
+                $query->orderBy('display_name');
+            }
+        ])->find($permissionId);
+        
+        if ($this->viewPermission) {
+            $this->showViewPermissionModal = true;
+            $this->showCreateRoleForm = false;
+            $this->showEditRoleForm = false;
+            $this->showCreatePermissionForm = false;
+            $this->showEditPermissionForm = false;
+            $this->showViewRoleModal = false;
         }
     }
 

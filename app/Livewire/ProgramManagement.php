@@ -15,6 +15,7 @@ class ProgramManagement extends Component
     public $selectedProgram = null;
     public $showCreateForm = false;
     public $showEditForm = false;
+    public $showViewModal = false;
 
     // Program Form Fields
     public $name = '';
@@ -50,6 +51,21 @@ class ProgramManagement extends Component
         }
     }
 
+    public function viewProgram($programId)
+    {
+        $this->selectedProgram = Program::with([
+            'programManager', 
+            'services', 
+            'contracts.funder',
+            'programEnrollments.participant',
+            'workPlans.goals'
+        ])->find($programId);
+        
+        if ($this->selectedProgram) {
+            $this->showViewModal = true;
+        }
+    }
+
     public function resetProgramForm()
     {
         $this->name = '';
@@ -61,6 +77,7 @@ class ProgramManagement extends Component
         $this->start_date = '';
         $this->end_date = '';
         $this->notes = '';
+        $this->showViewModal = false;
     }
 
     public function fillProgramForm()

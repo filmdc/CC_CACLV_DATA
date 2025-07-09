@@ -7,14 +7,16 @@
         </div>
 
         <!-- Search -->
-        <div class="p-4 bg-gray-50 dark:bg-zinc-700 border-b border-gray-200 dark:border-zinc-600">
-            <div class="flex items-center justify-between">
-                <div class="flex-1 max-w-md">
-                    <input type="text" wire:model.live="search" placeholder="Search participants..." 
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+        @if(!$showEditForm)
+            <div class="p-4 bg-gray-50 dark:bg-zinc-700 border-b border-gray-200 dark:border-zinc-600">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1 max-w-md">
+                        <input type="text" wire:model.live="search" placeholder="Search participants..." 
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
                 </div>
             </div>
-        </div>
+        @endif
 
         <!-- Success/Error Messages -->
         @if (session()->has('success'))
@@ -39,8 +41,15 @@
 
         <!-- Edit Form -->
         @if($showEditForm && $selectedParticipant)
-            <div class="p-6 bg-blue-50 dark:bg-blue-900/20 border-b border-gray-200 dark:border-zinc-600">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Edit Participant: {{ $selectedParticipant->full_name }}</h3>
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Edit Participant: {{ $selectedParticipant->full_name }}</h3>
+                    <button wire:click="$set('showEditForm', false)" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
 
                 <form wire:submit="updateParticipant" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -343,7 +352,8 @@
         @endif
 
         <!-- Participants Table -->
-        <div class="overflow-x-auto">
+        @if(!$showEditForm)
+            <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-600">
                 <thead class="bg-gray-50 dark:bg-zinc-700">
                     <tr>
@@ -361,7 +371,10 @@
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div>
-                                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $participant->full_name }}</div>
+                                    <button wire:click="viewParticipant({{ $participant->id }})" 
+                                            class="text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 hover:underline cursor-pointer transition-colors duration-200">
+                                        <div class="text-sm font-medium">{{ $participant->full_name }}</div>
+                                    </button>
                                     @if($participant->email)
                                         <div class="text-sm text-gray-500 dark:text-gray-400">{{ $participant->email }}</div>
                                     @endif
@@ -415,13 +428,188 @@
                     @endforelse
                 </tbody>
             </table>
-        </div>
-
-        <!-- Pagination -->
-        @if($participants->hasPages())
-            <div class="px-6 py-3 border-t border-gray-200 dark:border-zinc-600">
-                {{ $participants->links() }}
             </div>
+
+            <!-- Pagination -->
+            @if($participants->hasPages())
+                <div class="px-6 py-3 border-t border-gray-200 dark:border-zinc-600">
+                    {{ $participants->links() }}
+                </div>
+            @endif
         @endif
     </div>
+
+    <!-- View Participant Modal -->
+    @if($showViewModal && $selectedParticipant)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">Participant Details</h3>
+                    <button wire:click="$set('showViewModal', false)" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Personal Information -->
+                    <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg">
+                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Personal Information</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Full Name</label>
+                                <p class="text-sm text-gray-900 dark:text-white">{{ $selectedParticipant->full_name }}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Date of Birth</label>
+                                <p class="text-sm text-gray-900 dark:text-white">{{ $selectedParticipant->date_of_birth ? $selectedParticipant->date_of_birth->format('F j, Y') : 'N/A' }}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Age</label>
+                                <p class="text-sm text-gray-900 dark:text-white">{{ $selectedParticipant->age ?? 'N/A' }}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Gender</label>
+                                <p class="text-sm text-gray-900 dark:text-white">{{ $selectedParticipant->gender ?? 'N/A' }}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Ethnicity</label>
+                                <p class="text-sm text-gray-900 dark:text-white">{{ $selectedParticipant->ethnicity ?? 'N/A' }}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Race</label>
+                                <p class="text-sm text-gray-900 dark:text-white">
+                                    @if($selectedParticipant->race)
+                                        {{ is_array($selectedParticipant->race) ? implode(', ', $selectedParticipant->race) : $selectedParticipant->race }}
+                                    @else
+                                        N/A
+                                    @endif
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg">
+                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Contact Information</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Phone Number</label>
+                                <p class="text-sm text-gray-900 dark:text-white">{{ $selectedParticipant->telephone ?? 'N/A' }}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Email Address</label>
+                                <p class="text-sm text-gray-900 dark:text-white">{{ $selectedParticipant->email ?? 'N/A' }}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Household</label>
+                                <p class="text-sm text-gray-900 dark:text-white">{{ $selectedParticipant->household->household_code ?? 'N/A' }}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Household Role</label>
+                                <p class="text-sm text-gray-900 dark:text-white">
+                                    @if($selectedParticipant->is_head_of_household)
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">Head of Household</span>
+                                    @else
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">Family Member</span>
+                                    @endif
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Information -->
+                    <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg">
+                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Additional Information</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Education Level</label>
+                                <p class="text-sm text-gray-900 dark:text-white">{{ $selectedParticipant->education_level ?? 'N/A' }}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Work Status</label>
+                                <p class="text-sm text-gray-900 dark:text-white">{{ $selectedParticipant->work_status ?? 'N/A' }}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Military Status</label>
+                                <p class="text-sm text-gray-900 dark:text-white">{{ $selectedParticipant->military_status ?? 'N/A' }}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Disability Status</label>
+                                <p class="text-sm text-gray-900 dark:text-white">{{ $selectedParticipant->disability_status ?? 'N/A' }}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Health Insurance</label>
+                                <p class="text-sm text-gray-900 dark:text-white">{{ $selectedParticipant->health_insurance_status ?? 'N/A' }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Enrollment Information -->
+                    <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg">
+                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Enrollment Information</h4>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Program Enrollments</label>
+                                @if($selectedParticipant->programEnrollments && $selectedParticipant->programEnrollments->count() > 0)
+                                    <div class="mt-2 space-y-2">
+                                        @foreach($selectedParticipant->programEnrollments as $enrollment)
+                                            <div class="flex items-center justify-between p-2 bg-white dark:bg-zinc-800 rounded border">
+                                                <div>
+                                                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $enrollment->program->name }}</div>
+                                                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                                                        Enrolled: {{ $enrollment->enrollment_date->format('M j, Y') }}
+                                                    </div>
+                                                </div>
+                                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                                                    {{ $enrollment->status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200' }}">
+                                                    {{ ucfirst($enrollment->status) }}
+                                                </span>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">No program enrollments</p>
+                                @endif
+                            </div>
+
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Service Enrollments</label>
+                                @if($selectedParticipant->serviceEnrollments && $selectedParticipant->serviceEnrollments->count() > 0)
+                                    <div class="mt-2 space-y-2">
+                                        @foreach($selectedParticipant->serviceEnrollments as $enrollment)
+                                            <div class="flex items-center justify-between p-2 bg-white dark:bg-zinc-800 rounded border">
+                                                <div>
+                                                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $enrollment->service->name }}</div>
+                                                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                                                        Program: {{ $enrollment->programEnrollment->program->name ?? 'N/A' }}<br>
+                                                        Enrolled: {{ $enrollment->enrollment_date->format('M j, Y') }}
+                                                    </div>
+                                                </div>
+                                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                                                    {{ $enrollment->status === 'enrolled' || $enrollment->status === 'in_progress' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 
+                                                       ($enrollment->status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200') }}">
+                                                    {{ ucfirst(str_replace('_', ' ', $enrollment->status)) }}
+                                                </span>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">No service enrollments</p>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-end">
+                    <button wire:click="$set('showViewModal', false)" 
+                            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>

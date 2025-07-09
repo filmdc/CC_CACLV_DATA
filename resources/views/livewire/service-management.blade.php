@@ -1,5 +1,5 @@
 <div class="max-w-7xl mx-auto p-6">
-    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+    <div class="bg-white dark:bg-zinc-800 shadow-lg rounded-lg overflow-hidden">
         <!-- Header -->
         <div class="bg-teal-600 text-white p-6">
             <h1 class="text-2xl font-bold">Service Management</h1>
@@ -7,11 +7,12 @@
         </div>
 
         <!-- Search and Actions -->
-        <div class="p-4 bg-gray-50 border-b">
+        @if(!$showEditForm && !$showCreateForm && !$showViewModal)
+        <div class="p-4 bg-gray-50 dark:bg-zinc-700 border-b dark:border-zinc-600">
             <div class="flex items-center justify-between">
                 <div class="flex-1 max-w-md">
                     <input type="text" wire:model.live="search" placeholder="Search services or programs..." 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500">
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500">
                 </div>
                 <button wire:click="showCreateService" 
                         class="ml-4 px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500">
@@ -19,6 +20,7 @@
                 </button>
             </div>
         </div>
+        @endif
 
         <!-- Success/Error Messages -->
         @if (session()->has('success'))
@@ -43,8 +45,15 @@
 
         <!-- Create Service Form -->
         @if ($showCreateForm)
-            <div class="p-6 bg-blue-50 border-b">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Create New Service</h3>
+            <div class="p-6 border-b">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium text-gray-900">Create New Service</h3>
+                    <button wire:click="$set('showCreateForm', false)" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
                 
                 <form wire:submit="createService" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -121,8 +130,15 @@
 
         <!-- Edit Service Form -->
         @if ($showEditForm && $selectedService)
-            <div class="p-6 bg-yellow-50 border-b">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Edit Service: {{ $selectedService->name }}</h3>
+            <div class="p-6 border-b">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium text-gray-900">Edit Service: {{ $selectedService->name }}</h3>
+                    <button wire:click="$set('showEditForm', false)" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
                 
                 <form wire:submit="updateService" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -198,6 +214,7 @@
         @endif
 
         <!-- Services List -->
+        @if(!$showEditForm && !$showCreateForm && !$showViewModal)
         <div class="p-6">
             <div class="bg-white shadow overflow-hidden sm:rounded-md">
                 <ul class="divide-y divide-gray-200">
@@ -206,7 +223,11 @@
                             <div class="flex items-center justify-between">
                                 <div class="flex-1">
                                     <div class="flex items-center space-x-3">
-                                        <h3 class="text-lg font-medium text-gray-900">{{ $service->name }}</h3>
+                                        <h3 class="text-lg font-medium text-gray-900">
+                                            <button wire:click="viewService({{ $service->id }})" class="text-teal-600 hover:text-teal-800 hover:underline">
+                                                {{ $service->name }}
+                                            </button>
+                                        </h3>
                                         <span class="px-2 py-1 text-xs rounded-full {{ $service->active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                             {{ $service->active ? 'Active' : 'Inactive' }}
                                         </span>
@@ -257,5 +278,200 @@
                 {{ $services->links() }}
             </div>
         </div>
+        @endif
+
+        <!-- View Service Modal -->
+        @if ($showViewModal && $selectedViewService)
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+                <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-4xl w-full m-4 max-h-[90vh] overflow-y-auto">
+                    <!-- Modal Header -->
+                    <div class="bg-teal-600 text-white p-6 rounded-t-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-xl font-semibold">{{ $selectedViewService->name }}</h3>
+                                <p class="text-teal-100 mt-1">{{ $selectedViewService->program->name }}</p>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="px-3 py-1 text-sm rounded-full {{ $selectedViewService->active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                    {{ $selectedViewService->active ? 'Active' : 'Inactive' }}
+                                </span>
+                                <button wire:click="$set('showViewModal', false)" class="text-white hover:text-gray-300">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal Content -->
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Service Information -->
+                            <div class="space-y-6">
+                                <div>
+                                    <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-3">Service Information</h4>
+                                    <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg space-y-3">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Service Name</label>
+                                            <p class="text-sm text-gray-900 dark:text-white mt-1">{{ $selectedViewService->name }}</p>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+                                            <p class="text-sm text-gray-900 dark:text-white mt-1">{{ $selectedViewService->description ?: 'No description provided' }}</p>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Program</label>
+                                            <p class="text-sm text-gray-900 dark:text-white mt-1">{{ $selectedViewService->program->name }}</p>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Start Date</label>
+                                                <p class="text-sm text-gray-900 dark:text-white mt-1">{{ $selectedViewService->start_date ? $selectedViewService->start_date->format('M j, Y') : 'Not set' }}</p>
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">End Date</label>
+                                                <p class="text-sm text-gray-900 dark:text-white mt-1">{{ $selectedViewService->end_date ? $selectedViewService->end_date->format('M j, Y') : 'No end date' }}</p>
+                                            </div>
+                                        </div>
+                                        @if($selectedViewService->notes)
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Notes</label>
+                                                <p class="text-sm text-gray-900 dark:text-white mt-1">{{ $selectedViewService->notes }}</p>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <!-- Program Information -->
+                                <div>
+                                    <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-3">Program Information</h4>
+                                    <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg space-y-3">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Program Name</label>
+                                            <p class="text-sm text-gray-900 dark:text-white mt-1">{{ $selectedViewService->program->name }}</p>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Program Description</label>
+                                            <p class="text-sm text-gray-900 dark:text-white mt-1">{{ $selectedViewService->program->description ?: 'No description provided' }}</p>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Program Status</label>
+                                                <p class="text-sm mt-1">
+                                                    <span class="px-2 py-1 text-xs rounded-full {{ $selectedViewService->program->active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                                        {{ $selectedViewService->program->active ? 'Active' : 'Inactive' }}
+                                                    </span>
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Program Type</label>
+                                                <p class="text-sm text-gray-900 dark:text-white mt-1">{{ $selectedViewService->program->program_type ?? 'Not specified' }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Statistics and Enrollments -->
+                            <div class="space-y-6">
+                                <!-- Statistics -->
+                                <div>
+                                    <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-3">Service Statistics</h4>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div class="bg-blue-50 p-4 rounded-lg">
+                                            <div class="text-2xl font-bold text-blue-600">{{ $selectedViewService->getEnrolledParticipantsCount() }}</div>
+                                            <div class="text-sm text-blue-700">Currently Enrolled</div>
+                                        </div>
+                                        <div class="bg-green-50 p-4 rounded-lg">
+                                            <div class="text-2xl font-bold text-green-600">{{ $selectedViewService->getCompletedEnrollmentsCount() }}</div>
+                                            <div class="text-sm text-green-700">Completed</div>
+                                        </div>
+                                        <div class="bg-purple-50 p-4 rounded-lg">
+                                            <div class="text-2xl font-bold text-purple-600">{{ $selectedViewService->serviceEnrollments->count() }}</div>
+                                            <div class="text-sm text-purple-700">Total Enrollments</div>
+                                        </div>
+                                        <div class="bg-orange-50 p-4 rounded-lg">
+                                            <div class="text-2xl font-bold text-orange-600">{{ $selectedViewService->workPlanGoals->count() }}</div>
+                                            <div class="text-sm text-orange-700">Work Plan Goals</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Recent Enrollments -->
+                                <div>
+                                    <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-3">Recent Enrollments</h4>
+                                    <div class="bg-gray-50 dark:bg-zinc-700 rounded-lg">
+                                        @if($selectedViewService->serviceEnrollments->count() > 0)
+                                            <div class="max-h-64 overflow-y-auto">
+                                                @foreach($selectedViewService->serviceEnrollments->take(10) as $enrollment)
+                                                    <div class="p-3 border-b border-gray-200 dark:border-zinc-600 last:border-b-0">
+                                                        <div class="flex items-center justify-between">
+                                                            <div>
+                                                                <p class="font-medium text-sm text-gray-900 dark:text-white">{{ $enrollment->participant->first_name }} {{ $enrollment->participant->last_name }}</p>
+                                                                <p class="text-xs text-gray-600 dark:text-gray-300">Enrolled: {{ $enrollment->enrollment_date->format('M j, Y') }}</p>
+                                                            </div>
+                                                            <div class="text-right">
+                                                                <span class="px-2 py-1 text-xs rounded-full
+                                                                    @if($enrollment->status === 'completed') bg-green-100 text-green-800
+                                                                    @elseif($enrollment->status === 'in_progress') bg-blue-100 text-blue-800
+                                                                    @elseif($enrollment->status === 'enrolled') bg-yellow-100 text-yellow-800
+                                                                    @else bg-gray-100 text-gray-800
+                                                                    @endif">
+                                                                    {{ ucfirst($enrollment->status) }}
+                                                                </span>
+                                                                @if($enrollment->completion_date)
+                                                                    <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">Completed: {{ $enrollment->completion_date->format('M j, Y') }}</p>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                        @if($enrollment->hours_received || $enrollment->sessions_attended)
+                                                            <div class="mt-2 flex items-center space-x-4 text-xs text-gray-600 dark:text-gray-300">
+                                                                @if($enrollment->hours_received)
+                                                                    <span>Hours: {{ $enrollment->hours_received }}</span>
+                                                                @endif
+                                                                @if($enrollment->sessions_attended)
+                                                                    <span>Sessions: {{ $enrollment->sessions_attended }}</span>
+                                                                @endif
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <div class="p-4 text-center text-gray-500 dark:text-gray-400">
+                                                <p>No enrollments found for this service.</p>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal Footer -->
+                    <div class="bg-gray-50 dark:bg-zinc-700 px-6 py-4 rounded-b-lg">
+                        <div class="flex justify-between items-center">
+                            <div class="text-sm text-gray-600 dark:text-gray-300">
+                                Created: {{ $selectedViewService->created_at->format('M j, Y g:i A') }}
+                                @if($selectedViewService->updated_at != $selectedViewService->created_at)
+                                    • Updated: {{ $selectedViewService->updated_at->format('M j, Y g:i A') }}
+                                @endif
+                            </div>
+                            <div class="flex space-x-3">
+                                <button wire:click="showEditService({{ $selectedViewService->id }})" 
+                                        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    Edit Service
+                                </button>
+                                <button wire:click="$set('showViewModal', false)" 
+                                        class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-zinc-600 border border-gray-300 dark:border-zinc-500 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-500 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 </div>

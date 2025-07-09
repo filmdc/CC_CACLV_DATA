@@ -7,7 +7,8 @@
         </div>
 
         <!-- Search and Actions -->
-        <div class="p-4 bg-gray-50 dark:bg-zinc-700 border-b border-gray-200 dark:border-zinc-600">
+        @if(!$showEditForm && !$showCreateForm)
+            <div class="p-4 bg-gray-50 dark:bg-zinc-700 border-b border-gray-200 dark:border-zinc-600">
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div class="flex flex-col sm:flex-row gap-4 flex-1">
                     <div class="flex-1 max-w-md">
@@ -43,7 +44,8 @@
                     </button>
                 </div>
             </div>
-        </div>
+            </div>
+        @endif
 
         <!-- Success/Error Messages -->
         @if (session()->has('success'))
@@ -68,8 +70,15 @@
 
         <!-- Create/Edit Form -->
         @if($showCreateForm || $showEditForm)
-            <div class="p-6 bg-green-50 dark:bg-green-900/20 border-b border-gray-200 dark:border-zinc-600">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">{{ $showCreateForm ? 'Create New Contract' : 'Edit Contract' }}</h3>
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">{{ $showCreateForm ? 'Create New Contract' : 'Edit Contract' }}</h3>
+                    <button wire:click="resetContractForm" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
 
                 <form wire:submit="{{ $showCreateForm ? 'createContract' : 'updateContract' }}" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -232,8 +241,202 @@
             </div>
         @endif
 
+        <!-- View Contract Modal -->
+        @if($showViewModal && $selectedContract)
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+                <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                    <!-- Modal Header -->
+                    <div class="bg-green-600 text-white p-6 rounded-t-lg">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-xl font-bold">Contract Details</h3>
+                            <button wire:click="closeViewModal" class="text-green-200 hover:text-white transition-colors">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Modal Content -->
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Basic Information -->
+                            <div class="space-y-4">
+                                <h4 class="text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-zinc-600 pb-2">Contract Information</h4>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
+                                    <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $selectedContract->title }}</p>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Contract Number</label>
+                                    <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $selectedContract->contract_number ?? 'N/A' }}</p>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">CFDA Number</label>
+                                    <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $selectedContract->cfda_number ?? 'N/A' }}</p>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Grant Code</label>
+                                    <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $selectedContract->grant_code ?? 'N/A' }}</p>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                                    <p class="mt-1">
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                                            @if($selectedContract->status === 'Active') bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200
+                                            @elseif($selectedContract->status === 'Upcoming') bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200
+                                            @elseif($selectedContract->status === 'Expired') bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200
+                                            @else bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 @endif">
+                                            {{ $selectedContract->status }}
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <!-- Financial & Dates -->
+                            <div class="space-y-4">
+                                <h4 class="text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-zinc-600 pb-2">Financial & Timeline</h4>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Amount</label>
+                                    <p class="mt-1 text-sm text-gray-900 dark:text-white font-semibold">${{ number_format($selectedContract->amount, 2) }}</p>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date of Award</label>
+                                    <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $selectedContract->date_of_award?->format('M d, Y') ?? 'N/A' }}</p>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Start Date</label>
+                                    <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $selectedContract->start_date?->format('M d, Y') ?? 'N/A' }}</p>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">End Date</label>
+                                    <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $selectedContract->end_date?->format('M d, Y') ?? 'Open' }}</p>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Program</label>
+                                    <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $selectedContract->program->name ?? 'N/A' }}</p>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Funder</label>
+                                    <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $selectedContract->funder->name ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Purpose & Notes -->
+                        @if($selectedContract->purpose || $selectedContract->notes)
+                            <div class="mt-6 pt-6 border-t border-gray-200 dark:border-zinc-600">
+                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    @if($selectedContract->purpose)
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Purpose</label>
+                                            <p class="text-sm text-gray-900 dark:text-white">{{ $selectedContract->purpose }}</p>
+                                        </div>
+                                    @endif
+                                    
+                                    @if($selectedContract->notes)
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Notes</label>
+                                            <p class="text-sm text-gray-900 dark:text-white">{{ $selectedContract->notes }}</p>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        @endif
+                        
+                        <!-- Documents -->
+                        @if($selectedContract->documents && $selectedContract->documents->count() > 0)
+                            <div class="mt-6 pt-6 border-t border-gray-200 dark:border-zinc-600">
+                                <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Documents</h4>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    @foreach($selectedContract->documents as $document)
+                                        <div class="flex items-center p-3 bg-gray-50 dark:bg-zinc-700 rounded-lg">
+                                            <div class="flex-shrink-0">
+                                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                </svg>
+                                            </div>
+                                            <div class="ml-3 flex-1">
+                                                <a href="{{ $document->getUrl() }}" target="_blank" 
+                                                   class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">
+                                                    {{ $document->name }}
+                                                </a>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ $document->human_readable_size }}</p>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+                        
+                        <!-- Report Due Dates -->
+                        @if($selectedContract->reportDueDates && $selectedContract->reportDueDates->count() > 0)
+                            <div class="mt-6 pt-6 border-t border-gray-200 dark:border-zinc-600">
+                                <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Report Due Dates</h4>
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-600">
+                                        <thead class="bg-gray-50 dark:bg-zinc-700">
+                                            <tr>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Report Type</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Due Date</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-zinc-600">
+                                            @foreach($selectedContract->reportDueDates as $dueDate)
+                                                <tr>
+                                                    <td class="px-4 py-2 text-sm text-gray-900 dark:text-white">{{ $dueDate->report_type }}</td>
+                                                    <td class="px-4 py-2 text-sm text-gray-900 dark:text-white">{{ $dueDate->due_date?->format('M d, Y') }}</td>
+                                                    <td class="px-4 py-2 text-sm">
+                                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                                                            @if($dueDate->status === 'completed') bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200
+                                                            @elseif($dueDate->status === 'overdue') bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200
+                                                            @else bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 @endif">
+                                                            {{ ucfirst($dueDate->status) }}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                    
+                    <!-- Modal Footer -->
+                    <div class="bg-gray-50 dark:bg-zinc-700 px-6 py-4 rounded-b-lg">
+                        <div class="flex justify-end space-x-2">
+                            <button wire:click="closeViewModal" 
+                                    class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 transition">
+                                Close
+                            </button>
+                            @if($this->can('contracts.edit'))
+                                <button wire:click="showEditContract({{ $selectedContract->id }})" 
+                                        class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
+                                    Edit Contract
+                                </button>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <!-- Contracts Table -->
-        <div class="overflow-x-auto">
+        @if(!$showEditForm && !$showCreateForm)
+            <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-600">
                 <thead class="bg-gray-50 dark:bg-zinc-700">
                     <tr>
@@ -251,7 +454,12 @@
                     @forelse($contracts as $contract)
                         <tr class="{{ $contract->archived ? 'bg-gray-100 dark:bg-zinc-900' : '' }}">
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $contract->title }}</div>
+                                <div class="text-sm font-medium">
+                                    <button wire:click="viewContract({{ $contract->id }})" 
+                                            class="text-gray-900 dark:text-white hover:text-green-600 dark:hover:text-green-400 hover:underline cursor-pointer transition-colors duration-200">
+                                        {{ $contract->title }}
+                                    </button>
+                                </div>
                                 @if($contract->grant_code)
                                     <div class="text-sm text-gray-500 dark:text-gray-400">Grant: {{ $contract->grant_code }}</div>
                                 @endif
@@ -304,13 +512,14 @@
                     @endforelse
                 </tbody>
             </table>
-        </div>
-
-        <!-- Pagination -->
-        @if($contracts->hasPages())
-            <div class="px-6 py-3 border-t border-gray-200 dark:border-zinc-600">
-                {{ $contracts->links() }}
             </div>
+
+            <!-- Pagination -->
+            @if($contracts->hasPages())
+                <div class="px-6 py-3 border-t border-gray-200 dark:border-zinc-600">
+                    {{ $contracts->links() }}
+                </div>
+            @endif
         @endif
     </div>
 </div>

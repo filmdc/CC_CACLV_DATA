@@ -15,6 +15,7 @@ class HouseholdManagement extends Component
     public $selectedHousehold = null;
     public $showAddMember = false;
     public $showEditHousehold = false;
+    public $showViewModal = false;
 
     // Add Family Member Form
     public $first_name = '';
@@ -47,6 +48,20 @@ class HouseholdManagement extends Component
         $this->resetMemberForm();
     }
 
+    public function viewHousehold($householdId)
+    {
+        $this->selectedHousehold = Household::with([
+            'headOfHousehold', 
+            'familyMembers',
+            'participants.programEnrollments.program',
+            'participants.serviceEnrollments.service'
+        ])->find($householdId);
+        
+        if ($this->selectedHousehold) {
+            $this->showViewModal = true;
+        }
+    }
+
     public function resetMemberForm()
     {
         $this->first_name = '';
@@ -58,6 +73,7 @@ class HouseholdManagement extends Component
         $this->telephone = '';
         $this->email = '';
         $this->relationship = '';
+        $this->showViewModal = false;
     }
 
     public function addFamilyMember()

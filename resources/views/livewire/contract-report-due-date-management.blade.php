@@ -185,7 +185,7 @@
                 </thead>
                 <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-zinc-600">
                     @forelse($dueDates as $dueDate)
-                        <tr class="{{ $dueDate->isOverdue() ? 'bg-red-50 dark:bg-red-900/10' : '' }}">
+                        <tr class="{{ $dueDate->is_overdue ? 'bg-red-50 dark:bg-red-900/10' : '' }}">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $dueDate->report_name }}</div>
                                 @if($dueDate->description)
@@ -207,20 +207,20 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
                                     {{ $dueDate->status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300' : 
-                                       ($dueDate->isOverdue() ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300' : 
+                                       ($dueDate->is_overdue ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300' : 
                                         'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300') }}">
-                                    {{ $dueDate->isOverdue() && $dueDate->status !== 'completed' ? 'Overdue' : ucfirst($dueDate->status) }}
+                                    {{ $dueDate->is_overdue && $dueDate->status !== 'completed' ? 'Overdue' : ucfirst($dueDate->status) }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900 dark:text-white">
-                                    {{ $dueDate->assignedUsers->count() }} user(s)
+                                    {{ $dueDate->emails->count() }} email(s)
                                 </div>
-                                @if($dueDate->assignedUsers->count() > 0)
+                                @if($dueDate->emails->count() > 0)
                                     <div class="text-sm text-gray-500 dark:text-gray-400">
-                                        {{ $dueDate->assignedUsers->pluck('name')->take(2)->join(', ') }}
-                                        @if($dueDate->assignedUsers->count() > 2)
-                                            +{{ $dueDate->assignedUsers->count() - 2 }} more
+                                        {{ $dueDate->emails->pluck('name')->take(2)->join(', ') }}
+                                        @if($dueDate->emails->count() > 2)
+                                            +{{ $dueDate->emails->count() - 2 }} more
                                         @endif
                                     </div>
                                 @endif

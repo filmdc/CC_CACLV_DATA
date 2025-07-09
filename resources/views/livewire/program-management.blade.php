@@ -7,18 +7,20 @@
         </div>
 
         <!-- Search and Actions -->
-        <div class="p-4 bg-gray-50 dark:bg-zinc-700 border-b border-gray-200 dark:border-zinc-600">
-            <div class="flex items-center justify-between">
-                <div class="flex-1 max-w-md">
-                    <input type="text" wire:model.live="search" placeholder="Search programs..." 
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white">
+        @if(!$showEditForm && !$showCreateForm)
+            <div class="p-4 bg-gray-50 dark:bg-zinc-700 border-b border-gray-200 dark:border-zinc-600">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1 max-w-md">
+                        <input type="text" wire:model.live="search" placeholder="Search programs..." 
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white">
+                    </div>
+                    <button wire:click="showCreateProgram" 
+                            class="ml-4 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        Create Program
+                    </button>
                 </div>
-                <button wire:click="showCreateProgram" 
-                        class="ml-4 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
-                    Create Program
-                </button>
             </div>
-        </div>
+        @endif
 
         <!-- Success/Error Messages -->
         @if (session()->has('success'))
@@ -43,8 +45,15 @@
 
         <!-- Create/Edit Form -->
         @if($showCreateForm || $showEditForm)
-            <div class="p-6 bg-purple-50 dark:bg-purple-900/20 border-b border-gray-200 dark:border-zinc-600">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">{{ $showCreateForm ? 'Create New Program' : 'Edit Program' }}</h3>
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">{{ $showCreateForm ? 'Create New Program' : 'Edit Program' }}</h3>
+                    <button wire:click="resetForm" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
 
                 <form wire:submit="{{ $showCreateForm ? 'createProgram' : 'updateProgram' }}" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -131,7 +140,8 @@
         @endif
 
         <!-- Programs Table -->
-        <div class="overflow-x-auto">
+        @if(!$showEditForm && !$showCreateForm)
+            <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-600">
                 <thead class="bg-gray-50 dark:bg-zinc-700">
                     <tr>
@@ -150,7 +160,10 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div>
                                     <div class="flex items-center space-x-2">
-                                        <span class="text-sm font-medium text-gray-900 dark:text-white">{{ $program->name }}</span>
+                                        <button wire:click="viewProgram({{ $program->id }})" 
+                                                class="text-gray-900 dark:text-white hover:text-purple-600 dark:hover:text-purple-400 hover:underline cursor-pointer transition-colors duration-200">
+                                            <span class="text-sm font-medium">{{ $program->name }}</span>
+                                        </button>
                                         @if($program->contract_management_only)
                                             <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-orange-100 dark:bg-orange-900/20 text-orange-800 dark:text-orange-300" title="Contract Management Only - Hidden from end users">
                                                 Contract Only
@@ -210,13 +223,186 @@
                     @endforelse
                 </tbody>
             </table>
-        </div>
-
-        <!-- Pagination -->
-        @if($programs->hasPages())
-            <div class="px-6 py-3 border-t border-gray-200 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-700">
-                {{ $programs->links() }}
             </div>
+
+            <!-- Pagination -->
+            @if($programs->hasPages())
+                <div class="px-6 py-3 border-t border-gray-200 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-700">
+                    {{ $programs->links() }}
+                </div>
+            @endif
         @endif
     </div>
+
+    <!-- View Program Modal -->
+    @if($showViewModal && $selectedProgram)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">Program Details</h3>
+                    <button wire:click="$set('showViewModal', false)" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Program Information -->
+                    <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg">
+                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Program Information</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Program Name</label>
+                                <p class="text-sm text-gray-900 dark:text-white">{{ $selectedProgram->name }}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Description</label>
+                                <p class="text-sm text-gray-900 dark:text-white">{{ $selectedProgram->description ?? 'N/A' }}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Program Manager</label>
+                                <p class="text-sm text-gray-900 dark:text-white">{{ $selectedProgram->programManager->name ?? 'Unassigned' }}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Status</label>
+                                <p class="text-sm text-gray-900 dark:text-white">
+                                    @if($selectedProgram->active)
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">Active</span>
+                                    @else
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">Inactive</span>
+                                    @endif
+                                </p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Special Features</label>
+                                <div class="flex flex-wrap gap-2 mt-1">
+                                    @if($selectedProgram->contract_management_only)
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-orange-100 dark:bg-orange-900/20 text-orange-800 dark:text-orange-300">Contract Management Only</span>
+                                    @endif
+                                    @if($selectedProgram->housing_module_enabled)
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300">Housing Module Enabled</span>
+                                    @endif
+                                    @if(!$selectedProgram->contract_management_only && !$selectedProgram->housing_module_enabled)
+                                        <span class="text-sm text-gray-500 dark:text-gray-400">None</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Duration Information -->
+                    <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg">
+                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Duration Information</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Start Date</label>
+                                <p class="text-sm text-gray-900 dark:text-white">
+                                    {{ $selectedProgram->start_date ? $selectedProgram->start_date->format('F j, Y') : 'Not specified' }}
+                                </p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">End Date</label>
+                                <p class="text-sm text-gray-900 dark:text-white">
+                                    {{ $selectedProgram->end_date ? $selectedProgram->end_date->format('F j, Y') : 'Not specified' }}
+                                </p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Created</label>
+                                <p class="text-sm text-gray-900 dark:text-white">{{ $selectedProgram->created_at->format('F j, Y g:i A') }}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Last Updated</label>
+                                <p class="text-sm text-gray-900 dark:text-white">{{ $selectedProgram->updated_at->format('F j, Y g:i A') }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Services -->
+                    <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg">
+                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Services ({{ $selectedProgram->services->count() }})</h4>
+                        @if($selectedProgram->services && $selectedProgram->services->count() > 0)
+                            <div class="space-y-2">
+                                @foreach($selectedProgram->services as $service)
+                                    <div class="flex items-center justify-between p-2 bg-white dark:bg-zinc-800 rounded border">
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $service->name }}</div>
+                                            @if($service->description)
+                                                <div class="text-xs text-gray-500 dark:text-gray-400">{{ Str::limit($service->description, 50) }}</div>
+                                            @endif
+                                        </div>
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                                            {{ $service->active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' }}">
+                                            {{ $service->active ? 'Active' : 'Inactive' }}
+                                        </span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-sm text-gray-500 dark:text-gray-400">No services configured</p>
+                        @endif
+                    </div>
+
+                    <!-- Contracts -->
+                    <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg">
+                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Contracts ({{ $selectedProgram->contracts->count() }})</h4>
+                        @if($selectedProgram->contracts && $selectedProgram->contracts->count() > 0)
+                            <div class="space-y-2">
+                                @foreach($selectedProgram->contracts as $contract)
+                                    <div class="flex items-center justify-between p-2 bg-white dark:bg-zinc-800 rounded border">
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $contract->title }}</div>
+                                            <div class="text-xs text-gray-500 dark:text-gray-400">
+                                                Funder: {{ $contract->funder->name ?? 'N/A' }}
+                                            </div>
+                                        </div>
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                                            {{ $contract->status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200' }}">
+                                            {{ ucfirst($contract->status) }}
+                                        </span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-sm text-gray-500 dark:text-gray-400">No contracts</p>
+                        @endif
+                    </div>
+
+                    <!-- Enrollment Statistics -->
+                    <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg md:col-span-2">
+                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Enrollment Statistics</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="bg-white dark:bg-zinc-800 p-3 rounded border">
+                                <div class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Enrollments</div>
+                                <div class="text-lg font-bold text-gray-900 dark:text-white">{{ $selectedProgram->programEnrollments->count() }}</div>
+                            </div>
+                            <div class="bg-white dark:bg-zinc-800 p-3 rounded border">
+                                <div class="text-sm font-medium text-gray-600 dark:text-gray-400">Active Enrollments</div>
+                                <div class="text-lg font-bold text-green-600 dark:text-green-400">{{ $selectedProgram->programEnrollments->where('status', 'active')->count() }}</div>
+                            </div>
+                            <div class="bg-white dark:bg-zinc-800 p-3 rounded border">
+                                <div class="text-sm font-medium text-gray-600 dark:text-gray-400">Work Plans</div>
+                                <div class="text-lg font-bold text-blue-600 dark:text-blue-400">{{ $selectedProgram->workPlans->count() }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notes -->
+                    @if($selectedProgram->notes)
+                        <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg md:col-span-2">
+                            <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Notes</h4>
+                            <p class="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">{{ $selectedProgram->notes }}</p>
+                        </div>
+                    @endif
+                </div>
+
+                <div class="mt-6 flex justify-end">
+                    <button wire:click="$set('showViewModal', false)" 
+                            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>

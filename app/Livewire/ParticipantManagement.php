@@ -34,6 +34,7 @@ class ParticipantManagement extends Component
     public $search = '';
     public $selectedParticipant = null;
     public $showEditForm = false;
+    public $showViewModal = false;
 
     // Participant Form Fields
     public $first_name = '';
@@ -150,6 +151,20 @@ class ParticipantManagement extends Component
         }
     }
 
+    public function viewParticipant($participantId)
+    {
+        $this->selectedParticipant = Participant::with([
+            'household', 
+            'programEnrollments.program', 
+            'serviceEnrollments.service',
+            'serviceEnrollments.programEnrollment.program'
+        ])->find($participantId);
+        
+        if ($this->selectedParticipant) {
+            $this->showViewModal = true;
+        }
+    }
+
     public function resetForm()
     {
         $this->first_name = '';
@@ -168,6 +183,7 @@ class ParticipantManagement extends Component
         $this->military_status = '';
         $this->work_status = '';
         $this->showEditForm = false;
+        $this->showViewModal = false;
         $this->selectedParticipant = null;
         $this->showEnrollmentSection = false;
         $this->resetEnrollmentForm();

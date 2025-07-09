@@ -15,6 +15,7 @@ class FunderManagement extends Component
     public $selectedFunder = null;
     public $showCreateForm = false;
     public $showEditForm = false;
+    public $showViewModal = false;
 
     // Funder Form Fields
     public $name = '';
@@ -42,6 +43,7 @@ class FunderManagement extends Component
         $this->authorizeAction('funders.create');
         $this->showCreateForm = true;
         $this->showEditForm = false;
+        $this->showViewModal = false;
         $this->selectedFunder = null;
         $this->resetFunderForm();
     }
@@ -52,7 +54,23 @@ class FunderManagement extends Component
         $this->selectedFunder = Funder::findOrFail($funderId);
         $this->showEditForm = true;
         $this->showCreateForm = false;
+        $this->showViewModal = false;
         $this->fillFunderForm();
+    }
+
+    public function viewFunder($funderId)
+    {
+        $this->authorizeAction('funders.view');
+        $this->selectedFunder = Funder::with([
+            'contracts' => function($query) {
+                $query->orderBy('created_at', 'desc');
+            },
+            'createdBy',
+            'updatedBy'
+        ])->findOrFail($funderId);
+        $this->showViewModal = true;
+        $this->showCreateForm = false;
+        $this->showEditForm = false;
     }
 
     public function resetFunderForm()
@@ -66,6 +84,7 @@ class FunderManagement extends Component
         $this->address = '';
         $this->website = '';
         $this->active = true;
+        $this->showViewModal = false;
     }
 
     public function fillFunderForm()

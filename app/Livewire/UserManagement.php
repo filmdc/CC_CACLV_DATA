@@ -7,6 +7,9 @@ use App\Models\Role;
 use App\Traits\WithPermissionChecks;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 
 class UserManagement extends Component
 {
@@ -15,17 +18,34 @@ class UserManagement extends Component
     public $search = '';
     public $selectedUser = null;
     public $showEditForm = false;
+    public $showPasswordForm = false;
+    public $showViewModal = false;
     
     // User form fields
     public $name = '';
     public $email = '';
+    public $active = true;
     public $selectedRoles = [];
+    
+    // Password form fields
+    public $password = '';
+    public $password_confirmation = '';
+    public $send_password_reset = false;
 
     protected $rules = [
         'name' => 'required|string|max:255',
         'email' => 'required|email|max:255',
+        'active' => 'boolean',
         'selectedRoles' => 'array',
     ];
+    
+    protected function getPasswordRules()
+    {
+        return [
+            'password' => 'required|string|min:8|confirmed',
+            'password_confirmation' => 'required|string|min:8',
+        ];
+    }
 
     public function mount()
     {
@@ -46,8 +66,18 @@ class UserManagement extends Component
         if ($this->selectedUser) {
             $this->name = $this->selectedUser->name;
             $this->email = $this->selectedUser->email;
+            $this->active = $this->selectedUser->active;
             $this->selectedRoles = $this->selectedUser->roles->pluck('id')->toArray();
         }
+    }
+    
+    public function showPasswordModal($userId)
+    {
+        $this->authorizeAction('users.edit', 'You do not have permission to edit users.');
+        
+        $this->selectedUser = User::findOrFail($userId);
+        $this->clearPasswordForm();
+        $this->showPasswordForm = true;
     }
 
     public function updateUser()
@@ -60,6 +90,7 @@ class UserManagement extends Component
             $this->selectedUser->update([
                 'name' => $this->name,
                 'email' => $this->email,
+                'active' => $this->active,
             ]);
 
             // Update roles
@@ -72,14 +103,113 @@ class UserManagement extends Component
             session()->flash('error', 'An error occurred: ' . $e->getMessage());
         }
     }
+    
+    public function setUserPassword()
+    {
+        $this->authorizeAction('users.edit', 'You do not have permission to edit users.');
+        
+        $this->validate($this->getPasswordRules());
+
+        try {
+            if (!$this->selectedUser) {
+                session()->flash('error', 'No user selected.');
+                return;
+            }
+
+            $this->selectedUser->update([
+                'password' => Hash::make($this->password),
+                'email_verified_at' => now(), // Mark email as verified when admin sets password
+            ]);
+
+            session()->flash('success', 'Password updated successfully for ' . $this->selectedUser->name);
+            $this->resetPasswordForm();
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+        }
+    }
+    
+    public function sendPasswordReset($userId)
+    {
+        $this->authorizeAction('users.edit', 'You do not have permission to edit users.');
+        
+        try {
+            $user = User::findOrFail($userId);
+            
+            // Send password reset notification
+            $status = Password::sendResetLink(['email' => $user->email]);
+            
+            if ($status === Password::RESET_LINK_SENT) {
+                session()->flash('success', 'Password reset link sent to ' . $user->email);
+            } else {
+                session()->flash('error', 'Unable to send password reset link.');
+            }
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+        }
+    }
+    
+    public function toggleUserStatus($userId)
+    {
+        $this->authorizeAction('users.edit', 'You do not have permission to edit users.');
+        
+        try {
+            $user = User::findOrFail($userId);
+            
+            // Prevent deactivating yourself
+            if ($user->id === auth()->id()) {
+                session()->flash('error', 'You cannot deactivate your own account.');
+                return;
+            }
+            
+            $user->update(['active' => !$user->active]);
+            
+            $status = $user->active ? 'activated' : 'deactivated';
+            session()->flash('success', 'User ' . $status . ' successfully.');
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+        }
+    }
 
     public function resetForm()
     {
         $this->name = '';
         $this->email = '';
+        $this->active = true;
         $this->selectedRoles = [];
         $this->showEditForm = false;
+        $this->showViewModal = false;
         $this->selectedUser = null;
+        $this->resetPasswordForm();
+    }
+    
+    public function viewUser($userId)
+    {
+        $this->authorizeAction('users.view', 'You do not have permission to view users.');
+        
+        $this->selectedUser = User::with('roles')->findOrFail($userId);
+        $this->showViewModal = true;
+    }
+    
+    public function closeViewModal()
+    {
+        $this->showViewModal = false;
+        $this->selectedUser = null;
+    }
+    
+    public function clearPasswordForm()
+    {
+        $this->password = '';
+        $this->password_confirmation = '';
+        $this->send_password_reset = false;
+    }
+    
+    public function resetPasswordForm()
+    {
+        $this->clearPasswordForm();
+        $this->showPasswordForm = false;
     }
 
     public function deleteUser($userId)

@@ -17,6 +17,8 @@ class WorkPlanGoalManagement extends Component
     public $selectedGoal = null;
     public $showCreateForm = false;
     public $showEditForm = false;
+    public $showViewModal = false;
+    public $selectedViewGoal = null;
 
     // Goal Form Fields
     public $work_plan_id = '';
@@ -60,6 +62,7 @@ class WorkPlanGoalManagement extends Component
         if ($this->selectedGoal) {
             $this->showEditForm = true;
             $this->showCreateForm = false;
+            $this->showViewModal = false;
             $this->fillGoalForm();
         }
     }
@@ -72,6 +75,8 @@ class WorkPlanGoalManagement extends Component
         $this->description = '';
         $this->target_number = '';
         $this->actual_number = '';
+        $this->showViewModal = false;
+        $this->selectedViewGoal = null;
     }
 
     public function fillGoalForm()
@@ -233,6 +238,23 @@ class WorkPlanGoalManagement extends Component
             }
         } catch (\Exception $e) {
             session()->flash('error', 'Error updating goal: ' . $e->getMessage());
+        }
+    }
+
+    public function viewGoal($goalId)
+    {
+        $this->selectedViewGoal = WorkPlanGoal::with([
+            'workPlan.program',
+            'service.program',
+            'service.serviceEnrollments' => function($query) {
+                $query->with('participant')->orderBy('enrollment_date', 'desc');
+            }
+        ])->find($goalId);
+        
+        if ($this->selectedViewGoal) {
+            $this->showViewModal = true;
+            $this->showCreateForm = false;
+            $this->showEditForm = false;
         }
     }
 

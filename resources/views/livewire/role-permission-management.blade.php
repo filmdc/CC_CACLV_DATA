@@ -7,6 +7,7 @@
         </div>
 
         <!-- Tab Navigation -->
+        @if(!$showCreateRoleForm && !$showEditRoleForm && !$showCreatePermissionForm && !$showEditPermissionForm && !$showViewRoleModal && !$showViewPermissionModal)
         <div class="p-4 bg-gray-50 dark:bg-zinc-700 border-b border-gray-200 dark:border-zinc-600">
             <div class="flex border-b border-gray-200 dark:border-zinc-600">
                 <button 
@@ -23,8 +24,10 @@
                 </button>
             </div>
         </div>
+        @endif
 
         <!-- Search and Create Button -->
+        @if(!$showCreateRoleForm && !$showEditRoleForm && !$showCreatePermissionForm && !$showEditPermissionForm && !$showViewRoleModal && !$showViewPermissionModal)
         <div class="p-4 bg-gray-50 dark:bg-zinc-700 border-b border-gray-200 dark:border-zinc-600">
             <div class="flex items-center justify-between">
                 <div class="flex-1 max-w-md">
@@ -37,6 +40,7 @@
                 @endif
             </div>
         </div>
+        @endif
 
         <!-- Flash Messages -->
         @if (session()->has('success'))
@@ -62,7 +66,14 @@
         <!-- Role Create/Edit Form -->
         @if($activeTab === 'roles' && ($showCreateRoleForm || $showEditRoleForm))
             <div class="p-6 bg-purple-50 dark:bg-purple-900/20 border-b border-gray-200 dark:border-zinc-600">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">{{ $showCreateRoleForm ? 'Create New Role' : 'Edit Role' }}</h3>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ $showCreateRoleForm ? 'Create New Role' : 'Edit Role' }}</h3>
+                    <button wire:click="closeRoleForms" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
                 <form wire:submit="{{ $showCreateRoleForm ? 'createRole' : 'updateRole' }}" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -111,7 +122,7 @@
                     </div>
 
                     <div class="flex justify-end gap-2 mt-6">
-                        <button type="button" wire:click="$set('showCreateRoleForm', false); $set('showEditRoleForm', false)" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                        <button type="button" wire:click="closeRoleForms" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-gray-500">
                             Cancel
                         </button>
                         <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
@@ -125,7 +136,14 @@
         <!-- Permission Create/Edit Form -->
         @if($activeTab === 'permissions' && ($showCreatePermissionForm || $showEditPermissionForm))
             <div class="p-6 bg-purple-50 dark:bg-purple-900/20 border-b border-gray-200 dark:border-zinc-600">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">{{ $showCreatePermissionForm ? 'Create New Permission' : 'Edit Permission' }}</h3>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ $showCreatePermissionForm ? 'Create New Permission' : 'Edit Permission' }}</h3>
+                    <button wire:click="closePermissionForms" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
                 <form wire:submit="{{ $showCreatePermissionForm ? 'createPermission' : 'updatePermission' }}" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -154,7 +172,7 @@
                     </div>
 
                     <div class="flex justify-end gap-2 mt-6">
-                        <button type="button" wire:click="$set('showCreatePermissionForm', false); $set('showEditPermissionForm', false)" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                        <button type="button" wire:click="closePermissionForms" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-gray-500">
                             Cancel
                         </button>
                         <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
@@ -166,7 +184,7 @@
         @endif
 
         <!-- Roles Table -->
-        @if($activeTab === 'roles')
+        @if($activeTab === 'roles' && !$showCreateRoleForm && !$showEditRoleForm)
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-600">
                     <thead class="bg-gray-50 dark:bg-zinc-700">
@@ -182,7 +200,11 @@
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div>
-                                        <div class="font-medium text-gray-900 dark:text-white">{{ $role->display_name }}</div>
+                                        <div class="font-medium text-gray-900 dark:text-white">
+                                            <button wire:click="viewRole({{ $role->id }})" class="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 hover:underline">
+                                                {{ $role->display_name }}
+                                            </button>
+                                        </div>
                                         <div class="text-sm text-gray-500 dark:text-gray-400">{{ $role->name }}</div>
                                         @if($role->description)
                                             <div class="text-sm text-gray-400 dark:text-gray-500">{{ Str::limit($role->description, 50) }}</div>
@@ -205,6 +227,9 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ $role->users->count() }} {{ Str::plural('user', $role->users->count()) }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     <div class="flex gap-2">
+                                        <button wire:click="viewRole({{ $role->id }})" class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300">
+                                            View
+                                        </button>
                                         <button wire:click="showEditRole({{ $role->id }})" class="text-purple-600 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300">
                                             Edit
                                         </button>
@@ -239,7 +264,7 @@
         @endif
 
         <!-- Permissions Table -->
-        @if($activeTab === 'permissions')
+        @if($activeTab === 'permissions' && !$showCreatePermissionForm && !$showEditPermissionForm)
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-600">
                     <thead class="bg-gray-50 dark:bg-zinc-700">
@@ -255,7 +280,11 @@
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div>
-                                        <div class="font-medium text-gray-900 dark:text-white">{{ $permission->display_name }}</div>
+                                        <div class="font-medium text-gray-900 dark:text-white">
+                                            <button wire:click="viewPermission({{ $permission->id }})" class="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 hover:underline">
+                                                {{ $permission->display_name }}
+                                            </button>
+                                        </div>
                                         <div class="text-sm text-gray-500 dark:text-gray-400">{{ $permission->name }}</div>
                                         @if($permission->description)
                                             <div class="text-sm text-gray-400 dark:text-gray-500">{{ Str::limit($permission->description, 50) }}</div>
@@ -272,6 +301,9 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ $permission->roles->count() }} {{ Str::plural('role', $permission->roles->count()) }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     <div class="flex gap-2">
+                                        <button wire:click="viewPermission({{ $permission->id }})" class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300">
+                                            View
+                                        </button>
                                         <button wire:click="showEditPermission({{ $permission->id }})" class="text-purple-600 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300">
                                             Edit
                                         </button>
@@ -303,6 +335,241 @@
                 {{ $permissions->links() }}
             </div>
         @endif
+        @endif
+
+        <!-- View Role Modal -->
+        @if($showViewRoleModal && $viewRole)
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+                <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-4xl w-full m-4 max-h-[90vh] overflow-y-auto">
+                    <!-- Modal Header -->
+                    <div class="bg-purple-600 text-white p-6 rounded-t-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-xl font-semibold">{{ $viewRole->display_name }}</h3>
+                                <p class="text-purple-100 mt-1">Role Details</p>
+                            </div>
+                            <button wire:click="$set('showViewRoleModal', false)" class="text-white hover:text-gray-300">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Modal Content -->
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Role Information -->
+                            <div class="space-y-6">
+                                <div>
+                                    <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-3">Role Information</h4>
+                                    <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg space-y-3">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Display Name</label>
+                                            <p class="text-sm text-gray-900 dark:text-white mt-1">{{ $viewRole->display_name }}</p>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Role Name</label>
+                                            <p class="text-sm text-gray-900 dark:text-white mt-1">{{ $viewRole->name }}</p>
+                                        </div>
+                                        @if($viewRole->description)
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+                                                <p class="text-sm text-gray-900 dark:text-white mt-1">{{ $viewRole->description }}</p>
+                                            </div>
+                                        @endif
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Created</label>
+                                            <p class="text-sm text-gray-900 dark:text-white mt-1">{{ $viewRole->created_at->format('M j, Y g:i A') }}</p>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Last Updated</label>
+                                            <p class="text-sm text-gray-900 dark:text-white mt-1">{{ $viewRole->updated_at->format('M j, Y g:i A') }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Users with this Role -->
+                                <div>
+                                    <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-3">Users ({{ $viewRole->users->count() }})</h4>
+                                    <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg">
+                                        @if($viewRole->users->count() > 0)
+                                            <div class="space-y-2 max-h-40 overflow-y-auto">
+                                                @foreach($viewRole->users as $user)
+                                                    <div class="flex items-center justify-between border-b border-gray-200 dark:border-zinc-600 pb-2 last:border-b-0">
+                                                        <div>
+                                                            <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $user->name }}</p>
+                                                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ $user->email }}</p>
+                                                        </div>
+                                                        <span class="px-2 py-1 text-xs rounded-full {{ $user->active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' }}">
+                                                            {{ $user->active ? 'Active' : 'Inactive' }}
+                                                        </span>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <div class="text-center py-4">
+                                                <p class="text-gray-500 dark:text-gray-400">No users assigned to this role.</p>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Permissions -->
+                            <div class="space-y-6">
+                                <div>
+                                    <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-3">Permissions ({{ $viewRole->permissions->count() }})</h4>
+                                    <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg">
+                                        @if($viewRole->permissions->count() > 0)
+                                            <div class="space-y-4 max-h-96 overflow-y-auto">
+                                                @foreach($viewRole->permissions->groupBy('category') as $category => $permissions)
+                                                    <div>
+                                                        <h5 class="font-medium text-gray-900 dark:text-white mb-2">{{ $category ?: 'General' }}</h5>
+                                                        <div class="space-y-2">
+                                                            @foreach($permissions as $permission)
+                                                                <div class="flex items-center justify-between border-b border-gray-200 dark:border-zinc-600 pb-2 last:border-b-0">
+                                                                    <div>
+                                                                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $permission->display_name }}</p>
+                                                                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ $permission->name }}</p>
+                                                                        @if($permission->description)
+                                                                            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">{{ $permission->description }}</p>
+                                                                        @endif
+                                                                    </div>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <div class="text-center py-4">
+                                                <p class="text-gray-500 dark:text-gray-400">No permissions assigned to this role.</p>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal Footer -->
+                        <div class="flex justify-end mt-6">
+                            <button wire:click="$set('showViewRoleModal', false)" 
+                                    class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-zinc-600 border border-gray-300 dark:border-zinc-500 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-500 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        <!-- View Permission Modal -->
+        @if($showViewPermissionModal && $viewPermission)
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+                <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-3xl w-full m-4 max-h-[90vh] overflow-y-auto">
+                    <!-- Modal Header -->
+                    <div class="bg-purple-600 text-white p-6 rounded-t-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-xl font-semibold">{{ $viewPermission->display_name }}</h3>
+                                <p class="text-purple-100 mt-1">Permission Details</p>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                @if($viewPermission->category)
+                                    <span class="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800">{{ $viewPermission->category }}</span>
+                                @endif
+                                <button wire:click="$set('showViewPermissionModal', false)" class="text-white hover:text-gray-300">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal Content -->
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Permission Information -->
+                            <div class="space-y-6">
+                                <div>
+                                    <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-3">Permission Information</h4>
+                                    <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg space-y-3">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Display Name</label>
+                                            <p class="text-sm text-gray-900 dark:text-white mt-1">{{ $viewPermission->display_name }}</p>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Permission Name</label>
+                                            <p class="text-sm text-gray-900 dark:text-white mt-1">{{ $viewPermission->name }}</p>
+                                        </div>
+                                        @if($viewPermission->description)
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+                                                <p class="text-sm text-gray-900 dark:text-white mt-1">{{ $viewPermission->description }}</p>
+                                            </div>
+                                        @endif
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
+                                            <p class="text-sm text-gray-900 dark:text-white mt-1">{{ $viewPermission->category ?: 'General' }}</p>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Created</label>
+                                            <p class="text-sm text-gray-900 dark:text-white mt-1">{{ $viewPermission->created_at->format('M j, Y g:i A') }}</p>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Last Updated</label>
+                                            <p class="text-sm text-gray-900 dark:text-white mt-1">{{ $viewPermission->updated_at->format('M j, Y g:i A') }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Roles with this Permission -->
+                            <div class="space-y-6">
+                                <div>
+                                    <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-3">Assigned to Roles ({{ $viewPermission->roles->count() }})</h4>
+                                    <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg">
+                                        @if($viewPermission->roles->count() > 0)
+                                            <div class="space-y-3 max-h-60 overflow-y-auto">
+                                                @foreach($viewPermission->roles as $role)
+                                                    <div class="border-b border-gray-200 dark:border-zinc-600 pb-3 last:border-b-0">
+                                                        <div class="flex items-center justify-between">
+                                                            <div>
+                                                                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $role->display_name }}</p>
+                                                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ $role->name }}</p>
+                                                                @if($role->description)
+                                                                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">{{ Str::limit($role->description, 60) }}</p>
+                                                                @endif
+                                                            </div>
+                                                            <div class="text-right">
+                                                                <div class="text-sm text-gray-600 dark:text-gray-400">{{ $role->users->count() }} {{ Str::plural('user', $role->users->count()) }}</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <div class="text-center py-4">
+                                                <p class="text-gray-500 dark:text-gray-400">This permission is not assigned to any roles.</p>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal Footer -->
+                        <div class="flex justify-end mt-6">
+                            <button wire:click="$set('showViewPermissionModal', false)" 
+                                    class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-zinc-600 border border-gray-300 dark:border-zinc-500 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-500 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         @endif
     </div>
 </div>

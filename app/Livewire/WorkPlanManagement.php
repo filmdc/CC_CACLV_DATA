@@ -16,6 +16,8 @@ class WorkPlanManagement extends Component
     public $selectedWorkPlan = null;
     public $showCreateForm = false;
     public $showEditForm = false;
+    public $showViewModal = false;
+    public $selectedViewWorkPlan = null;
 
     // WorkPlan Form Fields
     public $name = '';
@@ -58,6 +60,7 @@ class WorkPlanManagement extends Component
         if ($this->selectedWorkPlan) {
             $this->showEditForm = true;
             $this->showCreateForm = false;
+            $this->showViewModal = false;
             $this->fillWorkPlanForm();
         }
     }
@@ -69,6 +72,8 @@ class WorkPlanManagement extends Component
         $this->year = date('Y');
         $this->description = '';
         $this->active = true;
+        $this->showViewModal = false;
+        $this->selectedViewWorkPlan = null;
     }
 
     public function fillWorkPlanForm()
@@ -209,6 +214,23 @@ class WorkPlanManagement extends Component
             session()->flash('success', "Successfully synced {$syncedCount} goals in {$workPlan->name} with current service data.");
         } catch (\Exception $e) {
             session()->flash('error', 'Error syncing work plan goals: ' . $e->getMessage());
+        }
+    }
+
+    public function viewWorkPlan($workPlanId)
+    {
+        $this->selectedViewWorkPlan = WorkPlan::with([
+            'program',
+            'goals.service',
+            'goals' => function($query) {
+                $query->orderBy('created_at', 'desc');
+            }
+        ])->find($workPlanId);
+        
+        if ($this->selectedViewWorkPlan) {
+            $this->showViewModal = true;
+            $this->showCreateForm = false;
+            $this->showEditForm = false;
         }
     }
 

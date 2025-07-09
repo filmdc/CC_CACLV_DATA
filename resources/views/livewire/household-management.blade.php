@@ -7,6 +7,7 @@
         </div>
 
         <!-- Search and Filters -->
+        @if(!$showAddMember)
         <div class="p-4 bg-gray-50 border-b">
             <div class="flex items-center space-x-4">
                 <div class="flex-1">
@@ -15,6 +16,7 @@
                 </div>
             </div>
         </div>
+        @endif
 
         <!-- Success/Error Messages -->
         @if (session()->has('success'))
@@ -37,6 +39,7 @@
             </div>
         @endif
 
+        @if(!$showAddMember)
         <div class="flex">
             <!-- Household List -->
             <div class="w-1/3 border-r">
@@ -50,7 +53,10 @@
                              wire:click="selectHousehold({{ $household->id }})">
                             <div class="flex justify-between items-start">
                                 <div>
-                                    <p class="font-medium text-gray-900">{{ $household->household_code }}</p>
+                                    <button wire:click="viewHousehold({{ $household->id }})" 
+                                            class="text-left w-full text-gray-900 hover:text-blue-600 hover:underline cursor-pointer transition-colors duration-200">
+                                        <p class="font-medium">{{ $household->household_code }}</p>
+                                    </button>
                                     <p class="text-sm text-gray-600">
                                         {{ $household->headOfHousehold?->full_name ?? 'No head of household' }}
                                     </p>
@@ -142,8 +148,15 @@
 
                         <!-- Add Family Member Form -->
                         @if ($showAddMember)
-                            <div class="mt-6 bg-blue-50 rounded-lg p-4">
-                                <h4 class="text-lg font-medium text-gray-900 mb-4">Add Family Member</h4>
+                            <div class="mt-6 rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h4 class="text-lg font-medium text-gray-900">Add Family Member</h4>
+                                    <button wire:click="$set('showAddMember', false)" class="text-gray-400 hover:text-gray-600">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
                                 
                                 <form wire:submit="addFamilyMember" class="space-y-4">
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -224,5 +237,194 @@
                 @endif
             </div>
         </div>
+        @endif
     </div>
+
+    <!-- View Household Modal -->
+    @if($showViewModal && $selectedHousehold)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">Household Details</h3>
+                    <button wire:click="$set('showViewModal', false)" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Household Information -->
+                    <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg">
+                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Household Information</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Household Code</label>
+                                <p class="text-sm text-gray-900 dark:text-white">{{ $selectedHousehold->household_code }}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Household Type</label>
+                                <p class="text-sm text-gray-900 dark:text-white">{{ $selectedHousehold->household_type ?? 'N/A' }}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Household Size</label>
+                                <p class="text-sm text-gray-900 dark:text-white">{{ $selectedHousehold->household_size }} {{ Str::plural('member', $selectedHousehold->household_size) }}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Housing Status</label>
+                                <p class="text-sm text-gray-900 dark:text-white">{{ $selectedHousehold->housing_status ?? 'N/A' }}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Monthly Income</label>
+                                <p class="text-sm text-gray-900 dark:text-white">
+                                    @if($selectedHousehold->monthly_income)
+                                        ${{ number_format($selectedHousehold->monthly_income, 2) }}
+                                    @else
+                                        N/A
+                                    @endif
+                                </p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Poverty Level</label>
+                                <p class="text-sm text-gray-900 dark:text-white">
+                                    @if($selectedHousehold->hhs_poverty_percentage)
+                                        {{ $selectedHousehold->hhs_poverty_percentage }}% of federal guidelines
+                                    @else
+                                        N/A
+                                    @endif
+                                </p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Created</label>
+                                <p class="text-sm text-gray-900 dark:text-white">{{ $selectedHousehold->created_at->format('F j, Y g:i A') }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Head of Household -->
+                    <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg">
+                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Head of Household</h4>
+                        @if($selectedHousehold->headOfHousehold)
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Full Name</label>
+                                    <p class="text-sm text-gray-900 dark:text-white">{{ $selectedHousehold->headOfHousehold->full_name }}</p>
+                                </div>
+                                <div>
+                                    <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Date of Birth</label>
+                                    <p class="text-sm text-gray-900 dark:text-white">{{ $selectedHousehold->headOfHousehold->date_of_birth ? $selectedHousehold->headOfHousehold->date_of_birth->format('F j, Y') : 'N/A' }}</p>
+                                </div>
+                                <div>
+                                    <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Age</label>
+                                    <p class="text-sm text-gray-900 dark:text-white">{{ $selectedHousehold->headOfHousehold->age ?? 'N/A' }}</p>
+                                </div>
+                                <div>
+                                    <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Gender</label>
+                                    <p class="text-sm text-gray-900 dark:text-white">{{ $selectedHousehold->headOfHousehold->gender ?? 'N/A' }}</p>
+                                </div>
+                                <div>
+                                    <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Phone Number</label>
+                                    <p class="text-sm text-gray-900 dark:text-white">{{ $selectedHousehold->headOfHousehold->telephone ?? 'N/A' }}</p>
+                                </div>
+                                <div>
+                                    <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Email</label>
+                                    <p class="text-sm text-gray-900 dark:text-white">{{ $selectedHousehold->headOfHousehold->email ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                        @else
+                            <p class="text-sm text-gray-500 dark:text-gray-400">No head of household assigned</p>
+                        @endif
+                    </div>
+
+                    <!-- Family Members -->
+                    <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg lg:col-span-2">
+                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Family Members</h4>
+                        @if($selectedHousehold->participants && $selectedHousehold->participants->count() > 0)
+                            <div class="space-y-3">
+                                @foreach($selectedHousehold->participants as $participant)
+                                    <div class="flex items-center justify-between p-3 bg-white dark:bg-zinc-800 rounded border">
+                                        <div class="flex-1">
+                                            <div class="flex items-center space-x-2">
+                                                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $participant->full_name }}</div>
+                                                @if($participant->is_head_of_household)
+                                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">Head</span>
+                                                @endif
+                                            </div>
+                                            <div class="text-xs text-gray-500 dark:text-gray-400">
+                                                Age: {{ $participant->age ?? 'N/A' }} • Gender: {{ $participant->gender ?? 'N/A' }}
+                                                @if($participant->telephone)
+                                                    • Phone: {{ $participant->telephone }}
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                                            <div>Programs: {{ $participant->programEnrollments->where('status', 'active')->count() }}</div>
+                                            <div>Services: {{ $participant->serviceEnrollments->whereIn('status', ['enrolled', 'in_progress'])->count() }}</div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-sm text-gray-500 dark:text-gray-400">No family members found</p>
+                        @endif
+                    </div>
+
+                    <!-- Enrollment Summary -->
+                    <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg lg:col-span-2">
+                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Enrollment Summary</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <h5 class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Program Enrollments</h5>
+                                @php
+                                    $programEnrollments = $selectedHousehold->participants->flatMap->programEnrollments;
+                                @endphp
+                                @if($programEnrollments->count() > 0)
+                                    <div class="space-y-2">
+                                        @foreach($programEnrollments->groupBy('program.name') as $programName => $enrollments)
+                                            <div class="flex items-center justify-between p-2 bg-white dark:bg-zinc-800 rounded border">
+                                                <div class="text-sm text-gray-900 dark:text-white">{{ $programName }}</div>
+                                                <div class="text-xs text-gray-500 dark:text-gray-400">
+                                                    {{ $enrollments->count() }} {{ Str::plural('enrollment', $enrollments->count()) }}
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">No program enrollments</p>
+                                @endif
+                            </div>
+
+                            <div>
+                                <h5 class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Service Enrollments</h5>
+                                @php
+                                    $serviceEnrollments = $selectedHousehold->participants->flatMap->serviceEnrollments;
+                                @endphp
+                                @if($serviceEnrollments->count() > 0)
+                                    <div class="space-y-2">
+                                        @foreach($serviceEnrollments->groupBy('service.name') as $serviceName => $enrollments)
+                                            <div class="flex items-center justify-between p-2 bg-white dark:bg-zinc-800 rounded border">
+                                                <div class="text-sm text-gray-900 dark:text-white">{{ $serviceName }}</div>
+                                                <div class="text-xs text-gray-500 dark:text-gray-400">
+                                                    {{ $enrollments->count() }} {{ Str::plural('enrollment', $enrollments->count()) }}
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">No service enrollments</p>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-end">
+                    <button wire:click="$set('showViewModal', false)" 
+                            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>

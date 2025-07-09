@@ -95,4 +95,68 @@ class ServiceManagementTest extends TestCase
             ->call('createService')
             ->assertHasErrors(['name', 'program_id', 'start_date']);
     }
+
+    public function test_service_view_modal_opens()
+    {
+        $user = User::factory()->create();
+        $program = Program::factory()->create();
+        $service = Service::factory()->create(['program_id' => $program->id]);
+
+        Livewire::actingAs($user)
+            ->test(\App\Livewire\ServiceManagement::class)
+            ->call('viewService', $service->id)
+            ->assertSet('showViewModal', true)
+            ->assertSet('viewService.id', $service->id)
+            ->assertSet('viewService.name', $service->name);
+    }
+
+    public function test_service_view_modal_closes()
+    {
+        $user = User::factory()->create();
+        $program = Program::factory()->create();
+        $service = Service::factory()->create(['program_id' => $program->id]);
+
+        Livewire::actingAs($user)
+            ->test(\App\Livewire\ServiceManagement::class)
+            ->call('viewService', $service->id)
+            ->assertSet('showViewModal', true)
+            ->set('showViewModal', false)
+            ->assertSet('showViewModal', false);
+    }
+
+    public function test_service_view_resets_on_form_reset()
+    {
+        $user = User::factory()->create();
+        $program = Program::factory()->create();
+        $service = Service::factory()->create(['program_id' => $program->id]);
+
+        Livewire::actingAs($user)
+            ->test(\App\Livewire\ServiceManagement::class)
+            ->call('viewService', $service->id)
+            ->assertSet('showViewModal', true)
+            ->call('resetServiceForm')
+            ->assertSet('showViewModal', false)
+            ->assertSet('viewService', null);
+    }
+
+    public function test_service_view_loads_with_relationships()
+    {
+        $user = User::factory()->create();
+        $program = Program::factory()->create();
+        $service = Service::factory()->create(['program_id' => $program->id]);
+
+        $component = Livewire::actingAs($user)
+            ->test(\App\Livewire\ServiceManagement::class)
+            ->call('viewService', $service->id);
+
+        $component->assertSet('showViewModal', true);
+        
+        // Check that the service is loaded with its relationships
+        $viewService = $component->get('viewService');
+        $this->assertNotNull($viewService);
+        $this->assertEquals($service->id, $viewService->id);
+        $this->assertTrue($viewService->relationLoaded('program'));
+        $this->assertTrue($viewService->relationLoaded('workPlanGoals'));
+        $this->assertTrue($viewService->relationLoaded('serviceEnrollments'));
+    }
 }

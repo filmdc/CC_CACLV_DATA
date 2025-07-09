@@ -15,6 +15,8 @@ class ServiceManagement extends Component
     public $selectedService = null;
     public $showCreateForm = false;
     public $showEditForm = false;
+    public $showViewModal = false;
+    public $selectedViewService = null;
 
     // Service Form Fields
     public $name = '';
@@ -34,6 +36,7 @@ class ServiceManagement extends Component
     {
         $this->showCreateForm = true;
         $this->showEditForm = false;
+        $this->showViewModal = false;
         $this->selectedService = null;
         $this->resetServiceForm();
     }
@@ -44,7 +47,26 @@ class ServiceManagement extends Component
         if ($this->selectedService) {
             $this->showEditForm = true;
             $this->showCreateForm = false;
+            $this->showViewModal = false;
             $this->fillServiceForm();
+        }
+    }
+
+    public function viewService($serviceId)
+    {
+        $this->selectedViewService = Service::with([
+            'program',
+            'workPlanGoals',
+            'serviceEnrollments' => function($query) {
+                $query->with('participant', 'programEnrollment')
+                      ->orderBy('enrollment_date', 'desc');
+            }
+        ])->find($serviceId);
+        
+        if ($this->selectedViewService) {
+            $this->showViewModal = true;
+            $this->showCreateForm = false;
+            $this->showEditForm = false;
         }
     }
 
@@ -57,6 +79,8 @@ class ServiceManagement extends Component
         $this->end_date = '';
         $this->active = true;
         $this->notes = '';
+        $this->showViewModal = false;
+        $this->selectedViewService = null;
     }
 
     public function fillServiceForm()

@@ -21,6 +21,7 @@ class ContractManagement extends Component
     public $showCreateForm = false;
     public $showEditForm = false;
     public $showArchivedContracts = false;
+    public $showViewModal = false;
 
     // Contract Form Fields
     public $title = '';
@@ -59,6 +60,24 @@ class ContractManagement extends Component
         $this->grant_code = '';
         $this->notes = '';
         $this->documents = [];
+        $this->showViewModal = false;
+        $this->showCreateForm = false;
+        $this->showEditForm = false;
+        $this->selectedContract = null;
+    }
+    
+    public function viewContract($contractId)
+    {
+        $this->authorizeAction('contracts.view');
+        
+        $this->selectedContract = Contract::with(['program', 'funder', 'reportDueDates'])->findOrFail($contractId);
+        $this->showViewModal = true;
+    }
+    
+    public function closeViewModal()
+    {
+        $this->showViewModal = false;
+        $this->selectedContract = null;
     }
 
     public function showCreateContract()
