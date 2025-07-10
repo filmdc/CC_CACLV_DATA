@@ -38,16 +38,6 @@
                 </button>
                 @endif
                 
-                @if($this->can('contracts.view'))
-                <button wire:click="setActiveTab('contracts')"
-                        class="py-2 px-1 border-b-2 font-medium text-sm transition-colors
-                               {{ $activeTab === 'contracts' 
-                                  ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' 
-                                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300' }}">
-                    Contracts & Funders
-                </button>
-                @endif
-                
                 @if($this->can('work_plans.view'))
                 <button wire:click="setActiveTab('workplans')"
                         class="py-2 px-1 border-b-2 font-medium text-sm transition-colors
@@ -109,48 +99,7 @@
                 </div>
             @endif
 
-            @if($activeTab === 'contracts' && $this->can('contracts.view'))
-                <div class="space-y-4">
-                    @forelse($contracts as $contract)
-                    <div class="bg-gray-50 dark:bg-zinc-700 rounded-lg p-4">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                                    <a href="{{ route('contract.show', $contract->id) }}" wire:navigate
-                                       class="hover:text-indigo-600 dark:hover:text-indigo-400">
-                                        {{ $contract->name }}
-                                    </a>
-                                </h3>
-                                <div class="mt-1 text-sm text-gray-600 dark:text-gray-300">
-                                    Contract #{{ $contract->contract_number }}
-                                    @if($contract->funder)
-                                    • Funder: {{ $contract->funder->name }}
-                                    @endif
-                                </div>
-                                <div class="mt-2 flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                                    <span>{{ $contract->programs->count() }} programs</span>
-                                    @if($contract->start_date && $contract->end_date)
-                                    <span>{{ $contract->start_date->format('M Y') }} - {{ $contract->end_date->format('M Y') }}</span>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @empty
-                    <p class="text-gray-500 dark:text-gray-400 text-center py-8">
-                        No contracts found.
-                    </p>
-                    @endforelse
-                    
-                    @if($contracts->hasPages())
-                    <div class="mt-4">
-                        {{ $contracts->links() }}
-                    </div>
-                    @endif
-                </div>
-            @endif
-
-            @if($activeTab === 'workplans' && $this->can('work_plans.view'))
+@if($activeTab === 'workplans' && $this->can('work_plans.view'))
                 <div class="space-y-4">
                     @forelse($workPlans as $workPlan)
                     <div class="bg-gray-50 dark:bg-zinc-700 rounded-lg p-4">
@@ -217,20 +166,6 @@
                 </a>
                 @endif
                 
-                @if($this->can('contracts.view'))
-                <a href="{{ route('contract.management') }}" wire:navigate
-                   class="inline-flex items-center px-4 py-2 bg-white dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-600">
-                    Manage Contracts
-                </a>
-                @endif
-                
-                @if($this->can('funders.view'))
-                <a href="{{ route('funder.management') }}" wire:navigate
-                   class="inline-flex items-center px-4 py-2 bg-white dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-600">
-                    Manage Funders
-                </a>
-                @endif
-                
                 @if($this->can('work_plans.view'))
                 <a href="{{ route('work-plan.management') }}" wire:navigate
                    class="inline-flex items-center px-4 py-2 bg-white dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-600">
@@ -245,12 +180,6 @@
                 </a>
                 @endif
                 
-                @if($this->can('due_dates.view'))
-                <a href="{{ route('contract-report-due-dates.management') }}" wire:navigate
-                   class="inline-flex items-center px-4 py-2 bg-white dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-600">
-                    Due Dates
-                </a>
-                @endif
             </div>
         </div>
     </div>

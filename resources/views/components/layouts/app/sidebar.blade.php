@@ -22,9 +22,15 @@
                 </flux:navlist.group>
                 @endif
 
-                @if(auth()->user()->hasAnyPermission(['programs.view', 'services.view', 'contracts.view', 'work_plans.view', 'work_plan_goals.view']) || auth()->user()->isAdmin())
+                @if(auth()->user()->hasAnyPermission(['programs.view', 'services.view', 'work_plans.view', 'work_plan_goals.view']) || auth()->user()->isAdmin())
                 <flux:navlist.group :heading="__('Programs')" class="grid">
                     <flux:navlist.item icon="folder" :href="route('program.service.hub')" :current="request()->routeIs('program.service.hub')" wire:navigate>{{ __('Programs & Services') }}</flux:navlist.item>
+                </flux:navlist.group>
+                @endif
+
+                @if(auth()->user()->hasAnyPermission(['contracts.view', 'funders.view', 'due_dates.view']) || auth()->user()->isAdmin())
+                <flux:navlist.group :heading="__('Contracts')" class="grid">
+                    <flux:navlist.item icon="document-text" :href="route('contracts.hub')" :current="request()->routeIs('contracts.hub')" wire:navigate>{{ __('Contract Management') }}</flux:navlist.item>
                 </flux:navlist.group>
                 @endif
 

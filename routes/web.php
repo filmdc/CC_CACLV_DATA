@@ -30,6 +30,7 @@ Route::middleware(['auth'])->group(function () {
     // Hub Routes - New consolidated pages
     Route::get('participants-households', App\Livewire\ParticipantHouseholdHub::class)->name('participant.household.hub');
     Route::get('programs-services', App\Livewire\ProgramServiceHub::class)->name('program.service.hub');
+    Route::get('contracts-hub', App\Livewire\ContractsHub::class)->name('contracts.hub');
     
     // Participant Routes
     Route::get('participant-intake', App\Livewire\ParticipantIntake::class)->name('participant.intake');

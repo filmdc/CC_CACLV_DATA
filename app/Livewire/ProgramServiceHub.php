@@ -3,7 +3,6 @@
 namespace App\Livewire;
 
 use App\Models\Program;
-use App\Models\Contract;
 use App\Models\WorkPlan;
 use App\Traits\WithPermissionChecks;
 use Livewire\Component;
@@ -14,7 +13,7 @@ class ProgramServiceHub extends Component
     use WithPagination, WithPermissionChecks;
 
     public $search = '';
-    public $activeTab = 'programs'; // programs, contracts, workplans
+    public $activeTab = 'programs'; // programs, workplans
 
     public function mount()
     {
@@ -22,7 +21,6 @@ class ProgramServiceHub extends Component
         $this->authorizeAny([
             'programs.view',
             'services.view',
-            'contracts.view',
             'work_plans.view',
             'work_plan_goals.view'
         ]);
@@ -43,7 +41,6 @@ class ProgramServiceHub extends Component
     {
         return view('livewire.program-service-hub', [
             'programs' => $this->getPrograms(),
-            'contracts' => $this->getContracts(),
             'workPlans' => $this->getWorkPlans(),
         ]);
     }
@@ -63,23 +60,6 @@ class ProgramServiceHub extends Component
             ->paginate(10);
     }
 
-    protected function getContracts()
-    {
-        if ($this->activeTab !== 'contracts' || !$this->can('contracts.view')) {
-            return collect();
-        }
-
-        return Contract::with(['funder', 'programs'])
-            ->when($this->search, function ($query) {
-                $query->where('name', 'like', '%' . $this->search . '%')
-                    ->orWhere('contract_number', 'like', '%' . $this->search . '%')
-                    ->orWhereHas('funder', function ($q) {
-                        $q->where('name', 'like', '%' . $this->search . '%');
-                    });
-            })
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
-    }
 
     protected function getWorkPlans()
     {
