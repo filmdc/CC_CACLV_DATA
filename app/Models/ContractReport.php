@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\Auditable;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -74,6 +75,14 @@ class ContractReport extends Model implements HasMedia
     public function contractReportDueDate(): BelongsTo
     {
         return $this->belongsTo(ContractReportDueDate::class);
+    }
+    
+    /**
+     * Get the user who created this report
+     */
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     /**

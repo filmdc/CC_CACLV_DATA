@@ -3,8 +3,12 @@
 namespace App\Livewire;
 
 use App\Models\Contract;
+use App\Models\ContractReportDueDate;
+use App\Models\ContractReport;
+use App\Models\DueDateEmail;
 use App\Models\Funder;
 use App\Models\Program;
+use App\Models\User;
 use App\Traits\WithPermissionChecks;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -22,6 +26,10 @@ class ContractManagement extends Component
     public $showEditForm = false;
     public $showArchivedContracts = false;
     public $showViewModal = false;
+    public $showDueDateForm = false;
+    public $showReportForm = false;
+    public $showReportView = false;
+    public $showDueDateReportsModal = false;
 
     // Contract Form Fields
     public $title = '';
@@ -39,10 +47,45 @@ class ContractManagement extends Component
     
     // File upload
     public $documents = [];
+    
+    // Report Due Date Form Fields
+    public $selectedDueDate = null;
+    public $selectedReport = null;
+    public $report_name = '';
+    public $due_date = '';
+    public $description = '';
+    public $reminder_intervals = [];
+    public $active = true;
+    public $assigned_users = [];
+    
+    // Report Form Fields
+    public $report_title = '';
+    public $report_description = '';
+    public $report_documents = [];
+    public $report_status = 'draft';
+    public $report_notes = '';
+    
+    // Available options
+    public $users = [];
+    public $reminderIntervalOptions = [
+        30 => '30 days before',
+        15 => '15 days before',
+        7 => '7 days before',
+        3 => '3 days before',
+        1 => '1 day before',
+        0 => 'On due date'
+    ];
 
     public function mount()
     {
         $this->authorizeAction('contracts.view');
+        $this->loadFormData();
+        $this->reminder_intervals = [30, 15, 7, 3, 1];
+    }
+    
+    public function loadFormData()
+    {
+        $this->users = User::where('active', true)->orderBy('name')->get();
     }
 
     public function resetContractForm()
@@ -70,7 +113,13 @@ class ContractManagement extends Component
     {
         $this->authorizeAction('contracts.view');
         
-        $this->selectedContract = Contract::with(['program', 'funder', 'reportDueDates'])->findOrFail($contractId);
+        $this->selectedContract = Contract::with([
+            'program', 
+            'funder', 
+            'reportDueDates.contractReports.media',
+            'reportDueDates.contractReports.creator',
+            'reportDueDates.emails.user'
+        ])->findOrFail($contractId);
         $this->showViewModal = true;
     }
     
@@ -296,6 +345,491 @@ class ContractManagement extends Component
     {
         $this->showArchivedContracts = !$this->showArchivedContracts;
         $this->resetPage();
+    }
+    
+    // Report Due Date Management Methods
+    public function showCreateDueDate()
+    {
+        $this->authorizeAction('due_dates.create');
+        $this->showDueDateForm = true;
+        $this->selectedDueDate = null;
+        $this->resetDueDateForm();
+    }
+    
+    public function showEditDueDate($dueDateId)
+    {
+        $this->authorizeAction('due_dates.edit');
+        $this->selectedDueDate = ContractReportDueDate::with('emails')->findOrFail($dueDateId);
+        $this->showDueDateForm = true;
+        $this->fillDueDateForm();
+    }
+    
+    public function viewDueDate($dueDateId)
+    {
+        $this->authorizeAction('due_dates.view');
+        $this->selectedDueDate = ContractReportDueDate::with(['emails', 'contractReports'])->findOrFail($dueDateId);
+        $this->showDueDateForm = true;
+    }
+    
+    public function resetDueDateForm()
+    {
+        $this->report_name = '';
+        $this->due_date = '';
+        $this->description = '';
+        $this->reminder_intervals = [30, 15, 7, 3, 1];
+        $this->active = true;
+        $this->assigned_users = [];
+    }
+    
+    public function fillDueDateForm()
+    {
+        if ($this->selectedDueDate) {
+            $this->report_name = $this->selectedDueDate->report_name ?? '';
+            $this->due_date = $this->selectedDueDate->due_date?->format('Y-m-d') ?? '';
+            $this->description = $this->selectedDueDate->description ?? '';
+            $this->reminder_intervals = $this->selectedDueDate->reminder_intervals ?? [30, 15, 7, 3, 1];
+            $this->active = $this->selectedDueDate->active ?? true;
+            $this->assigned_users = $this->selectedDueDate->emails->pluck('user_id')->filter()->toArray();
+        }
+    }
+    
+    public function saveDueDate()
+    {
+        if ($this->selectedDueDate) {
+            $this->updateDueDate();
+        } else {
+            $this->createDueDate();
+        }
+    }
+    
+    public function createDueDate()
+    {
+        $this->authorizeAction('due_dates.create');
+        
+        $this->validate([
+            'report_name' => 'required|string|max:255',
+            'due_date' => 'required|date|after:today',
+            'description' => 'nullable|string',
+            'reminder_intervals' => 'array',
+            'reminder_intervals.*' => 'integer|min:0|max:365',
+            'active' => 'boolean',
+            'assigned_users' => 'array',
+            'assigned_users.*' => 'exists:users,id',
+        ]);
+        
+        try {
+            $dueDate = ContractReportDueDate::create([
+                'contract_id' => $this->selectedContract->id,
+                'report_name' => $this->report_name,
+                'due_date' => $this->due_date,
+                'description' => $this->description,
+                'reminder_intervals' => $this->reminder_intervals,
+                'active' => $this->active,
+                'status' => 'pending',
+                'created_by' => auth()->id(),
+            ]);
+            
+            // Assign users
+            if (!empty($this->assigned_users)) {
+                foreach ($this->assigned_users as $userId) {
+                    $user = User::find($userId);
+                    if ($user) {
+                        // Create or find DueDateEmail record
+                        $dueDateEmail = DueDateEmail::firstOrCreate([
+                            'user_id' => $userId,
+                            'email' => $user->email,
+                        ], [
+                            'name' => $user->name,
+                            'active' => true,
+                            'created_by' => auth()->id(),
+                        ]);
+                        
+                        // Attach to due date
+                        $dueDate->emails()->attach($dueDateEmail->id, [
+                            'reminder_intervals' => $this->reminder_intervals,
+                            'active' => true,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
+                }
+            }
+            
+            session()->flash('success', 'Report due date created successfully.');
+            $this->showDueDateForm = false;
+            $this->resetDueDateForm();
+            
+            // Refresh the selected contract
+            $this->selectedContract = $this->selectedContract->fresh(['reportDueDates']);
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+        }
+    }
+    
+    public function updateDueDate()
+    {
+        $this->authorizeAction('due_dates.edit');
+        
+        $this->validate([
+            'report_name' => 'required|string|max:255',
+            'due_date' => 'required|date',
+            'description' => 'nullable|string',
+            'reminder_intervals' => 'array',
+            'reminder_intervals.*' => 'integer|min:0|max:365',
+            'active' => 'boolean',
+            'assigned_users' => 'array',
+            'assigned_users.*' => 'exists:users,id',
+        ]);
+        
+        try {
+            $this->selectedDueDate->update([
+                'report_name' => $this->report_name,
+                'due_date' => $this->due_date,
+                'description' => $this->description,
+                'reminder_intervals' => $this->reminder_intervals,
+                'active' => $this->active,
+                'updated_by' => auth()->id(),
+            ]);
+            
+            // Update assigned users
+            $this->selectedDueDate->emails()->detach();
+            if (!empty($this->assigned_users)) {
+                foreach ($this->assigned_users as $userId) {
+                    $user = User::find($userId);
+                    if ($user) {
+                        // Create or find DueDateEmail record
+                        $dueDateEmail = DueDateEmail::firstOrCreate([
+                            'user_id' => $userId,
+                            'email' => $user->email,
+                        ], [
+                            'name' => $user->name,
+                            'active' => true,
+                            'created_by' => auth()->id(),
+                        ]);
+                        
+                        // Attach to due date
+                        $this->selectedDueDate->emails()->attach($dueDateEmail->id, [
+                            'reminder_intervals' => $this->reminder_intervals,
+                            'active' => true,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
+                }
+            }
+            
+            session()->flash('success', 'Report due date updated successfully.');
+            $this->showDueDateForm = false;
+            $this->selectedDueDate = null;
+            $this->resetDueDateForm();
+            
+            // Refresh the selected contract
+            $this->selectedContract = $this->selectedContract->fresh(['reportDueDates']);
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+        }
+    }
+    
+    public function deleteDueDate($dueDateId)
+    {
+        $this->authorizeAction('due_dates.delete');
+        
+        try {
+            $dueDate = ContractReportDueDate::findOrFail($dueDateId);
+            $dueDate->update(['updated_by' => auth()->id()]);
+            $dueDate->delete();
+            
+            session()->flash('success', 'Report due date deleted successfully.');
+            
+            // Refresh the selected contract
+            $this->selectedContract = $this->selectedContract->fresh(['reportDueDates']);
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'Cannot delete due date: ' . $e->getMessage());
+        }
+    }
+    
+    public function toggleDueDateStatus($dueDateId)
+    {
+        $this->authorizeAction('due_dates.edit');
+        
+        try {
+            $dueDate = ContractReportDueDate::findOrFail($dueDateId);
+            $dueDate->update([
+                'status' => $dueDate->status === 'completed' ? 'pending' : 'completed',
+                'updated_by' => auth()->id(),
+            ]);
+            
+            session()->flash('success', 'Due date status updated successfully.');
+            
+            // Refresh the selected contract
+            $this->selectedContract = $this->selectedContract->fresh(['reportDueDates']);
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+        }
+    }
+    
+    public function viewDueDateReports($dueDateId)
+    {
+        $this->authorizeAction('contract_reports.view');
+        
+        $this->selectedDueDate = ContractReportDueDate::with([
+            'contractReports.media',
+            'contractReports.creator',
+            'contract'
+        ])->findOrFail($dueDateId);
+        
+        $this->showDueDateReportsModal = true;
+    }
+    
+    public function closeDueDateReportsModal()
+    {
+        $this->showDueDateReportsModal = false;
+        $this->selectedDueDate = null;
+    }
+    
+    public function downloadReport($reportId, $mediaId)
+    {
+        $this->authorizeAction('contract_reports.view');
+        
+        try {
+            $report = ContractReport::findOrFail($reportId);
+            $media = $report->getMedia('documents')->where('id', $mediaId)->first();
+            
+            if ($media) {
+                return response()->download($media->getPath(), $media->name);
+            }
+            
+            session()->flash('error', 'File not found.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Cannot download file: ' . $e->getMessage());
+        }
+    }
+    
+    public function closeDueDateForm()
+    {
+        $this->showDueDateForm = false;
+        $this->selectedDueDate = null;
+        $this->resetDueDateForm();
+    }
+    
+    // Report Management Methods
+    public function showCreateReport($dueDateId = null)
+    {
+        $this->authorizeAction('contract_reports.create');
+        
+        if ($dueDateId) {
+            $this->selectedDueDate = ContractReportDueDate::findOrFail($dueDateId);
+        }
+        
+        $this->showReportForm = true;
+        $this->selectedReport = null;
+        $this->resetReportForm();
+    }
+    
+    public function showEditReport($reportId)
+    {
+        $this->authorizeAction('reports.edit');
+        
+        $this->selectedReport = ContractReport::findOrFail($reportId);
+        $this->showReportForm = true;
+        $this->fillReportForm();
+    }
+    
+    public function viewReport($reportId)
+    {
+        $this->authorizeAction('reports.view');
+        
+        $this->selectedReport = ContractReport::with(['contractReportDueDate', 'contract'])->findOrFail($reportId);
+        $this->showReportView = true;
+    }
+    
+    public function resetReportForm()
+    {
+        $this->report_title = '';
+        $this->report_description = '';
+        $this->report_documents = [];
+        $this->report_status = 'draft';
+        $this->report_notes = '';
+    }
+    
+    public function fillReportForm()
+    {
+        if ($this->selectedReport) {
+            $this->report_title = $this->selectedReport->title;
+            $this->report_description = $this->selectedReport->description;
+            $this->report_status = $this->selectedReport->status;
+            $this->report_notes = $this->selectedReport->notes;
+            $this->selectedDueDate = $this->selectedReport->contractReportDueDate;
+        }
+    }
+    
+    public function saveReport()
+    {
+        if ($this->selectedReport) {
+            $this->updateReport();
+        } else {
+            $this->createReport();
+        }
+    }
+    
+    public function createReport()
+    {
+        $this->authorizeAction('contract_reports.create');
+        
+        $this->validate([
+            'report_title' => 'required|string|max:255',
+            'report_description' => 'nullable|string',
+            'report_notes' => 'nullable|string',
+            'report_documents' => 'required|array|min:1',
+            'report_documents.*' => 'file|max:102400', // 100MB max
+        ]);
+        
+        try {
+            $report = ContractReport::create([
+                'contract_id' => $this->selectedContract->id,
+                'contract_report_due_date_id' => $this->selectedDueDate ? $this->selectedDueDate->id : null,
+                'title' => $this->report_title,
+                'description' => $this->report_description,
+                'submitted_date' => now(),
+                'status' => 'submitted', // Auto-submit when uploaded from due date
+                'notes' => $this->report_notes,
+                'created_by' => auth()->id(),
+            ]);
+            
+            // Handle document uploads
+            if (!empty($this->report_documents)) {
+                foreach ($this->report_documents as $document) {
+                    $report->addMedia($document->getRealPath())
+                           ->usingName($document->getClientOriginalName())
+                           ->usingFileName($document->hashName())
+                           ->toMediaCollection('documents');
+                }
+            }
+            
+            // Update due date status if needed
+            if ($this->selectedDueDate && $this->selectedDueDate->status !== 'completed') {
+                $this->selectedDueDate->update([
+                    'status' => 'completed',
+                    'updated_by' => auth()->id(),
+                ]);
+            }
+            
+            session()->flash('success', 'Report uploaded successfully.');
+            $this->showReportForm = false;
+            $this->resetReportForm();
+            
+            // Refresh the selected contract with all relationships
+            $this->selectedContract = Contract::with([
+                'program', 
+                'funder', 
+                'reportDueDates.contractReports.media',
+                'reportDueDates.contractReports.creator',
+                'reportDueDates.emails.user'
+            ])->findOrFail($this->selectedContract->id);
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+        }
+    }
+    
+    public function updateReport()
+    {
+        $this->authorizeAction('reports.edit');
+        
+        $this->validate([
+            'report_title' => 'required|string|max:255',
+            'report_description' => 'required|string',
+            'report_notes' => 'nullable|string',
+            'report_documents.*' => 'nullable|file|max:10240', // 10MB max
+        ]);
+        
+        try {
+            $this->selectedReport->update([
+                'title' => $this->report_title,
+                'description' => $this->report_description,
+                'status' => $this->report_status,
+                'notes' => $this->report_notes,
+                'updated_by' => auth()->id(),
+            ]);
+            
+            // Handle document uploads
+            if (!empty($this->report_documents)) {
+                foreach ($this->report_documents as $document) {
+                    $this->selectedReport->addMedia($document->getRealPath())
+                                        ->usingName($document->getClientOriginalName())
+                                        ->toMediaCollection('documents');
+                }
+            }
+            
+            session()->flash('success', 'Report updated successfully.');
+            $this->showReportForm = false;
+            $this->selectedReport = null;
+            $this->resetReportForm();
+            
+            // Refresh the selected contract
+            $this->selectedContract = $this->selectedContract->fresh(['reportDueDates', 'contractReports']);
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+        }
+    }
+    
+    public function submitReport($reportId)
+    {
+        $this->authorizeAction('reports.edit');
+        
+        try {
+            $report = ContractReport::findOrFail($reportId);
+            
+            if ($report->submit()) {
+                session()->flash('success', 'Report submitted successfully.');
+                
+                // Refresh the selected contract
+                $this->selectedContract = $this->selectedContract->fresh(['reportDueDates', 'contractReports']);
+            } else {
+                session()->flash('error', 'Report cannot be submitted. Please check that all required fields are filled.');
+            }
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+        }
+    }
+    
+    public function deleteReport($reportId)
+    {
+        $this->authorizeAction('reports.delete');
+        
+        try {
+            $report = ContractReport::findOrFail($reportId);
+            $report->update(['updated_by' => auth()->id()]);
+            $report->delete();
+            
+            session()->flash('success', 'Report deleted successfully.');
+            
+            // Refresh the selected contract
+            $this->selectedContract = $this->selectedContract->fresh(['reportDueDates', 'contractReports']);
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'Cannot delete report: ' . $e->getMessage());
+        }
+    }
+    
+    public function closeReportForm()
+    {
+        $this->showReportForm = false;
+        $this->selectedReport = null;
+        $this->selectedDueDate = null;
+        $this->resetReportForm();
+    }
+    
+    public function closeReportView()
+    {
+        $this->showReportView = false;
+        $this->selectedReport = null;
     }
 
     public function render()

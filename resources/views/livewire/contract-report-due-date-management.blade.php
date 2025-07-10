@@ -179,6 +179,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Contract</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Due Date</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Reports</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Assigned Users</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                     </tr>
@@ -214,6 +215,16 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900 dark:text-white">
+                                    {{ $dueDate->contractReports->count() }} report(s)
+                                </div>
+                                @if($dueDate->contractReports->count() > 0)
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                                        Latest: {{ $dueDate->contractReports->sortByDesc('created_at')->first()->created_at->format('M j, Y') }}
+                                    </div>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900 dark:text-white">
                                     {{ $dueDate->emails->count() }} email(s)
                                 </div>
                                 @if($dueDate->emails->count() > 0)
@@ -227,6 +238,10 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
+                                    <button wire:click="viewDueDate({{ $dueDate->id }})" 
+                                            class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">View</button>
+                                    <button wire:click="showUploadReport({{ $dueDate->id }})" 
+                                            class="text-purple-600 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300">Upload</button>
                                     <button wire:click="showEditDueDate({{ $dueDate->id }})" 
                                             class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">Edit</button>
                                     <button wire:click="toggleStatus({{ $dueDate->id }})" 
@@ -257,4 +272,184 @@
             </div>
         @endif
     </div>
+    
+    <!-- Upload Report Modal -->
+    @if($showUploadForm && $selectedDueDate)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                    Upload Report for: {{ $selectedDueDate->report_name }}
+                </h3>
+                
+                <form wire:submit="uploadReport" class="space-y-4">
+                    <div>
+                        <label for="report_title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Report Title <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" wire:model="report_title" id="report_title"
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        @error('report_title') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
+                    
+                    <div>
+                        <label for="report_description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Description
+                        </label>
+                        <textarea wire:model="report_description" id="report_description" rows="3"
+                                  class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                        @error('report_description') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Report Files <span class="text-red-500">*</span>
+                        </label>
+                        <input type="file" wire:model="report_files" multiple 
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        @error('report_files') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        @error('report_files.*') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        
+                        <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                            Maximum file size: 100MB per file. You can upload multiple files.
+                        </div>
+                        
+                        <div wire:loading wire:target="report_files" class="mt-2 text-sm text-blue-600 dark:text-blue-400">
+                            Uploading files...
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-2 pt-4">
+                        <button type="button" wire:click="$set('showUploadForm', false)" 
+                                class="px-4 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
+                            Cancel
+                        </button>
+                        <button type="submit" 
+                                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            Upload Report
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
+    
+    <!-- View Due Date Details Modal -->
+    @if(!$showCreateForm && !$showEditForm && !$showUploadForm && $selectedDueDate)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                        Due Date Details: {{ $selectedDueDate->report_name }}
+                    </h3>
+                    <button wire:click="$set('selectedDueDate', null)" 
+                            class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Contract</label>
+                            <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $selectedDueDate->contract->title }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Due Date</label>
+                            <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $selectedDueDate->due_date->format('M j, Y') }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                            <p class="mt-1">
+                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                                    {{ $selectedDueDate->status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300' : 
+                                       ($selectedDueDate->is_overdue ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300' : 
+                                        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300') }}">
+                                    {{ $selectedDueDate->is_overdue && $selectedDueDate->status !== 'completed' ? 'Overdue' : ucfirst($selectedDueDate->status) }}
+                                </span>
+                            </p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Total Reports</label>
+                            <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $selectedDueDate->contractReports->count() }}</p>
+                        </div>
+                    </div>
+                    
+                    @if($selectedDueDate->description)
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+                            <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $selectedDueDate->description }}</p>
+                        </div>
+                    @endif
+                    
+                    <!-- Uploaded Reports -->
+                    <div>
+                        <h4 class="text-md font-medium text-gray-900 dark:text-white mb-2">Uploaded Reports</h4>
+                        @if($selectedDueDate->contractReports->count() > 0)
+                            <div class="space-y-2">
+                                @foreach($selectedDueDate->contractReports as $report)
+                                    <div class="border border-gray-200 dark:border-zinc-600 rounded-lg p-4">
+                                        <div class="flex justify-between items-start">
+                                            <div class="flex-1">
+                                                <h5 class="font-medium text-gray-900 dark:text-white">{{ $report->title }}</h5>
+                                                @if($report->description)
+                                                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ $report->description }}</p>
+                                                @endif
+                                                <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">
+                                                    Submitted: {{ $report->submitted_date->format('M j, Y g:i A') }}
+                                                </p>
+                                                
+                                                <!-- Report Files -->
+                                                @if($report->documents->count() > 0)
+                                                    <div class="mt-3">
+                                                        <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Files:</p>
+                                                        <div class="space-y-1">
+                                                            @foreach($report->documents as $document)
+                                                                <div class="flex items-center justify-between text-sm">
+                                                                    <span class="text-gray-600 dark:text-gray-400">{{ $document->name }}</span>
+                                                                    <button wire:click="downloadReport({{ $report->id }}, {{ $document->id }})"
+                                                                            class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
+                                                                        Download
+                                                                    </button>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                            <div class="ml-4">
+                                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                                                    {{ $report->status === 'approved' ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300' : 
+                                                       ($report->status === 'rejected' ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300' : 
+                                                        'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300') }}">
+                                                    {{ ucfirst($report->status) }}
+                                                </span>
+                                                @can('contract_reports.delete')
+                                                    <button wire:click="deleteReport({{ $report->id }})"
+                                                            onclick="return confirm('Are you sure you want to delete this report?')"
+                                                            class="ml-2 text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm">
+                                                        Delete
+                                                    </button>
+                                                @endcan
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-sm text-gray-500 dark:text-gray-400">No reports uploaded yet.</p>
+                        @endif
+                    </div>
+                    
+                    <div class="flex justify-end pt-4 border-t border-gray-200 dark:border-zinc-600">
+                        <button wire:click="showUploadReport({{ $selectedDueDate->id }})"
+                                class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            Upload New Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>

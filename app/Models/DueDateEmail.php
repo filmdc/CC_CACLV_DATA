@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -12,6 +13,7 @@ class DueDateEmail extends Model
     use SoftDeletes, Auditable;
 
     protected $fillable = [
+        'user_id',
         'email',
         'name',
         'active',
@@ -29,6 +31,14 @@ class DueDateEmail extends Model
         'email',
         'name',
     ];
+
+    /**
+     * Get the user this email belongs to
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 
     /**
      * Get the contract report due dates this email is assigned to

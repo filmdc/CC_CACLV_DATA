@@ -38,6 +38,7 @@ class ContractReportDueDate extends Model implements HasMedia
         'due_date',
         'status',
         'description',
+        'report_name',
         'report_type',
         'reminder_sent',
         'reminder_sent_at',
