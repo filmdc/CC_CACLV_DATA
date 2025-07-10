@@ -129,13 +129,8 @@ class ContractorManagement extends Component
 
     public function viewDetails($contractorId)
     {
-        $this->authorizeAction('contractors.view');
-        $this->selectedContractorId = $contractorId;
-        $this->selectedContractor = Contractor::with(['jobs.property', 'documents'])
-            ->findOrFail($contractorId);
-        $this->showDetails = true;
-        $this->showCreateForm = false;
-        $this->showEditForm = false;
+        // Redirect to the contractor show page instead of opening a modal
+        return redirect()->route('contractor.show', $contractorId);
     }
 
     public function save()

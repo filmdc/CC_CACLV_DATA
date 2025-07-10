@@ -54,17 +54,8 @@ class ProgramManagement extends Component
 
     public function viewProgram($programId)
     {
-        $this->selectedProgram = Program::with([
-            'programManager', 
-            'services', 
-            'contracts.funder',
-            'programEnrollments.participant',
-            'workPlans.goals'
-        ])->find($programId);
-        
-        if ($this->selectedProgram) {
-            $this->showViewModal = true;
-        }
+        // Redirect to the program show page instead of opening a modal
+        return redirect()->route('program.show', $programId);
     }
 
     public function resetProgramForm()

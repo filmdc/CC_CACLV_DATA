@@ -60,11 +60,9 @@ class FunderManagement extends Component
 
     public function viewFunder($funderId)
     {
-        $this->authorizeAction('funders.view');
-        $this->selectedFunder = Funder::with([
-            'contracts' => function($query) {
-                $query->orderBy('created_at', 'desc');
-            },
+        // Redirect to the funder show page instead of opening a modal
+        return redirect()->route('funder.show', $funderId);
+    },
             'createdBy',
             'updatedBy'
         ])->findOrFail($funderId);

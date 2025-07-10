@@ -256,13 +256,9 @@ class EnrollmentManagement extends Component
 
     public function viewEnrollment($enrollmentId)
     {
-        if ($this->enrollmentType === 'program') {
-            $this->selectedViewEnrollment = ProgramEnrollment::with([
-                'participant.household',
-                'program',
-                'serviceEnrollments' => function($query) {
-                    $query->with('service', 'participant')->orderBy('enrollment_date', 'desc');
-                }
+        // Redirect to the show page instead of opening a modal
+        return redirect()->route('enrollment.show', $id);
+    }
             ])->find($enrollmentId);
         } else {
             $this->selectedViewEnrollment = ServiceEnrollment::with([

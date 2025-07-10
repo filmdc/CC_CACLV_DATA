@@ -243,12 +243,9 @@ class WorkPlanGoalManagement extends Component
 
     public function viewGoal($goalId)
     {
-        $this->selectedViewGoal = WorkPlanGoal::with([
-            'workPlan.program',
-            'service.program',
-            'service.serviceEnrollments' => function($query) {
-                $query->with('participant')->orderBy('enrollment_date', 'desc');
-            }
+        // Redirect to the goal show page instead of opening a modal
+        return redirect()->route('work-plan-goal.show', $goalId);
+    }
         ])->find($goalId);
         
         if ($this->selectedViewGoal) {

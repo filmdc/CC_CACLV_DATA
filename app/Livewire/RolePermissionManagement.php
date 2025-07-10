@@ -290,41 +290,14 @@ class RolePermissionManagement extends Component
 
     public function viewRole($roleId)
     {
-        $this->viewRole = Role::with([
-            'permissions' => function($query) {
-                $query->orderBy('category')->orderBy('display_name');
-            },
-            'users' => function($query) {
-                $query->orderBy('name');
-            }
-        ])->find($roleId);
-        
-        if ($this->viewRole) {
-            $this->showViewRoleModal = true;
-            $this->showCreateRoleForm = false;
-            $this->showEditRoleForm = false;
-            $this->showCreatePermissionForm = false;
-            $this->showEditPermissionForm = false;
-            $this->showViewPermissionModal = false;
-        }
+        // Redirect to the role show page instead of opening a modal
+        return redirect()->route('role.show', $roleId);
     }
 
     public function viewPermission($permissionId)
     {
-        $this->viewPermission = Permission::with([
-            'roles' => function($query) {
-                $query->orderBy('display_name');
-            }
-        ])->find($permissionId);
-        
-        if ($this->viewPermission) {
-            $this->showViewPermissionModal = true;
-            $this->showCreateRoleForm = false;
-            $this->showEditRoleForm = false;
-            $this->showCreatePermissionForm = false;
-            $this->showEditPermissionForm = false;
-            $this->showViewRoleModal = false;
-        }
+        // Redirect to the permission show page instead of opening a modal
+        return redirect()->route('permission.show', $permissionId);
     }
 
     public function render()

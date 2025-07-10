@@ -55,20 +55,8 @@ class ServiceManagement extends Component
 
     public function viewService($serviceId)
     {
-        $this->selectedViewService = Service::with([
-            'program',
-            'workPlanGoals',
-            'serviceEnrollments' => function($query) {
-                $query->with('participant', 'programEnrollment')
-                      ->orderBy('enrollment_date', 'desc');
-            }
-        ])->find($serviceId);
-        
-        if ($this->selectedViewService) {
-            $this->showViewModal = true;
-            $this->showCreateForm = false;
-            $this->showEditForm = false;
-        }
+        // Redirect to the service show page instead of opening a modal
+        return redirect()->route('service.show', $serviceId);
     }
 
     public function resetServiceForm()

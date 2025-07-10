@@ -30,19 +30,30 @@ Route::middleware(['auth'])->group(function () {
     Route::get('participant-management', App\Livewire\ParticipantManagement::class)->name('participant.management');
     Route::get('participant/{id}', App\Livewire\ParticipantShow::class)->name('participant.show');
     Route::get('household-management', App\Livewire\HouseholdManagement::class)->name('household.management');
+    Route::get('household/{id}', App\Livewire\HouseholdShow::class)->name('household.show');
     Route::get('program-management', App\Livewire\ProgramManagement::class)->name('program.management');
+    Route::get('program/{id}', App\Livewire\ProgramShow::class)->name('program.show');
     Route::get('service-management', App\Livewire\ServiceManagement::class)->name('service.management');
+    Route::get('service/{id}', App\Livewire\ServiceShow::class)->name('service.show');
     Route::get('contract-management', App\Livewire\ContractManagement::class)->name('contract.management');
+    Route::get('contract/{id}', App\Livewire\ContractShow::class)->name('contract.show');
     Route::get('funder-management', App\Livewire\FunderManagement::class)->name('funder.management');
+    Route::get('funder/{id}', App\Livewire\FunderShow::class)->name('funder.show');
     Route::get('contract-report-due-dates', App\Livewire\ContractReportDueDateManagement::class)->name('contract-report-due-dates.management');
     Route::get('work-plan-management', App\Livewire\WorkPlanManagement::class)->name('work-plan.management');
+    Route::get('work-plan/{id}', App\Livewire\WorkPlanShow::class)->name('work-plan.show');
     Route::get('work-plan-goal-management', App\Livewire\WorkPlanGoalManagement::class)->name('work-plan-goal.management');
+    Route::get('work-plan-goal/{id}', App\Livewire\WorkPlanGoalShow::class)->name('work-plan-goal.show');
     Route::get('role-permission-management', App\Livewire\RolePermissionManagement::class)->name('role-permission.management');
+    Route::get('role/{id}', App\Livewire\RoleShow::class)->name('role.show');
+    Route::get('permission/{id}', App\Livewire\PermissionShow::class)->name('permission.show');
     Route::get('user-management', App\Livewire\UserManagement::class)->name('user.management');
+    Route::get('user/{id}', App\Livewire\UserShow::class)->name('user.show');
     Route::get('poverty-guideline-management', App\Livewire\PovertyGuidelineManagement::class)->name('poverty-guideline.management');
     Route::get('reference-data-management', App\Livewire\ReferenceDataManagement::class)->name('reference-data.management');
     Route::get('reference-data-set-management', App\Livewire\ReferenceDataSetManagement::class)->name('reference-data-set.management');
     Route::get('enrollment-management', App\Livewire\EnrollmentManagement::class)->name('enrollment.management');
+    Route::get('enrollment/{type}/{id}', App\Livewire\EnrollmentShow::class)->name('enrollment.show');
     Route::get('participant-import-export', App\Livewire\ParticipantImportExport::class)->name('participant.import-export');
     Route::get('duplicate-resolution', App\Livewire\DuplicateResolutionManagement::class)->name('duplicate.resolution');
     Route::get('admin-panel', App\Livewire\AdminPanel::class)->name('admin.panel');
@@ -82,8 +93,11 @@ Route::middleware(['auth'])->group(function () {
     
     // Housing Module Routes
     Route::get('property-management', App\Livewire\PropertyManagement::class)->name('property.management');
+    Route::get('property/{id}', App\Livewire\PropertyShow::class)->name('property.show');
     Route::get('contractor-management', App\Livewire\ContractorManagement::class)->name('contractor.management');
+    Route::get('contractor/{id}', App\Livewire\ContractorShow::class)->name('contractor.show');
     Route::get('housing-job-management', App\Livewire\HousingJobManagement::class)->name('housing-job.management');
+    Route::get('housing-job/{id}', App\Livewire\HousingJobShow::class)->name('housing-job.show');
     
     // Custom storage route for authenticated users
     Route::get('storage/{path}', function ($path) {

@@ -51,16 +51,9 @@ class HouseholdManagement extends Component
 
     public function viewHousehold($householdId)
     {
-        $this->selectedHousehold = Household::with([
-            'headOfHousehold', 
-            'familyMembers',
-            'participants.programEnrollments.program',
-            'participants.serviceEnrollments.service'
-        ])->find($householdId);
-        
-        if ($this->selectedHousehold) {
-            $this->showViewModal = true;
-        }
+        // Redirect to the household show page instead of opening a modal
+        return redirect()->route('household.show', $householdId);
+    }
     }
 
     public function resetMemberForm()

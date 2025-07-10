@@ -187,10 +187,8 @@ class UserManagement extends Component
     
     public function viewUser($userId)
     {
-        $this->authorizeAction('users.view', 'You do not have permission to view users.');
-        
-        $this->selectedUser = User::with('roles')->findOrFail($userId);
-        $this->showViewModal = true;
+        // Redirect to the user show page instead of opening a modal
+        return redirect()->route('user.show', $userId);
     }
     
     public function closeViewModal()

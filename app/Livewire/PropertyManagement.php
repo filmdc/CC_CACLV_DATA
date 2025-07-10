@@ -115,13 +115,8 @@ class PropertyManagement extends Component
 
     public function viewDetails($propertyId)
     {
-        $this->authorizeAction('properties.view');
-        $this->selectedPropertyId = $propertyId;
-        $this->selectedProperty = Property::with(['participant', 'household', 'propertyType', 'jobs', 'notes.createdBy'])
-            ->findOrFail($propertyId);
-        $this->showDetails = true;
-        $this->showCreateForm = false;
-        $this->showEditForm = false;
+        // Redirect to the property show page instead of opening a modal
+        return redirect()->route('property.show', $propertyId);
     }
 
     public function save()

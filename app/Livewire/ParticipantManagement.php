@@ -153,16 +153,8 @@ class ParticipantManagement extends Component
 
     public function viewParticipant($participantId)
     {
-        $this->selectedParticipant = Participant::with([
-            'household', 
-            'programEnrollments.program', 
-            'serviceEnrollments.service',
-            'serviceEnrollments.programEnrollment.program'
-        ])->find($participantId);
-        
-        if ($this->selectedParticipant) {
-            $this->showViewModal = true;
-        }
+        // Redirect to the participant show page instead of opening a modal
+        return redirect()->route('participant.show', $participantId);
     }
 
     public function resetForm()

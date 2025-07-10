@@ -111,16 +111,8 @@ class ContractManagement extends Component
     
     public function viewContract($contractId)
     {
-        $this->authorizeAction('contracts.view');
-        
-        $this->selectedContract = Contract::with([
-            'program', 
-            'funder', 
-            'reportDueDates.contractReports.media',
-            'reportDueDates.contractReports.creator',
-            'reportDueDates.emails.user'
-        ])->findOrFail($contractId);
-        $this->showViewModal = true;
+        // Redirect to the contract show page instead of opening a modal
+        return redirect()->route('contract.show', $contractId);
     }
     
     public function closeViewModal()

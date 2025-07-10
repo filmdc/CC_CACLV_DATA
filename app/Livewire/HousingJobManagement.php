@@ -173,17 +173,8 @@ class HousingJobManagement extends Component
 
     public function viewDetails($jobId)
     {
-        $this->authorizeAction('housing_jobs.view');
-        $this->selectedJobId = $jobId;
-        $this->selectedJob = HousingJob::with([
-            'participant', 'household', 'property', 'contractor', 
-            'program', 'service', 'jobType', 'contactLedgers.createdBy',
-            'documentChecklists', 'createdBy', 'updatedBy', 'approvedBy'
-        ])->findOrFail($jobId);
-        $this->showDetails = true;
-        $this->showCreateForm = false;
-        $this->showEditForm = false;
-        $this->activeTab = 'details';
+        // Redirect to the job show page instead of opening a modal
+        return redirect()->route('housing-job.show', $jobId);
     }
 
     public function save()

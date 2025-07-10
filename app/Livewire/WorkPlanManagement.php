@@ -219,12 +219,9 @@ class WorkPlanManagement extends Component
 
     public function viewWorkPlan($workPlanId)
     {
-        $this->selectedViewWorkPlan = WorkPlan::with([
-            'program',
-            'goals.service',
-            'goals' => function($query) {
-                $query->orderBy('created_at', 'desc');
-            }
+        // Redirect to the workPlan show page instead of opening a modal
+        return redirect()->route('work-plan.show', $workPlanId);
+    }
         ])->find($workPlanId);
         
         if ($this->selectedViewWorkPlan) {
