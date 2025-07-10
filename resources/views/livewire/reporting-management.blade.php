@@ -610,7 +610,23 @@ document.addEventListener('livewire:init', () => {
     
     Livewire.on('initializeCharts', (reportData) => {
         console.log('Received initializeCharts event with data:', reportData);
-        setTimeout(() => initializeCharts(reportData[0]), 100);
+        // Use requestAnimationFrame to wait for browser to finish rendering
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                // Double RAF ensures we wait for the next paint
+                if (document.querySelector('#chartContainer')) {
+                    console.log('Chart container ready, initializing charts');
+                    initializeCharts(reportData[0]);
+                } else {
+                    // If container still not found, try again after a delay
+                    setTimeout(() => {
+                        if (document.querySelector('#chartContainer')) {
+                            initializeCharts(reportData[0]);
+                        }
+                    }, 500);
+                }
+            });
+        });
     });
 });
 

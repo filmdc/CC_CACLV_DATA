@@ -125,7 +125,8 @@ class LegacyContractImportService
             'funders' => ['processed' => 0, 'created' => 0, 'updated' => 0, 'skipped' => 0, 'failed' => 0],
             'contracts' => ['processed' => 0, 'created' => 0, 'updated' => 0, 'skipped' => 0, 'failed' => 0],
             'report_due_dates' => ['processed' => 0, 'created' => 0, 'updated' => 0, 'skipped' => 0, 'failed' => 0],
-            'due_date_assignments' => ['processed' => 0, 'created' => 0, 'updated' => 0, 'skipped' => 0, 'failed' => 0],
+            'due_date_emails' => ['processed' => 0, 'created' => 0, 'updated' => 0, 'skipped' => 0, 'failed' => 0],
+            'due_date_email_assignments' => ['processed' => 0, 'created' => 0, 'updated' => 0, 'skipped' => 0, 'failed' => 0],
             'missing_users' => ['processed' => 0, 'created' => 0, 'updated' => 0, 'skipped' => 0, 'failed' => 0],
             'media' => ['processed' => 0, 'created' => 0, 'updated' => 0, 'skipped' => 0, 'failed' => 0],
         ];
@@ -280,6 +281,9 @@ class LegacyContractImportService
                 break;
             case 'report_due_dates':
                 $this->importReportDueDates($data);
+                break;
+            case 'due_date_emails':
+                $this->importDueDateEmails($data);
                 break;
             case 'due_date_email_assignments':
                 $this->importDueDateEmailAssignments($data);
@@ -675,12 +679,71 @@ class LegacyContractImportService
     }
 
     /**
+     * Import due date emails
+     */
+    protected function importDueDateEmails(array $emails): void
+    {
+        foreach ($emails as $emailData) {
+            $this->importStats['due_date_emails']['processed']++;
+
+            try {
+                // Check for existing email
+                $existingEmail = \App\Models\DueDateEmail::where('email', $emailData['email'])->first();
+                
+                if ($existingEmail) {
+                    if ($this->config['import_mode']['update_existing_users']) {
+                        if (!$this->dryRun) {
+                            $existingEmail->update([
+                                'active' => true,
+                                'updated_at' => $this->config['import_mode']['preserve_timestamps'] 
+                                    ? $emailData['updated_at'] 
+                                    : now(),
+                            ]);
+                        }
+                        $this->importStats['due_date_emails']['updated']++;
+                    } else {
+                        $this->importStats['due_date_emails']['skipped']++;
+                    }
+                    continue;
+                }
+
+                // Create new due date email record
+                if (!$this->dryRun) {
+                    \App\Models\DueDateEmail::create([
+                        'email' => $emailData['email'],
+                        'name' => $this->generateUserNameFromEmail($emailData['email']),
+                        'active' => true,
+                        'preferences' => [
+                            'reminder_intervals' => [30, 15, 7, 3, 1],
+                            'receive_overdue_notifications' => true,
+                            'receive_completion_notifications' => false,
+                        ],
+                        'created_by' => 1, // System user
+                        'created_at' => $this->config['import_mode']['preserve_timestamps'] 
+                            ? $emailData['created_at'] 
+                            : now(),
+                        'updated_at' => $this->config['import_mode']['preserve_timestamps'] 
+                            ? $emailData['updated_at'] 
+                            : now(),
+                    ]);
+                }
+
+                $this->importStats['due_date_emails']['created']++;
+
+            } catch (\Exception $e) {
+                $this->importStats['due_date_emails']['failed']++;
+                $this->errors[] = "Failed to import due date email {$emailData['email']}: " . $e->getMessage();
+            }
+        }
+    }
+
+    /**
      * Import due date email assignments  
      */
     protected function importDueDateEmailAssignments(array $assignments): void
     {
         foreach ($assignments as $assignmentData) {
-            $this->importStats['due_date_assignments']['processed']++;
+            $this->importStats['due_date_email_assignments']['processed']++;
 
             try {
                 // Find the user by email (case-insensitive)
@@ -740,7 +803,7 @@ class LegacyContractImportService
                 
                 if (!$contract) {
                     $this->warnings[] = "Contract not found for assignment: {$assignmentData['contract_title']}";
-                    $this->importStats['due_date_assignments']['skipped']++;
+                    $this->importStats['due_date_email_assignments']['skipped']++;
                     continue;
                 }
 
@@ -756,17 +819,19 @@ class LegacyContractImportService
 
                 if (!$reportDueDate) {
                     $this->warnings[] = "Report due date not found for assignment";
-                    $this->importStats['due_date_assignments']['skipped']++;
+                    $this->importStats['due_date_email_assignments']['skipped']++;
                     continue;
                 }
 
-                // Create or find the DueDateEmail record
+                // Find the DueDateEmail record (should exist from previous import step)
                 if (!$this->dryRun) {
-                    // Find or create the DueDateEmail record
-                    $dueDateEmail = \App\Models\DueDateEmail::firstOrCreate(
-                        ['email' => $assignmentData['email']],
-                        [
-                            'name' => $user->name ?? 'Imported User',
+                    $dueDateEmail = \App\Models\DueDateEmail::where('email', $assignmentData['email'])->first();
+                    
+                    if (!$dueDateEmail) {
+                        // Create if it doesn't exist (fallback)
+                        $dueDateEmail = \App\Models\DueDateEmail::create([
+                            'email' => $assignmentData['email'],
+                            'name' => $user->name ?? $this->generateUserNameFromEmail($assignmentData['email']),
                             'active' => true,
                             'created_by' => 1,
                             'preferences' => [
@@ -774,8 +839,9 @@ class LegacyContractImportService
                                 'receive_overdue_notifications' => true,
                                 'receive_completion_notifications' => false,
                             ],
-                        ]
-                    );
+                        ]);
+                        $this->warnings[] = "Created missing DueDateEmail record for: {$assignmentData['email']}";
+                    }
                     
                     // Create the many-to-many relationship (avoid duplicates)
                     if (!$reportDueDate->emails()->where('due_date_email_id', $dueDateEmail->id)->exists()) {
@@ -786,10 +852,10 @@ class LegacyContractImportService
                     }
                 }
 
-                $this->importStats['due_date_assignments']['created']++;
+                $this->importStats['due_date_email_assignments']['created']++;
 
             } catch (Exception $e) {
-                $this->importStats['due_date_assignments']['failed']++;
+                $this->importStats['due_date_email_assignments']['failed']++;
                 $this->errors[] = "Failed to import assignment: " . $e->getMessage();
             }
         }

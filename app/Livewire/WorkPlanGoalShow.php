@@ -16,14 +16,12 @@ class WorkPlanGoalShow extends Component
     public function mount($id)
     {
         // Check if user has permission to view work plan goals
-        $this->authorizeAction('work_plan_goals.view', 'You do not have permission to view work plan goals.');
+        $this->authorizeAction('work-plan-goals.view', 'You do not have permission to view work plan goals.');
         
         $this->goalId = $id;
         $this->goal = WorkPlanGoal::with([
-            'workPlan.participant',
             'workPlan.program',
-            'service',
-            'completedBy'
+            'service'
         ])->findOrFail($id);
     }
 

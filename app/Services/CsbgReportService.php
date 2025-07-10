@@ -834,6 +834,54 @@ class CsbgReportService
                 return $householdType === $value || 
                        ($value === 'Unknown/not reported' && ($householdType === null || $householdType === ''));
                        
+            case 'health_insurance_status':
+                return $participant->health_insurance_status === $value || 
+                       ($value === 'Unknown/not reported' && ($participant->health_insurance_status === null || $participant->health_insurance_status === ''));
+                       
+            case 'health_insurance_sources':
+                // Handle multi-select field
+                $sources = $participant->health_insurance_sources ?? [];
+                if (!is_array($sources)) {
+                    $sources = json_decode($sources, true) ?? [];
+                }
+                return in_array($value, $sources) || 
+                       ($value === 'Unknown/not reported' && empty($sources));
+                       
+            case 'military_status':
+                return $participant->military_status === $value || 
+                       ($value === 'Unknown/not reported' && ($participant->military_status === null || $participant->military_status === ''));
+                       
+            case 'disability_status':
+                return $participant->disability_status === $value || 
+                       ($value === 'Unknown/not reported' && ($participant->disability_status === null || $participant->disability_status === ''));
+                       
+            case 'income_sources':
+                // Handle multi-select field
+                $sources = $participant->income_sources ?? [];
+                if (!is_array($sources)) {
+                    $sources = json_decode($sources, true) ?? [];
+                }
+                return in_array($value, $sources) || 
+                       ($value === 'Unknown/not reported' && empty($sources));
+                       
+            case 'other_income_sources':
+                // Handle multi-select field
+                $sources = $participant->other_income_sources ?? [];
+                if (!is_array($sources)) {
+                    $sources = json_decode($sources, true) ?? [];
+                }
+                return in_array($value, $sources) || 
+                       ($value === 'Unknown/not reported' && empty($sources));
+                       
+            case 'non_cash_benefits':
+                // Handle multi-select field
+                $benefits = $participant->non_cash_benefits ?? [];
+                if (!is_array($benefits)) {
+                    $benefits = json_decode($benefits, true) ?? [];
+                }
+                return in_array($value, $benefits) || 
+                       ($value === 'Unknown/not reported' && empty($benefits));
+                       
             default:
                 return false;
         }

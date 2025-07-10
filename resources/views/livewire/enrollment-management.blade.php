@@ -110,7 +110,7 @@
                     @forelse($enrollments as $enrollment)
                         <tr class="hover:bg-gray-50 dark:hover:bg-zinc-700">
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <button wire:click="viewEnrollment({{ $enrollment->id }})" 
+                                <button wire:click="viewEnrollment('{{ $enrollmentType }}', {{ $enrollment->id }})" 
                                         class="text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 hover:underline cursor-pointer transition-colors duration-200">
                                     <div class="text-sm font-medium">{{ $enrollment->participant->full_name }}</div>
                                 </button>
@@ -157,7 +157,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
-                                    <button wire:click="viewEnrollment({{ $enrollment->id }})" 
+                                    <button wire:click="viewEnrollment('{{ $enrollmentType }}', {{ $enrollment->id }})" 
                                             class="text-green-600 dark:text-green-400 hover:underline">
                                         View
                                     </button>

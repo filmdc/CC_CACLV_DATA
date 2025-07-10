@@ -242,6 +242,7 @@ return [
         'funders',
         'contracts',
         'report_due_dates',
+        'due_date_emails',
         'due_date_email_assignments',
         'media', // Import media files last, after contracts exist
     ],

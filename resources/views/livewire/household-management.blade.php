@@ -1,5 +1,5 @@
 <div class="max-w-7xl mx-auto p-6">
-    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+    <div class="bg-white dark:bg-zinc-800 shadow-lg rounded-lg overflow-hidden">
         <!-- Header -->
         <div class="bg-green-600 text-white p-6">
             <h1 class="text-2xl font-bold">Household Management</h1>
@@ -7,238 +7,322 @@
         </div>
 
         <!-- Search and Filters -->
-        @if(!$showAddMember)
-        <div class="p-4 bg-gray-50 border-b">
-            <div class="flex items-center space-x-4">
-                <div class="flex-1">
-                    <input type="text" wire:model.live="search" placeholder="Search by household code or name..." 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+        <div class="p-4 bg-gray-50 dark:bg-zinc-700 border-b border-gray-200 dark:border-zinc-600">
+            <div class="flex items-center justify-between">
+                <div class="flex-1 max-w-md">
+                    <input type="text" wire:model.live="search" placeholder="Search by family name or household code..." 
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500">
                 </div>
             </div>
         </div>
-        @endif
 
         <!-- Success/Error Messages -->
         @if (session()->has('success'))
-            <div class="p-4 bg-green-50 border-l-4 border-green-400">
+            <div class="p-4 bg-green-50 dark:bg-green-900/20 border-l-4 border-green-400">
                 <div class="flex">
                     <div class="ml-3">
-                        <p class="text-sm text-green-700">{{ session('success') }}</p>
+                        <p class="text-sm text-green-700 dark:text-green-300">{{ session('success') }}</p>
                     </div>
                 </div>
             </div>
         @endif
 
         @if (session()->has('error'))
-            <div class="p-4 bg-red-50 border-l-4 border-red-400">
+            <div class="p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-400">
                 <div class="flex">
                     <div class="ml-3">
-                        <p class="text-sm text-red-700">{{ session('error') }}</p>
+                        <p class="text-sm text-red-700 dark:text-red-300">{{ session('error') }}</p>
                     </div>
                 </div>
             </div>
         @endif
 
-        @if(!$showAddMember)
-        <div class="flex">
-            <!-- Household List -->
-            <div class="w-1/3 border-r">
-                <div class="p-4 border-b bg-gray-50">
-                    <h3 class="text-lg font-medium">Households</h3>
-                </div>
-                
-                <div class="divide-y max-h-96 overflow-y-auto">
-                    @forelse ($households as $household)
-                        <div class="p-4 cursor-pointer hover:bg-gray-50 {{ $selectedHousehold && $selectedHousehold->id === $household->id ? 'bg-blue-50 border-l-4 border-blue-500' : '' }}" 
-                             wire:click="selectHousehold({{ $household->id }})">
-                            <div class="flex justify-between items-start">
+        <!-- Households Table -->
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-600">
+                <thead class="bg-gray-50 dark:bg-zinc-700">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Family Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Members</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Program Enrollments</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Service Enrollments</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Housing Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Income/Poverty</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-zinc-600">
+                    @forelse($households as $household)
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">
                                 <div>
                                     <button wire:click="viewHousehold({{ $household->id }})" 
-                                            class="text-left w-full text-gray-900 hover:text-blue-600 hover:underline cursor-pointer transition-colors duration-200">
-                                        <p class="font-medium">{{ $household->household_code }}</p>
+                                            class="text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 hover:underline cursor-pointer transition-colors duration-200">
+                                        <div class="text-sm font-medium">
+                                            {{ $household->headOfHousehold?->last_name ?? 'Unknown' }} Family
+                                        </div>
                                     </button>
-                                    <p class="text-sm text-gray-600">
-                                        {{ $household->headOfHousehold?->full_name ?? 'No head of household' }}
-                                    </p>
-                                    <p class="text-xs text-gray-500">
-                                        {{ $household->household_size }} {{ Str::plural('member', $household->household_size) }} • 
-                                        {{ $household->household_type }}
-                                    </p>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                                        Code: {{ $household->household_code }}
+                                    </div>
                                 </div>
-                                <span class="text-xs text-gray-400">
-                                    {{ $household->created_at->format('M j') }}
-                                </span>
-                            </div>
-                        </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div>
+                                    <div class="text-sm text-gray-900 dark:text-white">
+                                        {{ $household->household_size }} {{ Str::plural('member', $household->household_size) }}
+                                    </div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                                        {{ $household->household_type }}
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @php
+                                    $activeProgramEnrollments = $household->participants->flatMap->programEnrollments->where('status', 'active');
+                                    $programCount = $activeProgramEnrollments->pluck('program.name')->unique()->count();
+                                @endphp
+                                <div class="text-sm">
+                                    @if($programCount > 0)
+                                        <span class="text-green-600 dark:text-green-400 font-medium">{{ $programCount }} {{ Str::plural('program', $programCount) }}</span>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                                            {{ $activeProgramEnrollments->pluck('program.name')->unique()->take(2)->join(', ') }}
+                                            @if($programCount > 2)
+                                                ...
+                                            @endif
+                                        </div>
+                                    @else
+                                        <span class="text-gray-400 dark:text-gray-500">None</span>
+                                    @endif
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @php
+                                    $activeServiceEnrollments = $household->participants->flatMap->serviceEnrollments->whereIn('status', ['enrolled', 'in_progress']);
+                                    $serviceCount = $activeServiceEnrollments->pluck('service.name')->unique()->count();
+                                @endphp
+                                <div class="text-sm">
+                                    @if($serviceCount > 0)
+                                        <span class="text-blue-600 dark:text-blue-400 font-medium">{{ $serviceCount }} {{ Str::plural('service', $serviceCount) }}</span>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                                            {{ $activeServiceEnrollments->pluck('service.name')->unique()->take(2)->join(', ') }}
+                                            @if($serviceCount > 2)
+                                                ...
+                                            @endif
+                                        </div>
+                                    @else
+                                        <span class="text-gray-400 dark:text-gray-500">None</span>
+                                    @endif
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                {{ $household->housing_status ?? 'Not specified' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm">
+                                    @if($household->monthly_income)
+                                        <div class="text-gray-900 dark:text-white">${{ number_format($household->monthly_income, 0) }}/mo</div>
+                                    @endif
+                                    @if($household->hhs_poverty_percentage)
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">{{ $household->hhs_poverty_percentage }}% FPL</div>
+                                    @else
+                                        <span class="text-gray-400 dark:text-gray-500">Not calculated</span>
+                                    @endif
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div class="flex space-x-2">
+                                    <button wire:click="selectHousehold({{ $household->id }})" 
+                                            class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300">
+                                        Manage
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
                     @empty
-                        <div class="p-4 text-center text-gray-500">
-                            No households found.
-                        </div>
+                        <tr>
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                                No households found.
+                            </td>
+                        </tr>
                     @endforelse
-                </div>
+                </tbody>
+            </table>
+        </div>
 
-                <!-- Pagination -->
-                <div class="p-4 border-t">
-                    {{ $households->links() }}
+        <!-- Pagination -->
+        @if($households->hasPages())
+            <div class="px-6 py-3 border-t border-gray-200 dark:border-zinc-600">
+                {{ $households->links() }}
+            </div>
+        @endif
+    </div>
+
+    <!-- Household Management Panel -->
+    @if($selectedHousehold)
+        <div class="mt-6 bg-white dark:bg-zinc-800 shadow-lg rounded-lg overflow-hidden">
+            <div class="bg-gray-50 dark:bg-zinc-700 px-6 py-4 border-b border-gray-200 dark:border-zinc-600">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        Managing: {{ $selectedHousehold->headOfHousehold?->last_name ?? 'Unknown' }} Family
+                    </h2>
+                    <button wire:click="$set('selectedHousehold', null)" 
+                            class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
                 </div>
             </div>
 
-            <!-- Household Details -->
-            <div class="flex-1">
-                @if ($selectedHousehold)
-                    <div class="p-6">
-                        <!-- Household Info Header -->
-                        <div class="flex justify-between items-start mb-6">
-                            <div>
-                                <h2 class="text-xl font-bold text-gray-900">{{ $selectedHousehold->household_code }}</h2>
-                                <p class="text-gray-600">{{ $selectedHousehold->household_type }}</p>
-                                <div class="mt-2 space-y-1 text-sm text-gray-500">
-                                    <p>Size: {{ $selectedHousehold->household_size }} {{ Str::plural('member', $selectedHousehold->household_size) }}</p>
-                                    <p>Housing: {{ $selectedHousehold->housing_status }}</p>
-                                    @if($selectedHousehold->monthly_income)
-                                        <p>Monthly Income: ${{ number_format($selectedHousehold->monthly_income, 2) }}</p>
-                                    @endif
-                                    @if($selectedHousehold->hhs_poverty_percentage)
-                                        <p>Poverty Level: {{ $selectedHousehold->hhs_poverty_percentage }}% of federal guidelines</p>
+            <div class="p-6">
+                <!-- Household Info -->
+                <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Household Code</label>
+                        <p class="text-sm text-gray-900 dark:text-white">{{ $selectedHousehold->household_code }}</p>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Type</label>
+                        <p class="text-sm text-gray-900 dark:text-white">{{ $selectedHousehold->household_type }}</p>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Size</label>
+                        <p class="text-sm text-gray-900 dark:text-white">{{ $selectedHousehold->household_size }} {{ Str::plural('member', $selectedHousehold->household_size) }}</p>
+                    </div>
+                </div>
+
+                <!-- Family Members -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Family Members</h3>
+                        <button wire:click="showAddMemberForm" 
+                                class="px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+                            Add Family Member
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        @foreach ($selectedHousehold->participants as $participant)
+                            <div class="bg-gray-50 dark:bg-zinc-700 rounded-lg p-4">
+                                <div class="flex justify-between items-start">
+                                    <div class="flex-1">
+                                        <div class="flex items-center space-x-2">
+                                            <h4 class="font-medium text-gray-900 dark:text-white">{{ $participant->full_name }}</h4>
+                                            @if($participant->is_head_of_household)
+                                                <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded-full">Head of Household</span>
+                                            @endif
+                                        </div>
+                                        <div class="mt-1 space-y-1 text-sm text-gray-600 dark:text-gray-400">
+                                            <p>Age: {{ $participant->age }} • Gender: {{ $participant->gender }}</p>
+                                            <p>DOB: {{ $participant->date_of_birth->format('M j, Y') }}</p>
+                                            @if($participant->telephone)
+                                                <p>Phone: {{ $participant->telephone }}</p>
+                                            @endif
+                                            @if($participant->email)
+                                                <p>Email: {{ $participant->email }}</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    @if(!$participant->is_head_of_household)
+                                        <button wire:click="removeParticipant({{ $participant->id }})" 
+                                                wire:confirm="Are you sure you want to remove this family member?"
+                                                class="px-3 py-1 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 text-sm rounded hover:bg-red-200 dark:hover:bg-red-900/40 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                            Remove
+                                        </button>
                                     @endif
                                 </div>
                             </div>
-                            <button wire:click="showAddMemberForm" 
-                                    class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
-                                Add Family Member
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- Add Family Member Form -->
+                @if ($showAddMember)
+                    <div class="mt-6 border-t border-gray-200 dark:border-zinc-600 pt-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-lg font-medium text-gray-900 dark:text-white">Add Family Member</h4>
+                            <button wire:click="$set('showAddMember', false)" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
                             </button>
                         </div>
-
-                        <!-- Family Members -->
-                        <div class="space-y-4">
-                            <h3 class="text-lg font-medium text-gray-900">Family Members</h3>
-                            
-                            @foreach ($selectedHousehold->participants as $participant)
-                                <div class="bg-gray-50 rounded-lg p-4">
-                                    <div class="flex justify-between items-start">
-                                        <div class="flex-1">
-                                            <div class="flex items-center space-x-2">
-                                                <h4 class="font-medium text-gray-900">{{ $participant->full_name }}</h4>
-                                                @if($participant->is_head_of_household)
-                                                    <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Head of Household</span>
-                                                @endif
-                                            </div>
-                                            <div class="mt-1 space-y-1 text-sm text-gray-600">
-                                                <p>Age: {{ $participant->age }} • Gender: {{ $participant->gender }}</p>
-                                                <p>DOB: {{ $participant->date_of_birth->format('M j, Y') }}</p>
-                                                @if($participant->telephone)
-                                                    <p>Phone: {{ $participant->telephone }}</p>
-                                                @endif
-                                                @if($participant->email)
-                                                    <p>Email: {{ $participant->email }}</p>
-                                                @endif
-                                            </div>
-                                        </div>
-                                        @if(!$participant->is_head_of_household)
-                                            <button wire:click="removeParticipant({{ $participant->id }})" 
-                                                    wire:confirm="Are you sure you want to remove this family member?"
-                                                    class="px-3 py-1 bg-red-100 text-red-700 text-sm rounded hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500">
-                                                Remove
-                                            </button>
-                                        @endif
-                                    </div>
+                        
+                        <form wire:submit="addFamilyMember" class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="first_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        First Name <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" wire:model="first_name" id="first_name" 
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500">
+                                    @error('first_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
-                            @endforeach
-                        </div>
 
-                        <!-- Add Family Member Form -->
-                        @if ($showAddMember)
-                            <div class="mt-6 rounded-lg p-4">
-                                <div class="flex items-center justify-between mb-4">
-                                    <h4 class="text-lg font-medium text-gray-900">Add Family Member</h4>
-                                    <button wire:click="$set('showAddMember', false)" class="text-gray-400 hover:text-gray-600">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                        </svg>
-                                    </button>
+                                <div>
+                                    <label for="last_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Last Name <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" wire:model="last_name" id="last_name" 
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500">
+                                    @error('last_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
-                                
-                                <form wire:submit="addFamilyMember" class="space-y-4">
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">
-                                                First Name <span class="text-red-500">*</span>
-                                            </label>
-                                            <input type="text" wire:model="first_name" id="first_name" 
-                                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                            @error('first_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                                        </div>
 
-                                        <div>
-                                            <label for="last_name" class="block text-sm font-medium text-gray-700 mb-1">
-                                                Last Name <span class="text-red-500">*</span>
-                                            </label>
-                                            <input type="text" wire:model="last_name" id="last_name" 
-                                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                            @error('last_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                                        </div>
+                                <div>
+                                    <label for="date_of_birth" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Date of Birth <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="date" wire:model="date_of_birth" id="date_of_birth" 
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500">
+                                    @error('date_of_birth') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
 
-                                        <div>
-                                            <label for="date_of_birth" class="block text-sm font-medium text-gray-700 mb-1">
-                                                Date of Birth <span class="text-red-500">*</span>
-                                            </label>
-                                            <input type="date" wire:model="date_of_birth" id="date_of_birth" 
-                                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                            @error('date_of_birth') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                                        </div>
+                                <div>
+                                    <label for="gender" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Gender <span class="text-red-500">*</span>
+                                    </label>
+                                    <select wire:model="gender" id="gender" 
+                                            class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500">
+                                        <option value="">Select gender...</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Non-binary">Non-binary</option>
+                                        <option value="Other">Other</option>
+                                        <option value="Prefer not to say">Prefer not to say</option>
+                                    </select>
+                                    @error('gender') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
 
-                                        <div>
-                                            <label for="gender" class="block text-sm font-medium text-gray-700 mb-1">
-                                                Gender <span class="text-red-500">*</span>
-                                            </label>
-                                            <select wire:model="gender" id="gender" 
-                                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                                <option value="">Select gender...</option>
-                                                <option value="Male">Male</option>
-                                                <option value="Female">Female</option>
-                                                <option value="Non-binary">Non-binary</option>
-                                                <option value="Other">Other</option>
-                                                <option value="Prefer not to say">Prefer not to say</option>
-                                            </select>
-                                            @error('gender') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                                        </div>
+                                <div>
+                                    <label for="telephone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone Number</label>
+                                    <input type="tel" wire:model="telephone" id="telephone" 
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500">
+                                </div>
 
-                                        <div>
-                                            <label for="telephone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                                            <input type="tel" wire:model="telephone" id="telephone" 
-                                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        </div>
-
-                                        <div>
-                                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                                            <input type="email" wire:model="email" id="email" 
-                                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        </div>
-                                    </div>
-
-                                    <div class="flex justify-end space-x-3">
-                                        <button type="button" wire:click="$set('showAddMember', false)" 
-                                                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 border border-gray-300 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500">
-                                            Cancel
-                                        </button>
-                                        <button type="submit" 
-                                                class="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
-                                            Add Member
-                                        </button>
-                                    </div>
-                                </form>
+                                <div>
+                                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
+                                    <input type="email" wire:model="email" id="email" 
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500">
+                                </div>
                             </div>
-                        @endif
-                    </div>
-                @else
-                    <div class="p-6 text-center text-gray-500">
-                        <p>Select a household to view details and manage family members.</p>
+
+                            <div class="flex justify-end space-x-3">
+                                <button type="button" wire:click="$set('showAddMember', false)" 
+                                        class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                                    Cancel
+                                </button>
+                                <button type="submit" 
+                                        class="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+                                    Add Member
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 @endif
             </div>
         </div>
-        @endif
-    </div>
+    @endif
 
     <!-- View Household Modal -->
     @if($showViewModal && $selectedHousehold)

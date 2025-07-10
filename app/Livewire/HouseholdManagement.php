@@ -138,7 +138,11 @@ class HouseholdManagement extends Component
 
     public function render()
     {
-        $households = Household::with(['headOfHousehold'])
+        $households = Household::with([
+                'headOfHousehold',
+                'participants.programEnrollments.program',
+                'participants.serviceEnrollments.service'
+            ])
             ->when($this->search, function ($query) {
                 $query->where('household_code', 'like', '%' . $this->search . '%')
                       ->orWhereHas('headOfHousehold', function ($q) {

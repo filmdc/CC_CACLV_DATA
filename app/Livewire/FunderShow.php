@@ -20,7 +20,7 @@ class FunderShow extends Component
         
         $this->funderId = $id;
         $this->funder = Funder::with([
-            'contracts.programs',
+            'contracts.program',
             'createdBy',
             'updatedBy'
         ])->findOrFail($id);

@@ -21,8 +21,8 @@ class ContractShow extends Component
         $this->contractId = $id;
         $this->contract = Contract::with([
             'funder',
-            'programs',
-            'contractReportDueDates.sentEmails',
+            'program',
+            'reportDueDates.emails',
             'createdBy',
             'updatedBy'
         ])->findOrFail($id);

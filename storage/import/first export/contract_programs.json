@@ -1,0 +1,2234 @@
+[
+    {
+        "contract_id": 77,
+        "program_id": 1,
+        "contract_title": "2022-2026CALV_CSBG",
+        "program_name": "CALV"
+    },
+    {
+        "contract_id": 78,
+        "program_id": 5,
+        "contract_title": "2020HCP_LCCDBG_CV_ Foreclosure Mitigation Counseling",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 79,
+        "program_id": 2,
+        "contract_title": "2021CADCB_BethlehemCDBG_SouthsideFacades",
+        "program_name": "CADB"
+    },
+    {
+        "contract_id": 80,
+        "program_id": 2,
+        "contract_title": "2021CADCB_BethlehemCDBG_TrailAmenities",
+        "program_name": "CADB"
+    },
+    {
+        "contract_id": 81,
+        "program_id": 5,
+        "contract_title": "2021HCP_LCAHTF",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 82,
+        "program_id": 3,
+        "contract_title": "2022-2023CADA_AllentownCDBG",
+        "program_name": "CADA"
+    },
+    {
+        "contract_id": 83,
+        "program_id": 11,
+        "contract_title": "2022HRP_NCPHARE\/RTTEnergyRoofHVAC_West Ward",
+        "program_name": "CAH"
+    },
+    {
+        "contract_id": 84,
+        "program_id": 11,
+        "contract_title": "2022HRP_NCPHARE\/RTTLEAD_ East Bangor",
+        "program_name": "CAH"
+    },
+    {
+        "contract_id": 85,
+        "program_id": 11,
+        "contract_title": "2022CABH_PHARERTT_EnergyEfficiancy and Mobility",
+        "program_name": "CAH"
+    },
+    {
+        "contract_id": 86,
+        "program_id": 3,
+        "contract_title": "2020-2026CADA_CBC_NPP",
+        "program_name": "CADA"
+    },
+    {
+        "contract_id": 87,
+        "program_id": 3,
+        "contract_title": "2020-2026CADA_Butz_NPP",
+        "program_name": "CADA"
+    },
+    {
+        "contract_id": 88,
+        "program_id": 3,
+        "contract_title": "2020-2026CADA_CCIC_NPP",
+        "program_name": "CADA"
+    },
+    {
+        "contract_id": 89,
+        "program_id": 3,
+        "contract_title": "2020-2026CADA_Duggan&Marcon_NPP",
+        "program_name": "CADA"
+    },
+    {
+        "contract_id": 90,
+        "program_id": 3,
+        "contract_title": "2020-2026CADA_PeoplesSecurity_NPP",
+        "program_name": "CADA"
+    },
+    {
+        "contract_id": 91,
+        "program_id": 3,
+        "contract_title": "2020-2026CADA_PNCFOundation_NPP",
+        "program_name": "CADA"
+    },
+    {
+        "contract_id": 92,
+        "program_id": 3,
+        "contract_title": "2020-2026CADA_PPL_NPP",
+        "program_name": "CADA"
+    },
+    {
+        "contract_id": 93,
+        "program_id": 3,
+        "contract_title": "2020-2026CADA_Truist_NPP",
+        "program_name": "CADA"
+    },
+    {
+        "contract_id": 94,
+        "program_id": 3,
+        "contract_title": "2020-2026CADA_UnitedConcordia_NPP",
+        "program_name": "CADA"
+    },
+    {
+        "contract_id": 95,
+        "program_id": 3,
+        "contract_title": "2020-2026CADA_WellsFargo_NPP",
+        "program_name": "CADA"
+    },
+    {
+        "contract_id": 96,
+        "program_id": 2,
+        "contract_title": "2022CADCB_EmbassyBank_NPP",
+        "program_name": "CADB"
+    },
+    {
+        "contract_id": 97,
+        "program_id": 2,
+        "contract_title": "2022CADCB_PeoplesBank_NPP",
+        "program_name": "CADB"
+    },
+    {
+        "contract_id": 98,
+        "program_id": 2,
+        "contract_title": "2022CADCB_PNC_LopesPark",
+        "program_name": "CADB"
+    },
+    {
+        "contract_id": 99,
+        "program_id": 2,
+        "contract_title": "2022CADCB_PPL_NPP",
+        "program_name": "CADB"
+    },
+    {
+        "contract_id": 100,
+        "program_id": 2,
+        "contract_title": "2022CADCB_Provident_NPP",
+        "program_name": "CADB"
+    },
+    {
+        "contract_id": 101,
+        "program_id": 2,
+        "contract_title": "2022CADCB_Univest_NPP",
+        "program_name": "CADB"
+    },
+    {
+        "contract_id": 102,
+        "program_id": 1,
+        "contract_title": "2022CALV_LarosFoundation",
+        "program_name": "CALV"
+    },
+    {
+        "contract_id": 103,
+        "program_id": 12,
+        "contract_title": "2022CALV_LCAging and Adult Services",
+        "program_name": "Multi"
+    },
+    {
+        "contract_id": 104,
+        "program_id": 5,
+        "contract_title": "2022HCP_Allentown_CDBG_Year 48",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 105,
+        "program_id": 5,
+        "contract_title": "2022HCP_CDBG_BHAP",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 106,
+        "program_id": 5,
+        "contract_title": "2022HCP_PHFA_PAHAF_IEMsubcontract",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 107,
+        "program_id": 5,
+        "contract_title": "2022HCP_PHFAPHARE\/RTT",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 108,
+        "program_id": 4,
+        "contract_title": "2022REJ_FIdelityBank_EITC",
+        "program_name": "REJ"
+    },
+    {
+        "contract_id": 109,
+        "program_id": 4,
+        "contract_title": "2022REJ_JustBorn_COTL",
+        "program_name": "REJ"
+    },
+    {
+        "contract_id": 110,
+        "program_id": 4,
+        "contract_title": "2022REJ_StablerFoundation_GENX",
+        "program_name": "REJ"
+    },
+    {
+        "contract_id": 111,
+        "program_id": 6,
+        "contract_title": "2022RTCLF_Santander",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 112,
+        "program_id": 7,
+        "contract_title": "2022SBR_FidelityBank_NPP",
+        "program_name": "SBR"
+    },
+    {
+        "contract_id": 113,
+        "program_id": 7,
+        "contract_title": "2022SBR_FisrtNorthernBank_NPP",
+        "program_name": "SBR"
+    },
+    {
+        "contract_id": 114,
+        "program_id": 7,
+        "contract_title": "2022SBR_NCHotelTax_BangorBoroughEvents",
+        "program_name": "SBR"
+    },
+    {
+        "contract_id": 115,
+        "program_id": 7,
+        "contract_title": "2022SBR_NCCDBG",
+        "program_name": "SBR"
+    },
+    {
+        "contract_id": 116,
+        "program_id": 7,
+        "contract_title": "2022SBR_WasteManagement_NPP",
+        "program_name": "SBR"
+    },
+    {
+        "contract_id": 117,
+        "program_id": 8,
+        "contract_title": "2023SHFB_NCTEFAP",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 118,
+        "program_id": 8,
+        "contract_title": "2022SHFB_VeteransTrustFund",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 119,
+        "program_id": 4,
+        "contract_title": "2023-2026REJ_UnitedWay_SHE_ Gen Next",
+        "program_name": "REJ"
+    },
+    {
+        "contract_id": 120,
+        "program_id": 1,
+        "contract_title": "2023CALV_LVCFSynergyFund",
+        "program_name": "CALV"
+    },
+    {
+        "contract_id": 121,
+        "program_id": 5,
+        "contract_title": "2023HCP_NC_C-MED",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 122,
+        "program_id": 4,
+        "contract_title": "2023REJ_American Bank_EITC",
+        "program_name": "REJ"
+    },
+    {
+        "contract_id": 123,
+        "program_id": 7,
+        "contract_title": "2023SBR_NCHotelTaxGrant",
+        "program_name": "SBR"
+    },
+    {
+        "contract_id": 124,
+        "program_id": 8,
+        "contract_title": "2023SHFB_HighFoundation",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 126,
+        "program_id": 8,
+        "contract_title": "2022SHFB_WellsFargo_SeedFarm",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 127,
+        "program_id": 8,
+        "contract_title": "2023-2026SHFB_UnitedWay",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 128,
+        "program_id": 8,
+        "contract_title": "2022SHFB_PMUnitedWay",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 129,
+        "program_id": 8,
+        "contract_title": "2022SHFB_ClifFamilyFoundation_SeedFarm",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 130,
+        "program_id": 8,
+        "contract_title": "2022SHFB_KeyBank_SeedFarm",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 131,
+        "program_id": 8,
+        "contract_title": "2022SHFB_PayneFoundation",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 132,
+        "program_id": 8,
+        "contract_title": "2022SHFB_Sanofi",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 133,
+        "program_id": 8,
+        "contract_title": "2022SHFB_positiveNRG",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 134,
+        "program_id": 8,
+        "contract_title": "2022SHFB_ALLOneCharities_PoconoMountain",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 135,
+        "program_id": 8,
+        "contract_title": "2022SHFB_FA_DunkinJoyinChildhood",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 136,
+        "program_id": 8,
+        "contract_title": "2021SHFB_FA_DaleLarson",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 137,
+        "program_id": 8,
+        "contract_title": "2021SHFB_FA_Multi-DonorStrategic Capacity",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 138,
+        "program_id": 8,
+        "contract_title": "2022SHFB_FA_MorganStanley_ChildandFamily Choice",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 139,
+        "program_id": 8,
+        "contract_title": "2022SHFB_FA_ProteinPurchaseSubsidy",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 140,
+        "program_id": 8,
+        "contract_title": "2022SHFB_LCAging and Adult Services",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 141,
+        "program_id": 9,
+        "contract_title": "2022SSS-RuthPSeruga",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 142,
+        "program_id": 9,
+        "contract_title": "2023-2026SSS_United Way",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 143,
+        "program_id": 9,
+        "contract_title": "2022SSS_LCOCYS",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 144,
+        "program_id": 9,
+        "contract_title": "2022SSS_LCAging and Adult Services",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 145,
+        "program_id": 9,
+        "contract_title": "2022SSS_TJXFOundation",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 146,
+        "program_id": 9,
+        "contract_title": "2022SSS_AllentownCDBG_ESG",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 147,
+        "program_id": 9,
+        "contract_title": "2023SSS_AsburyUnitedMethodistChurch",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 148,
+        "program_id": 9,
+        "contract_title": "2022SSS_LVCF_FlemingFoundation",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 149,
+        "program_id": 10,
+        "contract_title": "2023WX_UGI_LUIRP",
+        "program_name": "WX"
+    },
+    {
+        "contract_id": 150,
+        "program_id": 10,
+        "contract_title": "2022-2027WX_DCEDDOE_MasterAgreement",
+        "program_name": "WX"
+    },
+    {
+        "contract_id": 151,
+        "program_id": 10,
+        "contract_title": "2020-2025WX_LIHEAP_MasterAgreement",
+        "program_name": "WX"
+    },
+    {
+        "contract_id": 152,
+        "program_id": 8,
+        "contract_title": "2023SHFB_McKesson",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 153,
+        "program_id": 5,
+        "contract_title": "2023HCP_PNCFoundation",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 154,
+        "program_id": 9,
+        "contract_title": "SSS_FEMA_EFSP",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 155,
+        "program_id": 9,
+        "contract_title": "2023SSS_ErieInsurance",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 156,
+        "program_id": 6,
+        "contract_title": "2023RTCLF_PCA",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 157,
+        "program_id": 3,
+        "contract_title": "2023CADA_JustBorn",
+        "program_name": "CADA"
+    },
+    {
+        "contract_id": 158,
+        "program_id": 11,
+        "contract_title": "2023HRP_NCCDBG_HomeImprovementProgram",
+        "program_name": "CAH"
+    },
+    {
+        "contract_id": 159,
+        "program_id": 9,
+        "contract_title": "2023SSS_SylviaPerkinsCharitableTrust",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 160,
+        "program_id": 11,
+        "contract_title": "2023HRP_PADCED_ARPACOVID19_WholeHomeRepairs",
+        "program_name": "CAH"
+    },
+    {
+        "contract_id": 161,
+        "program_id": 6,
+        "contract_title": "2023RTCLF_TDBank_InvestmentAgreement",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 162,
+        "program_id": 9,
+        "contract_title": "2023SSS_Provident Bank Foundation",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 163,
+        "program_id": 12,
+        "contract_title": "2023CALV_LC Aging and Adult Services",
+        "program_name": "Multi"
+    },
+    {
+        "contract_id": 164,
+        "program_id": 9,
+        "contract_title": "2023SSS_LC Covid Relief Non-Profit Block Grant Program",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 165,
+        "program_id": 4,
+        "contract_title": "2022REJ_PMUWGenerationNext",
+        "program_name": "REJ"
+    },
+    {
+        "contract_id": 166,
+        "program_id": 8,
+        "contract_title": "2022SHFB_NCCDBGCV_Fresh Food Program",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 168,
+        "program_id": 9,
+        "contract_title": "2023SSS_HarryTrexlerTrust",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 170,
+        "program_id": 1,
+        "contract_title": "2023CALV_WorkforceBoardLehighValley_DCED",
+        "program_name": "CALV"
+    },
+    {
+        "contract_id": 171,
+        "program_id": 4,
+        "contract_title": "2023REJ_PPL",
+        "program_name": "REJ"
+    },
+    {
+        "contract_id": 172,
+        "program_id": 12,
+        "contract_title": "2023HCP_CADA_CADB_M&TCharitableFoundation",
+        "program_name": "Multi"
+    },
+    {
+        "contract_id": 173,
+        "program_id": 11,
+        "contract_title": "2023HRP_NCDCEDARPA_SeniorHomeMaintenance Roofing and Furnace Program",
+        "program_name": "CAH"
+    },
+    {
+        "contract_id": 174,
+        "program_id": 11,
+        "contract_title": "2023HRP_NCDCEDARPA_ResidentialLeadHazardAbatementProgram",
+        "program_name": "CAH"
+    },
+    {
+        "contract_id": 175,
+        "program_id": 7,
+        "contract_title": "2022SBR_NCCDBG_ProgramAdministration",
+        "program_name": "SBR"
+    },
+    {
+        "contract_id": 176,
+        "program_id": 5,
+        "contract_title": "2023HCP_Univest",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 180,
+        "program_id": 8,
+        "contract_title": "2023SHFB_FASheetzfortheKids",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 181,
+        "program_id": 8,
+        "contract_title": "2023SHFB__FeedingAmericaPaychex",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 182,
+        "program_id": 8,
+        "contract_title": "2023SHFB_UrbanAgriculture_Seed Farm",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 183,
+        "program_id": 9,
+        "contract_title": "2023SSS_JohnandMargaretPostFoundation",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 184,
+        "program_id": 8,
+        "contract_title": "2023-2033 Feeding America Partner Food Bank Agreement",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 185,
+        "program_id": 12,
+        "contract_title": "2023HCP_CADB_State Farm",
+        "program_name": "Multi"
+    },
+    {
+        "contract_id": 186,
+        "program_id": 8,
+        "contract_title": "2023SHFB_WAWAFoundation",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 187,
+        "program_id": 9,
+        "contract_title": "2023SSS_City of Allentown Lead Abatement Paperwork",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 188,
+        "program_id": 3,
+        "contract_title": "2023CADA_EDSI_Paid Work Experience Worksite Agreement",
+        "program_name": "CADA"
+    },
+    {
+        "contract_id": 189,
+        "program_id": 8,
+        "contract_title": "2023SHFB_FACostcoFoodPurchase",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 190,
+        "program_id": 12,
+        "contract_title": "2023HCPSSS_Santander",
+        "program_name": "Multi"
+    },
+    {
+        "contract_id": 191,
+        "program_id": 5,
+        "contract_title": "2023HCP_TDCharitable Foundation",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 192,
+        "program_id": 6,
+        "contract_title": "2023RTCLF_WellsFargo",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 193,
+        "program_id": 5,
+        "contract_title": "2023HCP_PAHAFCyberSecurity",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 194,
+        "program_id": 9,
+        "contract_title": "2023SSS_StPaulsUCC",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 195,
+        "program_id": 5,
+        "contract_title": "2023HCP_CharlesHochFoundation",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 197,
+        "program_id": 8,
+        "contract_title": "2023SHFB_PMUW",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 198,
+        "program_id": 1,
+        "contract_title": "2023_NCDCED_Drug&AlcoholDivision",
+        "program_name": "CALV"
+    },
+    {
+        "contract_id": 200,
+        "program_id": 11,
+        "contract_title": "2023HRP_Dual Temp Air Conditioner Initiative",
+        "program_name": "CAH"
+    },
+    {
+        "contract_id": 201,
+        "program_id": 8,
+        "contract_title": "2023SF_PNLV",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 202,
+        "program_id": 12,
+        "contract_title": "2023HCPHRP_WellsFargoFoundation",
+        "program_name": "Multi"
+    },
+    {
+        "contract_id": 203,
+        "program_id": 9,
+        "contract_title": "2023SSS_LCC&Y",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 204,
+        "program_id": 9,
+        "contract_title": "2023SSS_TJX Foundation",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 205,
+        "program_id": 8,
+        "contract_title": "2022-2025SHFB_ USDA Feeding PA_LFPA_ MOU",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 206,
+        "program_id": 8,
+        "contract_title": "2023-2024SHFB_Feeding PA_PASS_MOU",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 207,
+        "program_id": 7,
+        "contract_title": "2023SBR_ GLV ChamberofCommerce",
+        "program_name": "SBR"
+    },
+    {
+        "contract_id": 208,
+        "program_id": 8,
+        "contract_title": "2023SHFB_FirstEnergyFoundation",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 209,
+        "program_id": 2,
+        "contract_title": "2023CADB_WindCreek",
+        "program_name": "CADB"
+    },
+    {
+        "contract_id": 210,
+        "program_id": 5,
+        "contract_title": "2023HCP_PHFA_PHARE",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 212,
+        "program_id": 2,
+        "contract_title": "2023CADB_GLVChamberFoundation",
+        "program_name": "CADB"
+    },
+    {
+        "contract_id": 213,
+        "program_id": 4,
+        "contract_title": "2023REJ_NCCDBG_LMI Student Enrichment Program_City of Easton Gen Nxt",
+        "program_name": "REJ"
+    },
+    {
+        "contract_id": 214,
+        "program_id": 7,
+        "contract_title": "2022-2028SBR_PADCED_NPP",
+        "program_name": "SBR"
+    },
+    {
+        "contract_id": 215,
+        "program_id": 8,
+        "contract_title": "2023SHFB_ShopRite LPGA Classic",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 216,
+        "program_id": 8,
+        "contract_title": "2023SHFB_SF_Davis&SmithfamilyFoundation",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 217,
+        "program_id": 4,
+        "contract_title": "2023REJ_KeyBank Foundation",
+        "program_name": "REJ"
+    },
+    {
+        "contract_id": 218,
+        "program_id": 11,
+        "contract_title": "2023HRP_LVCF_Downtown Allentown Community Initiative Fund",
+        "program_name": "CAH"
+    },
+    {
+        "contract_id": 219,
+        "program_id": 8,
+        "contract_title": "2023SHFB_FA_EmployeeEngagementSurvey",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 220,
+        "program_id": 6,
+        "contract_title": "2023RTCLF_Santander",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 221,
+        "program_id": 9,
+        "contract_title": "2023SSS_KentuckyFriedWishes",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 222,
+        "program_id": 12,
+        "contract_title": "2023RTCLFHRPHCP_Bank of America",
+        "program_name": "Multi"
+    },
+    {
+        "contract_id": 223,
+        "program_id": 8,
+        "contract_title": "United Way of Lackawanna and Wayne Counties Military Share",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 225,
+        "program_id": 2,
+        "contract_title": "2023CADB_BethlehemCDBG_Friendship Park Residential Facades",
+        "program_name": "CADB"
+    },
+    {
+        "contract_id": 226,
+        "program_id": 8,
+        "contract_title": "2023SHFB_FA_CVS General Operating Funds",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 227,
+        "program_id": 8,
+        "contract_title": "2023SHFB_PATEFAP_ Management Agreement",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 228,
+        "program_id": 8,
+        "contract_title": "2023SHFB_CarbonCountyTEFAP",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 229,
+        "program_id": 6,
+        "contract_title": "2021RTCLF_CDFI_RRP",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 230,
+        "program_id": 6,
+        "contract_title": "2020RTCLF_CDFI_TA",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 231,
+        "program_id": 4,
+        "contract_title": "2023-2024REJ_ScholarBlueprint_SATPrep",
+        "program_name": "REJ"
+    },
+    {
+        "contract_id": 232,
+        "program_id": 8,
+        "contract_title": "2023SHFB_Sanofi_SeedFarmMilitaryShare",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 233,
+        "program_id": 8,
+        "contract_title": "2022SHFB_SpecialtyCropBlockGrant",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 234,
+        "program_id": 9,
+        "contract_title": "2023SSS_Leona Gruber Trust",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 235,
+        "program_id": 5,
+        "contract_title": "2017HCP_PHFA_RTT",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 236,
+        "program_id": 9,
+        "contract_title": "2023SSS_Allentown ESG_Year 49",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 237,
+        "program_id": 5,
+        "contract_title": "2023HCP_AllentownCDBG",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 238,
+        "program_id": 4,
+        "contract_title": "2023REJ_LVCF_Generation Next",
+        "program_name": "REJ"
+    },
+    {
+        "contract_id": 240,
+        "program_id": 6,
+        "contract_title": "2023RTCLF_NCGeneral Purpose Authority _Loan agreement",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 241,
+        "program_id": 7,
+        "contract_title": "2021SBR_Hotel Tax -Slate Belt Marketing and Promotions",
+        "program_name": "SBR"
+    },
+    {
+        "contract_id": 242,
+        "program_id": 6,
+        "contract_title": "2023RTCLF_PNC",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 243,
+        "program_id": 8,
+        "contract_title": "2023SHFB_DEPFoodRecoveryInfrastructure",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 244,
+        "program_id": 7,
+        "contract_title": "2020SBR_NCGrow Norco",
+        "program_name": "SBR"
+    },
+    {
+        "contract_id": 245,
+        "program_id": 7,
+        "contract_title": "2021SBR_NCHotel Tax-Slate Belt Marketing and Promotions",
+        "program_name": "SBR"
+    },
+    {
+        "contract_id": 246,
+        "program_id": 11,
+        "contract_title": "2023HRP_NCDCEDARP_Western Area Food Hub",
+        "program_name": "CAH"
+    },
+    {
+        "contract_id": 247,
+        "program_id": 8,
+        "contract_title": "2020SHFB_SFPP_LehighCounty",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 248,
+        "program_id": 5,
+        "contract_title": "2023HCP_JP Morgan Chase",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 249,
+        "program_id": 8,
+        "contract_title": "2020SHFB_SFPP_NorthamptonCounty",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 250,
+        "program_id": 9,
+        "contract_title": "2023SSS_KiwanisClub_Mosaic Project",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 251,
+        "program_id": 6,
+        "contract_title": "2023RTCLF_AllentownCDBG_Retail Mosaic Loan Program",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 253,
+        "program_id": 2,
+        "contract_title": "2023CADB_NatureNurtureCenter_CBOAgreement",
+        "program_name": "CADB"
+    },
+    {
+        "contract_id": 254,
+        "program_id": 5,
+        "contract_title": "HCP_PHFA_CHCI_HEMAP",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 255,
+        "program_id": 3,
+        "contract_title": "2020-2026CADA_DCED_NPP",
+        "program_name": "CADA"
+    },
+    {
+        "contract_id": 256,
+        "program_id": 2,
+        "contract_title": "2021-2027CADB_DCED_NPP",
+        "program_name": "CADB"
+    },
+    {
+        "contract_id": 257,
+        "program_id": 7,
+        "contract_title": "2022-2028SBR_DCED_NPP",
+        "program_name": "SBR"
+    },
+    {
+        "contract_id": 258,
+        "program_id": 5,
+        "contract_title": "HCP_PHFAMasterContract_CHCI_HUD_HSCP",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 260,
+        "program_id": 4,
+        "contract_title": "2023REJ_ESSA_COTL_Mental Health",
+        "program_name": "REJ"
+    },
+    {
+        "contract_id": 261,
+        "program_id": 3,
+        "contract_title": "2023CADA_AllentownCDBG _FineFeatherFoundation",
+        "program_name": "CADA"
+    },
+    {
+        "contract_id": 262,
+        "program_id": 11,
+        "contract_title": "2023HRP_City of Allentown_HOME_CHDO_136N8thStreet",
+        "program_name": "CAH"
+    },
+    {
+        "contract_id": 263,
+        "program_id": 5,
+        "contract_title": "2023HCP_BHAP_CDBG",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 264,
+        "program_id": 4,
+        "contract_title": "2023REJ_AVALON_CapitalBueCross_GENNxtSHE",
+        "program_name": "REJ"
+    },
+    {
+        "contract_id": 265,
+        "program_id": 6,
+        "contract_title": "2022-2026RTCLF_PACDFI_ARPA_Small Business Growth Program",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 266,
+        "program_id": 8,
+        "contract_title": "2023SHFB_PositiveNRG",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 267,
+        "program_id": 8,
+        "contract_title": "2022-2025SHFB_DEP_FoodRecoveryInfrastructure",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 268,
+        "program_id": 3,
+        "contract_title": "2023-2024CADA_NPP Agreement",
+        "program_name": "CADA"
+    },
+    {
+        "contract_id": 269,
+        "program_id": 7,
+        "contract_title": "2023-2024SBR_PA DCED_NPP Agreement",
+        "program_name": "SBR"
+    },
+    {
+        "contract_id": 270,
+        "program_id": 2,
+        "contract_title": "2023CADB_Weyerhaeuser Giving Fund_Public and Green Space Project",
+        "program_name": "CADB"
+    },
+    {
+        "contract_id": 271,
+        "program_id": 8,
+        "contract_title": "2023SHFB_ClifFamilyFoundation_SeedFarm",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 272,
+        "program_id": 8,
+        "contract_title": "2024SHFB_AllOne_GeneralOperating",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 273,
+        "program_id": 8,
+        "contract_title": "2023-2024SHFB_NCTEFAP",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 274,
+        "program_id": 3,
+        "contract_title": "2020-2026CADA_Capitol Blue_NPP",
+        "program_name": "CADA"
+    },
+    {
+        "contract_id": 275,
+        "program_id": 2,
+        "contract_title": "2021CADB_CityofBethlehemCDBG_SouthsideResidentialFacades",
+        "program_name": "CADB"
+    },
+    {
+        "contract_id": 276,
+        "program_id": 3,
+        "contract_title": "2024CADA_LC_Quality of Life",
+        "program_name": "CADA"
+    },
+    {
+        "contract_id": 277,
+        "program_id": 12,
+        "contract_title": "2024HCPCADB_StateFarm",
+        "program_name": "Multi"
+    },
+    {
+        "contract_id": 278,
+        "program_id": 9,
+        "contract_title": "2024SSS_Ruth P Seruga",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 279,
+        "program_id": 2,
+        "contract_title": "2024CADB_Martin Guitar",
+        "program_name": "CADB"
+    },
+    {
+        "contract_id": 280,
+        "program_id": 8,
+        "contract_title": "2024SHFB_Ceres Trust_Sistah Seeds",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 282,
+        "program_id": 7,
+        "contract_title": "2024SBR_Baltimore Life Community Grant",
+        "program_name": "SBR"
+    },
+    {
+        "contract_id": 283,
+        "program_id": 4,
+        "contract_title": "2024-2025 REJ_Stabler Foundation_Gen NXt",
+        "program_name": "REJ"
+    },
+    {
+        "contract_id": 284,
+        "program_id": 11,
+        "contract_title": "2021HRP_PHARE\/RTT_Energy Efficient Housing Rehabilitation",
+        "program_name": "CAH"
+    },
+    {
+        "contract_id": 285,
+        "program_id": 11,
+        "contract_title": "2019HRP_Bethlehem HOME_723 Broadway",
+        "program_name": "CAH"
+    },
+    {
+        "contract_id": 286,
+        "program_id": 11,
+        "contract_title": "2022HRP_NCDCED_Table Games_Due Diligence Glendon Hotel Project",
+        "program_name": "CAH"
+    },
+    {
+        "contract_id": 292,
+        "program_id": 11,
+        "contract_title": "2021HRP_Redevelopment Authority of Bethlehem_ Blight Remediation_723 Broadway",
+        "program_name": "CAH"
+    },
+    {
+        "contract_id": 293,
+        "program_id": 8,
+        "contract_title": "2024SHFB_FeedingPA_Service Insights",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 295,
+        "program_id": 7,
+        "contract_title": "2024SBR_ Totts Gap Arts Insitute",
+        "program_name": "SBR"
+    },
+    {
+        "contract_id": 296,
+        "program_id": 10,
+        "contract_title": "Wx_UGI_LIURP",
+        "program_name": "WX"
+    },
+    {
+        "contract_id": 298,
+        "program_id": 8,
+        "contract_title": "2024SHFB_TEFAP Reach and Resiliency ARPA_ Warehouse Infrastructure",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 299,
+        "program_id": 5,
+        "contract_title": "2024HCP_ NCDCED_Affordable Housing Program",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 300,
+        "program_id": 6,
+        "contract_title": "2024RTCLF_PACDFI_ARPA_HDBA_SBGII",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 301,
+        "program_id": 4,
+        "contract_title": "2024REJ_ Nature Nurture Center_ CBO _ Create Connections: Linking a Vision of Resilience to Action",
+        "program_name": "REJ"
+    },
+    {
+        "contract_id": 302,
+        "program_id": 8,
+        "contract_title": "2024SHFB_TEFAP_CountyCommoditiesAgreements",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 303,
+        "program_id": 8,
+        "contract_title": "2024SHFB_FA_StarbucksGlobalMonthofGood",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 304,
+        "program_id": 8,
+        "contract_title": "2021_2026SHFB_LehighCountyTEFAP",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 306,
+        "program_id": 8,
+        "contract_title": "2021_SHFB_CSFP_SeniorFoodBoxes",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 307,
+        "program_id": 7,
+        "contract_title": "2024SBR_NCHotel Tax_ Slate Belt Public Art Trail",
+        "program_name": "SBR"
+    },
+    {
+        "contract_id": 308,
+        "program_id": 7,
+        "contract_title": "2023SBR_NCCDBG_Program Administration",
+        "program_name": "SBR"
+    },
+    {
+        "contract_id": 309,
+        "program_id": 5,
+        "contract_title": "2024HCP_BOA_Homebuyer Education and Counseling Agreement",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 310,
+        "program_id": 5,
+        "contract_title": "2023HCP_NCCDBG_Housing Counseling Program",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 311,
+        "program_id": 2,
+        "contract_title": "2024CADB_Collabo_City of Bethlehem_Pembroke Choice Neighborhood Plan",
+        "program_name": "CADB"
+    },
+    {
+        "contract_id": 312,
+        "program_id": 4,
+        "contract_title": "2022-2025REJ_BASD_SHE\/GenNxt",
+        "program_name": "REJ"
+    },
+    {
+        "contract_id": 313,
+        "program_id": 8,
+        "contract_title": "2023_SHFB_VeteransTrust_MilitaryShare",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 314,
+        "program_id": 9,
+        "contract_title": "2024SSS_Sylvia Perkins",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 315,
+        "program_id": 4,
+        "contract_title": "2023-2024REJ_EASD_Generation Next",
+        "program_name": "REJ"
+    },
+    {
+        "contract_id": 316,
+        "program_id": 6,
+        "contract_title": "2024 RTCLF_Embassy Bank Loan",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 317,
+        "program_id": 3,
+        "contract_title": "2024CADA_City of Allentown ARPA_ Youth Center",
+        "program_name": "CADA"
+    },
+    {
+        "contract_id": 318,
+        "program_id": 9,
+        "contract_title": "2024SSS_Asbury in Mission",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 319,
+        "program_id": 12,
+        "contract_title": "2024HCPHRP_Wells Fargo",
+        "program_name": "Multi"
+    },
+    {
+        "contract_id": 320,
+        "program_id": 3,
+        "contract_title": "2024CADA_Just Born",
+        "program_name": "CADA"
+    },
+    {
+        "contract_id": 321,
+        "program_id": 3,
+        "contract_title": "2024\/ 2025 CADA Neighborhood Partners_ MOU's",
+        "program_name": "CADA"
+    },
+    {
+        "contract_id": 322,
+        "program_id": 5,
+        "contract_title": "2024HCP_Univest Financial",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 323,
+        "program_id": 6,
+        "contract_title": "2024RTCLF_ Wells Fargo",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 324,
+        "program_id": 8,
+        "contract_title": "2024_SHFB_CrayolaCares",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 325,
+        "program_id": 8,
+        "contract_title": "2024_SHFB_TwoRiversHealthWellness",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 326,
+        "program_id": 8,
+        "contract_title": "2024_SHFB_FirstEnergy",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 327,
+        "program_id": 8,
+        "contract_title": "2023-2025SHFB_NCCDBG_FreshFoodDistribution",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 328,
+        "program_id": 5,
+        "contract_title": "2024HCP_ PNC",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 329,
+        "program_id": 9,
+        "contract_title": "2024SSS_St Paul's UCC",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 330,
+        "program_id": 9,
+        "contract_title": "2024SSS_TrexlerTrust",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 331,
+        "program_id": 9,
+        "contract_title": "2024SSS_Erie Insurance",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 333,
+        "program_id": 5,
+        "contract_title": "2024HCP_PAHAF_ PA Homeowner Assistance Program",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 334,
+        "program_id": 10,
+        "contract_title": "2024Wx_First Energy Warm_Master Service Agreement",
+        "program_name": "WX"
+    },
+    {
+        "contract_id": 335,
+        "program_id": 8,
+        "contract_title": "2024SHFB_StarbucksFoodShareCapacity",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 338,
+        "program_id": 8,
+        "contract_title": "2024-2025SHFB_PikeCDBG",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 339,
+        "program_id": 9,
+        "contract_title": "2024SSS_TJX Foundation",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 340,
+        "program_id": 4,
+        "contract_title": "2024REJ_PPL_ Power and Equity _SHEGENX",
+        "program_name": "REJ"
+    },
+    {
+        "contract_id": 341,
+        "program_id": 8,
+        "contract_title": "2024SHFB_FoodConnect_CSFP_Phase1",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 342,
+        "program_id": 2,
+        "contract_title": "2024 CADB_Lehigh University_Alley House Pilot Project",
+        "program_name": "CADB"
+    },
+    {
+        "contract_id": 343,
+        "program_id": 12,
+        "contract_title": "2024HCPHRP_TD Charitable Foundation",
+        "program_name": "Multi"
+    },
+    {
+        "contract_id": 344,
+        "program_id": 9,
+        "contract_title": "2024SSS_ National Giving Alliance",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 345,
+        "program_id": 5,
+        "contract_title": "2024HCP_ Hoch Foundation",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 347,
+        "program_id": 1,
+        "contract_title": "2024CALV_LC Aging and Adult Services",
+        "program_name": "CALV"
+    },
+    {
+        "contract_id": 348,
+        "program_id": 11,
+        "contract_title": "2024CAH_PHFA PHARE_ Healthy Homes",
+        "program_name": "CAH"
+    },
+    {
+        "contract_id": 349,
+        "program_id": 8,
+        "contract_title": "2024SHFB_AldiRetailRecovery",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 350,
+        "program_id": 5,
+        "contract_title": "2024HCP_LC Affordable Housing Trust",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 351,
+        "program_id": 8,
+        "contract_title": "2024SHFB_C&S Wholesale",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 352,
+        "program_id": 8,
+        "contract_title": "2024SHFB_Sheetz For The Kidz",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 353,
+        "program_id": 8,
+        "contract_title": "2024SHFB_Villaume Foundation",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 354,
+        "program_id": 8,
+        "contract_title": "2024SHFB_Sanofi_Monroe County",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 355,
+        "program_id": 8,
+        "contract_title": "2024SHFB_VernoCanova The Seed Farm",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 356,
+        "program_id": 8,
+        "contract_title": "2024SHFB_ShopRiteLPGA",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 357,
+        "program_id": 8,
+        "contract_title": "2024SHFB_FeedingAmerica 2024 Paychex General Operating",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 359,
+        "program_id": 8,
+        "contract_title": "2024SHFB_FeedingAmerica Hershey Child and Family Feeding",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 360,
+        "program_id": 8,
+        "contract_title": "2024-2025SHFB PMUW Monroe County Food Distribution",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 361,
+        "program_id": 8,
+        "contract_title": "2024SHFB_Wawa Foundation Fly Beyond",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 362,
+        "program_id": 8,
+        "contract_title": "2024-2025SHFB_Feeding PA_PASS_MOU",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 363,
+        "program_id": 8,
+        "contract_title": "2024SHFB_NCCDBG_Pantry Improvement",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 364,
+        "program_id": 2,
+        "contract_title": "2024CADB_ M&T",
+        "program_name": "CADB"
+    },
+    {
+        "contract_id": 365,
+        "program_id": 5,
+        "contract_title": "2024HCP_M&T",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 366,
+        "program_id": 12,
+        "contract_title": "2024HCP_SSS_Santander",
+        "program_name": "Multi"
+    },
+    {
+        "contract_id": 367,
+        "program_id": 12,
+        "contract_title": "2024CALV_LC Aging and Adult Services",
+        "program_name": "Multi"
+    },
+    {
+        "contract_id": 368,
+        "program_id": 8,
+        "contract_title": "2024SHFB_FeedingAmerica_Costco Food Purchase",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 369,
+        "program_id": 8,
+        "contract_title": "2025SHFB_Feeding America_CVS SNAP Application",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 371,
+        "program_id": 9,
+        "contract_title": "2024SSS_ Lehigh County Children and Youth",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 372,
+        "program_id": 8,
+        "contract_title": "2024SHFB_FA_Cargill 2024 Food Safety Training",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 373,
+        "program_id": 8,
+        "contract_title": "2025SHFB_FA_Agency Partner Capacity Building",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 374,
+        "program_id": 8,
+        "contract_title": "2025SHFB_Cedar Crest College Nutrition Intern MOU",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 375,
+        "program_id": 8,
+        "contract_title": "2024SHFB_CSFP_Senior Food Box Home Delivery",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 376,
+        "program_id": 8,
+        "contract_title": "2024SHFB_SF_ Davis & Smith Family Foundation",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 377,
+        "program_id": 6,
+        "contract_title": "2024RTCLF_PPL",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 378,
+        "program_id": 8,
+        "contract_title": "2024-2025SHFB_United Way of Wayne and Lackawanna_Military Share",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 379,
+        "program_id": 8,
+        "contract_title": "2024_2025SHFB_CarbonCountyTEFAP",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 380,
+        "program_id": 2,
+        "contract_title": "2024CADB_PHARE_Community Organizing and Tenant Advocacy",
+        "program_name": "CADB"
+    },
+    {
+        "contract_id": 381,
+        "program_id": 6,
+        "contract_title": "2024RTCLF_ M&T Charitable Foundation",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 382,
+        "program_id": 1,
+        "contract_title": "2024CALV_ NC DHS_ Drug and Alcohol",
+        "program_name": "CALV"
+    },
+    {
+        "contract_id": 383,
+        "program_id": 5,
+        "contract_title": "2024HCP_JP Morgan Chase",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 384,
+        "program_id": 8,
+        "contract_title": "2024-2025SHFB_WayneCDBG",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 385,
+        "program_id": 8,
+        "contract_title": "2024-2025SHFB_FoodConnect_CSFP_Phase2",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 386,
+        "program_id": 12,
+        "contract_title": "2024HCP_RTCLF_BOA",
+        "program_name": "Multi"
+    },
+    {
+        "contract_id": 387,
+        "program_id": 8,
+        "contract_title": "2024-2025SHFB_NAP-CFP",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 388,
+        "program_id": 11,
+        "contract_title": "2024CAH_LC CDBG CV_ Urgent Need Roof HVAC",
+        "program_name": "CAH"
+    },
+    {
+        "contract_id": 389,
+        "program_id": 6,
+        "contract_title": "2024RTCLF_ Penn Community",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 390,
+        "program_id": 4,
+        "contract_title": "2024REJ_PPL_EITC",
+        "program_name": "REJ"
+    },
+    {
+        "contract_id": 391,
+        "program_id": 11,
+        "contract_title": "2024CAH_Keystone Savings Foundation",
+        "program_name": "CAH"
+    },
+    {
+        "contract_id": 392,
+        "program_id": 8,
+        "contract_title": "2025SHFB_Starbucks FoodShare Capacity Round 2",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 393,
+        "program_id": 8,
+        "contract_title": "2025SHFB_FeedingPA_ServiceInsightsSupport",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 394,
+        "program_id": 6,
+        "contract_title": "2024RTCLF_ Santander",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 395,
+        "program_id": 9,
+        "contract_title": "2024SSS_ Kiwanis",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 396,
+        "program_id": 2,
+        "contract_title": "2024CADB_ City of Bethlehem CDBG_ Tenant Advocacy",
+        "program_name": "CADB"
+    },
+    {
+        "contract_id": 397,
+        "program_id": 8,
+        "contract_title": "2025SHFB_MARC Membership Agreement",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 398,
+        "program_id": 3,
+        "contract_title": "2024CADA_ GLV Auto Association",
+        "program_name": "CADA"
+    },
+    {
+        "contract_id": 399,
+        "program_id": 4,
+        "contract_title": "2024REJ-Fulton Bank_ EITC",
+        "program_name": "REJ"
+    },
+    {
+        "contract_id": 400,
+        "program_id": 8,
+        "contract_title": "2022-2025SHFB_LehighCountyCDBG CARES",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 401,
+        "program_id": 8,
+        "contract_title": "2024SHFB_Sanofi_Monroe County Transportation November",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 402,
+        "program_id": 4,
+        "contract_title": "2024REJ_ American Bank_ EITC",
+        "program_name": "REJ"
+    },
+    {
+        "contract_id": 403,
+        "program_id": 4,
+        "contract_title": "2024REJ_QNB Bank_ EITC",
+        "program_name": "REJ"
+    },
+    {
+        "contract_id": 404,
+        "program_id": 11,
+        "contract_title": "2024CAH_City of Bethlehem PHARE_ Alley House",
+        "program_name": "CAH"
+    },
+    {
+        "contract_id": 405,
+        "program_id": 11,
+        "contract_title": "2024CAH_LC CDBG_ Urgent Need Roof HVAC",
+        "program_name": "CAH"
+    },
+    {
+        "contract_id": 406,
+        "program_id": 4,
+        "contract_title": "2024REJ_Weis Markets_EITC",
+        "program_name": "REJ"
+    },
+    {
+        "contract_id": 407,
+        "program_id": 4,
+        "contract_title": "2024REJ_First Keystone_EITC",
+        "program_name": "REJ"
+    },
+    {
+        "contract_id": 408,
+        "program_id": 4,
+        "contract_title": "2024REJ_ Fidelity Bank_ EITC",
+        "program_name": "REJ"
+    },
+    {
+        "contract_id": 409,
+        "program_id": 5,
+        "contract_title": "2024HCP_ City of Bethlehem CDBG_ BHAP",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 410,
+        "program_id": 8,
+        "contract_title": "2024SHFB_ Lansford_ Statewide LSA_ Grace Community Church",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 411,
+        "program_id": 8,
+        "contract_title": "2024SHFB_ Lansford_Monroe County LSA_ Grace Community Church",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 412,
+        "program_id": 9,
+        "contract_title": "2024SSS_City of Allentown_ Community Reinvestment Fund",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 413,
+        "program_id": 8,
+        "contract_title": "2024-2025SHFB TEFAP Reach & Resiliency Round 2",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 414,
+        "program_id": 2,
+        "contract_title": "2024 CADB_ Wind Creek",
+        "program_name": "CADB"
+    },
+    {
+        "contract_id": 415,
+        "program_id": 4,
+        "contract_title": "2024 REJ_Butz_ EITC",
+        "program_name": "REJ"
+    },
+    {
+        "contract_id": 416,
+        "program_id": 3,
+        "contract_title": "2025CADA_Iron Pigs_ Afterzone Flag Football",
+        "program_name": "CADA"
+    },
+    {
+        "contract_id": 417,
+        "program_id": 6,
+        "contract_title": "2024RTCLF_ PA CDFI Grit Fund",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 418,
+        "program_id": 6,
+        "contract_title": "2024RTCLF_ PNC",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 419,
+        "program_id": 2,
+        "contract_title": "2025CADB_ Martin Guitar",
+        "program_name": "CADB"
+    },
+    {
+        "contract_id": 420,
+        "program_id": 8,
+        "contract_title": "2025SHFB_C&S Wholesale Grocers Child and Family Feeding",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 421,
+        "program_id": 8,
+        "contract_title": "2024-2025SHFB_NCTEFAP Agreement",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 422,
+        "program_id": 8,
+        "contract_title": "2024SHFB NC CDBG Retail Recovery",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 423,
+        "program_id": 7,
+        "contract_title": "2024SBR NC CDBG Program Administration",
+        "program_name": "SBR"
+    },
+    {
+        "contract_id": 424,
+        "program_id": 5,
+        "contract_title": "2024HCP NC CDBG Housing Counseling Program",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 425,
+        "program_id": 7,
+        "contract_title": "2025SBR NC Grow Norco Facade and Mural",
+        "program_name": "SBR"
+    },
+    {
+        "contract_id": 429,
+        "program_id": 3,
+        "contract_title": "CADCA Allentown School District 21 Century Grant 24\/25 SY",
+        "program_name": "CADA"
+    },
+    {
+        "contract_id": 430,
+        "program_id": 2,
+        "contract_title": "2025 CADB NC Grow Norco South Bethlehem Facades",
+        "program_name": "CADB"
+    },
+    {
+        "contract_id": 431,
+        "program_id": 9,
+        "contract_title": "2025SSS Asbury In Mission",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 432,
+        "program_id": 1,
+        "contract_title": "CALV CSBG Discretionary 10\/1\/24- 12\/30\/25",
+        "program_name": "CALV"
+    },
+    {
+        "contract_id": 434,
+        "program_id": 5,
+        "contract_title": "2024HCP City of Allentown CDBG Housing Counseling",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 435,
+        "program_id": 7,
+        "contract_title": "2025 SBR NC Hotel Tax Slate Belt Marketing Campaign",
+        "program_name": "SBR"
+    },
+    {
+        "contract_id": 436,
+        "program_id": 8,
+        "contract_title": "2024-2025SHFB City of Bethlehem Community Recovery Fund",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 438,
+        "program_id": 2,
+        "contract_title": "2024-2025 CADB Just Born Tenant Advocacy",
+        "program_name": "CADB"
+    },
+    {
+        "contract_id": 439,
+        "program_id": 2,
+        "contract_title": "24-25 CADB City of Bethlehem Community Recovery Fund",
+        "program_name": "CADB"
+    },
+    {
+        "contract_id": 440,
+        "program_id": 8,
+        "contract_title": "2024-2025SHFB_TRHWF School Pantry Program",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 441,
+        "program_id": 8,
+        "contract_title": "2025SHFB_AllOneFoundation",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 442,
+        "program_id": 9,
+        "contract_title": "2025SSS Sylvia Perkins Trust Fund Family Resource Center",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 443,
+        "program_id": 7,
+        "contract_title": "2025SBR Totts Gap Arts Program",
+        "program_name": "SBR"
+    },
+    {
+        "contract_id": 444,
+        "program_id": 2,
+        "contract_title": "2025CADB City of Bethlehem CDBG Exterior Rehabilitation and Weatherization",
+        "program_name": "CADB"
+    },
+    {
+        "contract_id": 445,
+        "program_id": 11,
+        "contract_title": "2024CAH City of Allentown CDBG Better Homes",
+        "program_name": "CAH"
+    },
+    {
+        "contract_id": 446,
+        "program_id": 8,
+        "contract_title": "2025SHFB_Crayola Cares General Operating",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 447,
+        "program_id": 6,
+        "contract_title": "Lehigh University Loan",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 448,
+        "program_id": 6,
+        "contract_title": "2022 RTCLF ESSA Loan",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 449,
+        "program_id": 6,
+        "contract_title": "2024 RTCLF Embassy Loan",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 450,
+        "program_id": 6,
+        "contract_title": "2018 RTCLF Fulton Loan",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 451,
+        "program_id": 6,
+        "contract_title": "2023 RTCLF NC General Purpose Authority Loan",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 452,
+        "program_id": 6,
+        "contract_title": "2008 RTCLF Industrial Development Authority",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 453,
+        "program_id": 6,
+        "contract_title": "2023 RTCLF TD Bank Loan",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 454,
+        "program_id": 6,
+        "contract_title": "2023 RTCLF QNB Loan",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 455,
+        "program_id": 6,
+        "contract_title": "2011 RTCLF Truist Loan",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 456,
+        "program_id": 6,
+        "contract_title": "2018 RTCLF Wells Fargo Loan",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 457,
+        "program_id": 10,
+        "contract_title": "2025-2030 WX DOE Master Contract",
+        "program_name": "WX"
+    },
+    {
+        "contract_id": 458,
+        "program_id": 8,
+        "contract_title": "2025SHFB_HomeDepotFoundation_TSF Volunteer Project",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 459,
+        "program_id": 9,
+        "contract_title": "2024 SSS City of Allentown ESG",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 460,
+        "program_id": 12,
+        "contract_title": "2025 CALV LC Aging and Adults Services",
+        "program_name": "Multi"
+    },
+    {
+        "contract_id": 461,
+        "program_id": 9,
+        "contract_title": "2025SSS Trexler Trust",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 462,
+        "program_id": 8,
+        "contract_title": "2025SHFB Trexler Trust Seed Farm Food Pantry Project",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 463,
+        "program_id": 4,
+        "contract_title": "2025 Gen Next Fulton Forward Foundation",
+        "program_name": "REJ"
+    },
+    {
+        "contract_id": 464,
+        "program_id": 8,
+        "contract_title": "2025SHFB_CheckOutHunger_CFBNJ",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 465,
+        "program_id": 9,
+        "contract_title": "2025 SSS St. Paul's UCC Trexlertown",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 467,
+        "program_id": 5,
+        "contract_title": "2025 HCP Univest",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 472,
+        "program_id": 8,
+        "contract_title": "2025SHFB_2025 Wawa Fly Beyond",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 474,
+        "program_id": 4,
+        "contract_title": "2025 Generation Next Power and Equity Grant",
+        "program_name": "REJ"
+    },
+    {
+        "contract_id": 475,
+        "program_id": 9,
+        "contract_title": "2025 SSS Children and Youth",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 476,
+        "program_id": 10,
+        "contract_title": "2025-2030 WX LIHEAP Master Contract",
+        "program_name": "WX"
+    },
+    {
+        "contract_id": 478,
+        "program_id": 6,
+        "contract_title": "2025 RTCLF Northampton County Bar Association via Lehigh Valley Community Foundation",
+        "program_name": "RTCLF"
+    },
+    {
+        "contract_id": 479,
+        "program_id": 8,
+        "contract_title": "2025 SHFB Veterans Trust Fund",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 480,
+        "program_id": 9,
+        "contract_title": "2025 SSS Post Foundation",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 481,
+        "program_id": 2,
+        "contract_title": "2025CADB Keystone Savings Foundation via LVCF",
+        "program_name": "CADB"
+    },
+    {
+        "contract_id": 482,
+        "program_id": 5,
+        "contract_title": "2025 HCP TD Charitable Foundation",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 483,
+        "program_id": 7,
+        "contract_title": "2025 SBR Greater Lehigh Valley Chamber of Commerce",
+        "program_name": "SBR"
+    },
+    {
+        "contract_id": 484,
+        "program_id": 5,
+        "contract_title": "2025HCP National Community Reinvestment Coalition Field Empowerment Fund",
+        "program_name": "HCP"
+    },
+    {
+        "contract_id": 485,
+        "program_id": 9,
+        "contract_title": "SSS United Way Greater Lehigh Valley Housing Hero",
+        "program_name": "SSS"
+    },
+    {
+        "contract_id": 486,
+        "program_id": 12,
+        "contract_title": "2025 HCP SSS Santander",
+        "program_name": "Multi"
+    },
+    {
+        "contract_id": 487,
+        "program_id": 8,
+        "contract_title": "2025SHFB_Feeding America Advocacy",
+        "program_name": "SHFB"
+    },
+    {
+        "contract_id": 488,
+        "program_id": 8,
+        "contract_title": "2025SHFB_Verna O. Canova Foundation_TSF",
+        "program_name": "SHFB"
+    }
+]

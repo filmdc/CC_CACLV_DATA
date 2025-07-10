@@ -143,11 +143,11 @@
                                         <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
                                             <a href="{{ route('contract.show', $contract->id) }}" 
                                                class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
-                                                {{ $contract->name }}
+                                                {{ $contract->title }}
                                             </a>
                                         </td>
                                         <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                                            {{ $contract->programs->pluck('name')->join(', ') ?: 'No programs' }}
+                                            {{ $contract->program ? $contract->program->name : 'No program' }}
                                         </td>
                                         <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
                                             {{ $contract->start_date ? \Carbon\Carbon::parse($contract->start_date)->format('M j, Y') : 'N/A' }}
@@ -156,7 +156,7 @@
                                             {{ $contract->end_date ? \Carbon\Carbon::parse($contract->end_date)->format('M j, Y') : 'N/A' }}
                                         </td>
                                         <td class="px-4 py-3 text-sm">
-                                            @if($contract->status === 'active')
+                                            @if($contract->status === 'Active')
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
                                                     Active
                                                 </span>

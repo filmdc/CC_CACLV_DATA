@@ -88,16 +88,27 @@
 
             <!-- Contracts -->
             <div class="mb-8">
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4 border-b border-gray-200 dark:border-zinc-700 pb-2">
-                    Contracts ({{ $program->contracts->count() }})
-                </h2>
-                @if($program->contracts->count() > 0)
+                <div class="flex items-center justify-between mb-4 border-b border-gray-200 dark:border-zinc-700 pb-2">
+                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+                        Contracts ({{ $contracts->total() }})
+                    </h2>
+                    <label class="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                        <input type="checkbox" 
+                               wire:model.live="showExpiredContracts" 
+                               class="rounded border-gray-300 dark:border-zinc-600 text-blue-600 focus:ring-blue-500 dark:bg-zinc-700 mr-2">
+                        Show expired contracts from past calendar years
+                    </label>
+                </div>
+                @if($contracts->count() > 0)
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700">
                             <thead>
                                 <tr>
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Contract Name
+                                        Contract Title
+                                    </th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Contract Number
                                     </th>
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                         Funder
@@ -114,13 +125,26 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200 dark:divide-zinc-700">
-                                @foreach($program->contracts as $contract)
+                                @foreach($contracts as $contract)
                                     <tr>
                                         <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                                            {{ $contract->name }}
+                                            <a href="{{ route('contract.show', $contract->id) }}" 
+                                               class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                                                {{ $contract->title }}
+                                            </a>
                                         </td>
                                         <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                                            {{ $contract->funder->name ?? 'N/A' }}
+                                            {{ $contract->contract_number ?? '-' }}
+                                        </td>
+                                        <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
+                                            @if($contract->funder)
+                                                <a href="{{ route('funder.show', $contract->funder->id) }}" 
+                                                   class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                                                    {{ $contract->funder->name }}
+                                                </a>
+                                            @else
+                                                N/A
+                                            @endif
                                         </td>
                                         <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
                                             {{ $contract->start_date ? \Carbon\Carbon::parse($contract->start_date)->format('M j, Y') : 'N/A' }}
@@ -129,13 +153,29 @@
                                             {{ $contract->end_date ? \Carbon\Carbon::parse($contract->end_date)->format('M j, Y') : 'N/A' }}
                                         </td>
                                         <td class="px-4 py-3 text-sm">
-                                            @if($contract->status === 'active')
+                                            @if($contract->status === 'Archived')
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100">
+                                                    Archived
+                                                </span>
+                                            @elseif($contract->status === 'Active')
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
                                                     Active
                                                 </span>
+                                            @elseif($contract->status === 'Expired')
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">
+                                                    Expired
+                                                </span>
+                                            @elseif($contract->status === 'Upcoming')
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100">
+                                                    Upcoming
+                                                </span>
+                                            @elseif($contract->status === 'Draft')
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100">
+                                                    Draft
+                                                </span>
                                             @else
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100">
-                                                    {{ ucfirst($contract->status) }}
+                                                    {{ $contract->status }}
                                                 </span>
                                             @endif
                                         </td>
@@ -144,6 +184,11 @@
                             </tbody>
                         </table>
                     </div>
+                    @if($contracts->hasPages())
+                        <div class="mt-4">
+                            {{ $contracts->links() }}
+                        </div>
+                    @endif
                 @else
                     <p class="text-gray-500 dark:text-gray-400">No contracts associated with this program.</p>
                 @endif
@@ -152,9 +197,9 @@
             <!-- Recent Enrollments -->
             <div>
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4 border-b border-gray-200 dark:border-zinc-700 pb-2">
-                    Recent Enrollments
+                    Recent Enrollments ({{ $enrollments->total() }})
                 </h2>
-                @if($program->programEnrollments->count() > 0)
+                @if($enrollments->count() > 0)
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700">
                             <thead>
@@ -163,7 +208,13 @@
                                         Participant
                                     </th>
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Household
+                                    </th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                         Enrollment Date
+                                    </th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Days Enrolled
                                     </th>
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                         Status
@@ -174,7 +225,7 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200 dark:divide-zinc-700">
-                                @foreach($program->programEnrollments as $enrollment)
+                                @foreach($enrollments as $enrollment)
                                     <tr>
                                         <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
                                             <a href="{{ route('participant.show', $enrollment->participant_id) }}" 
@@ -183,12 +234,33 @@
                                             </a>
                                         </td>
                                         <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
+                                            @if($enrollment->participant && $enrollment->participant->household)
+                                                <a href="{{ route('household.show', $enrollment->participant->household->id) }}" 
+                                                   class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                                                    {{ $enrollment->participant->household->household_code }}
+                                                </a>
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
                                             {{ $enrollment->enrollment_date ? \Carbon\Carbon::parse($enrollment->enrollment_date)->format('M j, Y') : 'N/A' }}
+                                        </td>
+                                        <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
+                                            {{ $enrollment->days_enrolled ?? '-' }}
                                         </td>
                                         <td class="px-4 py-3 text-sm">
                                             @if($enrollment->status === 'active')
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
                                                     Active
+                                                </span>
+                                            @elseif($enrollment->status === 'completed')
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100">
+                                                    Completed
+                                                </span>
+                                            @elseif($enrollment->status === 'withdrawn')
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">
+                                                    Withdrawn
                                                 </span>
                                             @else
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100">
@@ -204,9 +276,11 @@
                             </tbody>
                         </table>
                     </div>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                        Showing last 10 enrollments. View enrollment management for complete list.
-                    </p>
+                    @if($enrollments->hasPages())
+                        <div class="mt-4">
+                            {{ $enrollments->links() }}
+                        </div>
+                    @endif
                 @else
                     <p class="text-gray-500 dark:text-gray-400">No enrollments recorded for this program.</p>
                 @endif
