@@ -65,62 +65,101 @@ class CsbgReportService
     {
         $query = Participant::with(['household', 'programEnrollments.program', 'serviceEnrollments.service']);
 
-        // Filter by date range - check both participant creation and enrollment dates
-        $startDate = isset($filters['start_date']) ? Carbon::parse($filters['start_date']) : null;
+        // Filter by date range - only include participants with active enrollments during the reporting period
+        $startDate = isset($filters['start_date']) ? Carbon::parse($filters['start_date'])->startOfDay() : null;
         $endDate = isset($filters['end_date']) ? Carbon::parse($filters['end_date'])->endOfDay() : null;
 
-        if ($startDate || $endDate) {
+        // Log the date range being used
+        Log::info('CSBG Report Date Range', [
+            'start_date' => $startDate?->format('Y-m-d H:i:s'),
+            'end_date' => $endDate?->format('Y-m-d H:i:s'),
+            'filters' => $filters
+        ]);
+
+        if ($startDate && $endDate) {
             $query->where(function($q) use ($startDate, $endDate) {
-                // Include participants created in date range
-                if ($startDate) {
-                    $q->where('created_at', '>=', $startDate);
-                }
-                if ($endDate) {
-                    $q->where('created_at', '<=', $endDate);
-                }
+                // Only include participants with active enrollments during the reporting period
                 
-                // OR participants with enrollments in date range
-                $q->orWhereHas('programEnrollments', function($enrollQuery) use ($startDate, $endDate) {
-                    if ($startDate) {
-                        $enrollQuery->where('enrollment_date', '>=', $startDate);
-                    }
-                    if ($endDate) {
-                        $enrollQuery->where('enrollment_date', '<=', $endDate);
-                    }
-                });
-                
-                $q->orWhereHas('serviceEnrollments', function($serviceQuery) use ($startDate, $endDate) {
-                    if ($startDate) {
-                        $serviceQuery->where('enrollment_date', '>=', $startDate);
-                    }
-                    if ($endDate) {
-                        $serviceQuery->where('enrollment_date', '<=', $endDate);
-                    }
+                // Program enrollments active during the period
+                $q->whereHas('programEnrollments', function($enrollQuery) use ($startDate, $endDate) {
+                    $enrollQuery->where(function($q) use ($startDate, $endDate) {
+                        // Enrollment started before or during the period
+                        $q->where('enrollment_date', '<=', $endDate)
+                          // AND (no exit date OR exited after period started)
+                          ->where(function($q2) use ($startDate) {
+                              $q2->whereNull('exit_date')
+                                 ->orWhere('exit_date', '>=', $startDate);
+                          });
+                    });
+                    
+                    // Log the enrollment query for debugging
+                    Log::debug('Program Enrollment Query', [
+                        'sql' => $enrollQuery->toSql(),
+                        'bindings' => $enrollQuery->getBindings()
+                    ]);
+                })
+                // OR Service enrollments active during the period
+                ->orWhereHas('serviceEnrollments', function($serviceQuery) use ($startDate, $endDate) {
+                    $serviceQuery->where(function($q) use ($startDate, $endDate) {
+                        // Enrollment started before or during the period
+                        $q->where('enrollment_date', '<=', $endDate)
+                          // AND (no completion date OR completed after period started)
+                          ->where(function($q2) use ($startDate) {
+                              $q2->whereNull('completion_date')
+                                 ->orWhere('completion_date', '>=', $startDate);
+                          });
+                    });
+                    
+                    // Log the service enrollment query for debugging
+                    Log::debug('Service Enrollment Query', [
+                        'sql' => $serviceQuery->toSql(),
+                        'bindings' => $serviceQuery->getBindings()
+                    ]);
                 });
             });
         }
 
-        // Filter by reference data set if specified and participants have reference data set IDs
-        if (isset($filters['reference_data_set_id'])) {
-            // Only apply this filter if there are participants with reference data set IDs
-            $hasParticipantsWithRDS = Participant::whereNotNull('reference_data_set_id')->exists();
-            if ($hasParticipantsWithRDS) {
+        // Filter by reference data set if specified
+        // Note: This filter is optional and should only be applied when explicitly needed
+        // Most participants may not have a reference_data_set_id assigned
+        if (isset($filters['reference_data_set_id']) && !empty($filters['reference_data_set_id'])) {
+            // Check if we should apply strict filtering or not
+            $strictReferenceFiltering = $filters['strict_reference_filtering'] ?? false;
+            
+            if ($strictReferenceFiltering) {
+                // Strict mode: Only include participants with the specified reference_data_set_id
                 $query->where('reference_data_set_id', $filters['reference_data_set_id']);
+                Log::info('CSBG Report: Applying strict reference data set filter', [
+                    'reference_data_set_id' => $filters['reference_data_set_id']
+                ]);
+            } else {
+                // Default mode: Include participants with the specified reference_data_set_id OR no reference_data_set_id
+                $query->where(function($q) use ($filters) {
+                    $q->where('reference_data_set_id', $filters['reference_data_set_id'])
+                      ->orWhereNull('reference_data_set_id');
+                });
+                Log::info('CSBG Report: Applying inclusive reference data set filter', [
+                    'reference_data_set_id' => $filters['reference_data_set_id']
+                ]);
             }
         }
 
         // Filter by program if specified
-        if (isset($filters['program_id'])) {
+        if (isset($filters['program_id']) && !empty($filters['program_id'])) {
             $query->whereHas('programEnrollments', function($q) use ($filters, $startDate, $endDate) {
                 $q->where('program_id', $filters['program_id']);
-                // Only count enrollments within the date range
-                if ($startDate) {
-                    $q->where('enrollment_date', '>=', $startDate);
-                }
-                if ($endDate) {
-                    $q->where('enrollment_date', '<=', $endDate);
+                // Also check that the enrollment was active during the reporting period
+                if ($startDate && $endDate) {
+                    $q->where('enrollment_date', '<=', $endDate)
+                      ->where(function($q2) use ($startDate) {
+                          $q2->whereNull('exit_date')
+                             ->orWhere('exit_date', '>=', $startDate);
+                      });
                 }
             });
+            Log::info('CSBG Report: Applying program filter', [
+                'program_id' => $filters['program_id']
+            ]);
         }
 
         // Only count heads of household for CSBG reporting (avoids double counting families)
@@ -166,14 +205,56 @@ class CsbgReportService
             });
         }
 
+        // Log the final query for debugging
+        Log::debug('CSBG Report Final Query', [
+            'sql' => $query->toSql(),
+            'bindings' => $query->getBindings()
+        ]);
+
         // Get participants and ensure deduplication by participant ID
         $participants = $query->get()->unique('id');
         
-        Log::info('CSBG Report Participants', [
+        // Enhanced logging for debugging
+        Log::info('CSBG Report Participants Found', [
             'total_found' => $participants->count(),
-            'date_range' => [$startDate?->format('Y-m-d'), $endDate?->format('Y-m-d')],
-            'filters_applied' => array_keys(array_filter($filters))
+            'date_range' => [
+                'start' => $startDate?->format('Y-m-d'),
+                'end' => $endDate?->format('Y-m-d')
+            ],
+            'filters_applied' => array_keys(array_filter($filters)),
+            'heads_of_household_only' => $filters['heads_of_household_only'] ?? true,
+            'program_id' => $filters['program_id'] ?? 'All Programs',
+            'reference_data_set_id' => $filters['reference_data_set_id'] ?? 'Not specified'
         ]);
+        
+        // Log sample participant data for verification
+        if ($participants->count() > 0) {
+            $sampleParticipants = $participants->take(5)->map(function($p) {
+                return [
+                    'id' => $p->id,
+                    'name' => $p->full_name,
+                    'household_id' => $p->household_id,
+                    'is_head' => $p->is_head_of_household,
+                    'created_at' => $p->created_at->format('Y-m-d'),
+                    'program_enrollments_count' => $p->programEnrollments->count(),
+                    'service_enrollments_count' => $p->serviceEnrollments->count(),
+                    'active_program_enrollments' => $p->programEnrollments->filter(function($e) {
+                        return $e->status === 'active' || (!$e->exit_date || $e->exit_date->isFuture());
+                    })->count(),
+                    'active_service_enrollments' => $p->serviceEnrollments->filter(function($e) {
+                        return in_array($e->status, ['enrolled', 'in_progress']) || 
+                               (!$e->completion_date || $e->completion_date->isFuture());
+                    })->count()
+                ];
+            });
+            
+            Log::debug('CSBG Report Sample Participants', [
+                'sample_size' => $sampleParticipants->count(),
+                'participants' => $sampleParticipants->toArray()
+            ]);
+        } else {
+            Log::warning('CSBG Report: No participants found with current filters');
+        }
         
         return $participants;
     }
