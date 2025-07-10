@@ -53,4 +53,14 @@ trait WithPermissionChecks
             abort(403, $message ?? "You do not have permission to perform this action.");
         }
     }
+
+    /**
+     * Authorize if user has any of the given permissions or abort with 403.
+     */
+    public function authorizeAny(array $permissions, ?string $message = null): void
+    {
+        if (!$this->canAny($permissions)) {
+            abort(403, $message ?? "You do not have permission to access this page.");
+        }
+    }
 }
