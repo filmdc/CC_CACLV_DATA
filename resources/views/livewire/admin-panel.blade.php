@@ -33,6 +33,14 @@
                         class="py-4 px-1 border-b-2 font-medium text-sm {{ $activeTab === 'settings' ? 'border-purple-500 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
                     Site Settings
                 </button>
+                <button wire:click="setActiveTab('roles')" 
+                        class="py-4 px-1 border-b-2 font-medium text-sm {{ $activeTab === 'roles' ? 'border-purple-500 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+                    Roles & Permissions
+                </button>
+                <button wire:click="setActiveTab('reference')" 
+                        class="py-4 px-1 border-b-2 font-medium text-sm {{ $activeTab === 'reference' ? 'border-purple-500 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+                    Reference Data
+                </button>
             </nav>
         </div>
 
@@ -987,6 +995,141 @@
                             </button>
                         </div>
                     </form>
+                </div>
+            @elseif ($activeTab === 'roles')
+                <!-- Roles & Permissions -->
+                <div class="space-y-6">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Roles & Permissions Management</h2>
+                        <a href="{{ route('role-permission.management') }}" wire:navigate
+                           class="inline-flex items-center px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-md hover:bg-purple-700">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            Manage Roles & Permissions
+                        </a>
+                    </div>
+                    
+                    <div class="bg-gray-50 dark:bg-zinc-700 rounded-lg p-6">
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">
+                            Configure user roles and their associated permissions to control access to different parts of the system.
+                        </p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h3 class="font-medium text-gray-900 dark:text-white mb-2">Current Roles</h3>
+                                @php
+                                    $roles = \App\Models\Role::withCount('users')->get();
+                                @endphp
+                                <ul class="space-y-2">
+                                    @foreach($roles as $role)
+                                    <li class="flex justify-between items-center p-2 bg-white dark:bg-zinc-800 rounded">
+                                        <span class="text-gray-700 dark:text-gray-300">{{ $role->name }}</span>
+                                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ $role->users_count }} users</span>
+                                    </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                            
+                            <div>
+                                <h3 class="font-medium text-gray-900 dark:text-white mb-2">Permission Categories</h3>
+                                @php
+                                    $permissions = \App\Models\Permission::all()->groupBy(function($item) {
+                                        return explode('.', $item->name)[0];
+                                    });
+                                @endphp
+                                <ul class="space-y-2">
+                                    @foreach($permissions as $category => $perms)
+                                    <li class="flex justify-between items-center p-2 bg-white dark:bg-zinc-800 rounded">
+                                        <span class="text-gray-700 dark:text-gray-300 capitalize">{{ $category }}</span>
+                                        <span class="text-sm text-gray-500 dark:text-gray-400">{{ count($perms) }} permissions</span>
+                                    </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @elseif ($activeTab === 'reference')
+                <!-- Reference Data -->
+                <div class="space-y-6">
+                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Reference Data Management</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Reference Data Sets -->
+                        <div class="bg-white dark:bg-zinc-700 rounded-lg p-6 shadow">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Reference Data Sets</h3>
+                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"></path>
+                                </svg>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">
+                                Manage data sets used throughout the system like education levels, income sources, etc.
+                            </p>
+                            <a href="{{ route('reference-data-set.management') }}" wire:navigate
+                               class="inline-flex items-center text-purple-600 hover:text-purple-700 dark:text-purple-400">
+                                Manage Data Sets
+                                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </a>
+                        </div>
+                        
+                        <!-- Reference Data Items -->
+                        <div class="bg-white dark:bg-zinc-700 rounded-lg p-6 shadow">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Reference Data Items</h3>
+                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                </svg>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">
+                                Manage individual reference data items within each data set.
+                            </p>
+                            <a href="{{ route('reference-data.management') }}" wire:navigate
+                               class="inline-flex items-center text-purple-600 hover:text-purple-700 dark:text-purple-400">
+                                Manage Data Items
+                                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </a>
+                        </div>
+                        
+                        <!-- Poverty Guidelines -->
+                        <div class="bg-white dark:bg-zinc-700 rounded-lg p-6 shadow">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Poverty Guidelines</h3>
+                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">
+                                Manage federal poverty guidelines used for income calculations.
+                            </p>
+                            <a href="{{ route('poverty-guideline.management') }}" wire:navigate
+                               class="inline-flex items-center text-purple-600 hover:text-purple-700 dark:text-purple-400">
+                                Manage Guidelines
+                                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                        <div class="flex">
+                            <svg class="w-5 h-5 text-blue-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                            </svg>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-blue-800 dark:text-blue-300">Important Note</h3>
+                                <p class="mt-1 text-sm text-blue-700 dark:text-blue-400">
+                                    Reference data is used throughout the system. Changes to reference data will affect all records using that data.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             @endif
         </div>

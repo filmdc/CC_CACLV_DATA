@@ -26,6 +26,12 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
     
     // CAP TRACK Routes
+    
+    // Hub Routes - New consolidated pages
+    Route::get('participants-households', App\Livewire\ParticipantHouseholdHub::class)->name('participant.household.hub');
+    Route::get('programs-services', App\Livewire\ProgramServiceHub::class)->name('program.service.hub');
+    
+    // Participant Routes
     Route::get('participant-intake', App\Livewire\ParticipantIntake::class)->name('participant.intake');
     Route::get('participant-management', App\Livewire\ParticipantManagement::class)->name('participant.management');
     Route::get('participant/{id}', App\Livewire\ParticipantShow::class)->name('participant.show');
