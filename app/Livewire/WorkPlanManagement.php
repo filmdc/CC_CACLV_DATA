@@ -222,14 +222,6 @@ class WorkPlanManagement extends Component
         // Redirect to the workPlan show page instead of opening a modal
         return redirect()->route('work-plan.show', $workPlanId);
     }
-        ])->find($workPlanId);
-        
-        if ($this->selectedViewWorkPlan) {
-            $this->showViewModal = true;
-            $this->showCreateForm = false;
-            $this->showEditForm = false;
-        }
-    }
 
     public function render()
     {

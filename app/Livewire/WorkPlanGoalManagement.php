@@ -246,14 +246,6 @@ class WorkPlanGoalManagement extends Component
         // Redirect to the goal show page instead of opening a modal
         return redirect()->route('work-plan-goal.show', $goalId);
     }
-        ])->find($goalId);
-        
-        if ($this->selectedViewGoal) {
-            $this->showViewModal = true;
-            $this->showCreateForm = false;
-            $this->showEditForm = false;
-        }
-    }
 
     public function render()
     {

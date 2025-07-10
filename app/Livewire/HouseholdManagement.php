@@ -54,7 +54,6 @@ class HouseholdManagement extends Component
         // Redirect to the household show page instead of opening a modal
         return redirect()->route('household.show', $householdId);
     }
-    }
 
     public function resetMemberForm()
     {

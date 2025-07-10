@@ -62,13 +62,6 @@ class FunderManagement extends Component
     {
         // Redirect to the funder show page instead of opening a modal
         return redirect()->route('funder.show', $funderId);
-    },
-            'createdBy',
-            'updatedBy'
-        ])->findOrFail($funderId);
-        $this->showViewModal = true;
-        $this->showCreateForm = false;
-        $this->showEditForm = false;
     }
 
     public function resetFunderForm()

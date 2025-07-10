@@ -254,24 +254,10 @@ class EnrollmentManagement extends Component
         $this->resetProgramEnrollmentForm();
     }
 
-    public function viewEnrollment($enrollmentId)
+    public function viewEnrollment($type, $id)
     {
-        // Redirect to the show page instead of opening a modal
-        return redirect()->route('enrollment.show', $id);
-    }
-            ])->find($enrollmentId);
-        } else {
-            $this->selectedViewEnrollment = ServiceEnrollment::with([
-                'participant.household',
-                'service.program',
-                'programEnrollment.program'
-            ])->find($enrollmentId);
-        }
-        
-        if ($this->selectedViewEnrollment) {
-            $this->showViewModal = true;
-            $this->showProgramEnrollmentForm = false;
-        }
+        // Redirect to the enrollment show page instead of opening a modal
+        return redirect()->route('enrollment.show', ['type' => $type, 'id' => $id]);
     }
 
     public function render()
