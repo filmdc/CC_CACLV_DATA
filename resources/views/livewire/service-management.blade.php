@@ -6,6 +6,26 @@
             <p class="text-teal-100 mt-2">Manage program services and their configurations</p>
         </div>
 
+        <!-- Program Filter Notice -->
+        @if($filteredProgram)
+        <div class="bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-800 p-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                    </svg>
+                    <span class="text-blue-800 dark:text-blue-300 font-medium">
+                        Showing services for: {{ $filteredProgram->name }}
+                    </span>
+                </div>
+                <a href="{{ route('service.management') }}" wire:navigate
+                   class="text-sm text-blue-600 dark:text-blue-400 hover:underline">
+                    View all services
+                </a>
+            </div>
+        </div>
+        @endif
+
         <!-- Search and Actions -->
         @if(!$showEditForm && !$showCreateForm && !$showViewModal)
         <div class="p-4 bg-gray-50 dark:bg-zinc-700 border-b dark:border-zinc-600">
@@ -272,8 +292,22 @@
                             </div>
                         </li>
                     @empty
-                        <li class="px-6 py-4 text-center text-gray-500">
-                            No services found.
+                        <li class="px-6 py-8 text-center">
+                            @if($filteredProgram)
+                                <p class="text-gray-500 dark:text-gray-400 mb-4">
+                                    No services found for {{ $filteredProgram->name }}.
+                                </p>
+                                @if($this->can('services.create'))
+                                    <button wire:click="showCreateService" 
+                                            class="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700">
+                                        Create First Service
+                                    </button>
+                                @endif
+                            @else
+                                <p class="text-gray-500 dark:text-gray-400">
+                                    No services found.
+                                </p>
+                            @endif
                         </li>
                     @endforelse
                 </ul>

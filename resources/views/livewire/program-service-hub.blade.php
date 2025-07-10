@@ -76,11 +76,20 @@
                                 </div>
                             </div>
                             <div class="flex space-x-2">
-                                @if($this->can('services.view'))
+                                @if($program->services_count > 0 && $this->can('services.view'))
                                 <a href="{{ route('service.management') }}?program={{ $program->id }}" wire:navigate
                                    class="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
                                     View Services →
                                 </a>
+                                @elseif($program->services_count == 0 && $this->can('services.create'))
+                                <a href="{{ route('service.management') }}?program={{ $program->id }}" wire:navigate
+                                   class="text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300">
+                                    Add Services →
+                                </a>
+                                @elseif($program->services_count == 0)
+                                <span class="text-gray-500 dark:text-gray-400 text-sm italic">
+                                    No services
+                                </span>
                                 @endif
                             </div>
                         </div>

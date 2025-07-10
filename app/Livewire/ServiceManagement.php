@@ -18,6 +18,9 @@ class ServiceManagement extends Component
     public $showEditForm = false;
     public $showViewModal = false;
     public $selectedViewService = null;
+    public $filterProgramId = null;
+    
+    protected $queryString = ['filterProgramId' => ['as' => 'program']];
 
     // Service Form Fields
     public $name = '';
@@ -27,6 +30,14 @@ class ServiceManagement extends Component
     public $end_date = '';
     public $active = true;
     public $notes = '';
+
+    public function mount()
+    {
+        // Set default program if filtering by program
+        if ($this->filterProgramId) {
+            $this->program_id = $this->filterProgramId;
+        }
+    }
 
     public function updatedSearch()
     {
@@ -40,6 +51,11 @@ class ServiceManagement extends Component
         $this->showViewModal = false;
         $this->selectedService = null;
         $this->resetServiceForm();
+        
+        // Set default program if filtering by program
+        if ($this->filterProgramId) {
+            $this->program_id = $this->filterProgramId;
+        }
     }
 
     public function showEditService($serviceId)
@@ -173,21 +189,29 @@ class ServiceManagement extends Component
     public function render()
     {
         $services = Service::with(['program', 'workPlanGoals', 'serviceEnrollments'])
+            ->when($this->filterProgramId, function ($query) {
+                $query->where('program_id', $this->filterProgramId);
+            })
             ->when($this->search, function ($query) {
-                $query->where('name', 'like', '%' . $this->search . '%')
-                      ->orWhere('description', 'like', '%' . $this->search . '%')
-                      ->orWhereHas('program', function ($q) {
-                          $q->where('name', 'like', '%' . $this->search . '%');
-                      });
+                $query->where(function ($q) {
+                    $q->where('name', 'like', '%' . $this->search . '%')
+                      ->orWhere('description', 'like', '%' . $this->search . '%');
+                });
             })
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
         $programs = Program::active()->regularPrograms()->orderBy('name')->get();
+        
+        $filteredProgram = null;
+        if ($this->filterProgramId) {
+            $filteredProgram = Program::find($this->filterProgramId);
+        }
 
         return view('livewire.service-management', [
             'services' => $services,
             'programs' => $programs,
+            'filteredProgram' => $filteredProgram,
         ])->layout('components.layouts.app');
     }
 }
