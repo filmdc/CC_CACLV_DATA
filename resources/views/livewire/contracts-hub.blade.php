@@ -71,7 +71,7 @@
                                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                                     <a href="{{ route('contract.show', $contract->id) }}" wire:navigate
                                        class="hover:text-indigo-600 dark:hover:text-indigo-400">
-                                        {{ $contract->name }}
+                                        {{ $contract->title }}
                                     </a>
                                 </h3>
                                 <div class="mt-1 text-sm text-gray-600 dark:text-gray-300">
@@ -81,12 +81,14 @@
                                     @endif
                                 </div>
                                 <div class="mt-2 flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                                    <span>{{ $contract->programs->count() }} programs</span>
+                                    @if($contract->program)
+                                    <span>Program: {{ $contract->program->name }}</span>
+                                    @endif
                                     @if($contract->start_date && $contract->end_date)
                                     <span>{{ $contract->start_date->format('M Y') }} - {{ $contract->end_date->format('M Y') }}</span>
                                     @endif
-                                    @if($contract->total_amount)
-                                    <span>${{ number_format($contract->total_amount, 2) }}</span>
+                                    @if($contract->amount)
+                                    <span>${{ number_format($contract->amount, 2) }}</span>
                                     @endif
                                 </div>
                             </div>
@@ -176,7 +178,7 @@
                                 </h3>
                                 @if($dueDate->contract)
                                 <div class="mt-1 text-sm text-gray-600 dark:text-gray-300">
-                                    Contract: {{ $dueDate->contract->name }} (#{{ $dueDate->contract->contract_number }})
+                                    Contract: {{ $dueDate->contract->title }} (#{{ $dueDate->contract->contract_number }})
                                     @if($dueDate->contract->funder)
                                     • {{ $dueDate->contract->funder->name }}
                                     @endif

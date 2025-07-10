@@ -52,9 +52,9 @@ class ContractsHub extends Component
             return collect();
         }
 
-        return Contract::with(['funder', 'programs'])
+        return Contract::with(['funder', 'program'])
             ->when($this->search, function ($query) {
-                $query->where('name', 'like', '%' . $this->search . '%')
+                $query->where('title', 'like', '%' . $this->search . '%')
                     ->orWhere('contract_number', 'like', '%' . $this->search . '%')
                     ->orWhereHas('funder', function ($q) {
                         $q->where('name', 'like', '%' . $this->search . '%');
@@ -90,7 +90,7 @@ class ContractsHub extends Component
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
                     ->orWhereHas('contract', function ($q) {
-                        $q->where('name', 'like', '%' . $this->search . '%')
+                        $q->where('title', 'like', '%' . $this->search . '%')
                             ->orWhere('contract_number', 'like', '%' . $this->search . '%');
                     });
             })
