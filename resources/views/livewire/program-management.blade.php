@@ -14,10 +14,12 @@
                         <input type="text" wire:model.live="search" placeholder="Search programs..." 
                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white">
                     </div>
-                    <button wire:click="showCreateProgram" 
-                            class="ml-4 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
-                        Create Program
-                    </button>
+                    @if($this->can('programs.create'))
+                        <button wire:click="showCreateProgram" 
+                                class="ml-4 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            Create Program
+                        </button>
+                    @endif
                 </div>
             </div>
         @endif
@@ -202,15 +204,19 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
-                                    <button wire:click="showEditProgram({{ $program->id }})" 
-                                            class="text-purple-600 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300">Edit</button>
-                                    <button wire:click="toggleProgramStatus({{ $program->id }})"
-                                            class="text-{{ $program->active ? 'yellow' : 'green' }}-600 dark:text-{{ $program->active ? 'yellow' : 'green' }}-400 hover:text-{{ $program->active ? 'yellow' : 'green' }}-900 dark:hover:text-{{ $program->active ? 'yellow' : 'green' }}-300">
-                                        {{ $program->active ? 'Deactivate' : 'Activate' }}
-                                    </button>
-                                    <button wire:click="deleteProgram({{ $program->id }})" 
-                                            onclick="return confirm('Are you sure you want to delete this program?')"
-                                            class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">Delete</button>
+                                    @if($this->can('programs.edit'))
+                                        <button wire:click="showEditProgram({{ $program->id }})" 
+                                                class="text-purple-600 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300">Edit</button>
+                                        <button wire:click="toggleProgramStatus({{ $program->id }})"
+                                                class="text-{{ $program->active ? 'yellow' : 'green' }}-600 dark:text-{{ $program->active ? 'yellow' : 'green' }}-400 hover:text-{{ $program->active ? 'yellow' : 'green' }}-900 dark:hover:text-{{ $program->active ? 'yellow' : 'green' }}-300">
+                                            {{ $program->active ? 'Deactivate' : 'Activate' }}
+                                        </button>
+                                    @endif
+                                    @if($this->can('programs.delete'))
+                                        <button wire:click="deleteProgram({{ $program->id }})" 
+                                                onclick="return confirm('Are you sure you want to delete this program?')"
+                                                class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">Delete</button>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

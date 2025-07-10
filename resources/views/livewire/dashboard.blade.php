@@ -1,4 +1,4 @@
-<div class="max-w-7xl mx-auto p-6 space-y-6">
+<div class="max-w-7xl mx-auto p-6 space-y-6" wire:poll.30s="refreshMetrics">
     {{-- Welcome Header --}}
     <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-lg shadow-xl p-6">
         <div class="flex items-center justify-between">
@@ -85,44 +85,50 @@
         <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl p-6">
             <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Quick Actions</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <a href="{{ route('participant.intake') }}" 
-                   class="group bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg p-6 text-center transition-all duration-300 transform hover:scale-105 shadow-lg">
-                    <div class="flex flex-col items-center">
-                        <div class="p-3 bg-white bg-opacity-20 rounded-full mb-4 group-hover:bg-opacity-30 transition-all">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
-                            </svg>
+                @if($this->can('participants.create'))
+                    <a href="{{ route('participant.intake') }}" 
+                       class="group bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg p-6 text-center transition-all duration-300 transform hover:scale-105 shadow-lg">
+                        <div class="flex flex-col items-center">
+                            <div class="p-3 bg-white bg-opacity-20 rounded-full mb-4 group-hover:bg-opacity-30 transition-all">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-lg mb-2">New Participant</h3>
+                            <p class="text-blue-100 text-sm">Register & enroll new participants</p>
                         </div>
-                        <h3 class="font-semibold text-lg mb-2">New Participant</h3>
-                        <p class="text-blue-100 text-sm">Register & enroll new participants</p>
-                    </div>
-                </a>
+                    </a>
+                @endif
 
-                <a href="{{ route('service.management') }}" 
-                   class="group bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg p-6 text-center transition-all duration-300 transform hover:scale-105 shadow-lg">
-                    <div class="flex flex-col items-center">
-                        <div class="p-3 bg-white bg-opacity-20 rounded-full mb-4 group-hover:bg-opacity-30 transition-all">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
-                            </svg>
+                @if($this->can('services.view'))
+                    <a href="{{ route('service.management') }}" 
+                       class="group bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg p-6 text-center transition-all duration-300 transform hover:scale-105 shadow-lg">
+                        <div class="flex flex-col items-center">
+                            <div class="p-3 bg-white bg-opacity-20 rounded-full mb-4 group-hover:bg-opacity-30 transition-all">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-lg mb-2">Manage Services</h3>
+                            <p class="text-green-100 text-sm">Create & track program services</p>
                         </div>
-                        <h3 class="font-semibold text-lg mb-2">Manage Services</h3>
-                        <p class="text-green-100 text-sm">Create & track program services</p>
-                    </div>
-                </a>
+                    </a>
+                @endif
 
-                <a href="{{ route('work-plan.management') }}" 
-                   class="group bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-lg p-6 text-center transition-all duration-300 transform hover:scale-105 shadow-lg">
-                    <div class="flex flex-col items-center">
-                        <div class="p-3 bg-white bg-opacity-20 rounded-full mb-4 group-hover:bg-opacity-30 transition-all">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v6a2 2 0 002 2h2m0-8v8m0-8h6m-6 0V3m6 4v6a2 2 0 01-2 2h-2m0-8V3"></path>
-                            </svg>
+                @if($this->can('work_plans.view'))
+                    <a href="{{ route('work-plan.management') }}" 
+                       class="group bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-lg p-6 text-center transition-all duration-300 transform hover:scale-105 shadow-lg">
+                        <div class="flex flex-col items-center">
+                            <div class="p-3 bg-white bg-opacity-20 rounded-full mb-4 group-hover:bg-opacity-30 transition-all">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v6a2 2 0 002 2h2m0-8v8m0-8h6m-6 0V3m6 4v6a2 2 0 01-2 2h-2m0-8V3"></path>
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-lg mb-2">Work Plans</h3>
+                            <p class="text-purple-100 text-sm">Create & manage work plans</p>
                         </div>
-                        <h3 class="font-semibold text-lg mb-2">Work Plans</h3>
-                        <p class="text-purple-100 text-sm">Create & manage work plans</p>
-                    </div>
-                </a>
+                    </a>
+                @endif
 
                 <a href="{{ route('enrollment.management') }}" 
                    class="group bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg p-6 text-center transition-all duration-300 transform hover:scale-105 shadow-lg">
@@ -142,44 +148,50 @@
         <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl p-6">
             <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Participant Actions</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <a href="{{ route('participant.intake') }}" 
-                   class="group bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg p-6 text-center transition-all duration-300 transform hover:scale-105 shadow-lg">
-                    <div class="flex flex-col items-center">
-                        <div class="p-3 bg-white bg-opacity-20 rounded-full mb-4">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
-                            </svg>
+                @if($this->can('participants.create'))
+                    <a href="{{ route('participant.intake') }}" 
+                       class="group bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg p-6 text-center transition-all duration-300 transform hover:scale-105 shadow-lg">
+                        <div class="flex flex-col items-center">
+                            <div class="p-3 bg-white bg-opacity-20 rounded-full mb-4">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-lg mb-2">New Participant</h3>
+                            <p class="text-green-100 text-sm">Register new participant</p>
                         </div>
-                        <h3 class="font-semibold text-lg mb-2">New Participant</h3>
-                        <p class="text-green-100 text-sm">Register new participant</p>
-                    </div>
-                </a>
+                    </a>
+                @endif
 
-                <a href="{{ route('enrollment.management') }}" 
-                   class="group bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg p-6 text-center transition-all duration-300 transform hover:scale-105 shadow-lg">
-                    <div class="flex flex-col items-center">
-                        <div class="p-3 bg-white bg-opacity-20 rounded-full mb-4">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                            </svg>
+                @if($this->can('enrollments.view'))
+                    <a href="{{ route('enrollment.management') }}" 
+                       class="group bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg p-6 text-center transition-all duration-300 transform hover:scale-105 shadow-lg">
+                        <div class="flex flex-col items-center">
+                            <div class="p-3 bg-white bg-opacity-20 rounded-full mb-4">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-lg mb-2">Enroll Participant</h3>
+                            <p class="text-blue-100 text-sm">Manage program enrollments</p>
                         </div>
-                        <h3 class="font-semibold text-lg mb-2">Enroll Participant</h3>
-                        <p class="text-blue-100 text-sm">Manage program enrollments</p>
-                    </div>
-                </a>
+                    </a>
+                @endif
 
-                <a href="{{ route('participant.management') }}" 
-                   class="group bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-lg p-6 text-center transition-all duration-300 transform hover:scale-105 shadow-lg">
-                    <div class="flex flex-col items-center">
-                        <div class="p-3 bg-white bg-opacity-20 rounded-full mb-4">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100-4m0 4v2m0-6V4"></path>
-                            </svg>
+                @if($this->can('participants.view'))
+                    <a href="{{ route('participant.management') }}" 
+                       class="group bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-lg p-6 text-center transition-all duration-300 transform hover:scale-105 shadow-lg">
+                        <div class="flex flex-col items-center">
+                            <div class="p-3 bg-white bg-opacity-20 rounded-full mb-4">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100-4m0 4v2m0-6V4"></path>
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-lg mb-2">Manage Participants</h3>
+                            <p class="text-purple-100 text-sm">View & edit participants</p>
                         </div>
-                        <h3 class="font-semibold text-lg mb-2">Manage Participants</h3>
-                        <p class="text-purple-100 text-sm">View & edit participants</p>
-                    </div>
-                </a>
+                    </a>
+                @endif
 
                 <a href="#" 
                    class="group bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg p-6 text-center transition-all duration-300 transform hover:scale-105 shadow-lg">
@@ -199,44 +211,50 @@
         <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl p-6">
             <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Work Plan Actions</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <a href="{{ route('work-plan.management') }}" 
-                   class="group bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-lg p-6 text-center transition-all duration-300 transform hover:scale-105 shadow-lg">
-                    <div class="flex flex-col items-center">
-                        <div class="p-3 bg-white bg-opacity-20 rounded-full mb-4">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
+                @if($this->can('work_plans.create'))
+                    <a href="{{ route('work-plan.management') }}" 
+                       class="group bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-lg p-6 text-center transition-all duration-300 transform hover:scale-105 shadow-lg">
+                        <div class="flex flex-col items-center">
+                            <div class="p-3 bg-white bg-opacity-20 rounded-full mb-4">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-lg mb-2">New Work Plan</h3>
+                            <p class="text-purple-100 text-sm">Create new work plan</p>
                         </div>
-                        <h3 class="font-semibold text-lg mb-2">New Work Plan</h3>
-                        <p class="text-purple-100 text-sm">Create new work plan</p>
-                    </div>
-                </a>
+                    </a>
+                @endif
 
-                <a href="{{ route('work-plan-goal.management') }}" 
-                   class="group bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg p-6 text-center transition-all duration-300 transform hover:scale-105 shadow-lg">
-                    <div class="flex flex-col items-center">
-                        <div class="p-3 bg-white bg-opacity-20 rounded-full mb-4">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
-                            </svg>
+                @if($this->can('work_plan_goals.view'))
+                    <a href="{{ route('work-plan-goal.management') }}" 
+                       class="group bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg p-6 text-center transition-all duration-300 transform hover:scale-105 shadow-lg">
+                        <div class="flex flex-col items-center">
+                            <div class="p-3 bg-white bg-opacity-20 rounded-full mb-4">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-lg mb-2">Manage Goals</h3>
+                            <p class="text-green-100 text-sm">Track work plan goals</p>
                         </div>
-                        <h3 class="font-semibold text-lg mb-2">Manage Goals</h3>
-                        <p class="text-green-100 text-sm">Track work plan goals</p>
-                    </div>
-                </a>
+                    </a>
+                @endif
 
-                <a href="{{ route('service.management') }}" 
-                   class="group bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg p-6 text-center transition-all duration-300 transform hover:scale-105 shadow-lg">
-                    <div class="flex flex-col items-center">
-                        <div class="p-3 bg-white bg-opacity-20 rounded-full mb-4">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                            </svg>
+                @if($this->can('services.view'))
+                    <a href="{{ route('service.management') }}" 
+                       class="group bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg p-6 text-center transition-all duration-300 transform hover:scale-105 shadow-lg">
+                        <div class="flex flex-col items-center">
+                            <div class="p-3 bg-white bg-opacity-20 rounded-full mb-4">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-lg mb-2">Services & Goals</h3>
+                            <p class="text-blue-100 text-sm">Connect services to goals</p>
                         </div>
-                        <h3 class="font-semibold text-lg mb-2">Services & Goals</h3>
-                        <p class="text-blue-100 text-sm">Connect services to goals</p>
-                    </div>
-                </a>
+                    </a>
+                @endif
 
                 <a href="#" 
                    class="group bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg p-6 text-center transition-all duration-300 transform hover:scale-105 shadow-lg">
@@ -280,18 +298,20 @@
                     </div>
                 </button>
 
-                <a href="{{ route('contract.management') }}" 
-                   class="group bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-lg p-6 text-center transition-all duration-300 transform hover:scale-105 shadow-lg">
-                    <div class="flex flex-col items-center">
-                        <div class="p-3 bg-white bg-opacity-20 rounded-full mb-4">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
+                @if($this->can('contracts.view'))
+                    <a href="{{ route('contract.management') }}" 
+                       class="group bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-lg p-6 text-center transition-all duration-300 transform hover:scale-105 shadow-lg">
+                        <div class="flex flex-col items-center">
+                            <div class="p-3 bg-white bg-opacity-20 rounded-full mb-4">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-lg mb-2">Manage Deadlines</h3>
+                            <p class="text-purple-100 text-sm">Contract deadlines</p>
                         </div>
-                        <h3 class="font-semibold text-lg mb-2">Manage Deadlines</h3>
-                        <p class="text-purple-100 text-sm">Contract deadlines</p>
-                    </div>
-                </a>
+                    </a>
+                @endif
 
                 <button class="group bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg p-6 text-center transition-all duration-300 transform hover:scale-105 shadow-lg">
                     <div class="flex flex-col items-center">
@@ -749,42 +769,44 @@
         {{-- Schedule Tab Content --}}
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {{-- Upcoming Deadlines --}}
-            <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl p-6">
-                <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Upcoming Contract Deadlines</h2>
-                
-                @if($tabData['upcomingDeadlines']->count() > 0)
-                    <div class="space-y-4">
-                        @foreach($tabData['upcomingDeadlines'] as $contract)
-                            @php
-                                $daysUntil = now()->diffInDays($contract->end_date, false);
-                                $urgencyClass = $daysUntil <= 7 ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : ($daysUntil <= 30 ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20' : 'border-blue-500 bg-blue-50 dark:bg-blue-900/20');
-                            @endphp
-                            <div class="border-l-4 {{ $urgencyClass }} p-4 rounded-r-lg">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <h3 class="font-semibold text-gray-900 dark:text-white">{{ $contract->title }}</h3>
-                                        <p class="text-sm text-gray-600 dark:text-gray-300">{{ $contract->program->name }}</p>
-                                    </div>
-                                    <div class="text-right">
-                                        <div class="text-sm font-medium {{ $daysUntil <= 7 ? 'text-red-600' : ($daysUntil <= 30 ? 'text-yellow-600' : 'text-blue-600') }}">
-                                            {{ $daysUntil > 0 ? $daysUntil . ' days' : 'Overdue' }}
+            @if($this->can('contracts.view'))
+                <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl p-6">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Upcoming Contract Deadlines</h2>
+                    
+                    @if($tabData['upcomingDeadlines']->count() > 0)
+                        <div class="space-y-4">
+                            @foreach($tabData['upcomingDeadlines'] as $contract)
+                                @php
+                                    $daysUntil = now()->diffInDays($contract->end_date, false);
+                                    $urgencyClass = $daysUntil <= 7 ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : ($daysUntil <= 30 ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20' : 'border-blue-500 bg-blue-50 dark:bg-blue-900/20');
+                                @endphp
+                                <div class="border-l-4 {{ $urgencyClass }} p-4 rounded-r-lg">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h3 class="font-semibold text-gray-900 dark:text-white">{{ $contract->title }}</h3>
+                                            <p class="text-sm text-gray-600 dark:text-gray-300">{{ $contract->program->name }}</p>
                                         </div>
-                                        <div class="text-xs text-gray-500">{{ $contract->end_date->format('M d, Y') }}</div>
+                                        <div class="text-right">
+                                            <div class="text-sm font-medium {{ $daysUntil <= 7 ? 'text-red-600' : ($daysUntil <= 30 ? 'text-yellow-600' : 'text-blue-600') }}">
+                                                {{ $daysUntil > 0 ? $daysUntil . ' days' : 'Overdue' }}
+                                            </div>
+                                            <div class="text-xs text-gray-500">{{ $contract->end_date->format('M d, Y') }}</div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="text-center py-8">
-                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No upcoming deadlines</h3>
-                        <p class="mt-1 text-sm text-gray-500">All contracts are up to date.</p>
-                    </div>
-                @endif
-            </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="text-center py-8">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No upcoming deadlines</h3>
+                            <p class="mt-1 text-sm text-gray-500">All contracts are up to date.</p>
+                        </div>
+                    @endif
+                </div>
+            @endif
 
             {{-- Custom Reminders --}}
             <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl p-6">

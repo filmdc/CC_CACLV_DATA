@@ -4,12 +4,13 @@ namespace App\Livewire;
 
 use App\Models\Service;
 use App\Models\Program;
+use App\Traits\WithPermissionChecks;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class ServiceManagement extends Component
 {
-    use WithPagination;
+    use WithPagination, WithPermissionChecks;
 
     public $search = '';
     public $selectedService = null;

@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\PotentialDuplicate;
 use App\Models\Participant;
 use App\Services\DuplicateDetectionService;
+use App\Traits\WithPermissionChecks;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Auth;
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\Log;
 
 class DuplicateResolutionManagement extends Component
 {
-    use WithPagination;
+    use WithPagination, WithPermissionChecks;
 
     // UI State
     public $showDetailModal = false;

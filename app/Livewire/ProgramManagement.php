@@ -4,12 +4,13 @@ namespace App\Livewire;
 
 use App\Models\Program;
 use App\Models\User;
+use App\Traits\WithPermissionChecks;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class ProgramManagement extends Component
 {
-    use WithPagination;
+    use WithPagination, WithPermissionChecks;
 
     public $search = '';
     public $selectedProgram = null;

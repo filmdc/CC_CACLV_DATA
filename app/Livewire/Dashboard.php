@@ -10,18 +10,42 @@ use App\Models\WorkPlanGoal;
 use App\Models\Service;
 use App\Models\ProgramEnrollment;
 use App\Models\Contract;
+use App\Traits\WithPermissionChecks;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 
 class Dashboard extends Component
 {
+    use WithPermissionChecks;
+    
     public $activeTab = 'programs';
     public $expandedWorkPlans = false;
+    
+    // Protected listeners for real-time updates
+    protected $listeners = [
+        'refreshDashboard' => '$refresh',
+        'participantUpdated' => 'refreshMetrics',
+        'enrollmentUpdated' => 'refreshMetrics',
+        'workPlanUpdated' => 'refreshMetrics',
+        'programUpdated' => 'refreshMetrics'
+    ];
 
     public function setActiveTab($tab)
     {
         $this->activeTab = $tab;
         $this->expandedWorkPlans = false; // Reset expanded state when switching tabs
+        $this->refreshMetrics(); // Refresh data when switching tabs
+    }
+    
+    public function refreshMetrics()
+    {
+        // Force component refresh to recalculate metrics
+        $this->dispatch('$refresh');
+    }
+    
+    public function mount()
+    {
+        // No specific authorization needed for dashboard - handled per section
     }
 
     public function toggleExpandedWorkPlans()
@@ -52,15 +76,10 @@ class Dashboard extends Component
         // Get user's assigned programs
         $userPrograms = $user->programs()->with(['services', 'programEnrollments.participant', 'workPlans'])->get();
         
-        // Calculate metrics for user's programs
+        // Calculate metrics for user's programs - always fresh from database
         $userProgramIds = $userPrograms->pluck('id')->toArray();
         
-        $metrics = [
-            'my_programs' => $userPrograms->count(),
-            'my_participants' => ProgramEnrollment::whereIn('program_id', $userProgramIds)->active()->count(),
-            'my_work_plans' => WorkPlan::whereIn('program_id', $userProgramIds)->where('active', true)->count(),
-            'my_services' => Service::whereIn('program_id', $userProgramIds)->where('active', true)->count(),
-        ];
+        $metrics = $this->calculateMetrics($userProgramIds);
 
         // Recent activity - participants the user has worked with
         $recentParticipants = Participant::with(['household', 'programEnrollments.program'])
@@ -115,6 +134,16 @@ class Dashboard extends Component
         ])->layout('components.layouts.app');
     }
 
+    private function calculateMetrics($userProgramIds)
+    {
+        return [
+            'my_programs' => count($userProgramIds),
+            'my_participants' => ProgramEnrollment::whereIn('program_id', $userProgramIds)->active()->count(),
+            'my_work_plans' => WorkPlan::whereIn('program_id', $userProgramIds)->where('active', true)->count(),
+            'my_services' => Service::whereIn('program_id', $userProgramIds)->where('active', true)->count(),
+        ];
+    }
+    
     private function getTabData($userProgramIds)
     {
         switch ($this->activeTab) {

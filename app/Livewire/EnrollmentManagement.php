@@ -7,13 +7,14 @@ use App\Models\ServiceEnrollment;
 use App\Models\Participant;
 use App\Models\Program;
 use App\Models\Service;
+use App\Traits\WithPermissionChecks;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
 
 class EnrollmentManagement extends Component
 {
-    use WithPagination;
+    use WithPagination, WithPermissionChecks;
 
     public $search = '';
     public $statusFilter = '';

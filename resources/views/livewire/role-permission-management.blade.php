@@ -34,9 +34,13 @@
                     <input wire:model.live="search" placeholder="Search {{ $activeTab }}..." class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500" />
                 </div>
                 @if($activeTab === 'roles')
-                    <button wire:click="showCreateRole" class="ml-4 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500">Create Role</button>
+                    @if($this->can('roles.create'))
+                        <button wire:click="showCreateRole" class="ml-4 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500">Create Role</button>
+                    @endif
                 @else
-                    <button wire:click="showCreatePermission" class="ml-4 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500">Create Permission</button>
+                    @if($this->can('permissions.create'))
+                        <button wire:click="showCreatePermission" class="ml-4 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500">Create Permission</button>
+                    @endif
                 @endif
             </div>
         </div>
@@ -230,16 +234,20 @@
                                         <button wire:click="viewRole({{ $role->id }})" class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300">
                                             View
                                         </button>
-                                        <button wire:click="showEditRole({{ $role->id }})" class="text-purple-600 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300">
-                                            Edit
-                                        </button>
-                                        <button 
-                                            wire:click="deleteRole({{ $role->id }})"
-                                            onclick="return confirm('Are you sure you want to delete this role?')"
-                                            class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
-                                        >
-                                            Delete
-                                        </button>
+                                        @if($this->can('roles.edit'))
+                                            <button wire:click="showEditRole({{ $role->id }})" class="text-purple-600 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300">
+                                                Edit
+                                            </button>
+                                        @endif
+                                        @if($this->can('roles.delete'))
+                                            <button 
+                                                wire:click="deleteRole({{ $role->id }})"
+                                                onclick="return confirm('Are you sure you want to delete this role?')"
+                                                class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                                            >
+                                                Delete
+                                            </button>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
@@ -304,16 +312,20 @@
                                         <button wire:click="viewPermission({{ $permission->id }})" class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300">
                                             View
                                         </button>
-                                        <button wire:click="showEditPermission({{ $permission->id }})" class="text-purple-600 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300">
-                                            Edit
-                                        </button>
-                                        <button 
-                                            wire:click="deletePermission({{ $permission->id }})"
-                                            onclick="return confirm('Are you sure you want to delete this permission?')"
-                                            class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
-                                        >
-                                            Delete
-                                        </button>
+                                        @if($this->can('permissions.edit'))
+                                            <button wire:click="showEditPermission({{ $permission->id }})" class="text-purple-600 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300">
+                                                Edit
+                                            </button>
+                                        @endif
+                                        @if($this->can('permissions.delete'))
+                                            <button 
+                                                wire:click="deletePermission({{ $permission->id }})"
+                                                onclick="return confirm('Are you sure you want to delete this permission?')"
+                                                class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                                            >
+                                                Delete
+                                            </button>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

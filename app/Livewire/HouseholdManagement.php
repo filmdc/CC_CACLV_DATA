@@ -4,12 +4,13 @@ namespace App\Livewire;
 
 use App\Models\Household;
 use App\Models\Participant;
+use App\Traits\WithPermissionChecks;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class HouseholdManagement extends Component
 {
-    use WithPagination;
+    use WithPagination, WithPermissionChecks;
 
     public $search = '';
     public $selectedHousehold = null;

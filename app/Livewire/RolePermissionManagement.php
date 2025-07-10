@@ -5,12 +5,13 @@ namespace App\Livewire;
 use App\Models\Role;
 use App\Models\Permission;
 use App\Models\User;
+use App\Traits\WithPermissionChecks;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class RolePermissionManagement extends Component
 {
-    use WithPagination;
+    use WithPagination, WithPermissionChecks;
 
     public $activeTab = 'roles';
     public $search = '';

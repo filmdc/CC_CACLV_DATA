@@ -14,10 +14,12 @@
                     <input type="text" wire:model.live="search" placeholder="Search services or programs..." 
                            class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500">
                 </div>
-                <button wire:click="showCreateService" 
-                        class="ml-4 px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500">
-                    Create New Service
-                </button>
+                @if($this->can('services.create'))
+                    <button wire:click="showCreateService" 
+                            class="ml-4 px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        Create New Service
+                    </button>
+                @endif
             </div>
         </div>
         @endif
@@ -249,19 +251,23 @@
                                     </div>
                                 </div>
                                 <div class="flex items-center space-x-2">
-                                    <button wire:click="showEditService({{ $service->id }})" 
-                                            class="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200">
-                                        Edit
-                                    </button>
-                                    <button wire:click="toggleServiceStatus({{ $service->id }})" 
-                                            class="px-3 py-1 text-sm rounded {{ $service->active ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200' }}">
-                                        {{ $service->active ? 'Deactivate' : 'Activate' }}
-                                    </button>
-                                    <button wire:click="deleteService({{ $service->id }})" 
-                                            wire:confirm="Are you sure you want to delete this service?"
-                                            class="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200">
-                                        Delete
-                                    </button>
+                                    @if($this->can('services.edit'))
+                                        <button wire:click="showEditService({{ $service->id }})" 
+                                                class="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200">
+                                            Edit
+                                        </button>
+                                        <button wire:click="toggleServiceStatus({{ $service->id }})" 
+                                                class="px-3 py-1 text-sm rounded {{ $service->active ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200' }}">
+                                            {{ $service->active ? 'Deactivate' : 'Activate' }}
+                                        </button>
+                                    @endif
+                                    @if($this->can('services.delete'))
+                                        <button wire:click="deleteService({{ $service->id }})" 
+                                                wire:confirm="Are you sure you want to delete this service?"
+                                                class="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200">
+                                            Delete
+                                        </button>
+                                    @endif
                                 </div>
                             </div>
                         </li>

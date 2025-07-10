@@ -56,9 +56,11 @@
                 
                 <div class="flex gap-2">
                     @if($selectedDataSet && $selectedDataSet->is_draft)
-                        <button wire:click="showCreateItem" class="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 whitespace-nowrap">
-                            Add Reference Data
-                        </button>
+                        @if($this->can('reference_data.create'))
+                            <button wire:click="showCreateItem" class="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 whitespace-nowrap">
+                                Add Reference Data
+                            </button>
+                        @endif
                     @elseif($selectedDataSet && !$selectedDataSet->is_draft)
                         <button wire:click="createEditableVersionOfCurrentSet" 
                                 onclick="return confirm('This will create a new editable draft version of this data set. Continue?')"
@@ -197,19 +199,23 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex gap-2">
                                     @if($selectedDataSet && $selectedDataSet->is_draft)
-                                        <button wire:click="showEditItem({{ $item->id }})" class="text-teal-600 dark:text-teal-400 hover:text-teal-900 dark:hover:text-teal-300">
-                                            Edit
-                                        </button>
-                                        <button wire:click="toggleStatus({{ $item->id }})" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
-                                            {{ $item->active ? 'Deactivate' : 'Activate' }}
-                                        </button>
-                                        <button 
-                                            wire:click="deleteItem({{ $item->id }})"
-                                            onclick="return confirm('Are you sure you want to delete this reference data item?')"
-                                            class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
-                                        >
-                                            Delete
-                                        </button>
+                                        @if($this->can('reference_data.edit'))
+                                            <button wire:click="showEditItem({{ $item->id }})" class="text-teal-600 dark:text-teal-400 hover:text-teal-900 dark:hover:text-teal-300">
+                                                Edit
+                                            </button>
+                                            <button wire:click="toggleStatus({{ $item->id }})" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
+                                                {{ $item->active ? 'Deactivate' : 'Activate' }}
+                                            </button>
+                                        @endif
+                                        @if($this->can('reference_data.delete'))
+                                            <button 
+                                                wire:click="deleteItem({{ $item->id }})"
+                                                onclick="return confirm('Are you sure you want to delete this reference data item?')"
+                                                class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                                            >
+                                                Delete
+                                            </button>
+                                        @endif
                                     @else
                                         <span class="text-gray-400 dark:text-gray-500 text-xs">View Only</span>
                                     @endif

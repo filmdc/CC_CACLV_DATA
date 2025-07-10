@@ -36,7 +36,9 @@
         </div>
 
             <div class="flex-1"></div>
-            <button wire:click="showCreateGuideline" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 whitespace-nowrap">Add Guideline</button>
+            @if($this->can('poverty_guidelines.create'))
+                <button wire:click="showCreateGuideline" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 whitespace-nowrap">Add Guideline</button>
+            @endif
         </div>
     </div>
 
@@ -207,16 +209,20 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${{ number_format($guideline->poverty_200 ?? 0, 0) }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 <div class="flex gap-2">
-                                    <button wire:click="showEditGuideline({{ $guideline->id }})" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
-                                        Edit
-                                    </button>
-                                    <button 
-                                        wire:click="deleteGuideline({{ $guideline->id }})"
-                                        onclick="return confirm('Are you sure you want to delete this guideline?')"
-                                        class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
-                                    >
-                                        Delete
-                                    </button>
+                                    @if($this->can('poverty_guidelines.edit'))
+                                        <button wire:click="showEditGuideline({{ $guideline->id }})" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
+                                            Edit
+                                        </button>
+                                    @endif
+                                    @if($this->can('poverty_guidelines.delete'))
+                                        <button 
+                                            wire:click="deleteGuideline({{ $guideline->id }})"
+                                            onclick="return confirm('Are you sure you want to delete this guideline?')"
+                                            class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                                        >
+                                            Delete
+                                        </button>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
