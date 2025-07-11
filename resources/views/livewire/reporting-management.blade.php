@@ -410,7 +410,17 @@
 
                     @if($activeTab === 'visualizations')
                         <!-- Visualizations Content -->
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="chartContainer">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="chartContainer" wire:ignore
+                             x-data="{ mounted: false }"
+                             x-init="
+                                 mounted = true;
+                                 $nextTick(() => {
+                                     console.log('Alpine: Visualizations tab mounted');
+                                     if (typeof initializeCharts === 'function') {
+                                         initializeCharts();
+                                     }
+                                 });
+                             ">
                             <!-- Gender Distribution Chart -->
                             <div class="bg-gray-50 dark:bg-zinc-700 rounded-lg p-4">
                                 <h5 class="font-medium text-gray-900 dark:text-white mb-3">Gender Distribution</h5>
@@ -592,14 +602,21 @@
 <!-- Always load chart script -->
 <script>
 console.log('CSBG page loaded, reportData exists:', @js(!!$reportData));
+
+// Store the active tab and report data state
+window.csbgReportState = {
+    activeTab: @js($activeTab),
+    hasReportData: @js(!!$reportData),
+    chartsInitialized: false
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('CSBG Chart script loaded');
     console.log('Chart.js available:', typeof Chart !== 'undefined');
-    console.log('Window object:', typeof window !== 'undefined');
     
     // Initialize immediately if on visualizations tab
-    if (document.querySelector('#chartContainer')) {
-        console.log('Chart container found on load - initializing');
+    if (window.csbgReportState.activeTab === 'visualizations' && window.csbgReportState.hasReportData) {
+        console.log('Starting on visualizations tab - initializing charts');
         setTimeout(() => initializeCharts(), 100);
     }
 });
@@ -609,34 +626,27 @@ document.addEventListener('livewire:init', () => {
     console.log('Livewire initialized');
     
     Livewire.on('initializeCharts', (reportData) => {
-        console.log('Received initializeCharts event with data:', reportData);
-        // Use requestAnimationFrame to wait for browser to finish rendering
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                // Double RAF ensures we wait for the next paint
-                if (document.querySelector('#chartContainer')) {
-                    console.log('Chart container ready, initializing charts');
-                    initializeCharts(reportData[0]);
-                } else {
-                    // If container still not found, try again after a delay
-                    setTimeout(() => {
-                        if (document.querySelector('#chartContainer')) {
-                            initializeCharts(reportData[0]);
-                        }
-                    }, 500);
-                }
-            });
+        console.log('Received initializeCharts event');
+        window.csbgReportState.chartsInitialized = false;
+        
+        // Wait for next tick to ensure DOM is updated
+        Livewire.hook('morph.updated', ({ el, component }) => {
+            if (el.id === 'chartContainer' && !window.csbgReportState.chartsInitialized) {
+                console.log('Chart container morphed, initializing charts');
+                window.csbgReportState.chartsInitialized = true;
+                setTimeout(() => initializeCharts(reportData[0]), 50);
+            }
         });
+        
+        // Fallback initialization
+        setTimeout(() => {
+            if (document.querySelector('#chartContainer') && !window.csbgReportState.chartsInitialized) {
+                console.log('Fallback chart initialization');
+                window.csbgReportState.chartsInitialized = true;
+                initializeCharts(reportData[0]);
+            }
+        }, 300);
     });
-});
-
-// Listen for DOM updates
-document.addEventListener('livewire:updated', () => {
-    console.log('Livewire updated');
-    if (document.querySelector('#chartContainer')) {
-        console.log('Chart container found after update');
-        setTimeout(() => initializeCharts(), 100);
-    }
 });
 
 // Global chart instances to avoid memory leaks

@@ -18,7 +18,7 @@ class ReportingManagement extends Component
     public $end_date = '';
     public $program_id = '';
     public $reference_data_set_id = '';
-    public $heads_of_household_only = true;
+    public $heads_of_household_only = false;
     
     // Advanced filtering
     public $filter_gender = [];

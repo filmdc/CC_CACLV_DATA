@@ -63,9 +63,8 @@ class GeneralSearch extends Component
             ->where(function ($query) {
                 $query->where('first_name', 'like', '%' . $this->search . '%')
                     ->orWhere('last_name', 'like', '%' . $this->search . '%')
-                    ->orWhere('participant_number', 'like', '%' . $this->search . '%')
                     ->orWhere('email', 'like', '%' . $this->search . '%')
-                    ->orWhere('phone_number', 'like', '%' . $this->search . '%');
+                    ->orWhere('telephone', 'like', '%' . $this->search . '%');
             })
             ->orderBy('last_name')
             ->orderBy('first_name')
@@ -78,9 +77,9 @@ class GeneralSearch extends Component
         return Household::withCount('participants')
             ->where(function ($query) {
                 $query->where('household_code', 'like', '%' . $this->search . '%')
-                    ->orWhere('address_street', 'like', '%' . $this->search . '%')
-                    ->orWhere('address_city', 'like', '%' . $this->search . '%')
-                    ->orWhere('address_zip', 'like', '%' . $this->search . '%')
+                    ->orWhere('street_address', 'like', '%' . $this->search . '%')
+                    ->orWhere('city', 'like', '%' . $this->search . '%')
+                    ->orWhere('zip_code', 'like', '%' . $this->search . '%')
                     ->orWhereHas('participants', function ($q) {
                         $q->where('first_name', 'like', '%' . $this->search . '%')
                             ->orWhere('last_name', 'like', '%' . $this->search . '%');

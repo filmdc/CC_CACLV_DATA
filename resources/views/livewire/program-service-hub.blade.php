@@ -1,6 +1,49 @@
 <div class="max-w-7xl mx-auto p-6">
     <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl p-6">
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">Programs & Services</h1>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-6">Programs & Services</h1>
+        
+        <!-- Management Tools as Buttons -->
+        <div class="flex flex-wrap gap-3 mb-8">
+            @if($this->can('programs.view'))
+            <a href="{{ route('program.management') }}" wire:navigate
+               class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors font-medium">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                </svg>
+                Manage Programs
+            </a>
+            @endif
+            
+            @if($this->can('services.view'))
+            <a href="{{ route('service.management') }}" wire:navigate
+               class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors font-medium">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                </svg>
+                Manage Services
+            </a>
+            @endif
+            
+            @if($this->can('work_plans.view'))
+            <a href="{{ route('work-plan.management') }}" wire:navigate
+               class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors font-medium">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Manage Work Plans
+            </a>
+            @endif
+            
+            @if($this->can('work_plan_goals.view'))
+            <a href="{{ route('work-plan-goal.management') }}" wire:navigate
+               class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors font-medium">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                </svg>
+                Manage Goals
+            </a>
+            @endif
+        </div>
         
         <!-- Search Bar -->
         <div class="mb-6">
@@ -157,39 +200,5 @@
             @endif
         </div>
 
-        <!-- Quick Links -->
-        <div class="mt-8 pt-8 border-t border-gray-200 dark:border-zinc-600">
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Management Tools</h2>
-            <div class="flex flex-wrap gap-4">
-                @if($this->can('programs.view'))
-                <a href="{{ route('program.management') }}" wire:navigate
-                   class="inline-flex items-center px-4 py-2 bg-white dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-600">
-                    Manage Programs
-                </a>
-                @endif
-                
-                @if($this->can('services.view'))
-                <a href="{{ route('service.management') }}" wire:navigate
-                   class="inline-flex items-center px-4 py-2 bg-white dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-600">
-                    Manage Services
-                </a>
-                @endif
-                
-                @if($this->can('work_plans.view'))
-                <a href="{{ route('work-plan.management') }}" wire:navigate
-                   class="inline-flex items-center px-4 py-2 bg-white dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-600">
-                    Manage Work Plans
-                </a>
-                @endif
-                
-                @if($this->can('work_plan_goals.view'))
-                <a href="{{ route('work-plan-goal.management') }}" wire:navigate
-                   class="inline-flex items-center px-4 py-2 bg-white dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-600">
-                    Manage Goals
-                </a>
-                @endif
-                
-            </div>
-        </div>
     </div>
 </div>
