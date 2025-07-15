@@ -1,16 +1,312 @@
 <div class="max-w-7xl mx-auto p-6 space-y-6" wire:poll.30s="refreshMetrics">
-    {{-- Welcome Header --}}
-    <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-lg shadow-xl p-6">
+    {{-- User Configuration Section --}}
+    <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl p-6">
         <div class="flex items-center justify-between">
-            <div>
-                <h1 class="text-2xl font-bold">Welcome back, {{ Auth::user()->name }}!</h1>
-                <p class="text-blue-100 mt-1">Here's what's happening with your programs today</p>
+            <div class="flex items-center space-x-4">
+                <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
+                    <span class="text-white text-2xl font-bold">{{ substr($userConfig['name'], 0, 1) }}</span>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Welcome back, {{ $userConfig['name'] }}!</h1>
+                    <p class="text-gray-600 dark:text-gray-300">{{ $userConfig['email'] }}</p>
+                    <div class="flex items-center space-x-4 mt-2 text-sm">
+                        <span class="text-gray-500 dark:text-gray-400">
+                            <strong>Role{{ count($userConfig['roles']) > 1 ? 's' : '' }}:</strong> 
+                            {{ implode(', ', $userConfig['roles']) ?: 'No roles assigned' }}
+                        </span>
+                        <span class="text-gray-500 dark:text-gray-400">
+                            <strong>Programs:</strong> {{ $userConfig['programs_count'] }}
+                        </span>
+                    </div>
+                </div>
             </div>
             <div class="text-right">
-                <div class="text-3xl font-bold">{{ now()->format('M d') }}</div>
-                <div class="text-blue-200 text-sm">{{ now()->format('l, Y') }}</div>
+                <div class="text-3xl font-bold text-gray-900 dark:text-white">{{ now()->format('M d') }}</div>
+                <div class="text-gray-600 dark:text-gray-300 text-sm">{{ now()->format('l, Y') }}</div>
             </div>
         </div>
+    </div>
+
+    {{-- Date Filter Section --}}
+    <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-4">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+            <div class="flex items-center space-x-2">
+                <svg class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Date Range:</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button wire:click="setDateFilter('this_month')" 
+                        class="px-3 py-1 text-sm rounded-md {{ $dateFilter === 'this_month' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-zinc-600' }}">
+                    This Month
+                </button>
+                <button wire:click="setDateFilter('last_month')" 
+                        class="px-3 py-1 text-sm rounded-md {{ $dateFilter === 'last_month' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-zinc-600' }}">
+                    Last Month
+                </button>
+                <button wire:click="setDateFilter('this_quarter')" 
+                        class="px-3 py-1 text-sm rounded-md {{ $dateFilter === 'this_quarter' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-zinc-600' }}">
+                    This Quarter
+                </button>
+                <button wire:click="setDateFilter('this_year')" 
+                        class="px-3 py-1 text-sm rounded-md {{ $dateFilter === 'this_year' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-zinc-600' }}">
+                    This Year
+                </button>
+                <div class="flex items-center space-x-2 ml-4">
+                    <input type="date" wire:model="startDate" 
+                           class="text-sm rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white">
+                    <span class="text-gray-500">to</span>
+                    <input type="date" wire:model="endDate" 
+                           class="text-sm rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Statistics Summary --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Total Participants</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $statistics['total_participants'] }}</p>
+                </div>
+                <div class="p-3 bg-blue-100 dark:bg-blue-900 rounded-full">
+                    <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"></path>
+                    </svg>
+                </div>
+            </div>
+            @if($statistics['participant_trend'] != 0)
+            <div class="mt-2 flex items-center text-sm">
+                @if($statistics['participant_trend'] > 0)
+                    <svg class="w-4 h-4 text-green-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+                    </svg>
+                    <span class="text-green-600">{{ abs($statistics['participant_trend']) }}%</span>
+                @else
+                    <svg class="w-4 h-4 text-red-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                    </svg>
+                    <span class="text-red-600">{{ abs($statistics['participant_trend']) }}%</span>
+                @endif
+                <span class="text-gray-500 dark:text-gray-400 ml-1">from previous period</span>
+            </div>
+            @endif
+        </div>
+
+        <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Active Enrollments</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $statistics['active_enrollments'] }}</p>
+                </div>
+                <div class="p-3 bg-green-100 dark:bg-green-900 rounded-full">
+                    <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+            </div>
+            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ $statistics['new_enrollments'] }} new this period</p>
+        </div>
+
+        <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Services Delivered</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $statistics['services_delivered'] }}</p>
+                </div>
+                <div class="p-3 bg-purple-100 dark:bg-purple-900 rounded-full">
+                    <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                </div>
+            </div>
+            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">In selected period</p>
+        </div>
+
+        <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Goal Completion</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $statistics['goal_completion_rate'] }}%</p>
+                </div>
+                <div class="p-3 bg-orange-100 dark:bg-orange-900 rounded-full">
+                    <svg class="w-6 h-6 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                    </svg>
+                </div>
+            </div>
+            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Work plan goals</p>
+        </div>
+
+        <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Households Served</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $statistics['households_served'] }}</p>
+                </div>
+                <div class="p-3 bg-indigo-100 dark:bg-indigo-900 rounded-full">
+                    <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+                </div>
+            </div>
+            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">In selected period</p>
+        </div>
+
+        <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">My Programs</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $metrics['my_programs'] }}</p>
+                </div>
+                <div class="p-3 bg-teal-100 dark:bg-teal-900 rounded-full">
+                    <svg class="w-6 h-6 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                    </svg>
+                </div>
+            </div>
+            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Assigned to you</p>
+        </div>
+    </div>
+
+    {{-- Quick Actions Grid --}}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {{-- CSBG Reports Section --}}
+        <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl p-6">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+                <svg class="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                CSBG Reports
+            </h2>
+            
+            {{-- Success/Error Messages --}}
+            @if (session()->has('error'))
+                <div class="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-400 rounded">
+                    <p class="text-sm text-red-700 dark:text-red-300">{{ session('error') }}</p>
+                </div>
+            @endif
+            @if($userPrograms->count() > 0)
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Select Program</label>
+                        <select wire:model="selectedProgramForReport" 
+                                class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white">
+                            @foreach($userPrograms as $program)
+                                <option value="{{ $program->id }}">{{ $program->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Report Format</label>
+                        <div class="flex space-x-4">
+                            <label class="flex items-center">
+                                <input type="radio" wire:model="reportFormat" value="pdf" 
+                                       class="mr-2 text-blue-600 focus:ring-blue-500">
+                                <span class="text-sm text-gray-700 dark:text-gray-300">PDF</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" wire:model="reportFormat" value="excel" 
+                                       class="mr-2 text-blue-600 focus:ring-blue-500">
+                                <span class="text-sm text-gray-700 dark:text-gray-300">Excel</span>
+                            </label>
+                        </div>
+                    </div>
+                    <button wire:click="generateCsbgReport" 
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors">
+                        Generate Report
+                    </button>
+                </div>
+            @else
+                <p class="text-gray-500 dark:text-gray-400">No programs assigned. Contact your administrator.</p>
+            @endif
+        </div>
+
+        {{-- Data Import Section --}}
+        <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl p-6">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+                <svg class="w-6 h-6 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+                Quick Import
+            </h2>
+            @if($importTemplates->count() > 0)
+                <div class="space-y-3">
+                    @foreach($importTemplates->take(3) as $template)
+                        <button wire:click="startImport({{ $template->id }})" 
+                                class="w-full text-left p-3 border border-gray-200 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="font-medium text-gray-900 dark:text-white">{{ $template->name }}</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ $template->source_system }}</p>
+                                </div>
+                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </div>
+                        </button>
+                    @endforeach
+                    @if($importTemplates->count() > 3)
+                        <a href="{{ route('participant.import-export') }}" 
+                           class="block text-center text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                            View all import options →
+                        </a>
+                    @endif
+                </div>
+            @else
+                <p class="text-gray-500 dark:text-gray-400">No import templates available.</p>
+            @endif
+        </div>
+    </div>
+
+    {{-- Recent Activity Section --}}
+    <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl p-6">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+            <svg class="w-6 h-6 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Recent Activity in Your Programs
+        </h2>
+        @if($recentActivity->count() > 0)
+            <div class="space-y-3 max-h-96 overflow-y-auto">
+                @foreach($recentActivity as $activity)
+                    <div class="flex items-start space-x-3 p-3 hover:bg-gray-50 dark:hover:bg-zinc-700 rounded-lg transition-colors">
+                        <div class="flex-shrink-0">
+                            @if($activity['type'] == 'enrollment')
+                                <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                                    </svg>
+                                </div>
+                            @elseif($activity['type'] == 'service_enrollment')
+                                <div class="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                            @else
+                                <div class="w-8 h-8 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                                    </svg>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm text-gray-900 dark:text-white">{{ $activity['description'] }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                {{ $activity['timestamp']->diffForHumans() }}
+                            </p>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <p class="text-gray-500 dark:text-gray-400">No recent activity in the selected period.</p>
+        @endif
     </div>
 
     {{-- Interactive Metric Cards (Tabs) --}}

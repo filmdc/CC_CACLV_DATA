@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\User;
 use App\Models\Role;
+use App\Models\Program;
 use App\Traits\WithPermissionChecks;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -20,17 +21,25 @@ class UserManagement extends Component
     public $showEditForm = false;
     public $showPasswordForm = false;
     public $showViewModal = false;
+    public $showBulkAssignModal = false;
     
     // User form fields
     public $name = '';
     public $email = '';
     public $active = true;
     public $selectedRoles = [];
+    public $selectedPrograms = [];
     
     // Password form fields
     public $password = '';
     public $password_confirmation = '';
     public $send_password_reset = false;
+    
+    // Bulk assignment fields
+    public $selectedUsers = [];
+    public $bulkRoles = [];
+    public $bulkPrograms = [];
+    public $bulkAction = 'add'; // add or replace
 
     protected $rules = [
         'name' => 'required|string|max:255',
@@ -68,6 +77,7 @@ class UserManagement extends Component
             $this->email = $this->selectedUser->email;
             $this->active = $this->selectedUser->active;
             $this->selectedRoles = $this->selectedUser->roles->pluck('id')->toArray();
+            $this->selectedPrograms = $this->selectedUser->programs->pluck('id')->toArray();
         }
     }
     
@@ -95,6 +105,9 @@ class UserManagement extends Component
 
             // Update roles
             $this->selectedUser->roles()->sync($this->selectedRoles);
+            
+            // Update programs
+            $this->selectedUser->programs()->sync($this->selectedPrograms);
 
             session()->flash('success', 'User updated successfully.');
             $this->resetForm();
@@ -179,16 +192,80 @@ class UserManagement extends Component
         $this->email = '';
         $this->active = true;
         $this->selectedRoles = [];
+        $this->selectedPrograms = [];
         $this->showEditForm = false;
         $this->showViewModal = false;
         $this->selectedUser = null;
         $this->resetPasswordForm();
     }
     
+    public function showBulkAssign()
+    {
+        $this->authorizeAction('users.edit', 'You do not have permission to edit users.');
+        
+        if (empty($this->selectedUsers)) {
+            session()->flash('error', 'Please select at least one user.');
+            return;
+        }
+        
+        $this->bulkRoles = [];
+        $this->bulkPrograms = [];
+        $this->bulkAction = 'add';
+        $this->showBulkAssignModal = true;
+    }
+    
+    public function processBulkAssignment()
+    {
+        $this->authorizeAction('users.edit', 'You do not have permission to edit users.');
+        
+        try {
+            $users = User::whereIn('id', $this->selectedUsers)->get();
+            
+            foreach ($users as $user) {
+                if ($this->bulkAction === 'replace') {
+                    // Replace existing roles and programs
+                    if (!empty($this->bulkRoles)) {
+                        $user->roles()->sync($this->bulkRoles);
+                    }
+                    if (!empty($this->bulkPrograms)) {
+                        $user->programs()->sync($this->bulkPrograms);
+                    }
+                } else {
+                    // Add to existing roles and programs
+                    if (!empty($this->bulkRoles)) {
+                        $currentRoles = $user->roles->pluck('id')->toArray();
+                        $newRoles = array_unique(array_merge($currentRoles, $this->bulkRoles));
+                        $user->roles()->sync($newRoles);
+                    }
+                    if (!empty($this->bulkPrograms)) {
+                        $currentPrograms = $user->programs->pluck('id')->toArray();
+                        $newPrograms = array_unique(array_merge($currentPrograms, $this->bulkPrograms));
+                        $user->programs()->sync($newPrograms);
+                    }
+                }
+            }
+            
+            session()->flash('success', 'Bulk assignment completed for ' . count($users) . ' users.');
+            $this->resetBulkAssignment();
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+        }
+    }
+    
+    public function resetBulkAssignment()
+    {
+        $this->selectedUsers = [];
+        $this->bulkRoles = [];
+        $this->bulkPrograms = [];
+        $this->bulkAction = 'add';
+        $this->showBulkAssignModal = false;
+    }
+    
     public function viewUser($userId)
     {
-        // Redirect to the user show page instead of opening a modal
-        return redirect()->route('user.show', $userId);
+        $this->selectedUser = User::with(['roles', 'programs'])->findOrFail($userId);
+        $this->showViewModal = true;
     }
     
     public function closeViewModal()
@@ -232,7 +309,7 @@ class UserManagement extends Component
 
     public function render()
     {
-        $users = User::with('roles')
+        $users = User::with(['roles', 'programs'])
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
                       ->orWhere('email', 'like', '%' . $this->search . '%');
@@ -241,10 +318,12 @@ class UserManagement extends Component
             ->paginate(10);
             
         $roles = Role::orderBy('display_name')->get();
+        $programs = Program::orderBy('name')->get();
 
         return view('livewire.user-management', [
             'users' => $users,
             'roles' => $roles,
+            'programs' => $programs,
         ])->layout('components.layouts.app');
     }
 }

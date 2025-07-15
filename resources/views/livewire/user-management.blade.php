@@ -6,7 +6,7 @@
             <p class="text-purple-100 mt-2">Manage users and their role assignments</p>
         </div>
 
-        <!-- Search -->
+        <!-- Search and Bulk Actions -->
         @if(!$showEditForm && !$showPasswordForm)
             <div class="p-4 bg-gray-50 dark:bg-zinc-700 border-b border-gray-200 dark:border-zinc-600">
                 <div class="flex items-center justify-between">
@@ -14,6 +14,12 @@
                         <input type="text" wire:model.live="search" placeholder="Search users..." 
                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
                     </div>
+                    @if($this->can('users.edit') && count($selectedUsers) > 0)
+                        <button wire:click="showBulkAssign" 
+                                class="ml-4 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition">
+                            Bulk Assign ({{ count($selectedUsers) }} selected)
+                        </button>
+                    @endif
                 </div>
             </div>
         @endif
@@ -83,25 +89,48 @@
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Inactive users cannot log in to the system</p>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Assigned Roles
-                        </label>
-                        <div class="space-y-2 max-h-48 overflow-y-auto border border-gray-300 dark:border-zinc-600 rounded-md p-3 bg-white dark:bg-zinc-800">
-                            @foreach($roles as $role)
-                                <label class="flex items-center space-x-2">
-                                    <input type="checkbox" wire:model="selectedRoles" value="{{ $role->id }}"
-                                           class="rounded border-gray-300 dark:border-zinc-600 text-purple-600 focus:ring-purple-500">
-                                    <span class="text-sm text-gray-700 dark:text-gray-300">
-                                        {{ $role->display_name }}
-                                        @if($role->description)
-                                            <span class="text-xs text-gray-500 dark:text-gray-400">- {{ $role->description }}</span>
-                                        @endif
-                                    </span>
-                                </label>
-                            @endforeach
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Assigned Roles
+                            </label>
+                            <div class="space-y-2 max-h-48 overflow-y-auto border border-gray-300 dark:border-zinc-600 rounded-md p-3 bg-white dark:bg-zinc-800">
+                                @foreach($roles as $role)
+                                    <label class="flex items-center space-x-2">
+                                        <input type="checkbox" wire:model="selectedRoles" value="{{ $role->id }}"
+                                               class="rounded border-gray-300 dark:border-zinc-600 text-purple-600 focus:ring-purple-500">
+                                        <span class="text-sm text-gray-700 dark:text-gray-300">
+                                            {{ $role->display_name }}
+                                            @if($role->description)
+                                                <span class="text-xs text-gray-500 dark:text-gray-400">- {{ $role->description }}</span>
+                                            @endif
+                                        </span>
+                                    </label>
+                                @endforeach
+                            </div>
+                            @error('selectedRoles') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                         </div>
-                        @error('selectedRoles') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Assigned Programs
+                            </label>
+                            <div class="space-y-2 max-h-48 overflow-y-auto border border-gray-300 dark:border-zinc-600 rounded-md p-3 bg-white dark:bg-zinc-800">
+                                @foreach($programs as $program)
+                                    <label class="flex items-center space-x-2">
+                                        <input type="checkbox" wire:model="selectedPrograms" value="{{ $program->id }}"
+                                               class="rounded border-gray-300 dark:border-zinc-600 text-purple-600 focus:ring-purple-500">
+                                        <span class="text-sm text-gray-700 dark:text-gray-300">
+                                            {{ $program->name }}
+                                            @if($program->description)
+                                                <span class="text-xs text-gray-500 dark:text-gray-400">- {{ Str::limit($program->description, 50) }}</span>
+                                            @endif
+                                        </span>
+                                    </label>
+                                @endforeach
+                            </div>
+                            @error('selectedPrograms') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                        </div>
                     </div>
 
                     <div class="flex justify-end space-x-2">
@@ -265,6 +294,24 @@
                                         @endforelse
                                     </div>
                                 </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Assigned Programs</label>
+                                    <div class="space-y-2">
+                                        @forelse($selectedUser->programs as $program)
+                                            <div class="flex items-center justify-between p-2 bg-blue-50 dark:bg-blue-900/20 rounded-md">
+                                                <div>
+                                                    <span class="text-sm font-medium text-blue-800 dark:text-blue-200">{{ $program->name }}</span>
+                                                    @if($program->description)
+                                                        <p class="text-xs text-blue-600 dark:text-blue-300">{{ Str::limit($program->description, 50) }}</p>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        @empty
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">No programs assigned</p>
+                                        @endforelse
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         
@@ -309,16 +356,29 @@
             <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700">
                 <thead class="bg-gray-50 dark:bg-zinc-700">
                     <tr>
+                        @if($this->can('users.edit'))
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            <input type="checkbox" wire:model="selectedUsers" 
+                                   class="rounded border-gray-300 dark:border-zinc-600 text-purple-600 focus:ring-purple-500">
+                        </th>
+                        @endif
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Email</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Roles</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Programs</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-zinc-700">
                     @forelse($users as $user)
                         <tr class="{{ !$user->active ? 'bg-gray-50 dark:bg-zinc-700/50' : '' }}">
+                            @if($this->can('users.edit'))
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <input type="checkbox" wire:model="selectedUsers" value="{{ $user->id }}"
+                                       class="rounded border-gray-300 dark:border-zinc-600 text-purple-600 focus:ring-purple-500">
+                            </td>
+                            @endif
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-medium">
                                     <button wire:click="viewUser({{ $user->id }})" 
@@ -353,7 +413,18 @@
                                             {{ $role->display_name }}
                                         </span>
                                     @empty
-                                        <span class="text-sm text-gray-500 dark:text-gray-400">No roles assigned</span>
+                                        <span class="text-sm text-gray-500 dark:text-gray-400">No roles</span>
+                                    @endforelse
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex flex-wrap gap-1">
+                                    @forelse($user->programs as $program)
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                            {{ $program->name }}
+                                        </span>
+                                    @empty
+                                        <span class="text-sm text-gray-500 dark:text-gray-400">No programs</span>
                                     @endforelse
                                 </div>
                             </td>
@@ -387,7 +458,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                            <td colspan="{{ $this->can('users.edit') ? '7' : '6' }}" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                                 No users found.
                             </td>
                         </tr>
@@ -404,4 +475,105 @@
             @endif
         @endif
     </div>
+
+    <!-- Bulk Assignment Modal -->
+    @if($showBulkAssignModal)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                <!-- Modal Header -->
+                <div class="bg-purple-600 text-white p-6 rounded-t-lg">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xl font-bold">Bulk Role & Program Assignment</h3>
+                        <button wire:click="resetBulkAssignment" class="text-purple-200 hover:text-white transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Modal Content -->
+                <div class="p-6">
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            Assigning to <strong>{{ count($selectedUsers) }} users</strong>
+                        </p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Assignment Action
+                            </label>
+                            <div class="space-x-4">
+                                <label class="inline-flex items-center">
+                                    <input type="radio" wire:model="bulkAction" value="add" 
+                                           class="text-purple-600 focus:ring-purple-500">
+                                    <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Add to existing</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" wire:model="bulkAction" value="replace" 
+                                           class="text-purple-600 focus:ring-purple-500">
+                                    <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Replace existing</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Roles to Assign
+                                </label>
+                                <div class="space-y-2 max-h-48 overflow-y-auto border border-gray-300 dark:border-zinc-600 rounded-md p-3 bg-white dark:bg-zinc-800">
+                                    @foreach($roles as $role)
+                                        <label class="flex items-center space-x-2">
+                                            <input type="checkbox" wire:model="bulkRoles" value="{{ $role->id }}"
+                                                   class="rounded border-gray-300 dark:border-zinc-600 text-purple-600 focus:ring-purple-500">
+                                            <span class="text-sm text-gray-700 dark:text-gray-300">
+                                                {{ $role->display_name }}
+                                                @if($role->description)
+                                                    <span class="text-xs text-gray-500 dark:text-gray-400">- {{ $role->description }}</span>
+                                                @endif
+                                            </span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Programs to Assign
+                                </label>
+                                <div class="space-y-2 max-h-48 overflow-y-auto border border-gray-300 dark:border-zinc-600 rounded-md p-3 bg-white dark:bg-zinc-800">
+                                    @foreach($programs as $program)
+                                        <label class="flex items-center space-x-2">
+                                            <input type="checkbox" wire:model="bulkPrograms" value="{{ $program->id }}"
+                                                   class="rounded border-gray-300 dark:border-zinc-600 text-purple-600 focus:ring-purple-500">
+                                            <span class="text-sm text-gray-700 dark:text-gray-300">
+                                                {{ $program->name }}
+                                            </span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Modal Footer -->
+                <div class="bg-gray-50 dark:bg-zinc-700 px-6 py-4 rounded-b-lg">
+                    <div class="flex justify-end space-x-2">
+                        <button wire:click="resetBulkAssignment" 
+                                class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 transition">
+                            Cancel
+                        </button>
+                        <button wire:click="processBulkAssignment" 
+                                class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition">
+                            Apply Changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>

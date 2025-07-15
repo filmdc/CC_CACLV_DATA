@@ -9,10 +9,15 @@ use App\Models\WorkPlan;
 use App\Models\WorkPlanGoal;
 use App\Models\Service;
 use App\Models\ProgramEnrollment;
+use App\Models\ServiceEnrollment;
 use App\Models\Contract;
+use App\Models\CustomImportTemplate;
+use App\Services\CsbgReportService;
 use App\Traits\WithPermissionChecks;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class Dashboard extends Component
 {
@@ -20,6 +25,15 @@ class Dashboard extends Component
     
     public $activeTab = 'programs';
     public $expandedWorkPlans = false;
+    
+    // Date filtering
+    public $startDate;
+    public $endDate;
+    public $dateFilter = 'this_month'; // this_month, last_month, this_quarter, this_year, custom
+    
+    // CSBG Report Options
+    public $selectedProgramForReport;
+    public $reportFormat = 'pdf'; // pdf or excel
     
     // Protected listeners for real-time updates
     protected $listeners = [
@@ -45,7 +59,15 @@ class Dashboard extends Component
     
     public function mount()
     {
-        // No specific authorization needed for dashboard - handled per section
+        // Initialize date filters
+        $this->setDateFilter('this_month');
+        
+        // Set default program for report if user has programs
+        $user = Auth::user();
+        $userPrograms = $user->programs()->first();
+        if ($userPrograms) {
+            $this->selectedProgramForReport = $userPrograms->id;
+        }
     }
 
     public function toggleExpandedWorkPlans()
@@ -68,6 +90,168 @@ class Dashboard extends Component
     {
         return redirect()->route('work-plan.management', ['work_plan_id' => $workPlanId]);
     }
+    
+    public function setDateFilter($filter)
+    {
+        $this->dateFilter = $filter;
+        
+        switch ($filter) {
+            case 'this_month':
+                $this->startDate = Carbon::now()->startOfMonth()->format('Y-m-d');
+                $this->endDate = Carbon::now()->endOfMonth()->format('Y-m-d');
+                break;
+            case 'last_month':
+                $this->startDate = Carbon::now()->subMonth()->startOfMonth()->format('Y-m-d');
+                $this->endDate = Carbon::now()->subMonth()->endOfMonth()->format('Y-m-d');
+                break;
+            case 'this_quarter':
+                $this->startDate = Carbon::now()->firstOfQuarter()->format('Y-m-d');
+                $this->endDate = Carbon::now()->lastOfQuarter()->format('Y-m-d');
+                break;
+            case 'this_year':
+                $this->startDate = Carbon::now()->startOfYear()->format('Y-m-d');
+                $this->endDate = Carbon::now()->endOfYear()->format('Y-m-d');
+                break;
+            case 'custom':
+                // Keep existing dates
+                break;
+        }
+        
+        $this->refreshMetrics();
+    }
+    
+    public function generateCsbgReport()
+    {
+        if (!$this->selectedProgramForReport) {
+            session()->flash('error', 'Please select a program for the report.');
+            return;
+        }
+        
+        try {
+            $program = Program::findOrFail($this->selectedProgramForReport);
+            
+            // Initialize the CSBG Report Service
+            $reportService = app(CsbgReportService::class);
+            
+            // Generate the report data
+            $reportData = $reportService->generateReport([
+                'program_id' => $this->selectedProgramForReport,
+                'start_date' => $this->startDate,
+                'end_date' => $this->endDate,
+            ]);
+            
+            // Generate filename
+            $filename = 'CSBG_Report_' . $program->name . '_' . date('Y-m-d') . '.' . $this->reportFormat;
+            $filename = str_replace(' ', '_', $filename);
+            
+            if ($this->reportFormat === 'pdf') {
+                // Generate PDF using the same format as CsbgReportService
+                $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.csbg-pdf-template', [
+                    'reportData' => $reportData,
+                    'generatedAt' => Carbon::parse($reportData['report_metadata']['generated_at'])->format('F j, Y g:i A'),
+                    'periodStart' => Carbon::parse($reportData['report_metadata']['period_start'])->format('F j, Y'),
+                    'periodEnd' => Carbon::parse($reportData['report_metadata']['period_end'])->format('F j, Y'),
+                ])
+                ->setPaper('a4', 'portrait')
+                ->setOptions([
+                    'defaultFont' => 'sans-serif',
+                    'isRemoteEnabled' => false,
+                    'chroot' => public_path(),
+                ]);
+                
+                return response()->streamDownload(function() use ($pdf) {
+                    echo $pdf->output();
+                }, $filename);
+            } else {
+                // Generate CSV (Excel-compatible)
+                $csvContent = $this->generateCsvContent($reportData, $program);
+                
+                return response()->streamDownload(function() use ($csvContent) {
+                    echo $csvContent;
+                }, str_replace('.excel', '.csv', $filename), [
+                    'Content-Type' => 'text/csv',
+                    'Content-Encoding' => 'UTF-8',
+                ]);
+            }
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error generating report: ' . $e->getMessage());
+        }
+    }
+    
+    private function generateCsvContent($reportData, $program)
+    {
+        $csv = [];
+        
+        // Header
+        $csv[] = ['CSBG Module 4, Section C: All Characteristics Report'];
+        $csv[] = [$program->name];
+        $csv[] = ['Report Period: ' . date('m/d/Y', strtotime($reportData['report_metadata']['period_start'])) . ' - ' . date('m/d/Y', strtotime($reportData['report_metadata']['period_end']))];
+        $csv[] = [];
+        
+        // Summary
+        $csv[] = ['A. Total unduplicated number of all INDIVIDUALS:', $reportData['participant_count'] ?? 0];
+        $csv[] = ['B. Total unduplicated number of all HOUSEHOLDS:', count($reportData['households'] ?? [])];
+        $csv[] = [];
+        
+        // Process each section
+        $sections = [
+            'demographics' => 'DEMOGRAPHICS',
+            'characteristics' => 'CHARACTERISTICS', 
+            'employment_income' => 'EMPLOYMENT & INCOME',
+            'health_housing' => 'HEALTH & HOUSING'
+        ];
+        
+        foreach ($sections as $sectionKey => $sectionTitle) {
+            if (isset($reportData[$sectionKey])) {
+                $csv[] = [$sectionTitle];
+                $csv[] = [];
+                
+                foreach ($reportData[$sectionKey] as $category => $categoryData) {
+                    $csv[] = [ucfirst(str_replace('_', ' ', $category))];
+                    
+                    if (isset($categoryData['items'])) {
+                        foreach ($categoryData['items'] as $item) {
+                            $csv[] = ['', $item['label'], $item['count'], $item['percentage'] . '%'];
+                        }
+                        $csv[] = ['', 'TOTAL', $categoryData['total'] ?? ''];
+                    } else {
+                        // Handle flat arrays (like gender, ethnicity, etc.)
+                        foreach ($categoryData as $label => $count) {
+                            if ($label !== 'total') {
+                                $csv[] = ['', $label, $count];
+                            }
+                        }
+                        $csv[] = ['', 'TOTAL', array_sum($categoryData)];
+                    }
+                    $csv[] = [];
+                }
+            }
+        }
+        
+        // Convert to CSV string
+        $output = '';
+        foreach ($csv as $row) {
+            $output .= $this->arrayToCsv($row) . "\n";
+        }
+        
+        return $output;
+    }
+    
+    private function arrayToCsv($array)
+    {
+        $fp = fopen('php://temp', 'r+');
+        fputcsv($fp, $array);
+        rewind($fp);
+        $csv = stream_get_contents($fp);
+        fclose($fp);
+        return rtrim($csv);
+    }
+    
+    public function startImport($templateId)
+    {
+        // Redirect to import page with template
+        return redirect()->route('participant.import-export', ['template_id' => $templateId]);
+    }
 
     public function render()
     {
@@ -81,11 +265,15 @@ class Dashboard extends Component
         
         $metrics = $this->calculateMetrics($userProgramIds);
 
+        // Get recent activity with date filtering
+        $recentActivity = $this->getRecentActivity($userProgramIds);
+
         // Recent activity - participants the user has worked with
         $recentParticipants = Participant::with(['household', 'programEnrollments.program'])
             ->whereHas('programEnrollments', function($query) use ($userProgramIds) {
                 $query->whereIn('program_id', $userProgramIds);
             })
+            ->whereBetween('updated_at', [$this->startDate, $this->endDate . ' 23:59:59'])
             ->latest('updated_at')
             ->limit(5)
             ->get();
@@ -95,6 +283,7 @@ class Dashboard extends Component
             ->whereHas('participants.programEnrollments', function($query) use ($userProgramIds) {
                 $query->whereIn('program_id', $userProgramIds);
             })
+            ->whereBetween('updated_at', [$this->startDate, $this->endDate . ' 23:59:59'])
             ->latest('updated_at')
             ->limit(5)
             ->get();
@@ -119,17 +308,38 @@ class Dashboard extends Component
                 'work_plans_count' => $program->workPlans()->where('active', true)->count(),
             ];
         });
+        
+        // Get statistics with date filtering
+        $statistics = $this->getStatistics($userProgramIds);
+        
+        // Get available import templates
+        $importTemplates = CustomImportTemplate::active()->get();
+        
+        // Get user configuration data
+        $userConfig = [
+            'name' => $user->name,
+            'email' => $user->email,
+            'roles' => $user->roles->pluck('name')->toArray(),
+            'permissions' => $this->getUserPermissions($user),
+            'last_login' => null, // No last_login_at field in database
+            'programs_count' => $userPrograms->count()
+        ];
 
         // Load tab-specific data
         $tabData = $this->getTabData($userProgramIds);
 
         return view('livewire.dashboard', [
+            'user' => $user,
+            'userConfig' => $userConfig,
             'userPrograms' => $userPrograms,
             'programStats' => $programStats,
             'metrics' => $metrics,
+            'statistics' => $statistics,
+            'recentActivity' => $recentActivity,
             'recentHouseholds' => $recentHouseholds,
             'recentParticipants' => $recentParticipants,
             'workPlanGoals' => $workPlanGoals,
+            'importTemplates' => $importTemplates,
             'tabData' => $tabData,
         ])->layout('components.layouts.app');
     }
@@ -142,6 +352,168 @@ class Dashboard extends Component
             'my_work_plans' => WorkPlan::whereIn('program_id', $userProgramIds)->where('active', true)->count(),
             'my_services' => Service::whereIn('program_id', $userProgramIds)->where('active', true)->count(),
         ];
+    }
+    
+    private function getRecentActivity($userProgramIds)
+    {
+        // Get recent enrollments
+        $recentEnrollments = ProgramEnrollment::with(['participant', 'program'])
+            ->whereIn('program_id', $userProgramIds)
+            ->whereBetween('created_at', [$this->startDate, $this->endDate . ' 23:59:59'])
+            ->latest('created_at')
+            ->limit(10)
+            ->get()
+            ->map(function($enrollment) {
+                return [
+                    'type' => 'enrollment',
+                    'description' => $enrollment->participant->first_name . ' ' . $enrollment->participant->last_name . ' enrolled in ' . $enrollment->program->name,
+                    'timestamp' => $enrollment->created_at,
+                    'user' => $enrollment->created_by
+                ];
+            });
+            
+        // Get recent service enrollments
+        $recentServiceEnrollments = ServiceEnrollment::with(['participant', 'service.program'])
+            ->whereHas('service', function($query) use ($userProgramIds) {
+                $query->whereIn('program_id', $userProgramIds);
+            })
+            ->whereBetween('created_at', [$this->startDate, $this->endDate . ' 23:59:59'])
+            ->latest('created_at')
+            ->limit(10)
+            ->get()
+            ->map(function($enrollment) {
+                return [
+                    'type' => 'service_enrollment',
+                    'description' => $enrollment->participant->first_name . ' ' . $enrollment->participant->last_name . ' enrolled in service: ' . $enrollment->service->name,
+                    'timestamp' => $enrollment->created_at,
+                    'user' => $enrollment->created_by
+                ];
+            });
+            
+        // Get recent work plan goal updates
+        $recentGoalUpdates = WorkPlanGoal::with(['workPlan.program', 'service'])
+            ->whereHas('workPlan', function($query) use ($userProgramIds) {
+                $query->whereIn('program_id', $userProgramIds);
+            })
+            ->whereBetween('updated_at', [$this->startDate, $this->endDate . ' 23:59:59'])
+            ->where('updated_at', '>', 'created_at')
+            ->latest('updated_at')
+            ->limit(10)
+            ->get()
+            ->map(function($goal) {
+                return [
+                    'type' => 'goal_update',
+                    'description' => 'Work plan goal "' . $goal->goal_name . '" updated: ' . $goal->actual_number . '/' . $goal->target_number,
+                    'timestamp' => $goal->updated_at,
+                    'user' => $goal->updated_by
+                ];
+            });
+            
+        // Combine and sort all activities
+        return collect()
+            ->merge($recentEnrollments)
+            ->merge($recentServiceEnrollments)
+            ->merge($recentGoalUpdates)
+            ->sortByDesc('timestamp')
+            ->take(15);
+    }
+    
+    private function getStatistics($userProgramIds)
+    {
+        // Calculate statistics based on date range
+        $stats = [];
+        
+        // Total participants in date range
+        $stats['total_participants'] = Participant::whereHas('programEnrollments', function($query) use ($userProgramIds) {
+                $query->whereIn('program_id', $userProgramIds)
+                    ->whereBetween('created_at', [$this->startDate, $this->endDate . ' 23:59:59']);
+            })->count();
+            
+        // Active enrollments
+        $stats['active_enrollments'] = ProgramEnrollment::whereIn('program_id', $userProgramIds)
+            ->where('status', 'active')
+            ->count();
+            
+        // New enrollments in period
+        $stats['new_enrollments'] = ProgramEnrollment::whereIn('program_id', $userProgramIds)
+            ->whereBetween('created_at', [$this->startDate, $this->endDate . ' 23:59:59'])
+            ->count();
+            
+        // Services delivered
+        $stats['services_delivered'] = ServiceEnrollment::whereHas('service', function($query) use ($userProgramIds) {
+                $query->whereIn('program_id', $userProgramIds);
+            })
+            ->whereBetween('enrollment_date', [$this->startDate, $this->endDate])
+            ->count();
+            
+        // Work plan goal completion rate
+        $totalGoals = WorkPlanGoal::whereHas('workPlan', function($query) use ($userProgramIds) {
+                $query->whereIn('program_id', $userProgramIds);
+            })
+            ->where('target_number', '>', 0)
+            ->count();
+            
+        $completedGoals = WorkPlanGoal::whereHas('workPlan', function($query) use ($userProgramIds) {
+                $query->whereIn('program_id', $userProgramIds);
+            })
+            ->where('target_number', '>', 0)
+            ->whereColumn('actual_number', '>=', 'target_number')
+            ->count();
+            
+        $stats['goal_completion_rate'] = $totalGoals > 0 ? round(($completedGoals / $totalGoals) * 100, 1) : 0;
+        
+        // Households served
+        $stats['households_served'] = Household::whereHas('participants.programEnrollments', function($query) use ($userProgramIds) {
+                $query->whereIn('program_id', $userProgramIds)
+                    ->whereBetween('created_at', [$this->startDate, $this->endDate . ' 23:59:59']);
+            })->count();
+            
+        // Calculate trends (compare to previous period)
+        $previousPeriod = $this->getPreviousPeriodDates();
+        $stats['participant_trend'] = $this->calculateTrend(
+            Participant::whereHas('programEnrollments', function($query) use ($userProgramIds, $previousPeriod) {
+                $query->whereIn('program_id', $userProgramIds)
+                    ->whereBetween('created_at', $previousPeriod);
+            })->count(),
+            $stats['total_participants']
+        );
+        
+        return $stats;
+    }
+    
+    private function getPreviousPeriodDates()
+    {
+        $start = Carbon::parse($this->startDate);
+        $end = Carbon::parse($this->endDate);
+        $diff = $start->diffInDays($end);
+        
+        return [
+            $start->subDays($diff + 1)->format('Y-m-d'),
+            $end->subDays($diff + 1)->format('Y-m-d') . ' 23:59:59'
+        ];
+    }
+    
+    private function calculateTrend($previousValue, $currentValue)
+    {
+        if ($previousValue == 0) {
+            return $currentValue > 0 ? 100 : 0;
+        }
+        
+        return round((($currentValue - $previousValue) / $previousValue) * 100, 1);
+    }
+    
+    private function getUserPermissions($user)
+    {
+        $permissions = [];
+        
+        // Get all permissions through user's roles
+        foreach ($user->roles as $role) {
+            $rolePermissions = $role->permissions->pluck('name')->toArray();
+            $permissions = array_merge($permissions, $rolePermissions);
+        }
+        
+        // Return unique permissions
+        return array_unique($permissions);
     }
     
     private function getTabData($userProgramIds)

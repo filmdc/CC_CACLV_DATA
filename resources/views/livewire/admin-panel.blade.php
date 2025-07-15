@@ -286,130 +286,88 @@
                 <!-- User Management -->
                 <div class="space-y-6">
                     <div class="flex justify-between items-center">
-                        <h2 class="text-xl font-semibold text-gray-900">User Management</h2>
-                        <button wire:click="showCreateUser" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
-                            Create User
-                        </button>
+                        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">User Management</h2>
+                        <a href="{{ route('user.management') }}" wire:navigate
+                           class="inline-flex items-center px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-md hover:bg-purple-700">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            Advanced User Management
+                        </a>
                     </div>
 
-                    <!-- Success/Error Messages -->
-                    @if (session()->has('success'))
-                        <div class="p-4 bg-green-50 border-l-4 border-green-400">
-                            <div class="flex">
-                                <div class="ml-3">
-                                    <p class="text-sm text-green-700">{{ session('success') }}</p>
-                                </div>
+                    <div class="bg-gray-50 dark:bg-zinc-700 rounded-lg p-6">
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">
+                            Manage system users, assign roles and programs, and control access permissions.
+                        </p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-white dark:bg-zinc-800 rounded-lg p-4 shadow">
+                                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Users</h3>
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $systemStats['total_users'] ?? 0 }}</p>
                             </div>
-                        </div>
-                    @endif
-
-                    @if (session()->has('error'))
-                        <div class="p-4 bg-red-50 border-l-4 border-red-400">
-                            <div class="flex">
-                                <div class="ml-3">
-                                    <p class="text-sm text-red-700">{{ session('error') }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-
-                    <!-- Create User Form -->
-                    @if($showCreateUserForm)
-                        <div class="bg-purple-50 border border-purple-200 rounded-lg p-6">
-                            <h3 class="text-lg font-medium text-gray-900 mb-4">Create New User</h3>
                             
-                            <form wire:submit="createUser" class="space-y-4">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label for="user_name" class="block text-sm font-medium text-gray-700 mb-1">
-                                            Full Name <span class="text-red-500">*</span>
-                                        </label>
-                                        <input type="text" wire:model.defer="user_name" id="user_name" 
-                                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
-                                        @error('user_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                                    </div>
-
-                                    <div>
-                                        <label for="user_email" class="block text-sm font-medium text-gray-700 mb-1">
-                                            Email Address <span class="text-red-500">*</span>
-                                        </label>
-                                        <input type="email" wire:model.defer="user_email" id="user_email" 
-                                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
-                                        @error('user_email') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                                    </div>
-
-                                    <div>
-                                        <label for="user_password" class="block text-sm font-medium text-gray-700 mb-1">
-                                            Password <span class="text-red-500">*</span>
-                                        </label>
-                                        <input type="password" wire:model.defer="user_password" id="user_password" 
-                                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
-                                        @error('user_password') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                                    </div>
-
-                                    <div>
-                                        <label for="user_password_confirmation" class="block text-sm font-medium text-gray-700 mb-1">
-                                            Confirm Password <span class="text-red-500">*</span>
-                                        </label>
-                                        <input type="password" wire:model.defer="user_password_confirmation" id="user_password_confirmation" 
-                                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
-                                        @error('user_password_confirmation') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                                    </div>
-                                </div>
-
-                                <div class="flex justify-end space-x-3">
-                                    <button type="button" wire:click="$set('showCreateUserForm', false)" 
-                                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 border border-gray-300 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500">
-                                        Cancel
-                                    </button>
-                                    <button type="submit" 
-                                            class="px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
-                                        Create User
-                                    </button>
-                                </div>
-                            </form>
+                            <div class="bg-white dark:bg-zinc-800 rounded-lg p-4 shadow">
+                                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Active Users</h3>
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $systemStats['active_users'] ?? 0 }}</p>
+                            </div>
+                            
+                            <div class="bg-white dark:bg-zinc-800 rounded-lg p-4 shadow">
+                                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Roles</h3>
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ \App\Models\Role::count() }}</p>
+                            </div>
                         </div>
-                    @endif
-
-                    <!-- Search -->
-                    <div class="max-w-md">
-                        <input type="text" wire:model.live="search" placeholder="Search users..." 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        
+                        <div class="mt-6 space-y-3">
+                            <h3 class="font-medium text-gray-900 dark:text-white">Quick Actions</h3>
+                            <div class="flex flex-wrap gap-3">
+                                <a href="{{ route('user.management') }}" wire:navigate
+                                   class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-purple-600 rounded-md hover:bg-purple-700">
+                                    View All Users
+                                </a>
+                                <a href="{{ route('user.management') }}" wire:navigate
+                                   class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-zinc-600 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
+                                    Bulk User Assignment
+                                </a>
+                                <a href="{{ route('role-permission.management') }}" wire:navigate
+                                   class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-zinc-600 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
+                                    Manage Permissions
+                                </a>
+                            </div>
+                        </div>
                     </div>
-
-                    <!-- Users List -->
-                    <div class="bg-white shadow overflow-hidden sm:rounded-md">
-                        <ul class="divide-y divide-gray-200">
-                            @forelse ($users as $user)
-                                <li class="px-6 py-4">
-                                    <div class="flex items-center justify-between">
-                                        <div class="flex items-center">
-                                            <div class="flex-shrink-0 h-10 w-10">
-                                                <span class="h-10 w-10 rounded-full bg-purple-500 flex items-center justify-center text-white font-medium">
-                                                    {{ $user->initials() }}
-                                                </span>
-                                            </div>
-                                            <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900">{{ $user->name }}</div>
-                                                <div class="text-sm text-gray-500">{{ $user->email }}</div>
-                                            </div>
-                                        </div>
-                                        <div class="text-sm text-gray-500">
-                                            Joined {{ $user->created_at->format('M j, Y') }}
-                                        </div>
+                    
+                    <!-- Recent Users -->
+                    <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 shadow">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Recent Users</h3>
+                        <div class="space-y-3">
+                            @foreach($users->take(5) as $user)
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10">
+                                        <span class="h-10 w-10 rounded-full bg-purple-500 flex items-center justify-center text-white font-medium">
+                                            {{ $user->initials() }}
+                                        </span>
                                     </div>
-                                </li>
-                            @empty
-                                <li class="px-6 py-4 text-center text-gray-500">
-                                    No users found.
-                                </li>
-                            @endforelse
-                        </ul>
-                    </div>
-
-                    <!-- Pagination -->
-                    <div>
-                        {{ $users->links() }}
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $user->name }}</div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">{{ $user->email }}</div>
+                                    </div>
+                                </div>
+                                <div class="text-sm text-gray-500 dark:text-gray-400">
+                                    Joined {{ $user->created_at->format('M j, Y') }}
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                        
+                        <div class="mt-4">
+                            <a href="{{ route('user.management') }}" wire:navigate
+                               class="text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300">
+                                View all users →
+                            </a>
+                        </div>
                     </div>
                 </div>
 

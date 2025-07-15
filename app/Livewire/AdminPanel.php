@@ -836,6 +836,7 @@ class AdminPanel extends Component
                     'total_contracts' => Contract::count(),
                     'total_work_plans' => WorkPlan::count(),
                     'total_users' => User::count(),
+                    'active_users' => User::where('active', true)->count(),
                 ];
                 break;
 
