@@ -269,6 +269,14 @@ class AdminPanel extends Component
         $this->bulkDeleteModalVisible = true;
         $this->deleteConfirmation = '';
         $this->resetBulkDeleteOptions();
+        
+        // Set appropriate defaults based on type
+        if ($type === 'test_data') {
+            $this->deleteTestDataOnly = true;
+            $this->selectedSources = ['rx_office_import', 'hmis_import', 'general_import'];
+        } elseif ($type === 'participants' || $type === 'households') {
+            $this->deleteTestDataOnly = false;
+        }
     }
 
     public function closeBulkDeleteModal()
@@ -289,22 +297,30 @@ class AdminPanel extends Component
 
     public function getBulkDeletePreview()
     {
-        $query = $this->buildBulkDeleteQuery();
-        
-        if ($this->bulkDeleteType === 'participants') {
-            return $query->count();
-        } elseif ($this->bulkDeleteType === 'households') {
-            return $query->count();
-        } elseif ($this->bulkDeleteType === 'test_data') {
-            return [
-                'participants' => $this->buildBulkDeleteQuery('participants')->count(),
-                'households' => $this->buildBulkDeleteQuery('households')->count(),
-                'duplicates' => $this->buildBulkDeleteQuery('duplicates')->count(),
-                'import_logs' => $this->buildBulkDeleteQuery('import_logs')->count(),
-            ];
+        try {
+            if ($this->bulkDeleteType === 'test_data') {
+                $participantsQuery = $this->buildBulkDeleteQuery('participants');
+                $householdsQuery = $this->buildBulkDeleteQuery('households');
+                $duplicatesQuery = $this->buildBulkDeleteQuery('duplicates');
+                $importLogsQuery = $this->buildBulkDeleteQuery('import_logs');
+                
+                return [
+                    'participants' => $participantsQuery ? $participantsQuery->count() : 0,
+                    'households' => $householdsQuery ? $householdsQuery->count() : 0,
+                    'duplicates' => $duplicatesQuery ? $duplicatesQuery->count() : 0,
+                    'import_logs' => $importLogsQuery ? $importLogsQuery->count() : 0,
+                ];
+            } else {
+                $query = $this->buildBulkDeleteQuery();
+                return $query ? $query->count() : 0;
+            }
+        } catch (\Exception $e) {
+            Log::error('Error getting bulk delete preview', [
+                'type' => $this->bulkDeleteType,
+                'error' => $e->getMessage()
+            ]);
+            return 0;
         }
-        
-        return 0;
     }
 
     public function buildBulkDeleteQuery($type = null)
@@ -318,14 +334,23 @@ class AdminPanel extends Component
                 if ($this->deleteTestDataOnly) {
                     // Only delete test/import data, not manually entered participants
                     $query->where(function ($q) {
-                        $q->whereHas('programEnrollments', function ($pe) {
-                            $pe->whereIn('program_id', $this->selectedPrograms ?: [1]); // Default to Housing program
-                        })->orWhere('notes', 'like', '%import%');
+                        // Check if notes contain import references
+                        $q->where('notes', 'like', '%import%')
+                          ->orWhere('notes', 'like', '%case_id%')
+                          ->orWhere('notes', 'like', '%client_id%')
+                          ->orWhere('notes', 'like', '%ClientID%');
                     });
+                    
+                    // If specific programs selected, filter by them
+                    if (!empty($this->selectedPrograms)) {
+                        $query->whereHas('programEnrollments', function ($pe) {
+                            $pe->whereIn('program_id', $this->selectedPrograms);
+                        });
+                    }
                 }
                 
                 if ($this->selectedDateRange && $this->selectedDateRange !== 'all') {
-                    $query->where('created_at', '>=', now()->subDays($this->selectedDateRange));
+                    $query->where('created_at', '>=', now()->subDays((int)$this->selectedDateRange));
                 }
                 
                 return $query;
@@ -338,13 +363,16 @@ class AdminPanel extends Component
                     $query->where(function ($q) {
                         $q->whereDoesntHave('participants')
                           ->orWhereHas('participants', function ($p) {
-                              $p->where('notes', 'like', '%import%');
+                              $p->where('notes', 'like', '%import%')
+                                ->orWhere('notes', 'like', '%case_id%')
+                                ->orWhere('notes', 'like', '%client_id%')
+                                ->orWhere('notes', 'like', '%ClientID%');
                           });
                     });
                 }
                 
                 if ($this->selectedDateRange && $this->selectedDateRange !== 'all') {
-                    $query->where('created_at', '>=', now()->subDays($this->selectedDateRange));
+                    $query->where('created_at', '>=', now()->subDays((int)$this->selectedDateRange));
                 }
                 
                 return $query;
@@ -352,14 +380,12 @@ class AdminPanel extends Component
             case 'duplicates':
                 $query = PotentialDuplicate::query();
                 
-                if ($this->selectedSources) {
+                if (!empty($this->selectedSources)) {
                     $query->whereIn('source_type', $this->selectedSources);
-                } else {
-                    $query->whereIn('source_type', ['rx_office_import', 'hmis_import', 'general_import']);
                 }
                 
                 if ($this->selectedDateRange && $this->selectedDateRange !== 'all') {
-                    $query->where('created_at', '>=', now()->subDays($this->selectedDateRange));
+                    $query->where('created_at', '>=', now()->subDays((int)$this->selectedDateRange));
                 }
                 
                 return $query;
@@ -368,13 +394,13 @@ class AdminPanel extends Component
                 $query = CustomImportLog::query();
                 
                 if ($this->selectedDateRange && $this->selectedDateRange !== 'all') {
-                    $query->where('created_at', '>=', now()->subDays($this->selectedDateRange));
+                    $query->where('created_at', '>=', now()->subDays((int)$this->selectedDateRange));
                 }
                 
                 return $query;
                 
             default:
-                return collect();
+                return null;
         }
     }
 
@@ -395,71 +421,13 @@ class AdminPanel extends Component
 
             if ($this->bulkDeleteType === 'test_data') {
                 // Delete in correct order to avoid foreign key constraints
-                
-                // 1. Delete service enrollments first
-                $serviceEnrollments = ServiceEnrollment::whereHas('participant', function ($q) {
-                    $participantQuery = $this->buildBulkDeleteQuery('participants');
-                    $q->whereIn('id', $participantQuery->pluck('id'));
-                })->get();
-                
-                foreach ($serviceEnrollments as $enrollment) {
-                    $enrollment->delete();
-                }
-                $deletedCounts['service_enrollments'] = $serviceEnrollments->count();
-                
-                // 2. Delete program enrollments
-                $programEnrollments = ProgramEnrollment::whereHas('participant', function ($q) {
-                    $participantQuery = $this->buildBulkDeleteQuery('participants');
-                    $q->whereIn('id', $participantQuery->pluck('id'));
-                })->get();
-                
-                foreach ($programEnrollments as $enrollment) {
-                    $enrollment->delete();
-                }
-                $deletedCounts['program_enrollments'] = $programEnrollments->count();
-                
-                // 3. Delete potential duplicates
-                $duplicates = $this->buildBulkDeleteQuery('duplicates')->get();
-                foreach ($duplicates as $duplicate) {
-                    $duplicate->delete();
-                }
-                $deletedCounts['duplicates'] = $duplicates->count();
-                
-                // 4. Delete participants
-                $participants = $this->buildBulkDeleteQuery('participants')->get();
-                foreach ($participants as $participant) {
-                    $participant->delete();
-                }
-                $deletedCounts['participants'] = $participants->count();
-                
-                // 5. Delete empty households
-                $households = $this->buildBulkDeleteQuery('households')->get();
-                foreach ($households as $household) {
-                    $household->delete();
-                }
-                $deletedCounts['households'] = $households->count();
-                
-                // 6. Delete import logs
-                $importLogs = $this->buildBulkDeleteQuery('import_logs')->get();
-                foreach ($importLogs as $log) {
-                    $log->delete();
-                }
-                $deletedCounts['import_logs'] = $importLogs->count();
-                
+                $deletedCounts = $this->deleteTestData();
+            } elseif ($this->bulkDeleteType === 'participants') {
+                $deletedCounts = $this->deleteParticipantData();
+            } elseif ($this->bulkDeleteType === 'households') {
+                $deletedCounts = $this->deleteHouseholdData();
             } else {
-                // Single type deletion
-                $items = $this->buildBulkDeleteQuery()->get();
-                
-                foreach ($items as $item) {
-                    if ($this->bulkDeleteType === 'participants') {
-                        // Delete related enrollments first
-                        $item->serviceEnrollments()->delete();
-                        $item->programEnrollments()->delete();
-                    }
-                    $item->delete();
-                }
-                
-                $deletedCounts[$this->bulkDeleteType] = $items->count();
+                throw new \Exception('Invalid delete type');
             }
 
             DB::commit();
@@ -477,9 +445,8 @@ class AdminPanel extends Component
                 ]
             ]);
 
-            $totalDeleted = array_sum($deletedCounts);
             $summary = collect($deletedCounts)->map(function ($count, $type) {
-                return "{$count} {$type}";
+                return "{$count} " . str_replace('_', ' ', $type);
             })->implode(', ');
 
             session()->flash('success', "Bulk delete completed successfully. Deleted: {$summary}");
@@ -491,10 +458,137 @@ class AdminPanel extends Component
                 'type' => $this->bulkDeleteType,
                 'user_id' => auth()->id(),
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
             
             session()->flash('error', 'Bulk delete failed: ' . $e->getMessage());
         }
+    }
+
+    private function deleteTestData(): array
+    {
+        $deletedCounts = [];
+        
+        // Get participant IDs to delete
+        $participantIds = $this->buildBulkDeleteQuery('participants')->pluck('id')->toArray();
+        $householdIds = $this->buildBulkDeleteQuery('households')->pluck('id')->toArray();
+        
+        // 1. Delete service enrollments
+        $count = ServiceEnrollment::whereIn('participant_id', $participantIds)->delete();
+        $deletedCounts['service_enrollments'] = $count;
+        
+        // 2. Delete program enrollments
+        $count = ProgramEnrollment::whereIn('participant_id', $participantIds)->delete();
+        $deletedCounts['program_enrollments'] = $count;
+        
+        // 3. Delete potential duplicates
+        $count = $this->buildBulkDeleteQuery('duplicates')->delete();
+        $deletedCounts['potential_duplicates'] = $count;
+        
+        // 4. Delete participants
+        $count = Participant::whereIn('id', $participantIds)->delete();
+        $deletedCounts['participants'] = $count;
+        
+        // 5. Delete household addresses
+        $count = DB::table('household_addresses')->whereIn('household_id', $householdIds)->delete();
+        $deletedCounts['household_addresses'] = $count;
+        
+        // 6. Delete households
+        $count = Household::whereIn('id', $householdIds)->delete();
+        $deletedCounts['households'] = $count;
+        
+        // 7. Delete import logs
+        $count = $this->buildBulkDeleteQuery('import_logs')->delete();
+        $deletedCounts['import_logs'] = $count;
+        
+        return $deletedCounts;
+    }
+
+    private function deleteParticipantData(): array
+    {
+        $deletedCounts = [];
+        
+        // Get participant IDs to delete
+        $participantIds = $this->buildBulkDeleteQuery()->pluck('id')->toArray();
+        
+        if (empty($participantIds)) {
+            return ['participants' => 0];
+        }
+        
+        // 1. Delete service enrollments
+        $count = ServiceEnrollment::whereIn('participant_id', $participantIds)->delete();
+        $deletedCounts['service_enrollments'] = $count;
+        
+        // 2. Delete program enrollments
+        $count = ProgramEnrollment::whereIn('participant_id', $participantIds)->delete();
+        $deletedCounts['program_enrollments'] = $count;
+        
+        // 3. Delete potential duplicates that reference these participants
+        $count = PotentialDuplicate::whereIn('matched_participant_id', $participantIds)->delete();
+        $deletedCounts['potential_duplicates'] = $count;
+        
+        // 4. Delete participants
+        $count = Participant::whereIn('id', $participantIds)->delete();
+        $deletedCounts['participants'] = $count;
+        
+        // 5. Check for empty households and delete them
+        $emptyHouseholds = Household::whereDoesntHave('participants')->get();
+        if ($emptyHouseholds->count() > 0) {
+            $householdIds = $emptyHouseholds->pluck('id')->toArray();
+            
+            // Delete household addresses
+            $count = DB::table('household_addresses')->whereIn('household_id', $householdIds)->delete();
+            $deletedCounts['household_addresses'] = $count;
+            
+            // Delete households
+            $count = Household::whereIn('id', $householdIds)->delete();
+            $deletedCounts['empty_households'] = $count;
+        }
+        
+        return $deletedCounts;
+    }
+
+    private function deleteHouseholdData(): array
+    {
+        $deletedCounts = [];
+        
+        // Get household IDs to delete
+        $householdIds = $this->buildBulkDeleteQuery()->pluck('id')->toArray();
+        
+        if (empty($householdIds)) {
+            return ['households' => 0];
+        }
+        
+        // Get all participant IDs in these households
+        $participantIds = Participant::whereIn('household_id', $householdIds)->pluck('id')->toArray();
+        
+        if (!empty($participantIds)) {
+            // 1. Delete service enrollments
+            $count = ServiceEnrollment::whereIn('participant_id', $participantIds)->delete();
+            $deletedCounts['service_enrollments'] = $count;
+            
+            // 2. Delete program enrollments
+            $count = ProgramEnrollment::whereIn('participant_id', $participantIds)->delete();
+            $deletedCounts['program_enrollments'] = $count;
+            
+            // 3. Delete potential duplicates
+            $count = PotentialDuplicate::whereIn('matched_participant_id', $participantIds)->delete();
+            $deletedCounts['potential_duplicates'] = $count;
+            
+            // 4. Delete participants
+            $count = Participant::whereIn('id', $participantIds)->delete();
+            $deletedCounts['participants'] = $count;
+        }
+        
+        // 5. Delete household addresses
+        $count = DB::table('household_addresses')->whereIn('household_id', $householdIds)->delete();
+        $deletedCounts['household_addresses'] = $count;
+        
+        // 6. Delete households
+        $count = Household::whereIn('id', $householdIds)->delete();
+        $deletedCounts['households'] = $count;
+        
+        return $deletedCounts;
     }
 
     public function getAvailablePrograms()

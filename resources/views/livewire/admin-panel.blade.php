@@ -828,30 +828,60 @@
                         </div>
                     </div>
                     
+                    <!-- System Data Protection Notice -->
+                    <div class="bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg p-4 mb-6">
+                        <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">
+                            🔒 System Data Protection
+                        </h3>
+                        <p class="text-sm text-blue-700 dark:text-blue-300">
+                            These delete operations only affect participant and household data. System configuration data 
+                            (Programs, Services, Work Plans, Goals, Reference Data, Poverty Guidelines, Contracts) are protected 
+                            and cannot be deleted through these bulk operations.
+                        </p>
+                    </div>
+                    
                     <!-- Bulk Delete Actions -->
                     <div class="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg p-6">
                         <h3 class="text-lg font-medium text-red-800 dark:text-red-200 mb-4">
-                            ⚠️ Bulk Delete Operations
+                            ⚠️ Bulk Delete Operations - Participant/Household Data Only
                         </h3>
                         <p class="text-sm text-red-700 dark:text-red-300 mb-4">
-                            Use these tools to clean up test data. Always backup your database before performing bulk operations.
+                            Use these tools to clean up participant and household data. Always backup your database before performing bulk operations.
                         </p>
                         
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <button wire:click="showBulkDeleteModal('test_data')" 
-                                    class="bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700 transition duration-150 ease-in-out text-sm">
-                                🧹 Clean Test Data
-                            </button>
+                            <div class="space-y-2">
+                                <button wire:click="showBulkDeleteModal('test_data')" 
+                                        wire:loading.attr="disabled"
+                                        wire:loading.class="opacity-50 cursor-not-allowed"
+                                        class="w-full bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700 transition duration-150 ease-in-out text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <span wire:loading.remove wire:target="showBulkDeleteModal('test_data')">🧹 Clean Test Data</span>
+                                    <span wire:loading wire:target="showBulkDeleteModal('test_data')">Loading...</span>
+                                </button>
+                                <p class="text-xs text-gray-600 dark:text-gray-400">Remove imported test data only</p>
+                            </div>
                             
-                            <button wire:click="showBulkDeleteModal('participants')" 
-                                    class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition duration-150 ease-in-out text-sm">
-                                👥 Delete Participants
-                            </button>
+                            <div class="space-y-2">
+                                <button wire:click="showBulkDeleteModal('participants')" 
+                                        wire:loading.attr="disabled"
+                                        wire:loading.class="opacity-50 cursor-not-allowed"
+                                        class="w-full bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition duration-150 ease-in-out text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <span wire:loading.remove wire:target="showBulkDeleteModal('participants')">👥 Delete Participants</span>
+                                    <span wire:loading wire:target="showBulkDeleteModal('participants')">Loading...</span>
+                                </button>
+                                <p class="text-xs text-gray-600 dark:text-gray-400">Delete participant records</p>
+                            </div>
                             
-                            <button wire:click="showBulkDeleteModal('households')" 
-                                    class="bg-red-700 text-white px-4 py-2 rounded-md hover:bg-red-800 transition duration-150 ease-in-out text-sm">
-                                🏠 Delete Households
-                            </button>
+                            <div class="space-y-2">
+                                <button wire:click="showBulkDeleteModal('households')" 
+                                        wire:loading.attr="disabled"
+                                        wire:loading.class="opacity-50 cursor-not-allowed"
+                                        class="w-full bg-red-700 text-white px-4 py-2 rounded-md hover:bg-red-800 transition duration-150 ease-in-out text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <span wire:loading.remove wire:target="showBulkDeleteModal('households')">🏠 Delete Households</span>
+                                    <span wire:loading wire:target="showBulkDeleteModal('households')">Loading...</span>
+                                </button>
+                                <p class="text-xs text-gray-600 dark:text-gray-400">Delete household records and their participants</p>
+                            </div>
                         </div>
                     </div>
                     
@@ -1232,9 +1262,18 @@
                             Cancel
                         </button>
                         <button wire:click="executeBulkDelete" 
-                                class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+                                wire:loading.attr="disabled"
+                                wire:loading.class="opacity-50 cursor-not-allowed"
+                                class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed relative"
                                 @if(empty($deleteConfirmation)) disabled @endif>
-                            Delete
+                            <span wire:loading.remove wire:target="executeBulkDelete">Delete</span>
+                            <span wire:loading wire:target="executeBulkDelete">
+                                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Processing...
+                            </span>
                         </button>
                     </div>
                 </div>
