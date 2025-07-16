@@ -44,7 +44,7 @@
             <div class="p-6 bg-teal-50 dark:bg-teal-900/20 border-b border-gray-200 dark:border-zinc-600">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ $showCreateForm ? 'Create New Work Plan' : 'Edit Work Plan' }}</h3>
-                    <button wire:click="$set('showCreateForm', false); $set('showEditForm', false)" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
+                    <button wire:click="cancelForm" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -91,7 +91,7 @@
                     </div>
 
                     <div class="flex justify-end gap-2 mt-6">
-                        <button type="button" wire:click="$set('showCreateForm', false); $set('showEditForm', false)" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                        <button type="button" wire:click="cancelForm" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-gray-500">
                             Cancel
                         </button>
                         <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-teal-600 border border-transparent rounded-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500">

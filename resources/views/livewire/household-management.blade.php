@@ -133,8 +133,12 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
                                     <button wire:click="selectHousehold({{ $household->id }})" 
-                                            class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300">
-                                        Manage
+                                            wire:loading.attr="disabled"
+                                            wire:loading.class="opacity-50 cursor-wait"
+                                            wire:target="selectHousehold({{ $household->id }})"
+                                            class="px-3 py-1 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 text-sm rounded hover:bg-green-200 dark:hover:bg-green-900/40 focus:outline-none focus:ring-2 focus:ring-green-500 font-medium transition-all">
+                                        <span wire:loading.class="hidden" wire:target="selectHousehold({{ $household->id }})">Manage</span>
+                                        <span wire:loading.class.remove="hidden" class="hidden" wire:target="selectHousehold({{ $household->id }})">Loading...</span>
                                     </button>
                                 </div>
                             </td>
@@ -160,7 +164,9 @@
 
     <!-- Household Management Panel -->
     @if($selectedHousehold)
-        <div class="mt-6 bg-white dark:bg-zinc-800 shadow-lg rounded-lg overflow-hidden">
+        <div class="mt-6 bg-white dark:bg-zinc-800 shadow-lg rounded-lg overflow-hidden" 
+             x-data
+             x-init="$el.scrollIntoView({ behavior: 'smooth', block: 'start' })">
             <div class="bg-gray-50 dark:bg-zinc-700 px-6 py-4 border-b border-gray-200 dark:border-zinc-600">
                 <div class="flex items-center justify-between">
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
@@ -196,10 +202,18 @@
                 <div class="mb-6">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-lg font-medium text-gray-900 dark:text-white">Family Members</h3>
-                        <button wire:click="showAddMemberForm" 
-                                class="px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
-                            Add Family Member
-                        </button>
+                        <div class="flex space-x-2">
+                            @if($this->can('households.edit'))
+                                <button wire:click="showEditHouseholdForm" 
+                                        class="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    Edit Household
+                                </button>
+                            @endif
+                            <button wire:click="showAddMemberForm" 
+                                    class="px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+                                Add Family Member
+                            </button>
+                        </div>
                     </div>
                     
                     <div class="space-y-3">
@@ -315,6 +329,156 @@
                                 <button type="submit" 
                                         class="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
                                     Add Member
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                @endif
+                
+                <!-- Edit Household Form -->
+                @if ($showEditHousehold)
+                    <div class="mt-6 border-t border-gray-200 dark:border-zinc-600 pt-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-lg font-medium text-gray-900 dark:text-white">Edit Household Information</h4>
+                            <button wire:click="$set('showEditHousehold', false)" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <form wire:submit="updateHousehold" class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Household Type -->
+                                <div>
+                                    <label for="editHouseholdType" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Household Type <span class="text-red-500">*</span>
+                                    </label>
+                                    <select wire:model="editHouseholdType" id="editHouseholdType" 
+                                            class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">Select type...</option>
+                                        <option value="Single Person">Single Person</option>
+                                        <option value="Two Adults NO Children">Two Adults NO Children</option>
+                                        <option value="Single Parent Female">Single Parent Female</option>
+                                        <option value="Single Parent Male">Single Parent Male</option>
+                                        <option value="Two Parent Household">Two Parent Household</option>
+                                        <option value="Non-related Adults with Children">Non-related Adults with Children</option>
+                                        <option value="Multigenerational Household">Multigenerational Household</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                    @error('editHouseholdType') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                                
+                                <!-- Housing Status -->
+                                <div>
+                                    <label for="editHousingStatus" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Housing Status
+                                    </label>
+                                    <select wire:model="editHousingStatus" id="editHousingStatus" 
+                                            class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">Select status...</option>
+                                        <option value="Own">Own</option>
+                                        <option value="Rent">Rent</option>
+                                        <option value="Other permanent housing">Other permanent housing</option>
+                                        <option value="Homeless">Homeless</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                    @error('editHousingStatus') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                                
+                                <!-- Monthly Income -->
+                                <div>
+                                    <label for="editMonthlyIncome" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Monthly Income
+                                    </label>
+                                    <input type="number" wire:model="editMonthlyIncome" id="editMonthlyIncome" step="0.01" min="0"
+                                           placeholder="0.00"
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    @error('editMonthlyIncome') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                                
+                                <!-- Primary Phone -->
+                                <div>
+                                    <label for="editPrimaryPhone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Primary Phone
+                                    </label>
+                                    <input type="tel" wire:model="editPrimaryPhone" id="editPrimaryPhone" 
+                                           placeholder="(555) 123-4567"
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    @error('editPrimaryPhone') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                                
+                                <!-- Address -->
+                                <div class="md:col-span-2">
+                                    <label for="editAddress" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Street Address <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" wire:model="editAddress" id="editAddress" 
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    @error('editAddress') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                                
+                                <!-- City -->
+                                <div>
+                                    <label for="editCity" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        City <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" wire:model="editCity" id="editCity" 
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    @error('editCity') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                                
+                                <!-- State -->
+                                <div>
+                                    <label for="editState" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        State <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" wire:model="editState" id="editState" maxlength="2" 
+                                           placeholder="PA"
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    @error('editState') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                                
+                                <!-- Zip Code -->
+                                <div>
+                                    <label for="editZipCode" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Zip Code <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" wire:model="editZipCode" id="editZipCode" 
+                                           placeholder="12345"
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    @error('editZipCode') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                                
+                                <!-- County -->
+                                <div>
+                                    <label for="editCounty" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        County
+                                    </label>
+                                    <input type="text" wire:model="editCounty" id="editCounty" 
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    @error('editCounty') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                                
+                                <!-- Area -->
+                                <div>
+                                    <label for="editArea" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Area
+                                    </label>
+                                    <input type="text" wire:model="editArea" id="editArea" 
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    @error('editArea') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-end space-x-3">
+                                <button type="button" wire:click="resetEditForm" 
+                                        class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                                    Cancel
+                                </button>
+                                <button type="submit" 
+                                        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    Update Household
                                 </button>
                             </div>
                         </form>

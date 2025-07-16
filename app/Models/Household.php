@@ -16,10 +16,6 @@ class Household extends Model
         'monthly_income',
         'annual_income',
         'hhs_poverty_percentage',
-        'street_address',
-        'city',
-        'state',
-        'zip_code',
         'notes'
     ];
 
@@ -74,6 +70,16 @@ class Household extends Model
         return $this->hasMany(HousingJob::class);
     }
 
+    public function addresses(): HasMany
+    {
+        return $this->hasMany(HouseholdAddress::class)->orderBy('effective_date', 'desc');
+    }
+
+    public function currentAddress(): HasOne
+    {
+        return $this->hasOne(HouseholdAddress::class)->where('is_current', true);
+    }
+
     public function getActualHouseholdSize(): int
     {
         return $this->participants()->count();
@@ -117,5 +123,24 @@ class Household extends Model
         }
         
         return $fixed;
+    }
+
+    /**
+     * Update the household's address, creating a new address history record.
+     */
+    public function updateAddress(array $addressData, $reason = null)
+    {
+        // First, mark any current address as not current
+        $this->currentAddress?->update([
+            'is_current' => false,
+            'end_date' => now()->format('Y-m-d')
+        ]);
+
+        // Create the new address
+        return $this->addresses()->create(array_merge($addressData, [
+            'is_current' => true,
+            'effective_date' => now()->format('Y-m-d'),
+            'reason_for_change' => $reason
+        ]));
     }
 }

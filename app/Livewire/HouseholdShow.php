@@ -21,13 +21,26 @@ class HouseholdShow extends Component
         $this->householdId = $id;
         $this->household = Household::with([
             'participants',
-            'headOfHousehold'
+            'headOfHousehold',
+            'currentAddress',
+            'addresses' => function($query) {
+                $query->orderBy('effective_date', 'desc')->limit(5);
+            }
         ])->findOrFail($id);
     }
 
     public function editHousehold()
     {
-        return redirect()->route('household.management')->with('selectedHousehold', $this->householdId);
+        // Use session (not flash) to persist across redirect
+        session(['editHouseholdId' => $this->householdId]);
+        return redirect()->route('household.management');
+    }
+    
+    public function addMember()
+    {
+        // Use session (not flash) to persist across redirect
+        session(['addMemberHouseholdId' => $this->householdId]);
+        return redirect()->route('household.management');
     }
 
     public function render()

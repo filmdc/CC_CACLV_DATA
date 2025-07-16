@@ -16,7 +16,7 @@ class WorkPlanShow extends Component
     public function mount($id)
     {
         // Check if user has permission to view work plans
-        $this->authorizeAction('work-plans.view', 'You do not have permission to view work plans.');
+        $this->authorizeAction('work_plans.view', 'You do not have permission to view work plans.');
         
         $this->workPlanId = $id;
         $this->workPlan = WorkPlan::with([

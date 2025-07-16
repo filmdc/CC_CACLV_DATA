@@ -808,11 +808,20 @@ class RXOfficeHousingImportService
             'household_size' => $data['household_size'] ?? 1,
             'household_type' => $data['household_type'] ?? 'Unknown/not reported',
             'housing_status' => $data['housing_status'] ?? 'Unknown/not reported',
-            'street_address' => $address['street'],
-            'city' => $address['city'],
-            'state' => $address['state'],
-            'zip_code' => $address['zip'],
         ]);
+        
+        // Create initial address if we have address data
+        if ($address['street'] || $address['city'] || $address['state'] || $address['zip']) {
+            $household->addresses()->create([
+                'address' => $address['street'],
+                'city' => $address['city'],
+                'state' => $address['state'],
+                'zip_code' => $address['zip'],
+                'is_current' => true,
+                'effective_date' => now()->format('Y-m-d'),
+                'reason_for_change' => 'Imported from RX Office Housing',
+            ]);
+        }
         
         return $household;
     }

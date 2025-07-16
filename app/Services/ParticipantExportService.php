@@ -63,7 +63,7 @@ class ParticipantExportService
 
     public function exportParticipantById(int $participantId): string
     {
-        $participant = Participant::with('household')->findOrFail($participantId);
+        $participant = Participant::with(['household', 'household.currentAddress'])->findOrFail($participantId);
         $household = $participant->household;
         
         // Get all participants in the household for complete export
@@ -74,7 +74,7 @@ class ParticipantExportService
 
     public function exportHouseholdById(int $householdId): string
     {
-        $household = Household::with('participants')->findOrFail($householdId);
+        $household = Household::with(['participants', 'currentAddress'])->findOrFail($householdId);
         $participants = $household->participants()->orderBy('is_head_of_household', 'desc')->get();
         
         return $this->generateCsv($participants);
@@ -87,7 +87,7 @@ class ParticipantExportService
             throw new \InvalidArgumentException('Field must be either created_at or updated_at');
         }
 
-        $participants = Participant::with('household')
+        $participants = Participant::with(['household', 'household.currentAddress'])
             ->whereBetween($field, [$startDate->startOfDay(), $endDate->endOfDay()])
             ->orderBy('household_id')
             ->orderBy('is_head_of_household', 'desc')
@@ -98,7 +98,7 @@ class ParticipantExportService
 
     public function exportAll(): string
     {
-        $participants = Participant::with('household')
+        $participants = Participant::with(['household', 'household.currentAddress'])
             ->orderBy('household_id')
             ->orderBy('is_head_of_household', 'desc')
             ->get();
@@ -108,7 +108,7 @@ class ParticipantExportService
 
     public function exportByHouseholdCodes(array $householdCodes): string
     {
-        $participants = Participant::with('household')
+        $participants = Participant::with(['household', 'household.currentAddress'])
             ->whereHas('household', function($query) use ($householdCodes) {
                 $query->whereIn('household_code', $householdCodes);
             })
@@ -148,6 +148,9 @@ class ParticipantExportService
 
     protected function buildRow(Participant $participant, Household $household, bool $includeHouseholdData): array
     {
+        // Get current address for household
+        $currentAddress = $household->currentAddress;
+        
         return [
             // Household data (only for first participant in household)
             $includeHouseholdData ? $household->household_code : '',
@@ -157,10 +160,10 @@ class ParticipantExportService
             $includeHouseholdData ? $household->monthly_income : '',
             $includeHouseholdData ? $household->annual_income : '',
             $includeHouseholdData ? $household->hhs_poverty_percentage : '',
-            $includeHouseholdData ? $household->street_address : '',
-            $includeHouseholdData ? $household->city : '',
-            $includeHouseholdData ? $household->state : '',
-            $includeHouseholdData ? $household->zip_code : '',
+            $includeHouseholdData && $currentAddress ? $currentAddress->address : '',
+            $includeHouseholdData && $currentAddress ? $currentAddress->city : '',
+            $includeHouseholdData && $currentAddress ? $currentAddress->state : '',
+            $includeHouseholdData && $currentAddress ? $currentAddress->zip_code : '',
             $includeHouseholdData ? $household->notes : '',
             
             // Participant type

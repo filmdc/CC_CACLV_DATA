@@ -485,16 +485,16 @@ class InitialSetupSeeder extends Seeder
             ['name' => 'contracts.delete', 'display_name' => 'Delete Contracts', 'category' => 'Contracts'],
             
             // Work Plan permissions
-            ['name' => 'work-plans.view', 'display_name' => 'View Work Plans', 'category' => 'Work Plans'],
-            ['name' => 'work-plans.create', 'display_name' => 'Create Work Plans', 'category' => 'Work Plans'],
-            ['name' => 'work-plans.edit', 'display_name' => 'Edit Work Plans', 'category' => 'Work Plans'],
-            ['name' => 'work-plans.delete', 'display_name' => 'Delete Work Plans', 'category' => 'Work Plans'],
+            ['name' => 'work_plans.view', 'display_name' => 'View Work Plans', 'category' => 'Work Plans'],
+            ['name' => 'work_plans.create', 'display_name' => 'Create Work Plans', 'category' => 'Work Plans'],
+            ['name' => 'work_plans.edit', 'display_name' => 'Edit Work Plans', 'category' => 'Work Plans'],
+            ['name' => 'work_plans.delete', 'display_name' => 'Delete Work Plans', 'category' => 'Work Plans'],
             
             // Work Plan Goal permissions
-            ['name' => 'work-plan-goals.view', 'display_name' => 'View Work Plan Goals', 'category' => 'Work Plan Goals'],
-            ['name' => 'work-plan-goals.create', 'display_name' => 'Create Work Plan Goals', 'category' => 'Work Plan Goals'],
-            ['name' => 'work-plan-goals.edit', 'display_name' => 'Edit Work Plan Goals', 'category' => 'Work Plan Goals'],
-            ['name' => 'work-plan-goals.delete', 'display_name' => 'Delete Work Plan Goals', 'category' => 'Work Plan Goals'],
+            ['name' => 'work_plan_goals.view', 'display_name' => 'View Work Plan Goals', 'category' => 'Work Plan Goals'],
+            ['name' => 'work_plan_goals.create', 'display_name' => 'Create Work Plan Goals', 'category' => 'Work Plan Goals'],
+            ['name' => 'work_plan_goals.edit', 'display_name' => 'Edit Work Plan Goals', 'category' => 'Work Plan Goals'],
+            ['name' => 'work_plan_goals.delete', 'display_name' => 'Delete Work Plan Goals', 'category' => 'Work Plan Goals'],
             
             // Enrollment permissions
             ['name' => 'enrollments.view', 'display_name' => 'View Enrollments', 'category' => 'Enrollments'],

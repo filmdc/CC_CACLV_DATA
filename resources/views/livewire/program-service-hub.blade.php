@@ -1,6 +1,6 @@
 <div class="max-w-7xl mx-auto p-6">
     <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl p-6">
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-6">Programs & Services</h1>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-6">Programs & Work Plans</h1>
         
         <!-- Management Tools as Buttons -->
         <div class="flex flex-wrap gap-3 mb-8">
@@ -169,7 +169,7 @@
                                 </div>
                                 @endif
                                 <div class="mt-2 flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                                    <span>{{ $workPlan->work_plan_goals_count }} goals</span>
+                                    <span>{{ $workPlan->goals_count }} goals</span>
                                     @if($workPlan->start_date && $workPlan->end_date)
                                     <span>{{ $workPlan->start_date->format('M d, Y') }} - {{ $workPlan->end_date->format('M d, Y') }}</span>
                                     @endif

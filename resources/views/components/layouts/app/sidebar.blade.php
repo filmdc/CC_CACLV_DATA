@@ -24,7 +24,7 @@
 
                 @if(auth()->user()->hasAnyPermission(['programs.view', 'services.view', 'work_plans.view', 'work_plan_goals.view']) || auth()->user()->isAdmin())
                 <flux:navlist.group :heading="__('Programs')" class="grid">
-                    <flux:navlist.item icon="folder" :href="route('program.service.hub')" :current="request()->routeIs('program.service.hub')" wire:navigate>{{ __('Programs & Services') }}</flux:navlist.item>
+                    <flux:navlist.item icon="folder" :href="route('program.service.hub')" :current="request()->routeIs('program.service.hub')" wire:navigate>{{ __('Programs & Work Plans') }}</flux:navlist.item>
                 </flux:navlist.group>
                 @endif
 

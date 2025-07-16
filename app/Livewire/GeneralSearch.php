@@ -75,11 +75,14 @@ class GeneralSearch extends Component
     protected function searchHouseholds()
     {
         return Household::withCount('participants')
+            ->with('currentAddress')
             ->where(function ($query) {
                 $query->where('household_code', 'like', '%' . $this->search . '%')
-                    ->orWhere('street_address', 'like', '%' . $this->search . '%')
-                    ->orWhere('city', 'like', '%' . $this->search . '%')
-                    ->orWhere('zip_code', 'like', '%' . $this->search . '%')
+                    ->orWhereHas('currentAddress', function ($q) {
+                        $q->where('address', 'like', '%' . $this->search . '%')
+                            ->orWhere('city', 'like', '%' . $this->search . '%')
+                            ->orWhere('zip_code', 'like', '%' . $this->search . '%');
+                    })
                     ->orWhereHas('participants', function ($q) {
                         $q->where('first_name', 'like', '%' . $this->search . '%')
                             ->orWhere('last_name', 'like', '%' . $this->search . '%');

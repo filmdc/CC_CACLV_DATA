@@ -261,19 +261,28 @@ class ParticipantIntake extends Component
             // Calculate annual income if monthly is provided
             $annual_income = $this->monthly_income ? $this->monthly_income * 12 : null;
             
-            // Create household
+            // Create household (without address fields)
             $household = Household::create([
                 'household_type' => $this->household_type,
                 'household_size' => $this->household_size,
                 'housing_status' => $this->housing_status,
                 'monthly_income' => $this->monthly_income ?: null,
                 'annual_income' => $annual_income,
-                'street_address' => $this->street_address,
-                'city' => $this->city,
-                'state' => $this->state,
-                'zip_code' => $this->zip_code,
                 'notes' => $this->notes,
             ]);
+
+            // Create initial address record if any address data is provided
+            if ($this->street_address || $this->city || $this->state || $this->zip_code) {
+                $household->addresses()->create([
+                    'address' => $this->street_address,
+                    'city' => $this->city,
+                    'state' => $this->state,
+                    'zip_code' => $this->zip_code,
+                    'is_current' => true,
+                    'effective_date' => now()->format('Y-m-d'),
+                    'reason_for_change' => 'Initial intake',
+                ]);
+            }
 
             // Calculate poverty percentage
             if ($annual_income) {

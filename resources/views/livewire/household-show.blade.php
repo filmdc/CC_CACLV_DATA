@@ -8,7 +8,7 @@
                     <p class="text-blue-100 mt-2">Household Details</p>
                 </div>
                 <div class="flex space-x-3">
-                    @if ($this->can('households.update'))
+                    @if ($this->can('households.edit'))
                         <button wire:click="editHousehold" 
                                 class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-medium transition-colors">
                             Edit Household
@@ -85,32 +85,100 @@
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4 border-b border-gray-200 dark:border-zinc-700 pb-2">
                     Address Information
                 </h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Primary Address</label>
-                        <p class="text-gray-900 dark:text-white">
-                            {{ $household->address }}<br>
-                            {{ $household->city }}, {{ $household->state }} {{ $household->zip_code }}
-                        </p>
+                @if($household->currentAddress)
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Current Address</label>
+                            <p class="text-gray-900 dark:text-white">
+                                {{ $household->currentAddress->address ?: 'No street address' }}<br>
+                                @if($household->currentAddress->city || $household->currentAddress->state || $household->currentAddress->zip_code)
+                                    {{ $household->currentAddress->city }}{{ $household->currentAddress->state ? ', ' . $household->currentAddress->state : '' }} {{ $household->currentAddress->zip_code }}
+                                @endif
+                            </p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">County</label>
+                            <p class="text-gray-900 dark:text-white">{{ $household->currentAddress->county ?: 'Not specified' }}</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Area</label>
+                            <p class="text-gray-900 dark:text-white">{{ $household->currentAddress->area ?: 'Not specified' }}</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Primary Phone</label>
+                            <p class="text-gray-900 dark:text-white">{{ $household->currentAddress->primary_phone ?: 'Not specified' }}</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Effective Since</label>
+                            <p class="text-gray-900 dark:text-white">{{ $household->currentAddress->effective_date->format('M j, Y') }}</p>
+                        </div>
                     </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">County</label>
-                        <p class="text-gray-900 dark:text-white">{{ $household->county ?: 'Not specified' }}</p>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Area</label>
-                        <p class="text-gray-900 dark:text-white">{{ $household->area ?: 'Not specified' }}</p>
+                @else
+                    <p class="text-gray-500 dark:text-gray-400">No address on file</p>
+                @endif
+            </div>
+            
+            <!-- Address History -->
+            @if($household->addresses->count() > 1)
+                <div class="mb-8">
+                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4 border-b border-gray-200 dark:border-zinc-700 pb-2">
+                        Address History
+                    </h2>
+                    <div class="space-y-3">
+                        @foreach($household->addresses as $address)
+                            @if(!$address->is_current)
+                                <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="text-sm text-gray-900 dark:text-white">
+                                                {{ $address->address ?: 'No street address' }}
+                                                @if($address->city || $address->state || $address->zip_code)
+                                                    <br>{{ $address->city }}{{ $address->state ? ', ' . $address->state : '' }} {{ $address->zip_code }}
+                                                @endif
+                                            </p>
+                                            @if($address->reason_for_change)
+                                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Reason: {{ $address->reason_for_change }}</p>
+                                            @endif
+                                        </div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400 text-right">
+                                            <p>{{ $address->effective_date->format('M j, Y') }} - {{ $address->end_date ? $address->end_date->format('M j, Y') : 'Present' }}</p>
+                                            @if($address->creator)
+                                                <p>By: {{ $address->creator->name }}</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+                        @endforeach
                     </div>
                 </div>
-            </div>
+            @endif
 
             <!-- Members -->
             <div>
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4 border-b border-gray-200 dark:border-zinc-700 pb-2">
-                    Household Members ({{ $household->participants->count() }})
-                </h2>
+                <div class="flex items-center justify-between mb-4 border-b border-gray-200 dark:border-zinc-700 pb-2">
+                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+                        Household Members ({{ $household->participants->count() }})
+                    </h2>
+                    <div class="flex space-x-2">
+                        @if ($this->can('households.edit'))
+                            <button wire:click="editHousehold" 
+                                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                                Edit Info
+                            </button>
+                        @endif
+                        @if ($this->can('participants.create'))
+                            <button wire:click="addMember" 
+                                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                                Add Member
+                            </button>
+                        @endif
+                    </div>
+                </div>
                 @if($household->participants->count() > 0)
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700">

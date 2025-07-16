@@ -14,6 +14,7 @@ class HouseholdManagement extends Component
 
     public $search = '';
     public $selectedHousehold = null;
+    public $selectedHouseholdId = null;
     public $showAddMember = false;
     public $showEditHousehold = false;
     public $showViewModal = false;
@@ -28,6 +29,41 @@ class HouseholdManagement extends Component
     public $telephone = '';
     public $email = '';
     public $relationship = '';
+    
+    // Edit Household Form
+    public $editHouseholdType = '';
+    public $editHousingStatus = '';
+    public $editMonthlyIncome = '';
+    public $editPrimaryPhone = '';
+    public $editAddress = '';
+    public $editCity = '';
+    public $editState = '';
+    public $editZipCode = '';
+    public $editCounty = '';
+    public $editArea = '';
+    
+    public function mount()
+    {
+        // Check if we're coming from HouseholdShow with an edit request
+        if (session()->has('editHouseholdId')) {
+            $householdId = session('editHouseholdId');
+            session()->forget('editHouseholdId'); // Clean up session
+            $this->selectHousehold($householdId);
+            if ($this->selectedHousehold) {
+                $this->showEditHouseholdForm();
+            }
+        }
+        
+        // Check if we're coming from HouseholdShow with an add member request
+        if (session()->has('addMemberHouseholdId')) {
+            $householdId = session('addMemberHouseholdId');
+            session()->forget('addMemberHouseholdId'); // Clean up session
+            $this->selectHousehold($householdId);
+            if ($this->selectedHousehold) {
+                $this->showAddMemberForm();
+            }
+        }
+    }
 
     public function updatingSearch()
     {
@@ -36,10 +72,25 @@ class HouseholdManagement extends Component
 
     public function selectHousehold($householdId)
     {
-        $this->selectedHousehold = Household::with(['participants', 'headOfHousehold', 'familyMembers'])->find($householdId);
-        $this->showAddMember = false;
-        $this->showEditHousehold = false;
-        $this->resetMemberForm();
+        try {
+            $this->selectedHouseholdId = $householdId;
+            $this->selectedHousehold = Household::with(['participants', 'headOfHousehold', 'currentAddress'])->find($householdId);
+            
+            if (!$this->selectedHousehold) {
+                session()->flash('error', 'Household not found.');
+                $this->selectedHouseholdId = null;
+                return;
+            }
+            
+            $this->showAddMember = false;
+            $this->showEditHousehold = false;
+            $this->resetMemberForm();
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error loading household: ' . $e->getMessage());
+            $this->selectedHouseholdId = null;
+            $this->selectedHousehold = null;
+        }
     }
 
     public function showAddMemberForm()
@@ -47,6 +98,46 @@ class HouseholdManagement extends Component
         $this->showAddMember = true;
         $this->showEditHousehold = false;
         $this->resetMemberForm();
+    }
+    
+    public function showEditHouseholdForm()
+    {
+        if (!$this->can('households.edit')) {
+            session()->flash('error', 'You do not have permission to edit households.');
+            return;
+        }
+        
+        $this->showEditHousehold = true;
+        $this->showAddMember = false;
+        $this->resetMemberForm();
+        
+        // Load current household data
+        if ($this->selectedHousehold) {
+            $this->editHouseholdType = $this->selectedHousehold->household_type;
+            $this->editHousingStatus = $this->selectedHousehold->housing_status;
+            $this->editMonthlyIncome = $this->selectedHousehold->monthly_income;
+            
+            // Load address data from current address if exists
+            if ($this->selectedHousehold->currentAddress) {
+                $currentAddress = $this->selectedHousehold->currentAddress;
+                $this->editPrimaryPhone = $currentAddress->primary_phone;
+                $this->editAddress = $currentAddress->address;
+                $this->editCity = $currentAddress->city;
+                $this->editState = $currentAddress->state;
+                $this->editZipCode = $currentAddress->zip_code;
+                $this->editCounty = $currentAddress->county;
+                $this->editArea = $currentAddress->area;
+            } else {
+                // Clear address fields if no current address
+                $this->editPrimaryPhone = '';
+                $this->editAddress = '';
+                $this->editCity = '';
+                $this->editState = '';
+                $this->editZipCode = '';
+                $this->editCounty = '';
+                $this->editArea = '';
+            }
+        }
     }
 
     public function viewHousehold($householdId)
@@ -67,6 +158,21 @@ class HouseholdManagement extends Component
         $this->email = '';
         $this->relationship = '';
         $this->showViewModal = false;
+    }
+    
+    public function resetEditForm()
+    {
+        $this->editHouseholdType = '';
+        $this->editHousingStatus = '';
+        $this->editMonthlyIncome = '';
+        $this->editPrimaryPhone = '';
+        $this->editAddress = '';
+        $this->editCity = '';
+        $this->editState = '';
+        $this->editZipCode = '';
+        $this->editCounty = '';
+        $this->editArea = '';
+        $this->showEditHousehold = false;
     }
 
     public function addFamilyMember()
@@ -135,13 +241,102 @@ class HouseholdManagement extends Component
             session()->flash('error', 'An error occurred: ' . $e->getMessage());
         }
     }
+    
+    public function updateHousehold()
+    {
+        if (!$this->can('households.edit')) {
+            session()->flash('error', 'You do not have permission to edit households.');
+            return;
+        }
+        
+        $this->validate([
+            'editHouseholdType' => 'required|string',
+            'editHousingStatus' => 'nullable|string',
+            'editMonthlyIncome' => 'nullable|numeric|min:0',
+            'editPrimaryPhone' => 'nullable|string|max:20',
+            'editAddress' => 'required|string|max:255',
+            'editCity' => 'required|string|max:100',
+            'editState' => 'required|string|size:2',
+            'editZipCode' => 'required|string|regex:/^\d{5}(-\d{4})?$/',
+            'editCounty' => 'nullable|string|max:100',
+            'editArea' => 'nullable|string|max:100',
+        ]);
+        
+        if (!$this->selectedHousehold) {
+            session()->flash('error', 'No household selected.');
+            return;
+        }
+        
+        try {
+            // Update household basic info
+            $this->selectedHousehold->update([
+                'household_type' => $this->editHouseholdType,
+                'housing_status' => $this->editHousingStatus,
+                'monthly_income' => $this->editMonthlyIncome,
+            ]);
+            
+            // Check if address has changed
+            $currentAddress = $this->selectedHousehold->currentAddress;
+            $addressChanged = false;
+            
+            if ($currentAddress) {
+                $addressChanged = 
+                    $currentAddress->address !== $this->editAddress ||
+                    $currentAddress->city !== $this->editCity ||
+                    $currentAddress->state !== $this->editState ||
+                    $currentAddress->zip_code !== $this->editZipCode ||
+                    $currentAddress->county !== $this->editCounty ||
+                    $currentAddress->area !== $this->editArea ||
+                    $currentAddress->primary_phone !== $this->editPrimaryPhone;
+            } else {
+                // No current address, so if any address field is filled, it's changed
+                $addressChanged = $this->editAddress || $this->editCity || $this->editState || $this->editZipCode;
+            }
+            
+            // Create new address record if changed
+            if ($addressChanged) {
+                $this->selectedHousehold->updateAddress([
+                    'address' => $this->editAddress,
+                    'city' => $this->editCity,
+                    'state' => $this->editState,
+                    'zip_code' => $this->editZipCode,
+                    'county' => $this->editCounty,
+                    'area' => $this->editArea,
+                    'primary_phone' => $this->editPrimaryPhone,
+                ], 'Manual update via household management');
+            }
+            
+            // Recalculate poverty level if income changed
+            if ($this->selectedHousehold->monthly_income !== null) {
+                $annualIncome = $this->selectedHousehold->monthly_income * 12;
+                $povertyGuideline = \App\Models\PovertyGuideline::getCurrentGuideline(
+                    $this->selectedHousehold->household_size,
+                    $this->selectedHousehold->state
+                );
+                
+                if ($povertyGuideline) {
+                    $povertyPercentage = round(($annualIncome / $povertyGuideline->annual_income_threshold) * 100, 2);
+                    $this->selectedHousehold->update(['hhs_poverty_percentage' => $povertyPercentage]);
+                }
+            }
+            
+            session()->flash('success', 'Household information updated successfully.');
+            $this->showEditHousehold = false;
+            $this->resetEditForm();
+            $this->selectHousehold($this->selectedHousehold->id);
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+        }
+    }
 
     public function render()
     {
         $households = Household::with([
                 'headOfHousehold',
                 'participants.programEnrollments.program',
-                'participants.serviceEnrollments.service'
+                'participants.serviceEnrollments.service',
+                'currentAddress'
             ])
             ->when($this->search, function ($query) {
                 $query->where('household_code', 'like', '%' . $this->search . '%')

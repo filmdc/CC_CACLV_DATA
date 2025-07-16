@@ -17,8 +17,6 @@ class WorkPlanGoalManagement extends Component
     public $selectedGoal = null;
     public $showCreateForm = false;
     public $showEditForm = false;
-    public $showViewModal = false;
-    public $selectedViewGoal = null;
 
     // Goal Form Fields
     public $work_plan_id = '';
@@ -62,7 +60,6 @@ class WorkPlanGoalManagement extends Component
         if ($this->selectedGoal) {
             $this->showEditForm = true;
             $this->showCreateForm = false;
-            $this->showViewModal = false;
             $this->fillGoalForm();
         }
     }
@@ -75,8 +72,6 @@ class WorkPlanGoalManagement extends Component
         $this->description = '';
         $this->target_number = '';
         $this->actual_number = '';
-        $this->showViewModal = false;
-        $this->selectedViewGoal = null;
     }
 
     public function fillGoalForm()
@@ -158,6 +153,14 @@ class WorkPlanGoalManagement extends Component
         } catch (\Exception $e) {
             session()->flash('error', 'An error occurred: ' . $e->getMessage());
         }
+    }
+
+    public function cancelForm()
+    {
+        $this->showCreateForm = false;
+        $this->showEditForm = false;
+        $this->selectedGoal = null;
+        $this->resetGoalForm();
     }
 
     public function deleteGoal($goalId)

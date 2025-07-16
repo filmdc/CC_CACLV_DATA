@@ -68,7 +68,7 @@ class ProgramServiceHub extends Component
         }
 
         return WorkPlan::with(['program'])
-            ->withCount('workPlanGoals')
+            ->withCount('goals')
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
                     ->orWhereHas('program', function ($q) {

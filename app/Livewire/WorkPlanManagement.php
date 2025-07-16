@@ -152,6 +152,14 @@ class WorkPlanManagement extends Component
         }
     }
 
+    public function cancelForm()
+    {
+        $this->showCreateForm = false;
+        $this->showEditForm = false;
+        $this->selectedWorkPlan = null;
+        $this->resetWorkPlanForm();
+    }
+
     public function toggleWorkPlanStatus($workPlanId)
     {
         if (!$this->can('work_plans.edit') && !$this->isAdmin()) {
