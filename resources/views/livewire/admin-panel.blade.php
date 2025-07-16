@@ -1220,10 +1220,16 @@
                     </div>
                     
                     <!-- Preview -->
-                    <div class="bg-gray-50 dark:bg-zinc-700 rounded-lg p-4">
+                    <div class="bg-gray-50 dark:bg-zinc-700 rounded-lg p-4" wire:poll.5s>
                         <h4 class="font-medium text-gray-900 dark:text-white mb-2">Preview</h4>
                         @if($bulkDeleteType === 'test_data')
-                            @php $preview = $this->getBulkDeletePreview(); @endphp
+                            @php 
+                                try {
+                                    $preview = $this->getBulkDeletePreview();
+                                } catch (\Exception $e) {
+                                    $preview = ['participants' => 0, 'households' => 0, 'duplicates' => 0, 'import_logs' => 0];
+                                }
+                            @endphp
                             <div class="text-sm space-y-1">
                                 <div>Participants to delete: <span class="font-semibold">{{ $preview['participants'] ?? 0 }}</span></div>
                                 <div>Households to delete: <span class="font-semibold">{{ $preview['households'] ?? 0 }}</span></div>
@@ -1232,7 +1238,7 @@
                             </div>
                         @else
                             <div class="text-sm">
-                                Records to delete: <span class="font-semibold">{{ $this->getBulkDeletePreview() }}</span>
+                                Records to delete: <span class="font-semibold">{{ is_numeric($preview = $this->getBulkDeletePreview()) ? $preview : 0 }}</span>
                             </div>
                         @endif
                     </div>
@@ -1250,9 +1256,18 @@
                             </span> 
                             to confirm
                         </label>
-                        <input type="text" wire:model="deleteConfirmation" id="confirmation" 
-                               class="mt-1 block w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white"
+                        @php
+                            $expectedText = $bulkDeleteType === 'test_data' ? 'DELETE TEST DATA' : 'DELETE ' . strtoupper($bulkDeleteType);
+                            $isMatching = strtoupper(trim($deleteConfirmation)) === $expectedText;
+                        @endphp
+                        <input type="text" wire:model.live="deleteConfirmation" id="confirmation" 
+                               class="mt-1 block w-full rounded-md {{ $isMatching ? 'border-green-500 focus:border-green-500 focus:ring-green-500' : 'border-gray-300 dark:border-zinc-600' }} dark:bg-zinc-700 dark:text-white"
                                placeholder="Type confirmation text here">
+                        @if($deleteConfirmation && !$isMatching)
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">Confirmation text does not match</p>
+                        @elseif($isMatching)
+                            <p class="mt-1 text-sm text-green-600 dark:text-green-400">✓ Confirmation text matches</p>
+                        @endif
                     </div>
                     
                     <!-- Actions -->
@@ -1261,11 +1276,15 @@
                                 class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">
                             Cancel
                         </button>
+                        @php
+                            $expectedConfirmation = $bulkDeleteType === 'test_data' ? 'DELETE TEST DATA' : 'DELETE ' . strtoupper($bulkDeleteType);
+                            $isConfirmationValid = strtoupper(trim($deleteConfirmation)) === $expectedConfirmation;
+                        @endphp
                         <button wire:click="executeBulkDelete" 
                                 wire:loading.attr="disabled"
                                 wire:loading.class="opacity-50 cursor-not-allowed"
                                 class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed relative"
-                                @if(empty($deleteConfirmation)) disabled @endif>
+                                @if(!$isConfirmationValid) disabled @endif>
                             <span wire:loading.remove wire:target="executeBulkDelete">Delete</span>
                             <span wire:loading wire:target="executeBulkDelete">
                                 <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
