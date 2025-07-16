@@ -562,8 +562,19 @@ class ParticipantImportService
             $household = new Household();
         }
         
+        // Extract address fields before processing
+        $addressFields = ['street_address', 'city', 'state', 'zip_code'];
+        $addressData = [];
+        
         foreach ($householdData as $field => $value) {
-            if ($value !== null && $field !== 'household_notes') {
+            if (in_array($field, $addressFields)) {
+                // Map street_address to address for the address history table
+                if ($field === 'street_address') {
+                    $addressData['address'] = $value;
+                } else {
+                    $addressData[$field] = $value;
+                }
+            } elseif ($value !== null && $field !== 'household_notes') {
                 $household->$field = $value;
             } elseif ($field === 'household_notes') {
                 $household->notes = $value;
@@ -571,6 +582,11 @@ class ParticipantImportService
         }
         
         $household->save();
+        
+        // Create address history record if we have address data
+        if (!empty(array_filter($addressData))) {
+            $household->updateAddress($addressData, 'Initial import from participant data');
+        }
         
         // Calculate poverty percentage after saving household data
         $this->calculateAndUpdatePovertyLevel($household);

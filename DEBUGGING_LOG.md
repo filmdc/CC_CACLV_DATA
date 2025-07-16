@@ -130,9 +130,18 @@ When encountering errors:
 
 ---
 
+### 6. ParticipantImportService Not Using Address History
+**Issue**: The general participant import service was still trying to save address fields directly to the household table instead of using the address history system.
+**Root Cause**: The service wasn't updated when the address history system was implemented.
+**Fix**: Updated `processHousehold` method to extract address fields and use the `updateAddress` method to create address history records.
+**Files Affected**:
+- `/app/Services/ParticipantImportService.php`
+**Status**: Fixed
+
 ## Future Improvements
 
 1. **Add Database Field Validation**: Create a command to validate that all model fillable fields exist in database
 2. **Implement Field Mapping Registry**: Central location for field name mappings to prevent schema mismatches
 3. **Enhanced Error Logging**: Add more detailed error context in catch blocks
 4. **Automated Testing**: Add tests for critical data flows like participant intake and household management
+5. **Duplicate Detection Cleanup**: Add validation to ensure matched participants exist before displaying in duplicate management UI
