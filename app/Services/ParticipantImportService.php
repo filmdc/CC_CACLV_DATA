@@ -19,6 +19,7 @@ class ParticipantImportService
 {
     protected ReferenceDataTransformationService $transformer;
     protected ?ReferenceDataSet $importDefaultSet;
+    protected ?ReferenceDataSet $selectedReferenceDataSet = null;
 
     public function __construct(ReferenceDataTransformationService $transformer)
     {
@@ -52,12 +53,15 @@ class ParticipantImportService
 
     protected function getValidEnumValues(string $category): array
     {
-        if (!$this->importDefaultSet) {
-            // Fallback to basic CSBG-compliant values if no import default set
+        // Use selected reference data set if available, otherwise use import default
+        $referenceSet = $this->selectedReferenceDataSet ?? $this->importDefaultSet;
+        
+        if (!$referenceSet) {
+            // Fallback to basic CSBG-compliant values if no set available
             return $this->getFallbackValues($category);
         }
 
-        $referenceData = $this->importDefaultSet->referenceData()
+        $referenceData = $referenceSet->referenceData()
             ->where('category', $category)
             ->where('active', true)
             ->pluck('value')
@@ -140,8 +144,15 @@ class ParticipantImportService
         return $fallbacks[$category] ?? [];
     }
 
-    public function validateFile(string $filePath): array
+    public function validateFile(string $filePath, array $options = []): array
     {
+        // Set selected reference data set if provided
+        if (!empty($options['reference_data_set_id'])) {
+            $this->selectedReferenceDataSet = ReferenceDataSet::find($options['reference_data_set_id']);
+            // Also set it in the transformer for consistency
+            $this->transformer->setSelectedReferenceDataSet($this->selectedReferenceDataSet);
+        }
+        
         try {
             
             $csv = Reader::createFromPath($filePath, 'r');
@@ -233,13 +244,20 @@ class ParticipantImportService
     {
         $updateExisting = $options['update_existing'] ?? false;
         $skipErrors = $options['skip_errors'] ?? false;
+        $chunkSize = $options['chunk_size'] ?? 100; // Process 100 records at a time
+        
+        // Set selected reference data set if provided
+        if (!empty($options['reference_data_set_id'])) {
+            $this->selectedReferenceDataSet = ReferenceDataSet::find($options['reference_data_set_id']);
+            // Also set it in the transformer for consistency
+            $this->transformer->setSelectedReferenceDataSet($this->selectedReferenceDataSet);
+        }
         
         try {
             DB::beginTransaction();
             
             $csv = Reader::createFromPath($filePath, 'r');
             $csv->setHeaderOffset(0);
-            $records = iterator_to_array($csv->getRecords());
             
             $results = [
                 'success' => true,
@@ -253,62 +271,101 @@ class ParticipantImportService
             
             $currentHousehold = null;
             $householdParticipants = [];
+            $recordCount = 0;
+            $processedChunks = 0;
             
-            foreach ($records as $index => $record) {
-                $rowNumber = $index + 2;
+            // Process CSV in chunks for better memory efficiency
+            $stmt = (new \League\Csv\Statement())
+                ->offset(0)
+                ->limit($chunkSize);
+            
+            do {
+                $records = $stmt->process($csv);
+                $hasRecords = false;
                 
-                try {
-                    $parsedRecord = $this->parseRecord($record);
-                    $validation = $this->validateSingleRecord($record, $rowNumber);
+                foreach ($records as $index => $record) {
+                    $hasRecords = true;
+                    $rowNumber = ($processedChunks * $chunkSize) + $index + 2;
+                    $recordCount++;
                     
-                    if (!$validation['valid'] && !$skipErrors) {
-                        throw new \Exception(implode('; ', $validation['errors']));
-                    }
-                    
-                    if (!$validation['valid'] && $skipErrors) {
+                    try {
+                        $parsedRecord = $this->parseRecord($record);
+                        $validation = $this->validateSingleRecord($record, $rowNumber);
+                        
+                        if (!$validation['valid'] && !$skipErrors) {
+                            throw new \Exception(implode('; ', $validation['errors']));
+                        }
+                        
+                        if (!$validation['valid'] && $skipErrors) {
+                            $results['skipped_records']++;
+                            $results['errors'][] = "Row {$rowNumber}: " . implode('; ', $validation['errors']);
+                            continue;
+                        }
+                        
+                        // Check if this is a new household (only when household_code is provided and different)
+                        if (!empty($record['household_code']) && 
+                            (!$currentHousehold || $currentHousehold->household_code !== $record['household_code'])) {
+                            
+                            // Process previous household participants if any
+                            if ($currentHousehold && !empty($householdParticipants)) {
+                                $processedCounts = $this->processHouseholdParticipants($currentHousehold, $householdParticipants, $updateExisting);
+                                $results['processed_participants'] += $processedCounts['created'];
+                                $results['updated_participants'] += $processedCounts['updated'];
+                            }
+                            
+                            // Create or find household
+                            $currentHousehold = $this->processHousehold($parsedRecord, $updateExisting);
+                            $householdParticipants = [];
+                            
+                            if ($updateExisting && $currentHousehold->wasRecentlyCreated === false) {
+                                $results['updated_households']++;
+                            } else {
+                                $results['processed_households']++;
+                            }
+                        } elseif (empty($record['household_code']) && $currentHousehold) {
+                            // Family member with no household_code - inherit from current household
+                            $parsedRecord['household']['household_code'] = $currentHousehold->household_code;
+                            
+                            // Copy essential household data from current household for consistency
+                            $parsedRecord['household']['id'] = $currentHousehold->id;
+                        }
+                        
+                        // Add participant to current household
+                        if ($currentHousehold) {
+                            $parsedRecord['household_id'] = $currentHousehold->id; // Ensure household_id is set
+                            $householdParticipants[] = $parsedRecord;
+                        }
+                        
+                    } catch (\Exception $e) {
+                        if (!$skipErrors) {
+                            throw $e;
+                        }
+                        
                         $results['skipped_records']++;
-                        $results['errors'][] = "Row {$rowNumber}: " . implode('; ', $validation['errors']);
-                        continue;
+                        $results['errors'][] = "Row {$rowNumber}: " . $e->getMessage();
                     }
-                    
-                    // Check if this is a new household
-                    if (!empty($record['household_code']) && 
-                        (!$currentHousehold || $currentHousehold->household_code !== $record['household_code'])) {
-                        
-                        // Process previous household participants if any
-                        if ($currentHousehold && !empty($householdParticipants)) {
-                            $this->processHouseholdParticipants($currentHousehold, $householdParticipants, $updateExisting);
-                        }
-                        
-                        // Create or find household
-                        $currentHousehold = $this->processHousehold($parsedRecord, $updateExisting);
-                        $householdParticipants = [];
-                        
-                        if ($updateExisting && $currentHousehold->wasRecentlyCreated === false) {
-                            $results['updated_households']++;
-                        } else {
-                            $results['processed_households']++;
-                        }
-                    }
-                    
-                    // Add participant to current household
-                    if ($currentHousehold) {
-                        $householdParticipants[] = $parsedRecord;
-                    }
-                    
-                } catch (\Exception $e) {
-                    if (!$skipErrors) {
-                        throw $e;
-                    }
-                    
-                    $results['skipped_records']++;
-                    $results['errors'][] = "Row {$rowNumber}: " . $e->getMessage();
                 }
-            }
+                
+                // Move to next chunk
+                $processedChunks++;
+                $stmt = $stmt->offset($processedChunks * $chunkSize);
+                
+                // Log progress for large imports
+                if ($recordCount % 500 === 0) {
+                    Log::info('Import progress', [
+                        'processed_records' => $recordCount,
+                        'processed_households' => $results['processed_households'],
+                        'processed_participants' => $results['processed_participants']
+                    ]);
+                }
+                
+            } while ($hasRecords);
             
             // Process final household participants
             if ($currentHousehold && !empty($householdParticipants)) {
-                $this->processHouseholdParticipants($currentHousehold, $householdParticipants, $updateExisting);
+                $processedCounts = $this->processHouseholdParticipants($currentHousehold, $householdParticipants, $updateExisting);
+                $results['processed_participants'] += $processedCounts['created'];
+                $results['updated_participants'] += $processedCounts['updated'];
             }
             
             DB::commit();
@@ -387,8 +444,16 @@ class ParticipantImportService
         
         // Required field validation
         foreach ($this->requiredHeaders as $field) {
-            if (empty($record[$field])) {
-                $errors[] = "Row {$rowNumber}: Missing required field '{$field}'";
+            // Special handling for household_code - only required for HEAD_OF_HOUSEHOLD
+            if ($field === 'household_code') {
+                if (empty($record[$field]) && 
+                    (!isset($record['participant_type']) || $record['participant_type'] === 'HEAD_OF_HOUSEHOLD')) {
+                    $errors[] = "Row {$rowNumber}: Missing required field 'household_code' for head of household";
+                }
+            } else {
+                if (empty($record[$field])) {
+                    $errors[] = "Row {$rowNumber}: Missing required field '{$field}'";
+                }
             }
         }
         
@@ -409,7 +474,11 @@ class ParticipantImportService
             if (!empty($record[$field])) {
                 $validValues = $this->getValidEnumValues($field);
                 if (!empty($validValues) && !in_array($record[$field], $validValues)) {
-                    $errors[] = "Row {$rowNumber}: Invalid value for '{$field}': {$record[$field]}";
+                    $validOptions = implode('; ', array_slice($validValues, 0, 5));
+                    if (count($validValues) > 5) {
+                        $validOptions .= '... (' . count($validValues) . ' total options)';
+                    }
+                    $errors[] = "Row {$rowNumber}: Invalid value for '{$field}': '{$record[$field]}'. Valid options are: {$validOptions}";
                 }
             }
         }
@@ -420,7 +489,8 @@ class ParticipantImportService
             if (!empty($record[$field])) {
                 $validValues = $this->getValidEnumValues($field);
                 if (!empty($validValues) && !in_array($record[$field], $validValues)) {
-                    $errors[] = "Row {$rowNumber}: Invalid value for '{$field}': {$record[$field]}";
+                    $validOptions = implode('; ', $validValues);
+                    $errors[] = "Row {$rowNumber}: Invalid value for '{$field}': '{$record[$field]}'. Valid options are: {$validOptions}";
                 }
             }
         }
@@ -482,7 +552,7 @@ class ParticipantImportService
             case 'integer':
                 return is_numeric($transformedValue) ? (int) $transformedValue : null;
             case 'date':
-                return $this->parseDate($transformedValue);
+                return is_string($transformedValue) ? $this->parseDate($transformedValue) : $transformedValue;
             case 'array':
                 return $this->parseArray($transformedValue);
             default:
@@ -524,13 +594,23 @@ class ParticipantImportService
         }
     }
 
-    protected function parseArray(string $value): ?array
+    protected function parseArray($value): ?array
     {
-        if (empty($value)) {
-            return null;
+        // If it's already an array, return it
+        if (is_array($value)) {
+            return empty($value) ? null : $value;
         }
         
-        return array_map('trim', explode('|', $value));
+        // If it's a string, parse it
+        if (is_string($value)) {
+            if (empty($value)) {
+                return null;
+            }
+            return array_map('trim', explode('|', $value));
+        }
+        
+        // For any other type, return null
+        return null;
     }
 
     protected function parseDate(string $value): ?Carbon
@@ -595,8 +675,10 @@ class ParticipantImportService
         return $household;
     }
 
-    protected function processHouseholdParticipants(Household $household, array $participantsData, bool $updateExisting): void
+    protected function processHouseholdParticipants(Household $household, array $participantsData, bool $updateExisting): array
     {
+        $counts = ['created' => 0, 'updated' => 0];
+        
         foreach ($participantsData as $participantData) {
             $participant = $participantData['participant'];
             $participant['household_id'] = $household->id;
@@ -617,11 +699,14 @@ class ParticipantImportService
                 
                 if ($existingParticipant) {
                     $existingParticipant->update($participant);
+                    $counts['updated']++;
                 } else {
                     Participant::create($participant);
+                    $counts['created']++;
                 }
             } else {
                 Participant::create($participant);
+                $counts['created']++;
             }
         }
         
@@ -632,6 +717,8 @@ class ParticipantImportService
         $this->calculateAndUpdatePovertyLevel($household);
         
         $household->save();
+        
+        return $counts;
     }
 
     protected function countHouseholds(array $records): int

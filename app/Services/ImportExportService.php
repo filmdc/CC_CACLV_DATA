@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Services\ParticipantExportService;
 use App\Services\ParticipantImportService;
+use App\Models\ImportAuditLog;
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -135,7 +136,7 @@ class ImportExportService
     /**
      * Validate uploaded import file
      */
-    public function validateImportFile(UploadedFile $file): array
+    public function validateImportFile(UploadedFile $file, array $options = []): array
     {
         try {
             // Validate file type - accept various CSV MIME types
@@ -176,8 +177,8 @@ class ImportExportService
             $fullPath = Storage::disk('local')->path($tempPath);
             
             
-            // Validate file content
-            $validation = $this->importService->validateFile($fullPath);
+            // Validate file content with optional reference data set
+            $validation = $this->importService->validateFile($fullPath, $options);
             
             // Clean up temp file if validation failed
             if (!$validation['valid']) {
@@ -257,15 +258,28 @@ class ImportExportService
      */
     public function processImport(string $tempFilePath, array $options = []): array
     {
+        // Create audit log entry
+        $auditLog = ImportAuditLog::logImport([
+            'import_type' => 'participant',
+            'file_name' => basename($tempFilePath),
+            'file_size' => Storage::disk('local')->size($tempFilePath),
+            'reference_data_set_id' => $options['reference_data_set_id'] ?? null,
+            'options' => $options
+        ]);
+        
         try {
             $fullPath = Storage::disk('local')->path($tempFilePath);
             $results = $this->importService->processImport($fullPath, $options);
+            
+            // Update audit log with results
+            $auditLog->markCompleted($results);
             
             // Clean up temp file
             Storage::disk('local')->delete($tempFilePath);
             
             if ($results['success']) {
                 Log::info('Import completed successfully', [
+                    'audit_log_id' => $auditLog->id,
                     'processed_households' => $results['processed_households'],
                     'processed_participants' => $results['processed_participants'],
                     'updated_households' => $results['updated_households'],
@@ -274,6 +288,7 @@ class ImportExportService
                 ]);
             } else {
                 Log::error('Import failed', [
+                    'audit_log_id' => $auditLog->id,
                     'error' => $results['error']
                 ]);
             }
@@ -281,10 +296,17 @@ class ImportExportService
             return $results;
             
         } catch (\Exception $e) {
+            // Update audit log with failure
+            $auditLog->markCompleted([
+                'success' => false,
+                'error' => $e->getMessage()
+            ]);
+            
             // Clean up temp file on error
             Storage::disk('local')->delete($tempFilePath);
             
             Log::error('Import processing failed', [
+                'audit_log_id' => $auditLog->id,
                 'error' => $e->getMessage(),
                 'temp_file' => $tempFilePath
             ]);

@@ -152,8 +152,8 @@ class ParticipantExportService
         $currentAddress = $household->currentAddress;
         
         return [
-            // Household data (only for first participant in household)
-            $includeHouseholdData ? $household->household_code : '',
+            // Household data - always include household_code, other fields only for first participant
+            $household->household_code, // Always include household code for all members
             $includeHouseholdData ? $household->household_type : '',
             $includeHouseholdData ? $household->household_size : '',
             $includeHouseholdData ? $household->housing_status : '',
@@ -270,12 +270,12 @@ class ParticipantExportService
                 'John', // first_name
                 'Michael', // middle_name
                 'Doe', // last_name
-                'Sr.', // suffix
+                '', // suffix
                 '1985-06-15', // date_of_birth
                 'Male', // gender
                 '702-555-0123', // telephone
                 'john.doe@email.com', // email
-                'High school diploma/GED', // education_level
+                'High School Graduate', // education_level
                 'FALSE', // currently_enrolled_in_education
                 '', // education_enrollment_type
                 'No', // disability_status
@@ -284,10 +284,10 @@ class ParticipantExportService
                 'FALSE', // has_chronic_health_conditions
                 'Employment Based|Medicaid', // health_insurance_sources
                 'Yes', // health_insurance_status
-                'Not Hispanic or Latino', // ethnicity
+                'Not Hispanic, Latino or Spanish Origins', // ethnicity
                 'White', // race
-                'Not applicable', // military_status
-                'Employed full-time', // work_status
+                'Never Served in the Military', // military_status
+                'Employed Full-Time', // work_status
                 '40.00', // hours_worked_per_week
                 'FALSE', // is_seeking_employment
                 'FALSE', // is_underemployed
@@ -301,8 +301,8 @@ class ParticipantExportService
                 'Head of household - primary earner', // participant_notes
             ],
             [
-                // Family member - no household data
-                '', '', '', '', '', '', '', '', '', '', '', '', // Empty household fields
+                // Family member - same household code, other household fields empty
+                'ABC123H', '', '', '', '', '', '', '', '', '', '', '', // household_code filled, others empty
                 'FAMILY_MEMBER', // participant_type
                 'Jane', // first_name
                 'Elizabeth', // middle_name
@@ -312,7 +312,7 @@ class ParticipantExportService
                 'Female', // gender
                 '702-555-0124', // telephone
                 'jane.doe@email.com', // email
-                'Some college', // education_level
+                '12th Grade + Some Post-Secondary', // education_level
                 'TRUE', // currently_enrolled_in_education
                 'College', // education_enrollment_type
                 'No', // disability_status
@@ -321,10 +321,10 @@ class ParticipantExportService
                 'FALSE', // has_chronic_health_conditions
                 'Employment Based', // health_insurance_sources
                 'Yes', // health_insurance_status
-                'Hispanic or Latino', // ethnicity
+                'Hispanic, Latino or Spanish Origins', // ethnicity
                 'White|American Indian or Alaska Native', // race (multiple races)
-                'Not applicable', // military_status
-                'Employed part-time', // work_status
+                'Never Served in the Military', // military_status
+                'Employed Part-Time', // work_status
                 '20.00', // hours_worked_per_week
                 'FALSE', // is_seeking_employment
                 'TRUE', // is_underemployed

@@ -153,14 +153,12 @@
                                         class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
                                         wire:loading.attr="disabled" 
                                         wire:target="export">
-                                    <div class="flex items-center">
-                                        <svg wire:loading.class.remove="hidden" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" fill="none" viewBox="0 0 24 24" wire:target="export">
-                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        <span wire:loading.class="hidden" wire:target="export">Export Data</span>
-                                        <span wire:loading.class.remove="hidden" class="hidden" wire:target="export">Exporting...</span>
-                                    </div>
+                                    <svg wire:loading wire:target="export" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <span wire:loading.remove wire:target="export">Export Data</span>
+                                    <span wire:loading wire:target="export">Exporting...</span>
                                 </button>
 
                                 <button type="button" wire:click="resetExportForm"
@@ -223,6 +221,25 @@
                         @error('importFile') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
 
+                    <!-- Reference Data Set Selection -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Reference Data Set for Validation</label>
+                        <select wire:model="selectedReferenceDataSet" 
+                                class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500">
+                            <option value="">Use Import Default</option>
+                            @foreach($this->availableReferenceDataSets as $dataSet)
+                                <option value="{{ $dataSet->id }}">
+                                    {{ $dataSet->name }} ({{ $dataSet->version }})
+                                    @if($dataSet->is_active) - Active @endif
+                                    @if($dataSet->is_import_default) - Import Default @endif
+                                </option>
+                            @endforeach
+                        </select>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            Select a reference data set for validating import values. Use this for historical data imports.
+                        </p>
+                    </div>
+
                     <!-- Import Options -->
                     <div class="space-y-4">
                         <div class="flex items-center">
@@ -273,6 +290,13 @@
                                     <button wire:click="previewImport"
                                             class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-zinc-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-600">
                                         Preview Data
+                                    </button>
+                                    <button wire:click="previewTransformations"
+                                            class="inline-flex items-center px-4 py-2 border border-purple-300 dark:border-purple-600 text-sm font-medium rounded-md text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-900 hover:bg-purple-100 dark:hover:bg-purple-800">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+                                        </svg>
+                                        Preview Transformations
                                     </button>
                                     <button wire:click="processImport"
                                             class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 disabled:opacity-50"
@@ -590,13 +614,13 @@
                                         <div class="flex items-center justify-between">
                                             <div class="flex items-center">
                                                 <div class="flex-shrink-0">
-                                                    @if($log->status === 'success')
+                                                    @if($log->status === 'completed')
                                                         <div class="h-8 w-8 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
                                                             <svg class="h-5 w-5 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
                                                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                                                             </svg>
                                                         </div>
-                                                    @elseif($log->status === 'partial')
+                                                    @elseif($log->status === 'processing')
                                                         <div class="h-8 w-8 rounded-full bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center">
                                                             <svg class="h-5 w-5 text-yellow-600 dark:text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                                                                 <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
@@ -613,17 +637,17 @@
                                                 <div class="ml-4">
                                                     <div class="flex items-center">
                                                         <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                                            {{ $log->template->name ?? 'Unknown Template' }}
+                                                            {{ ucfirst(str_replace('_', ' ', $log->import_type)) }} Import
                                                         </p>
                                                         <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                                                            @if($log->status === 'success') bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200
-                                                            @elseif($log->status === 'partial') bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200
+                                                            @if($log->status === 'completed') bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200
+                                                            @elseif($log->status === 'processing') bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200
                                                             @else bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 @endif">
                                                             {{ ucfirst($log->status) }}
                                                         </span>
                                                     </div>
                                                     <div class="mt-1 flex items-center text-sm text-gray-500 dark:text-gray-400">
-                                                        <span>{{ $log->original_filename }}</span>
+                                                        <span>{{ $log->file_name }}</span>
                                                         <span class="mx-2">•</span>
                                                         <span>{{ $log->created_at->format('M j, Y g:i A') }}</span>
                                                         <span class="mx-2">•</span>
@@ -634,75 +658,32 @@
                                             <div class="flex items-center space-x-4">
                                                 <div class="text-right">
                                                     <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                                        {{ $log->successful_records }}/{{ $log->total_records }} records
+                                                        {{ $log->records_created }}/{{ $log->records_processed }} records
                                                     </p>
-                                                    @if($log->failed_records > 0)
+                                                    @if($log->records_skipped > 0)
                                                         <p class="text-sm text-red-600 dark:text-red-400">
-                                                            {{ $log->failed_records }} failed
+                                                            {{ $log->records_skipped }} skipped
                                                         </p>
                                                     @endif
                                                 </div>
-                                                @if($log->errors && count($log->errors) > 0)
+                                                @if($log->error_summary)
                                                     <button wire:click="toggleErrorDetails({{ $log->id }})" 
                                                             class="inline-flex items-center px-3 py-1.5 border border-red-300 dark:border-red-600 text-xs font-medium rounded text-red-700 dark:text-red-300 bg-white dark:bg-zinc-700 hover:bg-red-50 dark:hover:bg-red-900">
                                                         @if(in_array($log->id, $this->expandedErrors ?? []))
-                                                            Hide Errors
+                                                            Hide Details
                                                         @else
-                                                            View {{ count($log->errors) }} Errors
+                                                            View Details
                                                         @endif
                                                     </button>
                                                 @endif
                                             </div>
                                         </div>
                                         
-                                        @if($log->errors && count($log->errors) > 0 && in_array($log->id, $this->expandedErrors ?? []))
+                                        @if($log->error_summary && in_array($log->id, $this->expandedErrors ?? []))
                                             <div class="mt-4 border-t border-gray-200 dark:border-zinc-700 pt-4">
-                                                <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Import Errors:</h4>
+                                                <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Error Details:</h4>
                                                 <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-3 max-h-60 overflow-y-auto">
-                                                    <ul class="space-y-2">
-                                                        @foreach($log->errors as $error)
-                                                            <li class="text-sm text-red-800 dark:text-red-200">
-                                                                @if(is_array($error))
-                                                                    <div class="font-medium">
-                                                                        {{ $error['message'] ?? 'Unknown error' }}
-                                                                    </div>
-                                                                    @if(isset($error['row_number']))
-                                                                        <div class="text-xs opacity-75 mt-1">
-                                                                            Row: {{ $error['row_number'] }}
-                                                                        </div>
-                                                                    @endif
-                                                                @else
-                                                                    <div class="font-mono">{{ $error }}</div>
-                                                                @endif
-                                                            </li>
-                                                        @endforeach
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        @endif
-                                        
-                                        @if($log->warnings && count($log->warnings) > 0 && in_array($log->id, $this->expandedErrors ?? []))
-                                            <div class="mt-4">
-                                                <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Warnings:</h4>
-                                                <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-3 max-h-40 overflow-y-auto">
-                                                    <ul class="space-y-2">
-                                                        @foreach($log->warnings as $warning)
-                                                            <li class="text-sm text-yellow-800 dark:text-yellow-200">
-                                                                @if(is_array($warning))
-                                                                    <div class="font-medium">
-                                                                        {{ $warning['message'] ?? 'Unknown warning' }}
-                                                                    </div>
-                                                                    @if(isset($warning['row_number']))
-                                                                        <div class="text-xs opacity-75 mt-1">
-                                                                            Row: {{ $warning['row_number'] }}
-                                                                        </div>
-                                                                    @endif
-                                                                @else
-                                                                    <div class="font-mono">{{ $warning }}</div>
-                                                                @endif
-                                                            </li>
-                                                        @endforeach
-                                                    </ul>
+                                                    <p class="text-sm text-red-800 dark:text-red-200 whitespace-pre-wrap">{{ $log->error_summary }}</p>
                                                 </div>
                                             </div>
                                         @endif
@@ -741,6 +722,88 @@
             @endif
         </div>
     </div>
+    
+    <!-- Transformation Preview Modal -->
+    @if($showTransformationPreview ?? false)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[80vh] overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-700">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Data Transformation Preview</h3>
+                        <button wire:click="$set('showTransformationPreview', false)" 
+                                class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="px-6 py-4 overflow-y-auto max-h-[calc(80vh-8rem)]">
+                    @if($transformationPreview ?? false)
+                        <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
+                            <p>Showing how data will be transformed during import. These transformations help ensure data consistency and CSBG compliance.</p>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700">
+                                <thead class="bg-gray-50 dark:bg-zinc-700">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Field</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Original Value</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Transformed Value</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-zinc-700">
+                                    @foreach($transformationPreview['transformations'] ?? [] as $field => $transformation)
+                                        <tr>
+                                            <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">{{ ucwords(str_replace('_', ' ', $field)) }}</td>
+                                            <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{{ $transformation['original'] ?? 'N/A' }}</td>
+                                            <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">{{ $transformation['transformed'] ?? 'N/A' }}</td>
+                                            <td class="px-4 py-3 text-sm">
+                                                @if($transformation['changed'] ?? false)
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                                        Transformed
+                                                    </span>
+                                                @else
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300">
+                                                        No Change
+                                                    </span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        @if($transformationPreview['summary'] ?? false)
+                            <div class="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-md">
+                                <h4 class="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">Transformation Summary</h4>
+                                <ul class="text-sm text-blue-700 dark:text-blue-300 space-y-1">
+                                    <li>Total fields: {{ $transformationPreview['summary']['total_fields'] ?? 0 }}</li>
+                                    <li>Fields transformed: {{ $transformationPreview['summary']['transformed_count'] ?? 0 }}</li>
+                                    <li>Fields unchanged: {{ $transformationPreview['summary']['unchanged_count'] ?? 0 }}</li>
+                                </ul>
+                            </div>
+                        @endif
+                    @else
+                        <div class="text-center py-8">
+                            <p class="text-gray-500 dark:text-gray-400">Loading transformation preview...</p>
+                        </div>
+                    @endif
+                </div>
+                
+                <div class="px-6 py-4 border-t border-gray-200 dark:border-zinc-700 flex justify-end">
+                    <button wire:click="$set('showTransformationPreview', false)" 
+                            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-zinc-700 hover:bg-gray-200 dark:hover:bg-zinc-600 rounded-md">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>
 
 <script>

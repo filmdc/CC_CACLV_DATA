@@ -52,6 +52,9 @@ class ParticipantImportExport extends Component
     public $skipErrors = true;
     public $showPreview = false;
     public $importResult = null;
+    public $selectedReferenceDataSet = ''; // New property for reference data set selection
+    public $showTransformationPreview = false;
+    public $transformationPreview = null;
 
     protected ImportExportService $importExportService;
     protected HMISPennsylvaniaImportService $hmisImportService;
@@ -194,7 +197,30 @@ class ParticipantImportExport extends Component
         }
 
         $this->validate([
-            'importFile' => 'required|file|mimes:csv,txt|mimetypes:text/csv,text/plain,application/csv,application/excel,application/vnd.ms-excel,application/vnd.msexcel,text/anytext|max:10240' // 10MB max
+            'importFile' => [
+                'required',
+                'file',
+                'mimes:csv,txt',
+                'mimetypes:text/csv,text/plain,application/csv,application/excel,application/vnd.ms-excel,application/vnd.msexcel,text/anytext',
+                'max:10240', // 10MB max
+                function ($attribute, $value, $fail) {
+                    // Additional security checks
+                    $content = file_get_contents($value->getRealPath());
+                    
+                    // Check for potentially malicious content
+                    if (preg_match('/<\?php|<script|eval\(|exec\(|system\(|shell_exec/i', $content)) {
+                        $fail('The file contains potentially malicious content.');
+                    }
+                    
+                    // Check for excessive line length (potential DoS)
+                    $lines = explode("\n", $content);
+                    foreach ($lines as $line) {
+                        if (strlen($line) > 10000) {
+                            $fail('The file contains lines that are too long.');
+                        }
+                    }
+                }
+            ]
         ]);
 
         $this->isValidating = true;
@@ -203,7 +229,13 @@ class ParticipantImportExport extends Component
         $this->showPreview = false;
 
         try {
-            $result = $this->importExportService->validateImportFile($this->importFile);
+            // Pass the selected reference data set ID for validation
+            $options = [];
+            if ($this->selectedReferenceDataSet) {
+                $options['reference_data_set_id'] = $this->selectedReferenceDataSet;
+            }
+            
+            $result = $this->importExportService->validateImportFile($this->importFile, $options);
 
             if ($result['success']) {
                 $this->validationResult = $result['validation'];
@@ -268,6 +300,11 @@ class ParticipantImportExport extends Component
                 'update_existing' => $this->updateExisting,
                 'skip_errors' => $this->skipErrors
             ];
+            
+            // Pass the selected reference data set ID for import
+            if ($this->selectedReferenceDataSet) {
+                $options['reference_data_set_id'] = $this->selectedReferenceDataSet;
+            }
 
             $result = $this->importExportService->processImport($this->tempFilePath, $options);
 
@@ -578,9 +615,18 @@ class ParticipantImportExport extends Component
     
     public function getImportHistoryProperty()
     {
-        return \App\Models\CustomImportLog::with(['template', 'user'])
+        return \App\Models\ImportAuditLog::with(['user', 'referenceDataSet'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
+    }
+    
+    public function getAvailableReferenceDataSetsProperty()
+    {
+        return \App\Models\ReferenceDataSet::where('is_draft', false)
+            ->orderBy('is_import_default', 'desc')
+            ->orderBy('is_active', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->get();
     }
     
     // Import History Methods
@@ -600,6 +646,82 @@ class ParticipantImportExport extends Component
         $this->expandedErrors = [];
         $this->dispatch('$refresh');
         session()->flash('success', 'Import history refreshed.');
+    }
+    
+    public function previewTransformations()
+    {
+        if (!$this->tempFilePath) {
+            session()->flash('error', 'Please validate the file first.');
+            return;
+        }
+        
+        try {
+            $this->showTransformationPreview = true;
+            $this->transformationPreview = null;
+            
+            // Read CSV file directly without parsing to avoid issues
+            $fullPath = Storage::disk('local')->path($this->tempFilePath);
+            
+            // Read the CSV file
+            $csv = \League\Csv\Reader::createFromPath($fullPath, 'r');
+            $csv->setHeaderOffset(0);
+            
+            // Get first record
+            $records = iterator_to_array($csv->getRecords());
+            $firstRecord = reset($records);
+            
+            if ($firstRecord) {
+                $transformationService = app(\App\Services\ReferenceDataTransformationService::class);
+                
+                // Set the selected reference data set if provided
+                if ($this->selectedReferenceDataSet) {
+                    $referenceDataSet = \App\Models\ReferenceDataSet::find($this->selectedReferenceDataSet);
+                    $transformationService->setSelectedReferenceDataSet($referenceDataSet);
+                }
+                
+                $transformations = [];
+                $transformedCount = 0;
+                
+                // Fields to check for transformation
+                $fieldsToCheck = [
+                    'ethnicity', 'race', 'gender', 'work_status', 'military_status',
+                    'health_insurance', 'education_level', 'disability_status',
+                    'english_proficiency', 'housing_status'
+                ];
+                
+                foreach ($fieldsToCheck as $field) {
+                    if (isset($firstRecord[$field]) && !empty($firstRecord[$field])) {
+                        $original = $firstRecord[$field];
+                        $transformed = $transformationService->transformValue($field, $original);
+                        
+                        $transformations[$field] = [
+                            'original' => $original,
+                            'transformed' => $transformed,
+                            'changed' => $original !== $transformed
+                        ];
+                        
+                        if ($original !== $transformed) {
+                            $transformedCount++;
+                        }
+                    }
+                }
+                
+                $this->transformationPreview = [
+                    'transformations' => $transformations,
+                    'summary' => [
+                        'total_fields' => count($transformations),
+                        'transformed_count' => $transformedCount,
+                        'unchanged_count' => count($transformations) - $transformedCount
+                    ]
+                ];
+            } else {
+                session()->flash('error', 'No data found in file.');
+                $this->showTransformationPreview = false;
+            }
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error generating transformation preview: ' . $e->getMessage());
+            $this->showTransformationPreview = false;
+        }
     }
 
     public function render()

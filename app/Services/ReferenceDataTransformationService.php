@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 class ReferenceDataTransformationService
 {
     protected ?ReferenceDataSet $importDefaultSet = null;
+    protected ?ReferenceDataSet $selectedReferenceDataSet = null;
     protected Collection $referenceDataCache;
 
     public function __construct()
@@ -39,15 +40,17 @@ class ReferenceDataTransformationService
      */
     protected function loadReferenceDataCache(): void
     {
-        if (!$this->importDefaultSet) {
+        $referenceSet = $this->getActiveReferenceSet();
+        
+        if (!$referenceSet) {
             $this->referenceDataCache = collect();
             return;
         }
 
-        $cacheKey = "reference_data_cache_{$this->importDefaultSet->id}";
+        $cacheKey = "reference_data_cache_{$referenceSet->id}";
         
-        $this->referenceDataCache = Cache::remember($cacheKey, 3600, function () {
-            return $this->importDefaultSet->referenceData()
+        $this->referenceDataCache = Cache::remember($cacheKey, 3600, function () use ($referenceSet) {
+            return $referenceSet->referenceData()
                 ->where('active', true)
                 ->get()
                 ->groupBy('category');
@@ -144,7 +147,7 @@ class ReferenceDataTransformationService
     /**
      * Core transformation method that uses reference data for mapping
      */
-    protected function transformValue(string $category, string $value, array $fallbackMappings = []): string
+    public function transformValue(string $category, string $value, array $fallbackMappings = []): string
     {
         if (empty(trim($value))) {
             return 'Unknown/not reported';
@@ -463,6 +466,24 @@ class ReferenceDataTransformationService
         
         $this->loadImportDefaultSet();
         $this->loadReferenceDataCache();
+    }
+
+    /**
+     * Set the selected reference data set for transformations
+     */
+    public function setSelectedReferenceDataSet(?ReferenceDataSet $dataSet): void
+    {
+        $this->selectedReferenceDataSet = $dataSet;
+        // Reload cache with new data set
+        $this->loadReferenceDataCache();
+    }
+
+    /**
+     * Get the currently active reference data set (selected or default)
+     */
+    protected function getActiveReferenceSet(): ?ReferenceDataSet
+    {
+        return $this->selectedReferenceDataSet ?? $this->importDefaultSet;
     }
 
     /**
