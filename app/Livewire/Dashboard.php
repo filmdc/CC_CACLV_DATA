@@ -18,6 +18,8 @@ use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\ContractReportDueDate;
+use App\Models\ContractReport;
 
 class Dashboard extends Component
 {
@@ -89,6 +91,18 @@ class Dashboard extends Component
     public function viewWorkPlan($workPlanId)
     {
         return redirect()->route('work-plan.management', ['work_plan_id' => $workPlanId]);
+    }
+    
+    public function viewReportDueDate($dueDateId)
+    {
+        // For now, redirect to the contract report due dates management page
+        return redirect()->route('contract-report-due-dates.management');
+    }
+    
+    public function viewReport($reportId)
+    {
+        // For now, redirect to the contracts hub
+        return redirect()->route('contracts.hub');
     }
     
     public function setDateFilter($filter)
@@ -256,6 +270,11 @@ class Dashboard extends Component
     public function render()
     {
         $user = Auth::user();
+        
+        // Check if user has contract database dashboard role
+        if ($user->hasRole('contract-database-dashboard')) {
+            return $this->renderContractDashboard($user);
+        }
         
         // Get user's assigned programs
         $userPrograms = $user->programs()->with(['services', 'programEnrollments.participant', 'workPlans'])->get();
@@ -651,6 +670,169 @@ class Dashboard extends Component
             'contracts' => $contracts,
             'upcomingDeadlines' => $upcomingDeadlines,
             'customReminders' => $customReminders,
+        ];
+    }
+    
+    /**
+     * Render the contract database dashboard for users with contract dashboard role
+     */
+    private function renderContractDashboard($user)
+    {
+        // Get user's assigned contracts (via email assignments to report due dates)
+        $userEmail = $user->email;
+        
+        // Get upcoming report due dates assigned to this user
+        $upcomingReportDueDates = ContractReportDueDate::with(['contract.program', 'contract.funder', 'contractReports'])
+            ->whereHas('emails', function($query) use ($userEmail) {
+                $query->where('email', $userEmail)
+                    ->where('contract_report_due_date_emails.active', true);
+            })
+            ->where('active', true)
+            ->where('status', '!=', 'completed')
+            ->where('due_date', '>=', now())
+            ->orderBy('due_date')
+            ->get();
+            
+        // Get overdue report due dates
+        $overdueReportDueDates = ContractReportDueDate::with(['contract.program', 'contract.funder', 'contractReports'])
+            ->whereHas('emails', function($query) use ($userEmail) {
+                $query->where('email', $userEmail)
+                    ->where('contract_report_due_date_emails.active', true);
+            })
+            ->where('active', true)
+            ->where('status', '!=', 'completed')
+            ->where('due_date', '<', now())
+            ->orderBy('due_date', 'desc')
+            ->get();
+            
+        // Get recently submitted reports
+        $recentlySubmittedReports = ContractReport::with(['contract.program', 'contract.funder', 'contractReportDueDate'])
+            ->where('created_by', $user->id)
+            ->whereIn('status', ['submitted', 'under_review', 'approved'])
+            ->whereBetween('submitted_date', [$this->startDate, $this->endDate])
+            ->orderBy('submitted_date', 'desc')
+            ->limit(10)
+            ->get();
+            
+        // Get recent contract activity
+        $recentContractActivity = $this->getRecentContractActivity($user);
+        
+        // Calculate contract metrics
+        $contractMetrics = [
+            'total_upcoming_reports' => $upcomingReportDueDates->count(),
+            'overdue_reports' => $overdueReportDueDates->count(),
+            'reports_due_this_week' => $upcomingReportDueDates->filter(function($dueDate) {
+                return $dueDate->due_date <= now()->addDays(7);
+            })->count(),
+            'reports_submitted_this_period' => $recentlySubmittedReports->count(),
+        ];
+        
+        // Get contract statistics
+        $contractStats = $this->getContractStatistics($user);
+        
+        return view('livewire.contract-dashboard', [
+            'user' => $user,
+            'upcomingReportDueDates' => $upcomingReportDueDates,
+            'overdueReportDueDates' => $overdueReportDueDates,
+            'recentlySubmittedReports' => $recentlySubmittedReports,
+            'recentContractActivity' => $recentContractActivity,
+            'contractMetrics' => $contractMetrics,
+            'contractStats' => $contractStats,
+        ])->layout('components.layouts.app');
+    }
+    
+    /**
+     * Get recent contract activity for the user
+     */
+    private function getRecentContractActivity($user)
+    {
+        $activities = collect();
+        
+        // Recent report submissions
+        $recentSubmissions = ContractReport::with(['contract', 'contractReportDueDate'])
+            ->where('created_by', $user->id)
+            ->where('status', 'submitted')
+            ->whereBetween('submitted_date', [now()->subDays(30), now()])
+            ->orderBy('submitted_date', 'desc')
+            ->limit(5)
+            ->get()
+            ->map(function($report) {
+                return [
+                    'type' => 'report_submitted',
+                    'description' => 'Submitted report: ' . $report->title . ' for ' . $report->contract->title,
+                    'timestamp' => $report->submitted_date,
+                    'status' => $report->status,
+                    'id' => $report->id
+                ];
+            });
+            
+        // Recent status changes
+        $recentStatusChanges = ContractReport::with(['contract'])
+            ->where('created_by', $user->id)
+            ->whereIn('status', ['approved', 'rejected', 'revision_required'])
+            ->whereBetween('updated_at', [now()->subDays(30), now()])
+            ->orderBy('updated_at', 'desc')
+            ->limit(5)
+            ->get()
+            ->map(function($report) {
+                return [
+                    'type' => 'status_change',
+                    'description' => 'Report "' . $report->title . '" status changed to ' . ContractReport::STATUS_OPTIONS[$report->status],
+                    'timestamp' => $report->updated_at,
+                    'status' => $report->status,
+                    'id' => $report->id
+                ];
+            });
+            
+        // Combine and sort activities
+        return $activities
+            ->merge($recentSubmissions)
+            ->merge($recentStatusChanges)
+            ->sortByDesc('timestamp')
+            ->take(10);
+    }
+    
+    /**
+     * Get contract statistics for the user
+     */
+    private function getContractStatistics($user)
+    {
+        $userEmail = $user->email;
+        
+        // Total contracts assigned
+        $totalContracts = Contract::whereHas('reportDueDates.emails', function($query) use ($userEmail) {
+            $query->where('email', $userEmail)
+                ->where('contract_report_due_date_emails.active', true);
+        })->count();
+        
+        // Reports by status
+        $reportsByStatus = ContractReport::where('created_by', $user->id)
+            ->selectRaw('status, COUNT(*) as count')
+            ->groupBy('status')
+            ->get()
+            ->pluck('count', 'status');
+            
+        // Completion rate for current period
+        $completedInPeriod = ContractReport::where('created_by', $user->id)
+            ->where('status', 'approved')
+            ->whereBetween('submitted_date', [$this->startDate, $this->endDate])
+            ->count();
+            
+        $totalDueInPeriod = ContractReportDueDate::whereHas('emails', function($query) use ($userEmail) {
+                $query->where('email', $userEmail)
+                    ->where('contract_report_due_date_emails.active', true);
+            })
+            ->whereBetween('due_date', [$this->startDate, $this->endDate])
+            ->count();
+            
+        $completionRate = $totalDueInPeriod > 0 ? round(($completedInPeriod / $totalDueInPeriod) * 100, 1) : 0;
+        
+        return [
+            'total_contracts' => $totalContracts,
+            'reports_by_status' => $reportsByStatus,
+            'completion_rate' => $completionRate,
+            'completed_in_period' => $completedInPeriod,
+            'total_due_in_period' => $totalDueInPeriod,
         ];
     }
 }
