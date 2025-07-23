@@ -3,6 +3,8 @@
 namespace App\Notifications;
 
 use App\Models\ContractReportDueDate;
+use App\Models\SiteSetting;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -14,14 +16,16 @@ class ContractReportReminderNotification extends Notification implements ShouldQ
 
     protected $dueDate;
     protected $daysUntilDue;
+    protected $originalRecipient;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(ContractReportDueDate $dueDate, int $daysUntilDue)
+    public function __construct(ContractReportDueDate $dueDate, int $daysUntilDue, ?User $originalRecipient = null)
     {
         $this->dueDate = $dueDate;
         $this->daysUntilDue = $daysUntilDue;
+        $this->originalRecipient = $originalRecipient; // For test mode
     }
 
     /**
@@ -39,6 +43,61 @@ class ContractReportReminderNotification extends Notification implements ShouldQ
      */
     public function toMail(object $notifiable): MailMessage
     {
+        // Check if we should use custom template
+        $useCustomTemplate = !empty(SiteSetting::get('contract_reminder_email_template'));
+        
+        if ($useCustomTemplate) {
+            return $this->buildCustomEmail($notifiable);
+        }
+        
+        // Fallback to default template
+        return $this->buildDefaultEmail($notifiable);
+    }
+    
+    /**
+     * Build email using custom template from settings
+     */
+    private function buildCustomEmail(object $notifiable): MailMessage
+    {
+        $subject = SiteSetting::get('contract_reminder_email_subject', 'Contract Report Reminder: {{report_name}} - Due in {{days_until}} days');
+        $template = SiteSetting::get('contract_reminder_email_template', '');
+        
+        // Replace variables
+        $variables = $this->getTemplateVariables($notifiable);
+        
+        foreach ($variables as $key => $value) {
+            $subject = str_replace($key, $value, $subject);
+            $template = str_replace($key, $value, $template);
+        }
+        
+        // Add urgency prefix
+        $subject = $this->getUrgencyIndicator() . $subject;
+        
+        // Add test mode prefix if applicable
+        if (SiteSetting::get('contract_reminder_test_mode', '0') === '1') {
+            $subject = '[TEST] ' . $subject;
+        }
+        
+        $mailMessage = (new MailMessage)
+            ->subject($subject)
+            ->greeting($this->getGreeting());
+            
+        // Parse template into lines
+        $lines = explode("\n", $template);
+        foreach ($lines as $line) {
+            $mailMessage->line($line);
+        }
+        
+        $mailMessage->action('View Contract Management', $this->getContractUrl());
+        
+        return $mailMessage;
+    }
+    
+    /**
+     * Build default email template
+     */
+    private function buildDefaultEmail(object $notifiable): MailMessage
+    {
         $subject = $this->getSubject();
         $greeting = $this->getGreeting();
         $urgencyLevel = $this->getUrgencyLevel();
@@ -49,7 +108,7 @@ class ContractReportReminderNotification extends Notification implements ShouldQ
             ->line($this->getMainMessage())
             ->line('')
             ->line('**Report Details:**')
-            ->line("• **Report Name:** {$this->dueDate->report_name}")
+            ->line("• **Report Name:** " . strip_tags($this->dueDate->report_name ?? ucfirst($this->dueDate->report_type) . ' Report'))
             ->line("• **Contract:** {$this->dueDate->contract->title}")
             ->line("• **Program:** {$this->dueDate->contract->program->name ?? 'N/A'}")
             ->line("• **Funder:** {$this->dueDate->contract->funder->name ?? 'N/A'}")
@@ -57,7 +116,7 @@ class ContractReportReminderNotification extends Notification implements ShouldQ
             ->line("• **Days Remaining:** {$this->daysUntilDue}");
 
         if ($this->dueDate->description) {
-            $mailMessage->line("• **Description:** {$this->dueDate->description}");
+            $mailMessage->line("• **Description:** " . strip_tags($this->dueDate->description));
         }
 
         $mailMessage->line('')
@@ -69,7 +128,7 @@ class ContractReportReminderNotification extends Notification implements ShouldQ
             ->line('Thank you for your attention to this matter.');
 
         // Add urgency styling based on days remaining
-        if ($urgencyLevel === 'high') {
+        if ($urgencyLevel === 'high' || $urgencyLevel === 'critical') {
             $mailMessage->line('')
                 ->line('🔴 **HIGH PRIORITY** - Immediate attention required!');
         } elseif ($urgencyLevel === 'medium') {
@@ -78,6 +137,26 @@ class ContractReportReminderNotification extends Notification implements ShouldQ
         }
 
         return $mailMessage;
+    }
+    
+    /**
+     * Get template variables for replacement
+     */
+    private function getTemplateVariables(object $notifiable): array
+    {
+        // Use original recipient info if in test mode
+        $recipientName = $this->originalRecipient ? $this->originalRecipient->name : $notifiable->name;
+        
+        return [
+            '{{recipient_name}}' => $recipientName,
+            '{{report_name}}' => strip_tags($this->dueDate->report_name ?? ucfirst($this->dueDate->report_type) . ' Report'),
+            '{{contract_title}}' => $this->dueDate->contract->title,
+            '{{program}}' => $this->dueDate->contract->program->name ?? 'N/A',
+            '{{funder}}' => $this->dueDate->contract->funder->name ?? 'N/A',
+            '{{due_date}}' => $this->dueDate->due_date->format('F j, Y'),
+            '{{days_until}}' => (string) $this->daysUntilDue,
+            '{{description}}' => strip_tags($this->dueDate->description ?? ''),
+        ];
     }
 
     /**

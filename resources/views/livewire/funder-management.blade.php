@@ -10,9 +10,18 @@
         @if(!$showEditForm && !$showCreateForm && !$showViewModal)
         <div class="p-4 bg-gray-50 dark:bg-zinc-700 border-b border-gray-200 dark:border-zinc-600">
             <div class="flex items-center justify-between">
-                <div class="flex-1 max-w-md">
-                    <input type="text" wire:model.live="search" placeholder="Search funders..." 
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                <div class="flex items-center gap-4 flex-1">
+                    <a href="{{ route('contract.management') }}" 
+                       class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        Back to Contracts
+                    </a>
+                    <div class="flex-1 max-w-md">
+                        <input type="text" wire:model.live="search" placeholder="Search funders..." 
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
                 </div>
                 @if($this->can('funders.create'))
                     <button wire:click="showCreateFunder" 

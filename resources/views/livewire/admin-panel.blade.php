@@ -33,6 +33,10 @@
                         class="py-4 px-1 border-b-2 font-medium text-sm {{ $activeTab === 'settings' ? 'border-purple-500 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
                     Site Settings
                 </button>
+                <button wire:click="setActiveTab('contract_settings')" 
+                        class="py-4 px-1 border-b-2 font-medium text-sm {{ $activeTab === 'contract_settings' ? 'border-purple-500 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+                    Contract Settings
+                </button>
                 <button wire:click="setActiveTab('roles')" 
                         class="py-4 px-1 border-b-2 font-medium text-sm {{ $activeTab === 'roles' ? 'border-purple-500 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
                     Roles & Permissions
@@ -900,9 +904,9 @@
                                     </div>
                                 </div>
                                 <div class="text-right">
-                                    <div class="text-xs font-medium {{ $import->status === 'success' ? 'text-green-600' : 'text-red-600' }}">
+                                    <!-- <div class="text-xs font-medium {{ $import->status === 'success' ? 'text-green-600' : 'text-red-600' }}">
                                         {{ ucfirst($import->status) }}
-                                    </div>
+                                    </div> -->
                                     <div class="text-xs text-gray-500">
                                         {{ $import->created_at->diffForHumans() }}
                                     </div>
@@ -980,6 +984,99 @@
                             <button type="submit" 
                                     class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition duration-150 ease-in-out">
                                 Update Settings
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            @elseif ($activeTab === 'contract_settings')
+                <!-- Contract Settings -->
+                <div class="space-y-6">
+                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Contract Notification Settings</h2>
+                    
+                    <form wire:submit.prevent="updateContractSettings" class="space-y-6">
+                        <!-- Test Mode Toggle -->
+                        <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Test Mode</h3>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">When enabled, notifications will only be sent to the test email address</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" wire:model="contract_reminder_test_mode" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
+                                </label>
+                            </div>
+                            @if($contract_reminder_test_mode)
+                                <div class="mt-3">
+                                    <label for="test_email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Test Email Address</label>
+                                    <input type="email" wire:model="contract_reminder_test_email" id="test_email" 
+                                           class="mt-1 block w-full border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500"
+                                           placeholder="test@example.com">
+                                    @error('contract_reminder_test_email') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                </div>
+                            @endif
+                        </div>
+                        
+                        <!-- Global Reminder Intervals -->
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-3">Global Reminder Intervals</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Select when reminders should be sent before the due date</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                @foreach([365 => '1 Year', 180 => '6 Months', 90 => '3 Months', 60 => '2 Months', 30 => '30 Days', 15 => '15 Days', 7 => '7 Days', 3 => '3 Days', 1 => '1 Day', 0 => 'Due Date'] as $days => $label)
+                                    <label class="flex items-center space-x-2">
+                                        <input type="checkbox" 
+                                               wire:model="contract_reminder_intervals" 
+                                               value="{{ $days }}"
+                                               class="rounded border-gray-300 text-purple-600 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
+                                        <span class="text-sm text-gray-700 dark:text-gray-300">{{ $label }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                            @error('contract_reminder_intervals') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
+                        
+                        <!-- Email Subject -->
+                        <div>
+                            <label for="email_subject" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email Subject Template</label>
+                            <input type="text" wire:model="contract_reminder_email_subject" id="email_subject" 
+                                   class="mt-1 block w-full border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500"
+                                   placeholder="Contract Report Reminder: @{{report_name}}">
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Available variables: @{{report_name}}, @{{contract_title}}, @{{due_date}}, @{{days_until}}</p>
+                            @error('contract_reminder_email_subject') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
+                        
+                        <!-- Email Template -->
+                        <div wire:ignore>
+                            <label for="email_template" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email Body Template</label>
+                            <textarea wire:model="contract_reminder_email_template" id="email_template" rows="10"
+                                      class="mt-1 block w-full border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 font-mono text-sm"></textarea>
+                            <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                <p class="font-medium mb-1">Available variables:</p>
+                                <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                    <span>@{{report_name}}</span>
+                                    <span>@{{contract_title}}</span>
+                                    <span>@{{program}}</span>
+                                    <span>@{{funder}}</span>
+                                    <span>@{{due_date}}</span>
+                                    <span>@{{days_until}}</span>
+                                    <span>@{{description}}</span>
+                                </div>
+                            </div>
+                            @error('contract_reminder_email_template') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <div class="flex justify-between">
+                            <a href="{{ route('contract.notification-test') }}" wire:navigate
+                               class="inline-flex items-center px-4 py-2 border border-purple-600 text-purple-600 text-sm font-medium rounded-md hover:bg-purple-50 dark:hover:bg-purple-900/20">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                </svg>
+                                Test Dashboard
+                            </a>
+                            <button type="submit" 
+                                    class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition duration-150 ease-in-out">
+                                Update Contract Settings
                             </button>
                         </div>
                     </form>

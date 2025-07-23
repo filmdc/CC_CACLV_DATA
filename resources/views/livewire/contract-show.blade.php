@@ -174,62 +174,168 @@
 
             <!-- Report Due Dates -->
             <div class="mb-8">
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4 border-b border-gray-200 dark:border-zinc-700 pb-2">
-                    Report Due Dates ({{ $contract->reportDueDates->count() }})
-                </h2>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-zinc-700 pb-2">
+                        Report Due Dates ({{ $contract->reportDueDates->count() }})
+                    </h2>
+                    @if($this->can('due_dates.create'))
+                        <button wire:click="showCreateDueDate" 
+                                class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <svg class="w-5 h-5 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            Add Due Date
+                        </button>
+                    @endif
+                </div>
+                
                 @if($contract->reportDueDates->count() > 0)
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700">
                             <thead>
                                 <tr>
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Report Type
-                                    </th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Report Name
+                                        Type
                                     </th>
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                         Due Date
                                     </th>
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Reminder Sent
+                                        Status
                                     </th>
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Status
+                                        Assigned To
+                                    </th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Reports
+                                    </th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Actions
                                     </th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200 dark:divide-zinc-700">
                                 @foreach($contract->reportDueDates as $dueDate)
-                                    <tr>
+                                    <tr class="{{ $dueDate->due_date < now() && $dueDate->status !== 'completed' ? 'bg-red-50 dark:bg-red-900/20' : '' }}">
                                         <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                                            {{ ucfirst($dueDate->report_type) }}
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                                            {{ $dueDate->report_name ?: 'N/A' }}
+                                            <span class="font-medium">{{ ucfirst($dueDate->report_type ?: 'Other') }}</span>
                                         </td>
                                         <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
                                             {{ $dueDate->due_date ? \Carbon\Carbon::parse($dueDate->due_date)->format('M j, Y') : 'N/A' }}
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                                            @if($dueDate->reminder_sent)
-                                                Yes ({{ $dueDate->reminder_sent_at ? $dueDate->reminder_sent_at->format('M j, Y') : 'Date unknown' }})
-                                            @else
-                                                No
+                                            @if($dueDate->due_date < now() && $dueDate->status !== 'completed')
+                                                <span class="ml-2 text-xs text-red-600 dark:text-red-400">(Overdue)</span>
+                                            @elseif($dueDate->due_date <= now()->addDays(7) && $dueDate->status !== 'completed')
+                                                <span class="ml-2 text-xs text-yellow-600 dark:text-yellow-400">(Due Soon)</span>
                                             @endif
                                         </td>
                                         <td class="px-4 py-3 text-sm">
-                                            @if($dueDate->active)
+                                            @if($dueDate->status === 'completed')
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
-                                                    Active
+                                                    Completed
+                                                </span>
+                                            @elseif($dueDate->status === 'pending')
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100">
+                                                    Pending
                                                 </span>
                                             @else
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100">
-                                                    Inactive
+                                                    {{ ucfirst($dueDate->status) }}
                                                 </span>
                                             @endif
                                         </td>
+                                        <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
+                                            @if($dueDate->emails->count() > 0)
+                                                <button wire:click="showAssignedUsers({{ $dueDate->id }})"
+                                                        class="flex -space-x-2 group cursor-pointer hover:opacity-80 transition-opacity">
+                                                    @foreach($dueDate->emails->take(3) as $email)
+                                                        <div class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-300 dark:bg-zinc-600 text-xs font-medium text-gray-700 dark:text-gray-200 ring-2 ring-white dark:ring-zinc-800 group-hover:ring-blue-500" 
+                                                             title="{{ $email->name ?: $email->email }}">
+                                                            {{ strtoupper(substr($email->name ?: $email->email, 0, 2)) }}
+                                                        </div>
+                                                    @endforeach
+                                                    @if($dueDate->emails->count() > 3)
+                                                        <div class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-400 dark:bg-zinc-500 text-xs font-medium text-white ring-2 ring-white dark:ring-zinc-800 group-hover:ring-blue-500">
+                                                            +{{ $dueDate->emails->count() - 3 }}
+                                                        </div>
+                                                    @endif
+                                                </button>
+                                            @else
+                                                <span class="text-gray-500 dark:text-gray-400">None</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
+                                            {{ $dueDate->contractReports->count() }} uploaded
+                                        </td>
+                                        <td class="px-4 py-3 text-sm">
+                                            <div class="flex items-center space-x-2">
+                                                @if($this->can('contract_reports.create') && $dueDate->status !== 'completed')
+                                                    <button wire:click="showUploadReport({{ $dueDate->id }})" 
+                                                            class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300" 
+                                                            title="Upload Report">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                                        </svg>
+                                                    </button>
+                                                @endif
+                                                @if($this->can('due_dates.edit'))
+                                                    <button wire:click="showEditDueDate({{ $dueDate->id }})" 
+                                                            class="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-300" 
+                                                            title="Edit">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                        </svg>
+                                                    </button>
+                                                @endif
+                                                @if($this->can('due_dates.delete'))
+                                                    <button wire:click="deleteDueDate({{ $dueDate->id }})" 
+                                                            wire:confirm="Are you sure you want to delete this due date?"
+                                                            class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300" 
+                                                            title="Delete">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                        </svg>
+                                                    </button>
+                                                @endif
+                                            </div>
+                                        </td>
                                     </tr>
+                                    
+                                    @if($dueDate->contractReports->count() > 0)
+                                        <tr>
+                                            <td colspan="6" class="px-4 py-2 bg-gray-50 dark:bg-zinc-900">
+                                                <div class="text-sm">
+                                                    <strong class="text-gray-700 dark:text-gray-300">Uploaded Reports:</strong>
+                                                    <ul class="mt-1 space-y-1">
+                                                        @foreach($dueDate->contractReports as $report)
+                                                            <li class="flex items-center justify-between">
+                                                                <div>
+                                                                    <span class="text-gray-900 dark:text-white">{{ $report->title }}</span>
+                                                                    <span class="text-gray-500 dark:text-gray-400 ml-2">
+                                                                        ({{ $report->submitted_date ? $report->submitted_date->format('M j, Y') : 'N/A' }})
+                                                                    </span>
+                                                                </div>
+                                                                <div class="flex items-center space-x-2">
+                                                                    @foreach($report->getMedia('documents') as $media)
+                                                                        <a href="#" wire:click.prevent="downloadReport({{ $report->id }}, {{ $media->id }})" 
+                                                                           class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-xs">
+                                                                            Download {{ $loop->count > 1 ? '#' . $loop->iteration : '' }}
+                                                                        </a>
+                                                                    @endforeach
+                                                                    @if($this->can('contract_reports.delete'))
+                                                                        <button wire:click="deleteReport({{ $report->id }})" 
+                                                                                wire:confirm="Are you sure you want to delete this report?"
+                                                                                class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-xs">
+                                                                            Delete
+                                                                        </button>
+                                                                    @endif
+                                                                </div>
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endif
                                 @endforeach
                             </tbody>
                         </table>
@@ -286,4 +392,250 @@
             </div>
         </div>
     </div>
+    
+    <!-- Due Date Form Modal -->
+    @if($showDueDateForm)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 p-4">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <div class="bg-blue-600 text-white p-6 rounded-t-lg">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xl font-bold">
+                            {{ $selectedDueDate ? 'Edit Report Due Date' : 'Create Report Due Date' }}
+                        </h3>
+                        <button wire:click="closeDueDateForm" class="text-blue-200 hover:text-white transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <form wire:submit.prevent="saveDueDate" class="p-6">
+                    <div class="space-y-4">
+                        <div>
+                            <label for="due_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Due Date *</label>
+                            <input type="date" id="due_date" wire:model="due_date" 
+                                   class="mt-1 block w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500" 
+                                   required>
+                            @error('due_date') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+                        </div>
+                        
+                        <div>
+                            <label for="report_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Report Type *</label>
+                            <select id="report_type" wire:model="report_type" 
+                                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500" 
+                                    required>
+                                @foreach($reportTypes as $value => $label)
+                                    <option value="{{ $value }}">{{ $label }}</option>
+                                @endforeach
+                            </select>
+                            @error('report_type') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+                        </div>
+                        
+                        <div>
+                            <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+                            <textarea id="description" wire:model="description" rows="3"
+                                      class="mt-1 block w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                            @error('description') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Reminder Intervals (days before due date)</label>
+                            <div class="space-y-2">
+                                @foreach([60 => '60 days', 30 => '30 days', 15 => '15 days', 7 => '7 days', 3 => '3 days', 1 => '1 day', 0 => 'On due date'] as $days => $label)
+                                    <label class="flex items-center">
+                                        <input type="checkbox" value="{{ $days }}" 
+                                               wire:model="reminder_intervals"
+                                               class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{{ $label }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Assign Users to Receive Reminders</label>
+                            <div class="max-h-48 overflow-y-auto border border-gray-300 dark:border-zinc-600 rounded-md p-2">
+                                @foreach($users as $user)
+                                    <label class="flex items-center py-1">
+                                        <input type="checkbox" value="{{ $user->id }}" 
+                                               wire:model="assigned_users"
+                                               class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                                            {{ $user->name }} ({{ $user->email }})
+                                        </span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="flex items-center">
+                                <input type="checkbox" wire:model="active" 
+                                       class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Active</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 flex justify-end space-x-3">
+                        <button type="button" wire:click="closeDueDateForm" 
+                                class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600">
+                            Cancel
+                        </button>
+                        <button type="submit" 
+                                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
+                            {{ $selectedDueDate ? 'Update' : 'Create' }} Due Date
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
+    
+    <!-- Report Upload Modal -->
+    @if($showReportForm && $selectedDueDateForReport)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 p-4">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <div class="bg-green-600 text-white p-6 rounded-t-lg">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold">Upload Report</h3>
+                            <p class="text-green-100 mt-1">
+                                Due: {{ $selectedDueDateForReport->due_date->format('M j, Y') }}
+                                @if($selectedDueDateForReport->description)
+                                    - {{ strip_tags($selectedDueDateForReport->description) }}
+                                @endif
+                            </p>
+                        </div>
+                        <button wire:click="closeReportForm" class="text-green-200 hover:text-white transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <form wire:submit.prevent="uploadReport" class="p-6">
+                    <div class="space-y-4">
+                        <div>
+                            <label for="report_title" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Report Title *</label>
+                            <input type="text" id="report_title" wire:model="report_title" 
+                                   class="mt-1 block w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white shadow-sm focus:border-green-500 focus:ring-green-500" 
+                                   required>
+                            @error('report_title') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+                        </div>
+                        
+                        <div>
+                            <label for="report_description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+                            <textarea id="report_description" wire:model="report_description" rows="3"
+                                      class="mt-1 block w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white shadow-sm focus:border-green-500 focus:ring-green-500"></textarea>
+                            @error('report_description') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+                        </div>
+                        
+                        <div>
+                            <label for="report_documents" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Documents *</label>
+                            <input type="file" id="report_documents" wire:model="report_documents" multiple
+                                   class="mt-1 block w-full text-sm text-gray-900 dark:text-gray-300 border border-gray-300 dark:border-zinc-600 rounded-md cursor-pointer bg-gray-50 dark:bg-zinc-700 focus:outline-none"
+                                   accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg" required>
+                            @error('report_documents.*') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+                            
+                            @if($report_documents)
+                                <div class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                                    Selected files:
+                                    <ul class="mt-1">
+                                        @foreach($report_documents as $document)
+                                            <li>{{ $document->getClientOriginalName() }} ({{ number_format($document->getSize() / 1024 / 1024, 2) }} MB)</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+                        </div>
+                        
+                        <div>
+                            <label for="report_notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Notes</label>
+                            <textarea id="report_notes" wire:model="report_notes" rows="3"
+                                      class="mt-1 block w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white shadow-sm focus:border-green-500 focus:ring-green-500"></textarea>
+                            @error('report_notes') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 flex justify-end space-x-3">
+                        <button type="button" wire:click="closeReportForm" 
+                                class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600">
+                            Cancel
+                        </button>
+                        <button type="submit" 
+                                class="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700">
+                            Upload Report
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
+    
+    <!-- Assigned Users Modal -->
+    @if($showAssignedUsersModal && $selectedDueDateForUsers)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        Assigned Users - {{ ucfirst($selectedDueDateForUsers->report_type ?: 'Other') }} Report
+                    </h3>
+                    <button wire:click="closeAssignedUsersModal"
+                            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="mb-4 p-3 bg-gray-50 dark:bg-zinc-700 rounded">
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        Due Date: <span class="font-medium text-gray-900 dark:text-white">{{ $selectedDueDateForUsers->due_date->format('M j, Y') }}</span>
+                    </p>
+                    @if($selectedDueDateForUsers->description)
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                            {{ strip_tags($selectedDueDateForUsers->description) }}
+                        </p>
+                    @endif
+                </div>
+                
+                <div class="space-y-3">
+                    @if($selectedDueDateForUsers->emails->count() > 0)
+                        @foreach($selectedDueDateForUsers->emails as $email)
+                            <div class="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-zinc-700 rounded-lg">
+                                <div class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gray-300 dark:bg-zinc-600 text-sm font-medium text-gray-700 dark:text-gray-200">
+                                    {{ strtoupper(substr($email->name ?: $email->email, 0, 2)) }}
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                        {{ $email->name ?: 'No Name' }}
+                                    </p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                                        {{ $email->email }}
+                                    </p>
+                                </div>
+                                @if($email->pivot->reminder_intervals)
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                                        Reminders: {{ implode(', ', json_decode($email->pivot->reminder_intervals, true) ?? []) }} days
+                                    </div>
+                                @endif
+                            </div>
+                        @endforeach
+                    @else
+                        <p class="text-center text-gray-500 dark:text-gray-400 py-4">No users are assigned to this due date.</p>
+                    @endif
+                </div>
+                
+                <div class="flex justify-end pt-4 border-t border-gray-200 dark:border-zinc-600 mt-4">
+                    <button wire:click="closeAssignedUsersModal"
+                            class="px-4 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>

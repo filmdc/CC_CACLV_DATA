@@ -34,13 +34,16 @@
                        class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
                         Manage Funders
                     </a>
-                    <a href="{{ route('contract-report-due-dates.management') }}" 
+                    <!-- <a href="{{ route('contract-report-due-dates.management') }}" 
                        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         Report Due Dates
-                    </a>
+                    </a> -->
                     <button wire:click="showCreateContract" 
-                            class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
-                        Create Contract
+                            wire:loading.attr="disabled"
+                            wire:loading.class="opacity-50 cursor-not-allowed"
+                            class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition-opacity">
+                        <span wire:loading.remove wire:target="showCreateContract">Create Contract</span>
+                        <span wire:loading wire:target="showCreateContract">Loading...</span>
                     </button>
                 </div>
             </div>
@@ -436,10 +439,10 @@
                                                     <td class="px-4 py-2 text-sm text-gray-900 dark:text-white">
                                                         <button wire:click="viewDueDate({{ $dueDate->id }})" 
                                                                 class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline">
-                                                            {{ $dueDate->report_name ?? $dueDate->report_type }}
+                                                            {{ strip_tags($dueDate->report_name ?? $dueDate->report_type) }}
                                                         </button>
                                                         @if($dueDate->description)
-                                                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ Str::limit($dueDate->description, 50) }}</p>
+                                                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ Str::limit(strip_tags($dueDate->description), 50) }}</p>
                                                         @endif
                                                     </td>
                                                     <td class="px-4 py-2 text-sm text-gray-900 dark:text-white">
@@ -498,18 +501,21 @@
                                                     </td>
                                                     <td class="px-4 py-2 text-sm text-gray-900 dark:text-white">
                                                         @if($dueDate->emails && $dueDate->emails->count() > 0)
-                                                            <div class="flex flex-wrap gap-1">
+                                                            <button wire:click="showAssignedUsers({{ $dueDate->id }})"
+                                                                    class="flex -space-x-2 group cursor-pointer hover:opacity-80 transition-opacity">
                                                                 @foreach($dueDate->emails->take(3) as $email)
-                                                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 dark:bg-zinc-700 text-gray-800 dark:text-gray-200">
-                                                                        {{ $email->user->name ?? $email->email }}
-                                                                    </span>
+                                                                    <div class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-300 dark:bg-zinc-600 text-xs font-medium text-gray-700 dark:text-gray-200 ring-2 ring-white dark:ring-zinc-800 group-hover:ring-blue-500" 
+                                                                         title="{{ $email->name ?: $email->email }}">
+                                                                        {{ strtoupper(substr($email->name ?: $email->email, 0, 2)) }}
+                                                                    </div>
                                                                 @endforeach
                                                                 @if($dueDate->emails->count() > 3)
-                                                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 dark:bg-zinc-700 text-gray-800 dark:text-gray-200">
-                                                                        +{{ $dueDate->emails->count() - 3 }} more
-                                                                    </span>
+                                                                    <div class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-400 dark:bg-zinc-500 text-xs font-medium text-white ring-2 ring-white dark:ring-zinc-800 group-hover:ring-blue-500"
+                                                                         title="{{ $dueDate->emails->skip(3)->pluck('name')->filter()->implode(', ') ?: $dueDate->emails->skip(3)->pluck('email')->implode(', ') }}">
+                                                                        +{{ $dueDate->emails->count() - 3 }}
+                                                                    </div>
                                                                 @endif
-                                                            </div>
+                                                            </button>
                                                         @else
                                                             <span class="text-gray-500 dark:text-gray-400 text-xs">No staff assigned</span>
                                                         @endif
@@ -577,7 +583,7 @@
                                                     {{ $report->title }}
                                                 </button>
                                                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                                    {{ $report->description ? Str::limit($report->description, 100) : 'No description' }}
+                                                    {{ $report->description ? Str::limit(strip_tags($report->description), 100) : 'No description' }}
                                                 </p>
                                                 <div class="flex items-center space-x-4 mt-2">
                                                     <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
@@ -750,7 +756,7 @@
                         @if($selectedDueDate)
                             <div class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md">
                                 <p class="text-sm text-blue-700 dark:text-blue-300">
-                                    <span class="font-medium">Due Date:</span> {{ $selectedDueDate->report_name }} - {{ $selectedDueDate->due_date?->format('M d, Y') }}
+                                    <span class="font-medium">Due Date:</span> {{ strip_tags($selectedDueDate->report_name) }} - {{ $selectedDueDate->due_date?->format('M d, Y') }}
                                 </p>
                             </div>
                         @endif
@@ -846,7 +852,7 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
-                            <p class="text-sm text-gray-900 dark:text-white">{{ $selectedReport->description }}</p>
+                            <p class="text-sm text-gray-900 dark:text-white">{{ strip_tags($selectedReport->description) }}</p>
                         </div>
 
                         @if($selectedReport->notes)
@@ -904,14 +910,41 @@
             </div>
         @endif
 
-        <!-- Contracts Table -->
+        <!-- Tabs -->
         @if(!$showEditForm && !$showCreateForm)
-            <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-600">
+            <div class="border-b border-gray-200 dark:border-zinc-600">
+                <nav class="-mb-px flex space-x-8 px-6">
+                    <button wire:click="setActiveTab('contracts')"
+                            class="py-2 px-1 border-b-2 font-medium text-sm transition-colors
+                                   {{ $activeTab === 'contracts' 
+                                      ? 'border-green-500 text-green-600 dark:text-green-400' 
+                                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300' }}">
+                        Contracts
+                    </button>
+                    
+                    @if($this->can('due_dates.view'))
+                        <button wire:click="setActiveTab('upcoming-deadlines')"
+                                class="py-2 px-1 border-b-2 font-medium text-sm transition-colors
+                                       {{ $activeTab === 'upcoming-deadlines' 
+                                          ? 'border-green-500 text-green-600 dark:text-green-400' 
+                                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300' }}">
+                            Upcoming Deadlines
+                        </button>
+                    @endif
+                </nav>
+            </div>
+        @endif
+
+        <!-- Tab Content -->
+        @if(!$showEditForm && !$showCreateForm)
+            @if($activeTab === 'contracts')
+                <!-- Contracts Table -->
+                <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-600">
                 <thead class="bg-gray-50 dark:bg-zinc-700">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Title</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Contract Number</th>
+                        <!--th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Contract Number</th-->
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Program</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Funder</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Amount</th>
@@ -937,7 +970,7 @@
                                     <div class="text-xs text-orange-600 dark:text-orange-400">{{ $contract->reportDueDates->where('status', '!=', 'completed')->count() }} pending reports</div>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $contract->contract_number ?? 'N/A' }}</td>
+                            <!-- <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $contract->contract_number ?? 'N/A' }}</td> -->
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $contract->program->name ?? 'N/A' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $contract->funder->name ?? 'N/A' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${{ number_format($contract->amount, 2) }}</td>
@@ -984,10 +1017,163 @@
             </table>
             </div>
 
-            <!-- Pagination -->
-            @if($contracts->hasPages())
-                <div class="px-6 py-3 border-t border-gray-200 dark:border-zinc-600">
-                    {{ $contracts->links() }}
+                <!-- Pagination -->
+                @if($contracts->hasPages())
+                    <div class="px-6 py-3 border-t border-gray-200 dark:border-zinc-600">
+                        {{ $contracts->links() }}
+                    </div>
+                @endif
+            @endif
+            
+            @if($activeTab === 'upcoming-deadlines' && $this->can('due_dates.view'))
+                <!-- Upcoming Deadlines Table -->
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Upcoming Report Deadlines</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-600">
+                            <thead class="bg-gray-50 dark:bg-zinc-700">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Due Date</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Report Name</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Contract</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Contract #</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Program</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Funder</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Days</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Assigned</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-zinc-600">
+                                @forelse($upcomingDeadlines as $deadline)
+                                    @php
+                                        $daysUntilDue = now()->startOfDay()->diffInDays($deadline->due_date, false);
+                                        $isOverdue = $daysUntilDue < 0;
+                                        $isDueSoon = $daysUntilDue >= 0 && $daysUntilDue <= 7;
+                                    @endphp
+                                    <tr class="{{ $isOverdue ? 'bg-red-50 dark:bg-red-900/20' : ($isDueSoon ? 'bg-yellow-50 dark:bg-yellow-900/20' : '') }}">
+                                        <td class="px-4 py-3 whitespace-nowrap">
+                                            <span class="text-sm font-semibold {{ $isOverdue ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white' }}">
+                                                {{ $deadline->due_date->format('M d, Y') }}
+                                            </span>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                                {{ strip_tags($deadline->report_name) }}
+                                            </div>
+                                            @if($deadline->description)
+                                                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                    {{ Str::limit(strip_tags($deadline->description), 50) }}
+                                                </div>
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <div class="text-sm text-gray-900 dark:text-white">
+                                                {{ $deadline->contract->title }}
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                            {{ $deadline->contract->contract_number }}
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                            {{ $deadline->contract->program->name ?? 'N/A' }}
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                            {{ $deadline->contract->funder->name ?? 'N/A' }}
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap">
+                                            @if($isOverdue)
+                                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                                                    {{ abs($daysUntilDue) }} days overdue
+                                                </span>
+                                            @elseif($isDueSoon)
+                                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                                                    {{ $daysUntilDue }} days
+                                                </span>
+                                            @else
+                                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                                    {{ $daysUntilDue }} days
+                                                </span>
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap">
+                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                                                @if($deadline->status === 'completed') bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
+                                                @elseif($deadline->status === 'in_progress') bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200
+                                                @else bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200 @endif">
+                                                {{ ucfirst($deadline->status) }}
+                                            </span>
+                                            @if($deadline->contractReports->count() > 0)
+                                                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                    {{ $deadline->contractReports->count() }} report(s)
+                                                </div>
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            @if($deadline->emails && $deadline->emails->count() > 0)
+                                                <button wire:click="showAssignedUsers({{ $deadline->id }})"
+                                                        class="flex -space-x-2 group cursor-pointer hover:opacity-80 transition-opacity">
+                                                    @foreach($deadline->emails->take(3) as $email)
+                                                        <div class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-300 dark:bg-zinc-600 text-xs font-medium text-gray-700 dark:text-gray-200 ring-2 ring-white dark:ring-zinc-800 group-hover:ring-blue-500" 
+                                                             title="{{ $email->name ?: $email->email }}">
+                                                            {{ strtoupper(substr($email->name ?: $email->email, 0, 2)) }}
+                                                        </div>
+                                                    @endforeach
+                                                    @if($deadline->emails->count() > 3)
+                                                        <div class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-400 dark:bg-zinc-500 text-xs font-medium text-white ring-2 ring-white dark:ring-zinc-800 group-hover:ring-blue-500"
+                                                             title="{{ $deadline->emails->skip(3)->pluck('name')->filter()->implode(', ') ?: $deadline->emails->skip(3)->pluck('email')->implode(', ') }}">
+                                                            +{{ $deadline->emails->count() - 3 }}
+                                                        </div>
+                                                    @endif
+                                                </button>
+                                            @else
+                                                <span class="text-gray-500 dark:text-gray-400 text-xs">None</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                                            <div class="flex items-center space-x-2">
+                                                <button wire:click="viewContract({{ $deadline->contract_id }})" 
+                                                        class="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
+                                                        title="View Contract">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                    </svg>
+                                                </button>
+                                                
+                                                @if($deadline->contractReports->count() > 0)
+                                                    <button wire:click="viewDueDateReports({{ $deadline->id }})" 
+                                                            class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                                                            title="View Reports">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                        </svg>
+                                                    </button>
+                                                @endif
+                                                
+                                                @if($deadline->status !== 'completed')
+                                                    <button wire:click="selectedContract = {{ $deadline->contract_id }}; selectedDueDate = {{ $deadline->id }}; showCreateReport({{ $deadline->id }})" 
+                                                            class="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300"
+                                                            title="Upload Report">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                                        </svg>
+                                                    </button>
+                                                @endif
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="10" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                                            No upcoming deadlines found.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             @endif
         @endif
@@ -1000,7 +1186,7 @@
                 <div class="flex justify-between items-start mb-4">
                     <div>
                         <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-                            Reports for: {{ $selectedDueDate->report_name }}
+                            Reports for: {{ strip_tags($selectedDueDate->report_name) }}
                         </h3>
                         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                             Due Date: {{ $selectedDueDate->due_date->format('M d, Y') }} | 
@@ -1023,7 +1209,7 @@
                                     <div class="flex-1">
                                         <h4 class="font-medium text-gray-900 dark:text-white">{{ $report->title }}</h4>
                                         @if($report->description)
-                                            <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">{{ $report->description }}</p>
+                                            <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">{{ strip_tags($report->description) }}</p>
                                         @endif
                                         
                                         <div class="mt-2 space-y-1">
@@ -1086,6 +1272,59 @@
                             Close
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+    @endif
+    
+    <!-- Assigned Users Modal -->
+    @if($showAssignedUsersModal && $selectedDueDateForUsers)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        Assigned Users for {{ strip_tags($selectedDueDateForUsers->report_name) }}
+                    </h3>
+                    <button wire:click="closeAssignedUsersModal"
+                            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="space-y-3">
+                    @if($selectedDueDateForUsers->emails->count() > 0)
+                        @foreach($selectedDueDateForUsers->emails as $email)
+                            <div class="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-zinc-700 rounded-lg">
+                                <div class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gray-300 dark:bg-zinc-600 text-sm font-medium text-gray-700 dark:text-gray-200">
+                                    {{ strtoupper(substr($email->name ?: $email->email, 0, 2)) }}
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                        {{ $email->name ?: 'No Name' }}
+                                    </p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                                        {{ $email->email }}
+                                    </p>
+                                </div>
+                                @if($email->pivot->reminder_intervals)
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                                        Reminders: {{ implode(', ', json_decode($email->pivot->reminder_intervals, true) ?? []) }} days
+                                    </div>
+                                @endif
+                            </div>
+                        @endforeach
+                    @else
+                        <p class="text-center text-gray-500 dark:text-gray-400 py-4">No users are assigned to this due date.</p>
+                    @endif
+                </div>
+                
+                <div class="flex justify-end pt-4 border-t border-gray-200 dark:border-zinc-600 mt-4">
+                    <button wire:click="closeAssignedUsersModal"
+                            class="px-4 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
+                        Close
+                    </button>
                 </div>
             </div>
         </div>

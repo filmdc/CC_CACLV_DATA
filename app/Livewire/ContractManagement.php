@@ -30,6 +30,13 @@ class ContractManagement extends Component
     public $showReportForm = false;
     public $showReportView = false;
     public $showDueDateReportsModal = false;
+    
+    // Tab management
+    public $activeTab = 'contracts'; // contracts, upcoming-deadlines
+    
+    // Modal states
+    public $showAssignedUsersModal = false;
+    public $selectedDueDateForUsers = null;
 
     // Contract Form Fields
     public $title = '';
@@ -339,6 +346,27 @@ class ContractManagement extends Component
         $this->resetPage();
     }
     
+    public function setActiveTab($tab)
+    {
+        $this->activeTab = $tab;
+        $this->resetPage();
+        $this->resetContractForm();
+        $this->dispatch('tab-changed', ['tab' => $tab]);
+    }
+    
+    public function massDeleteDueDates($ids)
+    {
+        $this->authorizeAction('due_dates.delete');
+        
+        try {
+            ContractReportDueDate::whereIn('id', $ids)->delete();
+            session()->flash('success', 'Selected due dates deleted successfully.');
+            $this->dispatch('$refresh');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error deleting due dates: ' . $e->getMessage());
+        }
+    }
+    
     // Report Due Date Management Methods
     public function showCreateDueDate()
     {
@@ -581,6 +609,18 @@ class ContractManagement extends Component
     {
         $this->showDueDateReportsModal = false;
         $this->selectedDueDate = null;
+    }
+    
+    public function showAssignedUsers($dueDateId)
+    {
+        $this->selectedDueDateForUsers = ContractReportDueDate::with(['emails.user'])->findOrFail($dueDateId);
+        $this->showAssignedUsersModal = true;
+    }
+    
+    public function closeAssignedUsersModal()
+    {
+        $this->showAssignedUsersModal = false;
+        $this->selectedDueDateForUsers = null;
     }
     
     public function downloadReport($reportId, $mediaId)
@@ -826,49 +866,94 @@ class ContractManagement extends Component
 
     public function render()
     {
-        $query = Contract::with(['program', 'funder', 'reportDueDates'])
-            ->when($this->showArchivedContracts, function ($q) {
-                $q->archived();
-            }, function ($q) {
-                $q->active();
-            })
-            ->when($this->search, function ($query) {
-                $query->where(function ($q) {
-                    $q->where('title', 'like', '%' . $this->search . '%')
-                      ->orWhere('contract_number', 'like', '%' . $this->search . '%')
-                      ->orWhere('cfda_number', 'like', '%' . $this->search . '%')
-                      ->orWhere('grant_code', 'like', '%' . $this->search . '%')
-                      ->orWhereHas('program', function ($q) {
-                          $q->where('name', 'like', '%' . $this->search . '%');
-                      })
-                      ->orWhereHas('funder', function ($q) {
-                          $q->where('name', 'like', '%' . $this->search . '%');
-                      });
+        // Get contracts if on contracts tab
+        $contracts = collect();
+        if ($this->activeTab === 'contracts') {
+            $query = Contract::with(['program', 'funder', 'reportDueDates'])
+                ->when($this->showArchivedContracts, function ($q) {
+                    $q->archived();
+                }, function ($q) {
+                    $q->active();
+                })
+                ->when($this->search, function ($query) {
+                    $query->where(function ($q) {
+                        $q->where('title', 'like', '%' . $this->search . '%')
+                          ->orWhere('contract_number', 'like', '%' . $this->search . '%')
+                          ->orWhere('cfda_number', 'like', '%' . $this->search . '%')
+                          ->orWhere('grant_code', 'like', '%' . $this->search . '%')
+                          ->orWhereHas('program', function ($q) {
+                              $q->where('name', 'like', '%' . $this->search . '%');
+                          })
+                          ->orWhereHas('funder', function ($q) {
+                              $q->where('name', 'like', '%' . $this->search . '%');
+                          });
+                    });
+                })
+                ->when($this->statusFilter !== 'all', function ($query) {
+                    switch ($this->statusFilter) {
+                        case 'active':
+                            $query->where('start_date', '<=', now())
+                                  ->where('end_date', '>=', now());
+                            break;
+                        case 'upcoming':
+                            $query->where('start_date', '>', now());
+                            break;
+                        case 'expired':
+                            $query->where('end_date', '<', now());
+                            break;
+                    }
                 });
-            })
-            ->when($this->statusFilter !== 'all', function ($query) {
-                switch ($this->statusFilter) {
-                    case 'active':
-                        $query->where('start_date', '<=', now())
-                              ->where('end_date', '>=', now());
-                        break;
-                    case 'upcoming':
-                        $query->where('start_date', '>', now());
-                        break;
-                    case 'expired':
-                        $query->where('end_date', '<', now());
-                        break;
-                }
-            });
-
-        $contracts = $query->orderBy('created_at', 'desc')->paginate(10);
+                
+            $contracts = $query->orderBy('created_at', 'desc')->paginate(10);
+        }
+        
+        // Get upcoming deadlines if on upcoming-deadlines tab
+        $upcomingDeadlines = collect();
+        if ($this->activeTab === 'upcoming-deadlines') {
+            $upcomingDeadlines = $this->getUpcomingDeadlines();
+        }
+        
         $programs = Program::active()->orderBy('name')->get();
         $funders = Funder::active()->orderBy('name')->get();
 
         return view('livewire.contract-management', [
             'contracts' => $contracts,
+            'upcomingDeadlines' => $upcomingDeadlines,
             'programs' => $programs,
             'funders' => $funders,
         ])->layout('components.layouts.app');
+    }
+    
+    private function getUpcomingDeadlines()
+    {
+        $user = auth()->user();
+        
+        // Get upcoming report due dates
+        // If user is admin or has special permissions, show all upcoming deadlines
+        // Otherwise, show only deadlines assigned to the user
+        $query = ContractReportDueDate::with(['contract.program', 'contract.funder', 'contractReports', 'emails'])
+            ->where('active', true)
+            ->where('due_date', '>=', now()->format('Y-m-d')); // Only future dates like monitor.blade.php
+            
+        // Filter by user assignment unless admin
+        if (!$user->hasRole('Administrator') && !$user->can('contracts.view_all_deadlines')) {
+            $query->whereHas('emails', function($q) use ($user) {
+                $q->where('email', $user->email)
+                  ->where('contract_report_due_date_emails.active', true);
+            });
+        }
+        
+        // Get all results for DataTables (no pagination)
+        return $query->orderBy('due_date', 'asc')->get();
+    }
+    
+    public function getPrograms()
+    {
+        return Program::active()->orderBy('name')->get();
+    }
+    
+    public function getFunders()
+    {
+        return Funder::active()->orderBy('name')->get();
     }
 }

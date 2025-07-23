@@ -55,7 +55,28 @@ php artisan db:seed --class=InitialSetupSeeder  # Run specific seeder
 ```bash
 php artisan user:assign-role {email} {role}    # Assign role to user
 php artisan setup:admin-permissions             # Setup admin permissions
+php artisan contract:send-reminders             # Send contract report reminders
 ```
+
+### Contract Notification System
+```bash
+# Send reminders for all contracts (scheduled to run daily at 8 AM PST)
+php artisan contract:send-reminders
+
+# Test mode options
+php artisan contract:send-reminders --dry-run                    # Preview without sending
+php artisan contract:send-reminders --days=7                     # Only send 7-day reminders
+php artisan contract:send-reminders --contract-id=123            # Test specific contract
+php artisan contract:send-reminders --test-mode --test-email=test@example.com  # Send all to test email
+```
+
+**Features:**
+- Global reminder intervals (default: 30, 15, 7, 3, 1, 0 days)
+- Custom email templates with variable substitution
+- Test mode to prevent accidental mass emails
+- Notification test dashboard at `/admin/contract-notification-test`
+- Tracks sent reminders to prevent duplicates
+- Scheduled to run daily at 8:00 AM PST (configure in bootstrap/app.php)
 
 ## Architecture & Patterns
 
@@ -86,12 +107,12 @@ php artisan setup:admin-permissions             # Setup admin permissions
 - Custom middleware: `CheckPermission` and `CheckRole`
 - `WithPermissionChecks` trait provides helper methods:
   ```php
-  $this->can('participants.view')        // Check single permission
-  $this->canAny(['perm1', 'perm2'])    // Check if has any permission
-  $this->canAll(['perm1', 'perm2'])    // Check if has all permissions
-  $this->hasRole('admin')               // Check role
-  $this->isAdmin()                      // Check if admin
-  $this->authorizeAction('permission')  // Abort with 403 if unauthorized
+  $this->can('participants.view')        # Check single permission
+  $this->canAny(['perm1', 'perm2'])    # Check if has any permission
+  $this->canAll(['perm1', 'perm2'])    # Check if has all permissions
+  $this->hasRole('admin')               # Check role
+  $this->isAdmin()                      # Check if admin
+  $this->authorizeAction('permission')  # Abort with 403 if unauthorized
   ```
 
 #### 4. Routing Patterns
@@ -290,3 +311,7 @@ Housing Module Features:
 3. **Testing**:
    - No tests written for housing module yet
    - Need feature tests for all housing components
+
+## Memories
+
+- Do not try to run bash mysql commands that require a password, as the terminal prevents that approach

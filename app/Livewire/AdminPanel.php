@@ -58,6 +58,13 @@ class AdminPanel extends Component
     public $site_favicon = null;
     public $current_logo_path = null;
     public $current_favicon_path = null;
+    
+    // Contract Settings
+    public $contract_reminder_intervals = [];
+    public $contract_reminder_test_mode = false;
+    public $contract_reminder_test_email = '';
+    public $contract_reminder_email_subject = '';
+    public $contract_reminder_email_template = '';
 
     public function setActiveTab($tab)
     {
@@ -220,6 +227,14 @@ class AdminPanel extends Component
         $this->site_name = SiteSetting::get('site_name', 'CAP TRACK');
         $this->current_logo_path = SiteSetting::get('site_logo');
         $this->current_favicon_path = SiteSetting::get('site_favicon');
+        
+        // Load contract settings
+        $intervals = SiteSetting::get('contract_reminder_intervals', json_encode([30, 15, 7, 3, 1, 0]));
+        $this->contract_reminder_intervals = json_decode($intervals, true);
+        $this->contract_reminder_test_mode = (bool) SiteSetting::get('contract_reminder_test_mode', '0');
+        $this->contract_reminder_test_email = SiteSetting::get('contract_reminder_test_email', '');
+        $this->contract_reminder_email_subject = SiteSetting::get('contract_reminder_email_subject', 'Contract Report Reminder: {{report_name}} - Due in {{days_until}} days');
+        $this->contract_reminder_email_template = SiteSetting::get('contract_reminder_email_template', '');
     }
 
     public function updateSiteSettings()
@@ -913,6 +928,35 @@ class AdminPanel extends Component
     {
         // TODO: Implement CSV/PDF export functionality
         session()->flash('success', 'CSBG Report export functionality coming soon.');
+    }
+    
+    public function updateContractSettings()
+    {
+        $this->validate([
+            'contract_reminder_intervals' => 'required|array|min:1',
+            'contract_reminder_intervals.*' => 'integer|min:0|max:365',
+            'contract_reminder_test_mode' => 'boolean',
+            'contract_reminder_test_email' => 'required_if:contract_reminder_test_mode,true|nullable|email',
+            'contract_reminder_email_subject' => 'required|string|max:255',
+            'contract_reminder_email_template' => 'required|string',
+        ]);
+        
+        try {
+            // Save contract settings
+            SiteSetting::set('contract_reminder_intervals', json_encode($this->contract_reminder_intervals), 'json');
+            SiteSetting::set('contract_reminder_test_mode', $this->contract_reminder_test_mode ? '1' : '0', 'boolean');
+            SiteSetting::set('contract_reminder_test_email', $this->contract_reminder_test_email, 'text');
+            SiteSetting::set('contract_reminder_email_subject', $this->contract_reminder_email_subject, 'text');
+            SiteSetting::set('contract_reminder_email_template', $this->contract_reminder_email_template, 'html');
+            
+            // Clear cache
+            SiteSetting::clearCache();
+            
+            session()->flash('success', 'Contract notification settings updated successfully.');
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+        }
     }
 
     public function render()

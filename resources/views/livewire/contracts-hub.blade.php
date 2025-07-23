@@ -48,15 +48,6 @@
                 </button>
                 @endif
                 
-                @if($this->can('due_dates.view'))
-                <button wire:click="setActiveTab('duedates')"
-                        class="py-2 px-1 border-b-2 font-medium text-sm transition-colors
-                               {{ $activeTab === 'duedates' 
-                                  ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' 
-                                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300' }}">
-                    Report Due Dates
-                </button>
-                @endif
             </nav>
         </div>
 
@@ -167,67 +158,6 @@
                 </div>
             @endif
 
-            @if($activeTab === 'duedates' && $this->can('due_dates.view'))
-                <div class="space-y-4">
-                    @forelse($dueDates as $dueDate)
-                    <div class="bg-gray-50 dark:bg-zinc-700 rounded-lg p-4">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                                    {{ $dueDate->name }}
-                                </h3>
-                                @if($dueDate->contract)
-                                <div class="mt-1 text-sm text-gray-600 dark:text-gray-300">
-                                    Contract: {{ $dueDate->contract->title }} (#{{ $dueDate->contract->contract_number }})
-                                    @if($dueDate->contract->funder)
-                                    • {{ $dueDate->contract->funder->name }}
-                                    @endif
-                                </div>
-                                @endif
-                                <div class="mt-2 flex items-center space-x-4 text-sm">
-                                    <span class="text-gray-500 dark:text-gray-400">
-                                        Due: {{ $dueDate->due_date->format('M d, Y') }}
-                                    </span>
-                                    @if($dueDate->frequency)
-                                    <span class="text-gray-500 dark:text-gray-400">
-                                        Frequency: {{ ucfirst($dueDate->frequency) }}
-                                    </span>
-                                    @endif
-                                </div>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                @php
-                                    $daysUntilDue = now()->diffInDays($dueDate->due_date, false);
-                                @endphp
-                                @if($daysUntilDue < 0)
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
-                                        Overdue
-                                    </span>
-                                @elseif($daysUntilDue <= 30)
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
-                                        Due Soon
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-                                        {{ $daysUntilDue }} days
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                    @empty
-                    <p class="text-gray-500 dark:text-gray-400 text-center py-8">
-                        No due dates found.
-                    </p>
-                    @endforelse
-                    
-                    @if($dueDates->hasPages())
-                    <div class="mt-4">
-                        {{ $dueDates->links() }}
-                    </div>
-                    @endif
-                </div>
-            @endif
         </div>
 
         <!-- Quick Links -->
@@ -248,12 +178,6 @@
                 </a>
                 @endif
                 
-                @if($this->can('due_dates.view'))
-                <a href="{{ route('contract-report-due-dates.management') }}" wire:navigate
-                   class="inline-flex items-center px-4 py-2 bg-white dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-600">
-                    Manage Due Dates
-                </a>
-                @endif
             </div>
         </div>
     </div>

@@ -105,6 +105,25 @@ class ContractReportDueDate extends Model implements HasMedia
     }
 
     /**
+     * Get the assigned users through emails relationship
+     */
+    public function assignedUsers()
+    {
+        return $this->emails()
+            ->join('users', 'users.email', '=', 'due_date_emails.email')
+            ->select('users.*')
+            ->where('contract_report_due_date_emails.active', true);
+    }
+
+    /**
+     * Get the pivot table records for this due date
+     */
+    public function dueDateEmails()
+    {
+        return $this->hasMany(ContractReportDueDateEmail::class);
+    }
+
+    /**
      * Get documents attached to this due date
      */
     public function getDocumentsAttribute()

@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\ContractReportDueDate;
+use App\Models\SiteSetting;
 use App\Notifications\ContractReportReminderNotification;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -17,7 +18,10 @@ class ContractReportReminderCommand extends Command
      */
     protected $signature = 'contract:send-reminders 
                             {--dry-run : Run without sending emails}
-                            {--days= : Check for specific days until due date}';
+                            {--days= : Check for specific days until due date}
+                            {--contract-id= : Only process a specific contract}
+                            {--test-mode : Send all emails to test recipient}
+                            {--test-email= : Test recipient email address}';
 
     /**
      * The console command description.
@@ -33,23 +37,55 @@ class ContractReportReminderCommand extends Command
     {
         $dryRun = $this->option('dry-run');
         $specificDays = $this->option('days');
+        $contractId = $this->option('contract-id');
+        $testMode = $this->option('test-mode');
+        $testEmail = $this->option('test-email');
+        
+        // Check if test mode is enabled in settings
+        $globalTestMode = (bool) SiteSetting::get('contract_reminder_test_mode', '0');
+        $globalTestEmail = SiteSetting::get('contract_reminder_test_email');
+        
+        // Override with global test mode if enabled
+        if ($globalTestMode && !$testMode) {
+            $testMode = true;
+            $testEmail = $testEmail ?: $globalTestEmail;
+            $this->warn('GLOBAL TEST MODE is enabled in settings');
+        }
         
         $this->info('Starting contract report reminder check...');
         
         if ($dryRun) {
             $this->warn('DRY RUN MODE - No emails will be sent');
         }
+        
+        if ($testMode) {
+            if (!$testEmail) {
+                $this->error('Test mode requires --test-email parameter or global test email setting');
+                return Command::FAILURE;
+            }
+            $this->warn("TEST MODE - All emails will be sent to: {$testEmail}");
+        }
 
         // Get all active due dates that haven't been completed
-        $dueDates = ContractReportDueDate::with(['contract.program', 'contract.funder', 'assignedUsers'])
+        $query = ContractReportDueDate::with(['contract.program', 'contract.funder', 'assignedUsers'])
             ->where('active', true)
             ->where('status', '!=', 'completed')
-            ->whereNotNull('due_date')
-            ->get();
+            ->whereNotNull('due_date');
+            
+        // Filter by contract if specified
+        if ($contractId) {
+            $query->where('contract_id', $contractId);
+            $this->info("Filtering for contract ID: {$contractId}");
+        }
+        
+        $dueDates = $query->get();
 
         $totalReminders = 0;
         $todayDate = now()->startOfDay();
 
+        // Get global reminder intervals
+        $reminderIntervals = json_decode(SiteSetting::get('contract_reminder_intervals', '[30,15,7,3,1,0]'), true);
+        
         foreach ($dueDates as $dueDate) {
             $daysUntilDue = $todayDate->diffInDays($dueDate->due_date, false);
             
@@ -58,14 +94,14 @@ class ContractReportReminderCommand extends Command
                 continue;
             }
 
-            // Check if we should send reminder for this due date
-            if ($dueDate->shouldSendReminder($daysUntilDue)) {
-                $remindersSent = $this->sendRemindersForDueDate($dueDate, $daysUntilDue, $dryRun);
+            // Check if this day interval is in our reminder schedule
+            if (in_array($daysUntilDue, $reminderIntervals)) {
+                $remindersSent = $this->sendRemindersForDueDate($dueDate, $daysUntilDue, $dryRun, $testMode, $testEmail);
                 $totalReminders += $remindersSent;
                 
                 $this->line(sprintf(
                     'Due Date: %s (%d days) - %s - Sent %d reminders',
-                    $dueDate->report_name,
+                    strip_tags($dueDate->report_name ?? ucfirst($dueDate->report_type) . ' Report'),
                     $daysUntilDue,
                     $dueDate->contract->title ?? 'N/A',
                     $remindersSent
@@ -82,6 +118,8 @@ class ContractReportReminderCommand extends Command
             'total_reminders' => $totalReminders,
             'dry_run' => $dryRun,
             'specific_days' => $specificDays,
+            'contract_id' => $contractId,
+            'test_mode' => $testMode,
         ]);
 
         return Command::SUCCESS;
@@ -90,7 +128,7 @@ class ContractReportReminderCommand extends Command
     /**
      * Send reminders for a specific due date
      */
-    private function sendRemindersForDueDate(ContractReportDueDate $dueDate, int $daysUntilDue, bool $dryRun = false): int
+    private function sendRemindersForDueDate(ContractReportDueDate $dueDate, int $daysUntilDue, bool $dryRun = false, bool $testMode = false, ?string $testEmail = null): int
     {
         $remindersSent = 0;
         $assignedUsers = $dueDate->assignedUsers()->where('active', true)->get();
@@ -113,7 +151,16 @@ class ContractReportReminderCommand extends Command
             if (!$dryRun) {
                 try {
                     // Send the notification
-                    $user->notify(new ContractReportReminderNotification($dueDate, $daysUntilDue));
+                    if ($testMode && $testEmail) {
+                        // In test mode, create a temporary user object with test email
+                        $testUser = new \App\Models\User();
+                        $testUser->email = $testEmail;
+                        $testUser->name = "Test Recipient (for {$user->name})";
+                        $testUser->notify(new ContractReportReminderNotification($dueDate, $daysUntilDue, $user));
+                        $this->line("  [TEST] Sent to test recipient: {$testEmail} (instead of {$user->email})");
+                    } else {
+                        $user->notify(new ContractReportReminderNotification($dueDate, $daysUntilDue));
+                    }
                     
                     // Update email record
                     $this->updateEmailRecord($emailRecord, $daysUntilDue);
@@ -129,7 +176,9 @@ class ContractReportReminderCommand extends Command
                     ]);
                 }
             } else {
-                $this->line("  [DRY RUN] Would send reminder to: {$user->name} ({$user->email})");
+                $prefix = $testMode ? "[DRY RUN][TEST]" : "[DRY RUN]";
+                $recipient = $testMode ? $testEmail : "{$user->name} ({$user->email})";
+                $this->line("  {$prefix} Would send reminder to: {$recipient}");
                 $remindersSent++;
             }
         }
