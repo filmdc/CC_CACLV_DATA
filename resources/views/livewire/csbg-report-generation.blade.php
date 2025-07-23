@@ -589,86 +589,96 @@
     </div>
 @endif
 
-<!-- Always load chart script -->
+<!-- CSBG Chart Management Script -->
 <script>
-console.log('CSBG page loaded, reportData exists:', @js(!!$reportData));
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('CSBG Chart script loaded');
-    console.log('Chart.js available:', typeof Chart !== 'undefined');
-    console.log('Window object:', typeof window !== 'undefined');
-    
-    // Initialize immediately if on visualizations tab
-    if (document.querySelector('#chartContainer')) {
-        console.log('Chart container found on load - initializing');
-        setTimeout(() => initializeCharts(), 100);
-    }
-});
+// Initialize CSBG chart management
+window.csbgCharts = {
+    initialized: false,
+    reportData: @js($reportData),
+    activeTab: @js($activeTab)
+};
 
-// Listen for Livewire events
-document.addEventListener('livewire:init', () => {
-    console.log('Livewire initialized');
+// Wait for DOM and dependencies
+if (window.DOMReady) {
+    window.DOMReady.ready(() => {
+        initializeCsbgCharts();
+    });
+} else {
+    // Fallback for immediate execution
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(initializeCsbgCharts, 100);
+    });
+}
+
+function initializeCsbgCharts() {
+    console.log('Initializing CSBG charts');
     
-    Livewire.on('initializeCharts', (reportData) => {
-        console.log('Received initializeCharts event with data:', reportData);
-        // Use requestAnimationFrame to wait for browser to finish rendering
-        requestAnimationFrame(() => {
+    // Check if we're on visualizations tab with data
+    if (window.csbgCharts.activeTab === 'visualizations' && window.csbgCharts.reportData) {
+        // Initialize charts immediately
+        initializeCharts(window.csbgCharts.reportData);
+    }
+    
+    // Set up Livewire event listeners
+    if (window.LivewireEventManager) {
+        window.LivewireEventManager.on('initializeCharts', (data) => {
+            console.log('Received initializeCharts event');
+            const reportData = Array.isArray(data) ? data[0] : data;
+            window.csbgCharts.reportData = reportData;
+            
+            // Use requestAnimationFrame for smooth rendering
             requestAnimationFrame(() => {
-                // Double RAF ensures we wait for the next paint
-                if (document.querySelector('#chartContainer')) {
-                    console.log('Chart container ready, initializing charts');
-                    initializeCharts(reportData[0]);
-                } else {
-                    // If container still not found, try again after a delay
-                    setTimeout(() => {
-                        if (document.querySelector('#chartContainer')) {
-                            initializeCharts(reportData[0]);
-                        }
-                    }, 500);
+                if (document.getElementById('chartContainer')) {
+                    initializeCharts(reportData);
                 }
             });
-        });
-    });
-});
-
-// Listen for DOM updates
-document.addEventListener('livewire:updated', () => {
-    console.log('Livewire updated');
-    if (document.querySelector('#chartContainer')) {
-        console.log('Chart container found after update');
-        setTimeout(() => initializeCharts(), 100);
+        }, 'csbg-report');
+    } else {
+        // Fallback to direct Livewire events
+        if (window.Livewire) {
+            Livewire.on('initializeCharts', (data) => {
+                const reportData = Array.isArray(data) ? data[0] : data;
+                setTimeout(() => initializeCharts(reportData), 100);
+            });
+        }
     }
-});
-
-// Global chart instances to avoid memory leaks
-let chartInstances = {};
+}
 
 function initializeCharts(reportData) {
-    console.log('initializeCharts called with:', reportData);
+    console.log('initializeCharts called');
     
-    if (typeof Chart === 'undefined') {
+    // Validate Chart.js is loaded
+    if (!window.ChartManager || !window.ChartManager.isChartJsLoaded()) {
         console.error('Chart.js not loaded');
+        // Retry after a delay
+        setTimeout(() => {
+            if (window.Chart) {
+                initializeCharts(reportData);
+            }
+        }, 500);
         return;
     }
     
-    // Get report data from the current page if not provided
+    // Use provided data or fallback to window data
     if (!reportData) {
-        const currentReportData = @json($reportData ?? null);
-        if (!currentReportData) {
+        reportData = window.csbgCharts.reportData;
+        if (!reportData) {
             console.warn('No report data available');
             return;
         }
-        reportData = currentReportData;
     }
     
-    console.log('Starting chart initialization...');
+    // Prevent duplicate initialization
+    if (window.csbgCharts.initialized) {
+        console.log('Charts already initialized, refreshing...');
+    }
     
-    // Destroy existing charts
-    Object.values(chartInstances).forEach(chart => {
-        if (chart && typeof chart.destroy === 'function') {
-            chart.destroy();
-        }
-    });
-    chartInstances = {};
+    console.log('Creating charts...');
+    
+    // Destroy all existing charts
+    if (window.ChartManager) {
+        window.ChartManager.destroyAll();
+    }
     
     const colors = {
         primary: ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#F97316', '#06B6D4', '#84CC16'],
@@ -719,13 +729,18 @@ function initializeCharts(reportData) {
 }
 
 function createPieChart(canvasId, data, colors) {
-    const ctx = document.getElementById(canvasId);
-    if (!ctx) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) {
         console.warn('Canvas not found:', canvasId);
         return null;
     }
-
-    console.log('Creating pie chart for', canvasId);
+    
+    // Get 2D context
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+        console.error('Could not get 2D context for:', canvasId);
+        return null;
+    }
 
     return new Chart(ctx, {
         type: 'pie',
@@ -756,13 +771,18 @@ function createPieChart(canvasId, data, colors) {
 }
 
 function createDoughnutChart(canvasId, data, colors) {
-    const ctx = document.getElementById(canvasId);
-    if (!ctx) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) {
         console.warn('Canvas not found:', canvasId);
         return null;
     }
-
-    console.log('Creating doughnut chart for', canvasId);
+    
+    // Get 2D context
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+        console.error('Could not get 2D context for:', canvasId);
+        return null;
+    }
 
     return new Chart(ctx, {
         type: 'doughnut',
@@ -793,13 +813,18 @@ function createDoughnutChart(canvasId, data, colors) {
 }
 
 function createBarChart(canvasId, data, color) {
-    const ctx = document.getElementById(canvasId);
-    if (!ctx) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) {
         console.warn('Canvas not found:', canvasId);
         return null;
     }
-
-    console.log('Creating bar chart for', canvasId);
+    
+    // Get 2D context
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+        console.error('Could not get 2D context for:', canvasId);
+        return null;
+    }
 
     return new Chart(ctx, {
         type: 'bar',

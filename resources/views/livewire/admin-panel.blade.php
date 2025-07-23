@@ -1317,7 +1317,7 @@
                     </div>
                     
                     <!-- Preview -->
-                    <div class="bg-gray-50 dark:bg-zinc-700 rounded-lg p-4" wire:poll.5s>
+                    <div class="bg-gray-50 dark:bg-zinc-700 rounded-lg p-4">
                         <h4 class="font-medium text-gray-900 dark:text-white mb-2">Preview</h4>
                         @if($bulkDeleteType === 'test_data')
                             @php 

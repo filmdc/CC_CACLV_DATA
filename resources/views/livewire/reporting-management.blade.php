@@ -411,14 +411,22 @@
                     @if($activeTab === 'visualizations')
                         <!-- Visualizations Content -->
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="chartContainer" wire:ignore
-                             x-data="{ mounted: false }"
+                             x-data="{ 
+                                 mounted: false,
+                                 initCharts() {
+                                     if (typeof initializeCharts === 'function' && window.reportingCharts?.reportData) {
+                                         console.log('Alpine: Initializing charts');
+                                         initializeCharts(window.reportingCharts.reportData);
+                                     }
+                                 }
+                             }"
                              x-init="
                                  mounted = true;
-                                 $nextTick(() => {
-                                     console.log('Alpine: Visualizations tab mounted');
-                                     if (typeof initializeCharts === 'function') {
-                                         initializeCharts();
-                                     }
+                                 // Initialize on next tick
+                                 $nextTick(() => initCharts());
+                                 // Also listen for tab changes
+                                 $wire.on('initializeCharts', () => {
+                                     $nextTick(() => initCharts());
                                  });
                              ">
                             <!-- Gender Distribution Chart -->
@@ -599,86 +607,96 @@
     </div>
 @endif
 
-<!-- Always load chart script -->
+<!-- Chart Management Script -->
 <script>
-console.log('CSBG page loaded, reportData exists:', @js(!!$reportData));
-
-// Store the active tab and report data state
-window.csbgReportState = {
-    activeTab: @js($activeTab),
-    hasReportData: @js(!!$reportData),
-    chartsInitialized: false
+// Initialize chart management
+window.reportingCharts = {
+    initialized: false,
+    reportData: @js($reportData),
+    activeTab: @js($activeTab)
 };
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('CSBG Chart script loaded');
-    console.log('Chart.js available:', typeof Chart !== 'undefined');
-    
-    // Initialize immediately if on visualizations tab
-    if (window.csbgReportState.activeTab === 'visualizations' && window.csbgReportState.hasReportData) {
-        console.log('Starting on visualizations tab - initializing charts');
-        setTimeout(() => initializeCharts(), 100);
-    }
-});
-
-// Listen for Livewire events
-document.addEventListener('livewire:init', () => {
-    console.log('Livewire initialized');
-    
-    Livewire.on('initializeCharts', (reportData) => {
-        console.log('Received initializeCharts event');
-        window.csbgReportState.chartsInitialized = false;
-        
-        // Wait for next tick to ensure DOM is updated
-        Livewire.hook('morph.updated', ({ el, component }) => {
-            if (el.id === 'chartContainer' && !window.csbgReportState.chartsInitialized) {
-                console.log('Chart container morphed, initializing charts');
-                window.csbgReportState.chartsInitialized = true;
-                setTimeout(() => initializeCharts(reportData[0]), 50);
-            }
-        });
-        
-        // Fallback initialization
-        setTimeout(() => {
-            if (document.querySelector('#chartContainer') && !window.csbgReportState.chartsInitialized) {
-                console.log('Fallback chart initialization');
-                window.csbgReportState.chartsInitialized = true;
-                initializeCharts(reportData[0]);
-            }
-        }, 300);
+// Wait for DOM and dependencies
+if (window.DOMReady) {
+    window.DOMReady.ready(() => {
+        initializeReportingCharts();
     });
-});
+} else {
+    // Fallback for immediate execution
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(initializeReportingCharts, 100);
+    });
+}
 
-// Global chart instances to avoid memory leaks
-let chartInstances = {};
+function initializeReportingCharts() {
+    console.log('Initializing reporting charts');
+    
+    // Check if we're on visualizations tab with data
+    if (window.reportingCharts.activeTab === 'visualizations' && window.reportingCharts.reportData) {
+        // Initialize charts immediately
+        initializeCharts(window.reportingCharts.reportData);
+    }
+    
+    // Set up Livewire event listeners
+    if (window.LivewireEventManager) {
+        window.LivewireEventManager.on('initializeCharts', (data) => {
+            console.log('Received initializeCharts event');
+            const reportData = Array.isArray(data) ? data[0] : data;
+            window.reportingCharts.reportData = reportData;
+            
+            // Use requestAnimationFrame for smooth rendering
+            requestAnimationFrame(() => {
+                if (document.getElementById('chartContainer')) {
+                    initializeCharts(reportData);
+                }
+            });
+        }, 'reporting-management');
+    } else {
+        // Fallback to direct Livewire events
+        if (window.Livewire) {
+            Livewire.on('initializeCharts', (data) => {
+                const reportData = Array.isArray(data) ? data[0] : data;
+                setTimeout(() => initializeCharts(reportData), 100);
+            });
+        }
+    }
+}
 
 function initializeCharts(reportData) {
-    console.log('initializeCharts called with:', reportData);
+    console.log('initializeCharts called');
     
-    if (typeof Chart === 'undefined') {
+    // Validate Chart.js is loaded
+    if (!window.ChartManager || !window.ChartManager.isChartJsLoaded()) {
         console.error('Chart.js not loaded');
+        // Retry after a delay
+        setTimeout(() => {
+            if (window.Chart) {
+                initializeCharts(reportData);
+            }
+        }, 500);
         return;
     }
     
-    // Get report data from the current page if not provided
+    // Use provided data or fallback to window data
     if (!reportData) {
-        const currentReportData = @json($reportData ?? null);
-        if (!currentReportData) {
+        reportData = window.reportingCharts.reportData;
+        if (!reportData) {
             console.warn('No report data available');
             return;
         }
-        reportData = currentReportData;
     }
     
-    console.log('Starting chart initialization...');
+    // Prevent duplicate initialization
+    if (window.reportingCharts.initialized) {
+        console.log('Charts already initialized, refreshing...');
+    }
     
-    // Destroy existing charts
-    Object.values(chartInstances).forEach(chart => {
-        if (chart && typeof chart.destroy === 'function') {
-            chart.destroy();
-        }
-    });
-    chartInstances = {};
+    console.log('Creating charts...');
+    
+    // Destroy all existing charts
+    if (window.ChartManager) {
+        window.ChartManager.destroyAll();
+    }
     
     const colors = {
         primary: ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#F97316', '#06B6D4', '#84CC16'],
@@ -688,54 +706,73 @@ function initializeCharts(reportData) {
     try {
         // Gender Chart
         if (reportData.demographics?.gender) {
-            console.log('Creating gender chart');
-            chartInstances.gender = createPieChart('genderChart', reportData.demographics.gender, colors.primary);
+            const chart = createPieChart('genderChart', reportData.demographics.gender, colors.primary);
+            if (chart && window.ChartManager) {
+                window.ChartManager.register('gender', chart);
+            }
         }
 
         // Age Groups Chart  
         if (reportData.characteristics?.age_groups) {
-            console.log('Creating age chart');
-            chartInstances.age = createBarChart('ageChart', reportData.characteristics.age_groups, colors.primary[0]);
+            const chart = createBarChart('ageChart', reportData.characteristics.age_groups, colors.primary[0]);
+            if (chart && window.ChartManager) {
+                window.ChartManager.register('age', chart);
+            }
         }
 
         // Education Level Chart
         if (reportData.demographics?.education_level) {
-            console.log('Creating education chart');
-            chartInstances.education = createDoughnutChart('educationChart', reportData.demographics.education_level, colors.primary);
+            const chart = createDoughnutChart('educationChart', reportData.demographics.education_level, colors.primary);
+            if (chart && window.ChartManager) {
+                window.ChartManager.register('education', chart);
+            }
         }
 
         // Poverty Levels Chart
         if (reportData.employment_income?.poverty_levels) {
-            console.log('Creating poverty chart');
-            chartInstances.poverty = createBarChart('povertyChart', reportData.employment_income.poverty_levels, colors.poverty[0]);
+            const chart = createBarChart('povertyChart', reportData.employment_income.poverty_levels, colors.poverty[0]);
+            if (chart && window.ChartManager) {
+                window.ChartManager.register('poverty', chart);
+            }
         }
 
         // Work Status Chart
         if (reportData.employment_income?.work_status) {
-            console.log('Creating work status chart');
-            chartInstances.workStatus = createPieChart('workStatusChart', reportData.employment_income.work_status, colors.primary);
+            const chart = createPieChart('workStatusChart', reportData.employment_income.work_status, colors.primary);
+            if (chart && window.ChartManager) {
+                window.ChartManager.register('workStatus', chart);
+            }
         }
 
         // Housing Status Chart
         if (reportData.health_housing?.housing_status) {
-            console.log('Creating housing chart');
-            chartInstances.housing = createDoughnutChart('housingChart', reportData.health_housing.housing_status, colors.primary);
+            const chart = createDoughnutChart('housingChart', reportData.health_housing.housing_status, colors.primary);
+            if (chart && window.ChartManager) {
+                window.ChartManager.register('housing', chart);
+            }
         }
         
-        console.log('Chart initialization completed');
+        window.reportingCharts.initialized = true;
+        console.log('All charts created successfully');
     } catch (error) {
-        console.error('Error during chart initialization:', error);
+        console.error('Error creating charts:', error);
+        window.reportingCharts.initialized = false;
     }
 }
 
 function createPieChart(canvasId, data, colors) {
-    const ctx = document.getElementById(canvasId);
-    if (!ctx) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) {
         console.warn('Canvas not found:', canvasId);
         return null;
     }
-
-    console.log('Creating pie chart for', canvasId);
+    
+    // Get 2D context
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+        console.error('Could not get 2D context for:', canvasId);
+        return null;
+    }
 
     return new Chart(ctx, {
         type: 'pie',
@@ -766,13 +803,18 @@ function createPieChart(canvasId, data, colors) {
 }
 
 function createDoughnutChart(canvasId, data, colors) {
-    const ctx = document.getElementById(canvasId);
-    if (!ctx) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) {
         console.warn('Canvas not found:', canvasId);
         return null;
     }
-
-    console.log('Creating doughnut chart for', canvasId);
+    
+    // Get 2D context
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+        console.error('Could not get 2D context for:', canvasId);
+        return null;
+    }
 
     return new Chart(ctx, {
         type: 'doughnut',
@@ -803,13 +845,18 @@ function createDoughnutChart(canvasId, data, colors) {
 }
 
 function createBarChart(canvasId, data, color) {
-    const ctx = document.getElementById(canvasId);
-    if (!ctx) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) {
         console.warn('Canvas not found:', canvasId);
         return null;
     }
-
-    console.log('Creating bar chart for', canvasId);
+    
+    // Get 2D context
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+        console.error('Could not get 2D context for:', canvasId);
+        return null;
+    }
 
     return new Chart(ctx, {
         type: 'bar',
@@ -839,10 +886,21 @@ function createBarChart(canvasId, data, color) {
     });
 }
 
-// Expose for manual testing
+// Clean up function
+window.cleanupReportingCharts = function() {
+    if (window.ChartManager) {
+        window.ChartManager.destroyAll();
+    }
+    if (window.LivewireEventManager) {
+        window.LivewireEventManager.off('initializeCharts', 'reporting-management');
+    }
+    window.reportingCharts.initialized = false;
+};
+
+// Manual initialization for testing
 window.testChartInit = function() {
-    console.log('Manual test triggered');
-    initializeCharts();
+    console.log('Manual chart initialization triggered');
+    initializeCharts(window.reportingCharts.reportData);
 };
 </script>
 </div>

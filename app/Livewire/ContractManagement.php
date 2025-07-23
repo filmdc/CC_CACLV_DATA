@@ -116,6 +116,13 @@ class ContractManagement extends Component
         $this->selectedContract = null;
     }
     
+    public function cancelForm()
+    {
+        $this->showCreateForm = false;
+        $this->showEditForm = false;
+        $this->resetContractForm();
+    }
+    
     public function viewContract($contractId)
     {
         // Redirect to the contract show page instead of opening a modal
@@ -130,11 +137,35 @@ class ContractManagement extends Component
 
     public function showCreateContract()
     {
-        $this->authorizeAction('contracts.create');
-        $this->showCreateForm = true;
-        $this->showEditForm = false;
-        $this->selectedContract = null;
-        $this->resetContractForm();
+        try {
+            // Debug logging
+            \Log::info('showCreateContract called', [
+                'user' => auth()->user()->id,
+                'can_create' => $this->can('contracts.create')
+            ]);
+            
+            if (!$this->can('contracts.create')) {
+                session()->flash('error', 'You do not have permission to create contracts.');
+                return;
+            }
+            
+            // Reset form BEFORE setting visibility flags
+            $this->resetContractForm();
+            $this->showCreateForm = true;
+            $this->showEditForm = false;
+            $this->selectedContract = null;
+            
+            // Force a refresh to ensure the form is displayed
+            $this->dispatch('$refresh');
+            
+            \Log::info('showCreateContract completed', [
+                'showCreateForm' => $this->showCreateForm,
+                'showEditForm' => $this->showEditForm
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error in showCreateContract: ' . $e->getMessage());
+            session()->flash('error', 'Error opening create form: ' . $e->getMessage());
+        }
     }
 
     public function showEditContract($contractId)

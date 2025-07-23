@@ -165,8 +165,20 @@
     <!-- Household Management Panel -->
     @if($selectedHousehold)
         <div class="mt-6 bg-white dark:bg-zinc-800 shadow-lg rounded-lg overflow-hidden" 
-             x-data
-             x-init="$el.scrollIntoView({ behavior: 'smooth', block: 'start' })">
+             x-data="{ 
+                 scrolled: false,
+                 scrollToView() {
+                     if (!this.scrolled) {
+                         if (window.ScrollControl) {
+                             window.ScrollControl.scrollOnce($el, { behavior: 'smooth', block: 'start' });
+                         } else {
+                             $el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                         }
+                         this.scrolled = true;
+                     }
+                 }
+             }"
+             x-init="$nextTick(() => scrollToView())">
             <div class="bg-gray-50 dark:bg-zinc-700 px-6 py-4 border-b border-gray-200 dark:border-zinc-600">
                 <div class="flex items-center justify-between">
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
