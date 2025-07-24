@@ -68,6 +68,7 @@ class ContractShow extends Component
             'program',
             'reportDueDates.emails.user',
             'reportDueDates.contractReports.media',
+            'media',
             'createdBy',
             'updatedBy'
         ])->findOrFail($this->contractId);
@@ -355,6 +356,58 @@ class ContractShow extends Component
     {
         $this->showAssignedUsersModal = false;
         $this->selectedDueDateForUsers = null;
+    }
+    
+    public function downloadDocument($mediaId)
+    {
+        $this->authorizeAction('contracts.view');
+        
+        try {
+            $media = $this->contract->getMedia('documents')->where('id', $mediaId)->first();
+            
+            if ($media) {
+                return response()->download($media->getPath(), $media->name);
+            }
+            
+            session()->flash('error', 'Document not found.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Cannot download document: ' . $e->getMessage());
+        }
+    }
+    
+    public function previewDocument($contractId, $mediaId)
+    {
+        // Check permission
+        if (!auth()->user()->can('contracts.view')) {
+            abort(403, 'Unauthorized');
+        }
+        
+        try {
+            // Load the contract and media
+            $contract = Contract::findOrFail($contractId);
+            $media = $contract->getMedia('documents')->where('id', $mediaId)->first();
+            
+            if (!$media) {
+                abort(404, 'Document not found');
+            }
+            
+            $path = $media->getPath();
+            $mimeType = $media->mime_type;
+            
+            // For PDFs and images, return inline response
+            if (in_array($mimeType, ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'])) {
+                return response()->file($path, [
+                    'Content-Type' => $mimeType,
+                    'Content-Disposition' => 'inline; filename="' . $media->name . '"'
+                ]);
+            }
+            
+            // For other types, download
+            return response()->download($path, $media->name);
+            
+        } catch (\Exception $e) {
+            abort(500, 'Cannot preview document: ' . $e->getMessage());
+        }
     }
 
     public function render()

@@ -172,6 +172,85 @@
                 </div>
             </div>
 
+            <!-- Contract Documents -->
+            <div class="mb-8">
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4 border-b border-gray-200 dark:border-zinc-700 pb-2">
+                    Contract Documents ({{ $contract->documents->count() }})
+                </h2>
+                
+                @if($contract->documents->count() > 0)
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        @foreach($contract->documents as $document)
+                            <div class="border border-gray-200 dark:border-zinc-700 rounded-lg p-4 hover:shadow-lg transition-shadow duration-200">
+                                <div class="flex items-start space-x-3">
+                                    <!-- File Icon -->
+                                    <div class="flex-shrink-0">
+                                        @php
+                                            $extension = strtolower(pathinfo($document->file_name, PATHINFO_EXTENSION));
+                                            $iconClass = match($extension) {
+                                                'pdf' => 'text-red-500',
+                                                'doc', 'docx' => 'text-blue-500',
+                                                'xls', 'xlsx' => 'text-green-500',
+                                                'png', 'jpg', 'jpeg' => 'text-purple-500',
+                                                default => 'text-gray-500'
+                                            };
+                                        @endphp
+                                        
+                                        @if(in_array($extension, ['png', 'jpg', 'jpeg']))
+                                            <svg class="w-10 h-10 {{ $iconClass }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
+                                        @else
+                                            <svg class="w-10 h-10 {{ $iconClass }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                            </svg>
+                                        @endif
+                                    </div>
+                                    
+                                    <!-- File Details -->
+                                    <div class="flex-1 min-w-0">
+                                        <h3 class="text-sm font-medium text-gray-900 dark:text-white truncate" title="{{ $document->name }}">
+                                            {{ $document->name }}
+                                        </h3>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                            {{ strtoupper($extension) }} • {{ $document->human_readable_size }}
+                                        </p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                                            Uploaded {{ $document->created_at->format('M j, Y') }}
+                                        </p>
+                                        
+                                        <!-- Actions -->
+                                        <div class="mt-3 flex items-center space-x-3">
+                                            <button wire:click="downloadDocument({{ $document->id }})"
+                                                    class="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
+                                                <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                </svg>
+                                                Download
+                                            </button>
+                                            
+                                            @if(in_array($extension, ['pdf', 'png', 'jpg', 'jpeg']))
+                                                <a href="{{ route('contract.document.preview', ['contractId' => $contract->id, 'mediaId' => $document->id]) }}" 
+                                                   target="_blank"
+                                                   class="text-xs text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-300 font-medium inline-flex items-center">
+                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                    </svg>
+                                                    Preview
+                                                </a>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="text-gray-500 dark:text-gray-400">No documents attached to this contract.</p>
+                @endif
+            </div>
+
             <!-- Report Due Dates -->
             <div class="mb-8">
                 <div class="flex justify-between items-center mb-4">
