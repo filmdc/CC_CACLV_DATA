@@ -12,6 +12,7 @@ class HouseholdShow extends Component
 
     public $household;
     public $householdId;
+    public $backUrl;
 
     public function mount($id)
     {
@@ -27,6 +28,9 @@ class HouseholdShow extends Component
                 $query->orderBy('effective_date', 'desc')->limit(5);
             }
         ])->findOrFail($id);
+        
+        // Get the referrer URL from session, or default to household management
+        $this->backUrl = session('household_referrer', route('household.management'));
     }
 
     public function editHousehold()
