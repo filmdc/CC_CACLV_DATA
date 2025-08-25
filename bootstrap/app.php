@@ -21,9 +21,14 @@ return Application::configure(basePath: dirname(__DIR__))
         // Run contract reminders daily at 8:00 AM
         $schedule->command('contract:send-reminders')
             ->dailyAt('08:00')
-            ->timezone('America/Los_Angeles')
+            ->timezone('America/New_York')
             ->emailOutputOnFailure('admin@example.com')
             ->description('Send contract report reminder emails');
+            
+        // Process scheduled test reminders every minute
+        $schedule->command('contract:process-scheduled-tests')
+            ->everyMinute()
+            ->description('Process scheduled test reminder emails');
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

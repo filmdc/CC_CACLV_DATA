@@ -54,14 +54,24 @@
         @endif
 
         <div class="p-6">
+            <!-- Test Mode Selection -->
+            <div class="bg-gray-50 dark:bg-zinc-700 rounded-lg p-6 mb-6">
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Test Mode</h2>
+                <div class="flex space-x-4">
+                    <label class="flex items-center">
+                        <input type="radio" wire:model.live="testMode" value="immediate" class="mr-2 text-purple-600 focus:ring-purple-500">
+                        <span class="text-gray-700 dark:text-gray-300">Immediate Test Email</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="radio" wire:model.live="testMode" value="scheduled" class="mr-2 text-purple-600 focus:ring-purple-500">
+                        <span class="text-gray-700 dark:text-gray-300">Schedule Test Reminder</span>
+                    </label>
+                </div>
+            </div>
+
             <!-- Test Configuration -->
             <div class="bg-gray-50 dark:bg-zinc-700 rounded-lg p-6 mb-6">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Test Configuration</h2>
-                
-                <!-- Debug info (remove in production) -->
-                <div class="mb-4 text-xs text-gray-500 dark:text-gray-400">
-                    <p>Debug: Contract ID: {{ $selectedContractId ?: 'none' }} | Due Date ID: {{ $selectedDueDateId ?: 'none' }} | Day Interval: {{ $selectedDayInterval !== '' ? $selectedDayInterval : 'none' }} | Email: {{ $testEmailRecipient ?: 'none' }}</p>
-                </div>
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{{ $testMode === 'scheduled' ? 'Schedule Configuration' : 'Test Configuration' }}</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Contract Selection -->
@@ -79,36 +89,57 @@
                         @error('selectedContractId') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                     </div>
 
-                    <!-- Due Date Selection -->
-                    <div>
-                        <label for="dueDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Select Due Date</label>
-                        <select wire:model.live="selectedDueDateId" id="dueDate"
-                                class="mt-1 block w-full border-gray-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500"
-                                @if(!$selectedContractId) disabled @endif>
-                            <option value="">Select a due date...</option>
-                            @foreach($dueDates as $dueDate)
-                                <option wire:key="duedate-{{ $dueDate->id }}" value="{{ $dueDate->id }}">
-                                    {{ strip_tags($dueDate->report_name ?? ucfirst($dueDate->report_type) . ' Report') }} - 
-                                    Due: {{ $dueDate->due_date->format('M j, Y') }}
-                                    ({{ $dueDate->emails->count() }} assigned)
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('selectedDueDateId') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                    </div>
+                    @if($testMode === 'immediate')
+                        <!-- Due Date Selection (Optional for immediate mode) -->
+                        <div>
+                            <label for="dueDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Select Due Date (Optional)</label>
+                            <select wire:model.live="selectedDueDateId" id="dueDate"
+                                    class="mt-1 block w-full border-gray-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500"
+                                    @if(!$selectedContractId) disabled @endif>
+                                <option value="">No due date (custom email)...</option>
+                                @foreach($dueDates as $dueDate)
+                                    <option wire:key="duedate-{{ $dueDate->id }}" value="{{ $dueDate->id }}">
+                                        {{ strip_tags($dueDate->report_name ?? ucfirst($dueDate->report_type) . ' Report') }} - 
+                                        Due: {{ $dueDate->due_date->format('M j, Y') }}
+                                        ({{ $dueDate->emails->count() }} assigned)
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('selectedDueDateId') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
+                    @endif
 
-                    <!-- Day Interval Selection -->
-                    <div>
-                        <label for="dayInterval" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Test Reminder Interval</label>
-                        <select wire:model.live="selectedDayInterval" id="dayInterval"
-                                class="mt-1 block w-full border-gray-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                            <option value="">Select interval...</option>
-                            @foreach($intervalOptions as $days => $label)
-                                <option value="{{ $days }}">{{ $label }}</option>
-                            @endforeach
-                        </select>
-                        @error('selectedDayInterval') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                    </div>
+                    @if($testMode === 'immediate' && $selectedDueDateId)
+                        <!-- Day Interval Selection -->
+                        <div>
+                            <label for="dayInterval" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Test Reminder Interval</label>
+                            <select wire:model.live="selectedDayInterval" id="dayInterval"
+                                    class="mt-1 block w-full border-gray-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                                <option value="">Select interval...</option>
+                                @foreach($intervalOptions as $days => $label)
+                                    <option value="{{ $days }}">{{ $label }}</option>
+                                @endforeach
+                            </select>
+                            @error('selectedDayInterval') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
+                    @endif
+
+                    @if($testMode === 'scheduled')
+                        <!-- Schedule Date/Time -->
+                        <div>
+                            <label for="scheduledDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Schedule Date</label>
+                            <input type="date" wire:model="scheduledDate" id="scheduledDate"
+                                   min="{{ now()->format('Y-m-d') }}"
+                                   class="mt-1 block w-full border-gray-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                            @error('scheduledDate') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
+                        <div>
+                            <label for="scheduledTime" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Schedule Time</label>
+                            <input type="time" wire:model="scheduledTime" id="scheduledTime"
+                                   class="mt-1 block w-full border-gray-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                            @error('scheduledTime') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
+                    @endif
 
                     <!-- Test Email Recipient -->
                     <div>
@@ -120,30 +151,62 @@
                     </div>
                 </div>
 
+                @if($testMode === 'immediate' && !$selectedDueDateId)
+                    <!-- Custom Email Content -->
+                    <div class="mt-6 space-y-4">
+                        <div>
+                            <label for="customSubject" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Custom Subject (Optional)</label>
+                            <input type="text" wire:model="customSubject" id="customSubject"
+                                   placeholder="Leave blank for default test subject"
+                                   class="mt-1 block w-full border-gray-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                        </div>
+                        <div>
+                            <label for="customBody" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Custom Body (Optional)</label>
+                            <textarea wire:model="customBody" id="customBody" rows="4"
+                                      placeholder="Leave blank for default test body. You can use variables: @{{contract_title}}, @{{program}}, @{{funder}}"
+                                      class="mt-1 block w-full border-gray-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500"></textarea>
+                        </div>
+                    </div>
+                @endif
+
                 <!-- Action Buttons -->
                 <div class="mt-6 flex space-x-3">
-                    <button wire:click="previewEmail"
-                            wire:loading.attr="disabled"
-                            @if(!$selectedContractId || !$selectedDueDateId || $selectedDayInterval === null || $selectedDayInterval === '' || !$testEmailRecipient) 
-                                disabled 
-                                class="px-4 py-2 bg-gray-400 text-gray-200 rounded-md cursor-not-allowed"
-                            @else
-                                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                            @endif>
-                        <span wire:loading.remove wire:target="previewEmail">Preview Email</span>
-                        <span wire:loading wire:target="previewEmail">Loading...</span>
-                    </button>
-                    <button wire:click="sendTestNotification"
-                            wire:loading.attr="disabled"
-                            @if(!$selectedContractId || !$selectedDueDateId || $selectedDayInterval === null || $selectedDayInterval === '' || !$testEmailRecipient) 
-                                disabled 
-                                class="px-4 py-2 bg-gray-400 text-gray-200 rounded-md cursor-not-allowed"
-                            @else
-                                class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                            @endif>
-                        <span wire:loading.remove wire:target="sendTestNotification">Send Test Notification</span>
-                        <span wire:loading wire:target="sendTestNotification">Sending...</span>
-                    </button>
+                    @if($testMode === 'immediate')
+                        <button wire:click="previewEmail"
+                                wire:loading.attr="disabled"
+                                @if(!$selectedContractId || !$testEmailRecipient) 
+                                    disabled 
+                                    class="px-4 py-2 bg-gray-400 text-gray-200 rounded-md cursor-not-allowed"
+                                @else
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                @endif>
+                            <span wire:loading.remove wire:target="previewEmail">Preview Email</span>
+                            <span wire:loading wire:target="previewEmail">Loading...</span>
+                        </button>
+                        <button wire:click="sendTestNotification"
+                                wire:loading.attr="disabled"
+                                @if(!$selectedContractId || !$testEmailRecipient) 
+                                    disabled 
+                                    class="px-4 py-2 bg-gray-400 text-gray-200 rounded-md cursor-not-allowed"
+                                @else
+                                    class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                @endif>
+                            <span wire:loading.remove wire:target="sendTestNotification">Send Test Email</span>
+                            <span wire:loading wire:target="sendTestNotification">Sending...</span>
+                        </button>
+                    @else
+                        <button wire:click="scheduleTestReminder"
+                                wire:loading.attr="disabled"
+                                @if(!$selectedContractId || !$scheduledDate || !$scheduledTime || !$testEmailRecipient) 
+                                    disabled 
+                                    class="px-4 py-2 bg-gray-400 text-gray-200 rounded-md cursor-not-allowed"
+                                @else
+                                    class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                @endif>
+                            <span wire:loading.remove wire:target="scheduleTestReminder">Schedule Test Reminder</span>
+                            <span wire:loading wire:target="scheduleTestReminder">Scheduling...</span>
+                        </button>
+                    @endif
                 </div>
             </div>
 
@@ -248,6 +311,58 @@
                                 @endforeach
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Scheduled Tests -->
+            @if($scheduledTests->count() > 0)
+                <div class="bg-white dark:bg-zinc-700 rounded-lg shadow-md p-6 mb-6">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Scheduled Test Reminders</h2>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-600">
+                            <thead>
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Contract</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Scheduled For</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Test Email</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Created By</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 dark:divide-zinc-600">
+                                @foreach($scheduledTests as $test)
+                                    <tr class="{{ $test['is_past'] ? 'bg-red-50 dark:bg-red-900/20' : '' }}">
+                                        <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">{{ $test['contract_title'] }}</td>
+                                        <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                                            {{ $test['scheduled_at']->format('M j, Y g:i A') }}
+                                        </td>
+                                        <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $test['test_email'] }}</td>
+                                        <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $test['created_by'] }}</td>
+                                        <td class="px-4 py-3 text-sm">
+                                            @if($test['is_past'])
+                                                <span class="px-2 py-1 text-xs bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100 rounded-full">Past Due</span>
+                                            @else
+                                                <span class="px-2 py-1 text-xs bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 rounded-full">Pending</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-3 text-sm">
+                                            <button wire:click="cancelScheduledTest('{{ $test['id'] }}')"
+                                                    class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-200">
+                                                Cancel
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                        <p class="text-sm text-blue-700 dark:text-blue-300">
+                            <strong>Note:</strong> Scheduled tests will be processed by the scheduled task runner. Make sure your cron job or task scheduler is configured to run the contract reminder command at the scheduled times.
+                        </p>
                     </div>
                 </div>
             @endif

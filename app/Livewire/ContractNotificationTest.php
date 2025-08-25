@@ -24,6 +24,13 @@ class ContractNotificationTest extends Component
     public $executionLog = [];
     public $isTestMode = false;
     
+    // New properties for enhanced testing
+    public $testMode = 'immediate'; // 'immediate' or 'scheduled'
+    public $scheduledDate = '';
+    public $scheduledTime = '';
+    public $customSubject = '';
+    public $customBody = '';
+    
     public function mount()
     {
         $this->authorizeAction('contracts.manage', 'You do not have permission to access the notification test dashboard.');
@@ -35,15 +42,10 @@ class ContractNotificationTest extends Component
     
     public function getContractsProperty()
     {
+        // Get all contracts, not just those with active due dates for testing purposes
         return Contract::with(['reportDueDates' => function($query) {
-            $query->where('active', true)
-                  ->where('status', '!=', 'completed')
-                  ->orderBy('due_date');
-        }])
-        ->whereHas('reportDueDates', function($query) {
-            $query->where('active', true)
-                  ->where('status', '!=', 'completed');
-        })
+            $query->orderBy('due_date');
+        }, 'program', 'funder'])
         ->orderBy('title')
         ->get();
     }
@@ -54,9 +56,8 @@ class ContractNotificationTest extends Component
             return collect();
         }
         
+        // Get all due dates for testing, not just active ones
         return ContractReportDueDate::where('contract_id', $this->selectedContractId)
-            ->where('active', true)
-            ->where('status', '!=', 'completed')
             ->with(['emails.user'])
             ->orderBy('due_date')
             ->get();
@@ -94,8 +95,73 @@ class ContractNotificationTest extends Component
         $this->emailPreview = [];
     }
     
+    public function generateTestEmail()
+    {
+        $this->validate([
+            'selectedContractId' => 'required',
+            'testEmailRecipient' => 'required|email',
+        ]);
+        
+        try {
+            $contract = Contract::with(['program', 'funder'])->find($this->selectedContractId);
+            
+            if (!$contract) {
+                session()->flash('error', 'Selected contract not found.');
+                return;
+            }
+            
+            // Use custom or default subject/body
+            if ($this->customSubject && $this->customBody) {
+                $subject = $this->customSubject;
+                $body = $this->customBody;
+            } else {
+                $subject = 'Test Notification: {{contract_title}}';
+                $body = "This is a test notification for contract: {{contract_title}}\n\n" .
+                       "Program: {{program}}\n" .
+                       "Funder: {{funder}}\n\n" .
+                       "This email was sent as a test from the Contract Notification Test Dashboard.";
+            }
+            
+            // Replace variables
+            $variables = [
+                '{{contract_title}}' => $contract->title,
+                '{{program}}' => $contract->program->name ?? 'N/A',
+                '{{funder}}' => $contract->funder->name ?? 'N/A',
+            ];
+            
+            foreach ($variables as $key => $value) {
+                $subject = str_replace($key, $value, $subject);
+                $body = str_replace($key, $value, $body);
+            }
+            
+            // Add test mode prefix
+            $subject = '[TEST] ' . $subject;
+            
+            $this->emailPreview = [
+                'subject' => $subject,
+                'body' => $body,
+                'recipient' => $this->testEmailRecipient,
+                'contract' => $contract->title,
+            ];
+            
+            $this->showPreview = true;
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error generating test email: ' . $e->getMessage());
+            Log::error('Contract notification test error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+        }
+    }
+    
     public function previewEmail()
     {
+        if (!$this->selectedDueDateId) {
+            $this->generateTestEmail();
+            return;
+        }
+        
         $this->validate([
             'selectedContractId' => 'required',
             'selectedDueDateId' => 'required',
@@ -171,8 +237,92 @@ class ContractNotificationTest extends Component
         }
     }
     
+    public function sendTestEmail()
+    {
+        $this->validate([
+            'testEmailRecipient' => 'required|email',
+        ]);
+        
+        if (!$this->showPreview || empty($this->emailPreview)) {
+            session()->flash('error', 'Please preview the email first.');
+            return;
+        }
+        
+        try {
+            $this->executionLog = [];
+            $this->executionLog[] = ['time' => now()->format('H:i:s'), 'message' => 'Sending test email...'];
+            
+            // Send the email
+            \Mail::raw($this->emailPreview['body'], function ($message) {
+                $message->to($this->emailPreview['recipient'])
+                       ->subject($this->emailPreview['subject']);
+            });
+            
+            $this->executionLog[] = ['time' => now()->format('H:i:s'), 'message' => 'Email sent successfully to: ' . $this->emailPreview['recipient']];
+            session()->flash('success', 'Test email sent successfully! Check your inbox.');
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error sending test email: ' . $e->getMessage());
+            $this->executionLog[] = ['time' => now()->format('H:i:s'), 'message' => 'ERROR: ' . $e->getMessage()];
+            Log::error('Test email send error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+        }
+    }
+    
+    public function scheduleTestReminder()
+    {
+        $this->validate([
+            'selectedContractId' => 'required',
+            'scheduledDate' => 'required|date',
+            'scheduledTime' => 'required',
+            'testEmailRecipient' => 'required|email',
+        ]);
+        
+        try {
+            $scheduledDateTime = \Carbon\Carbon::parse($this->scheduledDate . ' ' . $this->scheduledTime);
+            
+            if ($scheduledDateTime->isPast()) {
+                session()->flash('error', 'Scheduled time must be in the future.');
+                return;
+            }
+            
+            // Store the scheduled test in site settings or a dedicated table
+            $scheduledTests = json_decode(SiteSetting::get('scheduled_test_reminders', '[]'), true);
+            $scheduledTests[] = [
+                'id' => uniqid(),
+                'contract_id' => $this->selectedContractId,
+                'scheduled_at' => $scheduledDateTime->toDateTimeString(),
+                'test_email' => $this->testEmailRecipient,
+                'created_at' => now()->toDateTimeString(),
+                'created_by' => auth()->user()->email,
+            ];
+            
+            SiteSetting::set('scheduled_test_reminders', json_encode($scheduledTests));
+            
+            session()->flash('success', 'Test reminder scheduled for ' . $scheduledDateTime->format('M j, Y g:i A'));
+            
+            // Reset form
+            $this->scheduledDate = '';
+            $this->scheduledTime = '';
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error scheduling test: ' . $e->getMessage());
+            Log::error('Schedule test error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+        }
+    }
+    
     public function sendTestNotification()
     {
+        if (!$this->selectedDueDateId) {
+            $this->sendTestEmail();
+            return;
+        }
+        
         $this->validate([
             'selectedContractId' => 'required',
             'selectedDueDateId' => 'required',
@@ -262,6 +412,30 @@ class ContractNotificationTest extends Component
         return collect($history)->sortByDesc('sent_at');
     }
     
+    public function getScheduledTestsProperty()
+    {
+        $tests = json_decode(SiteSetting::get('scheduled_test_reminders', '[]'), true);
+        $contracts = Contract::pluck('title', 'id');
+        
+        return collect($tests)->map(function($test) use ($contracts) {
+            $test['contract_title'] = $contracts[$test['contract_id']] ?? 'Unknown Contract';
+            $test['scheduled_at'] = \Carbon\Carbon::parse($test['scheduled_at']);
+            $test['is_past'] = $test['scheduled_at']->isPast();
+            return $test;
+        })->sortBy('scheduled_at');
+    }
+    
+    public function cancelScheduledTest($testId)
+    {
+        $tests = json_decode(SiteSetting::get('scheduled_test_reminders', '[]'), true);
+        $tests = array_filter($tests, function($test) use ($testId) {
+            return $test['id'] !== $testId;
+        });
+        
+        SiteSetting::set('scheduled_test_reminders', json_encode(array_values($tests)));
+        session()->flash('success', 'Scheduled test cancelled.');
+    }
+    
     public function render()
     {
         return view('livewire.contract-notification-test', [
@@ -269,6 +443,7 @@ class ContractNotificationTest extends Component
             'dueDates' => $this->dueDates,
             'intervalOptions' => $this->intervalOptions,
             'reminderHistory' => $this->getReminderHistory(),
+            'scheduledTests' => $this->scheduledTests,
         ])->layout('components.layouts.app');
     }
 }
