@@ -2,7 +2,7 @@
     <div class="bg-white shadow-lg rounded-lg overflow-hidden">
         <!-- Header -->
         <div class="bg-purple-600 text-white p-6">
-            <h1 class="text-2xl font-bold">CAP TRACK Administration</h1>
+            <h1 class="text-2xl font-bold">{{ \App\Models\SiteSetting::get('site_name', 'CAP TRACK') }} Administration</h1>
             <p class="text-purple-100 mt-2">System configuration and management dashboard</p>
         </div>
 
@@ -926,7 +926,7 @@
                         <!-- Site Name -->
                         <div>
                             <label for="site_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Site Name</label>
-                            <input type="text" wire:model="site_name" id="site_name" 
+                            <input type="text" wire:model.blur="site_name" id="site_name" 
                                    class="mt-1 block w-full border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
                             @error('site_name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
@@ -941,15 +941,19 @@
                                     </div>
                                 @endif
                                 <div class="flex-grow">
-                                    <input type="file" wire:model="site_logo" id="site_logo" accept="image/*"
+                                    <input type="file" wire:model.live="site_logo" id="site_logo" accept="image/*"
                                            class="block w-full text-sm text-gray-500 dark:text-gray-400
                                                   file:mr-4 file:py-2 file:px-4
                                                   file:rounded-md file:border-0
                                                   file:text-sm file:font-semibold
                                                   file:bg-purple-50 file:text-purple-700
                                                   hover:file:bg-purple-100
-                                                  dark:file:bg-zinc-700 dark:file:text-purple-400">
+                                                  dark:file:bg-zinc-700 dark:file:text-purple-400
+                                                  cursor-pointer">
                                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">PNG, JPG, JPEG, SVG up to 2MB</p>
+                                    @if($site_logo)
+                                        <p class="mt-1 text-xs text-green-600">File selected: {{ $site_logo->getClientOriginalName() }}</p>
+                                    @endif
                                 </div>
                             </div>
                             @error('site_logo') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
@@ -965,15 +969,19 @@
                                     </div>
                                 @endif
                                 <div class="flex-grow">
-                                    <input type="file" wire:model="site_favicon" id="site_favicon" accept="image/x-icon,image/png,image/jpeg"
+                                    <input type="file" wire:model.live="site_favicon" id="site_favicon" accept="image/x-icon,image/png,image/jpeg"
                                            class="block w-full text-sm text-gray-500 dark:text-gray-400
                                                   file:mr-4 file:py-2 file:px-4
                                                   file:rounded-md file:border-0
                                                   file:text-sm file:font-semibold
                                                   file:bg-purple-50 file:text-purple-700
+                                                  cursor-pointer
                                                   hover:file:bg-purple-100
                                                   dark:file:bg-zinc-700 dark:file:text-purple-400">
                                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">ICO, PNG, JPG up to 512KB</p>
+                                    @if($site_favicon)
+                                        <p class="mt-1 text-xs text-green-600">File selected: {{ $site_favicon->getClientOriginalName() }}</p>
+                                    @endif
                                 </div>
                             </div>
                             @error('site_favicon') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
@@ -1397,3 +1405,28 @@
         </div>
     @endif
 </div>
+
+@push('scripts')
+<script>
+    // Ensure file inputs work properly
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add click handlers to file inputs if they're not responding
+        const fileInputs = document.querySelectorAll('input[type="file"]');
+        fileInputs.forEach(input => {
+            // Remove any potential event blocking
+            input.style.pointerEvents = 'auto';
+            input.style.cursor = 'pointer';
+            
+            // Debug: log when file input is clicked
+            input.addEventListener('click', function(e) {
+                console.log('File input clicked:', this.id);
+            });
+            
+            // Debug: log when file is selected
+            input.addEventListener('change', function(e) {
+                console.log('File selected:', this.id, this.files[0]?.name);
+            });
+        });
+    });
+</script>
+@endpush

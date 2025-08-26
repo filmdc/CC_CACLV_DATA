@@ -40,7 +40,7 @@ return new class extends Migration
 <p>Please ensure this report is submitted on time.</p>
 
 <p>Thank you,<br>
-CAP TRACK System</p>
+{{site_name}} System</p>
 EOT;
         
         SiteSetting::set('contract_reminder_email_template', $defaultTemplate, 'html');

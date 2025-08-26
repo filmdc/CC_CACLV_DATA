@@ -254,13 +254,16 @@ class AdminPanel extends Component
                 $logoPath = $this->site_logo->store('site', 'public');
                 SiteSetting::set('site_logo', $logoPath, 'file');
                 $this->current_logo_path = $logoPath;
+                
+                // Generate favicons from logo if no favicon was uploaded
+                if (!$this->site_favicon) {
+                    $this->generateFaviconsFromLogo($logoPath);
+                }
             }
 
             // Handle favicon upload
             if ($this->site_favicon) {
-                $faviconPath = $this->site_favicon->store('site', 'public');
-                SiteSetting::set('site_favicon', $faviconPath, 'file');
-                $this->current_favicon_path = $faviconPath;
+                $this->handleFaviconUpload($this->site_favicon);
             }
 
             // Clear cache to ensure changes are reflected immediately
@@ -1046,5 +1049,74 @@ class AdminPanel extends Component
         }
 
         return view('livewire.admin-panel', $data)->layout('components.layouts.app');
+    }
+    
+    /**
+     * Generate favicons from uploaded logo
+     */
+    private function generateFaviconsFromLogo($logoPath)
+    {
+        try {
+            $fullPath = storage_path('app/public/' . $logoPath);
+            $publicPath = public_path();
+            
+            // Copy the logo as various favicon formats
+            // For simplicity, we'll just copy the image to public folder
+            // In production, you'd want to use an image processing library to resize properly
+            
+            // Copy as PNG favicon
+            if (pathinfo($fullPath, PATHINFO_EXTENSION) == 'png') {
+                copy($fullPath, $publicPath . '/favicon.png');
+                copy($fullPath, $publicPath . '/apple-touch-icon.png');
+            }
+            
+            // For SVG logos
+            if (pathinfo($fullPath, PATHINFO_EXTENSION) == 'svg') {
+                copy($fullPath, $publicPath . '/favicon.svg');
+            }
+            
+            // Note: In a production environment, you would use an image manipulation library
+            // like Intervention Image to properly resize and convert the logo to different formats
+            
+            SiteSetting::set('site_favicon', $logoPath, 'file');
+            $this->current_favicon_path = $logoPath;
+            
+        } catch (\Exception $e) {
+            \Log::error('Failed to generate favicons: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Handle favicon upload and copy to public directory
+     */
+    private function handleFaviconUpload($favicon)
+    {
+        try {
+            $faviconPath = $favicon->store('site', 'public');
+            $fullPath = storage_path('app/public/' . $faviconPath);
+            $publicPath = public_path();
+            $extension = $favicon->getClientOriginalExtension();
+            
+            // Copy to public directory based on file type
+            switch ($extension) {
+                case 'ico':
+                    copy($fullPath, $publicPath . '/favicon.ico');
+                    break;
+                case 'png':
+                    copy($fullPath, $publicPath . '/favicon.png');
+                    copy($fullPath, $publicPath . '/apple-touch-icon.png');
+                    break;
+                case 'svg':
+                    copy($fullPath, $publicPath . '/favicon.svg');
+                    break;
+            }
+            
+            SiteSetting::set('site_favicon', $faviconPath, 'file');
+            $this->current_favicon_path = $faviconPath;
+            
+        } catch (\Exception $e) {
+            \Log::error('Failed to handle favicon upload: ' . $e->getMessage());
+            throw $e;
+        }
     }
 }

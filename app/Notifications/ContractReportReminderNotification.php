@@ -156,6 +156,7 @@ class ContractReportReminderNotification extends Notification implements ShouldQ
             '{{due_date}}' => $this->dueDate->due_date->format('F j, Y'),
             '{{days_until}}' => (string) $this->daysUntilDue,
             '{{description}}' => strip_tags($this->dueDate->description ?? ''),
+            '{{site_name}}' => SiteSetting::get('site_name', 'CAP TRACK'),
         ];
     }
 

@@ -32,7 +32,7 @@
                             <x-app-logo-icon class="size-9 fill-current text-black dark:text-white" />
                         </span>
 
-                        <span class="sr-only">{{ config('app.name', 'Laravel') }}</span>
+                        <span class="sr-only">{{ \App\Models\SiteSetting::get('site_name', config('app.name', 'Laravel')) }}</span>
                     </a>
                     {{ $slot }}
                 </div>

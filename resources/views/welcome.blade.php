@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>CAP TRACK - Community Action Partnership Data Management</title>
+        <title>{{ \App\Models\SiteSetting::get('site_name', 'CAP TRACK') }} - Community Action Partnership Data Management</title>
 
         <link rel="icon" href="/favicon.ico" sizes="any">
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -23,8 +23,9 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16">
                     <div class="flex items-center">
+                        
                         <div class="flex-shrink-0">
-                            <h1 class="text-2xl font-bold text-gray-900">CAP TRACK</h1>
+                            <h1 class="text-2xl font-bold text-gray-900">{{ \App\Models\SiteSetting::get('site_name', 'CAP TRACK') }}</h1>
                         </div>
                     </div>
                     
@@ -56,7 +57,7 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
                 <div class="text-center">
                     <h1 class="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-                        CAP TRACK
+                        {{ \App\Models\SiteSetting::get('site_name', 'CAP TRACK') }}
                     </h1>
                     <p class="text-xl md:text-2xl text-gray-600 mb-4">
                         Community Action Partnership Data Management Platform
@@ -174,7 +175,7 @@
         <footer class="bg-gray-900 text-white py-12">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center">
-                    <h3 class="text-2xl font-bold mb-4">CAP TRACK</h3>
+                    <h3 class="text-2xl font-bold mb-4">{{ \App\Models\SiteSetting::get('site_name', 'CAP TRACK') }}</h3>
                     <p class="text-gray-400 mb-6">Community Action Partnership Data Management Platform</p>
                     <p class="text-sm text-gray-500">
                         Built with Laravel {{ app()->version() }} • 
