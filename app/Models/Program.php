@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Program extends Model
@@ -19,7 +20,9 @@ class Program extends Model
         'contract_management_only',
         'start_date',
         'end_date',
-        'notes'
+        'notes',
+        'legacy_id',
+        'last_synced_at',
     ];
 
     protected $casts = [
@@ -27,7 +30,8 @@ class Program extends Model
         'housing_module_enabled' => 'boolean',
         'contract_management_only' => 'boolean',
         'start_date' => 'date',
-        'end_date' => 'date'
+        'end_date' => 'date',
+        'last_synced_at' => 'datetime',
     ];
 
     public function programManager(): BelongsTo
@@ -99,10 +103,54 @@ class Program extends Model
     }
 
     /**
+     * Get contracts associated with this program via many-to-many (legacy compatibility)
+     */
+    public function contractsViaMany(): BelongsToMany
+    {
+        return $this->belongsToMany(Contract::class, 'contract_program')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Get all contracts for this program (both direct FK and many-to-many)
+     */
+    public function getAllContracts()
+    {
+        $contracts = collect();
+        
+        // Add contracts with direct FK relationship (current system)
+        $contracts = $contracts->merge($this->contracts);
+        
+        // Add contracts via many-to-many (legacy compatibility)
+        $contracts = $contracts->merge($this->contractsViaMany);
+        
+        return $contracts->unique('id');
+    }
+
+    /**
      * Scope to get active programs (with optional contract management filter)
      */
     public function scopeActive($query)
     {
         return $query->where('active', true);
+    }
+
+    /**
+     * Scope to find by legacy ID
+     */
+    public function scopeByLegacyId($query, $legacyId)
+    {
+        return $query->where('legacy_id', $legacyId);
+    }
+
+    /**
+     * Scope to get programs that need sync
+     */
+    public function scopeNeedsSync($query, $hours = 1)
+    {
+        return $query->where(function ($q) use ($hours) {
+            $q->whereNull('last_synced_at')
+              ->orWhere('last_synced_at', '<', now()->subHours($hours));
+        });
     }
 }

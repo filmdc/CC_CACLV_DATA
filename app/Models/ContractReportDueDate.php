@@ -36,6 +36,7 @@ class ContractReportDueDate extends Model implements HasMedia
     protected $fillable = [
         'contract_id',
         'due_date',
+        'due_time',
         'status',
         'description',
         'report_name',
@@ -43,18 +44,32 @@ class ContractReportDueDate extends Model implements HasMedia
         'reminder_sent',
         'reminder_sent_at',
         'reminder_intervals',
+        'first_reminder',
+        'second_reminder',
+        'final_reminder',
+        'invite_sent',
+        'microsoft_event_id',
+        'is_recurring',
+        'recurrence_pattern',
+        'reminder_emails',
         'active',
         'notes',
         'created_by',
         'updated_by',
+        'legacy_id',
+        'last_synced_at',
     ];
 
     protected $casts = [
         'due_date' => 'date',
+        'due_time' => 'datetime:H:i:s',
         'reminder_sent' => 'boolean',
         'reminder_sent_at' => 'datetime',
         'reminder_intervals' => 'array',
+        'invite_sent' => 'boolean',
+        'is_recurring' => 'boolean',
         'active' => 'boolean',
+        'last_synced_at' => 'datetime',
     ];
 
     protected $appends = [
@@ -200,5 +215,82 @@ class ContractReportDueDate extends Model implements HasMedia
     public static function getDefaultReminderIntervals(): array
     {
         return [30, 15, 7, 3, 1];
+    }
+
+    /**
+     * Convert legacy individual reminder fields to current reminder_intervals array
+     */
+    public function setLegacyReminders(int $first = null, int $second = null, int $final = null): void
+    {
+        $intervals = [];
+        if ($first) $intervals[] = $first;
+        if ($second) $intervals[] = $second;
+        if ($final) $intervals[] = $final;
+        
+        $this->reminder_intervals = $intervals;
+        $this->first_reminder = $first;
+        $this->second_reminder = $second;
+        $this->final_reminder = $final;
+    }
+
+    /**
+     * Get legacy reminder fields from current reminder_intervals array
+     */
+    public function getLegacyReminderFields(): array
+    {
+        $intervals = $this->reminder_intervals ?? [];
+        return [
+            'first_reminder' => $intervals[0] ?? null,
+            'second_reminder' => $intervals[1] ?? null,
+            'final_reminder' => $intervals[2] ?? null,
+        ];
+    }
+
+    /**
+     * Create due date with time from legacy date and time fields
+     */
+    public function setLegacyDateTime(string $date, string $time = null): void
+    {
+        $this->due_date = $date;
+        $this->due_time = $time;
+    }
+
+    /**
+     * Get full datetime for legacy compatibility
+     */
+    public function getLegacyDateTimeAttribute(): string
+    {
+        $dateTime = $this->due_date->format('Y-m-d');
+        if ($this->due_time) {
+            $dateTime .= ' ' . $this->due_time;
+        }
+        return $dateTime;
+    }
+
+    /**
+     * Scope to find by legacy ID
+     */
+    public function scopeByLegacyId($query, $legacyId)
+    {
+        return $query->where('legacy_id', $legacyId);
+    }
+
+    /**
+     * Scope to get items that need sync
+     */
+    public function scopeNeedsSync($query, $hours = 1)
+    {
+        return $query->where(function ($q) use ($hours) {
+            $q->whereNull('last_synced_at')
+              ->orWhere('last_synced_at', '<', now()->subHours($hours));
+        });
+    }
+
+    /**
+     * Check if this due date has calendar integration
+     */
+    public function hasCalendarIntegration(): bool
+    {
+        return !empty($this->microsoft_event_id);
     }
 }

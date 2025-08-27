@@ -23,10 +23,13 @@ class Funder extends Model
         'active',
         'created_by',
         'updated_by',
+        'legacy_id',
+        'last_synced_at',
     ];
 
     protected $casts = [
         'active' => 'boolean',
+        'last_synced_at' => 'datetime',
     ];
 
     public static $searchable = [
@@ -66,5 +69,24 @@ class Funder extends Model
     public function getDisplayNameAttribute(): string
     {
         return $this->code ? "{$this->name} ({$this->code})" : $this->name;
+    }
+
+    /**
+     * Scope to find by legacy ID
+     */
+    public function scopeByLegacyId($query, $legacyId)
+    {
+        return $query->where('legacy_id', $legacyId);
+    }
+
+    /**
+     * Scope to get funders that need sync
+     */
+    public function scopeNeedsSync($query, $hours = 1)
+    {
+        return $query->where(function ($q) use ($hours) {
+            $q->whereNull('last_synced_at')
+              ->orWhere('last_synced_at', '<', now()->subHours($hours));
+        });
     }
 }

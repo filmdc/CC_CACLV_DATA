@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'legacy_api' => [
+        'url' => env('LEGACY_API_URL'),
+        'email' => env('LEGACY_API_EMAIL'),
+        'password' => env('LEGACY_API_PASSWORD'),
+        'device_name' => env('LEGACY_API_DEVICE_NAME', 'New_Contracts_System'),
+    ],
+
 ];

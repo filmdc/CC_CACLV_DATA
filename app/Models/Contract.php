@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
@@ -32,6 +33,8 @@ class Contract extends Model implements HasMedia
         'date_archived',
         'created_by',
         'updated_by',
+        'legacy_id',
+        'last_synced_at',
     ];
 
     protected $casts = [
@@ -41,6 +44,7 @@ class Contract extends Model implements HasMedia
         'date_of_award' => 'date',
         'date_archived' => 'datetime',
         'archived' => 'boolean',
+        'last_synced_at' => 'datetime',
     ];
 
     protected $appends = [
@@ -89,7 +93,16 @@ class Contract extends Model implements HasMedia
      */
     public function funder(): BelongsTo
     {
-        return $this->belongsTo(Funder::class);
+        return $this->belongsTo(Funder::class, 'funder_id', 'id');
+    }
+
+    /**
+     * Get all programs associated with this contract (many-to-many for legacy compatibility)
+     */
+    public function programs(): BelongsToMany
+    {
+        return $this->belongsToMany(Program::class, 'contract_program')
+                    ->withTimestamps();
     }
 
     /**
@@ -218,5 +231,70 @@ class Contract extends Model implements HasMedia
     public function getUpcomingReportDueDates(int $days = 30)
     {
         return $this->reportDueDates()->upcoming($days)->get();
+    }
+
+    /**
+     * Get all programs for this contract (includes both single program and many-to-many programs)
+     */
+    public function getAllPrograms()
+    {
+        $programs = collect();
+        
+        // Add the single program if it exists (current system)
+        if ($this->program_id && $this->program) {
+            $programs->push($this->program);
+        }
+        
+        // Add many-to-many programs (legacy compatibility)
+        $programs = $programs->merge($this->programs);
+        
+        return $programs->unique('id');
+    }
+
+    /**
+     * Sync legacy programs (from many-to-many relationship data)
+     */
+    public function syncLegacyPrograms(array $programIds): void
+    {
+        $this->programs()->sync($programIds);
+    }
+
+    /**
+     * Check if contract has multiple programs (legacy style)
+     */
+    public function hasMultiplePrograms(): bool
+    {
+        return $this->programs()->count() > 0;
+    }
+
+    /**
+     * Get primary program (either the single program or first from many-to-many)
+     */
+    public function getPrimaryProgram()
+    {
+        if ($this->program_id && $this->program) {
+            return $this->program;
+        }
+        
+        return $this->programs()->first();
+    }
+
+    /**
+     * Scope to find contracts by legacy ID
+     */
+    public function scopeByLegacyId($query, $legacyId)
+    {
+        return $query->where('legacy_id', $legacyId);
+    }
+
+    /**
+     * Scope to get contracts that need sync (not synced recently)
+     */
+    public function scopeNeedsSync($query, $hours = 1)
+    {
+        return $query->where(function ($q) use ($hours) {
+            $q->whereNull('last_synced_at')
+              ->orWhere('last_synced_at', '<', now()->subHours($hours));
+        });
     }
 }
