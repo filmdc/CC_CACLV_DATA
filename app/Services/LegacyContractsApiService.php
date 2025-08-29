@@ -266,7 +266,7 @@ class LegacyContractsApiService
             $response = $this->request()->get("{$this->baseUrl}/contracts", [
                 'page' => $page,
                 'per_page' => 100,
-                'include' => 'programs,funder,reportDueDates'
+                'include' => 'programs,funder,reportDueDates,documents'
             ]);
             
             if (!$response->successful()) {
@@ -364,6 +364,11 @@ class LegacyContractsApiService
             // Sync report due dates
             if (isset($contractData['reportDueDates']) && is_array($contractData['reportDueDates'])) {
                 $this->syncReportDueDates($contract, $contractData['reportDueDates']);
+            }
+
+            // Sync contract documents
+            if (isset($contractData['documents']) && is_array($contractData['documents'])) {
+                $this->syncContractDocuments($contract, $contractData['documents']);
             }
 
             Log::debug("Synced contract: {$contract->title} (Legacy ID: {$contractData['id']})");
@@ -498,6 +503,74 @@ class LegacyContractsApiService
                 'trace' => $e->getTraceAsString()
             ]);
             throw $e;
+        }
+    }
+
+    /**
+     * Sync contract documents from legacy API
+     */
+    private function syncContractDocuments(Contract $contract, array $documentsData): void
+    {
+        try {
+            foreach ($documentsData as $documentData) {
+                // Check if document already exists to avoid duplicates
+                $existingMedia = $contract->getMedia('documents')
+                    ->where('name', $documentData['name'])
+                    ->where('file_name', $documentData['file_name'])
+                    ->first();
+
+                if ($existingMedia) {
+                    Log::debug("Document already exists: {$documentData['name']}", [
+                        'contract_id' => $contract->id,
+                        'document_id' => $documentData['id']
+                    ]);
+                    continue;
+                }
+
+                // Download the document from legacy API
+                $documentUrl = $documentData['url'];
+                $response = $this->request()->get($documentUrl);
+
+                if (!$response->successful()) {
+                    Log::warning("Failed to download document from legacy API", [
+                        'contract_id' => $contract->id,
+                        'document_id' => $documentData['id'],
+                        'url' => $documentUrl,
+                        'status' => $response->status()
+                    ]);
+                    continue;
+                }
+
+                // Create a temporary file
+                $tempPath = tempnam(sys_get_temp_dir(), 'contract_doc_');
+                file_put_contents($tempPath, $response->body());
+
+                // Add to media library
+                $mediaRecord = $contract->addMedia($tempPath)
+                    ->usingName($documentData['name'])
+                    ->usingFileName($documentData['file_name'])
+                    ->withCustomProperties([
+                        'legacy_document_id' => $documentData['id'],
+                        'legacy_url' => $documentData['url'],
+                        'original_size' => $documentData['size'],
+                    ])
+                    ->toMediaCollection('documents');
+
+                // Clean up temp file
+                unlink($tempPath);
+
+                Log::info("Synced contract document: {$documentData['name']}", [
+                    'contract_id' => $contract->id,
+                    'legacy_document_id' => $documentData['id'],
+                    'media_id' => $mediaRecord->id
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Failed to sync contract documents', [
+                'contract_id' => $contract->id,
+                'error' => $e->getMessage()
+            ]);
         }
     }
 }
