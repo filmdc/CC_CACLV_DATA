@@ -184,15 +184,13 @@
 
                     <div>
                         <label for="purpose" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Purpose</label>
-                        <textarea wire:model="purpose" id="purpose" rows="3" 
-                                  class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+                        <x-wysiwyg-editor model="purpose" :rows="3" placeholder="Describe the purpose of this contract..." id="purpose" />
                         @error('purpose') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
 
                     <div>
                         <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
-                        <textarea wire:model="notes" id="notes" rows="3" 
-                                  class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+                        <x-wysiwyg-editor model="notes" :rows="3" placeholder="Additional notes or special instructions..." id="notes" />
                         @error('notes') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
 
@@ -683,8 +681,7 @@
 
                         <div>
                             <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
-                            <textarea wire:model="description" id="description" rows="3"
-                                      class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                            <x-wysiwyg-editor model="description" :rows="3" placeholder="Describe this due date or report requirement..." id="report_description" />
                             @error('description') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 
@@ -774,15 +771,13 @@
                             <label for="report_description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 Description
                             </label>
-                            <textarea wire:model="report_description" id="report_description" rows="4"
-                                      class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                            <x-wysiwyg-editor model="report_description" :rows="4" placeholder="Describe the report requirements and expectations..." id="report_description_edit" />
                             @error('report_description') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 
                         <div>
                             <label for="report_notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
-                            <textarea wire:model="report_notes" id="report_notes" rows="3"
-                                      class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                            <x-wysiwyg-editor model="report_notes" :rows="3" placeholder="Additional notes about this report..." id="report_notes_edit" />
                             @error('report_notes') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 

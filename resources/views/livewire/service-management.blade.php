@@ -126,14 +126,12 @@
 
                     <div>
                         <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                        <textarea wire:model="description" id="description" rows="3" 
-                                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"></textarea>
+                        <x-wysiwyg-editor model="description" :rows="3" placeholder="Describe this service and its objectives..." id="service_description" />
                     </div>
 
                     <div>
                         <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                        <textarea wire:model="notes" id="notes" rows="2" 
-                                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"></textarea>
+                        <x-wysiwyg-editor model="notes" :rows="2" placeholder="Additional notes about this service..." id="service_notes" />
                     </div>
 
                     <div class="flex justify-end space-x-3">
@@ -211,14 +209,12 @@
 
                     <div>
                         <label for="edit_description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                        <textarea wire:model="description" id="edit_description" rows="3" 
-                                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"></textarea>
+                        <x-wysiwyg-editor model="description" :rows="3" placeholder="Describe this service and its objectives..." id="edit_service_description" />
                     </div>
 
                     <div>
                         <label for="edit_notes" class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                        <textarea wire:model="notes" id="edit_notes" rows="2" 
-                                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"></textarea>
+                        <x-wysiwyg-editor model="notes" :rows="2" placeholder="Additional notes about this service..." id="edit_service_notes" />
                     </div>
 
                     <div class="flex justify-end space-x-3">

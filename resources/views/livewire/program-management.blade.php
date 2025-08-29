@@ -115,15 +115,13 @@
 
                     <div>
                         <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
-                        <textarea wire:model="description" id="description" rows="3" 
-                                  class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white"></textarea>
+                        <x-wysiwyg-editor model="description" :rows="3" placeholder="Describe this program's purpose and services..." id="program_description" />
                         @error('description') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
 
                     <div>
                         <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
-                        <textarea wire:model="notes" id="notes" rows="3" 
-                                  class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white"></textarea>
+                        <x-wysiwyg-editor model="notes" :rows="3" placeholder="Additional notes about this program..." id="program_notes" />
                         @error('notes') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
 

@@ -93,7 +93,9 @@
                     
                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Purpose</label>
-                        <p class="text-gray-900 dark:text-white whitespace-pre-line">{{ $contract->purpose ?: 'No purpose specified' }}</p>
+                        <div class="text-gray-900 dark:text-white prose prose-sm max-w-none dark:prose-invert">
+                            {!! $contract->purpose ?: '<p>No purpose specified</p>' !!}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -430,7 +432,9 @@
                     <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4 border-b border-gray-200 dark:border-zinc-700 pb-2">
                         Notes
                     </h2>
-                    <p class="text-gray-900 dark:text-white whitespace-pre-line">{{ $contract->notes }}</p>
+                    <div class="text-gray-900 dark:text-white prose prose-sm max-w-none dark:prose-invert">
+                        {!! $contract->notes !!}
+                    </div>
                 </div>
             @endif
 
@@ -513,8 +517,7 @@
                         
                         <div>
                             <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
-                            <textarea id="description" wire:model="description" rows="3"
-                                      class="mt-1 block w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                            <x-wysiwyg-editor model="description" :rows="3" placeholder="Describe this due date or report requirement..." id="contract_description" />
                             @error('description') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
                         </div>
                         
@@ -607,8 +610,7 @@
                         
                         <div>
                             <label for="report_description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
-                            <textarea id="report_description" wire:model="report_description" rows="3"
-                                      class="mt-1 block w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white shadow-sm focus:border-green-500 focus:ring-green-500"></textarea>
+                            <x-wysiwyg-editor model="report_description" :rows="3" placeholder="Describe the report requirements and expectations..." id="contract_report_description" />
                             @error('report_description') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
                         </div>
                         
@@ -633,8 +635,7 @@
                         
                         <div>
                             <label for="report_notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Notes</label>
-                            <textarea id="report_notes" wire:model="report_notes" rows="3"
-                                      class="mt-1 block w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white shadow-sm focus:border-green-500 focus:ring-green-500"></textarea>
+                            <x-wysiwyg-editor model="report_notes" :rows="3" placeholder="Additional notes about this report..." id="contract_report_notes" />
                             @error('report_notes') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
                         </div>
                     </div>
