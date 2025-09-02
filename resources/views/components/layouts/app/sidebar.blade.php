@@ -175,6 +175,10 @@
 
         @fluxScripts
         @livewireScripts
+        
+        <!-- Jodit Editor JavaScript -->
+        <script src="//unpkg.com/jodit@4.1.16/es2021/jodit.min.js"></script>
+        
         @stack('scripts')
     </body>
 </html>

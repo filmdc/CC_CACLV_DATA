@@ -237,12 +237,4 @@ DOMReady.ready(() => {
     });
 });
 
-// Export for use in other modules
-export {
-    ChartManager,
-    LivewireEventManager,
-    DOMReady,
-    AnimationControl,
-    ScrollControl,
-    AlpineComponents
-};
+// Note: All utilities are available as window globals (ChartManager, LivewireEventManager, etc.)

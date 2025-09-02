@@ -17,6 +17,7 @@
         "league/csv": "^9.24",
         "livewire/flux": "^2.1.1",
         "livewire/volt": "^1.7.0",
+        "mantix/livewire-jodit-text-editor": "^1.6",
         "phpoffice/phpspreadsheet": "^4.4",
         "spatie/laravel-medialibrary": "^11.13"
     },

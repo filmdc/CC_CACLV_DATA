@@ -21,4 +21,8 @@
 
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 @fluxAppearance
+
+<!-- Jodit Editor CSS -->
+<link rel="stylesheet" href="//unpkg.com/jodit@4.1.16/es2021/jodit.min.css">
+
 @stack('styles')
