@@ -42,7 +42,9 @@
                             @if($goal->description)
                                 <div>
                                     <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Description</label>
-                                    <p class="text-gray-900 dark:text-white whitespace-pre-line">{{ $goal->description }}</p>
+                                    <div class="text-gray-900 dark:text-white rich-text-content">
+                                        {!! $goal->description !!}
+                                    </div>
                                 </div>
                             @endif
                             
@@ -185,7 +187,9 @@
                                 @if($goal->service->description)
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Service Description</label>
-                                        <p class="text-sm text-gray-900 dark:text-white mt-1">{{ $goal->service->description }}</p>
+                                        <div class="text-sm text-gray-900 dark:text-white mt-1 rich-text-content">
+                                            {!! $goal->service->description !!}
+                                        </div>
                                     </div>
                                 @endif
                                 <div>

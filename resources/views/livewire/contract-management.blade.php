@@ -108,12 +108,15 @@
                             @error('cfda_number') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 
+                        {{-- Date of Award field hidden as requested --}}
+                        {{--
                         <div>
                             <label for="date_of_award" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date of Award</label>
                             <input type="date" wire:model="date_of_award" id="date_of_award" 
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500">
                             @error('date_of_award') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
+                        --}}
 
                         <div>
                             <label for="grant_code" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Grant Code</label>
@@ -138,6 +141,14 @@
                                     </option>
                                 @endforeach
                             </select>
+                            @if($showEditForm && $selectedContract && $selectedContract->getAllPrograms()->count() > 1)
+                                <p class="text-sm text-blue-600 dark:text-blue-400 mt-1">
+                                    <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    This contract has multiple programs ({{ $selectedContract->getAllPrograms()->count() }} total). Editing will set the primary program.
+                                </p>
+                            @endif
                             @error('program_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 
@@ -310,10 +321,13 @@
                                     <p class="mt-1 text-sm text-gray-900 dark:text-white font-semibold">${{ number_format($selectedContract->amount, 2) }}</p>
                                 </div>
                                 
+                                {{-- Date of Award field hidden as requested --}}
+                                {{--
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date of Award</label>
                                     <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $selectedContract->date_of_award?->format('M d, Y') ?? 'N/A' }}</p>
                                 </div>
+                                --}}
                                 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Start Date</label>
@@ -326,8 +340,8 @@
                                 </div>
                                 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Program</label>
-                                    <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $selectedContract->program->name ?? 'N/A' }}</p>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Program{{ $selectedContract->getAllPrograms()->count() > 1 ? 's' : '' }}</label>
+                                    <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $selectedContract->getDisplayProgramNames() }}</p>
                                 </div>
                                 
                                 <div>
@@ -966,7 +980,7 @@
                                 @endif
                             </td>
                             <!-- <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $contract->contract_number ?? 'N/A' }}</td> -->
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $contract->program->name ?? 'N/A' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $contract->getDisplayProgramNamesWithCount() }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $contract->funder->name ?? 'N/A' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${{ number_format($contract->amount, 2) }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
@@ -1072,7 +1086,7 @@
                                             {{ $deadline->contract->contract_number }}
                                         </td>
                                         <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                            {{ $deadline->contract->program->name ?? 'N/A' }}
+                                            {{ $deadline->contract->getDisplayProgramNamesWithCount() }}
                                         </td>
                                         <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                             {{ $deadline->contract->funder->name ?? 'N/A' }}

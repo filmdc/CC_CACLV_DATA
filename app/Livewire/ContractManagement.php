@@ -20,7 +20,7 @@ class ContractManagement extends Component
     use WithPagination, WithPermissionChecks, WithFileUploads;
 
     public $search = '';
-    public $statusFilter = 'all';
+    public $statusFilter = 'active';
     public $selectedContract = null;
     public $showCreateForm = false;
     public $showEditForm = false;
@@ -184,7 +184,11 @@ class ContractManagement extends Component
             $this->contract_number = $this->selectedContract->contract_number;
             $this->cfda_number = $this->selectedContract->cfda_number;
             $this->purpose = $this->selectedContract->purpose;
-            $this->program_id = $this->selectedContract->program_id;
+            
+            // Use primary program (handles both single program_id and many-to-many relationships)
+            $primaryProgram = $this->selectedContract->getPrimaryProgram();
+            $this->program_id = $primaryProgram ? $primaryProgram->id : '';
+            
             $this->funder_id = $this->selectedContract->funder_id;
             $this->date_of_award = $this->selectedContract->date_of_award ? $this->selectedContract->date_of_award->format('Y-m-d') : '';
             $this->amount = $this->selectedContract->amount;
@@ -223,10 +227,10 @@ class ContractManagement extends Component
                 'purpose' => $this->purpose,
                 'program_id' => $this->program_id,
                 'funder_id' => $this->funder_id,
-                'date_of_award' => $this->date_of_award,
+                'date_of_award' => $this->date_of_award ?: null,
                 'amount' => $this->amount,
                 'start_date' => $this->start_date,
-                'end_date' => $this->end_date,
+                'end_date' => $this->end_date ?: null,
                 'grant_code' => $this->grant_code,
                 'notes' => $this->notes,
                 'created_by' => auth()->id(),
@@ -278,10 +282,10 @@ class ContractManagement extends Component
                 'purpose' => $this->purpose,
                 'program_id' => $this->program_id,
                 'funder_id' => $this->funder_id,
-                'date_of_award' => $this->date_of_award,
+                'date_of_award' => $this->date_of_award ?: null,
                 'amount' => $this->amount,
                 'start_date' => $this->start_date,
-                'end_date' => $this->end_date,
+                'end_date' => $this->end_date ?: null,
                 'grant_code' => $this->grant_code,
                 'notes' => $this->notes,
                 'updated_by' => auth()->id(),

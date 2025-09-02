@@ -293,6 +293,44 @@ class Contract extends Model implements HasMedia
     }
 
     /**
+     * Get formatted program names for display
+     */
+    public function getDisplayProgramNames(): string
+    {
+        $allPrograms = $this->getAllPrograms();
+        
+        if ($allPrograms->isEmpty()) {
+            return 'N/A';
+        }
+        
+        if ($allPrograms->count() === 1) {
+            return $allPrograms->first()->name;
+        }
+        
+        return $allPrograms->pluck('name')->join(', ');
+    }
+    
+    /**
+     * Get formatted program names with count for display
+     */
+    public function getDisplayProgramNamesWithCount(): string
+    {
+        $allPrograms = $this->getAllPrograms();
+        
+        if ($allPrograms->isEmpty()) {
+            return 'N/A';
+        }
+        
+        if ($allPrograms->count() === 1) {
+            return $allPrograms->first()->name;
+        }
+        
+        $count = $allPrograms->count();
+        $firstProgram = $allPrograms->first()->name;
+        return "{$firstProgram} (+{$count} programs)";
+    }
+
+    /**
      * Scope to find contracts by legacy ID
      */
     public function scopeByLegacyId($query, $legacyId)

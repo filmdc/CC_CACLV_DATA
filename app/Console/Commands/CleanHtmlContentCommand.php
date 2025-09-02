@@ -11,7 +11,7 @@ use Illuminate\Console\Command;
 
 class CleanHtmlContentCommand extends Command
 {
-    protected $signature = 'content:clean-html {--dry-run : Preview changes without applying them} {--model= : Clean specific model only}';
+    protected $signature = 'content:clean-html {--dry-run : Preview changes without applying them} {--model= : Clean specific model only} {--decode-entities : Decode HTML entities instead of cleaning HTML}';
     
     protected $description = 'Clean HTML content from text fields throughout the application';
 
@@ -27,12 +27,14 @@ class CleanHtmlContentCommand extends Command
     {
         $dryRun = $this->option('dry-run');
         $specificModel = $this->option('model');
+        $decodeEntities = $this->option('decode-entities');
         
         if ($dryRun) {
             $this->info('Running in DRY RUN mode - no changes will be made');
         }
 
-        $this->info('Starting HTML content cleanup...');
+        $operation = $decodeEntities ? 'HTML entity decoding' : 'HTML content cleanup';
+        $this->info("Starting $operation...");
         
         $totalCleaned = 0;
         $totalProcessed = 0;
@@ -46,17 +48,30 @@ class CleanHtmlContentCommand extends Command
             $this->info("\nProcessing $modelName model...");
 
             foreach ($fields as $field) {
-                $this->line("  Cleaning field: $field");
+                $action = $decodeEntities ? "Decoding entities in field: $field" : "Cleaning field: $field";
+                $this->line("  $action");
                 
-                $recordsWithHtml = $modelClass::where($field, 'like', '%<%')
-                    ->where($field, 'like', '%>%')
-                    ->whereNotNull($field)
-                    ->get();
+                if ($decodeEntities) {
+                    // Look for HTML entities
+                    $recordsWithHtml = $modelClass::where($field, 'like', '%&lt;%')
+                        ->orWhere($field, 'like', '%&gt;%')
+                        ->orWhere($field, 'like', '%&amp;%')
+                        ->whereNotNull($field)
+                        ->get();
+                } else {
+                    // Look for HTML tags
+                    $recordsWithHtml = $modelClass::where($field, 'like', '%<%')
+                        ->where($field, 'like', '%>%')
+                        ->whereNotNull($field)
+                        ->get();
+                }
 
                 $cleanedInField = 0;
                 foreach ($recordsWithHtml as $record) {
                     $originalContent = $record->$field;
-                    $cleanedContent = $this->cleanHtmlContent($originalContent);
+                    $cleanedContent = $decodeEntities 
+                        ? $this->decodeHtmlEntities($originalContent)
+                        : $this->cleanHtmlContent($originalContent);
                     
                     if ($originalContent !== $cleanedContent) {
                         if (!$dryRun) {
@@ -142,5 +157,15 @@ class CleanHtmlContentCommand extends Command
         
         // Trim and return
         return trim($content);
+    }
+
+    private function decodeHtmlEntities($content)
+    {
+        if (empty($content)) {
+            return $content;
+        }
+
+        // Decode HTML entities
+        return html_entity_decode($content, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     }
 }

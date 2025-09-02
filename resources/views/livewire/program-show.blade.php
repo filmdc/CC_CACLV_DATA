@@ -51,7 +51,9 @@
                     
                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Description</label>
-                        <p class="text-gray-900 dark:text-white">{{ $program->description ?: 'No description provided' }}</p>
+                        <div class="text-gray-900 dark:text-white rich-text-content">
+                            {!! $program->description ?: '<p>No description provided</p>' !!}
+                        </div>
                     </div>
                 </div>
             </div>

@@ -72,7 +72,9 @@
                             @if($workPlan->description)
                                 <div>
                                     <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Description</label>
-                                    <p class="text-gray-900 dark:text-white whitespace-pre-line">{{ $workPlan->description }}</p>
+                                    <div class="text-gray-900 dark:text-white rich-text-content">
+                                        {!! $workPlan->description !!}
+                                    </div>
                                 </div>
                             @endif
                             
@@ -101,7 +103,9 @@
                             @if($workPlan->program->description)
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Program Description</label>
-                                    <p class="text-sm text-gray-900 dark:text-white mt-1">{{ $workPlan->program->description }}</p>
+                                    <div class="text-sm text-gray-900 dark:text-white mt-1 rich-text-content">
+                                        {!! $workPlan->program->description !!}
+                                    </div>
                                 </div>
                             @endif
                             <div>
@@ -136,7 +140,9 @@
                                                 </a>
                                             </h3>
                                             @if($goal->description)
-                                                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ $goal->description }}</p>
+                                                <div class="text-sm text-gray-600 dark:text-gray-400 mt-1 rich-text-content">
+                                                    {!! $goal->description !!}
+                                                </div>
                                             @endif
                                             
                                             <div class="mt-3 space-y-2">

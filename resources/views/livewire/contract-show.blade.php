@@ -93,7 +93,7 @@
                     
                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Purpose</label>
-                        <div class="text-gray-900 dark:text-white prose prose-sm max-w-none dark:prose-invert">
+                        <div class="text-gray-900 dark:text-white rich-text-content">
                             {!! $contract->purpose ?: '<p>No purpose specified</p>' !!}
                         </div>
                     </div>
@@ -107,17 +107,27 @@
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Program</label>
-                        <p class="text-gray-900 dark:text-white">
-                            @if($contract->program)
-                                <a href="{{ route('program.show', $contract->program->id) }}" 
-                                   class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
-                                    {{ $contract->program->name }}
-                                </a>
+                        <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+                            Program{{ $contract->getAllPrograms()->count() > 1 ? 's' : '' }}
+                        </label>
+                        <div class="text-gray-900 dark:text-white">
+                            @php $allPrograms = $contract->getAllPrograms(); @endphp
+                            @if($allPrograms->count() > 0)
+                                @foreach($allPrograms as $program)
+                                    <div class="mb-1">
+                                        <a href="{{ route('program.show', $program->id) }}" 
+                                           class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                                            {{ $program->name }}
+                                        </a>
+                                        @if($program->contract_management_only)
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">(Contract Only)</span>
+                                        @endif
+                                    </div>
+                                @endforeach
                             @else
-                                Not assigned
+                                <p>Not assigned</p>
                             @endif
-                        </p>
+                        </div>
                     </div>
                     
                     <div>
@@ -142,12 +152,15 @@
                     Important Dates
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {{-- Date of Award field hidden as requested --}}
+                    {{--
                     <div>
                         <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Date of Award</label>
                         <p class="text-gray-900 dark:text-white">
                             {{ $contract->date_of_award ? \Carbon\Carbon::parse($contract->date_of_award)->format('M j, Y') : 'N/A' }}
                         </p>
                     </div>
+                    --}}
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Start Date</label>
@@ -432,7 +445,7 @@
                     <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4 border-b border-gray-200 dark:border-zinc-700 pb-2">
                         Notes
                     </h2>
-                    <div class="text-gray-900 dark:text-white prose prose-sm max-w-none dark:prose-invert">
+                    <div class="text-gray-900 dark:text-white rich-text-content">
                         {!! $contract->notes !!}
                     </div>
                 </div>
