@@ -363,6 +363,7 @@
                                     <select wire:model="memberRelationship" id="memberRelationship" 
                                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                         <option value="">Select relationship...</option>
+                                        <option value="head_of_household">Head of Household</option>
                                         <option value="spouse">Spouse</option>
                                         <option value="child">Child</option>
                                         <option value="parent">Parent</option>

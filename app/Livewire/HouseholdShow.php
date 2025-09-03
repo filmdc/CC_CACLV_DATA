@@ -55,6 +55,7 @@ class HouseholdShow extends Component
     
     // Member edit fields
     public $editingMemberId = null;
+    public $isEditingHeadOfHousehold = false;
     
     #[Validate('required|string|max:255')]
     public $memberFirstName = '';
@@ -270,6 +271,7 @@ class HouseholdShow extends Component
         
         // Populate edit form
         $this->editingMemberId = $member->id;
+        $this->isEditingHeadOfHousehold = $member->is_head_of_household;
         $this->memberFirstName = $member->first_name;
         $this->memberMiddleName = $member->middle_name;
         $this->memberLastName = $member->last_name;
@@ -278,31 +280,45 @@ class HouseholdShow extends Component
         $this->memberGender = $member->gender;
         $this->memberTelephone = $member->telephone;
         $this->memberEmail = $member->email;
-        $this->memberRelationship = $member->relationship_to_head;
+        
+        // Set appropriate relationship based on head of household status
+        if ($member->is_head_of_household) {
+            $this->memberRelationship = 'head_of_household';
+        } else {
+            $this->memberRelationship = $member->relationship_to_head;
+        }
         
         $this->showEditMemberModal = true;
     }
     
     public function updateMember()
     {
-        $this->validate([
+        $member = Participant::findOrFail($this->editingMemberId);
+        
+        // Validate based on whether this is head of household
+        $rules = [
             'memberFirstName' => 'required|string|max:255',
             'memberLastName' => 'required|string|max:255',
             'memberDateOfBirth' => 'required|date|before:today',
             'memberGender' => 'required|string',
-            'memberRelationship' => 'required|string',
-        ]);
+        ];
+        
+        // Only require relationship if not head of household
+        if (!$member->is_head_of_household) {
+            $rules['memberRelationship'] = 'required|string';
+        }
+        
+        $this->validate($rules);
         
         try {
-            $member = Participant::findOrFail($this->editingMemberId);
-            
             // Verify member belongs to this household
             if ($member->household_id !== $this->household->id) {
                 session()->flash('error', 'Member does not belong to this household.');
                 return;
             }
             
-            $member->update([
+            // Prepare update data
+            $updateData = [
                 'first_name' => $this->memberFirstName,
                 'middle_name' => $this->memberMiddleName,
                 'last_name' => $this->memberLastName,
@@ -311,8 +327,14 @@ class HouseholdShow extends Component
                 'gender' => $this->memberGender,
                 'telephone' => $this->memberTelephone,
                 'email' => $this->memberEmail,
-                'relationship_to_head' => $this->memberRelationship,
-            ]);
+            ];
+            
+            // Only update relationship_to_head if not head of household
+            if (!$member->is_head_of_household) {
+                $updateData['relationship_to_head'] = $this->memberRelationship;
+            }
+            
+            $member->update($updateData);
             
             $this->household->refresh();
             $this->showEditMemberModal = false;
@@ -334,6 +356,7 @@ class HouseholdShow extends Component
     public function resetMemberForm()
     {
         $this->editingMemberId = null;
+        $this->isEditingHeadOfHousehold = false;
         $this->memberFirstName = '';
         $this->memberMiddleName = '';
         $this->memberLastName = '';

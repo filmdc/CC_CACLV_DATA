@@ -488,6 +488,7 @@
                             <select wire:model="memberRelationship" id="memberRelationship" 
                                     class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="">Select relationship...</option>
+                                <option value="head_of_household">Head of Household</option>
                                 <option value="spouse">Spouse</option>
                                 <option value="child">Child</option>
                                 <option value="parent">Parent</option>
@@ -603,22 +604,39 @@
                         </div>
 
                         <div class="md:col-span-2">
-                            <label for="memberRelationship" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Relationship to Head of Household <span class="text-red-500">*</span>
-                            </label>
-                            <select wire:model="memberRelationship" id="memberRelationship" 
-                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="">Select relationship...</option>
-                                <option value="spouse">Spouse</option>
-                                <option value="child">Child</option>
-                                <option value="parent">Parent</option>
-                                <option value="sibling">Sibling</option>
-                                <option value="grandparent">Grandparent</option>
-                                <option value="grandchild">Grandchild</option>
-                                <option value="other_relative">Other Relative</option>
-                                <option value="unrelated">Unrelated</option>
-                            </select>
-                            @error('memberRelationship') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            @if($isEditingHeadOfHousehold)
+                                <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0">
+                                            <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                        <div class="ml-3">
+                                            <p class="text-sm text-blue-800 dark:text-blue-200 font-medium">This is the Head of Household</p>
+                                            <p class="text-sm text-blue-700 dark:text-blue-300 mt-1">Relationship field is automatically set for head of household members.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="hidden" wire:model="memberRelationship" value="head_of_household">
+                            @else
+                                <label for="memberRelationship" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Relationship to Head of Household <span class="text-red-500">*</span>
+                                </label>
+                                <select wire:model="memberRelationship" id="memberRelationship" 
+                                        class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Select relationship...</option>
+                                    <option value="spouse">Spouse</option>
+                                    <option value="child">Child</option>
+                                    <option value="parent">Parent</option>
+                                    <option value="sibling">Sibling</option>
+                                    <option value="grandparent">Grandparent</option>
+                                    <option value="grandchild">Grandchild</option>
+                                    <option value="other_relative">Other Relative</option>
+                                    <option value="unrelated">Unrelated</option>
+                                </select>
+                                @error('memberRelationship') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            @endif
                         </div>
                     </div>
                 </div>
