@@ -100,7 +100,7 @@ class HouseholdShow extends Component
     
     public function goBack()
     {
-        return $this->redirect($this->backUrl);
+        return $this->redirect($this->backUrl, navigate: true);
     }
 
     public function editHousehold()
