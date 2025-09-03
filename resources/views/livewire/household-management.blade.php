@@ -132,6 +132,12 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
+                                    @if ($this->can('households.edit'))
+                                        <button wire:click="quickEditHousehold({{ $household->id }})" 
+                                                class="px-3 py-1 bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 text-sm rounded hover:bg-blue-200 dark:hover:bg-blue-900/40 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium transition-all">
+                                            Quick Edit
+                                        </button>
+                                    @endif
                                     <button wire:click="manageHousehold({{ $household->id }})" 
                                             wire:loading.attr="disabled"
                                             wire:loading.class="opacity-50 cursor-wait"
@@ -161,4 +167,83 @@
             </div>
         @endif
     </div>
+
+    <!-- Quick Edit Modal -->
+    @if($showQuickEditModal)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-600">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Quick Edit Household</h3>
+                        <button wire:click="cancelQuickEdit" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="px-6 py-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="quickEditHouseholdType" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Household Type <span class="text-red-500">*</span>
+                            </label>
+                            <select wire:model="quickEditHouseholdType" id="quickEditHouseholdType" 
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Select household type...</option>
+                                @foreach($householdTypes as $option)
+                                    <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                @endforeach
+                            </select>
+                            @error('quickEditHouseholdType') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="quickEditHouseholdSize" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Household Size <span class="text-red-500">*</span>
+                            </label>
+                            <input type="number" wire:model="quickEditHouseholdSize" id="quickEditHouseholdSize" min="1" 
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            @error('quickEditHouseholdSize') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="quickEditHousingStatus" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Housing Status <span class="text-red-500">*</span>
+                            </label>
+                            <select wire:model="quickEditHousingStatus" id="quickEditHousingStatus" 
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Select housing status...</option>
+                                @foreach($housingStatuses as $option)
+                                    <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                @endforeach
+                            </select>
+                            @error('quickEditHousingStatus') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="quickEditMonthlyIncome" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Monthly Household Income
+                            </label>
+                            <input type="number" wire:model="quickEditMonthlyIncome" id="quickEditMonthlyIncome" min="0" step="0.01" 
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            @error('quickEditMonthlyIncome') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="px-6 py-4 border-t border-gray-200 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-700 flex justify-end space-x-3">
+                    <button wire:click="cancelQuickEdit" 
+                            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-zinc-600 border border-gray-300 dark:border-zinc-500 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-500">
+                        Cancel
+                    </button>
+                    <button wire:click="saveQuickEdit" 
+                            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>
