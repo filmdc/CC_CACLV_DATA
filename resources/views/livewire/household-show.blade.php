@@ -36,7 +36,7 @@
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Household Type</label>
-                        <p class="text-gray-900 dark:text-white">{{ ucfirst($household->household_type) }}</p>
+                        <p class="text-gray-900 dark:text-white">{{ $household->household_type ? ucfirst($household->household_type) : 'Not specified' }}</p>
                     </div>
                     
                     <div>
@@ -219,13 +219,13 @@
                                             </a>
                                         </td>
                                         <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                                            {{ ucfirst($participant->relationship_to_head) ?: 'Not specified' }}
+                                            {{ $participant->relationship_to_head ? ucfirst($participant->relationship_to_head) : 'Not specified' }}
                                         </td>
                                         <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
                                             {{ $participant->date_of_birth ? \Carbon\Carbon::parse($participant->date_of_birth)->format('M j, Y') : 'N/A' }}
                                         </td>
                                         <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                                            {{ ucfirst($participant->gender) ?: 'Not specified' }}
+                                            {{ $participant->gender ? ucfirst($participant->gender) : 'Not specified' }}
                                         </td>
                                         <td class="px-4 py-3 text-sm">
                                             @if($participant->active)

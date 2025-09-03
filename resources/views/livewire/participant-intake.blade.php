@@ -246,8 +246,8 @@
                                                     @if($member['suffix']) {{ $member['suffix'] }} @endif
                                                 </p>
                                                 <p class="text-xs text-gray-500">
-                                                    {{ ucfirst($member['relationship_to_head']) }} • 
-                                                    {{ ucfirst($member['gender']) }} • 
+                                                    {{ $member['relationship_to_head'] ? ucfirst($member['relationship_to_head']) : 'Not specified' }} • 
+                                                    {{ $member['gender'] ? ucfirst($member['gender']) : 'Not specified' }} • 
                                                     DOB: {{ \Carbon\Carbon::parse($member['date_of_birth'])->format('M j, Y') }}
                                                 </p>
                                             </div>
