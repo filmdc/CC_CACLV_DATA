@@ -182,7 +182,7 @@
                             @error('street_address') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label for="city" class="block text-sm font-medium text-gray-700 mb-2">City</label>
                                 <input type="text" wire:model="city" id="city" 
@@ -202,6 +202,18 @@
                                 <input type="text" wire:model="zip_code" id="zip_code" 
                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 @error('zip_code') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            </div>
+
+                            <div>
+                                <label for="county" class="block text-sm font-medium text-gray-700 mb-2">County</label>
+                                <select wire:model="county" id="county" 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Select county...</option>
+                                    @foreach($countyOptions as $option)
+                                        <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                    @endforeach
+                                </select>
+                                @error('county') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                             </div>
                         </div>
                     </div>

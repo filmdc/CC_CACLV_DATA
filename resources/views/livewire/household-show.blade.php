@@ -103,11 +103,6 @@
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Area</label>
-                            <p class="text-gray-900 dark:text-white">{{ $household->currentAddress->area ?: 'Not specified' }}</p>
-                        </div>
-                        
-                        <div>
                             <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Primary Phone</label>
                             <p class="text-gray-900 dark:text-white">{{ $household->currentAddress->primary_phone ?: 'Not specified' }}</p>
                         </div>
@@ -343,7 +338,7 @@
                             @error('editStreetAddress') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label for="editCity" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">City</label>
                                 <input type="text" wire:model="editCity" id="editCity" 
@@ -363,6 +358,18 @@
                                 <input type="text" wire:model="editZipCode" id="editZipCode" 
                                        class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 @error('editZipCode') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            </div>
+
+                            <div>
+                                <label for="editCounty" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">County</label>
+                                <select wire:model="editCounty" id="editCounty" 
+                                        class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Select county...</option>
+                                    @foreach($countyOptions as $option)
+                                        <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                    @endforeach
+                                </select>
+                                @error('editCounty') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                             </div>
                         </div>
 

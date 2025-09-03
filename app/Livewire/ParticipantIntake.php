@@ -46,6 +46,9 @@ class ParticipantIntake extends Component
     
     #[Validate('nullable|string|max:10')]
     public $zip_code = '';
+    
+    #[Validate('nullable|string')]
+    public $county = '';
 
     // Head of Household Information
     #[Validate('required|string|max:255')]
@@ -155,6 +158,7 @@ class ParticipantIntake extends Component
         $this->city = '';
         $this->state = '';
         $this->zip_code = '';
+        $this->county = '';
         $this->first_name = '';
         $this->middle_name = '';
         $this->last_name = '';
@@ -401,12 +405,13 @@ class ParticipantIntake extends Component
             ]);
 
             // Create initial address record if any address data is provided
-            if ($this->street_address || $this->city || $this->state || $this->zip_code) {
+            if ($this->street_address || $this->city || $this->state || $this->zip_code || $this->county) {
                 $household->addresses()->create([
                     'address' => $this->street_address,
                     'city' => $this->city,
                     'state' => $this->state,
                     'zip_code' => $this->zip_code,
+                    'county' => $this->county,
                     'is_current' => true,
                     'effective_date' => now()->format('Y-m-d'),
                     'reason_for_change' => 'Initial intake',
@@ -635,6 +640,7 @@ class ParticipantIntake extends Component
             'housingStatuses' => ReferenceData::getOptions('housing_status'),
             'housingTypes' => ReferenceData::getOptions('housing_type'),
             'householdTypes' => ReferenceData::getOptions('household_type'),
+            'countyOptions' => ReferenceData::getOptions('county'),
             'programs' => $programs,
             'services' => $services,
         ])->layout('components.layouts.app');

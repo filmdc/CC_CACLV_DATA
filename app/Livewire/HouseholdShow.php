@@ -48,6 +48,9 @@ class HouseholdShow extends Component
     #[Validate('nullable|string|max:10')]
     public $editZipCode = '';
     
+    #[Validate('nullable|string')]
+    public $editCounty = '';
+    
     public $editNotes = '';
     
     // Member edit fields
@@ -116,6 +119,7 @@ class HouseholdShow extends Component
             $this->editCity = $this->household->currentAddress->city;
             $this->editState = $this->household->currentAddress->state;
             $this->editZipCode = $this->household->currentAddress->zip_code;
+            $this->editCounty = $this->household->currentAddress->county;
         }
         
         $this->showEditHouseholdModal = true;
@@ -132,6 +136,7 @@ class HouseholdShow extends Component
             'editCity' => 'nullable|string|max:100',
             'editState' => 'nullable|string|size:2',
             'editZipCode' => 'nullable|string|max:10',
+            'editCounty' => 'nullable|string',
         ]);
         
         try {
@@ -148,13 +153,14 @@ class HouseholdShow extends Component
             ]);
             
             // Update or create address if any address data provided
-            if ($this->editStreetAddress || $this->editCity || $this->editState || $this->editZipCode) {
+            if ($this->editStreetAddress || $this->editCity || $this->editState || $this->editZipCode || $this->editCounty) {
                 if ($this->household->currentAddress) {
                     $this->household->currentAddress->update([
                         'address' => $this->editStreetAddress,
                         'city' => $this->editCity,
                         'state' => $this->editState,
                         'zip_code' => $this->editZipCode,
+                        'county' => $this->editCounty,
                     ]);
                 } else {
                     $this->household->addresses()->create([
@@ -162,6 +168,7 @@ class HouseholdShow extends Component
                         'city' => $this->editCity,
                         'state' => $this->editState,
                         'zip_code' => $this->editZipCode,
+                        'county' => $this->editCounty,
                         'is_current' => true,
                         'effective_date' => now()->format('Y-m-d'),
                         'reason_for_change' => 'Updated via household edit',
@@ -194,6 +201,7 @@ class HouseholdShow extends Component
         $this->editCity = '';
         $this->editState = '';
         $this->editZipCode = '';
+        $this->editCounty = '';
         $this->editNotes = '';
     }
     
@@ -376,6 +384,7 @@ class HouseholdShow extends Component
             'genderOptions' => ReferenceData::getOptions('gender'),
             'householdTypes' => ReferenceData::getOptions('household_type'),
             'housingStatuses' => ReferenceData::getOptions('housing_status'),
+            'countyOptions' => ReferenceData::getOptions('county'),
         ])->layout('components.layouts.app');
     }
 }
