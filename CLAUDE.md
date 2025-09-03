@@ -341,4 +341,4 @@ Housing Module Features:
 ## Memories
 
 - Do not try to run bash mysql commands that require a password, as the terminal prevents that approach
-
+- do not use artisan to serve the site. it only is to be configured so the site and its assets work right from apache

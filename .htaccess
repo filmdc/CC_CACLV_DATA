@@ -1,3 +1,9 @@
+# Force correct MIME types for static assets
+<IfModule mod_mime.c>
+    AddType text/css .css
+    AddType application/javascript .js
+</IfModule>
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes
@@ -13,6 +19,10 @@
     RewriteCond %{HTTP:x-xsrf-token} .
     RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
 
+    # Skip rewrite for build assets specifically
+    RewriteCond %{REQUEST_URI} ^/build/
+    RewriteRule ^ - [L]
+    
     # Skip rewrite for existing files and directories (this should handle static assets)
     RewriteCond %{REQUEST_FILENAME} -f [OR]
     RewriteCond %{REQUEST_FILENAME} -d

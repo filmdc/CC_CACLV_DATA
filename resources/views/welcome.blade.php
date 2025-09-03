@@ -15,7 +15,8 @@
         <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700" rel="stylesheet" />
 
         <!-- Styles -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <link rel="stylesheet" href="/build/assets/app-BWmO2UYX.css">
+        <script type="module" src="/build/assets/app-DZ6OBlhX.js"></script>
     </head>
     <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
         <!-- Navigation -->
