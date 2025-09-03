@@ -263,7 +263,7 @@
                     @endif
 
                     <!-- Add Member Button -->
-                    @if(!$showAddMemberForm)
+                    @if(!$showMemberForm)
                         <div class="text-center">
                             <button type="button" wire:click="showAddMemberForm" 
                                     class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
@@ -276,7 +276,7 @@
                     @endif
 
                     <!-- Add Member Form -->
-                    @if($showAddMemberForm)
+                    @if($showMemberForm)
                         <div class="bg-gray-50 border border-gray-200 rounded-lg p-6">
                             <div class="flex items-center justify-between mb-4">
                                 <h3 class="text-lg font-medium text-gray-900">Add Household Member</h3>

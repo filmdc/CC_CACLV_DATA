@@ -100,7 +100,7 @@ class ParticipantIntake extends Component
 
     // Step 2.5: Household Members (new step)
     public $householdMembers = [];
-    public $showAddMemberForm = false;
+    public $showMemberForm = false;
     public $memberFirstName = '';
     public $memberMiddleName = '';
     public $memberLastName = '';
@@ -304,12 +304,12 @@ class ParticipantIntake extends Component
     public function showAddMemberForm()
     {
         $this->resetMemberForm();
-        $this->showAddMemberForm = true;
+        $this->showMemberForm = true;
     }
 
     public function hideAddMemberForm()
     {
-        $this->showAddMemberForm = false;
+        $this->showMemberForm = false;
         $this->resetMemberForm();
     }
 
