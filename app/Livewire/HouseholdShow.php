@@ -97,6 +97,11 @@ class HouseholdShow extends Component
         // Get the referrer URL from session, or default to household management
         $this->backUrl = session('household_referrer', route('household.management'));
     }
+    
+    public function goBack()
+    {
+        return $this->redirect($this->backUrl);
+    }
 
     public function editHousehold()
     {

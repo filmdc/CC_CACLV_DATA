@@ -14,11 +14,10 @@
                             Edit Household
                         </button>
                     @endif
-                    <a href="{{ $backUrl }}" 
-                       wire:navigate
-                       class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                    <button wire:click="goBack" 
+                            class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-medium transition-colors">
                         Back to List
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>
