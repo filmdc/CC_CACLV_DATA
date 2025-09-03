@@ -214,7 +214,11 @@
                                             </a>
                                         </td>
                                         <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                                            {{ $participant->relationship_to_head ? ucfirst($participant->relationship_to_head) : 'Not specified' }}
+                                            @if($participant->is_head_of_household)
+                                                Head of Household
+                                            @else
+                                                {{ $participant->relationship_to_head ? ucfirst(str_replace('_', ' ', $participant->relationship_to_head)) : 'Not specified' }}
+                                            @endif
                                         </td>
                                         <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
                                             {{ $participant->date_of_birth ? \Carbon\Carbon::parse($participant->date_of_birth)->format('M j, Y') : 'N/A' }}
@@ -488,7 +492,7 @@
                             <select wire:model="memberRelationship" id="memberRelationship" 
                                     class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="">Select relationship...</option>
-                                <option value="head_of_household">Head of Household</option>
+                                <option value="self">Self (Head of Household)</option>
                                 <option value="spouse">Spouse</option>
                                 <option value="child">Child</option>
                                 <option value="parent">Parent</option>
@@ -496,7 +500,7 @@
                                 <option value="grandparent">Grandparent</option>
                                 <option value="grandchild">Grandchild</option>
                                 <option value="other_relative">Other Relative</option>
-                                <option value="unrelated">Unrelated</option>
+                                <option value="unrelated_individual">Unrelated Individual</option>
                             </select>
                             @error('memberRelationship') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
@@ -618,7 +622,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <input type="hidden" wire:model="memberRelationship" value="head_of_household">
+                                <input type="hidden" wire:model="memberRelationship" value="self">
                             @else
                                 <label for="memberRelationship" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                     Relationship to Head of Household <span class="text-red-500">*</span>
@@ -633,7 +637,7 @@
                                     <option value="grandparent">Grandparent</option>
                                     <option value="grandchild">Grandchild</option>
                                     <option value="other_relative">Other Relative</option>
-                                    <option value="unrelated">Unrelated</option>
+                                    <option value="unrelated_individual">Unrelated Individual</option>
                                 </select>
                                 @error('memberRelationship') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                             @endif

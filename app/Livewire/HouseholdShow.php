@@ -227,11 +227,21 @@ class HouseholdShow extends Component
             // Get the active reference data set
             $activeDataSet = \App\Models\ReferenceDataSet::getActive();
             
+            // Check if this will be the head of household
+            $isHeadOfHousehold = ($this->memberRelationship === 'self');
+            
+            // If becoming head of household, remove head status from current head
+            if ($isHeadOfHousehold) {
+                $this->household->participants()
+                    ->where('is_head_of_household', true)
+                    ->update(['is_head_of_household' => false, 'relationship_to_head' => null]);
+            }
+            
             // Create new household member
             Participant::create([
                 'household_id' => $this->household->id,
                 'reference_data_set_id' => $activeDataSet?->id,
-                'is_head_of_household' => false,
+                'is_head_of_household' => $isHeadOfHousehold,
                 'first_name' => $this->memberFirstName,
                 'middle_name' => $this->memberMiddleName,
                 'last_name' => $this->memberLastName,
@@ -240,7 +250,7 @@ class HouseholdShow extends Component
                 'gender' => $this->memberGender,
                 'telephone' => $this->memberTelephone,
                 'email' => $this->memberEmail,
-                'relationship_to_head' => $this->memberRelationship,
+                'relationship_to_head' => $isHeadOfHousehold ? null : $this->memberRelationship,
                 'intake_date' => Carbon::today(),
             ]);
             
@@ -283,7 +293,7 @@ class HouseholdShow extends Component
         
         // Set appropriate relationship based on head of household status
         if ($member->is_head_of_household) {
-            $this->memberRelationship = 'head_of_household';
+            $this->memberRelationship = 'self';
         } else {
             $this->memberRelationship = $member->relationship_to_head;
         }
@@ -295,18 +305,15 @@ class HouseholdShow extends Component
     {
         $member = Participant::findOrFail($this->editingMemberId);
         
-        // Validate based on whether this is head of household
+        
+        // Validate form fields
         $rules = [
             'memberFirstName' => 'required|string|max:255',
             'memberLastName' => 'required|string|max:255',
             'memberDateOfBirth' => 'required|date|before:today',
             'memberGender' => 'required|string',
+            'memberRelationship' => 'required|string|in:self,spouse,child,parent,sibling,grandchild,grandparent,other_relative,unrelated_individual',
         ];
-        
-        // Only require relationship if not head of household
-        if (!$member->is_head_of_household) {
-            $rules['memberRelationship'] = 'required|string';
-        }
         
         $this->validate($rules);
         
@@ -315,6 +322,18 @@ class HouseholdShow extends Component
             if ($member->household_id !== $this->household->id) {
                 session()->flash('error', 'Member does not belong to this household.');
                 return;
+            }
+            
+            // Check if changing to/from head of household
+            $isBecomingHeadOfHousehold = ($this->memberRelationship === 'self');
+            $wasHeadOfHousehold = $member->is_head_of_household;
+            
+            // If becoming head of household, ensure only one head exists
+            if ($isBecomingHeadOfHousehold && !$wasHeadOfHousehold) {
+                // Remove head status from current head
+                $this->household->participants()
+                    ->where('is_head_of_household', true)
+                    ->update(['is_head_of_household' => false, 'relationship_to_head' => null]);
             }
             
             // Prepare update data
@@ -327,12 +346,9 @@ class HouseholdShow extends Component
                 'gender' => $this->memberGender,
                 'telephone' => $this->memberTelephone,
                 'email' => $this->memberEmail,
+                'is_head_of_household' => $isBecomingHeadOfHousehold,
+                'relationship_to_head' => $isBecomingHeadOfHousehold ? null : $this->memberRelationship,
             ];
-            
-            // Only update relationship_to_head if not head of household
-            if (!$member->is_head_of_household) {
-                $updateData['relationship_to_head'] = $this->memberRelationship;
-            }
             
             $member->update($updateData);
             

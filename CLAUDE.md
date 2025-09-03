@@ -341,6 +341,5 @@ Housing Module Features:
 ## Memories
 
 - Do not try to run bash mysql commands that require a password, as the terminal prevents that approach
-
-
-- this is an apache hosted project, so all work on this project must work as a standard apache virtual hosted web application
+- This is an apache hosted project, so all work on this project must work as a standard apache virtual hosted web application
+- Do not use artisan to serve the site. It only is to be configured so the site and its assets work right from apache
