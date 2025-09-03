@@ -13,6 +13,7 @@ class Participant extends Model
         'household_id',
         'reference_data_set_id',
         'is_head_of_household',
+        'relationship_to_head',
         'first_name',
         'middle_name',
         'last_name',
