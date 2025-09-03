@@ -14,10 +14,10 @@
                             Edit Household
                         </button>
                     @endif
-                    <button wire:click="goBack" 
-                            class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                    <a href="{{ route('household.management') }}" 
+                       class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-medium transition-colors">
                         Back to List
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>

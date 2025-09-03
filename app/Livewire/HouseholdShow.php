@@ -98,10 +98,6 @@ class HouseholdShow extends Component
         $this->backUrl = session('household_referrer', route('household.management'));
     }
     
-    public function goBack()
-    {
-        return redirect($this->backUrl);
-    }
 
     public function editHousehold()
     {
