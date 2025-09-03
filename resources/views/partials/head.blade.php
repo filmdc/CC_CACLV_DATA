@@ -19,8 +19,7 @@
 <link rel="preconnect" href="https://fonts.bunny.net">
 <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 
-<link rel="stylesheet" href="/build/assets/app-BWmO2UYX.css">
-<script type="module" src="/build/assets/app-DZ6OBlhX.js"></script>
+@vite(['resources/css/app.css', 'resources/js/app.js'])
 @fluxAppearance
 
 <!-- Jodit Editor CSS -->
