@@ -342,3 +342,5 @@ Housing Module Features:
 
 - Do not try to run bash mysql commands that require a password, as the terminal prevents that approach
 
+
+- this is an apache hosted project, so all work on this project must work as a standard apache virtual hosted web application
