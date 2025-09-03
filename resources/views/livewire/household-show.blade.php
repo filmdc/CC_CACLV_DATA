@@ -199,6 +199,9 @@
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                         Status
                                     </th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        Actions
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200 dark:divide-zinc-700">
@@ -235,6 +238,23 @@
                                                 </span>
                                             @endif
                                         </td>
+                                        <td class="px-4 py-3 text-sm font-medium">
+                                            <div class="flex space-x-2">
+                                                @if ($this->can('participants.edit'))
+                                                    <button wire:click="editMember({{ $participant->id }})" 
+                                                            class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-xs font-medium">
+                                                        Edit
+                                                    </button>
+                                                @endif
+                                                @if ($this->can('participants.delete') && !$participant->is_head_of_household)
+                                                    <button wire:click="removeMember({{ $participant->id }})" 
+                                                            onclick="return confirm('Are you sure you want to remove this household member?')"
+                                                            class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-xs font-medium">
+                                                        Remove
+                                                    </button>
+                                                @endif
+                                            </div>
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -246,4 +266,367 @@
             </div>
         </div>
     </div>
+
+    <!-- Edit Household Modal -->
+    @if($showEditHouseholdModal)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-600">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Edit Household Information</h3>
+                        <button wire:click="cancelHouseholdEdit" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="px-6 py-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="editHouseholdType" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Household Type <span class="text-red-500">*</span>
+                            </label>
+                            <select wire:model="editHouseholdType" id="editHouseholdType" 
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Select household type...</option>
+                                @foreach($householdTypes as $option)
+                                    <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                @endforeach
+                            </select>
+                            @error('editHouseholdType') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="editHouseholdSize" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Household Size <span class="text-red-500">*</span>
+                            </label>
+                            <input type="number" wire:model="editHouseholdSize" id="editHouseholdSize" min="1" 
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            @error('editHouseholdSize') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="editHousingStatus" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Housing Status <span class="text-red-500">*</span>
+                            </label>
+                            <select wire:model="editHousingStatus" id="editHousingStatus" 
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Select housing status...</option>
+                                @foreach($housingStatuses as $option)
+                                    <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                @endforeach
+                            </select>
+                            @error('editHousingStatus') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="editMonthlyIncome" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Monthly Household Income
+                            </label>
+                            <input type="number" wire:model="editMonthlyIncome" id="editMonthlyIncome" min="0" step="0.01" 
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            @error('editMonthlyIncome') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 mt-6">
+                        <h4 class="text-lg font-medium text-gray-900 dark:text-white">Address Information</h4>
+                        
+                        <div>
+                            <label for="editStreetAddress" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Street Address
+                            </label>
+                            <input type="text" wire:model="editStreetAddress" id="editStreetAddress" 
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            @error('editStreetAddress') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label for="editCity" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">City</label>
+                                <input type="text" wire:model="editCity" id="editCity" 
+                                       class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                @error('editCity') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            </div>
+
+                            <div>
+                                <label for="editState" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">State</label>
+                                <input type="text" wire:model="editState" id="editState" maxlength="2" 
+                                       class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                @error('editState') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            </div>
+
+                            <div>
+                                <label for="editZipCode" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">ZIP Code</label>
+                                <input type="text" wire:model="editZipCode" id="editZipCode" 
+                                       class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                @error('editZipCode') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="editNotes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Notes</label>
+                            <textarea wire:model="editNotes" id="editNotes" rows="3" 
+                                      class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="px-6 py-4 border-t border-gray-200 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-700 flex justify-end space-x-3">
+                    <button wire:click="cancelHouseholdEdit" 
+                            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-zinc-600 border border-gray-300 dark:border-zinc-500 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-500">
+                        Cancel
+                    </button>
+                    <button wire:click="saveHouseholdEdit" 
+                            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Add Member Modal -->
+    @if($showAddMemberModal)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-600">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Add Household Member</h3>
+                        <button wire:click="cancelMemberEdit" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="px-6 py-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="memberFirstName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                First Name <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" wire:model="memberFirstName" id="memberFirstName" 
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            @error('memberFirstName') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="memberMiddleName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Middle Name</label>
+                            <input type="text" wire:model="memberMiddleName" id="memberMiddleName" 
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            @error('memberMiddleName') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="memberLastName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Last Name <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" wire:model="memberLastName" id="memberLastName" 
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            @error('memberLastName') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="memberSuffix" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Suffix</label>
+                            <input type="text" wire:model="memberSuffix" id="memberSuffix" 
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            @error('memberSuffix') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="memberDateOfBirth" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Date of Birth <span class="text-red-500">*</span>
+                            </label>
+                            <input type="date" wire:model="memberDateOfBirth" id="memberDateOfBirth" 
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            @error('memberDateOfBirth') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="memberGender" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Gender <span class="text-red-500">*</span>
+                            </label>
+                            <select wire:model="memberGender" id="memberGender" 
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Select gender...</option>
+                                @foreach($genderOptions as $option)
+                                    <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                @endforeach
+                            </select>
+                            @error('memberGender') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="memberTelephone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Phone Number</label>
+                            <input type="tel" wire:model="memberTelephone" id="memberTelephone" 
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            @error('memberTelephone') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="memberEmail" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
+                            <input type="email" wire:model="memberEmail" id="memberEmail" 
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            @error('memberEmail') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label for="memberRelationship" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Relationship to Head of Household <span class="text-red-500">*</span>
+                            </label>
+                            <select wire:model="memberRelationship" id="memberRelationship" 
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Select relationship...</option>
+                                <option value="spouse">Spouse</option>
+                                <option value="child">Child</option>
+                                <option value="parent">Parent</option>
+                                <option value="sibling">Sibling</option>
+                                <option value="grandparent">Grandparent</option>
+                                <option value="grandchild">Grandchild</option>
+                                <option value="other_relative">Other Relative</option>
+                                <option value="unrelated">Unrelated</option>
+                            </select>
+                            @error('memberRelationship') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="px-6 py-4 border-t border-gray-200 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-700 flex justify-end space-x-3">
+                    <button wire:click="cancelMemberEdit" 
+                            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-zinc-600 border border-gray-300 dark:border-zinc-500 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-500">
+                        Cancel
+                    </button>
+                    <button wire:click="saveMember" 
+                            class="px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700">
+                        Add Member
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Edit Member Modal -->
+    @if($showEditMemberModal)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-600">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Edit Household Member</h3>
+                        <button wire:click="cancelMemberEdit" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="px-6 py-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="memberFirstName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                First Name <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" wire:model="memberFirstName" id="memberFirstName" 
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            @error('memberFirstName') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="memberMiddleName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Middle Name</label>
+                            <input type="text" wire:model="memberMiddleName" id="memberMiddleName" 
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            @error('memberMiddleName') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="memberLastName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Last Name <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" wire:model="memberLastName" id="memberLastName" 
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            @error('memberLastName') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="memberSuffix" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Suffix</label>
+                            <input type="text" wire:model="memberSuffix" id="memberSuffix" 
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            @error('memberSuffix') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="memberDateOfBirth" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Date of Birth <span class="text-red-500">*</span>
+                            </label>
+                            <input type="date" wire:model="memberDateOfBirth" id="memberDateOfBirth" 
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            @error('memberDateOfBirth') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="memberGender" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Gender <span class="text-red-500">*</span>
+                            </label>
+                            <select wire:model="memberGender" id="memberGender" 
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Select gender...</option>
+                                @foreach($genderOptions as $option)
+                                    <option value="{{ $option->value }}">{{ $option->label }}</option>
+                                @endforeach
+                            </select>
+                            @error('memberGender') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="memberTelephone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Phone Number</label>
+                            <input type="tel" wire:model="memberTelephone" id="memberTelephone" 
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            @error('memberTelephone') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="memberEmail" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
+                            <input type="email" wire:model="memberEmail" id="memberEmail" 
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            @error('memberEmail') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label for="memberRelationship" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Relationship to Head of Household <span class="text-red-500">*</span>
+                            </label>
+                            <select wire:model="memberRelationship" id="memberRelationship" 
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Select relationship...</option>
+                                <option value="spouse">Spouse</option>
+                                <option value="child">Child</option>
+                                <option value="parent">Parent</option>
+                                <option value="sibling">Sibling</option>
+                                <option value="grandparent">Grandparent</option>
+                                <option value="grandchild">Grandchild</option>
+                                <option value="other_relative">Other Relative</option>
+                                <option value="unrelated">Unrelated</option>
+                            </select>
+                            @error('memberRelationship') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="px-6 py-4 border-t border-gray-200 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-700 flex justify-end space-x-3">
+                    <button wire:click="cancelMemberEdit" 
+                            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-zinc-600 border border-gray-300 dark:border-zinc-500 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-500">
+                        Cancel
+                    </button>
+                    <button wire:click="updateMember" 
+                            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
+                        Update Member
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>
