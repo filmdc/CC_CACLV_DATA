@@ -20,7 +20,7 @@ use Carbon\Carbon;
 class ParticipantIntake extends Component
 {
     public $step = 1;
-    public $totalSteps = 5;
+    public $totalSteps = 6; // Added one more step for household members
 
     // Household Information
     #[Validate('required|string')]
@@ -98,7 +98,18 @@ class ParticipantIntake extends Component
     // System
     public $notes = '';
 
-    // Step 5: Program Enrollment
+    // Step 2.5: Household Members (new step)
+    public $householdMembers = [];
+    public $showAddMemberForm = false;
+    public $memberFirstName = '';
+    public $memberMiddleName = '';
+    public $memberLastName = '';
+    public $memberSuffix = '';
+    public $memberDateOfBirth = '';
+    public $memberGender = '';
+    public $memberRelationship = '';
+
+    // Step 6: Program Enrollment (previously step 5)
     public $program_id = '';
     public $enrollment_date = '';
     public $enrollment_notes = '';
@@ -109,13 +120,16 @@ class ParticipantIntake extends Component
     public $service_enrollment_date = '';
     public $service_notes = '';
 
-    // Created participant for step 5
+    // Created participant for step 6 (previously step 5)
     public $createdParticipant = null;
     
     // Duplicate detection
     public $showDuplicateModal = false;
+    public $showHeadOfHouseholdDuplicateModal = false;
     public $potentialDuplicates = [];
+    public $potentialHeadOfHouseholdDuplicates = [];
     public $bypassDuplicateCheck = false;
+    public $bypassHeadOfHouseholdCheck = false;
     protected $duplicateDetectionService;
 
     public function boot(DuplicateDetectionService $duplicateDetectionService)
@@ -183,8 +197,17 @@ class ParticipantIntake extends Component
     {
         $this->validateCurrentStep();
         
-        // If moving from step 4 to 5, create the participant and household first
-        if ($this->step == 4 && !$this->createdParticipant) {
+        // If moving from step 1 to 2, check for head of household duplicates first
+        if ($this->step == 1 && !$this->bypassHeadOfHouseholdCheck) {
+            $this->checkHeadOfHouseholdDuplicates();
+            // If duplicates found, the check will show modal and return early
+            if ($this->showHeadOfHouseholdDuplicateModal) {
+                return;
+            }
+        }
+        
+        // If moving from step 5 to 6, create the participant and household first
+        if ($this->step == 5 && !$this->createdParticipant) {
             $this->createParticipantAndHousehold();
         }
         
@@ -219,12 +242,15 @@ class ParticipantIntake extends Component
                 ]);
                 break;
             case 3:
-                // Demographics are mostly optional
+                // Household members step - no required validation
                 break;
             case 4:
-                // Financial information is mostly optional
+                // Demographics are mostly optional
                 break;
             case 5:
+                // Financial information is mostly optional
+                break;
+            case 6:
                 $this->validate([
                     'program_id' => 'required|exists:programs,id',
                     'enrollment_date' => 'required|date',
@@ -237,6 +263,109 @@ class ParticipantIntake extends Component
                     ]);
                 }
                 break;
+        }
+    }
+
+    public function checkHeadOfHouseholdDuplicates()
+    {
+        try {
+            $proposedData = [
+                'first_name' => $this->first_name,
+                'last_name' => $this->last_name,
+                'date_of_birth' => $this->date_of_birth,
+            ];
+            
+            $duplicates = $this->duplicateDetectionService->checkForHeadOfHouseholdDuplicates($proposedData);
+
+            if ($duplicates->isNotEmpty()) {
+                $this->potentialHeadOfHouseholdDuplicates = $duplicates->toArray();
+                $this->showHeadOfHouseholdDuplicateModal = true;
+                return;
+            }
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error checking for duplicates: ' . $e->getMessage());
+        }
+    }
+
+    public function proceedWithHeadOfHouseholdDuplicate()
+    {
+        $this->bypassHeadOfHouseholdCheck = true;
+        $this->showHeadOfHouseholdDuplicateModal = false;
+        $this->step++;
+    }
+
+    public function cancelHeadOfHouseholdDuplicateCreation()
+    {
+        $this->showHeadOfHouseholdDuplicateModal = false;
+        $this->potentialHeadOfHouseholdDuplicates = [];
+        $this->bypassHeadOfHouseholdCheck = false;
+    }
+
+    public function showAddMemberForm()
+    {
+        $this->resetMemberForm();
+        $this->showAddMemberForm = true;
+    }
+
+    public function hideAddMemberForm()
+    {
+        $this->showAddMemberForm = false;
+        $this->resetMemberForm();
+    }
+
+    public function resetMemberForm()
+    {
+        $this->memberFirstName = '';
+        $this->memberMiddleName = '';
+        $this->memberLastName = '';
+        $this->memberSuffix = '';
+        $this->memberDateOfBirth = '';
+        $this->memberGender = '';
+        $this->memberRelationship = '';
+    }
+
+    public function addMember()
+    {
+        $this->validate([
+            'memberFirstName' => 'required|string|max:255',
+            'memberLastName' => 'required|string|max:255',
+            'memberDateOfBirth' => 'required|date|before:today',
+            'memberGender' => 'required',
+            'memberRelationship' => 'required',
+        ], [
+            'memberFirstName.required' => 'First name is required.',
+            'memberLastName.required' => 'Last name is required.',
+            'memberDateOfBirth.required' => 'Date of birth is required.',
+            'memberDateOfBirth.before' => 'Date of birth must be before today.',
+            'memberGender.required' => 'Gender is required.',
+            'memberRelationship.required' => 'Relationship to head is required.',
+        ]);
+
+        $member = [
+            'first_name' => $this->memberFirstName,
+            'middle_name' => $this->memberMiddleName,
+            'last_name' => $this->memberLastName,
+            'suffix' => $this->memberSuffix,
+            'date_of_birth' => $this->memberDateOfBirth,
+            'gender' => $this->memberGender,
+            'relationship_to_head' => $this->memberRelationship,
+            'is_head_of_household' => false,
+        ];
+
+        $this->householdMembers[] = $member;
+        $this->household_size = count($this->householdMembers) + 1; // +1 for head of household
+        
+        $this->hideAddMemberForm();
+        session()->flash('success', 'Household member added successfully.');
+    }
+
+    public function removeMember($index)
+    {
+        if (isset($this->householdMembers[$index])) {
+            unset($this->householdMembers[$index]);
+            $this->householdMembers = array_values($this->householdMembers); // Re-index array
+            $this->household_size = count($this->householdMembers) + 1; // +1 for head of household
+            session()->flash('success', 'Household member removed.');
         }
     }
 
@@ -335,7 +464,34 @@ class ParticipantIntake extends Component
                 'notes' => $this->notes,
             ]);
 
-            session()->flash('success', 'Participant and household created successfully! Now let\'s enroll them in a program.');
+            // Create household members if any were added
+            foreach ($this->householdMembers as $memberData) {
+                Participant::create([
+                    'household_id' => $household->id,
+                    'reference_data_set_id' => $activeDataSet?->id,
+                    'is_head_of_household' => false,
+                    'first_name' => $memberData['first_name'],
+                    'middle_name' => $memberData['middle_name'],
+                    'last_name' => $memberData['last_name'],
+                    'suffix' => $memberData['suffix'],
+                    'date_of_birth' => $memberData['date_of_birth'],
+                    'gender' => $memberData['gender'],
+                    'relationship_to_head' => $memberData['relationship_to_head'],
+                    'intake_date' => Carbon::today(),
+                ]);
+            }
+
+            // Update household size to match actual member count
+            $actualMemberCount = count($this->householdMembers) + 1; // +1 for head of household
+            if ($actualMemberCount !== $this->household_size) {
+                $household->update(['household_size' => $actualMemberCount]);
+            }
+
+            $memberMessage = count($this->householdMembers) > 0 
+                ? ' (' . count($this->householdMembers) . ' additional household members added)'
+                : '';
+            
+            session()->flash('success', 'Participant and household created successfully!' . $memberMessage . ' Now let\'s enroll them in a program.');
             
         } catch (\Exception $e) {
             session()->flash('error', 'An error occurred during registration: ' . $e->getMessage());

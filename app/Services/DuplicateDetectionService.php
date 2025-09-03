@@ -29,6 +29,140 @@ class DuplicateDetectionService
     protected float $autoMergeThreshold = 95.0;
 
     /**
+     * Check for head of household duplicates using simplified criteria
+     * Focuses on first name, last name, and date of birth matching
+     */
+    public function checkForHeadOfHouseholdDuplicates(array $proposedData, string $sourceType = 'manual'): Collection
+    {
+        $potentialDuplicates = collect();
+
+        // Only check head of household participants
+        $candidates = Participant::where('is_head_of_household', true)
+            ->where(function ($query) use ($proposedData) {
+                // Strategy 1: Exact name match
+                if (!empty($proposedData['first_name']) && !empty($proposedData['last_name'])) {
+                    $query->where('first_name', 'LIKE', '%' . trim($proposedData['first_name']) . '%')
+                          ->where('last_name', 'LIKE', '%' . trim($proposedData['last_name']) . '%');
+                }
+            })
+            ->orWhere(function ($query) use ($proposedData) {
+                // Strategy 2: Date of birth match (if provided)
+                if (!empty($proposedData['date_of_birth'])) {
+                    $query->where('date_of_birth', $proposedData['date_of_birth'])
+                          ->where('is_head_of_household', true);
+                }
+            })
+            ->with('household')
+            ->get();
+
+        foreach ($candidates as $candidate) {
+            $score = $this->calculateHeadOfHouseholdScore($proposedData, $candidate);
+            
+            if ($score >= 50.0) { // Lower threshold for head of household check
+                $matchingCriteria = $this->getHeadOfHouseholdMatchingCriteria($proposedData, $candidate);
+                
+                $duplicate = [
+                    'participant' => $candidate,
+                    'confidence_score' => $score,
+                    'matching_criteria' => $matchingCriteria,
+                    'proposed_data' => $proposedData,
+                    'source_type' => $sourceType,
+                    'source_identifier' => session()->getId(),
+                ];
+
+                $potentialDuplicates->push($duplicate);
+            }
+        }
+
+        return $potentialDuplicates->sortByDesc('confidence_score');
+    }
+
+    /**
+     * Calculate simplified confidence score for head of household matching
+     */
+    protected function calculateHeadOfHouseholdScore(array $proposedData, Participant $candidate): float
+    {
+        $totalScore = 0;
+
+        // First name match (40 points)
+        if (!empty($proposedData['first_name']) && !empty($candidate->first_name)) {
+            if (strtolower(trim($proposedData['first_name'])) === strtolower(trim($candidate->first_name))) {
+                $totalScore += 40;
+            } else {
+                // Fuzzy match
+                $similarity = 0;
+                similar_text(strtolower($proposedData['first_name']), strtolower($candidate->first_name), $similarity);
+                if ($similarity >= 80) {
+                    $totalScore += 25 * ($similarity / 100);
+                }
+            }
+        }
+
+        // Last name match (40 points)
+        if (!empty($proposedData['last_name']) && !empty($candidate->last_name)) {
+            if (strtolower(trim($proposedData['last_name'])) === strtolower(trim($candidate->last_name))) {
+                $totalScore += 40;
+            } else {
+                // Fuzzy match
+                $similarity = 0;
+                similar_text(strtolower($proposedData['last_name']), strtolower($candidate->last_name), $similarity);
+                if ($similarity >= 80) {
+                    $totalScore += 25 * ($similarity / 100);
+                }
+            }
+        }
+
+        // Date of birth match (20 points)
+        if (!empty($proposedData['date_of_birth']) && !empty($candidate->date_of_birth)) {
+            if ($proposedData['date_of_birth'] === $candidate->date_of_birth->format('Y-m-d')) {
+                $totalScore += 20;
+            }
+        }
+
+        return $totalScore;
+    }
+
+    /**
+     * Get matching criteria for head of household duplicates
+     */
+    protected function getHeadOfHouseholdMatchingCriteria(array $proposedData, Participant $candidate): array
+    {
+        $criteria = [];
+
+        if (!empty($proposedData['first_name']) && !empty($candidate->first_name)) {
+            if (strtolower(trim($proposedData['first_name'])) === strtolower(trim($candidate->first_name))) {
+                $criteria[] = 'Exact first name match';
+            } else {
+                $similarity = 0;
+                similar_text(strtolower($proposedData['first_name']), strtolower($candidate->first_name), $similarity);
+                if ($similarity >= 80) {
+                    $criteria[] = 'Similar first name (' . round($similarity) . '% match)';
+                }
+            }
+        }
+
+        if (!empty($proposedData['last_name']) && !empty($candidate->last_name)) {
+            if (strtolower(trim($proposedData['last_name'])) === strtolower(trim($candidate->last_name))) {
+                $criteria[] = 'Exact last name match';
+            } else {
+                $similarity = 0;
+                similar_text(strtolower($proposedData['last_name']), strtolower($candidate->last_name), $similarity);
+                if ($similarity >= 80) {
+                    $criteria[] = 'Similar last name (' . round($similarity) . '% match)';
+                }
+            }
+        }
+
+        if (!empty($proposedData['date_of_birth']) && !empty($candidate->date_of_birth)) {
+            if ($proposedData['date_of_birth'] === $candidate->date_of_birth->format('Y-m-d')) {
+                $criteria[] = 'Exact date of birth match';
+            }
+        }
+
+        return $criteria;
+    }
+
+    /**
      * Check for potential duplicates of proposed participant data
      */
     public function checkForDuplicates(array $proposedData, string $sourceType, ?string $sourceIdentifier = null): Collection
