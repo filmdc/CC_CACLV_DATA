@@ -109,14 +109,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('housing-job-management', App\Livewire\HousingJobManagement::class)->name('housing-job.management');
     Route::get('housing-job/{id}', App\Livewire\HousingJobShow::class)->name('housing-job.show');
     
-    // Custom storage route for authenticated users
-    Route::get('storage/{path}', function ($path) {
+    // Custom storage route for authenticated users (only for specific protected folders)
+    Route::get('storage/protected/{path}', function ($path) {
         // Check if user is authenticated
         if (!auth()->check()) {
             abort(403, 'Unauthorized access to file');
         }
         
-        $fullPath = storage_path('app/public/' . $path);
+        $fullPath = storage_path('app/public/protected/' . $path);
         
         // Check if file exists
         if (!file_exists($fullPath)) {
@@ -150,7 +150,7 @@ Route::middleware(['auth'])->group(function () {
         
         // Return file response
         return response()->file($fullPath, $headers);
-    })->where('path', '.*')->name('storage.authenticated');
+    })->where('path', '.*')->name('storage.protected');
 });
 
 require __DIR__.'/auth.php';

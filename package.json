@@ -3,7 +3,8 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "vite"
+        "dev": "vite",
+        "apache": "vite build && php artisan config:clear"
     },
     "dependencies": {
         "@tailwindcss/vite": "^4.0.7",
