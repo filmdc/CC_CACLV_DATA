@@ -303,8 +303,9 @@ class HouseholdShow extends Component
     
     public function updateMember()
     {
-        $member = Participant::findOrFail($this->editingMemberId);
+        $this->authorizeAction('participants.edit', 'You do not have permission to edit participants.');
         
+        $member = Participant::findOrFail($this->editingMemberId);
         
         // Validate form fields
         $rules = [
@@ -318,6 +319,14 @@ class HouseholdShow extends Component
         $this->validate($rules);
         
         try {
+            // Log for debugging
+            \Log::info('Updating member', [
+                'member_id' => $this->editingMemberId,
+                'relationship' => $this->memberRelationship,
+                'is_becoming_head' => ($this->memberRelationship === 'self'),
+                'was_head' => $member->is_head_of_household
+            ]);
+            
             // Verify member belongs to this household
             if ($member->household_id !== $this->household->id) {
                 session()->flash('error', 'Member does not belong to this household.');
@@ -357,7 +366,14 @@ class HouseholdShow extends Component
             $this->resetMemberForm();
             session()->flash('success', 'Household member updated successfully.');
             
+            \Log::info('Member update completed successfully', ['member_id' => $this->editingMemberId]);
+            
         } catch (\Exception $e) {
+            \Log::error('Error updating household member', [
+                'member_id' => $this->editingMemberId,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             session()->flash('error', 'Error updating household member: ' . $e->getMessage());
         }
     }
