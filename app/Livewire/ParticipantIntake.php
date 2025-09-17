@@ -122,6 +122,9 @@ class ParticipantIntake extends Component
     public $service_id = '';
     public $service_enrollment_date = '';
     public $service_notes = '';
+    
+    // Family member enrollment options
+    public $enroll_family_members = false;
 
     // Created participant for step 6 (previously step 5)
     public $createdParticipant = null;
@@ -194,6 +197,7 @@ class ParticipantIntake extends Component
         $this->service_id = '';
         $this->service_enrollment_date = Carbon::today()->format('Y-m-d');
         $this->service_notes = '';
+        $this->enroll_family_members = false;
         $this->createdParticipant = null;
     }
 
@@ -537,6 +541,42 @@ class ParticipantIntake extends Component
                 $message = 'Participant successfully enrolled in program and service!';
             } else {
                 $message = 'Participant successfully enrolled in program!';
+            }
+
+            // Enroll family members if requested
+            if ($this->enroll_family_members && count($this->householdMembers) > 0) {
+                $familyMembersEnrolled = 0;
+                
+                foreach ($this->createdParticipant->household->familyMembers as $familyMember) {
+                    // Create program enrollment for family member
+                    $familyProgramEnrollment = ProgramEnrollment::create([
+                        'participant_id' => $familyMember->id,
+                        'program_id' => $this->program_id,
+                        'enrollment_date' => $this->enrollment_date,
+                        'status' => 'active',
+                        'notes' => $this->enrollment_notes ? 'Family member enrollment: ' . $this->enrollment_notes : 'Enrolled as family member',
+                    ]);
+                    
+                    // Create service enrollment for family member if service was selected
+                    if ($this->enroll_in_service && $this->service_id) {
+                        ServiceEnrollment::create([
+                            'participant_id' => $familyMember->id,
+                            'service_id' => $this->service_id,
+                            'program_enrollment_id' => $familyProgramEnrollment->id,
+                            'enrollment_date' => $this->service_enrollment_date,
+                            'status' => 'enrolled',
+                            'notes' => $this->service_notes ? 'Family member enrollment: ' . $this->service_notes : 'Enrolled as family member',
+                        ]);
+                    }
+                    
+                    $familyMembersEnrolled++;
+                }
+                
+                if ($this->enroll_in_service && $this->service_id) {
+                    $message = "Head of household and {$familyMembersEnrolled} family member(s) successfully enrolled in program and service!";
+                } else {
+                    $message = "Head of household and {$familyMembersEnrolled} family member(s) successfully enrolled in program!";
+                }
             }
 
             $household = $this->createdParticipant->household;

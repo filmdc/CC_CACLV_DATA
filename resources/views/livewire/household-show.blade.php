@@ -227,7 +227,7 @@
                                             {{ $participant->gender ? ucfirst($participant->gender) : 'Not specified' }}
                                         </td>
                                         <td class="px-4 py-3 text-sm">
-                                            @if($participant->active)
+                                            @if($participant->programEnrollments->where('status', 'active')->count() > 0)
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
                                                     Active
                                                 </span>

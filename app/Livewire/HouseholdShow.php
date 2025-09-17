@@ -90,7 +90,7 @@ class HouseholdShow extends Component
         
         $this->householdId = $id;
         $this->household = Household::with([
-            'participants',
+            'participants.programEnrollments',
             'headOfHousehold',
             'currentAddress',
             'addresses' => function($query) {
