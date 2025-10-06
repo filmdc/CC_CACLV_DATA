@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('contracts')) {
+            return;
+        }
+
         Schema::table('contracts', function (Blueprint $table) {
             // Add new fields from reference system
             $table->date('date_of_award')->nullable()->after('cfda_number');
@@ -45,6 +49,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (!Schema::hasTable('contracts')) {
+            return;
+        }
+
         Schema::table('contracts', function (Blueprint $table) {
             $table->dropForeign(['funder_id']);
             $table->dropForeign(['created_by']);

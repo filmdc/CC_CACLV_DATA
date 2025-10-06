@@ -7,6 +7,7 @@ use App\Models\ReferenceData;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class ReferenceDataTransformationService
 {
@@ -25,13 +26,23 @@ class ReferenceDataTransformationService
      */
     protected function loadImportDefaultSet(): void
     {
-        $this->importDefaultSet = Cache::remember('import_default_reference_set', 3600, function () {
-            return ReferenceDataSet::getImportDefault();
-        });
+        try {
+            $this->importDefaultSet = Cache::remember('import_default_reference_set', 3600, function () {
+                return ReferenceDataSet::getImportDefault();
+            });
+        } catch (Throwable $exception) {
+            report($exception);
+            $this->importDefaultSet = null;
+        }
 
         if (!$this->importDefaultSet) {
-            Log::warning('No import default reference data set found. Using active set as fallback.');
-            $this->importDefaultSet = ReferenceDataSet::getActive();
+            try {
+                Log::warning('No import default reference data set found. Using active set as fallback.');
+                $this->importDefaultSet = ReferenceDataSet::getActive();
+            } catch (Throwable $exception) {
+                report($exception);
+                $this->importDefaultSet = null;
+            }
         }
     }
 
@@ -49,12 +60,17 @@ class ReferenceDataTransformationService
 
         $cacheKey = "reference_data_cache_{$referenceSet->id}";
         
-        $this->referenceDataCache = Cache::remember($cacheKey, 3600, function () use ($referenceSet) {
-            return $referenceSet->referenceData()
-                ->where('active', true)
-                ->get()
-                ->groupBy('category');
-        });
+        try {
+            $this->referenceDataCache = Cache::remember($cacheKey, 3600, function () use ($referenceSet) {
+                return $referenceSet->referenceData()
+                    ->where('active', true)
+                    ->get()
+                    ->groupBy('category');
+            });
+        } catch (Throwable $exception) {
+            report($exception);
+            $this->referenceDataCache = collect();
+        }
     }
 
     /**

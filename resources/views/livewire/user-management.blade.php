@@ -14,11 +14,21 @@
                         <input type="text" wire:model.live="search" placeholder="Search users..." 
                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
                     </div>
-                    @if($this->can('users.edit') && count($selectedUsers) > 0)
-                        <button wire:click="showBulkAssign" 
-                                class="ml-4 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition">
-                            Bulk Assign ({{ count($selectedUsers) }} selected)
-                        </button>
+                    @if(count($selectedUsers) > 0)
+                        <div class="flex space-x-2 ml-4">
+                            @if($this->can('users.edit'))
+                                <button wire:click="showBulkAssign" 
+                                        class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition">
+                                    Bulk Assign ({{ count($selectedUsers) }} selected)
+                                </button>
+                            @endif
+                            @if($this->can('users.delete'))
+                                <button wire:click="showBulkDelete" 
+                                        class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition">
+                                    Bulk Delete ({{ count($selectedUsers) }} selected)
+                                </button>
+                            @endif
+                        </div>
                     @endif
                 </div>
             </div>
@@ -570,6 +580,83 @@
                         <button wire:click="processBulkAssignment" 
                                 class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition">
                             Apply Changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Bulk Delete Confirmation Modal -->
+    @if($showBulkDeleteModal)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-md w-full mx-4">
+                <!-- Modal Header -->
+                <div class="bg-red-600 text-white p-6 rounded-t-lg">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xl font-bold">Confirm Bulk Delete</h3>
+                        <button wire:click="resetBulkDelete" class="text-red-200 hover:text-white transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Modal Content -->
+                <div class="p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="flex-shrink-0">
+                            <svg class="h-12 w-12 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.996-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z"/>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                                Delete Selected Users
+                            </h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                    Are you sure you want to delete <strong>{{ count($selectedUsers) }} users</strong>? This action cannot be undone.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-md p-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
+                                    Warning
+                                </h3>
+                                <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+                                    <ul class="list-disc list-inside space-y-1">
+                                        <li>All user data will be permanently deleted</li>
+                                        <li>This action cannot be undone</li>
+                                        <li>User sessions will be terminated</li>
+                                        <li>Your own account is protected and cannot be deleted</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Modal Footer -->
+                <div class="bg-gray-50 dark:bg-zinc-700 px-6 py-4 rounded-b-lg">
+                    <div class="flex justify-end space-x-2">
+                        <button wire:click="resetBulkDelete" 
+                                class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 transition">
+                            Cancel
+                        </button>
+                        <button wire:click="processBulkDelete" 
+                                class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition">
+                            Delete {{ count($selectedUsers) }} Users
                         </button>
                     </div>
                 </div>

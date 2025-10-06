@@ -2,57 +2,94 @@
 
 namespace App\Livewire;
 
-use App\Models\User;
-use App\Models\Role;
 use App\Models\Program;
+use App\Models\Role;
+use App\Models\User;
 use App\Traits\WithPermissionChecks;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
+use Throwable;
 
 class UserManagement extends Component
 {
     use WithPagination, WithPermissionChecks;
 
+    /** @var string */
     public $search = '';
+
+    /** @var array<int> */
+    public $selectedUsers = [];
+
+    /**
+     * The user that is currently being viewed or edited.
+     */
     public $selectedUser = null;
+
     public $showEditForm = false;
     public $showPasswordForm = false;
     public $showViewModal = false;
     public $showBulkAssignModal = false;
-    
+    public $showBulkDeleteModal = false;
+
     // User form fields
     public $name = '';
     public $email = '';
     public $active = true;
+
+    /** @var array<int> */
     public $selectedRoles = [];
+
+    /** @var array<int> */
     public $selectedPrograms = [];
-    
+
     // Password form fields
     public $password = '';
     public $password_confirmation = '';
-    public $send_password_reset = false;
-    
-    // Bulk assignment fields
-    public $selectedUsers = [];
-    public $bulkRoles = [];
-    public $bulkPrograms = [];
-    public $bulkAction = 'add'; // add or replace
 
-    protected $rules = [
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|max:255',
-        'active' => 'boolean',
-        'selectedRoles' => 'array',
-    ];
-    
-    protected function getPasswordRules()
+    // Bulk assignment fields
+    /** @var array<int> */
+    public $bulkRoles = [];
+
+    /** @var array<int> */
+    public $bulkPrograms = [];
+
+    /** @var string */
+    public $bulkAction = self::BULK_ACTION_ADD; // add or replace
+
+    private const BULK_ACTION_ADD = 'add';
+    private const BULK_ACTION_REPLACE = 'replace';
+
+    protected string $paginationTheme = 'tailwind';
+
+    protected function rules(): array
+    {
+        $userId = $this->selectedUser->id ?? null;
+
+        return [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')->ignore($userId),
+            ],
+            'active' => ['boolean'],
+            'selectedRoles' => ['array'],
+            'selectedRoles.*' => ['integer', 'exists:roles,id'],
+            'selectedPrograms' => ['array'],
+            'selectedPrograms.*' => ['integer', 'exists:programs,id'],
+        ];
+    }
+
+    protected function passwordRules(): array
     {
         return [
-            'password' => 'required|string|min:8|confirmed',
-            'password_confirmation' => 'required|string|min:8',
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password_confirmation' => ['required', 'string', 'min:8'],
         ];
     }
 
@@ -65,7 +102,7 @@ class UserManagement extends Component
     {
         $this->authorizeAction('users.edit', 'You do not have permission to edit users.');
         
-        $this->selectedUser = User::findOrFail($userId);
+        $this->selectedUser = $this->findUserForManagement($userId)->loadMissing(['roles', 'programs']);
         $this->fillUserForm();
         $this->showEditForm = true;
     }
@@ -85,7 +122,7 @@ class UserManagement extends Component
     {
         $this->authorizeAction('users.edit', 'You do not have permission to edit users.');
         
-        $this->selectedUser = User::findOrFail($userId);
+        $this->selectedUser = $this->findUserForManagement($userId);
         $this->clearPasswordForm();
         $this->showPasswordForm = true;
     }
@@ -93,52 +130,55 @@ class UserManagement extends Component
     public function updateUser()
     {
         $this->authorizeAction('users.edit', 'You do not have permission to edit users.');
-        
+
+        if (!$this->selectedUser) {
+            $this->flashError('Please select a user to update.');
+            return;
+        }
+
+        $this->name = Str::of($this->name)->squish()->toString();
+        $this->email = Str::lower(trim($this->email));
+
         $this->validate();
 
         try {
             $this->selectedUser->update([
                 'name' => $this->name,
                 'email' => $this->email,
-                'active' => $this->active,
+                'active' => (bool) $this->active,
             ]);
 
-            // Update roles
-            $this->selectedUser->roles()->sync($this->selectedRoles);
-            
-            // Update programs
-            $this->selectedUser->programs()->sync($this->selectedPrograms);
+            $this->selectedUser->roles()->sync($this->sanitizeIds($this->selectedRoles));
+            $this->selectedUser->programs()->sync($this->sanitizeIds($this->selectedPrograms));
 
-            session()->flash('success', 'User updated successfully.');
+            $this->flashSuccess('User updated successfully.');
             $this->resetForm();
-            
-        } catch (\Exception $e) {
-            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+        } catch (Throwable $exception) {
+            $this->handleException($exception, 'Unable to update the user right now.');
         }
     }
     
     public function setUserPassword()
     {
         $this->authorizeAction('users.edit', 'You do not have permission to edit users.');
-        
-        $this->validate($this->getPasswordRules());
+
+        if (!$this->selectedUser) {
+            $this->flashError('No user selected.');
+            return;
+        }
+
+        $this->validate($this->passwordRules());
 
         try {
-            if (!$this->selectedUser) {
-                session()->flash('error', 'No user selected.');
-                return;
-            }
-
             $this->selectedUser->update([
                 'password' => Hash::make($this->password),
                 'email_verified_at' => now(), // Mark email as verified when admin sets password
             ]);
 
-            session()->flash('success', 'Password updated successfully for ' . $this->selectedUser->name);
+            $this->flashSuccess('Password updated successfully for ' . $this->selectedUser->name);
             $this->resetPasswordForm();
-            
-        } catch (\Exception $e) {
-            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+        } catch (Throwable $exception) {
+            $this->handleException($exception, 'Failed to update the password.');
         }
     }
     
@@ -147,19 +187,19 @@ class UserManagement extends Component
         $this->authorizeAction('users.edit', 'You do not have permission to edit users.');
         
         try {
-            $user = User::findOrFail($userId);
+            $user = $this->findUserForManagement($userId);
             
             // Send password reset notification
             $status = Password::sendResetLink(['email' => $user->email]);
             
             if ($status === Password::RESET_LINK_SENT) {
-                session()->flash('success', 'Password reset link sent to ' . $user->email);
+                $this->flashSuccess('Password reset link sent to ' . $user->email);
             } else {
-                session()->flash('error', 'Unable to send password reset link.');
+                $this->flashError('Unable to send password reset link.');
             }
             
-        } catch (\Exception $e) {
-            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+        } catch (Throwable $exception) {
+            $this->handleException($exception, 'Unable to send password reset link.');
         }
     }
     
@@ -168,21 +208,21 @@ class UserManagement extends Component
         $this->authorizeAction('users.edit', 'You do not have permission to edit users.');
         
         try {
-            $user = User::findOrFail($userId);
+            $user = $this->findUserForManagement($userId);
             
             // Prevent deactivating yourself
             if ($user->id === auth()->id()) {
-                session()->flash('error', 'You cannot deactivate your own account.');
+                $this->flashError('You cannot deactivate your own account.');
                 return;
             }
             
             $user->update(['active' => !$user->active]);
-            
-            $status = $user->active ? 'activated' : 'deactivated';
-            session()->flash('success', 'User ' . $status . ' successfully.');
-            
-        } catch (\Exception $e) {
-            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+
+            $status = $user->fresh()->active ? 'activated' : 'deactivated';
+            $this->flashSuccess('User ' . $status . ' successfully.');
+
+        } catch (Throwable $exception) {
+            $this->handleException($exception, 'Unable to toggle user status.');
         }
     }
 
@@ -197,14 +237,17 @@ class UserManagement extends Component
         $this->showViewModal = false;
         $this->selectedUser = null;
         $this->resetPasswordForm();
+        $this->resetValidation();
     }
     
     public function showBulkAssign()
     {
         $this->authorizeAction('users.edit', 'You do not have permission to edit users.');
         
+        $this->selectedUsers = $this->sanitizeIds($this->selectedUsers);
+
         if (empty($this->selectedUsers)) {
-            session()->flash('error', 'Please select at least one user.');
+            $this->flashError('Please select at least one user.');
             return;
         }
         
@@ -217,39 +260,58 @@ class UserManagement extends Component
     public function processBulkAssignment()
     {
         $this->authorizeAction('users.edit', 'You do not have permission to edit users.');
-        
+
+        $targetUserIds = $this->sanitizeIds($this->selectedUsers);
+        $roleIds = $this->sanitizeIds($this->bulkRoles);
+        $programIds = $this->sanitizeIds($this->bulkPrograms);
+
+        if (empty($targetUserIds)) {
+            $this->flashError('Please select at least one user.');
+            return;
+        }
+
+        if ($this->bulkAction !== self::BULK_ACTION_ADD && $this->bulkAction !== self::BULK_ACTION_REPLACE) {
+            $this->flashError('Invalid bulk action selected.');
+            return;
+        }
+
+        if (empty($roleIds) && empty($programIds)) {
+            $this->flashError('Choose at least one role or program to assign.');
+            return;
+        }
+
         try {
-            $users = User::whereIn('id', $this->selectedUsers)->get();
-            
-            foreach ($users as $user) {
-                if ($this->bulkAction === 'replace') {
-                    // Replace existing roles and programs
-                    if (!empty($this->bulkRoles)) {
-                        $user->roles()->sync($this->bulkRoles);
+            User::whereIn('id', $targetUserIds)
+                ->with(['roles:id', 'programs:id'])
+                ->get()
+                ->each(function (User $user) use ($roleIds, $programIds) {
+                    if ($this->bulkAction === self::BULK_ACTION_REPLACE) {
+                        // Replace existing roles and programs; sync only when payload present
+                        if ($roleIds) {
+                            $user->roles()->sync($roleIds);
+                        }
+                        if ($programIds) {
+                            $user->programs()->sync($programIds);
+                        }
+                        return;
                     }
-                    if (!empty($this->bulkPrograms)) {
-                        $user->programs()->sync($this->bulkPrograms);
+
+                    // Merge new assignments with current ones
+                    if ($roleIds) {
+                        $currentRoles = $user->roles->pluck('id')->all();
+                        $user->roles()->sync(array_values(array_unique(array_merge($currentRoles, $roleIds))));
                     }
-                } else {
-                    // Add to existing roles and programs
-                    if (!empty($this->bulkRoles)) {
-                        $currentRoles = $user->roles->pluck('id')->toArray();
-                        $newRoles = array_unique(array_merge($currentRoles, $this->bulkRoles));
-                        $user->roles()->sync($newRoles);
+
+                    if ($programIds) {
+                        $currentPrograms = $user->programs->pluck('id')->all();
+                        $user->programs()->sync(array_values(array_unique(array_merge($currentPrograms, $programIds))));
                     }
-                    if (!empty($this->bulkPrograms)) {
-                        $currentPrograms = $user->programs->pluck('id')->toArray();
-                        $newPrograms = array_unique(array_merge($currentPrograms, $this->bulkPrograms));
-                        $user->programs()->sync($newPrograms);
-                    }
-                }
-            }
-            
-            session()->flash('success', 'Bulk assignment completed for ' . count($users) . ' users.');
+                });
+
+            $this->flashSuccess('Bulk assignment completed for ' . count($targetUserIds) . ' users.');
             $this->resetBulkAssignment();
-            
-        } catch (\Exception $e) {
-            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+        } catch (Throwable $exception) {
+            $this->handleException($exception, 'Failed to apply the bulk assignment.');
         }
     }
     
@@ -262,8 +324,69 @@ class UserManagement extends Component
         $this->showBulkAssignModal = false;
     }
     
+    public function showBulkDelete()
+    {
+        $this->authorizeAction('users.delete', 'You do not have permission to delete users.');
+
+        $this->selectedUsers = $this->sanitizeIds($this->selectedUsers);
+
+        if (empty($this->selectedUsers)) {
+            $this->flashError('Please select at least one user.');
+            return;
+        }
+        
+        // Check if current user is selected
+        if (in_array(auth()->id(), $this->selectedUsers, true)) {
+            $this->flashError('You cannot delete your own account.');
+            return;
+        }
+        
+        $this->showBulkDeleteModal = true;
+    }
+    
+    public function processBulkDelete()
+    {
+        $this->authorizeAction('users.delete', 'You do not have permission to delete users.');
+        
+        $targetUserIds = $this->sanitizeIds($this->selectedUsers);
+
+        try {
+            $currentUserId = auth()->id();
+
+            $usersToDelete = User::whereIn('id', $targetUserIds)
+                ->where('id', '!=', $currentUserId)
+                ->get();
+
+            if ($usersToDelete->isEmpty()) {
+                $this->flashError('No valid users selected for deletion.');
+                $this->resetBulkDelete();
+                return;
+            }
+
+            $usersToDelete->each(static function (User $user) {
+                $user->delete();
+            });
+
+            $this->flashSuccess('Successfully deleted ' . $usersToDelete->count() . ' users.');
+            $this->resetBulkDelete();
+
+        } catch (Throwable $exception) {
+            $this->handleException($exception, 'An error occurred while deleting users.');
+        }
+    }
+    
+    public function resetBulkDelete()
+    {
+        $this->selectedUsers = [];
+        $this->showBulkDeleteModal = false;
+    }
+    
     public function viewUser($userId)
     {
+        $this->authorizeAction('users.view', 'You do not have permission to view users.');
+
+        $userId = $this->resolveUserId($userId);
+
         $this->selectedUser = User::with(['roles', 'programs'])->findOrFail($userId);
         $this->showViewModal = true;
     }
@@ -278,7 +401,6 @@ class UserManagement extends Component
     {
         $this->password = '';
         $this->password_confirmation = '';
-        $this->send_password_reset = false;
     }
     
     public function resetPasswordForm()
@@ -292,27 +414,31 @@ class UserManagement extends Component
         $this->authorizeAction('users.delete', 'You do not have permission to delete users.');
         
         try {
-            $user = User::findOrFail($userId);
+            $user = $this->findUserForManagement($userId);
             
             // Prevent deleting yourself
             if ($user->id === auth()->id()) {
-                session()->flash('error', 'You cannot delete your own account.');
+                $this->flashError('You cannot delete your own account.');
                 return;
             }
             
             $user->delete();
-            session()->flash('success', 'User deleted successfully.');
-        } catch (\Exception $e) {
-            session()->flash('error', 'Cannot delete user: ' . $e->getMessage());
+            $this->flashSuccess('User deleted successfully.');
+        } catch (Throwable $exception) {
+            $this->handleException($exception, 'Unable to delete the user.');
         }
     }
 
     public function render()
     {
+        $search = trim($this->search);
+
         $users = User::with(['roles', 'programs'])
-            ->when($this->search, function ($query) {
-                $query->where('name', 'like', '%' . $this->search . '%')
-                      ->orWhere('email', 'like', '%' . $this->search . '%');
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
             })
             ->orderBy('name')
             ->paginate(10);
@@ -325,5 +451,66 @@ class UserManagement extends Component
             'roles' => $roles,
             'programs' => $programs,
         ])->layout('components.layouts.app');
+    }
+
+    /**
+     * Normalize a list of ids to positive integers.
+     *
+     * @param  array<int, mixed>  $ids
+     * @return array<int>
+     */
+    private function sanitizeIds(array $ids): array
+    {
+        return array_values(array_unique(array_filter(array_map(static function ($value) {
+            if (is_numeric($value) && (int) $value > 0) {
+                return (int) $value;
+            }
+
+            return null;
+        }, $ids), static fn ($value) => !is_null($value))));
+    }
+
+    private function flashSuccess(string $message): void
+    {
+        session()->flash('success', $message);
+    }
+
+    private function flashError(string $message): void
+    {
+        session()->flash('error', $message);
+    }
+
+    private function handleException(Throwable $exception, string $message): void
+    {
+        report($exception);
+        $this->flashError($message);
+    }
+
+    private function findUserForManagement($userId): User
+    {
+        return User::findOrFail($this->resolveUserId($userId));
+    }
+
+    public function updatedSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedSelectedUsers($value): void
+    {
+        if (is_array($value)) {
+            $this->selectedUsers = $this->sanitizeIds($value);
+        }
+    }
+
+    private function resolveUserId($userId): int
+    {
+        $id = is_numeric($userId) ? (int) $userId : 0;
+
+        if ($id <= 0) {
+            abort(404);
+        }
+
+        return $id;
     }
 }
