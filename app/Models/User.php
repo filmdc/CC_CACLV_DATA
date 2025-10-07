@@ -174,4 +174,108 @@ class User extends Authenticatable
     {
         return $query->where('active', false);
     }
+
+    /**
+     * Check if user has access to a specific program.
+     */
+    public function hasAccessToProgram($programId): bool
+    {
+        // Admins have access to all programs
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        // Check if user is assigned to this program
+        return $this->programs()->where('program_id', $programId)->exists();
+    }
+
+    /**
+     * Get all program IDs the user has access to.
+     */
+    public function getAccessibleProgramIds(): array
+    {
+        // Admins have access to all programs
+        if ($this->isAdmin()) {
+            return Program::pluck('id')->toArray();
+        }
+
+        return $this->programs()->pluck('program_id')->toArray();
+    }
+
+    /**
+     * Check if user can access participant sensitive data.
+     * User must be enrolled in at least one program that the participant is enrolled in.
+     */
+    public function canAccessParticipantData($participantId): bool
+    {
+        // Admins can access all participant data
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        $userProgramIds = $this->getAccessibleProgramIds();
+
+        // If user has no program assignments, they cannot access sensitive data
+        if (empty($userProgramIds)) {
+            return false;
+        }
+
+        // Check if participant is enrolled in any of user's programs
+        return ProgramEnrollment::where('participant_id', $participantId)
+            ->whereIn('program_id', $userProgramIds)
+            ->exists();
+    }
+
+    /**
+     * Check if user can access a specific enrollment.
+     */
+    public function canAccessEnrollment($enrollmentId, $enrollmentType = 'program'): bool
+    {
+        // Admins can access all enrollments
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        $userProgramIds = $this->getAccessibleProgramIds();
+
+        if (empty($userProgramIds)) {
+            return false;
+        }
+
+        if ($enrollmentType === 'program') {
+            return ProgramEnrollment::where('id', $enrollmentId)
+                ->whereIn('program_id', $userProgramIds)
+                ->exists();
+        } else {
+            // For service enrollments, check the related program
+            return ServiceEnrollment::where('id', $enrollmentId)
+                ->whereHas('service', function ($query) use ($userProgramIds) {
+                    $query->whereIn('program_id', $userProgramIds);
+                })
+                ->exists();
+        }
+    }
+
+    /**
+     * Check if user can access household sensitive data.
+     * User can access if any household member is enrolled in user's programs.
+     */
+    public function canAccessHouseholdData($householdId): bool
+    {
+        // Admins can access all household data
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        $userProgramIds = $this->getAccessibleProgramIds();
+
+        if (empty($userProgramIds)) {
+            return false;
+        }
+
+        // Check if any household member is enrolled in user's programs
+        return ProgramEnrollment::whereHas('participant', function ($query) use ($householdId) {
+            $query->where('household_id', $householdId);
+        })->whereIn('program_id', $userProgramIds)->exists();
+    }
 }

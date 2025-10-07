@@ -143,4 +143,56 @@ class Household extends Model
             'reason_for_change' => $reason
         ]));
     }
+
+    /**
+     * Scope to filter households by user's program access.
+     * User can access household if any member is enrolled in their programs.
+     */
+    public function scopeForUserPrograms($query, $user)
+    {
+        // Admins see all households
+        if ($user->isAdmin()) {
+            return $query;
+        }
+
+        $userProgramIds = $user->getAccessibleProgramIds();
+
+        if (empty($userProgramIds)) {
+            return $query->whereRaw('1 = 0'); // Returns no results
+        }
+
+        // Return households where any participant is enrolled in user's programs
+        return $query->whereHas('participants.programEnrollments', function ($q) use ($userProgramIds) {
+            $q->whereIn('program_id', $userProgramIds);
+        });
+    }
+
+    /**
+     * Define sensitive household fields.
+     */
+    public static function getSensitiveFields(): array
+    {
+        return [
+            'household_type',
+            'housing_status',
+            'monthly_income',
+            'annual_income',
+            'hhs_poverty_percentage',
+            'notes'
+        ];
+    }
+
+    /**
+     * Define public household fields.
+     */
+    public static function getPublicFields(): array
+    {
+        return [
+            'id',
+            'household_code',
+            'household_size',
+            'created_at',
+            'updated_at'
+        ];
+    }
 }

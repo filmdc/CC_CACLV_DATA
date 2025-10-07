@@ -9,12 +9,20 @@
                 </div>
                 <div class="flex space-x-3">
                     @if ($this->can('households.edit'))
-                        <button wire:click="editHousehold" 
-                                class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                            Edit Household
-                        </button>
+                        @if($canViewSensitiveData)
+                            <button wire:click="editHousehold"
+                                    class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                                Edit Household
+                            </button>
+                        @else
+                            <button disabled
+                                    class="bg-white/10 text-white/50 px-4 py-2 rounded-lg font-medium cursor-not-allowed"
+                                    title="You need program access to edit this household">
+                                Edit Household
+                            </button>
+                        @endif
                     @endif
-                    <a href="{{ route('household.management') }}" 
+                    <a href="{{ route('household.management') }}"
                        class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-medium transition-colors">
                         Back to List
                     </a>
@@ -23,6 +31,37 @@
         </div>
 
         <div class="p-6">
+            <!-- Access Level Indicator -->
+            @if(!$canViewSensitiveData)
+            <div class="mb-6 bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 p-4 rounded-r-lg">
+                <div class="flex items-start">
+                    <svg class="h-5 w-5 text-yellow-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">Limited Access View</h3>
+                        <p class="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
+                            You are viewing basic household information only. Income, housing status, and other details require program access to household members.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            @else
+            <div class="mb-6 bg-green-50 dark:bg-green-900/20 border-l-4 border-green-400 p-4 rounded-r-lg">
+                <div class="flex items-start">
+                    <svg class="h-5 w-5 text-green-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-green-800 dark:text-green-200">Full Access</h3>
+                        <p class="mt-1 text-sm text-green-700 dark:text-green-300">
+                            You have full access to this household's information.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            @endif
+
             <!-- Basic Information -->
             <div class="mb-8">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4 border-b border-gray-200 dark:border-zinc-700 pb-2">
@@ -33,11 +72,13 @@
                         <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Household Code</label>
                         <p class="text-gray-900 dark:text-white font-mono">{{ $household->household_code }}</p>
                     </div>
-                    
+
+                    @if($canViewSensitiveData)
                     <div>
                         <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Household Type</label>
                         <p class="text-gray-900 dark:text-white">{{ $household->household_type ? ucfirst($household->household_type) : 'Not specified' }}</p>
                     </div>
+                    @endif
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Primary Phone</label>

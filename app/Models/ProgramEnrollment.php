@@ -65,4 +65,23 @@ class ProgramEnrollment extends Model
     {
         return $query->where('participant_id', $participantId);
     }
+
+    /**
+     * Scope to filter program enrollments by user's program access.
+     */
+    public function scopeForUserPrograms($query, $user)
+    {
+        // Admins see all enrollments
+        if ($user->isAdmin()) {
+            return $query;
+        }
+
+        $userProgramIds = $user->getAccessibleProgramIds();
+
+        if (empty($userProgramIds)) {
+            return $query->whereRaw('1 = 0'); // Returns no results
+        }
+
+        return $query->whereIn('program_id', $userProgramIds);
+    }
 }

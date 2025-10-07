@@ -85,4 +85,26 @@ class ServiceEnrollment extends Model
     {
         return $query->where('program_enrollment_id', $programEnrollmentId);
     }
+
+    /**
+     * Scope to filter service enrollments by user's program access.
+     */
+    public function scopeForUserPrograms($query, $user)
+    {
+        // Admins see all service enrollments
+        if ($user->isAdmin()) {
+            return $query;
+        }
+
+        $userProgramIds = $user->getAccessibleProgramIds();
+
+        if (empty($userProgramIds)) {
+            return $query->whereRaw('1 = 0'); // Returns no results
+        }
+
+        // Service enrollments are accessible if the service belongs to user's programs
+        return $query->whereHas('service', function ($q) use ($userProgramIds) {
+            $q->whereIn('program_id', $userProgramIds);
+        });
+    }
 }

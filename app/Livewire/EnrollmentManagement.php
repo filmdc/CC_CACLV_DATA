@@ -8,13 +8,14 @@ use App\Models\Participant;
 use App\Models\Program;
 use App\Models\Service;
 use App\Traits\WithPermissionChecks;
+use App\Traits\WithProgramAccess;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
 
 class EnrollmentManagement extends Component
 {
-    use WithPagination, WithPermissionChecks;
+    use WithPagination, WithPermissionChecks, WithProgramAccess;
 
     public $search = '';
     public $statusFilter = '';
@@ -263,7 +264,14 @@ class EnrollmentManagement extends Component
     public function render()
     {
         if ($this->enrollmentType === 'program') {
-            $enrollments = ProgramEnrollment::with(['participant', 'program'])
+            // Start with base query and apply program access filter for non-admins
+            $query = ProgramEnrollment::with(['participant', 'program']);
+
+            if (!auth()->user()->isAdmin()) {
+                $query->forUserPrograms(auth()->user());
+            }
+
+            $enrollments = $query
                 ->when($this->search, function ($query) {
                     $query->whereHas('participant', function ($q) {
                         $q->where('first_name', 'like', '%' . $this->search . '%')
@@ -281,7 +289,14 @@ class EnrollmentManagement extends Component
                 ->orderBy('created_at', 'desc')
                 ->paginate(15);
         } else {
-            $enrollments = ServiceEnrollment::with(['participant', 'service', 'programEnrollment.program'])
+            // Start with base query and apply program access filter for non-admins
+            $query = ServiceEnrollment::with(['participant', 'service', 'programEnrollment.program']);
+
+            if (!auth()->user()->isAdmin()) {
+                $query->forUserPrograms(auth()->user());
+            }
+
+            $enrollments = $query
                 ->when($this->search, function ($query) {
                     $query->whereHas('participant', function ($q) {
                         $q->where('first_name', 'like', '%' . $this->search . '%')
@@ -302,9 +317,25 @@ class EnrollmentManagement extends Component
                 ->paginate(15);
         }
 
-        $participants = Participant::orderBy('first_name')->get();
-        $programs = Program::active()->regularPrograms()->orderBy('name')->get();
-        $services = Service::where('active', true)->with('program')->orderBy('name')->get();
+        // Filter participants to only accessible ones
+        $participants = $this->getAccessibleParticipants()->orderBy('first_name')->get();
+
+        // Filter programs to only accessible ones
+        $programs = $this->getAccessiblePrograms()
+            ->active()
+            ->regularPrograms()
+            ->orderBy('name')
+            ->get();
+
+        // Filter services to only those in accessible programs
+        $userProgramIds = auth()->user()->getAccessibleProgramIds();
+        $services = Service::where('active', true)
+            ->when(!auth()->user()->isAdmin(), function ($query) use ($userProgramIds) {
+                $query->whereIn('program_id', $userProgramIds);
+            })
+            ->with('program')
+            ->orderBy('name')
+            ->get();
 
         return view('livewire.enrollment-management', [
             'enrollments' => $enrollments,

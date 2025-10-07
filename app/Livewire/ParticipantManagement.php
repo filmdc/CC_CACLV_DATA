@@ -10,13 +10,14 @@ use App\Models\Service;
 use App\Models\ProgramEnrollment;
 use App\Models\ServiceEnrollment;
 use App\Traits\WithPermissionChecks;
+use App\Traits\WithProgramAccess;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
 
 class ParticipantManagement extends Component
 {
-    use WithPagination, WithPermissionChecks;
+    use WithPagination, WithPermissionChecks, WithProgramAccess;
 
     public function mount()
     {
@@ -72,6 +73,12 @@ class ParticipantManagement extends Component
     {
         $this->selectedParticipant = Participant::with('household')->find($participantId);
         if ($this->selectedParticipant) {
+            // Check if user has access to edit this participant
+            if (!auth()->user()->can('update', $this->selectedParticipant)) {
+                session()->flash('error', 'You do not have access to edit this participant. You must be assigned to one of their enrolled programs.');
+                return;
+            }
+
             $this->showEditForm = true;
             $this->showEnrollmentSection = false;
             $this->fillParticipantForm();
@@ -212,6 +219,12 @@ class ParticipantManagement extends Component
             'enrollment_date' => 'required|date',
         ]);
 
+        // Check if user has access to enroll in this program
+        if (!auth()->user()->hasAccessToProgram($this->program_id)) {
+            session()->flash('error', 'You do not have permission to enroll participants in this program.');
+            return;
+        }
+
         try {
             // Check for existing active enrollment
             $existingEnrollment = ProgramEnrollment::where('participant_id', $this->selectedParticipant->id)
@@ -234,7 +247,7 @@ class ParticipantManagement extends Component
 
             session()->flash('success', 'Program enrollment created successfully.');
             $this->resetEnrollmentForm();
-            
+
         } catch (\Exception $e) {
             session()->flash('error', 'An error occurred: ' . $e->getMessage());
         }
@@ -290,15 +303,21 @@ class ParticipantManagement extends Component
     public function deleteParticipant($participantId)
     {
         $this->authorizeAction('participants.delete', 'You do not have permission to delete participants.');
-        
+
         try {
             $participant = Participant::find($participantId);
             if ($participant) {
+                // Check if user has access to delete this participant
+                if (!auth()->user()->can('delete', $participant)) {
+                    session()->flash('error', 'You do not have access to delete this participant.');
+                    return;
+                }
+
                 if ($participant->is_head_of_household) {
                     session()->flash('error', 'Cannot delete head of household. Transfer headship first.');
                     return;
                 }
-                
+
                 $participant->delete();
                 session()->flash('success', 'Participant deleted successfully.');
             }
@@ -307,8 +326,27 @@ class ParticipantManagement extends Component
         }
     }
 
+    /**
+     * Check if current user can edit a specific participant.
+     */
+    public function canEditParticipant($participantId): bool
+    {
+        $participant = Participant::find($participantId);
+        return $participant && auth()->user()->can('update', $participant);
+    }
+
+    /**
+     * Check if current user can view sensitive data for a participant.
+     */
+    public function canViewParticipantSensitiveData($participantId): bool
+    {
+        return auth()->user()->canAccessParticipantData($participantId);
+    }
+
     public function render()
     {
+        // Build base query - ALL users can see all participants for contact purposes
+        // Sensitive data access is controlled at the field/view level
         $participants = Participant::with(['household', 'programEnrollments.program', 'serviceEnrollments.service'])
             ->when($this->search, function ($query) {
                 $query->where('first_name', 'like', '%' . $this->search . '%')
@@ -324,15 +362,22 @@ class ParticipantManagement extends Component
         // Use the selected participant's reference data set if editing, otherwise use active set
         $dataSetId = $this->selectedParticipant ? $this->selectedParticipant->reference_data_set_id : null;
 
-        // Get programs and services for enrollment
-        $programs = Program::where('active', true)->orderBy('name')->get();
+        // Get programs - restrict to user's accessible programs for non-admins
+        $programs = $this->getAccessiblePrograms()
+            ->where('active', true)
+            ->orderBy('name')
+            ->get();
+
         $services = collect();
-        
+
         if ($this->program_id) {
-            $services = Service::where('program_id', $this->program_id)
-                ->where('active', true)
-                ->orderBy('name')
-                ->get();
+            // Verify user has access to this program before showing services
+            if (auth()->user()->hasAccessToProgram($this->program_id)) {
+                $services = Service::where('program_id', $this->program_id)
+                    ->where('active', true)
+                    ->orderBy('name')
+                    ->get();
+            }
         }
 
         return view('livewire.participant-management', [

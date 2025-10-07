@@ -6,17 +6,19 @@ use App\Models\Household;
 use App\Models\Participant;
 use App\Models\ReferenceData;
 use App\Traits\WithPermissionChecks;
+use App\Traits\WithProgramAccess;
 use Livewire\Component;
 use Livewire\Attributes\Validate;
 use Carbon\Carbon;
 
 class HouseholdShow extends Component
 {
-    use WithPermissionChecks;
+    use WithPermissionChecks, WithProgramAccess;
 
     public $household;
     public $householdId;
     public $backUrl;
+    public $canViewSensitiveData = false;
     
     // Edit modals
     public $showEditHouseholdModal = false;
@@ -87,7 +89,7 @@ class HouseholdShow extends Component
     {
         // Check if user has permission to view households
         $this->authorizeAction('households.view', 'You do not have permission to view households.');
-        
+
         $this->householdId = $id;
         $this->household = Household::with([
             'participants.programEnrollments',
@@ -97,7 +99,10 @@ class HouseholdShow extends Component
                 $query->orderBy('effective_date', 'desc')->limit(5);
             }
         ])->findOrFail($id);
-        
+
+        // Check if user can view sensitive household data
+        $this->canViewSensitiveData = auth()->user()->canAccessHouseholdData($id);
+
         // Get the referrer URL from session, or default to household management
         $this->backUrl = session('household_referrer', route('household.management'));
     }
@@ -106,6 +111,12 @@ class HouseholdShow extends Component
     public function editHousehold()
     {
         $this->authorizeAction('households.edit', 'You do not have permission to edit households.');
+
+        // Check if user has access to edit this household
+        if (!$this->canViewSensitiveData) {
+            session()->flash('error', 'You do not have access to edit this household. You must be assigned to one of the household members\' programs.');
+            return;
+        }
         
         // Populate edit fields with current household data
         $this->editHouseholdType = $this->household->household_type;

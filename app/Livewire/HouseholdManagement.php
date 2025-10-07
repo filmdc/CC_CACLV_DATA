@@ -5,13 +5,14 @@ namespace App\Livewire;
 use App\Models\Household;
 use App\Models\ReferenceData;
 use App\Traits\WithPermissionChecks;
+use App\Traits\WithProgramAccess;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Validate;
 
 class HouseholdManagement extends Component
 {
-    use WithPagination, WithPermissionChecks;
+    use WithPagination, WithPermissionChecks, WithProgramAccess;
 
     public $search = '';
     
@@ -117,6 +118,8 @@ class HouseholdManagement extends Component
 
     public function render()
     {
+        // Build base query - ALL users can see all households for contact purposes
+        // Sensitive data access is controlled at the field/view level
         $households = Household::with([
                 'headOfHousehold',
                 'participants.programEnrollments.program',

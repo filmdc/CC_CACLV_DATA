@@ -4,6 +4,14 @@
         <div class="bg-green-600 text-white p-6">
             <h1 class="text-2xl font-bold">Household Management</h1>
             <p class="text-green-100 mt-2">Manage household composition and family relationships</p>
+            @if(!auth()->user()->isAdmin())
+                <div class="mt-3 text-sm text-green-100 flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                    </svg>
+                    All households visible - full details available when members are in your assigned programs
+                </div>
+            @endif
         </div>
 
         <!-- Search and Filters -->

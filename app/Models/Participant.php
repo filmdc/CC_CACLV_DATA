@@ -244,12 +244,90 @@ class Participant extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
         static::saving(function ($participant) {
             // Auto-update computed fields when relevant data changes
             $participant->csbg_age_group = $participant->csbg_age_group;
             $participant->is_disconnected_youth = $participant->is_disconnected_youth;
             $participant->csbg_income_classification = $participant->csbg_income_classification;
         });
+    }
+
+    /**
+     * Scope to filter participants by user's program access.
+     */
+    public function scopeForUserPrograms($query, $user)
+    {
+        // Admins see all participants
+        if ($user->isAdmin()) {
+            return $query;
+        }
+
+        $userProgramIds = $user->getAccessibleProgramIds();
+
+        if (empty($userProgramIds)) {
+            return $query->whereRaw('1 = 0'); // Returns no results
+        }
+
+        // Return participants enrolled in user's programs
+        return $query->whereHas('programEnrollments', function ($q) use ($userProgramIds) {
+            $q->whereIn('program_id', $userProgramIds);
+        });
+    }
+
+    /**
+     * Define sensitive fields that require program access to view.
+     */
+    public static function getSensitiveFields(): array
+    {
+        return [
+            'education_level',
+            'currently_enrolled_in_education',
+            'education_enrollment_type',
+            'disability_status',
+            'disability_types',
+            'assistance_needs',
+            'has_chronic_health_conditions',
+            'health_insurance_sources',
+            'health_insurance_status',
+            'ethnicity',
+            'race',
+            'military_status',
+            'work_status',
+            'hours_worked_per_week',
+            'is_seeking_employment',
+            'is_underemployed',
+            'income_sources',
+            'employment_income',
+            'other_income_sources',
+            'non_cash_benefits',
+            'is_disconnected_youth',
+            'csbg_age_group',
+            'csbg_income_classification',
+            'documentation_notes',
+            'notes'
+        ];
+    }
+
+    /**
+     * Define public fields that are always visible.
+     */
+    public static function getPublicFields(): array
+    {
+        return [
+            'id',
+            'household_id',
+            'is_head_of_household',
+            'relationship_to_head',
+            'first_name',
+            'middle_name',
+            'last_name',
+            'suffix',
+            'date_of_birth',
+            'telephone',
+            'email',
+            'created_at',
+            'updated_at'
+        ];
     }
 }
