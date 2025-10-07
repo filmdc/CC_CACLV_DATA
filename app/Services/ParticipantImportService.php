@@ -689,20 +689,34 @@ class ParticipantImportService
             
             // Remove participant_type as it's not a database field
             unset($participant['participant_type']);
-            
+
+            $dateOfBirth = $participant['date_of_birth'];
+            $dateOfBirthString = null;
+            if ($dateOfBirth instanceof \Carbon\CarbonInterface) {
+                $dateOfBirthString = $dateOfBirth->format('Y-m-d');
+            } elseif (!empty($dateOfBirth)) {
+                $dateOfBirthString = Carbon::parse($dateOfBirth)->format('Y-m-d');
+            }
+
+            $participant['date_of_birth'] = $dateOfBirthString;
+
             if ($updateExisting) {
-                $existingParticipant = Participant::where('household_id', $household->id)
-                    ->where('first_name', $participant['first_name'])
-                    ->where('last_name', $participant['last_name'])
-                    ->where('date_of_birth', $participant['date_of_birth'])
-                    ->first();
-                
-                if ($existingParticipant) {
-                    $existingParticipant->update($participant);
-                    $counts['updated']++;
-                } else {
-                    Participant::create($participant);
+                $lookup = [
+                    'household_id' => $household->id,
+                    'first_name' => $participant['first_name'],
+                    'last_name' => $participant['last_name'],
+                ];
+
+                if ($dateOfBirthString !== null) {
+                    $lookup['date_of_birth'] = $dateOfBirthString;
+                }
+
+                $savedParticipant = Participant::updateOrCreate($lookup, $participant);
+
+                if ($savedParticipant->wasRecentlyCreated) {
                     $counts['created']++;
+                } else {
+                    $counts['updated']++;
                 }
             } else {
                 Participant::create($participant);

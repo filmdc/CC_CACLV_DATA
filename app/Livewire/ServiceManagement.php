@@ -13,7 +13,7 @@ class ServiceManagement extends Component
     use WithPagination, WithPermissionChecks;
 
     public $search = '';
-    public $selectedService = null;
+    public $selectedServiceId = null;
     public $showCreateForm = false;
     public $showEditForm = false;
     public $showViewModal = false;
@@ -49,7 +49,7 @@ class ServiceManagement extends Component
         $this->showCreateForm = true;
         $this->showEditForm = false;
         $this->showViewModal = false;
-        $this->selectedService = null;
+        $this->selectedServiceId = null;
         $this->resetServiceForm();
         
         // Set default program if filtering by program
@@ -60,12 +60,13 @@ class ServiceManagement extends Component
 
     public function showEditService($serviceId)
     {
-        $this->selectedService = Service::find($serviceId);
-        if ($this->selectedService) {
+        $service = Service::find($serviceId);
+        if ($service) {
+            $this->selectedServiceId = $serviceId;
             $this->showEditForm = true;
             $this->showCreateForm = false;
             $this->showViewModal = false;
-            $this->fillServiceForm();
+            $this->fillServiceForm($service);
         }
     }
 
@@ -86,19 +87,27 @@ class ServiceManagement extends Component
         $this->notes = '';
         $this->showViewModal = false;
         $this->selectedViewService = null;
+        $this->selectedServiceId = null;
     }
 
-    public function fillServiceForm()
+    public function fillServiceForm(Service $service = null)
     {
-        if ($this->selectedService) {
-            $this->name = $this->selectedService->name;
-            $this->description = $this->selectedService->description;
-            $this->program_id = $this->selectedService->program_id;
-            $this->start_date = $this->selectedService->start_date ? $this->selectedService->start_date->format('Y-m-d') : '';
-            $this->end_date = $this->selectedService->end_date ? $this->selectedService->end_date->format('Y-m-d') : '';
-            $this->active = $this->selectedService->active;
-            $this->notes = $this->selectedService->notes;
+        $service = $service ?? ($this->selectedServiceId ? Service::find($this->selectedServiceId) : null);
+
+        if ($service) {
+            $this->name = $service->name;
+            $this->description = $service->description;
+            $this->program_id = $service->program_id;
+            $this->start_date = $service->start_date ? $service->start_date->format('Y-m-d') : '';
+            $this->end_date = $service->end_date ? $service->end_date->format('Y-m-d') : '';
+            $this->active = $service->active;
+            $this->notes = $service->notes;
         }
+    }
+
+    public function getSelectedServiceProperty(): ?Service
+    {
+        return $this->selectedServiceId ? Service::find($this->selectedServiceId) : null;
     }
 
     public function createService()
@@ -144,7 +153,14 @@ class ServiceManagement extends Component
         ]);
 
         try {
-            $this->selectedService->update([
+            $service = $this->selectedServiceId ? Service::find($this->selectedServiceId) : null;
+
+            if (!$service) {
+                session()->flash('error', 'Selected service is no longer available.');
+                return;
+            }
+
+            $service->update([
                 'name' => $this->name,
                 'description' => $this->description,
                 'program_id' => $this->program_id,
@@ -156,7 +172,7 @@ class ServiceManagement extends Component
 
             session()->flash('success', 'Service updated successfully.');
             $this->showEditForm = false;
-            $this->selectedService = null;
+            $this->selectedServiceId = null;
             $this->resetServiceForm();
             
         } catch (\Exception $e) {
@@ -212,6 +228,7 @@ class ServiceManagement extends Component
             'services' => $services,
             'programs' => $programs,
             'filteredProgram' => $filteredProgram,
+            'selectedService' => $this->selectedService,
         ])->layout('components.layouts.app');
     }
 }
