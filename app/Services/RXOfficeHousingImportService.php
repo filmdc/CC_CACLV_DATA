@@ -1279,4 +1279,273 @@ class RXOfficeHousingImportService
     {
         return trim($value) ? Str::title(trim($value)) : $value;
     }
+
+    /**
+     * Generate a CSV template file for RX Office Housing imports
+     *
+     * @param string $format Either 'detailed_case' or 'borrower_class' (default: detailed_case)
+     * @return string CSV content with headers, field descriptions, and example data
+     */
+    public function generateTemplate(string $format = 'detailed_case'): string
+    {
+        $csv = \League\Csv\Writer::createFromString();
+
+        // Add UTF-8 BOM for Excel compatibility
+        $csv->setOutputBOM(\League\Csv\Bom::Utf8);
+
+        if ($format === 'borrower_class') {
+            return $this->generateBorrowerClassTemplate($csv);
+        }
+
+        return $this->generateDetailedCaseTemplate($csv);
+    }
+
+    /**
+     * Generate template for Detailed Case Information format
+     */
+    protected function generateDetailedCaseTemplate(\League\Csv\Writer $csv): string
+    {
+        $fieldMappings = $this->getFieldMappings();
+        $headers = array_keys($fieldMappings);
+
+        // Insert header row
+        $csv->insertOne($headers);
+
+        // Insert field description row
+        $descriptions = [
+            'Case ID' => 'TEXT - Unique case identifier (required, becomes household code)',
+            'Case Type' => 'TEXT - Type of housing counseling service',
+            'Case Open Date' => 'DATE - Format: MM/DD/YYYY (enrollment date)',
+            'Borrower First Name' => 'TEXT - First name (required)',
+            'Borrower Last Name' => 'TEXT - Last name (required)',
+            'Borrower Birthdate' => 'DATE - Format: MM/DD/YYYY',
+            'Borrower Family Size' => 'NUMBER - Number of household members',
+            'Borrower Gender' => 'TEXT - Options: Male, Female, Other',
+            'Borrower Race' => 'TEXT - Race (e.g., White, Black or African American)',
+            'Borrower Ethnicity' => 'TEXT - Ethnicity (Hispanic, Latino or Spanish Origins / Not Hispanic)',
+            'Borrower Dependents' => 'NUMBER - Number of dependents',
+            'Military Status' => 'TEXT - Options: Veteran, Active Military, Never Served',
+            'Borrower Household Type' => 'TEXT - Type (e.g., Single, Two Parent Household)',
+            'Borrower Monthly Income Gross' => 'NUMBER - Monthly income in dollars',
+            'Owner Occupied' => 'TEXT - Options: Yes, No (housing status)',
+            'Disabled' => 'TEXT - Options: Yes, No',
+            'AMI' => 'TEXT - Area Median Income level',
+            'Assigned Agent' => 'TEXT - Staff member name',
+            'Age' => 'NUMBER - Age in years (calculated from birthdate)',
+            'Counseling Type' => 'TEXT - Type of counseling provided',
+            'Borrower Total Gross Income' => 'NUMBER - Annual income in dollars',
+            'Household Income Gross' => 'NUMBER - Total household income',
+            'Counseling Outcome' => 'TEXT - Outcome of counseling session',
+            'Employment Status' => 'TEXT - Current employment status',
+            'Occupation' => 'TEXT - Job title or occupation',
+        ];
+
+        $descriptionRow = [];
+        foreach ($headers as $header) {
+            $descriptionRow[] = $descriptions[$header] ?? '';
+        }
+        $csv->insertOne($descriptionRow);
+
+        // Insert example data rows
+        $exampleRows = [
+            [
+                'Case ID' => 'RXO-2024-001',
+                'Case Type' => 'Foreclosure Prevention',
+                'Case Open Date' => '01/15/2024',
+                'Borrower First Name' => 'John',
+                'Borrower Last Name' => 'Smith',
+                'Borrower Birthdate' => '06/15/1985',
+                'Borrower Family Size' => '4',
+                'Borrower Gender' => 'Male',
+                'Borrower Race' => 'White',
+                'Borrower Ethnicity' => 'Not Hispanic, Latino or Spanish Origins',
+                'Borrower Dependents' => '2',
+                'Military Status' => 'Veteran',
+                'Borrower Household Type' => 'Two Parent Household',
+                'Borrower Monthly Income Gross' => '3500',
+                'Owner Occupied' => 'Yes',
+                'Disabled' => 'No',
+                'AMI' => '80%',
+                'Assigned Agent' => 'Jane Counselor',
+                'Age' => '39',
+                'Counseling Type' => 'Pre-Purchase',
+                'Borrower Total Gross Income' => '42000',
+                'Household Income Gross' => '48000',
+                'Counseling Outcome' => 'Successfully Completed',
+                'Employment Status' => 'Employed Full-Time',
+                'Occupation' => 'Construction Worker',
+            ],
+            [
+                'Case ID' => 'RXO-2024-002',
+                'Case Type' => 'Rental Housing',
+                'Case Open Date' => '02/01/2024',
+                'Borrower First Name' => 'Mary',
+                'Borrower Last Name' => 'Johnson',
+                'Borrower Birthdate' => '03/22/1990',
+                'Borrower Family Size' => '2',
+                'Borrower Gender' => 'Female',
+                'Borrower Race' => 'Black or African American',
+                'Borrower Ethnicity' => 'Hispanic, Latino or Spanish Origins',
+                'Borrower Dependents' => '1',
+                'Military Status' => 'Never Served in the Military',
+                'Borrower Household Type' => 'Single Parent Household',
+                'Borrower Monthly Income Gross' => '2100',
+                'Owner Occupied' => 'No',
+                'Disabled' => 'Yes',
+                'AMI' => '50%',
+                'Assigned Agent' => 'Robert Helper',
+                'Age' => '34',
+                'Counseling Type' => 'Post-Purchase',
+                'Borrower Total Gross Income' => '25200',
+                'Household Income Gross' => '25200',
+                'Counseling Outcome' => 'In Progress',
+                'Employment Status' => 'Employed Part-Time',
+                'Occupation' => 'Retail Clerk',
+            ],
+        ];
+
+        foreach ($exampleRows as $row) {
+            $csv->insertOne($row);
+        }
+
+        return $csv->toString();
+    }
+
+    /**
+     * Generate template for Borrower Class Registration format
+     */
+    protected function generateBorrowerClassTemplate(\League\Csv\Writer $csv): string
+    {
+        $fieldMappings = $this->getBorrowerClassFieldMappings();
+        $headers = array_keys($fieldMappings);
+
+        // Insert header row
+        $csv->insertOne($headers);
+
+        // Insert field description row
+        $descriptions = [
+            'Class Name' => 'TEXT - Name of the educational class',
+            'Class ID' => 'TEXT - Unique class identifier',
+            'Class Status' => 'TEXT - Status (e.g., Completed, Scheduled, Canceled)',
+            'Class Date' => 'DATE - Format: MM/DD/YYYY',
+            'Class Hours' => 'NUMBER - Duration in hours',
+            'Instructor' => 'TEXT - Instructor name',
+            'Class Max Capacity' => 'NUMBER - Maximum number of participants',
+            'Number of Users Registered' => 'NUMBER - Actual number registered',
+            'Class Close Date' => 'DATE - Format: MM/DD/YYYY',
+            'HUD Category' => 'TEXT - HUD reporting category',
+            'Attendance' => 'TEXT - Options: Attended, No Show, Canceled',
+            'Location' => 'TEXT - Class location/venue',
+            'Client Name' => 'TEXT - Format: "First Last" or "Last, First"',
+            'Intake Client ID' => 'TEXT - Unique client identifier',
+            'Client Address' => 'TEXT - Full address',
+            'Client Phone Number' => 'TEXT - Phone number',
+            'Client Email' => 'EMAIL - Email address',
+            'Race' => 'TEXT - Race (e.g., White, Asian)',
+            'Ethnicity' => 'TEXT - Ethnicity',
+            'Income Level' => 'TEXT - Income bracket or AMI percentage',
+            'Rural Area Status' => 'TEXT - Options: Rural, Urban',
+            'Family Size' => 'NUMBER - Number of household members',
+            'Household Type' => 'TEXT - Type (e.g., Single, Couple with Children)',
+            'Language' => 'TEXT - Primary language',
+            'Gender' => 'TEXT - Options: Male, Female, Other',
+            'Client Registration Date' => 'DATE - Format: MM/DD/YYYY',
+            'Disabled' => 'TEXT - Options: Yes, No',
+            'Birth Date' => 'DATE - Format: MM/DD/YYYY',
+            'Dependents' => 'NUMBER - Number of dependents',
+            'Monthly Income' => 'NUMBER - Monthly income in dollars',
+            'Veteran' => 'TEXT - Options: Yes, No',
+            'Age' => 'NUMBER - Age in years',
+            'Military Status' => 'TEXT - Options: Veteran, Active, Never Served',
+            'Referral Source' => 'TEXT - How client was referred',
+        ];
+
+        $descriptionRow = [];
+        foreach ($headers as $header) {
+            $descriptionRow[] = $descriptions[$header] ?? '';
+        }
+        $csv->insertOne($descriptionRow);
+
+        // Insert example data rows
+        $exampleRows = [
+            [
+                'Class Name' => 'First-Time Homebuyer Education',
+                'Class ID' => 'FTH-2024-001',
+                'Class Status' => 'Completed',
+                'Class Date' => '01/20/2024',
+                'Class Hours' => '8',
+                'Instructor' => 'Sarah Educator',
+                'Class Max Capacity' => '25',
+                'Number of Users Registered' => '18',
+                'Class Close Date' => '01/20/2024',
+                'HUD Category' => 'Pre-Purchase Education',
+                'Attendance' => 'Attended',
+                'Location' => 'Community Center Room A',
+                'Client Name' => 'Smith, John',
+                'Intake Client ID' => 'CLI-12345',
+                'Client Address' => '123 Main St, Las Vegas, NV 89101',
+                'Client Phone Number' => '702-555-0123',
+                'Client Email' => 'john.smith@email.com',
+                'Race' => 'White',
+                'Ethnicity' => 'Not Hispanic, Latino or Spanish Origins',
+                'Income Level' => '60% AMI',
+                'Rural Area Status' => 'Urban',
+                'Family Size' => '3',
+                'Household Type' => 'Two Parent Household',
+                'Language' => 'English',
+                'Gender' => 'Male',
+                'Client Registration Date' => '01/15/2024',
+                'Disabled' => 'No',
+                'Birth Date' => '06/15/1985',
+                'Dependents' => '1',
+                'Monthly Income' => '3200',
+                'Veteran' => 'Yes',
+                'Age' => '39',
+                'Military Status' => 'Veteran',
+                'Referral Source' => 'County Housing Authority',
+            ],
+            [
+                'Class Name' => 'Financial Literacy Workshop',
+                'Class ID' => 'FIN-2024-002',
+                'Class Status' => 'Completed',
+                'Class Date' => '02/10/2024',
+                'Class Hours' => '4',
+                'Instructor' => 'Michael Finance',
+                'Class Max Capacity' => '20',
+                'Number of Users Registered' => '15',
+                'Class Close Date' => '02/10/2024',
+                'HUD Category' => 'Financial Capability',
+                'Attendance' => 'Attended',
+                'Location' => 'Online - Zoom',
+                'Client Name' => 'Johnson, Mary',
+                'Intake Client ID' => 'CLI-12346',
+                'Client Address' => '456 Oak Ave, Las Vegas, NV 89102',
+                'Client Phone Number' => '702-555-0124',
+                'Client Email' => 'mary.johnson@email.com',
+                'Race' => 'Black or African American',
+                'Ethnicity' => 'Hispanic, Latino or Spanish Origins',
+                'Income Level' => '40% AMI',
+                'Rural Area Status' => 'Urban',
+                'Family Size' => '2',
+                'Household Type' => 'Single Parent Household',
+                'Language' => 'Spanish',
+                'Gender' => 'Female',
+                'Client Registration Date' => '02/05/2024',
+                'Disabled' => 'No',
+                'Birth Date' => '03/22/1990',
+                'Dependents' => '1',
+                'Monthly Income' => '1800',
+                'Veteran' => 'No',
+                'Age' => '34',
+                'Military Status' => 'Never Served in the Military',
+                'Referral Source' => 'Community Action Agency',
+            ],
+        ];
+
+        foreach ($exampleRows as $row) {
+            $csv->insertOne($row);
+        }
+
+        return $csv->toString();
+    }
 }

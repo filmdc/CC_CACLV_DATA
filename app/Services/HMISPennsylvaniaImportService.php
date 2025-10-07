@@ -787,4 +787,99 @@ class HMISPennsylvaniaImportService
     {
         return $this->template;
     }
+
+    /**
+     * Generate a CSV template file for HMIS Pennsylvania imports
+     *
+     * @return string CSV content with headers, field descriptions, and example data
+     */
+    public function generateTemplate(): string
+    {
+        $csv = \League\Csv\Writer::createFromString();
+
+        // Add UTF-8 BOM for Excel compatibility
+        $csv->setOutputBOM(\League\Csv\Bom::Utf8);
+
+        // Get field mappings to determine columns
+        $fieldMappings = $this->getFieldMappings();
+        $headers = array_keys($fieldMappings);
+
+        // Insert header row
+        $csv->insertOne($headers);
+
+        // Insert field description row (commented for reference)
+        $descriptions = [
+            'OrganizationName' => 'TEXT - Organization name (optional, not imported)',
+            'ProgramName' => 'TEXT - Service name for enrollment (e.g., "Emergency Shelter", "Case Management")',
+            'CaseID' => 'TEXT - Household code (required, groups family members)',
+            'ClientName' => 'TEXT - Format: "Last, First Middle" (required)',
+            'DOB' => 'DATE - Format: MM/DD/YYYY (required)',
+            'Gender' => 'TEXT - Options: Male, Female, Other',
+            'RaceAndEthnicity' => 'TEXT - Format: "Race|Ethnicity" (e.g., "White|Not Hispanic")',
+            'VeteranStatus' => 'TEXT - Options: Veteran, Active Military, Never Served in the Military',
+            'Relationship' => 'TEXT - Options: Self (Head of Household), Spouse, Child, Other Family Member',
+            'HouseholdType' => 'TEXT - Options: Single, Two Parent Household, Single Parent Household, etc.',
+            'HealthInsurance' => 'TEXT - Options: Yes, No, Unknown',
+            'DisablingCondition' => 'TEXT - Options: Yes, No, Unknown',
+            'CashIncome' => 'NUMBER - Monthly income amount (dollars)',
+            'EnrollDate' => 'DATETIME - Format: MM/DD/YYYY HH:MM:SS AM/PM (e.g., "01/15/2024 09:30:00 AM")',
+            'ExitDate' => 'DATETIME - Format: MM/DD/YYYY HH:MM:SS AM/PM (leave blank if still enrolled)',
+            'ClientID' => 'TEXT - Unique client identifier for tracking (optional)',
+            'EnrollID' => 'TEXT - Unique enrollment identifier (optional)',
+        ];
+
+        $descriptionRow = [];
+        foreach ($headers as $header) {
+            $descriptionRow[] = $descriptions[$header] ?? '';
+        }
+        $csv->insertOne($descriptionRow);
+
+        // Insert example data rows
+        $exampleRows = [
+            [
+                'OrganizationName' => 'Sixth Street Shelter',
+                'ProgramName' => 'Emergency Shelter',
+                'CaseID' => 'HMIS-001',
+                'ClientName' => 'Smith, John Michael',
+                'DOB' => '06/15/1985',
+                'Gender' => 'Male',
+                'RaceAndEthnicity' => 'White|Not Hispanic, Latino or Spanish Origins',
+                'VeteranStatus' => 'Veteran',
+                'Relationship' => 'Self (Head of Household)',
+                'HouseholdType' => 'Single',
+                'HealthInsurance' => 'No',
+                'DisablingCondition' => 'No',
+                'CashIncome' => '1200',
+                'EnrollDate' => '01/15/2024 09:30:00 AM',
+                'ExitDate' => '',
+                'ClientID' => 'CLI-12345',
+                'EnrollID' => 'ENR-98765',
+            ],
+            [
+                'OrganizationName' => 'Sixth Street Shelter',
+                'ProgramName' => 'Case Management',
+                'CaseID' => 'HMIS-002',
+                'ClientName' => 'Johnson, Mary Elizabeth',
+                'DOB' => '03/22/1990',
+                'Gender' => 'Female',
+                'RaceAndEthnicity' => 'Black or African American|Hispanic, Latino or Spanish Origins',
+                'VeteranStatus' => 'Never Served in the Military',
+                'Relationship' => 'Self (Head of Household)',
+                'HouseholdType' => 'Single Parent Household',
+                'HealthInsurance' => 'Yes',
+                'DisablingCondition' => 'Yes',
+                'CashIncome' => '850',
+                'EnrollDate' => '02/01/2024 10:00:00 AM',
+                'ExitDate' => '06/30/2024 05:00:00 PM',
+                'ClientID' => 'CLI-12346',
+                'EnrollID' => 'ENR-98766',
+            ],
+        ];
+
+        foreach ($exampleRows as $row) {
+            $csv->insertOne($row);
+        }
+
+        return $csv->toString();
+    }
 }

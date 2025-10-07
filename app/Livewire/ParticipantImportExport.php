@@ -503,11 +503,82 @@ class ParticipantImportExport extends Component
         $this->customImportFile = null;
         $this->customValidationResult = null;
         $this->customImportResult = null;
-        
+
         // Clean up temp file if exists
         if ($this->customTempFilePath) {
             Storage::disk('local')->delete($this->customTempFilePath);
             $this->customTempFilePath = '';
+        }
+    }
+
+    public function downloadCustomTemplate()
+    {
+        if (!$this->can('participants.import')) {
+            session()->flash('error', 'You do not have permission to download import template.');
+            return;
+        }
+
+        if (!$this->selectedCustomTemplate) {
+            session()->flash('error', 'Please select a template first.');
+            return;
+        }
+
+        try {
+            $template = CustomImportTemplate::find($this->selectedCustomTemplate);
+
+            if (!$template) {
+                session()->flash('error', 'Selected template not found.');
+                return;
+            }
+
+            // Generate template based on source system
+            $templateContent = null;
+            $filename = null;
+
+            if ($template->source_system === 'HMIS_Pennsylvania') {
+                $templateContent = $this->hmisImportService->generateTemplate();
+                $filename = 'HMIS_Pennsylvania_Import_Template_' . now()->format('Y-m-d_H-i-s') . '.csv';
+            } elseif ($template->source_system === 'RX_Office_Housing') {
+                // Default to detailed_case format
+                // In the future, we could add a dropdown to let users choose the format
+                $templateContent = $this->rxOfficeImportService->generateTemplate('detailed_case');
+                $filename = 'RX_Office_Housing_Import_Template_' . now()->format('Y-m-d_H-i-s') . '.csv';
+            } else {
+                session()->flash('error', 'Template generation not yet implemented for this template type.');
+                return;
+            }
+
+            if (!$templateContent) {
+                session()->flash('error', 'Failed to generate template content.');
+                return;
+            }
+
+            // Store template temporarily in exports directory (same as standard template)
+            $uniqueFilename = 'custom_template_' . uniqid() . '_' . time() . '.csv';
+            $tempPath = 'exports/' . $uniqueFilename;
+            Storage::disk('local')->put($tempPath, $templateContent);
+
+            // Create a secure download token
+            $downloadToken = \Str::random(32);
+            $downloadData = [
+                'file_path' => $tempPath, // Store relative path, not absolute
+                'filename' => $filename,
+                'expires_at' => now()->addMinutes(5)->timestamp
+            ];
+
+            // Store in cache for 5 minutes
+            \Cache::put('download_' . $downloadToken, $downloadData, now()->addMinutes(5));
+
+            // Trigger JavaScript download
+            $this->dispatch('triggerDownload', [
+                'url' => route('secure-download', ['token' => $downloadToken]),
+                'filename' => $filename
+            ]);
+
+            session()->flash('success', 'Template download started.');
+
+        } catch (\Exception $e) {
+            session()->flash('error', 'Template generation failed: ' . $e->getMessage());
         }
     }
 
