@@ -6,6 +6,7 @@ use App\Services\ImportExportService;
 use App\Services\HMISPennsylvaniaImportService;
 use App\Services\RXOfficeHousingImportService;
 use App\Models\CustomImportTemplate;
+use App\Models\ImportAuditLog;
 use App\Traits\WithPermissionChecks;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -427,16 +428,32 @@ class ParticipantImportExport extends Component
         }
 
         $this->customImportResult = null;
+        $auditLog = null;
 
         try {
             $template = CustomImportTemplate::find($this->selectedCustomTemplate);
-            
+
             if (!$template) {
                 session()->flash('error', 'Selected template not found.');
                 return;
             }
 
             $fullPath = Storage::disk('local')->path($this->customTempFilePath);
+            $fileSize = Storage::disk('local')->size($this->customTempFilePath);
+
+            // Create audit log
+            $auditLog = ImportAuditLog::logImport([
+                'import_type' => 'custom_import',
+                'file_name' => $this->customImportFile->getClientOriginalName(),
+                'file_size' => $fileSize,
+                'options' => [
+                    'template' => $template->name,
+                    'source_system' => $template->source_system,
+                    'update_existing' => $this->customUpdateExisting,
+                    'skip_errors' => $this->customSkipErrors
+                ]
+            ]);
+
             $options = [
                 'update_existing' => $this->customUpdateExisting,
                 'skip_errors' => $this->customSkipErrors
@@ -453,6 +470,11 @@ class ParticipantImportExport extends Component
             }
 
             $this->customImportResult = $result;
+
+            // Mark audit log as completed
+            if ($auditLog) {
+                $auditLog->markCompleted($result);
+            }
 
             if ($result['success']) {
                 $message = "Import completed successfully! ";
@@ -489,6 +511,17 @@ class ParticipantImportExport extends Component
             }
         } catch (\Exception $e) {
             session()->flash('error', 'Import failed: ' . $e->getMessage());
+
+            // Mark audit log as failed
+            if ($auditLog) {
+                $auditLog->markCompleted([
+                    'success' => false,
+                    'error' => $e->getMessage(),
+                    'processed_participants' => 0,
+                    'updated_participants' => 0,
+                    'skipped_records' => 0
+                ]);
+            }
         } finally {
             // Clean up temp file
             if ($this->customTempFilePath) {
