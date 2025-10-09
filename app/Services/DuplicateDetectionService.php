@@ -541,4 +541,146 @@ class DuplicateDetectionService
     {
         return PotentialDuplicate::pending()->count();
     }
+
+    /**
+     * Check for household-level duplicates
+     * Helps prevent creating new households when one already exists
+     */
+    public function checkForHouseholdDuplicates(array $proposedHouseholdData): \Illuminate\Support\Collection
+    {
+        $potentialDuplicates = collect();
+
+        // Strategy 1: Match by address components
+        if (!empty($proposedHouseholdData['street_address']) &&
+            !empty($proposedHouseholdData['zip_code'])) {
+
+            $addressMatches = \App\Models\Household::whereHas('addresses', function($query) use ($proposedHouseholdData) {
+                $query->where('is_current', true)
+                    ->where('address', 'LIKE', '%' . trim($proposedHouseholdData['street_address']) . '%')
+                    ->where('zip_code', trim($proposedHouseholdData['zip_code']));
+            })->with('participants')->get();
+
+            foreach ($addressMatches as $household) {
+                $score = $this->calculateHouseholdMatchScore($proposedHouseholdData, $household);
+
+                if ($score >= 50.0) {
+                    $potentialDuplicates->push([
+                        'household' => $household,
+                        'confidence_score' => $score,
+                        'matching_criteria' => $this->getHouseholdMatchingCriteria($proposedHouseholdData, $household),
+                    ]);
+                }
+            }
+        }
+
+        // Strategy 2: Match by household_code (if provided)
+        if (!empty($proposedHouseholdData['household_code'])) {
+            $codeMatch = \App\Models\Household::where('household_code', $proposedHouseholdData['household_code'])
+                ->with('participants')
+                ->first();
+
+            if ($codeMatch && !$potentialDuplicates->contains('household.id', $codeMatch->id)) {
+                $potentialDuplicates->push([
+                    'household' => $codeMatch,
+                    'confidence_score' => 100.0,
+                    'matching_criteria' => ['Exact household_code match'],
+                ]);
+            }
+        }
+
+        return $potentialDuplicates->sortByDesc('confidence_score');
+    }
+
+    /**
+     * Calculate confidence score for household matching
+     */
+    protected function calculateHouseholdMatchScore(array $proposedData, \App\Models\Household $candidate): float
+    {
+        $score = 0;
+
+        // Address match (40 points)
+        if (!empty($proposedData['street_address']) && !empty($candidate->currentAddress->address)) {
+            $similarity = 0;
+            similar_text(
+                strtolower(trim($proposedData['street_address'])),
+                strtolower(trim($candidate->currentAddress->address)),
+                $similarity
+            );
+            if ($similarity >= 80) {
+                $score += 40 * ($similarity / 100);
+            }
+        }
+
+        // Zip code match (20 points)
+        if (!empty($proposedData['zip_code']) && !empty($candidate->currentAddress->zip_code)) {
+            if (trim($proposedData['zip_code']) === trim($candidate->currentAddress->zip_code)) {
+                $score += 20;
+            }
+        }
+
+        // City match (10 points)
+        if (!empty($proposedData['city']) && !empty($candidate->currentAddress->city)) {
+            if (strtolower(trim($proposedData['city'])) === strtolower(trim($candidate->currentAddress->city))) {
+                $score += 10;
+            }
+        }
+
+        // Household size match (15 points)
+        if (!empty($proposedData['household_size']) && !empty($candidate->household_size)) {
+            if ($proposedData['household_size'] == $candidate->household_size) {
+                $score += 15;
+            } elseif (abs($proposedData['household_size'] - $candidate->household_size) <= 1) {
+                $score += 7.5; // Close match
+            }
+        }
+
+        // Household type match (15 points)
+        if (!empty($proposedData['household_type']) && !empty($candidate->household_type)) {
+            if ($proposedData['household_type'] === $candidate->household_type) {
+                $score += 15;
+            }
+        }
+
+        return $score;
+    }
+
+    /**
+     * Get matching criteria for household duplicates
+     */
+    protected function getHouseholdMatchingCriteria(array $proposedData, \App\Models\Household $candidate): array
+    {
+        $criteria = [];
+
+        if (!empty($proposedData['street_address']) && !empty($candidate->currentAddress->address)) {
+            $similarity = 0;
+            similar_text(
+                strtolower(trim($proposedData['street_address'])),
+                strtolower(trim($candidate->currentAddress->address)),
+                $similarity
+            );
+            if ($similarity >= 80) {
+                $criteria[] = 'Address match (' . round($similarity) . '%)';
+            }
+        }
+
+        if (!empty($proposedData['zip_code']) && !empty($candidate->currentAddress->zip_code)) {
+            if (trim($proposedData['zip_code']) === trim($candidate->currentAddress->zip_code)) {
+                $criteria[] = 'Exact zip code match';
+            }
+        }
+
+        if (!empty($proposedData['household_size']) && !empty($candidate->household_size)) {
+            if ($proposedData['household_size'] == $candidate->household_size) {
+                $criteria[] = 'Same household size (' . $candidate->household_size . ')';
+            }
+        }
+
+        if (!empty($proposedData['household_type']) && !empty($candidate->household_type)) {
+            if ($proposedData['household_type'] === $candidate->household_type) {
+                $criteria[] = 'Same household type';
+            }
+        }
+
+        return $criteria;
+    }
 }

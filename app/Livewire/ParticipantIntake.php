@@ -473,8 +473,38 @@ class ParticipantIntake extends Component
                 'notes' => $this->notes,
             ]);
 
-            // Create household members if any were added
+            // Create household members if any were added - with duplicate checking
             foreach ($this->householdMembers as $memberData) {
+                // Check for duplicates for each family member
+                $memberProposedData = [
+                    'first_name' => $memberData['first_name'],
+                    'middle_name' => $memberData['middle_name'],
+                    'last_name' => $memberData['last_name'],
+                    'date_of_birth' => $memberData['date_of_birth'],
+                    'gender' => $memberData['gender'],
+                ];
+
+                $memberDuplicates = $this->duplicateDetectionService->checkForDuplicates(
+                    $memberProposedData,
+                    'manual_intake_family',
+                    $household->household_code
+                );
+
+                if ($memberDuplicates->isNotEmpty()) {
+                    // Store for review but still create the family member
+                    // This ensures the household is complete during intake
+                    $this->duplicateDetectionService->storePotentialDuplicates(
+                        $memberDuplicates,
+                        \Illuminate\Support\Facades\Auth::id()
+                    );
+
+                    \Illuminate\Support\Facades\Log::warning('Participant Intake: Potential duplicate family member detected', [
+                        'family_member_name' => $memberData['first_name'] . ' ' . $memberData['last_name'],
+                        'household_code' => $household->household_code,
+                        'confidence' => $memberDuplicates->first()['confidence_score'],
+                    ]);
+                }
+
                 Participant::create([
                     'household_id' => $household->id,
                     'reference_data_set_id' => $activeDataSet?->id,

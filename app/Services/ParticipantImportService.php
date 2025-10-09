@@ -7,23 +7,34 @@ use App\Models\Household;
 use App\Models\PovertyGuideline;
 use App\Models\ReferenceDataSet;
 use App\Services\ReferenceDataTransformationService;
+use App\Services\DuplicateDetectionService;
 use League\Csv\Reader;
 use League\Csv\Statement;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class ParticipantImportService
 {
     protected ReferenceDataTransformationService $transformer;
+    protected DuplicateDetectionService $duplicateDetectionService;
     protected ?ReferenceDataSet $importDefaultSet;
     protected ?ReferenceDataSet $selectedReferenceDataSet = null;
 
-    public function __construct(ReferenceDataTransformationService $transformer)
-    {
+    // Duplicate handling configuration
+    protected bool $strictDuplicatePrevention = true;
+    protected float $autoMergeThreshold = 95.0;
+    protected float $storeForReviewThreshold = 60.0;
+
+    public function __construct(
+        ReferenceDataTransformationService $transformer,
+        DuplicateDetectionService $duplicateDetectionService
+    ) {
         $this->transformer = $transformer;
+        $this->duplicateDetectionService = $duplicateDetectionService;
         $this->importDefaultSet = ReferenceDataSet::getImportDefault();
     }
 
@@ -266,6 +277,7 @@ class ParticipantImportService
                 'updated_households' => 0,
                 'updated_participants' => 0,
                 'skipped_records' => 0,
+                'skipped_duplicates' => 0,
                 'errors' => []
             ];
             
@@ -311,6 +323,7 @@ class ParticipantImportService
                                 $processedCounts = $this->processHouseholdParticipants($currentHousehold, $householdParticipants, $updateExisting);
                                 $results['processed_participants'] += $processedCounts['created'];
                                 $results['updated_participants'] += $processedCounts['updated'];
+                                $results['skipped_duplicates'] += $processedCounts['skipped_duplicates'] ?? 0;
                             }
                             
                             // Create or find household
@@ -366,6 +379,7 @@ class ParticipantImportService
                 $processedCounts = $this->processHouseholdParticipants($currentHousehold, $householdParticipants, $updateExisting);
                 $results['processed_participants'] += $processedCounts['created'];
                 $results['updated_participants'] += $processedCounts['updated'];
+                $results['skipped_duplicates'] += $processedCounts['skipped_duplicates'] ?? 0;
             }
             
             DB::commit();
@@ -383,6 +397,7 @@ class ParticipantImportService
                 'updated_households' => 0,
                 'updated_participants' => 0,
                 'skipped_records' => 0,
+                'skipped_duplicates' => 0,
                 'errors' => []
             ];
         }
@@ -677,16 +692,16 @@ class ParticipantImportService
 
     protected function processHouseholdParticipants(Household $household, array $participantsData, bool $updateExisting): array
     {
-        $counts = ['created' => 0, 'updated' => 0];
-        
+        $counts = ['created' => 0, 'updated' => 0, 'skipped_duplicates' => 0];
+
         foreach ($participantsData as $participantData) {
             $participant = $participantData['participant'];
             $participant['household_id'] = $household->id;
-            
+
             // Determine if this is head of household
-            $participant['is_head_of_household'] = 
+            $participant['is_head_of_household'] =
                 ($participantData['participant']['participant_type'] ?? '') === 'HEAD_OF_HOUSEHOLD';
-            
+
             // Remove participant_type as it's not a database field
             unset($participant['participant_type']);
 
@@ -700,39 +715,134 @@ class ParticipantImportService
 
             $participant['date_of_birth'] = $dateOfBirthString;
 
-            if ($updateExisting) {
-                $lookup = [
-                    'household_id' => $household->id,
-                    'first_name' => $participant['first_name'],
-                    'last_name' => $participant['last_name'],
-                ];
+            // Check for duplicates across the ENTIRE system (not just this household)
+            $duplicates = $this->duplicateDetectionService->checkForDuplicates(
+                $participant,
+                'general_import',
+                $household->household_code
+            );
 
-                if ($dateOfBirthString !== null) {
-                    $lookup['date_of_birth'] = $dateOfBirthString;
-                }
+            if ($duplicates->isNotEmpty()) {
+                $highestConfidence = $duplicates->first();
 
-                $savedParticipant = Participant::updateOrCreate($lookup, $participant);
-
-                if ($savedParticipant->wasRecentlyCreated) {
-                    $counts['created']++;
-                } else {
+                // Handle based on confidence score
+                if ($highestConfidence['confidence_score'] >= $this->autoMergeThreshold && $updateExisting) {
+                    // Auto-update the existing participant with new data
+                    $existingParticipant = $highestConfidence['participant'];
+                    $this->updateParticipantFromImport($existingParticipant, $participant, $household);
                     $counts['updated']++;
+
+                    Log::info('General Import: Auto-merged high confidence duplicate', [
+                        'existing_id' => $existingParticipant->id,
+                        'name' => $participant['first_name'] . ' ' . $participant['last_name'],
+                        'confidence' => $highestConfidence['confidence_score'],
+                        'household_code' => $household->household_code,
+                    ]);
+                } elseif ($highestConfidence['confidence_score'] >= $this->storeForReviewThreshold) {
+                    // Store for manual review
+                    $this->duplicateDetectionService->storePotentialDuplicates(
+                        $duplicates,
+                        Auth::id() ?? 1
+                    );
+
+                    if ($this->strictDuplicatePrevention) {
+                        // Skip creating this participant
+                        $counts['skipped_duplicates']++;
+
+                        Log::warning('General Import: Skipped potential duplicate', [
+                            'name' => $participant['first_name'] . ' ' . $participant['last_name'],
+                            'confidence' => $highestConfidence['confidence_score'],
+                            'household_code' => $household->household_code,
+                            'matched_participant_id' => $highestConfidence['participant']->id,
+                        ]);
+                        continue; // Skip to next participant
+                    } else {
+                        // Create anyway but log warning
+                        Participant::create($participant);
+                        $counts['created']++;
+
+                        Log::warning('General Import: Created despite duplicate warning', [
+                            'name' => $participant['first_name'] . ' ' . $participant['last_name'],
+                            'confidence' => $highestConfidence['confidence_score'],
+                            'household_code' => $household->household_code,
+                        ]);
+                    }
+                } else {
+                    // Low confidence - create new participant
+                    Participant::create($participant);
+                    $counts['created']++;
                 }
             } else {
-                Participant::create($participant);
-                $counts['created']++;
+                // No duplicates found - create new participant
+                if ($updateExisting) {
+                    // Still use the old updateOrCreate logic for same-household updates
+                    $lookup = [
+                        'first_name' => $participant['first_name'],
+                        'last_name' => $participant['last_name'],
+                        'date_of_birth' => $dateOfBirthString,
+                    ];
+
+                    $savedParticipant = Participant::updateOrCreate($lookup, $participant);
+
+                    if ($savedParticipant->wasRecentlyCreated) {
+                        $counts['created']++;
+                    } else {
+                        $counts['updated']++;
+                    }
+                } else {
+                    Participant::create($participant);
+                    $counts['created']++;
+                }
             }
         }
-        
+
         // Update household size based on actual participant count
         $household->household_size = $household->participants()->count();
-        
+
         // Calculate and update poverty percentage if we have income data
         $this->calculateAndUpdatePovertyLevel($household);
-        
+
         $household->save();
-        
+
         return $counts;
+    }
+
+    /**
+     * Update an existing participant with data from import
+     */
+    protected function updateParticipantFromImport(Participant $existingParticipant, array $newData, Household $newHousehold): void
+    {
+        $updates = [];
+
+        // Update fields only if they have values and existing doesn't
+        $fieldsToUpdate = [
+            'middle_name', 'suffix', 'telephone', 'email', 'education_level',
+            'currently_enrolled_in_education', 'education_enrollment_type',
+            'disability_status', 'disability_types', 'assistance_needs',
+            'has_chronic_health_conditions', 'health_insurance_sources',
+            'health_insurance_status', 'ethnicity', 'race', 'military_status',
+            'work_status', 'hours_worked_per_week', 'is_seeking_employment',
+            'is_underemployed', 'income_sources', 'employment_income',
+            'other_income_sources', 'non_cash_benefits',
+        ];
+
+        foreach ($fieldsToUpdate as $field) {
+            if (!empty($newData[$field]) && empty($existingParticipant->$field)) {
+                $updates[$field] = $newData[$field];
+            }
+        }
+
+        // Update household if different and new household provided
+        if ($newHousehold && $existingParticipant->household_id !== $newHousehold->id) {
+            $updates['household_id'] = $newHousehold->id;
+        }
+
+        // Always update last_service_date to show recent activity
+        $updates['last_service_date'] = now();
+
+        if (!empty($updates)) {
+            $existingParticipant->update($updates);
+        }
     }
 
     protected function countHouseholds(array $records): int
