@@ -24,7 +24,7 @@ php artisan clear-compiled
 
 # Rebuild assets
 echo "🏗️  Building assets..."
-npm run build
+npm run apache
 
 # Fix permissions (if needed)
 #echo "🔐 Setting storage permissions..."

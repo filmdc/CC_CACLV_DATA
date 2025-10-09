@@ -19,10 +19,14 @@
     RewriteCond %{HTTP:x-xsrf-token} .
     RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
 
+    # Rewrite /storage/ requests to /public/storage/
+    RewriteCond %{REQUEST_URI} ^/storage/
+    RewriteRule ^storage/(.*)$ public/storage/$1 [L]
+
     # Skip rewrite for build assets specifically
     RewriteCond %{REQUEST_URI} ^/build/
     RewriteRule ^ - [L]
-    
+
     # Skip rewrite for existing files and directories (this should handle static assets)
     RewriteCond %{REQUEST_FILENAME} -f [OR]
     RewriteCond %{REQUEST_FILENAME} -d
