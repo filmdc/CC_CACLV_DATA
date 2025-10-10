@@ -8,21 +8,28 @@ class Media extends BaseMedia
 {
     /**
      * Get the authenticated URL for this media item
+     * Path format: storage/authenticated/{media_id}/{filename}
      */
     public function getAuthenticatedUrl(): string
     {
+        // Get the relative path from storage/app/public/
+        // Spatie stores as: {model_id}/{filename}
+        $relativePath = str_replace(storage_path('app/public/'), '', $this->getPath());
+
         return route('storage.authenticated', [
-            'path' => $this->id . '/' . $this->file_name
+            'path' => ltrim($relativePath, '/')
         ]);
     }
-    
+
     /**
      * Get the download URL for this media item
      */
     public function getDownloadUrl(): string
     {
+        $relativePath = str_replace(storage_path('app/public/'), '', $this->getPath());
+
         return route('storage.authenticated', [
-            'path' => $this->id . '/' . $this->file_name
+            'path' => ltrim($relativePath, '/')
         ]) . '?download=1';
     }
     

@@ -230,8 +230,8 @@
                                                    class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm">View</a>
                                                 <a href="{{ $document->getDownloadUrl() }}" 
                                                    class="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 text-sm">Download</a>
-                                                <button type="button" wire:click="removeDocument({{ $document->id }})" 
-                                                        onclick="return confirm('Are you sure you want to remove this document?')"
+                                                <button type="button" wire:click="removeDocument({{ $document->id }})"
+                                                        wire:confirm="Are you sure you want to remove this document?"
                                                         class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm">Remove</button>
                                             </div>
                                         </div>
@@ -553,8 +553,8 @@
                                                                 </button>
                                                             @endif
                                                             @if($this->can('due_dates.delete'))
-                                                                <button wire:click="deleteDueDate({{ $dueDate->id }})" 
-                                                                        onclick="return confirm('Are you sure you want to delete this due date?')"
+                                                                <button wire:click="deleteDueDate({{ $dueDate->id }})"
+                                                                        wire:confirm="Are you sure you want to delete this due date?"
                                                                         class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-xs font-medium">
                                                                     Delete
                                                                 </button>
@@ -626,8 +626,8 @@
                                                     </button>
                                                 @endif
                                                 @if($this->can('reports.delete'))
-                                                    <button wire:click="deleteReport({{ $report->id }})" 
-                                                            onclick="return confirm('Are you sure you want to delete this report?')"
+                                                    <button wire:click="deleteReport({{ $report->id }})"
+                                                            wire:confirm="Are you sure you want to delete this report?"
                                                             class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-xs font-medium">
                                                         Delete
                                                     </button>
@@ -1002,15 +1002,15 @@
                                     <button wire:click="showEditContract({{ $contract->id }})" 
                                             class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300">Edit</button>
                                     @if($contract->archived)
-                                        <button wire:click="unarchiveContract({{ $contract->id }})" 
+                                        <button wire:click="unarchiveContract({{ $contract->id }})"
                                                 class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">Unarchive</button>
                                     @else
-                                        <button wire:click="archiveContract({{ $contract->id }})" 
-                                                onclick="return confirm('Are you sure you want to archive this contract?')"
+                                        <button wire:click="archiveContract({{ $contract->id }})"
+                                                wire:confirm="Are you sure you want to archive this contract?"
                                                 class="text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300">Archive</button>
                                     @endif
-                                    <button wire:click="deleteContract({{ $contract->id }})" 
-                                            onclick="return confirm('Are you sure you want to delete this contract?')"
+                                    <button wire:click="deleteContract({{ $contract->id }})"
+                                            wire:confirm="Are you sure you want to delete this contract?"
                                             class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">Delete</button>
                                 </div>
                             </td>

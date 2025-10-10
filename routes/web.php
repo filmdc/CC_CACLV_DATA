@@ -115,27 +115,27 @@ Route::middleware(['auth'])->group(function () {
         if (!auth()->check()) {
             abort(403, 'Unauthorized access to file');
         }
-        
+
         $fullPath = storage_path('app/public/protected/' . $path);
-        
+
         // Check if file exists
         if (!file_exists($fullPath)) {
             abort(404, 'File not found');
         }
-        
+
         // Get file info
         $mimeType = mime_content_type($fullPath);
         $fileName = basename($fullPath);
-        
+
         // Check if download is requested
         $isDownload = request()->has('download') && request()->get('download') == '1';
-        
+
         // Set appropriate headers based on file type and download preference
         $headers = [
             'Content-Type' => $mimeType,
             'Cache-Control' => 'private, max-age=300', // 5 minutes cache
         ];
-        
+
         if ($isDownload) {
             $headers['Content-Disposition'] = 'attachment; filename="' . $fileName . '"';
         } else {
@@ -147,10 +147,63 @@ Route::middleware(['auth'])->group(function () {
                 $headers['Content-Disposition'] = 'attachment; filename="' . $fileName . '"';
             }
         }
-        
+
         // Return file response
         return response()->file($fullPath, $headers);
     })->where('path', '.*')->name('storage.protected');
+
+    // Authenticated storage route for Spatie Media Library files
+    // Handles files stored in storage/app/public/{id}/{filename}
+    Route::get('storage/authenticated/{path}', function ($path) {
+        // Check if user is authenticated
+        if (!auth()->check()) {
+            abort(403, 'Unauthorized access to file');
+        }
+
+        // Path format is: {media_id}/{filename}
+        $fullPath = storage_path('app/public/' . $path);
+
+        // Security: Prevent directory traversal attacks
+        $realPath = realpath($fullPath);
+        $storagePath = realpath(storage_path('app/public'));
+
+        if (!$realPath || !str_starts_with($realPath, $storagePath)) {
+            abort(403, 'Invalid file path');
+        }
+
+        // Check if file exists
+        if (!file_exists($fullPath)) {
+            abort(404, 'File not found');
+        }
+
+        // Get file info
+        $mimeType = mime_content_type($fullPath);
+        $fileName = basename($fullPath);
+
+        // Check if download is requested
+        $isDownload = request()->has('download') && request()->get('download') == '1';
+
+        // Set appropriate headers based on file type and download preference
+        $headers = [
+            'Content-Type' => $mimeType,
+            'Cache-Control' => 'private, max-age=300', // 5 minutes cache
+        ];
+
+        if ($isDownload) {
+            $headers['Content-Disposition'] = 'attachment; filename="' . $fileName . '"';
+        } else {
+            // For inline viewing, set appropriate content disposition based on file type
+            if (str_contains($mimeType, 'pdf') || str_contains($mimeType, 'image')) {
+                $headers['Content-Disposition'] = 'inline; filename="' . $fileName . '"';
+            } else {
+                // For other file types, force download for security
+                $headers['Content-Disposition'] = 'attachment; filename="' . $fileName . '"';
+            }
+        }
+
+        // Return file response
+        return response()->file($fullPath, $headers);
+    })->where('path', '.*')->name('storage.authenticated');
 });
 
 require __DIR__.'/auth.php';
