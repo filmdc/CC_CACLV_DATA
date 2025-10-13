@@ -4,7 +4,8 @@
 /storage/*.key
 /vendor
 .env
-.env.backup
+.env.backup*
+.env.*.temp
 .env.production
 .phpunit.result.cache
 Homestead.json
@@ -15,3 +16,34 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+
+# Build artifacts
+/public/build/assets/*.css
+/public/build/assets/*.js
+
+# Temporary files
+*.backup
+*.temp
+*.patch
+cookies.txt
+index.html.backup
+
+# Scripts and configs (local only)
+fix-*.sh
+setup-*.sh
+migrate-to-new-server.sh*
+apache-config-*.conf
+initial-setup.sql
+
+# Systemd templates (local only)
+laravel-scheduler.*.template
+
+# Composer binary
+composer.phar
+
+# Test files
+public/test.php
+
+# Misc
+"│"
+"\342\224\202"
