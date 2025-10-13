@@ -119,6 +119,38 @@ class ParticipantExportService
         return $this->generateCsv($participants);
     }
 
+    public function exportByProgram(int $programId): string
+    {
+        $participants = Participant::with(['household', 'household.currentAddress'])
+            ->whereHas('programEnrollments', function($query) use ($programId) {
+                $query->where('program_id', $programId);
+            })
+            ->orderBy('household_id')
+            ->orderBy('is_head_of_household', 'desc')
+            ->get();
+
+        return $this->generateCsv($participants);
+    }
+
+    public function exportByProgramAndDateRange(int $programId, Carbon $startDate, Carbon $endDate, string $field = 'enrollment_date'): string
+    {
+        // Validate field parameter
+        if (!in_array($field, ['enrollment_date', 'exit_date'])) {
+            throw new \InvalidArgumentException('Field must be either enrollment_date or exit_date');
+        }
+
+        $participants = Participant::with(['household', 'household.currentAddress'])
+            ->whereHas('programEnrollments', function($query) use ($programId, $startDate, $endDate, $field) {
+                $query->where('program_id', $programId)
+                      ->whereBetween($field, [$startDate->startOfDay(), $endDate->endOfDay()]);
+            })
+            ->orderBy('household_id')
+            ->orderBy('is_head_of_household', 'desc')
+            ->get();
+
+        return $this->generateCsv($participants);
+    }
+
     protected function generateCsv(Collection $participants): string
     {
         $csv = Writer::createFromString();

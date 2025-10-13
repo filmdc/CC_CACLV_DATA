@@ -98,6 +98,8 @@
                                     <option value="household">Specific Household</option>
                                     <option value="date_range">Date Range</option>
                                     <option value="household_codes">Household Codes</option>
+                                    <option value="program">By Program</option>
+                                    <option value="program_date_range">By Program & Date Range</option>
                                 </select>
                                 @error('exportType') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                             </div>
@@ -144,6 +146,43 @@
                                               class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500"
                                               placeholder="ABC123H, DEF456G, XYZ789J"></textarea>
                                     @error('householdCodes') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            @endif
+
+                            @if($exportType === 'program' || $exportType === 'program_date_range')
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Program</label>
+                                    <select wire:model="programId" class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500">
+                                        <option value="">Select a program...</option>
+                                        @foreach($this->availablePrograms as $program)
+                                            <option value="{{ $program->id }}">{{ $program->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('programId') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            @endif
+
+                            @if($exportType === 'program_date_range')
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Start Date</label>
+                                        <input type="date" wire:model="startDate"
+                                               class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500">
+                                        @error('startDate') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">End Date</label>
+                                        <input type="date" wire:model="endDate"
+                                               class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500">
+                                        @error('endDate') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Date Field</label>
+                                        <select wire:model="dateField" class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500">
+                                            <option value="enrollment_date">Enrollment Date</option>
+                                            <option value="exit_date">Exit Date</option>
+                                        </select>
+                                    </div>
                                 </div>
                             @endif
 

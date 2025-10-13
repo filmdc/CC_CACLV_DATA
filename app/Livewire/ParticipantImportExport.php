@@ -39,6 +39,7 @@ class ParticipantImportExport extends Component
     public $endDate = '';
     public $dateField = 'created_at';
     public $householdCodes = '';
+    public $programId = '';
     public $isExporting = false;
     public $exportResult = null;
 
@@ -622,6 +623,7 @@ class ParticipantImportExport extends Component
         $this->startDate = '';
         $this->endDate = '';
         $this->householdCodes = '';
+        $this->programId = '';
         $this->exportResult = null;
     }
 
@@ -632,7 +634,7 @@ class ParticipantImportExport extends Component
         // Base rules for the component
         return [
             'activeTab' => 'string|in:export,import,custom-import,import-history',
-            'exportType' => 'string|in:all,household,date_range,household_codes',
+            'exportType' => 'string|in:all,household,date_range,household_codes,program,program_date_range',
             'importFile' => 'nullable|file|mimes:csv,txt|max:10240',
         ];
     }
@@ -651,6 +653,14 @@ class ParticipantImportExport extends Component
                 break;
             case 'household_codes':
                 $rules['householdCodes'] = 'required|string';
+                break;
+            case 'program':
+                $rules['programId'] = 'required|integer|exists:programs,id';
+                break;
+            case 'program_date_range':
+                $rules['programId'] = 'required|integer|exists:programs,id';
+                $rules['startDate'] = 'required|date';
+                $rules['endDate'] = 'required|date|after_or_equal:startDate';
                 break;
         }
 
@@ -673,6 +683,18 @@ class ParticipantImportExport extends Component
             case 'household_codes':
                 $codes = array_map('trim', explode(',', $this->householdCodes));
                 $criteria['household_codes'] = array_filter($codes);
+                break;
+            case 'program':
+                $criteria['program_id'] = $this->programId;
+                break;
+            case 'program_date_range':
+                $criteria['program_id'] = $this->programId;
+                $criteria['start_date'] = $this->startDate;
+                $criteria['end_date'] = $this->endDate;
+                // Default to enrollment_date if not set or if it's still the old default
+                $criteria['date_field'] = in_array($this->dateField, ['enrollment_date', 'exit_date'])
+                    ? $this->dateField
+                    : 'enrollment_date';
                 break;
         }
 
@@ -731,6 +753,11 @@ class ParticipantImportExport extends Component
             ->orderBy('is_active', 'desc')
             ->orderBy('created_at', 'desc')
             ->get();
+    }
+
+    public function getAvailableProgramsProperty()
+    {
+        return \App\Models\Program::orderBy('name')->get();
     }
     
     // Import History Methods

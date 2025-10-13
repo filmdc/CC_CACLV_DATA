@@ -63,7 +63,27 @@ class ImportExportService
                     }
                     $csvContent = $this->exportService->exportByHouseholdCodes($criteria['household_codes']);
                     break;
-                
+
+                case 'program':
+                    if (empty($criteria['program_id'])) {
+                        throw new \InvalidArgumentException('Program ID is required for program export');
+                    }
+                    $csvContent = $this->exportService->exportByProgram($criteria['program_id']);
+                    break;
+
+                case 'program_date_range':
+                    if (empty($criteria['program_id'])) {
+                        throw new \InvalidArgumentException('Program ID is required for program date range export');
+                    }
+                    if (empty($criteria['start_date']) || empty($criteria['end_date'])) {
+                        throw new \InvalidArgumentException('Start date and end date are required for program date range export');
+                    }
+                    $startDate = Carbon::parse($criteria['start_date']);
+                    $endDate = Carbon::parse($criteria['end_date']);
+                    $field = $criteria['date_field'] ?? 'created_at';
+                    $csvContent = $this->exportService->exportByProgramAndDateRange($criteria['program_id'], $startDate, $endDate, $field);
+                    break;
+
                 case 'all':
                 default:
                     $csvContent = $this->exportService->exportAll();
