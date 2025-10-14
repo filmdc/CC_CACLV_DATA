@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::table('contracts', function (Blueprint $table) {
             // Remove the old funder string column that conflicts with funder() relationship
-            $table->dropColumn('funder');
+            if (Schema::hasColumn('contracts', 'funder')) {
+                $table->dropColumn('funder');
+            }
         });
     }
 
@@ -24,7 +26,9 @@ return new class extends Migration
     {
         Schema::table('contracts', function (Blueprint $table) {
             // Restore the old funder string column
-            $table->string('funder')->nullable()->after('program_id');
+            if (!Schema::hasColumn('contracts', 'funder')) {
+                $table->string('funder')->nullable()->after('program_id');
+            }
         });
     }
 };

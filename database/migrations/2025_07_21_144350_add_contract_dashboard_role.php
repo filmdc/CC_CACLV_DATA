@@ -14,11 +14,13 @@ return new class extends Migration
     public function up(): void
     {
         // Create the contract database dashboard role
-        $role = Role::create([
-            'name' => 'contract-database-dashboard',
-            'display_name' => 'Contract Database Dashboard',
-            'description' => 'User with access to contract reporting dashboard only'
-        ]);
+        $role = Role::firstOrCreate(
+            ['name' => 'contract-database-dashboard'],
+            [
+                'display_name' => 'Contract Database Dashboard',
+                'description' => 'User with access to contract reporting dashboard only',
+            ]
+        );
         
         // Create specific permissions for contract dashboard
         $permissions = [
@@ -59,7 +61,9 @@ return new class extends Migration
         }
         
         // Assign permissions to the role
-        $role->permissions()->sync($permissionIds);
+        if ($role) {
+            $role->permissions()->syncWithoutDetaching($permissionIds);
+        }
     }
 
     /**

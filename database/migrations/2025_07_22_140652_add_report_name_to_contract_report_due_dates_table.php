@@ -42,7 +42,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('contract_report_due_dates', function (Blueprint $table) {
-            $table->dropColumn('report_name');
+            if (Schema::hasColumn('contract_report_due_dates', 'report_name')) {
+                $table->dropColumn('report_name');
+            }
         });
     }
 };

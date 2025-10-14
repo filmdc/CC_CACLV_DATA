@@ -12,10 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('services', function (Blueprint $table) {
-            $table->string('service_type')->nullable()->after('description');
-            $table->unsignedBigInteger('created_by')->nullable()->after('notes');
-            
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
+            if (!Schema::hasColumn('services', 'service_type')) {
+                $table->string('service_type')->nullable()->after('description');
+            }
+
+            if (!Schema::hasColumn('services', 'created_by')) {
+                $table->unsignedBigInteger('created_by')->nullable()->after('notes');
+                $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
+            }
         });
     }
 
@@ -25,8 +29,16 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('services', function (Blueprint $table) {
-            $table->dropForeign(['created_by']);
-            $table->dropColumn(['service_type', 'created_by']);
+            if (Schema::hasColumn('services', 'created_by')) {
+                $table->dropForeign(['created_by']);
+            }
+
+            $columns = ['service_type', 'created_by'];
+            foreach ($columns as $column) {
+                if (Schema::hasColumn('services', $column)) {
+                    $table->dropColumn($column);
+                }
+            }
         });
     }
 };

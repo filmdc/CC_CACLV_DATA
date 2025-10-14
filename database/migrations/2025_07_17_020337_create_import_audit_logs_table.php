@@ -11,7 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('import_audit_logs', function (Blueprint $table) {
+        if (!Schema::hasTable('import_audit_logs')) {
+            Schema::create('import_audit_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('import_type'); // 'participant', 'hmis', 'rx_office', etc.
@@ -35,7 +36,8 @@ return new class extends Migration
             $table->index(['user_id', 'created_at']);
             $table->index('status');
             $table->index('import_type');
-        });
+            });
+        }
     }
 
     /**

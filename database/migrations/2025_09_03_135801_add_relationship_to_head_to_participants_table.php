@@ -12,17 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('participants', function (Blueprint $table) {
-            $table->enum('relationship_to_head', [
-                'self',
-                'spouse',
-                'child',
-                'parent',
-                'sibling',
-                'grandchild',
-                'grandparent',
-                'other_relative',
-                'unrelated_individual'
-            ])->nullable()->after('is_head_of_household');
+            if (!Schema::hasColumn('participants', 'relationship_to_head')) {
+                $table->enum('relationship_to_head', [
+                    'self',
+                    'spouse',
+                    'child',
+                    'parent',
+                    'sibling',
+                    'grandchild',
+                    'grandparent',
+                    'other_relative',
+                    'unrelated_individual'
+                ])->nullable()->after('is_head_of_household');
+            }
         });
     }
 
@@ -32,7 +34,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('participants', function (Blueprint $table) {
-            $table->dropColumn('relationship_to_head');
+            if (Schema::hasColumn('participants', 'relationship_to_head')) {
+                $table->dropColumn('relationship_to_head');
+            }
         });
     }
 };

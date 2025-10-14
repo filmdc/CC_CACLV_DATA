@@ -8,7 +8,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('potential_duplicates', function (Blueprint $table) {
+        if (!Schema::hasTable('potential_duplicates')) {
+            Schema::create('potential_duplicates', function (Blueprint $table) {
             $table->id();
             
             // Source information
@@ -36,7 +37,8 @@ return new class extends Migration
             $table->index(['status', 'created_at']);
             $table->index(['matched_participant_id', 'status']);
             $table->index(['source_type', 'created_at']);
-        });
+            });
+        }
     }
 
     public function down(): void

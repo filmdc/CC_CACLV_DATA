@@ -23,23 +23,30 @@ return new class extends Migration
         foreach ($households as $household) {
             // Only create address record if there's at least some address data
             if ($household->street_address || $household->city || $household->state || $household->zip_code) {
-                DB::table('household_addresses')->insert([
-                    'household_id' => $household->id,
-                    'address' => $household->street_address,
-                    'city' => $household->city,
-                    'state' => $household->state,
-                    'zip_code' => $household->zip_code,
-                    'county' => null, // These fields didn't exist before
-                    'area' => null,
-                    'primary_phone' => null,
-                    'is_current' => true,
-                    'effective_date' => $household->created_at,
-                    'end_date' => null,
-                    'created_by' => null, // System migration
-                    'reason_for_change' => 'Initial address from system migration',
-                    'created_at' => $household->created_at,
-                    'updated_at' => $household->updated_at,
-                ]);
+                $alreadyMigrated = DB::table('household_addresses')
+                    ->where('household_id', $household->id)
+                    ->where('reason_for_change', 'Initial address from system migration')
+                    ->exists();
+
+                if (!$alreadyMigrated) {
+                    DB::table('household_addresses')->insert([
+                        'household_id' => $household->id,
+                        'address' => $household->street_address,
+                        'city' => $household->city,
+                        'state' => $household->state,
+                        'zip_code' => $household->zip_code,
+                        'county' => null, // These fields didn't exist before
+                        'area' => null,
+                        'primary_phone' => null,
+                        'is_current' => true,
+                        'effective_date' => $household->created_at,
+                        'end_date' => null,
+                        'created_by' => null, // System migration
+                        'reason_for_change' => 'Initial address from system migration',
+                        'created_at' => $household->created_at,
+                        'updated_at' => $household->updated_at,
+                    ]);
+                }
             }
         }
     }

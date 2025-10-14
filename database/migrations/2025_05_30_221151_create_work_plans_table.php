@@ -11,16 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('work_plans', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->foreignId('program_id')->constrained()->onDelete('cascade');
-            $table->year('year');
-            $table->text('description')->nullable();
-            $table->json('final_reports')->nullable();
-            $table->boolean('active')->default(true);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('work_plans')) {
+            Schema::create('work_plans', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->foreignId('program_id')->constrained()->onDelete('cascade');
+                $table->year('year');
+                $table->text('description')->nullable();
+                $table->json('final_reports')->nullable();
+                $table->boolean('active')->default(true);
+                $table->timestamps();
+            });
+        }
     }
 
     /**

@@ -11,7 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('contract_program', function (Blueprint $table) {
+        if (!Schema::hasTable('contract_program')) {
+            Schema::create('contract_program', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('contract_id');
             $table->unsignedBigInteger('program_id');
@@ -23,7 +24,8 @@ return new class extends Migration
             $table->unique(['contract_id', 'program_id']);
             $table->index('contract_id');
             $table->index('program_id');
-        });
+            });
+        }
     }
 
     /**

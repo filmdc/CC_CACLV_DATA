@@ -11,7 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('job_contact_ledgers', function (Blueprint $table) {
+        if (!Schema::hasTable('job_contact_ledgers')) {
+            Schema::create('job_contact_ledgers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('housing_job_id')->constrained()->onDelete('cascade');
             $table->datetime('contact_date');
@@ -48,7 +49,8 @@ return new class extends Migration
             $table->index('housing_job_id');
             $table->index('contact_date');
             $table->index('contact_type');
-        });
+            });
+        }
     }
 
     /**

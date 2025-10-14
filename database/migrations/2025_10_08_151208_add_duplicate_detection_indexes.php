@@ -13,19 +13,24 @@ return new class extends Migration
     {
         Schema::table('participants', function (Blueprint $table) {
             // Add composite index for duplicate detection (first_name + last_name + date_of_birth)
-            $table->index(['first_name', 'last_name', 'date_of_birth'], 'idx_participants_duplicate_check');
+            if (!$this->hasIndex('participants', 'idx_participants_duplicate_check')) {
+                $table->index(['first_name', 'last_name', 'date_of_birth'], 'idx_participants_duplicate_check');
+            }
 
             // Add index for email-based duplicate detection
-            $table->index('email', 'idx_participants_email');
+            if (!$this->hasIndex('participants', 'idx_participants_email')) {
+                $table->index('email', 'idx_participants_email');
+            }
 
             // Add index for telephone-based duplicate detection
-            $table->index('telephone', 'idx_participants_telephone');
+            if (!$this->hasIndex('participants', 'idx_participants_telephone')) {
+                $table->index('telephone', 'idx_participants_telephone');
+            }
         });
 
         Schema::table('households', function (Blueprint $table) {
             // Add index for household_code lookups
-            if (!Schema::hasColumn('households', 'household_code')) {
-                // Index likely already exists, but add if missing
+            if (Schema::hasColumn('households', 'household_code') && !$this->hasIndex('households', 'idx_households_code')) {
                 $table->index('household_code', 'idx_households_code');
             }
         });
@@ -33,16 +38,24 @@ return new class extends Migration
         // Add indexes to potential_duplicates table for performance
         Schema::table('potential_duplicates', function (Blueprint $table) {
             // Index for filtering by status
-            $table->index('status', 'idx_potential_duplicates_status');
+            if (!$this->hasIndex('potential_duplicates', 'idx_potential_duplicates_status')) {
+                $table->index('status', 'idx_potential_duplicates_status');
+            }
 
             // Index for filtering by source type
-            $table->index('source_type', 'idx_potential_duplicates_source_type');
+            if (!$this->hasIndex('potential_duplicates', 'idx_potential_duplicates_source_type')) {
+                $table->index('source_type', 'idx_potential_duplicates_source_type');
+            }
 
             // Index for filtering by matched participant
-            $table->index('matched_participant_id', 'idx_potential_duplicates_matched');
+            if (!$this->hasIndex('potential_duplicates', 'idx_potential_duplicates_matched')) {
+                $table->index('matched_participant_id', 'idx_potential_duplicates_matched');
+            }
 
             // Index for filtering by confidence score
-            $table->index('confidence_score', 'idx_potential_duplicates_confidence');
+            if (!$this->hasIndex('potential_duplicates', 'idx_potential_duplicates_confidence')) {
+                $table->index('confidence_score', 'idx_potential_duplicates_confidence');
+            }
         });
     }
 
@@ -52,22 +65,43 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('participants', function (Blueprint $table) {
-            $table->dropIndex('idx_participants_duplicate_check');
-            $table->dropIndex('idx_participants_email');
-            $table->dropIndex('idx_participants_telephone');
+            foreach ([
+                'idx_participants_duplicate_check',
+                'idx_participants_email',
+                'idx_participants_telephone',
+            ] as $index) {
+                if ($this->hasIndex('participants', $index)) {
+                    $table->dropIndex($index);
+                }
+            }
         });
 
         Schema::table('households', function (Blueprint $table) {
-            if (Schema::hasIndex('households', 'idx_households_code')) {
+            if ($this->hasIndex('households', 'idx_households_code')) {
                 $table->dropIndex('idx_households_code');
             }
         });
 
         Schema::table('potential_duplicates', function (Blueprint $table) {
-            $table->dropIndex('idx_potential_duplicates_status');
-            $table->dropIndex('idx_potential_duplicates_source_type');
-            $table->dropIndex('idx_potential_duplicates_matched');
-            $table->dropIndex('idx_potential_duplicates_confidence');
+            foreach ([
+                'idx_potential_duplicates_status',
+                'idx_potential_duplicates_source_type',
+                'idx_potential_duplicates_matched',
+                'idx_potential_duplicates_confidence',
+            ] as $index) {
+                if ($this->hasIndex('potential_duplicates', $index)) {
+                    $table->dropIndex($index);
+                }
+            }
         });
+    }
+
+    private function hasIndex(string $table, string $indexName): bool
+    {
+        $connection = Schema::getConnection();
+        $tableName = $connection->getTablePrefix() . $table;
+        $results = $connection->select("SHOW INDEX FROM `{$tableName}` WHERE Key_name = ?", [$indexName]);
+
+        return !empty($results);
     }
 };

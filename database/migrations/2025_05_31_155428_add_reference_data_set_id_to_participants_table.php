@@ -11,9 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasColumn('participants', 'reference_data_set_id')) {
+            return;
+        }
+
         Schema::table('participants', function (Blueprint $table) {
-            $table->foreignId('reference_data_set_id')->after('household_id')->nullable()->constrained()->onDelete('set null');
-            $table->index('reference_data_set_id');
+            if (!Schema::hasColumn('participants', 'reference_data_set_id')) {
+                $table->foreignId('reference_data_set_id')->after('household_id')->nullable()->constrained()->onDelete('set null');
+                $table->index('reference_data_set_id');
+            }
         });
     }
 
@@ -23,9 +29,11 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('participants', function (Blueprint $table) {
-            $table->dropForeign(['reference_data_set_id']);
-            $table->dropIndex(['reference_data_set_id']);
-            $table->dropColumn('reference_data_set_id');
+            if (Schema::hasColumn('participants', 'reference_data_set_id')) {
+                $table->dropForeign(['reference_data_set_id']);
+                $table->dropIndex(['reference_data_set_id']);
+                $table->dropColumn('reference_data_set_id');
+            }
         });
     }
 };

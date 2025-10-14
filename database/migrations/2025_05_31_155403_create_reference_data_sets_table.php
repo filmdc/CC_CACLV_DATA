@@ -11,20 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('reference_data_sets', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->text('description')->nullable();
-            $table->string('version', 20);
-            $table->boolean('is_active')->default(false);
-            $table->boolean('is_draft')->default(true);
-            $table->timestamp('activated_at')->nullable();
-            $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
-            $table->timestamps();
-            
-            $table->index(['is_active', 'activated_at']);
-            $table->unique(['version']);
-        });
+        if (!Schema::hasTable('reference_data_sets')) {
+            Schema::create('reference_data_sets', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->text('description')->nullable();
+                $table->string('version', 20);
+                $table->boolean('is_active')->default(false);
+                $table->boolean('is_draft')->default(true);
+                $table->timestamp('activated_at')->nullable();
+                $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
+                $table->timestamps();
+
+                $table->index(['is_active', 'activated_at']);
+                $table->unique(['version']);
+            });
+        }
     }
 
     /**

@@ -11,7 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('housing_jobs', function (Blueprint $table) {
+        if (!Schema::hasTable('housing_jobs')) {
+            Schema::create('housing_jobs', function (Blueprint $table) {
             $table->id();
             $table->string('job_number')->unique();
             $table->foreignId('participant_id')->constrained()->onDelete('cascade');
@@ -60,7 +61,8 @@ return new class extends Migration
             $table->index('status');
             $table->index('job_number');
             $table->index('request_date');
-        });
+            });
+        }
     }
 
     /**

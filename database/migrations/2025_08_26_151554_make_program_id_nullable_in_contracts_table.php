@@ -12,14 +12,20 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('contracts', function (Blueprint $table) {
-            // Drop the foreign key constraint first
-            $table->dropForeign(['program_id']);
-            
-            // Make program_id nullable for legacy many-to-many compatibility
-            $table->unsignedBigInteger('program_id')->nullable()->change();
-            
-            // Re-add the foreign key constraint as nullable
-            $table->foreign('program_id')->references('id')->on('programs')->onDelete('set null');
+            if (Schema::hasColumn('contracts', 'program_id')) {
+                // Drop the foreign key constraint first
+                try {
+                    $table->dropForeign(['program_id']);
+                } catch (\Throwable $e) {
+                    // ignore if already dropped
+                }
+
+                // Make program_id nullable for legacy many-to-many compatibility
+                $table->unsignedBigInteger('program_id')->nullable()->change();
+
+                // Re-add the foreign key constraint as nullable
+                $table->foreign('program_id')->references('id')->on('programs')->onDelete('set null');
+            }
         });
     }
 
@@ -29,14 +35,20 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('contracts', function (Blueprint $table) {
-            // Drop the foreign key constraint
-            $table->dropForeign(['program_id']);
-            
-            // Make program_id required again
-            $table->unsignedBigInteger('program_id')->nullable(false)->change();
-            
-            // Re-add the foreign key constraint as required
-            $table->foreign('program_id')->references('id')->on('programs')->onDelete('cascade');
+            if (Schema::hasColumn('contracts', 'program_id')) {
+                // Drop the foreign key constraint
+                try {
+                    $table->dropForeign(['program_id']);
+                } catch (\Throwable $e) {
+                    // ignore
+                }
+
+                // Make program_id required again
+                $table->unsignedBigInteger('program_id')->nullable(false)->change();
+
+                // Re-add the foreign key constraint as required
+                $table->foreign('program_id')->references('id')->on('programs')->onDelete('cascade');
+            }
         });
     }
 };

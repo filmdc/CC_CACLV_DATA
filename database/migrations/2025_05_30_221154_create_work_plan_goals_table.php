@@ -11,16 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('work_plan_goals', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('work_plan_id')->constrained()->onDelete('cascade');
-            $table->foreignId('service_id')->constrained()->onDelete('cascade');
-            $table->string('goal_name');
-            $table->text('description')->nullable();
-            $table->integer('target_number');
-            $table->integer('actual_number')->default(0);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('work_plan_goals')) {
+            Schema::create('work_plan_goals', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('work_plan_id')->constrained()->onDelete('cascade');
+                $table->foreignId('service_id')->constrained()->onDelete('cascade');
+                $table->string('goal_name');
+                $table->text('description')->nullable();
+                $table->integer('target_number');
+                $table->integer('actual_number')->default(0);
+                $table->timestamps();
+            });
+        }
     }
 
     /**

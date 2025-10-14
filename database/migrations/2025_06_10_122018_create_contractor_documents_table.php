@@ -11,7 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('contractor_documents', function (Blueprint $table) {
+        if (!Schema::hasTable('contractor_documents')) {
+            Schema::create('contractor_documents', function (Blueprint $table) {
             $table->id();
             $table->foreignId('contractor_id')->constrained()->onDelete('cascade');
             $table->string('document_name');
@@ -39,7 +40,9 @@ return new class extends Migration
             $table->index('document_type');
             $table->index('expiration_date');
             $table->index('is_current');
-        });
+            });
+        }
+    }
     }
 
     /**

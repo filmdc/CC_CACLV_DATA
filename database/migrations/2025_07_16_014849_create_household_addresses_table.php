@@ -11,7 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('household_addresses', function (Blueprint $table) {
+        if (!Schema::hasTable('household_addresses')) {
+            Schema::create('household_addresses', function (Blueprint $table) {
             $table->id();
             $table->foreignId('household_id')->constrained()->onDelete('cascade');
             $table->string('address')->nullable();
@@ -31,7 +32,8 @@ return new class extends Migration
             // Indexes for performance
             $table->index(['household_id', 'is_current']);
             $table->index('effective_date');
-        });
+            });
+        }
     }
 
     /**

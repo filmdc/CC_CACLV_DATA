@@ -11,7 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('property_notes', function (Blueprint $table) {
+        if (!Schema::hasTable('property_notes')) {
+            Schema::create('property_notes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('property_id')->constrained()->onDelete('cascade');
             $table->string('subject')->nullable();
@@ -24,7 +25,8 @@ return new class extends Migration
             $table->index('property_id');
             $table->index('note_type');
             $table->index('created_at');
-        });
+            });
+        }
     }
 
     /**
