@@ -209,7 +209,11 @@
                                 <h2 class="text-lg font-semibold text-slate-900">2. Attach Your File</h2>
                                 <p class="mt-1 text-sm text-slate-500">Accepted formats: CSV, TXT, XLSX, XLS, PDF, ZIP, DOC, DOCX, JSON (max 100MB).</p>
                                 <div class="mt-4">
-                                    <label class="flex flex-col items-center justify-center w-full p-6 border-2 border-dashed rounded-xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition @error('upload_file') border-rose-400 bg-rose-50 @else border-slate-300 @enderror">
+                                    <label data-dropzone
+                                           role="button"
+                                           tabindex="0"
+                                           aria-label="Upload file"
+                                           class="flex flex-col items-center justify-center w-full p-6 border-2 border-dashed rounded-xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition @error('upload_file') border-rose-400 bg-rose-50 @else border-slate-300 @enderror">
                                         <svg class="h-10 w-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" />
                                         </svg>
@@ -217,6 +221,7 @@
                                         <span class="text-xs text-slate-500 mt-1">or drag and drop your file here</span>
                                         <input id="upload_file" name="upload_file" type="file" class="hidden" required>
                                     </label>
+                                    <p id="selected-file-name" class="mt-2 text-xs text-slate-500">No file selected yet.</p>
                                     @error('upload_file')
                                         <p class="mt-2 text-sm text-rose-600">{{ $message }}</p>
                                     @enderror
@@ -245,14 +250,14 @@
         <script>
             document.addEventListener('DOMContentLoaded', () => {
                 const templateContainer = document.getElementById('template-links');
-                if (!templateContainer) {
-                    return;
-                }
-
-                const templateBlocks = templateContainer.querySelectorAll('[data-template]');
+                const templateBlocks = templateContainer?.querySelectorAll('[data-template]') ?? [];
                 const typeInputs = document.querySelectorAll('input[name="submission_type"]');
 
                 const updateTemplateVisibility = (selectedType) => {
+                    if (!templateContainer) {
+                        return;
+                    }
+
                     if (!selectedType) {
                         templateContainer.classList.add('hidden');
                         return;
@@ -271,6 +276,78 @@
                 const initiallyChecked = document.querySelector('input[name="submission_type"]:checked');
                 if (initiallyChecked) {
                     updateTemplateVisibility(initiallyChecked.value);
+                }
+
+                const dropzone = document.querySelector('[data-dropzone]');
+                const fileInput = document.getElementById('upload_file');
+                const fileNameDisplay = document.getElementById('selected-file-name');
+
+                if (dropzone && fileInput) {
+                    const updateFileName = (file) => {
+                        if (!fileNameDisplay) {
+                            return;
+                        }
+
+                        fileNameDisplay.textContent = file
+                            ? `Selected: ${file.name}`
+                            : 'No file selected yet.';
+                    };
+
+                    const highlight = () => dropzone.classList.add('border-blue-400', 'bg-blue-50');
+                    const unhighlight = () => dropzone.classList.remove('border-blue-400', 'bg-blue-50');
+
+                    ['dragenter', 'dragover'].forEach((eventName) => {
+                        dropzone.addEventListener(eventName, (event) => {
+                            event.preventDefault();
+                            highlight();
+                        });
+                    });
+
+                    ['dragleave', 'dragend'].forEach((eventName) => {
+                        dropzone.addEventListener(eventName, (event) => {
+                            event.preventDefault();
+                            unhighlight();
+                        });
+                    });
+
+                    dropzone.addEventListener('drop', (event) => {
+                        event.preventDefault();
+                        unhighlight();
+
+                        if (!event.dataTransfer?.files?.length) {
+                            return;
+                        }
+
+                        const file = event.dataTransfer.files[0];
+                        if (!file) {
+                            return;
+                        }
+
+                        try {
+                            if (window.DataTransfer) {
+                                const dataTransfer = new DataTransfer();
+                                dataTransfer.items.add(file);
+                                fileInput.files = dataTransfer.files;
+                            } else {
+                                fileInput.files = event.dataTransfer.files;
+                            }
+                        } catch (error) {
+                            console.error('Unable to attach dropped file', error);
+                        }
+                        fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    });
+
+                    dropzone.addEventListener('click', () => fileInput.click());
+                    dropzone.addEventListener('keydown', (event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            fileInput.click();
+                        }
+                    });
+
+                    fileInput.addEventListener('change', () => {
+                        updateFileName(fileInput.files?.[0] ?? null);
+                    });
                 }
             });
         </script>
