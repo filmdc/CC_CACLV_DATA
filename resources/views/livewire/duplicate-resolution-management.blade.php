@@ -3,13 +3,32 @@
         <!-- Header -->
         <div class="p-6 border-b border-gray-200 dark:border-zinc-700">
             <div class="flex items-center justify-between">
-                <div>
+                <div class="flex items-center gap-3">
                     <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Duplicate Resolution</h1>
                     <p class="text-gray-600 dark:text-gray-300 mt-1">
                         Review and resolve potential participant duplicates
                     </p>
                 </div>
-                
+
+                <div class="flex items-center gap-3">
+                    @if ($rescanSummary)
+                        <div class="text-xs text-gray-500 dark:text-gray-300">
+                            Last rescan processed {{ $rescanSummary['evaluated'] }} participants; {{ $rescanSummary['created'] }} duplicates logged.
+                        </div>
+                    @endif
+                    <button wire:click="rescanDuplicates"
+                            wire:loading.attr="disabled"
+                            wire:loading.class="opacity-60 cursor-progress"
+                            wire:target="rescanDuplicates"
+                            class="inline-flex items-center gap-2 rounded-md bg-purple-600 px-3 py-2 text-xs font-semibold text-white shadow hover:bg-purple-700">
+                        <svg wire:loading wire:target="rescanDuplicates" class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                        </svg>
+                        Rescan All Participants
+                    </button>
+                </div>
+
                 <!-- Summary Stats -->
                 <div class="flex space-x-4">
                     <div class="text-center">

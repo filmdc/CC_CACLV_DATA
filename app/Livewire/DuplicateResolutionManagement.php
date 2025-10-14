@@ -34,6 +34,9 @@ class DuplicateResolutionManagement extends Component
 
     protected $duplicateDetectionService;
 
+    public bool $rescanRunning = false;
+    public ?array $rescanSummary = null;
+
     public function boot(DuplicateDetectionService $duplicateDetectionService)
     {
         $this->duplicateDetectionService = $duplicateDetectionService;
@@ -52,7 +55,32 @@ class DuplicateResolutionManagement extends Component
             'duplicates' => $duplicates,
             'pendingCount' => PotentialDuplicate::pending()->count(),
             'totalCount' => PotentialDuplicate::count(),
+            'rescanSummary' => $this->rescanSummary,
         ]);
+    }
+
+    public function rescanDuplicates(): void
+    {
+        $this->authorizeAction('participants.import', 'You do not have permission to rescan duplicates.');
+
+        $this->rescanRunning = true;
+        $this->rescanSummary = null;
+
+        try {
+            $summary = $this->duplicateDetectionService->rescanExistingParticipants();
+            $this->rescanSummary = $summary;
+
+            session()->flash('message', sprintf(
+                'Rescan complete. Evaluated %d participants and logged %d potential duplicates.',
+                $summary['evaluated'],
+                $summary['created']
+            ));
+        } catch (\Throwable $e) {
+            Log::error('Duplicate rescan failed', ['error' => $e->getMessage()]);
+            session()->flash('error', 'Rescan failed: ' . $e->getMessage());
+        } finally {
+            $this->rescanRunning = false;
+        }
     }
 
     protected function getPotentialDuplicates()

@@ -165,12 +165,16 @@ class DuplicateDetectionService
     /**
      * Check for potential duplicates of proposed participant data
      */
-    public function checkForDuplicates(array $proposedData, string $sourceType, ?string $sourceIdentifier = null): Collection
+    public function checkForDuplicates(array $proposedData, string $sourceType, ?string $sourceIdentifier = null, ?int $excludeParticipantId = null): Collection
     {
         $potentialDuplicates = collect();
 
         // Get candidates using multiple search strategies
         $candidates = $this->getCandidates($proposedData);
+
+        if ($excludeParticipantId) {
+            $candidates = $candidates->reject(fn ($candidate) => $candidate->id === $excludeParticipantId);
+        }
 
         foreach ($candidates as $candidate) {
             $score = $this->calculateConfidenceScore($proposedData, $candidate);
@@ -203,6 +207,23 @@ class DuplicateDetectionService
         $storedDuplicates = collect();
 
         foreach ($duplicates as $duplicate) {
+            $existingPending = PotentialDuplicate::where('matched_participant_id', $duplicate['participant']->id)
+                ->where('status', 'pending')
+                ->get();
+
+            $alreadyExists = $existingPending->first(function ($existing) use ($duplicate) {
+                $existingData = $existing->proposed_data ?? [];
+
+                return $existing->source_type === $duplicate['source_type']
+                    && data_get($existingData, 'first_name') === ($duplicate['proposed_data']['first_name'] ?? null)
+                    && data_get($existingData, 'last_name') === ($duplicate['proposed_data']['last_name'] ?? null)
+                    && data_get($existingData, 'date_of_birth') === ($duplicate['proposed_data']['date_of_birth'] ?? null);
+            });
+
+            if ($alreadyExists) {
+                continue;
+            }
+
             $stored = PotentialDuplicate::create([
                 'source_type' => $duplicate['source_type'],
                 'source_identifier' => $duplicate['source_identifier'],
@@ -217,6 +238,43 @@ class DuplicateDetectionService
         }
 
         return $storedDuplicates;
+    }
+
+    public function rescanExistingParticipants(int $chunkSize = 250): array
+    {
+        $evaluated = 0;
+        $created = 0;
+
+        Participant::chunkById($chunkSize, function ($participants) use (&$evaluated, &$created) {
+            foreach ($participants as $participant) {
+                $evaluated++;
+
+                $proposedData = [
+                    'first_name' => $participant->first_name,
+                    'last_name' => $participant->last_name,
+                    'date_of_birth' => optional($participant->date_of_birth)->format('Y-m-d'),
+                    'email' => $participant->email,
+                    'telephone' => $participant->telephone,
+                ];
+
+                $duplicates = $this->checkForDuplicates(
+                    $proposedData,
+                    'duplicate_rescan',
+                    (string) $participant->id,
+                    $participant->id
+                );
+
+                if ($duplicates->isNotEmpty()) {
+                    $stored = $this->storePotentialDuplicates($duplicates, Auth::id() ?? 1);
+                    $created += $stored->count();
+                }
+            }
+        });
+
+        return [
+            'evaluated' => $evaluated,
+            'created' => $created,
+        ];
     }
 
     /**
