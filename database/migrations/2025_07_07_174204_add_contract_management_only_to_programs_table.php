@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('programs', function (Blueprint $table) {
-            $table->boolean('contract_management_only')->default(false)->after('active');
+            if (!Schema::hasColumn('programs', 'contract_management_only')) {
+                $table->boolean('contract_management_only')->default(false)->after('active');
+            }
         });
     }
 
@@ -22,7 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('programs', function (Blueprint $table) {
-            $table->dropColumn('contract_management_only');
+            if (Schema::hasColumn('programs', 'contract_management_only')) {
+                $table->dropColumn('contract_management_only');
+            }
         });
     }
 };

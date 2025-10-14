@@ -105,31 +105,39 @@ return new class extends Migration
             $status = $originalDueDate['status'] === 'incomplete' ? 'pending' : 'completed';
             
             // Create the due date record
-            $dueDate = ContractReportDueDate::create([
+            $lookup = [
                 'contract_id' => $contract->id,
                 'due_date' => $originalDueDate['due_date'],
-                'status' => $status,
                 'description' => $originalDueDate['description'],
-                'report_type' => $reportType,
-                'reminder_intervals' => [30, 15, 7, 3, 1], // Default intervals
-                'active' => true,
-                'created_by' => null,
-                'updated_by' => null,
-            ]);
-            
+            ];
+
+            $dueDate = ContractReportDueDate::firstOrCreate(
+                $lookup,
+                array_merge($lookup, [
+                    'status' => $status,
+                    'report_type' => $reportType,
+                    'reminder_intervals' => [30, 15, 7, 3, 1],
+                    'active' => true,
+                    'created_by' => null,
+                    'updated_by' => null,
+                ])
+            );
+
             // Attach emails
             foreach ($originalDueDate['email_addresses'] as $email) {
                 $dueDateEmail = DueDateEmail::where('email', $email)->first();
                 if ($dueDateEmail) {
-                    $dueDate->emails()->attach($dueDateEmail->id, [
-                        'reminder_intervals' => json_encode([30, 15, 7, 3, 1]),
-                        'active' => true,
-                        'created_at' => now(),
-                        'updated_at' => now(),
+                    $dueDate->emails()->syncWithoutDetaching([
+                        $dueDateEmail->id => [
+                            'reminder_intervals' => json_encode([30, 15, 7, 3, 1]),
+                            'active' => true,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ],
                     ]);
                 }
             }
-            
+
             $imported++;
         }
         

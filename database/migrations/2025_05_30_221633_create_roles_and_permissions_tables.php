@@ -11,49 +11,59 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('roles', function (Blueprint $table) {
-            $table->id();
-            $table->string('name')->unique();
-            $table->string('display_name');
-            $table->text('description')->nullable();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('roles')) {
+            Schema::create('roles', function (Blueprint $table) {
+                $table->id();
+                $table->string('name')->unique();
+                $table->string('display_name');
+                $table->text('description')->nullable();
+                $table->timestamps();
+            });
+        }
 
-        Schema::create('permissions', function (Blueprint $table) {
-            $table->id();
-            $table->string('name')->unique();
-            $table->string('display_name');
-            $table->text('description')->nullable();
-            $table->string('category')->nullable();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('permissions')) {
+            Schema::create('permissions', function (Blueprint $table) {
+                $table->id();
+                $table->string('name')->unique();
+                $table->string('display_name');
+                $table->text('description')->nullable();
+                $table->string('category')->nullable();
+                $table->timestamps();
+            });
+        }
 
-        Schema::create('role_permission', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('role_id')->constrained()->onDelete('cascade');
-            $table->foreignId('permission_id')->constrained()->onDelete('cascade');
-            $table->timestamps();
-            
-            $table->unique(['role_id', 'permission_id']);
-        });
+        if (!Schema::hasTable('role_permission')) {
+            Schema::create('role_permission', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('role_id')->constrained()->onDelete('cascade');
+                $table->foreignId('permission_id')->constrained()->onDelete('cascade');
+                $table->timestamps();
 
-        Schema::create('user_role', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('role_id')->constrained()->onDelete('cascade');
-            $table->timestamps();
-            
-            $table->unique(['user_id', 'role_id']);
-        });
+                $table->unique(['role_id', 'permission_id']);
+            });
+        }
 
-        Schema::create('user_program', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('program_id')->constrained()->onDelete('cascade');
-            $table->timestamps();
-            
-            $table->unique(['user_id', 'program_id']);
-        });
+        if (!Schema::hasTable('user_role')) {
+            Schema::create('user_role', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('user_id')->constrained()->onDelete('cascade');
+                $table->foreignId('role_id')->constrained()->onDelete('cascade');
+                $table->timestamps();
+
+                $table->unique(['user_id', 'role_id']);
+            });
+        }
+
+        if (!Schema::hasTable('user_program')) {
+            Schema::create('user_program', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('user_id')->constrained()->onDelete('cascade');
+                $table->foreignId('program_id')->constrained()->onDelete('cascade');
+                $table->timestamps();
+
+                $table->unique(['user_id', 'program_id']);
+            });
+        }
     }
 
     /**

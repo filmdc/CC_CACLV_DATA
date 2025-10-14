@@ -11,9 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('programs', function (Blueprint $table) {
-            $table->boolean('housing_module_enabled')->default(false)->after('active');
-        });
+        if (!Schema::hasColumn('programs', 'housing_module_enabled')) {
+            Schema::table('programs', function (Blueprint $table) {
+                if (!Schema::hasColumn('programs', 'housing_module_enabled')) {
+                    $table->boolean('housing_module_enabled')->default(false)->after('active');
+                }
+            });
+        }
     }
 
     /**
@@ -22,7 +26,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('programs', function (Blueprint $table) {
-            $table->dropColumn('housing_module_enabled');
+            if (Schema::hasColumn('programs', 'housing_module_enabled')) {
+                $table->dropColumn('housing_module_enabled');
+            }
         });
     }
 };

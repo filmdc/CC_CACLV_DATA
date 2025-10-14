@@ -11,7 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('job_document_checklists', function (Blueprint $table) {
+        if (!Schema::hasTable('job_document_checklists')) {
+            Schema::create('job_document_checklists', function (Blueprint $table) {
             $table->id();
             $table->foreignId('housing_job_id')->constrained()->onDelete('cascade');
             $table->string('document_name');
@@ -34,7 +35,8 @@ return new class extends Migration
             $table->index('housing_job_id');
             $table->index('status');
             $table->index('is_required');
-        });
+            });
+        }
     }
 
     /**

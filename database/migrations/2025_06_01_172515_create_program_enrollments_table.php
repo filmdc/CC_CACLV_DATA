@@ -11,28 +11,30 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('program_enrollments', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('participant_id')->constrained()->onDelete('cascade');
-            $table->foreignId('program_id')->constrained()->onDelete('cascade');
-            $table->date('enrollment_date');
-            $table->date('exit_date')->nullable();
-            $table->enum('status', ['active', 'completed', 'withdrawn', 'transferred'])->default('active');
-            $table->enum('exit_reason', [
-                'completed_successfully',
-                'moved_out_of_area',
-                'no_longer_eligible',
-                'non_compliance',
-                'participant_choice',
-                'other'
-            ])->nullable();
-            $table->text('exit_notes')->nullable();
-            $table->text('notes')->nullable();
-            $table->timestamps();
-            
-            // Add index for performance
-            $table->index(['participant_id', 'program_id', 'status']);
-        });
+        if (!Schema::hasTable('program_enrollments')) {
+            Schema::create('program_enrollments', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('participant_id')->constrained()->onDelete('cascade');
+                $table->foreignId('program_id')->constrained()->onDelete('cascade');
+                $table->date('enrollment_date');
+                $table->date('exit_date')->nullable();
+                $table->enum('status', ['active', 'completed', 'withdrawn', 'transferred'])->default('active');
+                $table->enum('exit_reason', [
+                    'completed_successfully',
+                    'moved_out_of_area',
+                    'no_longer_eligible',
+                    'non_compliance',
+                    'participant_choice',
+                    'other'
+                ])->nullable();
+                $table->text('exit_notes')->nullable();
+                $table->text('notes')->nullable();
+                $table->timestamps();
+
+                // Add index for performance
+                $table->index(['participant_id', 'program_id', 'status']);
+            });
+        }
     }
 
     /**

@@ -12,20 +12,28 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('site_settings', function (Blueprint $table) {
-            $table->id();
-            $table->string('key')->unique();
-            $table->text('value')->nullable();
-            $table->string('type')->default('text'); // text, file, boolean, etc.
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('site_settings')) {
+            Schema::create('site_settings', function (Blueprint $table) {
+                $table->id();
+                $table->string('key')->unique();
+                $table->text('value')->nullable();
+                $table->string('type')->default('text'); // text, file, boolean, etc.
+                $table->timestamps();
+            });
+        }
 
-        // Insert default settings
-        DB::table('site_settings')->insert([
-            ['key' => 'site_name', 'value' => 'CAP TRACK', 'type' => 'text', 'created_at' => now(), 'updated_at' => now()],
-            ['key' => 'site_logo', 'value' => null, 'type' => 'file', 'created_at' => now(), 'updated_at' => now()],
-            ['key' => 'site_favicon', 'value' => null, 'type' => 'file', 'created_at' => now(), 'updated_at' => now()],
-        ]);
+        $defaults = [
+            ['key' => 'site_name', 'value' => 'CAP TRACK', 'type' => 'text'],
+            ['key' => 'site_logo', 'value' => null, 'type' => 'file'],
+            ['key' => 'site_favicon', 'value' => null, 'type' => 'file'],
+        ];
+
+        foreach ($defaults as $setting) {
+            DB::table('site_settings')->updateOrInsert(
+                ['key' => $setting['key']],
+                array_merge($setting, ['updated_at' => now(), 'created_at' => now()])
+            );
+        }
     }
 
     /**

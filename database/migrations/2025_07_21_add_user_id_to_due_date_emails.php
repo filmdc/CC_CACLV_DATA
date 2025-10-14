@@ -12,9 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('due_date_emails', function (Blueprint $table) {
-            $table->unsignedBigInteger('user_id')->nullable()->after('id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
-            $table->index('user_id');
+            if (!Schema::hasColumn('due_date_emails', 'user_id')) {
+                $table->unsignedBigInteger('user_id')->nullable()->after('id');
+                $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
+                $table->index('user_id');
+            }
         });
     }
 
@@ -24,8 +26,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('due_date_emails', function (Blueprint $table) {
-            $table->dropForeign(['user_id']);
-            $table->dropColumn('user_id');
+            if (Schema::hasColumn('due_date_emails', 'user_id')) {
+                $table->dropForeign(['user_id']);
+                $table->dropColumn('user_id');
+            }
         });
     }
 };

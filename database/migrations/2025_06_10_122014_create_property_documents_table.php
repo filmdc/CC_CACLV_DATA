@@ -11,7 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('property_documents', function (Blueprint $table) {
+        if (!Schema::hasTable('property_documents')) {
+            Schema::create('property_documents', function (Blueprint $table) {
             $table->id();
             $table->foreignId('property_id')->constrained()->onDelete('cascade');
             $table->string('document_name');
@@ -39,7 +40,8 @@ return new class extends Migration
             $table->index('property_id');
             $table->index('document_type');
             $table->index('document_date');
-        });
+            });
+        }
     }
 
     /**

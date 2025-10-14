@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Livewire\Volt\Volt;
+use App\Http\Controllers\ProgramManagerUploadController;
 
 Route::get('/', function () {
     return redirect()->route('welcome');
@@ -13,6 +14,12 @@ Route::get('/', function () {
 Route::get('/welcome', function () {
     return view('welcome');
 })->name('welcome');
+
+Route::get('/program-manager-upload', [ProgramManagerUploadController::class, 'create'])->name('program-manager-upload.create');
+Route::post('/program-manager-upload', [ProgramManagerUploadController::class, 'store'])->name('program-manager-upload.store');
+Route::get('/program-manager-upload/template/{type}', [ProgramManagerUploadController::class, 'downloadTemplate'])
+    ->whereIn('type', ['general', 'hmis', 'rx_office'])
+    ->name('program-manager-upload.template');
 
 Route::get('dashboard', App\Livewire\Dashboard::class)
     ->middleware(['auth', 'verified'])

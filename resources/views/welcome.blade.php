@@ -90,6 +90,16 @@
                             </a>
                         </div>
                     @endauth
+
+                    <div class="mt-10 flex flex-col items-center gap-3">
+                        <a href="{{ route('program-manager-upload.create') }}"
+                           class="inline-flex items-center justify-center rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 text-lg font-semibold transition-colors shadow-lg shadow-emerald-500/25">
+                            Program Staff Upload Portal
+                        </a>
+                        <p class="text-sm text-gray-500 max-w-md">
+                            Program managers can submit General, HMIS, or RX Office data files securely using the upload portal.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

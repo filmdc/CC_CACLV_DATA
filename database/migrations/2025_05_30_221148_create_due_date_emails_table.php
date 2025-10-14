@@ -11,22 +11,24 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('due_date_emails', function (Blueprint $table) {
-            $table->id();
-            $table->string('email')->unique();
-            $table->string('name')->nullable();
-            $table->boolean('active')->default(true);
-            $table->json('preferences')->nullable(); // Email preferences like reminder intervals
-            $table->timestamps();
-            $table->softDeletes();
-            $table->unsignedBigInteger('created_by')->nullable();
-            $table->unsignedBigInteger('updated_by')->nullable();
-            
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
-            $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
-            
-            $table->index(['active', 'email']);
-        });
+        if (!Schema::hasTable('due_date_emails')) {
+            Schema::create('due_date_emails', function (Blueprint $table) {
+                $table->id();
+                $table->string('email')->unique();
+                $table->string('name')->nullable();
+                $table->boolean('active')->default(true);
+                $table->json('preferences')->nullable(); // Email preferences like reminder intervals
+                $table->timestamps();
+                $table->softDeletes();
+                $table->unsignedBigInteger('created_by')->nullable();
+                $table->unsignedBigInteger('updated_by')->nullable();
+
+                $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
+                $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
+
+                $table->index(['active', 'email']);
+            });
+        }
     }
 
     /**
