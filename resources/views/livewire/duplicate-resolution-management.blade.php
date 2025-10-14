@@ -258,29 +258,44 @@
                         ];
                     @endphp
 
-                    <div class="overflow-hidden rounded-lg border border-gray-200 dark:border-zinc-700">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700 text-sm">
-                            <thead class="bg-gray-50 dark:bg-zinc-900">
-                                <tr>
-                                    <th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">Field</th>
-                                    <th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">Proposed</th>
-                                    <th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">Existing</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-200 dark:divide-zinc-800">
-                                @foreach ($fields as $label => [$proposedValue, $existingValue])
+                    <div class="rounded-lg border border-gray-200 dark:border-zinc-700">
+                        <div class="max-h-[55vh] overflow-y-auto">
+                            <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700 text-sm">
+                                <thead class="sticky top-0 bg-gray-50 dark:bg-zinc-900">
                                     <tr>
-                                        <td class="px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{{ $label }}</td>
-                                        <td class="px-4 py-2 text-gray-600 dark:text-gray-300">
-                                            {{ $proposedValue ? (is_array($proposedValue) ? implode(', ', $proposedValue) : $proposedValue) : '—' }}
-                                        </td>
-                                        <td class="px-4 py-2 text-gray-600 dark:text-gray-300">
-                                            {{ $existingValue ? (is_array($existingValue) ? implode(', ', $existingValue) : $existingValue) : '—' }}
-                                        </td>
+                                        <th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">Field</th>
+                                        <th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">Proposed</th>
+                                        <th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">Existing</th>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200 dark:divide-zinc-800">
+                                    @foreach ($fields as $label => [$proposedValue, $existingValue])
+                                        @php
+                                            $formatValue = function ($value) {
+                                                if (is_array($value)) {
+                                                    return implode(', ', array_filter($value));
+                                                }
+
+                                                if (is_string($value) && strlen($value) > 160) {
+                                                    return nl2br(e(\Illuminate\Support\Str::limit($value, 160)));
+                                                }
+
+                                                return $value;
+                                            };
+                                        @endphp
+                                        <tr>
+                                            <td class="px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{{ $label }}</td>
+                                            <td class="px-4 py-2 text-gray-600 dark:text-gray-300">
+                                                {!! $proposedValue ? $formatValue($proposedValue) : '—' !!}
+                                            </td>
+                                            <td class="px-4 py-2 text-gray-600 dark:text-gray-300">
+                                                {!! $existingValue ? $formatValue($existingValue) : '—' !!}
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     
                     <!-- Review Notes -->
