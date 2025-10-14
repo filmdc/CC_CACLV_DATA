@@ -237,6 +237,7 @@
                         $proposed = $selectedDuplicate->proposed_data ?? [];
                         $existing = $selectedDuplicate->matchedParticipant;
                         $existingHousehold = $existing?->household;
+                        $existingAddress = $existingHousehold?->currentAddress;
 
                         $fields = [
                             'First Name' => [data_get($proposed, 'first_name'), $existing?->first_name],
@@ -248,10 +249,10 @@
                             'Race' => [implode(', ', (array) data_get($proposed, 'race')), implode(', ', (array) ($existing?->race ? (is_array($existing->race) ? $existing->race : json_decode($existing->race, true)) : []))],
                             'Email' => [data_get($proposed, 'email'), $existing?->email],
                             'Phone' => [data_get($proposed, 'telephone'), $existing?->telephone],
-                            'Address' => [data_get($proposed, 'street_address'), $existingHousehold?->currentAddress()?->address],
-                            'City' => [data_get($proposed, 'city'), $existingHousehold?->currentAddress()?->city],
-                            'State' => [data_get($proposed, 'state'), $existingHousehold?->currentAddress()?->state],
-                            'Postal Code' => [data_get($proposed, 'zip_code'), $existingHousehold?->currentAddress()?->zip_code],
+                            'Address' => [data_get($proposed, 'street_address'), $existingAddress?->address],
+                            'City' => [data_get($proposed, 'city'), $existingAddress?->city],
+                            'State' => [data_get($proposed, 'state'), $existingAddress?->state],
+                            'Postal Code' => [data_get($proposed, 'zip_code'), $existingAddress?->zip_code],
                             'Household Code' => [data_get($proposed, 'household_code'), $existingHousehold?->household_code],
                             'Notes' => [data_get($proposed, 'notes'), $existing?->notes],
                         ];
