@@ -261,6 +261,15 @@ class DuplicateResolutionManagement extends Component
         
         // Remove any ID fields and ensure required fields are present
         unset($proposedData['id']);
+
+        $householdId = $proposedData['household_id'] ?? $duplicate->matchedParticipant->household_id;
+
+        if (!$householdId) {
+            throw new \RuntimeException('Unable to determine household for this participant.');
+        }
+
+        $proposedData['household_id'] = $householdId;
+        $proposedData['is_head_of_household'] = $proposedData['is_head_of_household'] ?? false;
         
         // Create the new participant
         $participant = Participant::create($proposedData);
