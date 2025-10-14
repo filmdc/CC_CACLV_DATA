@@ -33,6 +33,16 @@
                 Import/Export Data
             </a>
             @endif
+
+            @if($this->can('program-manager-uploads.manage'))
+            <a href="{{ route('program-manager-uploads.review') }}" wire:navigate
+               class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors font-medium">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 16.5V19a2 2 0 002 2h14a2 2 0 002-2v-2.5m-18-5l5.857 4.399a4 4 0 004.286 0L21 11.5m-18-7l6.238 4.706a4 4 0 004.524 0L21 4.5"/>
+                </svg>
+                Program Uploads
+            </a>
+            @endif
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
