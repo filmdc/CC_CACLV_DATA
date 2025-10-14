@@ -26,6 +26,14 @@ Route::get('dashboard', App\Livewire\Dashboard::class)
     ->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('admin/program-manager-uploads', App\Livewire\ProgramManagerUploadReview::class)
+        ->middleware(['permission:program-manager-uploads.manage'])
+        ->name('program-manager-uploads.review');
+
+    Route::get('admin/program-manager-upload/{upload}/download', [ProgramManagerUploadController::class, 'download'])
+        ->middleware(['permission:program-manager-uploads.manage'])
+        ->name('program-manager-upload.download');
+
     Route::redirect('settings', 'settings/profile');
 
     Volt::route('settings/profile', 'settings.profile')->name('settings.profile');

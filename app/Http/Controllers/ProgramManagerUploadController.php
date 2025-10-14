@@ -64,6 +64,7 @@ class ProgramManagerUploadController extends Controller
             'file_size' => $file->getSize(),
             'ip_address' => $request->ip(),
             'submitted_at' => now(),
+            'status' => ProgramManagerUpload::STATUS_PENDING,
         ]);
 
         Log::info('Program manager upload submitted', [
@@ -113,5 +114,25 @@ class ProgramManagerUploadController extends Controller
             default:
                 abort(404);
         }
+    }
+
+    /**
+     * Download an original upload file for internal review.
+     */
+    public function download(ProgramManagerUpload $upload)
+    {
+        $user = auth()->user();
+
+        if (!$user || !$user->hasPermission('program-manager-uploads.manage')) {
+            abort(403, 'You do not have permission to access this file.');
+        }
+
+        if (!Storage::exists($upload->file_path)) {
+            abort(404, 'Uploaded file could not be found.');
+        }
+
+        $filename = $upload->original_filename ?: basename($upload->file_path);
+
+        return Storage::download($upload->file_path, $filename);
     }
 }

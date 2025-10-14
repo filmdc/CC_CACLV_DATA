@@ -15,6 +15,11 @@
                 <flux:navbar.item icon="layout-grid" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
                     {{ __('Dashboard') }}
                 </flux:navbar.item>
+                @if (auth()->user()?->hasPermission('program-manager-uploads.manage'))
+                    <flux:navbar.item icon="cloud-arrow-up" :href="route('program-manager-uploads.review')" :current="request()->routeIs('program-manager-uploads.review')" wire:navigate>
+                        Program Uploads
+                    </flux:navbar.item>
+                @endif
             </flux:navbar>
 
             <flux:spacer />
@@ -101,6 +106,11 @@
                     <flux:navlist.item icon="layout-grid" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
                     {{ __('Dashboard') }}
                     </flux:navlist.item>
+                    @if (auth()->user()?->hasPermission('program-manager-uploads.manage'))
+                        <flux:navlist.item icon="cloud-arrow-up" :href="route('program-manager-uploads.review')" :current="request()->routeIs('program-manager-uploads.review')" wire:navigate>
+                        Program Uploads
+                        </flux:navlist.item>
+                    @endif
                 </flux:navlist.group>
             </flux:navlist>
 
