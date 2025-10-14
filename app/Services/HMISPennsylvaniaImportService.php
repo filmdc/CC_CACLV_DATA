@@ -12,8 +12,10 @@ use App\Models\CustomImportTemplate;
 use App\Models\CustomImportLog;
 use App\Models\PovertyGuideline;
 use App\Services\DataTransformationService;
+use App\Services\DuplicateDetectionService;
 use League\Csv\Reader;
 use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -22,12 +24,14 @@ class HMISPennsylvaniaImportService
 {
     protected DataTransformationService $transformer;
     protected CustomImportTemplate $template;
+    protected DuplicateDetectionService $duplicateDetectionService;
     
     const SIXTH_STREET_SHELTER_PROGRAM_ID = 4;
 
-    public function __construct(DataTransformationService $transformer)
+    public function __construct(DataTransformationService $transformer, DuplicateDetectionService $duplicateDetectionService)
     {
         $this->transformer = $transformer;
+        $this->duplicateDetectionService = $duplicateDetectionService;
         $this->template = $this->getOrCreateTemplate();
     }
 
@@ -241,6 +245,7 @@ class HMISPennsylvaniaImportService
                 'updated_households' => 0,
                 'updated_participants' => 0,
                 'skipped_records' => 0,
+                'skipped_duplicates' => 0,
                 'errors' => [],
                 'warnings' => []
             ];
@@ -257,6 +262,8 @@ class HMISPennsylvaniaImportService
                     $results['updated_households'] += $householdResult['updated_households'];
                     $results['updated_participants'] += $householdResult['updated_participants'];
                     $results['warnings'] = array_merge($results['warnings'], $householdResult['warnings']);
+                    $results['skipped_duplicates'] += $householdResult['skipped_duplicates'];
+                    $results['skipped_records'] += $householdResult['skipped_duplicates'];
                     
                 } catch (\Exception $e) {
                     $error = "Household {$householdCode}: " . mb_convert_encoding($e->getMessage(), 'UTF-8', 'UTF-8');
@@ -330,6 +337,7 @@ class HMISPennsylvaniaImportService
                 'updated_households' => 0,
                 'updated_participants' => 0,
                 'skipped_records' => 0,
+                'skipped_duplicates' => 0,
                 'errors' => [$e->getMessage()],
                 'warnings' => []
             ];
@@ -402,7 +410,8 @@ class HMISPennsylvaniaImportService
             'enrollments' => 0,
             'updated_households' => 0,
             'updated_participants' => 0,
-            'warnings' => []
+            'warnings' => [],
+            'skipped_duplicates' => 0,
         ];
         
         // Find or create household
@@ -440,6 +449,7 @@ class HMISPennsylvaniaImportService
                 $results['enrollments'] += $participantResult['enrollments'];
                 $results['updated_participants'] += $participantResult['updated_participants'];
                 $results['warnings'] = array_merge($results['warnings'], $participantResult['warnings']);
+                $results['skipped_duplicates'] += $participantResult['skipped_duplicates'];
             } catch (\Exception $e) {
                 Log::error('Participant processing failed', [
                     'household_code' => $householdCode,
@@ -505,12 +515,49 @@ class HMISPennsylvaniaImportService
             'participants' => 0,
             'enrollments' => 0,
             'updated_participants' => 0,
-            'warnings' => []
+            'warnings' => [],
+            'skipped_duplicates' => 0,
         ];
-        
+
         $participantData = $this->transformParticipantData($record);
         $participantData['household_id'] = $household->id;
-        
+
+        if (isset($participantData['date_of_birth']) && $participantData['date_of_birth'] instanceof CarbonInterface) {
+            $participantData['date_of_birth'] = $participantData['date_of_birth']->format('Y-m-d');
+        }
+
+        $duplicatePayload = [
+            'first_name' => $participantData['first_name'] ?? null,
+            'last_name' => $participantData['last_name'] ?? null,
+            'date_of_birth' => $participantData['date_of_birth'] ?? null,
+            'email' => $participantData['email'] ?? null,
+            'telephone' => $participantData['telephone'] ?? null,
+        ];
+
+        $duplicates = $this->duplicateDetectionService->checkForDuplicates(
+            $duplicatePayload,
+            'hmis_import',
+            $record['ClientID'] ?? ($record['CaseID'] ?? null)
+        );
+
+        if ($duplicates->isNotEmpty()) {
+            $this->duplicateDetectionService->storePotentialDuplicates($duplicates, Auth::id() ?? 1);
+
+            $results['warnings'][] = sprintf(
+                'Skipped %s due to potential duplicate (confidence %s%%).',
+                $participantData['first_name'] . ' ' . $participantData['last_name'],
+                $duplicates->first()['confidence_score']
+            );
+            Log::warning('HMIS Import: Potential duplicate detected and stored for review', [
+                'name' => $participantData['first_name'] . ' ' . $participantData['last_name'],
+                'confidence' => $duplicates->first()['confidence_score'],
+                'client_id' => $record['ClientID'] ?? null,
+                'household_code' => $record['CaseID'] ?? null,
+            ]);
+            $results['skipped_duplicates']++;
+            return $results;
+        }
+
         // Find existing participant or create new one
         $participant = null;
         
