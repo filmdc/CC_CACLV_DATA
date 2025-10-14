@@ -55,9 +55,20 @@
             </thead>
             <tbody class="divide-y divide-slate-200 text-sm dark:divide-slate-700">
                 @forelse ($uploads as $upload)
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/60">
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/60" wire:key="upload-{{ $upload->id }}">
                         <td class="px-4 py-3 align-top">
-                            <div class="font-semibold text-slate-900 dark:text-white">{{ $upload->program_manager_name }}</div>
+                            <div class="flex items-center gap-2">
+                                <div class="font-semibold text-slate-900 dark:text-white">{{ $upload->program_manager_name }}</div>
+                                @if ($upload->status === App\Models\ProgramManagerUpload::STATUS_PROCESSING)
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-medium text-blue-700">
+                                        <svg class="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                                        </svg>
+                                        Processing
+                                    </span>
+                                @endif
+                            </div>
                             <div class="text-xs text-slate-500">{{ $upload->program_manager_email }}</div>
                             @if ($upload->organization)
                                 <div class="text-xs text-slate-500">{{ $upload->organization }}</div>
@@ -113,7 +124,13 @@
                             <div class="flex flex-col gap-2">
                                 <a href="{{ route('program-manager-upload.download', $upload->id) }}" class="inline-flex items-center justify-center rounded-md border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100">Download</a>
                                 @if (in_array($upload->status, [App\Models\ProgramManagerUpload::STATUS_PENDING, App\Models\ProgramManagerUpload::STATUS_FAILED]))
-                                    <button wire:click="processUpload({{ $upload->id }})" class="inline-flex items-center justify-center rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700">Process Import</button>
+                                    <button wire:click="processUpload({{ $upload->id }})" wire:loading.attr="disabled" wire:loading.class="opacity-60 cursor-progress" wire:target="processUpload({{ $upload->id }})" class="inline-flex items-center justify-center rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700">
+                                        <svg wire:loading wire:target="processUpload({{ $upload->id }})" class="mr-1 h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                                        </svg>
+                                        Process Import
+                                    </button>
                                     <button wire:click="openRejectModal({{ $upload->id }})" class="inline-flex items-center justify-center rounded-md border border-amber-400 px-3 py-1.5 text-xs font-medium text-amber-700 hover:bg-amber-50">Reject</button>
                                 @endif
                                 @if ($upload->status === App\Models\ProgramManagerUpload::STATUS_COMPLETED)
