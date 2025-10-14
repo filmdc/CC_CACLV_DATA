@@ -233,34 +233,53 @@
                     </div>
                     
                     <!-- Detailed Comparison -->
-                    <div class="grid grid-cols-2 gap-6">
-                        <div>
-                            <h4 class="font-medium text-gray-900 dark:text-white mb-3">Proposed Data</h4>
-                            <div class="space-y-2 text-sm">
-                                @foreach($selectedDuplicate->proposed_data as $field => $value)
-                                    @if(!empty($value))
-                                        <div>
-                                            <span class="font-medium">{{ ucfirst(str_replace('_', ' ', $field)) }}:</span>
-                                            <span class="text-gray-600 dark:text-gray-300">
-                                                {{ is_array($value) ? implode(', ', $value) : $value }}
-                                            </span>
-                                        </div>
-                                    @endif
+                    @php
+                        $proposed = $selectedDuplicate->proposed_data ?? [];
+                        $existing = $selectedDuplicate->matchedParticipant;
+                        $existingHousehold = $existing?->household;
+
+                        $fields = [
+                            'First Name' => [data_get($proposed, 'first_name'), $existing?->first_name],
+                            'Middle Name' => [data_get($proposed, 'middle_name'), $existing?->middle_name],
+                            'Last Name' => [data_get($proposed, 'last_name'), $existing?->last_name],
+                            'Date of Birth' => [data_get($proposed, 'date_of_birth'), optional($existing?->date_of_birth)->format('Y-m-d')],
+                            'Gender' => [data_get($proposed, 'gender'), $existing?->gender],
+                            'Ethnicity' => [data_get($proposed, 'ethnicity'), $existing?->ethnicity],
+                            'Race' => [implode(', ', (array) data_get($proposed, 'race')), implode(', ', (array) ($existing?->race ? (is_array($existing->race) ? $existing->race : json_decode($existing->race, true)) : []))],
+                            'Email' => [data_get($proposed, 'email'), $existing?->email],
+                            'Phone' => [data_get($proposed, 'telephone'), $existing?->telephone],
+                            'Address' => [data_get($proposed, 'street_address'), $existingHousehold?->currentAddress()?->address],
+                            'City' => [data_get($proposed, 'city'), $existingHousehold?->currentAddress()?->city],
+                            'State' => [data_get($proposed, 'state'), $existingHousehold?->currentAddress()?->state],
+                            'Postal Code' => [data_get($proposed, 'zip_code'), $existingHousehold?->currentAddress()?->zip_code],
+                            'Household Code' => [data_get($proposed, 'household_code'), $existingHousehold?->household_code],
+                            'Notes' => [data_get($proposed, 'notes'), $existing?->notes],
+                        ];
+                    @endphp
+
+                    <div class="overflow-hidden rounded-lg border border-gray-200 dark:border-zinc-700">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700 text-sm">
+                            <thead class="bg-gray-50 dark:bg-zinc-900">
+                                <tr>
+                                    <th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">Field</th>
+                                    <th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">Proposed</th>
+                                    <th class="px-4 py-2 text-left font-semibold text-gray-600 dark:text-gray-300">Existing</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 dark:divide-zinc-800">
+                                @foreach ($fields as $label => [$proposedValue, $existingValue])
+                                    <tr>
+                                        <td class="px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{{ $label }}</td>
+                                        <td class="px-4 py-2 text-gray-600 dark:text-gray-300">
+                                            {{ $proposedValue ? (is_array($proposedValue) ? implode(', ', $proposedValue) : $proposedValue) : '—' }}
+                                        </td>
+                                        <td class="px-4 py-2 text-gray-600 dark:text-gray-300">
+                                            {{ $existingValue ? (is_array($existingValue) ? implode(', ', $existingValue) : $existingValue) : '—' }}
+                                        </td>
+                                    </tr>
                                 @endforeach
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <h4 class="font-medium text-gray-900 dark:text-white mb-3">Existing Participant</h4>
-                            <div class="space-y-2 text-sm">
-                                <div><span class="font-medium">Name:</span> {{ $selectedDuplicate->matchedParticipant->full_name }}</div>
-                                <div><span class="font-medium">Date of Birth:</span> {{ $selectedDuplicate->matchedParticipant->date_of_birth?->format('Y-m-d') ?? 'Not set' }}</div>
-                                <div><span class="font-medium">Gender:</span> {{ $selectedDuplicate->matchedParticipant->gender ?? 'Not set' }}</div>
-                                <div><span class="font-medium">Email:</span> {{ $selectedDuplicate->matchedParticipant->email ?? 'Not set' }}</div>
-                                <div><span class="font-medium">Phone:</span> {{ $selectedDuplicate->matchedParticipant->telephone ?? 'Not set' }}</div>
-                                <div><span class="font-medium">Household:</span> {{ $selectedDuplicate->matchedParticipant->household->household_code ?? 'Not set' }}</div>
-                            </div>
-                        </div>
+                            </tbody>
+                        </table>
                     </div>
                     
                     <!-- Review Notes -->
