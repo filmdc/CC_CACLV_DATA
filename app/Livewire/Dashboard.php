@@ -2,48 +2,52 @@
 
 namespace App\Livewire;
 
+use App\Models\Contract;
+use App\Models\ContractReport;
+use App\Models\ContractReportDueDate;
+use App\Models\CustomImportTemplate;
 use App\Models\Household;
 use App\Models\Participant;
 use App\Models\Program;
+use App\Models\ProgramEnrollment;
+use App\Models\Service;
+use App\Models\ServiceEnrollment;
 use App\Models\WorkPlan;
 use App\Models\WorkPlanGoal;
-use App\Models\Service;
-use App\Models\ProgramEnrollment;
-use App\Models\ServiceEnrollment;
-use App\Models\Contract;
-use App\Models\CustomImportTemplate;
 use App\Services\CsbgReportService;
 use App\Traits\WithPermissionChecks;
-use Livewire\Component;
-use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
-use App\Models\ContractReportDueDate;
-use App\Models\ContractReport;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Livewire\Component;
 
 class Dashboard extends Component
 {
     use WithPermissionChecks;
-    
+
     public $activeTab = 'programs';
+
     public $expandedWorkPlans = false;
-    
+
     // Date filtering
     public $startDate;
+
     public $endDate;
+
     public $dateFilter = 'this_month'; // this_month, last_month, this_quarter, this_year, custom
-    
+
     // CSBG Report Options
     public $selectedProgramForReport;
+
     public $reportFormat = 'pdf'; // pdf or excel
-    
+
     // Protected listeners for real-time updates
     protected $listeners = [
         'refreshDashboard' => '$refresh',
         'participantUpdated' => 'refreshMetrics',
         'enrollmentUpdated' => 'refreshMetrics',
         'workPlanUpdated' => 'refreshMetrics',
-        'programUpdated' => 'refreshMetrics'
+        'programUpdated' => 'refreshMetrics',
     ];
 
     public function setActiveTab($tab)
@@ -52,18 +56,18 @@ class Dashboard extends Component
         $this->expandedWorkPlans = false; // Reset expanded state when switching tabs
         $this->refreshMetrics(); // Refresh data when switching tabs
     }
-    
+
     public function refreshMetrics()
     {
         // Force component refresh to recalculate metrics
         $this->dispatch('$refresh');
     }
-    
+
     public function mount()
     {
         // Initialize date filters
         $this->setDateFilter('this_month');
-        
+
         // Set default program for report if user has programs
         $user = Auth::user();
         $userPrograms = $user->programs()->first();
@@ -74,7 +78,7 @@ class Dashboard extends Component
 
     public function toggleExpandedWorkPlans()
     {
-        $this->expandedWorkPlans = !$this->expandedWorkPlans;
+        $this->expandedWorkPlans = ! $this->expandedWorkPlans;
     }
 
     public function viewProgram($programId)
@@ -92,23 +96,23 @@ class Dashboard extends Component
     {
         return redirect()->route('work-plan.management', ['work_plan_id' => $workPlanId]);
     }
-    
+
     public function viewReportDueDate($dueDateId)
     {
         // For now, redirect to the contract report due dates management page
         return redirect()->route('contract-report-due-dates.management');
     }
-    
+
     public function viewReport($reportId)
     {
         // For now, redirect to the contracts hub
         return redirect()->route('contracts.hub');
     }
-    
+
     public function setDateFilter($filter)
     {
         $this->dateFilter = $filter;
-        
+
         switch ($filter) {
             case 'this_month':
                 $this->startDate = Carbon::now()->startOfMonth()->format('Y-m-d');
@@ -130,34 +134,35 @@ class Dashboard extends Component
                 // Keep existing dates
                 break;
         }
-        
+
         $this->refreshMetrics();
     }
-    
+
     public function generateCsbgReport()
     {
-        if (!$this->selectedProgramForReport) {
+        if (! $this->selectedProgramForReport) {
             session()->flash('error', 'Please select a program for the report.');
+
             return;
         }
-        
+
         try {
             $program = Program::findOrFail($this->selectedProgramForReport);
-            
+
             // Initialize the CSBG Report Service
             $reportService = app(CsbgReportService::class);
-            
+
             // Generate the report data
             $reportData = $reportService->generateReport([
                 'program_id' => $this->selectedProgramForReport,
                 'start_date' => $this->startDate,
                 'end_date' => $this->endDate,
             ]);
-            
+
             // Generate filename
-            $filename = 'CSBG_Report_' . $program->name . '_' . date('Y-m-d') . '.' . $this->reportFormat;
+            $filename = 'CSBG_Report_'.$program->name.'_'.date('Y-m-d').'.'.$this->reportFormat;
             $filename = str_replace(' ', '_', $filename);
-            
+
             if ($this->reportFormat === 'pdf') {
                 // Generate PDF using the same format as CsbgReportService
                 $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.csbg-pdf-template', [
@@ -166,21 +171,21 @@ class Dashboard extends Component
                     'periodStart' => Carbon::parse($reportData['report_metadata']['period_start'])->format('F j, Y'),
                     'periodEnd' => Carbon::parse($reportData['report_metadata']['period_end'])->format('F j, Y'),
                 ])
-                ->setPaper('a4', 'portrait')
-                ->setOptions([
-                    'defaultFont' => 'sans-serif',
-                    'isRemoteEnabled' => false,
-                    'chroot' => public_path(),
-                ]);
-                
-                return response()->streamDownload(function() use ($pdf) {
+                    ->setPaper('a4', 'portrait')
+                    ->setOptions([
+                        'defaultFont' => 'sans-serif',
+                        'isRemoteEnabled' => false,
+                        'chroot' => public_path(),
+                    ]);
+
+                return response()->streamDownload(function () use ($pdf) {
                     echo $pdf->output();
                 }, $filename);
             } else {
                 // Generate CSV (Excel-compatible)
                 $csvContent = $this->generateCsvContent($reportData, $program);
-                
-                return response()->streamDownload(function() use ($csvContent) {
+
+                return response()->streamDownload(function () use ($csvContent) {
                     echo $csvContent;
                 }, str_replace('.excel', '.csv', $filename), [
                     'Content-Type' => 'text/csv',
@@ -188,44 +193,44 @@ class Dashboard extends Component
                 ]);
             }
         } catch (\Exception $e) {
-            session()->flash('error', 'Error generating report: ' . $e->getMessage());
+            session()->flash('error', 'Error generating report: '.$e->getMessage());
         }
     }
-    
+
     private function generateCsvContent($reportData, $program)
     {
         $csv = [];
-        
+
         // Header
         $csv[] = ['CSBG Module 4, Section C: All Characteristics Report'];
         $csv[] = [$program->name];
-        $csv[] = ['Report Period: ' . date('m/d/Y', strtotime($reportData['report_metadata']['period_start'])) . ' - ' . date('m/d/Y', strtotime($reportData['report_metadata']['period_end']))];
+        $csv[] = ['Report Period: '.date('m/d/Y', strtotime($reportData['report_metadata']['period_start'])).' - '.date('m/d/Y', strtotime($reportData['report_metadata']['period_end']))];
         $csv[] = [];
-        
+
         // Summary
         $csv[] = ['A. Total unduplicated number of all INDIVIDUALS:', $reportData['participant_count'] ?? 0];
         $csv[] = ['B. Total unduplicated number of all HOUSEHOLDS:', count($reportData['households'] ?? [])];
         $csv[] = [];
-        
+
         // Process each section
         $sections = [
             'demographics' => 'DEMOGRAPHICS',
-            'characteristics' => 'CHARACTERISTICS', 
+            'characteristics' => 'CHARACTERISTICS',
             'employment_income' => 'EMPLOYMENT & INCOME',
-            'health_housing' => 'HEALTH & HOUSING'
+            'health_housing' => 'HEALTH & HOUSING',
         ];
-        
+
         foreach ($sections as $sectionKey => $sectionTitle) {
             if (isset($reportData[$sectionKey])) {
                 $csv[] = [$sectionTitle];
                 $csv[] = [];
-                
+
                 foreach ($reportData[$sectionKey] as $category => $categoryData) {
                     $csv[] = [ucfirst(str_replace('_', ' ', $category))];
-                    
+
                     if (isset($categoryData['items'])) {
                         foreach ($categoryData['items'] as $item) {
-                            $csv[] = ['', $item['label'], $item['count'], $item['percentage'] . '%'];
+                            $csv[] = ['', $item['label'], $item['count'], $item['percentage'].'%'];
                         }
                         $csv[] = ['', 'TOTAL', $categoryData['total'] ?? ''];
                     } else {
@@ -241,16 +246,16 @@ class Dashboard extends Component
                 }
             }
         }
-        
+
         // Convert to CSV string
         $output = '';
         foreach ($csv as $row) {
-            $output .= $this->arrayToCsv($row) . "\n";
+            $output .= $this->arrayToCsv($row)."\n";
         }
-        
+
         return $output;
     }
-    
+
     private function arrayToCsv($array)
     {
         $fp = fopen('php://temp', 'r+');
@@ -258,9 +263,10 @@ class Dashboard extends Component
         rewind($fp);
         $csv = stream_get_contents($fp);
         fclose($fp);
+
         return rtrim($csv);
     }
-    
+
     public function startImport($templateId)
     {
         // Redirect to import page with template
@@ -270,18 +276,18 @@ class Dashboard extends Component
     public function render()
     {
         $user = Auth::user();
-        
+
         // Check if user has contract database dashboard role
         if ($user->hasRole('contract-database-dashboard')) {
             return $this->renderContractDashboard($user);
         }
-        
+
         // Get user's assigned programs
         $userPrograms = $user->programs()->with(['services', 'programEnrollments.participant', 'workPlans'])->get();
-        
+
         // Calculate metrics for user's programs - always fresh from database
         $userProgramIds = $userPrograms->pluck('id')->toArray();
-        
+
         $metrics = $this->calculateMetrics($userProgramIds);
 
         // Get recent activity with date filtering
@@ -289,27 +295,27 @@ class Dashboard extends Component
 
         // Recent activity - participants the user has worked with
         $recentParticipants = Participant::with(['household', 'programEnrollments.program'])
-            ->whereHas('programEnrollments', function($query) use ($userProgramIds) {
+            ->whereHas('programEnrollments', function ($query) use ($userProgramIds) {
                 $query->whereIn('program_id', $userProgramIds);
             })
-            ->whereBetween('updated_at', [$this->startDate, $this->endDate . ' 23:59:59'])
+            ->whereBetween('updated_at', [$this->startDate, $this->endDate.' 23:59:59'])
             ->latest('updated_at')
             ->limit(5)
             ->get();
 
         // Recent households in user's programs
         $recentHouseholds = Household::with(['headOfHousehold', 'participants.programEnrollments.program'])
-            ->whereHas('participants.programEnrollments', function($query) use ($userProgramIds) {
+            ->whereHas('participants.programEnrollments', function ($query) use ($userProgramIds) {
                 $query->whereIn('program_id', $userProgramIds);
             })
-            ->whereBetween('updated_at', [$this->startDate, $this->endDate . ' 23:59:59'])
+            ->whereBetween('updated_at', [$this->startDate, $this->endDate.' 23:59:59'])
             ->latest('updated_at')
             ->limit(5)
             ->get();
 
         // Work plan goals for user's programs
         $workPlanGoals = WorkPlanGoal::with(['workPlan.program', 'service'])
-            ->whereHas('workPlan', function($query) use ($userProgramIds) {
+            ->whereHas('workPlan', function ($query) use ($userProgramIds) {
                 $query->whereIn('program_id', $userProgramIds);
             })
             ->where('target_number', '>', 0)
@@ -318,7 +324,7 @@ class Dashboard extends Component
             ->get();
 
         // Program enrollment stats for user's programs
-        $programStats = $userPrograms->map(function($program) {
+        $programStats = $userPrograms->map(function ($program) {
             return [
                 'program' => $program,
                 'active_enrollments' => $program->programEnrollments()->active()->count(),
@@ -327,13 +333,13 @@ class Dashboard extends Component
                 'work_plans_count' => $program->workPlans()->where('active', true)->count(),
             ];
         });
-        
+
         // Get statistics with date filtering
         $statistics = $this->getStatistics($userProgramIds);
-        
+
         // Get available import templates
         $importTemplates = CustomImportTemplate::active()->get();
-        
+
         // Get user configuration data
         $userConfig = [
             'name' => $user->name,
@@ -341,7 +347,7 @@ class Dashboard extends Component
             'roles' => $user->roles->pluck('name')->toArray(),
             'permissions' => $this->getUserPermissions($user),
             'last_login' => null, // No last_login_at field in database
-            'programs_count' => $userPrograms->count()
+            'programs_count' => $userPrograms->count(),
         ];
 
         // Load tab-specific data
@@ -372,62 +378,62 @@ class Dashboard extends Component
             'my_services' => Service::whereIn('program_id', $userProgramIds)->where('active', true)->count(),
         ];
     }
-    
+
     private function getRecentActivity($userProgramIds)
     {
         // Get recent enrollments
         $recentEnrollments = ProgramEnrollment::with(['participant', 'program'])
             ->whereIn('program_id', $userProgramIds)
-            ->whereBetween('created_at', [$this->startDate, $this->endDate . ' 23:59:59'])
+            ->whereBetween('created_at', [$this->startDate, $this->endDate.' 23:59:59'])
             ->latest('created_at')
             ->limit(10)
             ->get()
-            ->map(function($enrollment) {
+            ->map(function ($enrollment) {
                 return [
                     'type' => 'enrollment',
-                    'description' => $enrollment->participant->first_name . ' ' . $enrollment->participant->last_name . ' enrolled in ' . $enrollment->program->name,
+                    'description' => $enrollment->participant->first_name.' '.$enrollment->participant->last_name.' enrolled in '.$enrollment->program->name,
                     'timestamp' => $enrollment->created_at,
-                    'user' => $enrollment->created_by
+                    'user' => $enrollment->created_by,
                 ];
             });
-            
+
         // Get recent service enrollments
         $recentServiceEnrollments = ServiceEnrollment::with(['participant', 'service.program'])
-            ->whereHas('service', function($query) use ($userProgramIds) {
+            ->whereHas('service', function ($query) use ($userProgramIds) {
                 $query->whereIn('program_id', $userProgramIds);
             })
-            ->whereBetween('created_at', [$this->startDate, $this->endDate . ' 23:59:59'])
+            ->whereBetween('created_at', [$this->startDate, $this->endDate.' 23:59:59'])
             ->latest('created_at')
             ->limit(10)
             ->get()
-            ->map(function($enrollment) {
+            ->map(function ($enrollment) {
                 return [
                     'type' => 'service_enrollment',
-                    'description' => $enrollment->participant->first_name . ' ' . $enrollment->participant->last_name . ' enrolled in service: ' . $enrollment->service->name,
+                    'description' => $enrollment->participant->first_name.' '.$enrollment->participant->last_name.' enrolled in service: '.$enrollment->service->name,
                     'timestamp' => $enrollment->created_at,
-                    'user' => $enrollment->created_by
+                    'user' => $enrollment->created_by,
                 ];
             });
-            
+
         // Get recent work plan goal updates
         $recentGoalUpdates = WorkPlanGoal::with(['workPlan.program', 'service'])
-            ->whereHas('workPlan', function($query) use ($userProgramIds) {
+            ->whereHas('workPlan', function ($query) use ($userProgramIds) {
                 $query->whereIn('program_id', $userProgramIds);
             })
-            ->whereBetween('updated_at', [$this->startDate, $this->endDate . ' 23:59:59'])
+            ->whereBetween('updated_at', [$this->startDate, $this->endDate.' 23:59:59'])
             ->where('updated_at', '>', 'created_at')
             ->latest('updated_at')
             ->limit(10)
             ->get()
-            ->map(function($goal) {
+            ->map(function ($goal) {
                 return [
                     'type' => 'goal_update',
-                    'description' => 'Work plan goal "' . $goal->goal_name . '" updated: ' . $goal->actual_number . '/' . $goal->target_number,
+                    'description' => 'Work plan goal "'.$goal->goal_name.'" updated: '.$goal->actual_number.'/'.$goal->target_number,
                     'timestamp' => $goal->updated_at,
-                    'user' => $goal->updated_by
+                    'user' => $goal->updated_by,
                 ];
             });
-            
+
         // Combine and sort all activities
         return collect()
             ->merge($recentEnrollments)
@@ -436,105 +442,105 @@ class Dashboard extends Component
             ->sortByDesc('timestamp')
             ->take(15);
     }
-    
+
     private function getStatistics($userProgramIds)
     {
         // Calculate statistics based on date range
         $stats = [];
-        
+
         // Total participants in date range
-        $stats['total_participants'] = Participant::whereHas('programEnrollments', function($query) use ($userProgramIds) {
-                $query->whereIn('program_id', $userProgramIds)
-                    ->whereBetween('created_at', [$this->startDate, $this->endDate . ' 23:59:59']);
-            })->count();
-            
+        $stats['total_participants'] = Participant::whereHas('programEnrollments', function ($query) use ($userProgramIds) {
+            $query->whereIn('program_id', $userProgramIds)
+                ->whereBetween('created_at', [$this->startDate, $this->endDate.' 23:59:59']);
+        })->count();
+
         // Active enrollments
         $stats['active_enrollments'] = ProgramEnrollment::whereIn('program_id', $userProgramIds)
             ->where('status', 'active')
             ->count();
-            
+
         // New enrollments in period
         $stats['new_enrollments'] = ProgramEnrollment::whereIn('program_id', $userProgramIds)
-            ->whereBetween('created_at', [$this->startDate, $this->endDate . ' 23:59:59'])
+            ->whereBetween('created_at', [$this->startDate, $this->endDate.' 23:59:59'])
             ->count();
-            
+
         // Services delivered
-        $stats['services_delivered'] = ServiceEnrollment::whereHas('service', function($query) use ($userProgramIds) {
-                $query->whereIn('program_id', $userProgramIds);
-            })
+        $stats['services_delivered'] = ServiceEnrollment::whereHas('service', function ($query) use ($userProgramIds) {
+            $query->whereIn('program_id', $userProgramIds);
+        })
             ->whereBetween('enrollment_date', [$this->startDate, $this->endDate])
             ->count();
-            
+
         // Work plan goal completion rate
-        $totalGoals = WorkPlanGoal::whereHas('workPlan', function($query) use ($userProgramIds) {
-                $query->whereIn('program_id', $userProgramIds);
-            })
+        $totalGoals = WorkPlanGoal::whereHas('workPlan', function ($query) use ($userProgramIds) {
+            $query->whereIn('program_id', $userProgramIds);
+        })
             ->where('target_number', '>', 0)
             ->count();
-            
-        $completedGoals = WorkPlanGoal::whereHas('workPlan', function($query) use ($userProgramIds) {
-                $query->whereIn('program_id', $userProgramIds);
-            })
+
+        $completedGoals = WorkPlanGoal::whereHas('workPlan', function ($query) use ($userProgramIds) {
+            $query->whereIn('program_id', $userProgramIds);
+        })
             ->where('target_number', '>', 0)
             ->whereColumn('actual_number', '>=', 'target_number')
             ->count();
-            
+
         $stats['goal_completion_rate'] = $totalGoals > 0 ? round(($completedGoals / $totalGoals) * 100, 1) : 0;
-        
+
         // Households served
-        $stats['households_served'] = Household::whereHas('participants.programEnrollments', function($query) use ($userProgramIds) {
-                $query->whereIn('program_id', $userProgramIds)
-                    ->whereBetween('created_at', [$this->startDate, $this->endDate . ' 23:59:59']);
-            })->count();
-            
+        $stats['households_served'] = Household::whereHas('participants.programEnrollments', function ($query) use ($userProgramIds) {
+            $query->whereIn('program_id', $userProgramIds)
+                ->whereBetween('created_at', [$this->startDate, $this->endDate.' 23:59:59']);
+        })->count();
+
         // Calculate trends (compare to previous period)
         $previousPeriod = $this->getPreviousPeriodDates();
         $stats['participant_trend'] = $this->calculateTrend(
-            Participant::whereHas('programEnrollments', function($query) use ($userProgramIds, $previousPeriod) {
+            Participant::whereHas('programEnrollments', function ($query) use ($userProgramIds, $previousPeriod) {
                 $query->whereIn('program_id', $userProgramIds)
                     ->whereBetween('created_at', $previousPeriod);
             })->count(),
             $stats['total_participants']
         );
-        
+
         return $stats;
     }
-    
+
     private function getPreviousPeriodDates()
     {
         $start = Carbon::parse($this->startDate);
         $end = Carbon::parse($this->endDate);
         $diff = $start->diffInDays($end);
-        
+
         return [
             $start->subDays($diff + 1)->format('Y-m-d'),
-            $end->subDays($diff + 1)->format('Y-m-d') . ' 23:59:59'
+            $end->subDays($diff + 1)->format('Y-m-d').' 23:59:59',
         ];
     }
-    
+
     private function calculateTrend($previousValue, $currentValue)
     {
         if ($previousValue == 0) {
             return $currentValue > 0 ? 100 : 0;
         }
-        
+
         return round((($currentValue - $previousValue) / $previousValue) * 100, 1);
     }
-    
+
     private function getUserPermissions($user)
     {
         $permissions = [];
-        
+
         // Get all permissions through user's roles
         foreach ($user->roles as $role) {
             $rolePermissions = $role->permissions->pluck('name')->toArray();
             $permissions = array_merge($permissions, $rolePermissions);
         }
-        
+
         // Return unique permissions
         return array_unique($permissions);
     }
-    
+
     private function getTabData($userProgramIds)
     {
         switch ($this->activeTab) {
@@ -565,7 +571,7 @@ class Dashboard extends Component
     private function getParticipantsTabData($userProgramIds)
     {
         $participants = Participant::with(['household', 'programEnrollments.program'])
-            ->whereHas('programEnrollments', function($query) use ($userProgramIds) {
+            ->whereHas('programEnrollments', function ($query) use ($userProgramIds) {
                 $query->whereIn('program_id', $userProgramIds);
             })
             ->latest('updated_at')
@@ -591,18 +597,18 @@ class Dashboard extends Component
             ->get();
 
         // Calculate work plan statistics
-        $totalGoals = $workPlans->sum(function($plan) {
+        $totalGoals = $workPlans->sum(function ($plan) {
             return $plan->goals->count();
         });
 
-        $completedGoals = $workPlans->sum(function($plan) {
-            return $plan->goals->filter(function($goal) {
+        $completedGoals = $workPlans->sum(function ($plan) {
+            return $plan->goals->filter(function ($goal) {
                 return $goal->target_number > 0 && $goal->actual_number >= $goal->target_number;
             })->count();
         });
 
-        $inProgressGoals = $workPlans->sum(function($plan) {
-            return $plan->goals->filter(function($goal) {
+        $inProgressGoals = $workPlans->sum(function ($plan) {
+            return $plan->goals->filter(function ($goal) {
                 return $goal->target_number > 0 && $goal->actual_number > 0 && $goal->actual_number < $goal->target_number;
             })->count();
         });
@@ -612,8 +618,8 @@ class Dashboard extends Component
 
         // Services tied to work plan goals
         $servicesInWorkPlans = Service::with('program')
-            ->whereHas('workPlanGoals', function($query) use ($userProgramIds) {
-                $query->whereHas('workPlan', function($subQuery) use ($userProgramIds) {
+            ->whereHas('workPlanGoals', function ($query) use ($userProgramIds) {
+                $query->whereHas('workPlan', function ($subQuery) use ($userProgramIds) {
                     $subQuery->whereIn('program_id', $userProgramIds);
                 });
             })
@@ -644,7 +650,7 @@ class Dashboard extends Component
             ->orderBy('end_date')
             ->get();
 
-        $upcomingDeadlines = $contracts->filter(function($contract) {
+        $upcomingDeadlines = $contracts->filter(function ($contract) {
             return $contract->end_date <= now()->addDays(60);
         });
 
@@ -655,14 +661,14 @@ class Dashboard extends Component
                 'title' => 'Monthly Housing Report Due',
                 'due_date' => now()->addDays(5),
                 'priority' => 'high',
-                'type' => 'report'
+                'type' => 'report',
             ],
             (object) [
                 'id' => 2,
                 'title' => 'Quarterly CSBG Submission',
                 'due_date' => now()->addDays(15),
                 'priority' => 'medium',
-                'type' => 'submission'
+                'type' => 'submission',
             ],
         ]);
 
@@ -672,7 +678,7 @@ class Dashboard extends Component
             'customReminders' => $customReminders,
         ];
     }
-    
+
     /**
      * Render the contract database dashboard for users with contract dashboard role
      */
@@ -680,56 +686,68 @@ class Dashboard extends Component
     {
         // Get user's assigned contracts (via email assignments to report due dates)
         $userEmail = $user->email;
-        
+
+        // Get user's accessible program IDs
+        $accessibleProgramIds = $user->getAccessibleProgramIds();
+
         // Get upcoming report due dates assigned to this user
         $upcomingReportDueDates = ContractReportDueDate::with(['contract.program', 'contract.funder', 'contractReports'])
-            ->whereHas('emails', function($query) use ($userEmail) {
+            ->whereHas('emails', function ($query) use ($userEmail) {
                 $query->where('email', $userEmail)
                     ->where('contract_report_due_date_emails.active', true);
+            })
+            ->whereHas('contract', function ($query) use ($accessibleProgramIds) {
+                $query->whereIn('program_id', $accessibleProgramIds);
             })
             ->where('active', true)
             ->where('status', '!=', 'completed')
             ->where('due_date', '>=', now())
             ->orderBy('due_date')
             ->get();
-            
+
         // Get overdue report due dates
         $overdueReportDueDates = ContractReportDueDate::with(['contract.program', 'contract.funder', 'contractReports'])
-            ->whereHas('emails', function($query) use ($userEmail) {
+            ->whereHas('emails', function ($query) use ($userEmail) {
                 $query->where('email', $userEmail)
                     ->where('contract_report_due_date_emails.active', true);
+            })
+            ->whereHas('contract', function ($query) use ($accessibleProgramIds) {
+                $query->whereIn('program_id', $accessibleProgramIds);
             })
             ->where('active', true)
             ->where('status', '!=', 'completed')
             ->where('due_date', '<', now())
             ->orderBy('due_date', 'desc')
             ->get();
-            
+
         // Get recently submitted reports
         $recentlySubmittedReports = ContractReport::with(['contract.program', 'contract.funder', 'contractReportDueDate'])
             ->where('created_by', $user->id)
+            ->whereHas('contract', function ($query) use ($accessibleProgramIds) {
+                $query->whereIn('program_id', $accessibleProgramIds);
+            })
             ->whereIn('status', ['submitted', 'under_review', 'approved'])
             ->whereBetween('submitted_date', [$this->startDate, $this->endDate])
             ->orderBy('submitted_date', 'desc')
             ->limit(10)
             ->get();
-            
+
         // Get recent contract activity
-        $recentContractActivity = $this->getRecentContractActivity($user);
-        
+        $recentContractActivity = $this->getRecentContractActivity($user, $accessibleProgramIds);
+
         // Calculate contract metrics
         $contractMetrics = [
             'total_upcoming_reports' => $upcomingReportDueDates->count(),
             'overdue_reports' => $overdueReportDueDates->count(),
-            'reports_due_this_week' => $upcomingReportDueDates->filter(function($dueDate) {
+            'reports_due_this_week' => $upcomingReportDueDates->filter(function ($dueDate) {
                 return $dueDate->due_date <= now()->addDays(7);
             })->count(),
             'reports_submitted_this_period' => $recentlySubmittedReports->count(),
         ];
-        
+
         // Get contract statistics
-        $contractStats = $this->getContractStatistics($user);
-        
+        $contractStats = $this->getContractStatistics($user, $accessibleProgramIds);
+
         return view('livewire.contract-dashboard', [
             'user' => $user,
             'upcomingReportDueDates' => $upcomingReportDueDates,
@@ -740,50 +758,56 @@ class Dashboard extends Component
             'contractStats' => $contractStats,
         ])->layout('components.layouts.app');
     }
-    
+
     /**
      * Get recent contract activity for the user
      */
-    private function getRecentContractActivity($user)
+    private function getRecentContractActivity($user, $accessibleProgramIds)
     {
         $activities = collect();
-        
+
         // Recent report submissions
         $recentSubmissions = ContractReport::with(['contract', 'contractReportDueDate'])
             ->where('created_by', $user->id)
+            ->whereHas('contract', function ($query) use ($accessibleProgramIds) {
+                $query->whereIn('program_id', $accessibleProgramIds);
+            })
             ->where('status', 'submitted')
             ->whereBetween('submitted_date', [now()->subDays(30), now()])
             ->orderBy('submitted_date', 'desc')
             ->limit(5)
             ->get()
-            ->map(function($report) {
+            ->map(function ($report) {
                 return [
                     'type' => 'report_submitted',
-                    'description' => 'Submitted report: ' . $report->title . ' for ' . $report->contract->title,
+                    'description' => 'Submitted report: '.$report->title.' for '.$report->contract->title,
                     'timestamp' => $report->submitted_date,
                     'status' => $report->status,
-                    'id' => $report->id
+                    'id' => $report->id,
                 ];
             });
-            
+
         // Recent status changes
         $recentStatusChanges = ContractReport::with(['contract'])
             ->where('created_by', $user->id)
+            ->whereHas('contract', function ($query) use ($accessibleProgramIds) {
+                $query->whereIn('program_id', $accessibleProgramIds);
+            })
             ->whereIn('status', ['approved', 'rejected', 'revision_required'])
             ->whereBetween('updated_at', [now()->subDays(30), now()])
             ->orderBy('updated_at', 'desc')
             ->limit(5)
             ->get()
-            ->map(function($report) {
+            ->map(function ($report) {
                 return [
                     'type' => 'status_change',
-                    'description' => 'Report "' . $report->title . '" status changed to ' . ContractReport::STATUS_OPTIONS[$report->status],
+                    'description' => 'Report "'.$report->title.'" status changed to '.ContractReport::STATUS_OPTIONS[$report->status],
                     'timestamp' => $report->updated_at,
                     'status' => $report->status,
-                    'id' => $report->id
+                    'id' => $report->id,
                 ];
             });
-            
+
         // Combine and sort activities
         return $activities
             ->merge($recentSubmissions)
@@ -791,42 +815,53 @@ class Dashboard extends Component
             ->sortByDesc('timestamp')
             ->take(10);
     }
-    
+
     /**
      * Get contract statistics for the user
      */
-    private function getContractStatistics($user)
+    private function getContractStatistics($user, $accessibleProgramIds)
     {
         $userEmail = $user->email;
-        
+
         // Total contracts assigned
-        $totalContracts = Contract::whereHas('reportDueDates.emails', function($query) use ($userEmail) {
+        $totalContracts = Contract::whereHas('reportDueDates.emails', function ($query) use ($userEmail) {
             $query->where('email', $userEmail)
                 ->where('contract_report_due_date_emails.active', true);
-        })->count();
-        
+        })
+            ->whereIn('program_id', $accessibleProgramIds)
+            ->count();
+
         // Reports by status
         $reportsByStatus = ContractReport::where('created_by', $user->id)
+            ->whereHas('contract', function ($query) use ($accessibleProgramIds) {
+                $query->whereIn('program_id', $accessibleProgramIds);
+            })
             ->selectRaw('status, COUNT(*) as count')
             ->groupBy('status')
             ->get()
             ->pluck('count', 'status');
-            
+
         // Completion rate for current period
         $completedInPeriod = ContractReport::where('created_by', $user->id)
+            ->whereHas('contract', function ($query) use ($accessibleProgramIds) {
+                $query->whereIn('program_id', $accessibleProgramIds);
+            })
             ->where('status', 'approved')
             ->whereBetween('submitted_date', [$this->startDate, $this->endDate])
             ->count();
-            
-        $totalDueInPeriod = ContractReportDueDate::whereHas('emails', function($query) use ($userEmail) {
-                $query->where('email', $userEmail)
-                    ->where('contract_report_due_date_emails.active', true);
+
+        $totalDueInPeriod = ContractReportDueDate::whereHas('emails', function ($query) use ($userEmail) {
+            $query->where('email', $userEmail)
+                ->where('contract_report_due_date_emails.active', true);
+        })
+            ->whereHas('contract', function ($query) use ($accessibleProgramIds) {
+                $query->whereIn('program_id', $accessibleProgramIds);
             })
             ->whereBetween('due_date', [$this->startDate, $this->endDate])
             ->count();
-            
+
         $completionRate = $totalDueInPeriod > 0 ? round(($completedInPeriod / $totalDueInPeriod) * 100, 1) : 0;
-        
+
         return [
             'total_contracts' => $totalContracts,
             'reports_by_status' => $reportsByStatus,
