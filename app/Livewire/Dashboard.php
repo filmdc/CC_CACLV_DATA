@@ -690,35 +690,46 @@ class Dashboard extends Component
         // Get user's accessible program IDs
         $accessibleProgramIds = $user->getAccessibleProgramIds();
 
-        // Get upcoming report due dates assigned to this user
-        $upcomingReportDueDates = ContractReportDueDate::with(['contract.program', 'contract.funder', 'contractReports'])
-            ->whereHas('emails', function ($query) use ($userEmail) {
-                $query->where('email', $userEmail)
-                    ->where('contract_report_due_date_emails.active', true);
-            })
-            ->whereHas('contract', function ($query) use ($accessibleProgramIds) {
-                $query->whereIn('program_id', $accessibleProgramIds);
-            })
-            ->where('active', true)
-            ->where('status', '!=', 'completed')
-            ->where('due_date', '>=', now())
-            ->orderBy('due_date')
-            ->get();
+        // Check if user is a Contract Manager (sees all report due dates)
+        $isContractManager = $user->hasRole('Contract Manager');
 
-        // Get overdue report due dates
-        $overdueReportDueDates = ContractReportDueDate::with(['contract.program', 'contract.funder', 'contractReports'])
-            ->whereHas('emails', function ($query) use ($userEmail) {
-                $query->where('email', $userEmail)
-                    ->where('contract_report_due_date_emails.active', true);
-            })
+        // Build upcoming report due dates query
+        $upcomingQuery = ContractReportDueDate::with(['contract.program', 'contract.funder', 'contractReports'])
             ->whereHas('contract', function ($query) use ($accessibleProgramIds) {
                 $query->whereIn('program_id', $accessibleProgramIds);
             })
             ->where('active', true)
             ->where('status', '!=', 'completed')
-            ->where('due_date', '<', now())
-            ->orderBy('due_date', 'desc')
-            ->get();
+            ->where('due_date', '>=', now());
+
+        // For non-Contract Managers, filter by email assignment
+        if (! $isContractManager) {
+            $upcomingQuery->whereHas('emails', function ($query) use ($userEmail) {
+                $query->where('email', $userEmail)
+                    ->where('contract_report_due_date_emails.active', true);
+            });
+        }
+
+        $upcomingReportDueDates = $upcomingQuery->orderBy('due_date')->get();
+
+        // Build overdue report due dates query
+        $overdueQuery = ContractReportDueDate::with(['contract.program', 'contract.funder', 'contractReports'])
+            ->whereHas('contract', function ($query) use ($accessibleProgramIds) {
+                $query->whereIn('program_id', $accessibleProgramIds);
+            })
+            ->where('active', true)
+            ->where('status', '!=', 'completed')
+            ->where('due_date', '<', now());
+
+        // For non-Contract Managers, filter by email assignment
+        if (! $isContractManager) {
+            $overdueQuery->whereHas('emails', function ($query) use ($userEmail) {
+                $query->where('email', $userEmail)
+                    ->where('contract_report_due_date_emails.active', true);
+            });
+        }
+
+        $overdueReportDueDates = $overdueQuery->orderBy('due_date', 'desc')->get();
 
         // Get recently submitted reports
         $recentlySubmittedReports = ContractReport::with(['contract.program', 'contract.funder', 'contractReportDueDate'])
@@ -822,16 +833,23 @@ class Dashboard extends Component
     private function getContractStatistics($user, $accessibleProgramIds)
     {
         $userEmail = $user->email;
+        $isContractManager = $user->hasRole('Contract Manager');
 
         // Total contracts assigned
-        $totalContracts = Contract::whereHas('reportDueDates.emails', function ($query) use ($userEmail) {
-            $query->where('email', $userEmail)
-                ->where('contract_report_due_date_emails.active', true);
-        })
-            ->whereIn('program_id', $accessibleProgramIds)
-            ->count();
+        if ($isContractManager) {
+            // Contract Managers see all contracts in their accessible programs
+            $totalContracts = Contract::whereIn('program_id', $accessibleProgramIds)->count();
+        } else {
+            // Others only see contracts with email assignments
+            $totalContracts = Contract::whereHas('reportDueDates.emails', function ($query) use ($userEmail) {
+                $query->where('email', $userEmail)
+                    ->where('contract_report_due_date_emails.active', true);
+            })
+                ->whereIn('program_id', $accessibleProgramIds)
+                ->count();
+        }
 
-        // Reports by status
+        // Reports by status (for this user only)
         $reportsByStatus = ContractReport::where('created_by', $user->id)
             ->whereHas('contract', function ($query) use ($accessibleProgramIds) {
                 $query->whereIn('program_id', $accessibleProgramIds);
@@ -850,15 +868,21 @@ class Dashboard extends Component
             ->whereBetween('submitted_date', [$this->startDate, $this->endDate])
             ->count();
 
-        $totalDueInPeriod = ContractReportDueDate::whereHas('emails', function ($query) use ($userEmail) {
-            $query->where('email', $userEmail)
-                ->where('contract_report_due_date_emails.active', true);
+        // Total due in period
+        $totalDueQuery = ContractReportDueDate::whereHas('contract', function ($query) use ($accessibleProgramIds) {
+            $query->whereIn('program_id', $accessibleProgramIds);
         })
-            ->whereHas('contract', function ($query) use ($accessibleProgramIds) {
-                $query->whereIn('program_id', $accessibleProgramIds);
-            })
-            ->whereBetween('due_date', [$this->startDate, $this->endDate])
-            ->count();
+            ->whereBetween('due_date', [$this->startDate, $this->endDate]);
+
+        // For non-Contract Managers, filter by email assignment
+        if (! $isContractManager) {
+            $totalDueQuery->whereHas('emails', function ($query) use ($userEmail) {
+                $query->where('email', $userEmail)
+                    ->where('contract_report_due_date_emails.active', true);
+            });
+        }
+
+        $totalDueInPeriod = $totalDueQuery->count();
 
         $completionRate = $totalDueInPeriod > 0 ? round(($completedInPeriod / $totalDueInPeriod) * 100, 1) : 0;
 

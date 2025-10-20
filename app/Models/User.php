@@ -100,10 +100,11 @@ class User extends Authenticatable
     public function hasAllRoles(array $roles): bool
     {
         foreach ($roles as $role) {
-            if (!$this->hasRole($role)) {
+            if (! $this->hasRole($role)) {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -133,10 +134,11 @@ class User extends Authenticatable
     public function hasAllPermissions(array $permissions): bool
     {
         foreach ($permissions as $permission) {
-            if (!$this->hasPermission($permission)) {
+            if (! $this->hasPermission($permission)) {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -180,8 +182,8 @@ class User extends Authenticatable
      */
     public function hasAccessToProgram($programId): bool
     {
-        // Admins have access to all programs
-        if ($this->isAdmin()) {
+        // Admins and Contract Managers have access to all programs
+        if ($this->isAdmin() || $this->hasRole('Contract Manager')) {
             return true;
         }
 
@@ -194,8 +196,8 @@ class User extends Authenticatable
      */
     public function getAccessibleProgramIds(): array
     {
-        // Admins have access to all programs
-        if ($this->isAdmin()) {
+        // Admins and Contract Managers have access to all programs
+        if ($this->isAdmin() || $this->hasRole('Contract Manager')) {
             return Program::pluck('id')->toArray();
         }
 
