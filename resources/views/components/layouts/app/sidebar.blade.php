@@ -56,6 +56,20 @@
                 </flux:navlist.group>
                 @endif
 
+                @if(auth()->user()->hasAnyPermission(['donor_gifts.view', 'donor_gifts.configure', 'intacct.configure']))
+                <flux:navlist.group :heading="__('Accounting & Fiscal')" class="grid">
+                    @if(auth()->user()->hasPermission('donor_gifts.view'))
+                        <flux:navlist.item icon="currency-dollar" :href="route('donor-gifts.feed')" :current="request()->routeIs('donor-gifts.feed')" wire:navigate>{{ __('DonorPerfect Gifts') }}</flux:navlist.item>
+                    @endif
+                    @if(auth()->user()->hasPermission('donor_gifts.configure'))
+                        <flux:navlist.item icon="cog" :href="route('donor-gifts.configuration')" :current="request()->routeIs('donor-gifts.configuration')" wire:navigate>{{ __('DP Configuration') }}</flux:navlist.item>
+                    @endif
+                    @if(auth()->user()->hasPermission('intacct.configure'))
+                        <flux:navlist.item icon="cloud-arrow-up" :href="route('sage-intacct.configuration')" :current="request()->routeIs('sage-intacct.configuration')" wire:navigate>{{ __('Sage Intacct Sync') }}</flux:navlist.item>
+                    @endif
+                </flux:navlist.group>
+                @endif
+
                 @if(auth()->user()->hasAnyPermission(['users.view', 'roles.view', 'poverty_guidelines.view', 'reference_data.view', 'reference_data_sets.view', 'admin.access']) || auth()->user()->isAdmin())
                 <flux:navlist.group :heading="__('Administration')" class="grid">
                     <flux:navlist.item icon="cog-6-tooth" :href="route('admin.panel')" :current="request()->routeIs('admin.panel')" wire:navigate>{{ __('Admin Panel') }}</flux:navlist.item>

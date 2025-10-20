@@ -83,7 +83,129 @@ Route::middleware(['auth'])->group(function () {
     Route::get('duplicate-resolution', App\Livewire\DuplicateResolutionManagement::class)->name('duplicate.resolution');
     Route::get('admin-panel', App\Livewire\AdminPanel::class)->name('admin.panel');
     Route::get('reports', App\Livewire\ReportingManagement::class)->name('reports');
-    
+
+    // DonorPerfect Routes
+    Route::get('donor-gifts', App\Livewire\DonorPerfectGiftsFeed::class)
+        ->middleware(['permission:donor_gifts.view'])
+        ->name('donor-gifts.feed');
+    Route::get('donor-gifts/configuration', App\Livewire\DonorPerfectConfiguration::class)
+        ->middleware(['permission:donor_gifts.configure'])
+        ->name('donor-gifts.configuration');
+
+    // Sage Intacct Routes
+    Route::get('/accounting/sage-intacct/configuration', \App\Livewire\SageIntacctConfiguration::class)
+        ->name('sage-intacct.configuration')
+        ->middleware(['auth']);
+
+    // Serve cached check images (authenticated, auto-convert TIFF to PNG)
+    Route::get('donor-gifts/check-image/{filename}', function ($filename) {
+        // Verify user is authenticated and has permission
+        if (!auth()->check() || !auth()->user()->hasPermission('donor_gifts.view')) {
+            abort(403, 'Unauthorized');
+        }
+
+        // Security: prevent directory traversal
+        $safeFilename = basename($filename);
+        $filePath = 'check_images/' . $safeFilename;
+
+        if (!Storage::disk('public')->exists($filePath)) {
+            abort(404, 'Image not found');
+        }
+
+        $fullPath = Storage::disk('public')->path($filePath);
+
+        // Check if it's a TIFF file
+        $extension = strtolower(pathinfo($safeFilename, PATHINFO_EXTENSION));
+
+        if (in_array($extension, ['tif', 'tiff'])) {
+            // Convert multi-page TIFF to PNGs for browser viewing
+            try {
+                $imagick = new \Imagick($fullPath);
+                $pageCount = $imagick->getNumberImages();
+
+                $baseFilename = pathinfo($safeFilename, PATHINFO_FILENAME);
+                $pngFiles = [];
+
+                // Convert each page to PNG
+                $imagick = new \Imagick($fullPath);
+                $pageNum = 0;
+                foreach ($imagick as $page) {
+                    $pngFilename = $baseFilename . '_page' . $pageNum . '.png';
+                    $pngPath = 'check_images/' . $pngFilename;
+                    $pngFullPath = Storage::disk('public')->path($pngPath);
+
+                    if (!file_exists($pngFullPath)) {
+                        $page->setImageFormat('png');
+                        $page->setImageCompression(\Imagick::COMPRESSION_JPEG);
+                        $page->setImageCompressionQuality(85);
+                        $page->writeImage($pngFullPath);
+                    }
+
+                    $pngFiles[] = [
+                        'filename' => $pngFilename,
+                        'url' => route('donor-gifts.check-image-png', ['filename' => $pngFilename]),
+                        'size' => file_exists($pngFullPath) ? filesize($pngFullPath) : 0
+                    ];
+
+                    $pageNum++;
+                }
+
+                $imagick->clear();
+                $imagick->destroy();
+
+                Log::info('Converted multi-page TIFF', [
+                    'tiff_file' => $safeFilename,
+                    'pages' => $pageCount,
+                    'png_files' => count($pngFiles)
+                ]);
+
+                // Return HTML viewer for multi-page check
+                return response()->view('check-image-viewer', [
+                    'pages' => $pngFiles,
+                    'filename' => $safeFilename,
+                    'pageCount' => $pageCount
+                ]);
+
+            } catch (\Exception $e) {
+                Log::error('Failed to convert TIFF', [
+                    'file' => $safeFilename,
+                    'error' => $e->getMessage()
+                ]);
+                abort(500, 'Failed to convert image for viewing');
+            }
+        }
+
+        // For non-TIFF files, serve as-is
+        $mimeType = mime_content_type($fullPath) ?: 'application/octet-stream';
+        return response()->file($fullPath, [
+            'Content-Type' => $mimeType,
+            'Content-Disposition' => 'inline; filename="' . $safeFilename . '"',
+            'Cache-Control' => 'private, max-age=3600',
+        ]);
+    })->name('donor-gifts.check-image');
+
+    // Serve individual PNG pages from converted TIFFs
+    Route::get('donor-gifts/check-image-png/{filename}', function ($filename) {
+        if (!auth()->check() || !auth()->user()->hasPermission('donor_gifts.view')) {
+            abort(403, 'Unauthorized');
+        }
+
+        $safeFilename = basename($filename);
+        $filePath = 'check_images/' . $safeFilename;
+
+        if (!Storage::disk('public')->exists($filePath)) {
+            abort(404, 'PNG not found');
+        }
+
+        $fullPath = Storage::disk('public')->path($filePath);
+
+        return response()->file($fullPath, [
+            'Content-Type' => 'image/png',
+            'Content-Disposition' => 'inline; filename="' . $safeFilename . '"',
+            'Cache-Control' => 'private, max-age=86400',
+        ]);
+    })->name('donor-gifts.check-image-png');
+
     // Secure download route for import/export files
     Route::get('secure-download/{token}', function ($token) {
         $downloadData = Cache::get('download_' . $token);
