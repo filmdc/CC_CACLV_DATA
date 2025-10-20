@@ -95,7 +95,7 @@
                 Page {{ $index + 1 }} of {{ $pageCount }}
             @endif
         </div>
-        <img src="{{ $page['url'] }}" alt="Check page {{ $index + 1 }}" class="check-image">
+        <img src="data:image/png;base64,{{ $page['imageData'] }}" alt="Check page {{ $index + 1 }}" class="check-image">
     </div>
     @endforeach
 

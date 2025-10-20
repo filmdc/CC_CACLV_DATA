@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Livewire\Volt\Volt;
 use App\Http\Controllers\ProgramManagerUploadController;
+use App\Services\CheckImageCacheService;
 
 Route::get('/', function () {
     return redirect()->route('welcome');
@@ -91,13 +92,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('donor-gifts/configuration', App\Livewire\DonorPerfectConfiguration::class)
         ->middleware(['permission:donor_gifts.configure'])
         ->name('donor-gifts.configuration');
+    Route::get('donor-gifts/audit-log', App\Livewire\CheckImageAuditLog::class)
+        ->middleware(['role:admin'])
+        ->name('donor-gifts.audit-log');
 
     // Sage Intacct Routes
     Route::get('/accounting/sage-intacct/configuration', \App\Livewire\SageIntacctConfiguration::class)
         ->name('sage-intacct.configuration')
         ->middleware(['auth']);
 
-    // Serve cached check images (authenticated, auto-convert TIFF to PNG)
+    // Serve cached check images (authenticated, encrypted, auto-convert TIFF to PNG)
     Route::get('donor-gifts/check-image/{filename}', function ($filename) {
         // Verify user is authenticated and has permission
         if (!auth()->check() || !auth()->user()->hasPermission('donor_gifts.view')) {
@@ -108,43 +112,67 @@ Route::middleware(['auth'])->group(function () {
         $safeFilename = basename($filename);
         $filePath = 'check_images/' . $safeFilename;
 
-        if (!Storage::disk('public')->exists($filePath)) {
+        // Log audit event for file access
+        \App\Models\CheckImageAuditLog::logAccess('accessed', $safeFilename, null, [
+            'file_type' => pathinfo($safeFilename, PATHINFO_EXTENSION)
+        ]);
+
+        // Check if encrypted file exists
+        if (!Storage::disk('local')->exists($filePath . '.enc')) {
             abort(404, 'Image not found');
         }
 
-        $fullPath = Storage::disk('public')->path($filePath);
+        // Decrypt the file
+        $imageCacheService = new CheckImageCacheService();
+        $decryptResult = $imageCacheService->decryptFile($filePath);
 
-        // Check if it's a TIFF file
+        if (!$decryptResult['success']) {
+            Log::error('Failed to decrypt check image', [
+                'filename' => $safeFilename,
+                'error' => $decryptResult['error']
+            ]);
+            abort(500, 'Failed to decrypt image');
+        }
+
+        $fileContents = $decryptResult['contents'];
+
+        // Get metadata for mime type
+        $metadataPath = 'check_images/metadata/' . $safeFilename . '.json';
+        $metadata = Storage::disk('local')->exists($metadataPath)
+            ? json_decode(Storage::disk('local')->get($metadataPath), true)
+            : [];
+
+        $mimeType = $metadata['mime_type'] ?? 'application/octet-stream';
+
+        // Create temporary file for processing (needed for TIFF conversion)
+        $tempPath = tempnam(sys_get_temp_dir(), 'check_img_');
+        file_put_contents($tempPath, $fileContents);
+
         $extension = strtolower(pathinfo($safeFilename, PATHINFO_EXTENSION));
 
+        // Check if it's a TIFF file that needs conversion
         if (in_array($extension, ['tif', 'tiff'])) {
-            // Convert multi-page TIFF to PNGs for browser viewing
             try {
-                $imagick = new \Imagick($fullPath);
+                $imagick = new \Imagick($tempPath);
                 $pageCount = $imagick->getNumberImages();
 
                 $baseFilename = pathinfo($safeFilename, PATHINFO_FILENAME);
                 $pngFiles = [];
 
                 // Convert each page to PNG
-                $imagick = new \Imagick($fullPath);
+                $imagick = new \Imagick($tempPath);
                 $pageNum = 0;
                 foreach ($imagick as $page) {
                     $pngFilename = $baseFilename . '_page' . $pageNum . '.png';
-                    $pngPath = 'check_images/' . $pngFilename;
-                    $pngFullPath = Storage::disk('public')->path($pngPath);
 
-                    if (!file_exists($pngFullPath)) {
-                        $page->setImageFormat('png');
-                        $page->setImageCompression(\Imagick::COMPRESSION_JPEG);
-                        $page->setImageCompressionQuality(85);
-                        $page->writeImage($pngFullPath);
-                    }
+                    $page->setImageFormat('png');
+                    $page->setImageCompression(\Imagick::COMPRESSION_JPEG);
+                    $page->setImageCompressionQuality(85);
 
                     $pngFiles[] = [
                         'filename' => $pngFilename,
                         'url' => route('donor-gifts.check-image-png', ['filename' => $pngFilename]),
-                        'size' => file_exists($pngFullPath) ? filesize($pngFullPath) : 0
+                        'imageData' => base64_encode($page->getImageBlob())
                     ];
 
                     $pageNum++;
@@ -152,6 +180,9 @@ Route::middleware(['auth'])->group(function () {
 
                 $imagick->clear();
                 $imagick->destroy();
+
+                // Clean up temp file
+                unlink($tempPath);
 
                 Log::info('Converted multi-page TIFF', [
                     'tiff_file' => $safeFilename,
@@ -167,6 +198,11 @@ Route::middleware(['auth'])->group(function () {
                 ]);
 
             } catch (\Exception $e) {
+                // Clean up temp file on error
+                if (file_exists($tempPath)) {
+                    unlink($tempPath);
+                }
+
                 Log::error('Failed to convert TIFF', [
                     'file' => $safeFilename,
                     'error' => $e->getMessage()
@@ -175,16 +211,21 @@ Route::middleware(['auth'])->group(function () {
             }
         }
 
-        // For non-TIFF files, serve as-is
-        $mimeType = mime_content_type($fullPath) ?: 'application/octet-stream';
-        return response()->file($fullPath, [
+        // For non-TIFF files, serve decrypted contents directly
+        $response = response($fileContents, 200, [
             'Content-Type' => $mimeType,
             'Content-Disposition' => 'inline; filename="' . $safeFilename . '"',
             'Cache-Control' => 'private, max-age=3600',
         ]);
+
+        // Clean up temp file
+        unlink($tempPath);
+
+        return $response;
     })->name('donor-gifts.check-image');
 
-    // Serve individual PNG pages from converted TIFFs
+    // Serve standalone PNG check images (encrypted)
+    // Note: TIFF-to-PNG conversions are now handled inline with base64 encoding
     Route::get('donor-gifts/check-image-png/{filename}', function ($filename) {
         if (!auth()->check() || !auth()->user()->hasPermission('donor_gifts.view')) {
             abort(403, 'Unauthorized');
@@ -193,13 +234,31 @@ Route::middleware(['auth'])->group(function () {
         $safeFilename = basename($filename);
         $filePath = 'check_images/' . $safeFilename;
 
-        if (!Storage::disk('public')->exists($filePath)) {
+        // Log audit event for PNG page access
+        \App\Models\CheckImageAuditLog::logAccess('accessed', $safeFilename, null, [
+            'file_type' => 'png'
+        ]);
+
+        // Check if encrypted file exists
+        if (!Storage::disk('local')->exists($filePath . '.enc')) {
             abort(404, 'PNG not found');
         }
 
-        $fullPath = Storage::disk('public')->path($filePath);
+        // Decrypt the file
+        $imageCacheService = new CheckImageCacheService();
+        $decryptResult = $imageCacheService->decryptFile($filePath);
 
-        return response()->file($fullPath, [
+        if (!$decryptResult['success']) {
+            Log::error('Failed to decrypt PNG check image', [
+                'filename' => $safeFilename,
+                'error' => $decryptResult['error']
+            ]);
+            abort(500, 'Failed to decrypt image');
+        }
+
+        $fileContents = $decryptResult['contents'];
+
+        return response($fileContents, 200, [
             'Content-Type' => 'image/png',
             'Content-Disposition' => 'inline; filename="' . $safeFilename . '"',
             'Cache-Control' => 'private, max-age=86400',

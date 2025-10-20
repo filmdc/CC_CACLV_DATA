@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\CheckImageAuditLog;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -13,12 +15,27 @@ class CheckImageCacheService
     private ?string $smbPassword = null;
     private ?string $smbDomain = null;
 
+    private array $allowedMimeTypes = [
+        'image/tiff',
+        'image/png',
+        'image/jpeg',
+        'image/jpg',
+        'application/pdf',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+        'application/msword', // .doc
+        'application/vnd.ms-excel', // .xls
+    ];
+
+    private int $maxFileSizeMB = 50;
+
     public function __construct()
     {
         // Load SMB credentials from environment or config
         $this->smbUsername = env('SMB_USERNAME');
         $this->smbPassword = env('SMB_PASSWORD');
         $this->smbDomain = env('SMB_DOMAIN', 'CACLV');
+        $this->maxFileSizeMB = env('CHECK_IMAGE_MAX_SIZE_MB', 50);
     }
 
     /**
@@ -49,11 +66,17 @@ class CheckImageCacheService
             $cacheFilename = $giftId . '_' . Str::slug(pathinfo($fileName, PATHINFO_FILENAME)) . '.' . pathinfo($fileName, PATHINFO_EXTENSION);
             $localPath = $this->cacheDirectory . '/' . $cacheFilename;
 
-            // Check if already cached
-            if (Storage::disk('public')->exists($localPath)) {
+            // Check if already cached (encrypted file)
+            if (Storage::disk('local')->exists($localPath . '.enc')) {
                 Log::info('Check image already cached', [
                     'gift_id' => $giftId,
                     'cached_file' => $cacheFilename
+                ]);
+
+                // Log audit event
+                CheckImageAuditLog::logAccess('cached', $cacheFilename, $giftId, [
+                    'unc_path' => $uncPath,
+                    'already_cached' => true
                 ]);
 
                 return [
@@ -65,9 +88,21 @@ class CheckImageCacheService
             }
 
             // Fetch file from SMB share using smbclient
-            $result = $this->fetchFileViaSmbClient($server, $share, $filePath, $localPath);
+            $result = $this->fetchFileViaSmbClient($server, $share, $filePath, $localPath, [
+                'gift_id' => $giftId,
+                'original_name' => $fileName
+            ]);
 
             if ($result['success']) {
+                // Log audit event for newly cached file
+                CheckImageAuditLog::logAccess('cached', $cacheFilename, $giftId, [
+                    'unc_path' => $uncPath,
+                    'already_cached' => false,
+                    'file_size' => $result['file_size'] ?? null,
+                    'mime_type' => $result['mime_type'] ?? null,
+                    'checksum' => $result['checksum'] ?? null
+                ]);
+
                 return [
                     'success' => true,
                     'cached' => false,
@@ -130,24 +165,174 @@ class CheckImageCacheService
     }
 
     /**
+     * Validate file type and size
+     *
+     * @param string $filePath
+     * @return array
+     */
+    private function validateFile(string $filePath): array
+    {
+        if (!file_exists($filePath)) {
+            return ['valid' => false, 'error' => 'File does not exist'];
+        }
+
+        // Check file size
+        $fileSize = filesize($filePath);
+        $maxBytes = $this->maxFileSizeMB * 1024 * 1024;
+
+        if ($fileSize > $maxBytes) {
+            return [
+                'valid' => false,
+                'error' => "File too large: " . round($fileSize / 1024 / 1024, 2) . "MB (max: {$this->maxFileSizeMB}MB)"
+            ];
+        }
+
+        // Check MIME type
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mimeType = finfo_file($finfo, $filePath);
+        finfo_close($finfo);
+
+        if (!in_array($mimeType, $this->allowedMimeTypes)) {
+            return [
+                'valid' => false,
+                'error' => "File type not allowed: {$mimeType}"
+            ];
+        }
+
+        return [
+            'valid' => true,
+            'mime_type' => $mimeType,
+            'file_size' => $fileSize
+        ];
+    }
+
+    /**
+     * Scan file for malware using ClamAV (if enabled)
+     *
+     * @param string $filePath Absolute path to file
+     * @return array Scan result with 'clean' boolean
+     */
+    private function scanForMalware(string $filePath): array
+    {
+        // Check if malware scanning is enabled
+        if (!env('ENABLE_MALWARE_SCANNING', false)) {
+            return ['clean' => true, 'skipped' => true];
+        }
+
+        // Verify ClamAV is installed
+        exec('which clamdscan', $output, $returnCode);
+        if ($returnCode !== 0) {
+            Log::warning('ClamAV not found - malware scanning disabled');
+            return ['clean' => true, 'skipped' => true, 'error' => 'ClamAV not installed'];
+        }
+
+        // Scan the file
+        $escapedPath = escapeshellarg($filePath);
+        exec("clamdscan --no-summary {$escapedPath}", $output, $returnCode);
+
+        // ClamAV returns:
+        // 0 = clean
+        // 1 = infected
+        // 2 = error
+
+        if ($returnCode === 1) {
+            Log::error('MALWARE DETECTED in check image', [
+                'file' => basename($filePath),
+                'scan_output' => implode("\n", $output)
+            ]);
+
+            // Delete the infected file immediately
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+
+            return ['clean' => false, 'infected' => true];
+        }
+
+        if ($returnCode === 2) {
+            Log::warning('ClamAV scan error', [
+                'file' => basename($filePath),
+                'output' => implode("\n", $output)
+            ]);
+            return ['clean' => true, 'skipped' => true, 'error' => 'Scan error'];
+        }
+
+        Log::info('File passed malware scan', ['file' => basename($filePath)]);
+        return ['clean' => true, 'scanned' => true];
+    }
+
+    /**
+     * Verify file integrity against stored checksum
+     *
+     * @param string $storagePath
+     * @param string $expectedChecksum
+     * @return bool
+     */
+    public function verifyFileIntegrity(string $storagePath, string $expectedChecksum): bool
+    {
+        if (!Storage::disk('local')->exists($storagePath . '.enc')) {
+            Log::warning('Cannot verify integrity - file not found', ['path' => $storagePath]);
+            return false;
+        }
+
+        // Decrypt and calculate checksum
+        $decryptResult = $this->decryptFile($storagePath);
+        if (!$decryptResult['success']) {
+            return false;
+        }
+
+        $actualChecksum = hash('sha256', $decryptResult['contents']);
+        $isValid = hash_equals($expectedChecksum, $actualChecksum);
+
+        if (!$isValid) {
+            Log::error('File integrity check failed', [
+                'path' => $storagePath,
+                'expected' => $expectedChecksum,
+                'actual' => $actualChecksum
+            ]);
+        }
+
+        return $isValid;
+    }
+
+    /**
+     * Get file metadata with integrity verification
+     *
+     * @param string $storagePath
+     * @return array|null
+     */
+    public function getFileMetadata(string $storagePath): ?array
+    {
+        $metadataPath = 'check_images/metadata/' . basename($storagePath) . '.json';
+
+        if (!Storage::disk('local')->exists($metadataPath)) {
+            return null;
+        }
+
+        return json_decode(Storage::disk('local')->get($metadataPath), true);
+    }
+
+    /**
      * Fetch file from SMB share using smbclient command
      *
      * @param string $server
      * @param string $share
      * @param string $remoteFilePath
      * @param string $localStoragePath
+     * @param array $metadata
      * @return array
      */
-    private function fetchFileViaSmbClient(string $server, string $share, string $remoteFilePath, string $localStoragePath): array
+    private function fetchFileViaSmbClient(string $server, string $share, string $remoteFilePath, string $localStoragePath, array $metadata = []): array
     {
         try {
-            // Build local absolute path
-            $localAbsolutePath = Storage::disk('public')->path($localStoragePath);
+            // Build local absolute path (temporary, unencrypted location)
+            $tempPath = 'temp/' . basename($localStoragePath);
+            $localAbsolutePath = Storage::disk('local')->path($tempPath);
             $localDir = dirname($localAbsolutePath);
 
-            // Ensure directory exists
+            // Ensure directory exists with restricted permissions
             if (!file_exists($localDir)) {
-                mkdir($localDir, 0755, true);
+                mkdir($localDir, 0700, true);
             }
 
             // Build smbclient command
@@ -213,15 +398,72 @@ class CheckImageCacheService
                 ];
             }
 
-            Log::info('Successfully cached check image', [
+            // Validate file after successful download
+            $validationResult = $this->validateFile($localAbsolutePath);
+            if (!$validationResult['valid']) {
+                // Delete invalid file
+                @unlink($localAbsolutePath);
+
+                Log::error('File validation failed after download', [
+                    'server' => $server,
+                    'share' => $share,
+                    'file' => $remoteFilePath,
+                    'error' => $validationResult['error']
+                ]);
+
+                return [
+                    'success' => false,
+                    'error' => 'File validation failed: ' . $validationResult['error']
+                ];
+            }
+
+            // Scan for malware after validation
+            $scanResult = $this->scanForMalware($localAbsolutePath);
+            if (!$scanResult['clean']) {
+                return [
+                    'success' => false,
+                    'error' => 'File failed security scan: malware detected'
+                ];
+            }
+
+            Log::info('Successfully fetched check image, encrypting...', [
                 'unc_path' => "\\\\{$server}\\{$share}\\{$remoteFilePath}",
                 'local_path' => $localStoragePath,
-                'file_size' => filesize($localAbsolutePath)
+                'file_size' => $validationResult['file_size'],
+                'mime_type' => $validationResult['mime_type'],
+                'malware_scan' => $scanResult
+            ]);
+
+            // Encrypt and store the file
+            $encryptResult = $this->encryptAndStoreFile(
+                $localAbsolutePath,
+                $localStoragePath,
+                array_merge($metadata, [
+                    'original_name' => basename($remoteFilePath),
+                    'mime_type' => $validationResult['mime_type'],
+                    'file_size' => $validationResult['file_size']
+                ])
+            );
+
+            if (!$encryptResult['success']) {
+                return [
+                    'success' => false,
+                    'error' => 'File downloaded but encryption failed: ' . ($encryptResult['error'] ?? 'Unknown error')
+                ];
+            }
+
+            Log::info('Successfully encrypted and cached check image', [
+                'unc_path' => "\\\\{$server}\\{$share}\\{$remoteFilePath}",
+                'local_path' => $localStoragePath,
+                'checksum' => $encryptResult['checksum']
             ]);
 
             return [
                 'success' => true,
-                'message' => 'File cached successfully'
+                'message' => 'File cached and encrypted successfully',
+                'mime_type' => $validationResult['mime_type'],
+                'file_size' => $validationResult['file_size'],
+                'checksum' => $encryptResult['checksum']
             ];
 
         } catch (\Exception $e) {
@@ -291,16 +533,36 @@ class CheckImageCacheService
     public function clearOldCachedImages(int $olderThanDays = 30): int
     {
         $deleted = 0;
-        $files = Storage::disk('public')->files($this->cacheDirectory);
+        $files = Storage::disk('local')->files($this->cacheDirectory);
 
         $cutoffTime = now()->subDays($olderThanDays)->timestamp;
 
         foreach ($files as $file) {
-            $lastModified = Storage::disk('public')->lastModified($file);
+            // Only process encrypted files
+            if (!str_ends_with($file, '.enc')) {
+                continue;
+            }
+
+            $lastModified = Storage::disk('local')->lastModified($file);
 
             if ($lastModified < $cutoffTime) {
-                Storage::disk('public')->delete($file);
+                $filename = basename($file, '.enc');
+                Storage::disk('local')->delete($file);
+
+                // Also delete corresponding metadata file
+                $metadataPath = 'check_images/metadata/' . $filename . '.json';
+                if (Storage::disk('local')->exists($metadataPath)) {
+                    Storage::disk('local')->delete($metadataPath);
+                }
+
                 $deleted++;
+
+                // Log audit event for deleted file
+                CheckImageAuditLog::logAccess('deleted', $filename, null, [
+                    'reason' => 'auto_cleanup',
+                    'age_days' => round((now()->timestamp - $lastModified) / 86400, 1),
+                    'older_than_days' => $olderThanDays
+                ]);
             }
         }
 
@@ -310,5 +572,96 @@ class CheckImageCacheService
         ]);
 
         return $deleted;
+    }
+
+    /**
+     * Encrypt file contents and store with metadata
+     *
+     * @param string $sourcePath Absolute path to source file
+     * @param string $storagePath Storage path (relative to disk)
+     * @param array $metadata Metadata to store with file
+     * @return array Result with success status and checksum
+     */
+    private function encryptAndStoreFile(string $sourcePath, string $storagePath, array $metadata): array
+    {
+        try {
+            // Read file contents
+            $fileContents = file_get_contents($sourcePath);
+
+            // Calculate checksum before encryption
+            $checksum = hash('sha256', $fileContents);
+
+            // Encrypt the contents
+            $encryptedContents = Crypt::encryptString($fileContents);
+
+            // Store encrypted file
+            Storage::disk('local')->put($storagePath . '.enc', $encryptedContents);
+
+            // Store metadata
+            $metadataPath = 'check_images/metadata/' . basename($storagePath) . '.json';
+            Storage::disk('local')->put($metadataPath, json_encode([
+                'original_name' => $metadata['original_name'] ?? basename($sourcePath),
+                'mime_type' => $metadata['mime_type'] ?? mime_content_type($sourcePath),
+                'checksum' => $checksum,
+                'gift_id' => $metadata['gift_id'] ?? null,
+                'cached_at' => now()->toIso8601String(),
+                'file_size' => $metadata['file_size'] ?? strlen($fileContents)
+            ], JSON_PRETTY_PRINT));
+
+            // Delete unencrypted source
+            unlink($sourcePath);
+
+            return ['success' => true, 'checksum' => $checksum];
+
+        } catch (\Exception $e) {
+            Log::error('File encryption failed', [
+                'source_path' => $sourcePath,
+                'error' => $e->getMessage()
+            ]);
+
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Decrypt a file and return its contents
+     *
+     * @param string $storagePath Storage path (relative to disk, without .enc extension)
+     * @return array Result with success status and decrypted contents
+     */
+    public function decryptFile(string $storagePath): array
+    {
+        try {
+            $encryptedPath = $storagePath . '.enc';
+
+            if (!Storage::disk('local')->exists($encryptedPath)) {
+                return ['success' => false, 'error' => 'Encrypted file not found'];
+            }
+
+            $encryptedContents = Storage::disk('local')->get($encryptedPath);
+            $decryptedContents = Crypt::decryptString($encryptedContents);
+
+            // Also load metadata if available
+            $metadataPath = 'check_images/metadata/' . basename($storagePath) . '.json';
+            $metadata = null;
+
+            if (Storage::disk('local')->exists($metadataPath)) {
+                $metadata = json_decode(Storage::disk('local')->get($metadataPath), true);
+            }
+
+            return [
+                'success' => true,
+                'contents' => $decryptedContents,
+                'metadata' => $metadata
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('File decryption failed', [
+                'storage_path' => $storagePath,
+                'error' => $e->getMessage()
+            ]);
+
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
     }
 }

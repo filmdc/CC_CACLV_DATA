@@ -392,7 +392,7 @@ class SageIntacctApiService
     public function sendRequest(string $xmlPayload): array
     {
         try {
-            $apiUrl = $this->setting->api_url ?? 'https://api.intacct.com/ia/xml/xmlgw.phtml';
+            $apiUrl = $this->setting->endpoint_url ?? 'https://api.intacct.com/ia/xml/xmlgw.phtml';
 
             Log::debug('Sage Intacct API: Sending request', [
                 'url' => $apiUrl,
@@ -780,5 +780,148 @@ class SageIntacctApiService
     public function getSessionId(): ?string
     {
         return $this->sessionId;
+    }
+
+    /**
+     * Upload an attachment to Sage Intacct
+     *
+     * @param string $fileName Original filename
+     * @param string $fileContents Binary file contents
+     * @param string $objectType Intacct object type (e.g., 'GLTRANSACTION', 'ARINVOICE')
+     * @param string $objectId The object key/ID to attach to
+     * @return array Result with success boolean and message
+     */
+    public function createAttachment(string $fileName, string $fileContents, string $objectType, string $objectId): array
+    {
+        try {
+            // Ensure we have a valid session
+            if (!$this->sessionId) {
+                $authResult = $this->authenticate();
+                if (!$authResult['success']) {
+                    return $authResult;
+                }
+            }
+
+            // Base64 encode file contents for XML transmission
+            $base64Contents = base64_encode($fileContents);
+
+            // Validate file size (Intacct has limits)
+            $sizeMB = strlen($base64Contents) / 1024 / 1024;
+            if ($sizeMB > 100) {
+                return [
+                    'success' => false,
+                    'error' => "Attachment too large: {$sizeMB}MB (max 100MB)"
+                ];
+            }
+
+            Log::info('Sage Intacct: Uploading attachment', [
+                'filename' => $fileName,
+                'object_type' => $objectType,
+                'object_id' => $objectId,
+                'size_mb' => round($sizeMB, 2)
+            ]);
+
+            // Build XML request for attachment creation
+            $xmlRequest = $this->buildAttachmentXml(
+                $fileName,
+                $base64Contents,
+                $objectType,
+                $objectId
+            );
+
+            // Send request
+            $response = $this->sendRequest($xmlRequest);
+
+            if (!$response['success']) {
+                Log::error('Sage Intacct attachment upload failed', [
+                    'filename' => $fileName,
+                    'error' => $response['error'] ?? 'Unknown error'
+                ]);
+
+                return [
+                    'success' => false,
+                    'error' => $response['error'] ?? 'Failed to upload attachment'
+                ];
+            }
+
+            // Parse response to check for errors
+            $xml = simplexml_load_string($response['xml']);
+            $errormessage = $xml->xpath('//errormessage');
+
+            if (!empty($errormessage)) {
+                $errorText = (string) ($errormessage[0]->error->description2 ?? $errormessage[0]->error->description ?? 'Attachment upload failed');
+
+                Log::error('Sage Intacct attachment API error', [
+                    'filename' => $fileName,
+                    'error' => $errorText
+                ]);
+
+                return [
+                    'success' => false,
+                    'error' => $errorText
+                ];
+            }
+
+            Log::info('Sage Intacct: Attachment uploaded successfully', [
+                'filename' => $fileName,
+                'object_type' => $objectType,
+                'object_id' => $objectId
+            ]);
+
+            return [
+                'success' => true,
+                'message' => 'Attachment uploaded successfully'
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Sage Intacct attachment upload exception', [
+                'filename' => $fileName,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return [
+                'success' => false,
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Build XML for attachment creation
+     */
+    private function buildAttachmentXml(string $fileName, string $base64Contents, string $objectType, string $objectId): string
+    {
+        $controlId = 'attachment-' . $objectId . '-' . time();
+        $sanitizedFileName = htmlspecialchars($fileName, ENT_XML1, 'UTF-8');
+
+        return <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<request>
+    <control>
+        <senderid>{$this->setting->sender_id}</senderid>
+        <password>{$this->setting->sender_password}</password>
+        <controlid>{$controlId}</controlid>
+        <uniqueid>false</uniqueid>
+        <dtdversion>3.0</dtdversion>
+    </control>
+    <operation>
+        <authentication>
+            <sessionid>{$this->sessionId}</sessionid>
+        </authentication>
+        <content>
+            <function controlid="{$controlId}">
+                <create>
+                    <SUPDOCATTACHMENT>
+                        <attachmentname>{$sanitizedFileName}</attachmentname>
+                        <attachmenttype>File</attachmenttype>
+                        <attachmentdata>{$base64Contents}</attachmentdata>
+                    </SUPDOCATTACHMENT>
+                </create>
+            </function>
+        </content>
+    </operation>
+</request>
+XML;
     }
 }
