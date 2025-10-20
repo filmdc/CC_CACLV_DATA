@@ -122,7 +122,9 @@
                         </svg>
                         <span>
                             <strong>Code Mapping Enabled:</strong> Showing Sage Intacct code equivalents for reference.
-                            <a href="{{ route('sage-intacct.configuration') }}" class="underline hover:text-blue-900 dark:hover:text-blue-100" wire:navigate>Configure mappings →</a>
+                            @if($this->isAdmin())
+                                <a href="{{ route('sage-intacct.configuration') }}" class="underline hover:text-blue-900 dark:hover:text-blue-100" wire:navigate>Configure mappings →</a>
+                            @endif
                         </span>
                     </div>
                     <label class="flex items-center space-x-2 text-sm text-blue-800 dark:text-blue-300 cursor-pointer">
