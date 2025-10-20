@@ -675,14 +675,14 @@
                         Code Format
                     </label>
                     <div class="space-y-2">
-                        <label class="flex items-start space-x-3 cursor-pointer p-3 border rounded-md {{ !$useIntacctCodes ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-900/20' : 'border-gray-300 dark:border-zinc-600' }}">
+                        <label class="flex items-start space-x-3 cursor-pointer p-3 border rounded-md {{ $useIntacctCodes == 0 ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-900/20' : 'border-gray-300 dark:border-zinc-600' }}">
                             <input type="radio" wire:model.live="useIntacctCodes" value="0" class="mt-1">
                             <div>
                                 <div class="text-sm font-medium text-gray-900 dark:text-white">DonorPerfect Original Codes</div>
                                 <div class="text-xs text-gray-600 dark:text-gray-400">Export with codes as received from DonorPerfect</div>
                             </div>
                         </label>
-                        <label class="flex items-start space-x-3 cursor-pointer p-3 border rounded-md {{ $useIntacctCodes ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-900/20' : 'border-gray-300 dark:border-zinc-600' }}">
+                        <label class="flex items-start space-x-3 cursor-pointer p-3 border rounded-md {{ $useIntacctCodes == 1 ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-900/20' : 'border-gray-300 dark:border-zinc-600' }}">
                             <input type="radio" wire:model.live="useIntacctCodes" value="1" class="mt-1">
                             <div>
                                 <div class="text-sm font-medium text-gray-900 dark:text-white">Sage Intacct Mapped Codes</div>

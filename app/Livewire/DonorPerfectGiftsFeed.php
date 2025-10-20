@@ -32,7 +32,7 @@ class DonorPerfectGiftsFeed extends Component
 
     public $syncInProgress = false;
 
-    public $useIntacctCodes = false; // For export
+    public $useIntacctCodes = 0; // For export - 0 = DonorPerfect codes, 1 = Intacct mapped codes
 
     public $codeMappingEnabled = false;
 
@@ -50,7 +50,7 @@ class DonorPerfectGiftsFeed extends Component
         $this->codeMappingEnabled = $intacctSetting && $intacctSetting->isCodeMappingEnabled();
 
         // Also check if any code mappings exist (for display purposes)
-        if (!$this->codeMappingEnabled) {
+        if (! $this->codeMappingEnabled) {
             $hasCodeMappings = \App\Models\DonorPerfectCodeMapping::exists();
             if ($hasCodeMappings) {
                 $this->codeMappingEnabled = true;
@@ -91,7 +91,8 @@ class DonorPerfectGiftsFeed extends Component
             $startDate = Carbon::parse($this->startDate);
             $endDate = Carbon::parse($this->endDate);
 
-            $csvContent = $giftService->exportToCsv($startDate, $endDate, $this->search, $this->useIntacctCodes);
+            // Cast to boolean for service method
+            $csvContent = $giftService->exportToCsv($startDate, $endDate, $this->search, (bool) $this->useIntacctCodes);
 
             $filename = 'donor_gifts_'.$startDate->format('Ymd').'_'.$endDate->format('Ymd').'.csv';
 
@@ -113,7 +114,8 @@ class DonorPerfectGiftsFeed extends Component
             $startDate = Carbon::parse($this->startDate);
             $endDate = Carbon::parse($this->endDate);
 
-            $excelContent = $giftService->exportToExcel($startDate, $endDate, $this->search, $this->useIntacctCodes);
+            // Cast to boolean for service method
+            $excelContent = $giftService->exportToExcel($startDate, $endDate, $this->search, (bool) $this->useIntacctCodes);
 
             $filename = 'donor_gifts_'.$startDate->format('Ymd').'_'.$endDate->format('Ymd').'.xlsx';
 
@@ -135,7 +137,8 @@ class DonorPerfectGiftsFeed extends Component
             $startDate = Carbon::parse($this->startDate);
             $endDate = Carbon::parse($this->endDate);
 
-            $pdfContent = $giftService->exportToPdf($startDate, $endDate, $this->search, $this->useIntacctCodes);
+            // Cast to boolean for service method
+            $pdfContent = $giftService->exportToPdf($startDate, $endDate, $this->search, (bool) $this->useIntacctCodes);
 
             $filename = 'donor_gifts_'.$startDate->format('Ymd').'_'.$endDate->format('Ymd').'.pdf';
 
