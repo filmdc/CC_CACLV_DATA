@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Services\DonorPerfectGiftService;
 use App\Traits\WithPermissionChecks;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -36,6 +37,22 @@ class DonorPerfectGiftsFeed extends Component
 
     public $codeMappingEnabled = false;
 
+    public $availableFields = []; // All available fields from gift data
+
+    public $selectedFields = []; // Fields selected for export
+
+    public $includeCheckImages = true; // Include check images in export
+
+    public $zipPassword = ''; // Password for check images ZIP file
+
+    public $pendingCheckImagesDownload = false; // Flag to trigger check images download via JavaScript
+
+    public $showDownloadModal = false; // Show download modal with links
+
+    public $dataFileUrl = ''; // URL for data file download
+
+    public $checkImagesUrl = ''; // URL for check images ZIP download
+
     public function mount()
     {
         // Check permission
@@ -56,6 +73,21 @@ class DonorPerfectGiftsFeed extends Component
                 $this->codeMappingEnabled = true;
             }
         }
+
+        // Set default export fields
+        $this->selectedFields = [
+            'gift_id',
+            'gift_date',
+            'amount',
+            'campaign',
+            'solicit_code',
+            'sub_solicit_code',
+            'gl_code',
+            'payment_type',
+            'donor_id',
+            'first_name',
+            'last_name',
+        ];
     }
 
     public function updatedSearch()
@@ -88,45 +120,112 @@ class DonorPerfectGiftsFeed extends Component
     public function exportCsv(DonorPerfectGiftService $giftService)
     {
         try {
-            $startDate = Carbon::parse($this->startDate);
-            $endDate = Carbon::parse($this->endDate);
-
-            // Cast to boolean for service method
-            $csvContent = $giftService->exportToCsv($startDate, $endDate, $this->search, (bool) $this->useIntacctCodes);
-
-            $filename = 'donor_gifts_'.$startDate->format('Ymd').'_'.$endDate->format('Ymd').'.csv';
-
-            return response()->streamDownload(function () use ($csvContent) {
-                echo $csvContent;
-            }, $filename, [
-                'Content-Type' => 'text/csv',
-                'Content-Disposition' => 'attachment; filename="'.$filename.'"',
-            ]);
+            $this->prepareExport($giftService, 'csv');
         } catch (\Exception $e) {
-            session()->flash('error', 'Failed to export CSV: '.$e->getMessage());
+            session()->flash('error', 'Failed to prepare export: '.$e->getMessage());
             $this->showExportModal = false;
+        }
+    }
+
+    private function prepareExport(DonorPerfectGiftService $giftService, string $format)
+    {
+        $startDate = Carbon::parse($this->startDate);
+        $endDate = Carbon::parse($this->endDate);
+
+        // Generate the data export file
+        $result = $giftService->prepareExportFiles(
+            $startDate,
+            $endDate,
+            $this->search,
+            $this->selectedFields,
+            $format,
+            (bool) $this->useIntacctCodes,
+            $this->includeCheckImages,
+            $this->zipPassword
+        );
+
+        if (! $result['success']) {
+            throw new \Exception($result['error'] ?? 'Export preparation failed');
+        }
+
+        // Store download tokens in session
+        session()->put('export_downloads', $result);
+
+        // Close export modal and show download modal
+        $this->showExportModal = false;
+        $this->showDownloadModal = true;
+
+        // Set download URLs
+        $this->dataFileUrl = route('donor-gifts.download-export', ['type' => 'data']);
+        if ($this->includeCheckImages && isset($result['check_images_token'])) {
+            $this->checkImagesUrl = route('donor-gifts.download-export', ['type' => 'images']);
+        }
+    }
+
+    public function exportCheckImages(DonorPerfectGiftService $giftService)
+    {
+        try {
+            Log::info('=== exportCheckImages method called ===', [
+                'has_session_data' => session()->has('pending_check_images_export'),
+                'session_keys' => array_keys(session()->all()),
+            ]);
+
+            $exportData = session()->get('pending_check_images_export');
+            if (! $exportData) {
+                Log::warning('No pending check images export data in session', [
+                    'session_id' => session()->getId(),
+                    'all_session_data' => session()->all(),
+                ]);
+                session()->flash('error', 'No pending check images export found.');
+
+                return redirect()->route('donor-gifts.feed');
+            }
+
+            Log::info('Starting check images export', array_merge($exportData, [
+                'data_keys' => array_keys($exportData),
+            ]));
+
+            $startDate = Carbon::parse($exportData['start_date']);
+            $endDate = Carbon::parse($exportData['end_date']);
+            $search = $exportData['search'] ?? '';
+            $password = $exportData['password'] ?? '';
+
+            Log::info('Parsed export parameters', [
+                'start_date' => $startDate->format('Y-m-d'),
+                'end_date' => $endDate->format('Y-m-d'),
+                'search' => $search,
+                'has_password' => ! empty($password),
+            ]);
+
+            $result = $giftService->exportCheckImagesOnly(
+                $startDate,
+                $endDate,
+                $search,
+                $password
+            );
+
+            if (! $result['success']) {
+                throw new \Exception($result['error'] ?? 'Check images export failed');
+            }
+
+            session()->forget('pending_check_images_export');
+
+            $filename = 'check_images_'.$startDate->format('Ymd').'_'.$endDate->format('Ymd').'.zip';
+
+            return response()->download($result['zip_path'], $filename, [
+                'Content-Type' => 'application/zip',
+            ])->deleteFileAfterSend(true);
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to export check images: '.$e->getMessage());
         }
     }
 
     public function exportExcel(DonorPerfectGiftService $giftService)
     {
         try {
-            $startDate = Carbon::parse($this->startDate);
-            $endDate = Carbon::parse($this->endDate);
-
-            // Cast to boolean for service method
-            $excelContent = $giftService->exportToExcel($startDate, $endDate, $this->search, (bool) $this->useIntacctCodes);
-
-            $filename = 'donor_gifts_'.$startDate->format('Ymd').'_'.$endDate->format('Ymd').'.xlsx';
-
-            return response()->streamDownload(function () use ($excelContent) {
-                echo $excelContent;
-            }, $filename, [
-                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'Content-Disposition' => 'attachment; filename="'.$filename.'"',
-            ]);
+            $this->prepareExport($giftService, 'excel');
         } catch (\Exception $e) {
-            session()->flash('error', 'Failed to export Excel: '.$e->getMessage());
+            session()->flash('error', 'Failed to prepare export: '.$e->getMessage());
             $this->showExportModal = false;
         }
     }
@@ -134,29 +233,71 @@ class DonorPerfectGiftsFeed extends Component
     public function exportPdf(DonorPerfectGiftService $giftService)
     {
         try {
-            $startDate = Carbon::parse($this->startDate);
-            $endDate = Carbon::parse($this->endDate);
-
-            // Cast to boolean for service method
-            $pdfContent = $giftService->exportToPdf($startDate, $endDate, $this->search, (bool) $this->useIntacctCodes);
-
-            $filename = 'donor_gifts_'.$startDate->format('Ymd').'_'.$endDate->format('Ymd').'.pdf';
-
-            return response()->streamDownload(function () use ($pdfContent) {
-                echo $pdfContent;
-            }, $filename, [
-                'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'attachment; filename="'.$filename.'"',
-            ]);
+            $this->prepareExport($giftService, 'pdf');
         } catch (\Exception $e) {
-            session()->flash('error', 'Failed to export PDF: '.$e->getMessage());
+            session()->flash('error', 'Failed to prepare export: '.$e->getMessage());
             $this->showExportModal = false;
         }
+    }
+
+    public function closeDownloadModal()
+    {
+        $this->showDownloadModal = false;
+        $this->dataFileUrl = '';
+        $this->checkImagesUrl = '';
+        session()->forget('export_downloads');
     }
 
     public function toggleExportModal()
     {
         $this->showExportModal = ! $this->showExportModal;
+
+        // Populate available fields when opening modal
+        if ($this->showExportModal) {
+            $this->loadAvailableFields();
+        }
+    }
+
+    public function loadAvailableFields()
+    {
+        $giftService = app(DonorPerfectGiftService::class);
+        $startDate = Carbon::parse($this->startDate);
+        $endDate = Carbon::parse($this->endDate);
+
+        $result = $giftService->getGiftsWithMetadata($startDate, $endDate, $this->search);
+
+        if ($result['success'] && $result['gifts']->isNotEmpty()) {
+            // Get all available fields from first gift
+            $firstGift = $result['gifts']->first();
+            $this->availableFields = array_keys($firstGift);
+        }
+    }
+
+    public function selectAllFields()
+    {
+        $this->selectedFields = $this->availableFields;
+    }
+
+    public function deselectAllFields()
+    {
+        $this->selectedFields = [];
+    }
+
+    public function resetToDefaultFields()
+    {
+        $this->selectedFields = [
+            'gift_id',
+            'gift_date',
+            'amount',
+            'campaign',
+            'solicit_code',
+            'sub_solicit_code',
+            'gl_code',
+            'payment_type',
+            'donor_id',
+            'first_name',
+            'last_name',
+        ];
     }
 
     public function showGiftDetails($giftData)

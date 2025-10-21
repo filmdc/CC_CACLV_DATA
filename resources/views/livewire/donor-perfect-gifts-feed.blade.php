@@ -670,7 +670,81 @@
             </div>
 
             <!-- Modal Body -->
-            <div class="p-6">
+            <div class="p-6 max-h-[70vh] overflow-y-auto">
+                <!-- Field Selection -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Select Fields to Export
+                        </label>
+                        <div class="flex items-center space-x-2">
+                            <button type="button" wire:click="selectAllFields" class="text-xs text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
+                                Select All
+                            </button>
+                            <span class="text-gray-400">|</span>
+                            <button type="button" wire:click="deselectAllFields" class="text-xs text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
+                                Deselect All
+                            </button>
+                            <span class="text-gray-400">|</span>
+                            <button type="button" wire:click="resetToDefaultFields" class="text-xs text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
+                                Reset to Default
+                            </button>
+                        </div>
+                    </div>
+
+                    @if(!empty($availableFields))
+                    <div class="bg-gray-50 dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md p-4 max-h-48 overflow-y-auto">
+                        <div class="grid grid-cols-2 gap-3">
+                            @foreach($availableFields as $field)
+                                @if($field !== 'donor_name' && $field !== 'IMAGE_CHECK_URL')
+                                <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-600 p-2 rounded">
+                                    <input type="checkbox" wire:model.live="selectedFields" value="{{ $field }}" class="rounded border-gray-300 dark:border-zinc-600 text-green-600 focus:ring-green-500">
+                                    <span class="text-sm text-gray-900 dark:text-white">{{ ucwords(str_replace('_', ' ', $field)) }}</span>
+                                </label>
+                                @endif
+                            @endforeach
+                        </div>
+                    </div>
+                    <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                        Selected: {{ count($selectedFields) }} field(s)
+                    </p>
+                    @else
+                    <div class="bg-gray-50 dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md p-4">
+                        <p class="text-sm text-gray-600 dark:text-gray-400 text-center">
+                            Loading available fields...
+                        </p>
+                    </div>
+                    @endif
+                </div>
+
+                <!-- Check Images Option -->
+                <div class="mb-6">
+                    <label class="flex items-start space-x-3 cursor-pointer p-3 border rounded-md {{ $includeCheckImages ? 'border-green-600 bg-green-50 dark:bg-green-900/20' : 'border-gray-300 dark:border-zinc-600' }}">
+                        <input type="checkbox" wire:model.live="includeCheckImages" class="mt-1 rounded border-gray-300 dark:border-zinc-600 text-green-600 focus:ring-green-500">
+                        <div class="flex-1">
+                            <div class="text-sm font-medium text-gray-900 dark:text-white">Include Check Images</div>
+                            <div class="text-xs text-gray-600 dark:text-gray-400">
+                                Check images will be exported separately as a password-protected ZIP file, organized by donor name, donor ID, and gift ID
+                            </div>
+                        </div>
+                    </label>
+
+                    @if($includeCheckImages)
+                    <div class="mt-3 ml-8">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            ZIP File Password (Optional)
+                        </label>
+                        <input type="password"
+                               wire:model="zipPassword"
+                               placeholder="Enter password to protect ZIP file"
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                            If provided, the check images ZIP file will be password-protected using AES-256 encryption
+                        </p>
+                    </div>
+                    @endif
+                </div>
+
                 @if($codeMappingEnabled)
                 <div class="mb-6">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
@@ -755,6 +829,101 @@
                     <button wire:click="toggleExportModal"
                             class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
                         Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- Download Modal -->
+    @if($showDownloadModal)
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-lg w-full mx-4">
+            <!-- Modal Header -->
+            <div class="bg-green-600 text-white p-6 rounded-t-lg flex justify-between items-center">
+                <div>
+                    <h3 class="text-xl font-bold">Export Ready</h3>
+                    <p class="text-green-100 text-sm mt-1">Your files are ready to download</p>
+                </div>
+                <button wire:click="closeDownloadModal" class="text-white hover:text-gray-200">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6">
+                <div class="space-y-4">
+                    <!-- Data Export Download Button -->
+                    <a href="{{ $dataFileUrl }}"
+                       class="flex items-center justify-between w-full px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md transition-colors">
+                        <div class="flex items-center space-x-3">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <div class="text-left">
+                                <div class="font-semibold">Download Data Export</div>
+                                <div class="text-sm text-indigo-100">
+                                    @php
+                                        $exportData = session()->get('export_downloads');
+                                        $giftCount = $exportData['gift_count'] ?? 0;
+                                    @endphp
+                                    {{ $giftCount }} gift record(s)
+                                </div>
+                            </div>
+                        </div>
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </a>
+
+                    <!-- Check Images Download Button (if available) -->
+                    @if(!empty($checkImagesUrl))
+                    <a href="{{ $checkImagesUrl }}"
+                       class="flex items-center justify-between w-full px-6 py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-lg shadow-md transition-colors">
+                        <div class="flex items-center space-x-3">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            <div class="text-left">
+                                <div class="font-semibold">Download Check Images ZIP</div>
+                                <div class="text-sm text-purple-100">
+                                    @php
+                                        $imageCount = $exportData['image_count'] ?? 0;
+                                    @endphp
+                                    {{ $imageCount }} check image(s)
+                                    @if(!empty($zipPassword))
+                                        • Password protected
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </a>
+                    @elseif($includeCheckImages && isset($exportData['check_images_error']))
+                    <div class="px-6 py-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700 rounded-lg">
+                        <div class="flex items-start space-x-3">
+                            <svg class="h-5 w-5 text-yellow-600 dark:text-yellow-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                            </svg>
+                            <div class="text-sm text-yellow-800 dark:text-yellow-200">
+                                <div class="font-medium">Check Images Not Available</div>
+                                <div class="mt-1">{{ $exportData['check_images_error'] }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+                </div>
+
+                <!-- Close Button -->
+                <div class="mt-6 pt-4 border-t border-gray-200 dark:border-zinc-600">
+                    <button wire:click="closeDownloadModal"
+                            class="w-full px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                        Close
                     </button>
                 </div>
             </div>

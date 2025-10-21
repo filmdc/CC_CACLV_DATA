@@ -1,12 +1,12 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
-use Livewire\Volt\Volt;
 use App\Http\Controllers\ProgramManagerUploadController;
 use App\Services\CheckImageCacheService;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
+use Livewire\Volt\Volt;
 
 Route::get('/', function () {
     return redirect()->route('welcome');
@@ -40,14 +40,14 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
     Volt::route('settings/password', 'settings.password')->name('settings.password');
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
-    
+
     // CAP TRACK Routes
-    
+
     // Hub Routes - New consolidated pages
     Route::get('participants-households', App\Livewire\ParticipantHouseholdHub::class)->name('participant.household.hub');
     Route::get('programs-services', App\Livewire\ProgramServiceHub::class)->name('program.service.hub');
     Route::get('contracts-hub', App\Livewire\ContractsHub::class)->name('contracts.hub');
-    
+
     // Participant Routes
     Route::get('participant-intake', App\Livewire\ParticipantIntake::class)->name('participant.intake');
     Route::get('participant-management', App\Livewire\ParticipantManagement::class)->name('participant.management');
@@ -89,6 +89,31 @@ Route::middleware(['auth'])->group(function () {
     Route::get('donor-gifts', App\Livewire\DonorPerfectGiftsFeed::class)
         ->middleware(['permission:donor_gifts.view'])
         ->name('donor-gifts.feed');
+    Route::get('donor-gifts/download-export/{type}', function ($type) {
+        $exportData = session()->get('export_downloads');
+
+        if (! $exportData || ! isset($exportData['success']) || ! $exportData['success']) {
+            return redirect()->route('donor-gifts.feed')->with('error', 'Export data not found or expired.');
+        }
+
+        if ($type === 'data') {
+            $filePath = $exportData['data_file_path'] ?? null;
+            $filename = $exportData['data_filename'] ?? 'export.csv';
+        } elseif ($type === 'images') {
+            $filePath = $exportData['check_images_path'] ?? null;
+            $filename = $exportData['check_images_filename'] ?? 'check_images.zip';
+        } else {
+            return redirect()->route('donor-gifts.feed')->with('error', 'Invalid download type.');
+        }
+
+        if (! $filePath || ! file_exists($filePath)) {
+            return redirect()->route('donor-gifts.feed')->with('error', 'File not found.');
+        }
+
+        return response()->download($filePath, $filename)->deleteFileAfterSend(true);
+    })
+        ->middleware(['auth', 'permission:donor_gifts.view'])
+        ->name('donor-gifts.download-export');
     Route::get('donor-gifts/configuration', App\Livewire\DonorPerfectConfiguration::class)
         ->middleware(['permission:donor_gifts.configure'])
         ->name('donor-gifts.configuration');
@@ -104,32 +129,32 @@ Route::middleware(['auth'])->group(function () {
     // Serve cached check images (authenticated, encrypted, auto-convert TIFF to PNG)
     Route::get('donor-gifts/check-image/{filename}', function ($filename) {
         // Verify user is authenticated and has permission
-        if (!auth()->check() || !auth()->user()->hasPermission('donor_gifts.view')) {
+        if (! auth()->check() || ! auth()->user()->hasPermission('donor_gifts.view')) {
             abort(403, 'Unauthorized');
         }
 
         // Security: prevent directory traversal
         $safeFilename = basename($filename);
-        $filePath = 'check_images/' . $safeFilename;
+        $filePath = 'check_images/'.$safeFilename;
 
         // Log audit event for file access
         \App\Models\CheckImageAuditLog::logAccess('accessed', $safeFilename, null, [
-            'file_type' => pathinfo($safeFilename, PATHINFO_EXTENSION)
+            'file_type' => pathinfo($safeFilename, PATHINFO_EXTENSION),
         ]);
 
         // Check if encrypted file exists
-        if (!Storage::disk('local')->exists($filePath . '.enc')) {
+        if (! Storage::disk('local')->exists($filePath.'.enc')) {
             abort(404, 'Image not found');
         }
 
         // Decrypt the file
-        $imageCacheService = new CheckImageCacheService();
+        $imageCacheService = new CheckImageCacheService;
         $decryptResult = $imageCacheService->decryptFile($filePath);
 
-        if (!$decryptResult['success']) {
+        if (! $decryptResult['success']) {
             Log::error('Failed to decrypt check image', [
                 'filename' => $safeFilename,
-                'error' => $decryptResult['error']
+                'error' => $decryptResult['error'],
             ]);
             abort(500, 'Failed to decrypt image');
         }
@@ -137,7 +162,7 @@ Route::middleware(['auth'])->group(function () {
         $fileContents = $decryptResult['contents'];
 
         // Get metadata for mime type
-        $metadataPath = 'check_images/metadata/' . $safeFilename . '.json';
+        $metadataPath = 'check_images/metadata/'.$safeFilename.'.json';
         $metadata = Storage::disk('local')->exists($metadataPath)
             ? json_decode(Storage::disk('local')->get($metadataPath), true)
             : [];
@@ -163,7 +188,7 @@ Route::middleware(['auth'])->group(function () {
                 $imagick = new \Imagick($tempPath);
                 $pageNum = 0;
                 foreach ($imagick as $page) {
-                    $pngFilename = $baseFilename . '_page' . $pageNum . '.png';
+                    $pngFilename = $baseFilename.'_page'.$pageNum.'.png';
 
                     $page->setImageFormat('png');
                     $page->setImageCompression(\Imagick::COMPRESSION_JPEG);
@@ -172,7 +197,7 @@ Route::middleware(['auth'])->group(function () {
                     $pngFiles[] = [
                         'filename' => $pngFilename,
                         'url' => route('donor-gifts.check-image-png', ['filename' => $pngFilename]),
-                        'imageData' => base64_encode($page->getImageBlob())
+                        'imageData' => base64_encode($page->getImageBlob()),
                     ];
 
                     $pageNum++;
@@ -187,14 +212,14 @@ Route::middleware(['auth'])->group(function () {
                 Log::info('Converted multi-page TIFF', [
                     'tiff_file' => $safeFilename,
                     'pages' => $pageCount,
-                    'png_files' => count($pngFiles)
+                    'png_files' => count($pngFiles),
                 ]);
 
                 // Return HTML viewer for multi-page check
                 return response()->view('check-image-viewer', [
                     'pages' => $pngFiles,
                     'filename' => $safeFilename,
-                    'pageCount' => $pageCount
+                    'pageCount' => $pageCount,
                 ]);
 
             } catch (\Exception $e) {
@@ -205,7 +230,7 @@ Route::middleware(['auth'])->group(function () {
 
                 Log::error('Failed to convert TIFF', [
                     'file' => $safeFilename,
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ]);
                 abort(500, 'Failed to convert image for viewing');
             }
@@ -214,7 +239,7 @@ Route::middleware(['auth'])->group(function () {
         // For non-TIFF files, serve decrypted contents directly
         $response = response($fileContents, 200, [
             'Content-Type' => $mimeType,
-            'Content-Disposition' => 'inline; filename="' . $safeFilename . '"',
+            'Content-Disposition' => 'inline; filename="'.$safeFilename.'"',
             'Cache-Control' => 'private, max-age=3600',
         ]);
 
@@ -227,31 +252,31 @@ Route::middleware(['auth'])->group(function () {
     // Serve standalone PNG check images (encrypted)
     // Note: TIFF-to-PNG conversions are now handled inline with base64 encoding
     Route::get('donor-gifts/check-image-png/{filename}', function ($filename) {
-        if (!auth()->check() || !auth()->user()->hasPermission('donor_gifts.view')) {
+        if (! auth()->check() || ! auth()->user()->hasPermission('donor_gifts.view')) {
             abort(403, 'Unauthorized');
         }
 
         $safeFilename = basename($filename);
-        $filePath = 'check_images/' . $safeFilename;
+        $filePath = 'check_images/'.$safeFilename;
 
         // Log audit event for PNG page access
         \App\Models\CheckImageAuditLog::logAccess('accessed', $safeFilename, null, [
-            'file_type' => 'png'
+            'file_type' => 'png',
         ]);
 
         // Check if encrypted file exists
-        if (!Storage::disk('local')->exists($filePath . '.enc')) {
+        if (! Storage::disk('local')->exists($filePath.'.enc')) {
             abort(404, 'PNG not found');
         }
 
         // Decrypt the file
-        $imageCacheService = new CheckImageCacheService();
+        $imageCacheService = new CheckImageCacheService;
         $decryptResult = $imageCacheService->decryptFile($filePath);
 
-        if (!$decryptResult['success']) {
+        if (! $decryptResult['success']) {
             Log::error('Failed to decrypt PNG check image', [
                 'filename' => $safeFilename,
-                'error' => $decryptResult['error']
+                'error' => $decryptResult['error'],
             ]);
             abort(500, 'Failed to decrypt image');
         }
@@ -260,43 +285,43 @@ Route::middleware(['auth'])->group(function () {
 
         return response($fileContents, 200, [
             'Content-Type' => 'image/png',
-            'Content-Disposition' => 'inline; filename="' . $safeFilename . '"',
+            'Content-Disposition' => 'inline; filename="'.$safeFilename.'"',
             'Cache-Control' => 'private, max-age=86400',
         ]);
     })->name('donor-gifts.check-image-png');
 
     // Secure download route for import/export files
     Route::get('secure-download/{token}', function ($token) {
-        $downloadData = Cache::get('download_' . $token);
-        
-        if (!$downloadData) {
+        $downloadData = Cache::get('download_'.$token);
+
+        if (! $downloadData) {
             abort(404, 'Download link expired or invalid');
         }
-        
+
         // Check if expired
         if (now()->timestamp > $downloadData['expires_at']) {
-            Cache::forget('download_' . $token);
+            Cache::forget('download_'.$token);
             abort(404, 'Download link expired');
         }
-        
+
         try {
             // Get file content
             $content = Storage::disk('local')->get($downloadData['file_path']);
-            
+
             // Clean up
-            Cache::forget('download_' . $token);
+            Cache::forget('download_'.$token);
             Storage::disk('local')->delete($downloadData['file_path']);
-            
+
             return response($content)
                 ->header('Content-Type', 'text/csv')
-                ->header('Content-Disposition', 'attachment; filename="' . $downloadData['filename'] . '"')
+                ->header('Content-Disposition', 'attachment; filename="'.$downloadData['filename'].'"')
                 ->header('Cache-Control', 'no-cache, must-revalidate');
-                
+
         } catch (\Exception $e) {
-            abort(500, 'Download failed: ' . $e->getMessage());
+            abort(500, 'Download failed: '.$e->getMessage());
         }
     })->name('secure-download')->middleware(['auth']);
-    
+
     // Housing Module Routes
     Route::get('property-management', App\Livewire\PropertyManagement::class)->name('property.management');
     Route::get('property/{id}', App\Livewire\PropertyShow::class)->name('property.show');
@@ -304,18 +329,18 @@ Route::middleware(['auth'])->group(function () {
     Route::get('contractor/{id}', App\Livewire\ContractorShow::class)->name('contractor.show');
     Route::get('housing-job-management', App\Livewire\HousingJobManagement::class)->name('housing-job.management');
     Route::get('housing-job/{id}', App\Livewire\HousingJobShow::class)->name('housing-job.show');
-    
+
     // Custom storage route for authenticated users (only for specific protected folders)
     Route::get('storage/protected/{path}', function ($path) {
         // Check if user is authenticated
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             abort(403, 'Unauthorized access to file');
         }
 
-        $fullPath = storage_path('app/public/protected/' . $path);
+        $fullPath = storage_path('app/public/protected/'.$path);
 
         // Check if file exists
-        if (!file_exists($fullPath)) {
+        if (! file_exists($fullPath)) {
             abort(404, 'File not found');
         }
 
@@ -333,14 +358,14 @@ Route::middleware(['auth'])->group(function () {
         ];
 
         if ($isDownload) {
-            $headers['Content-Disposition'] = 'attachment; filename="' . $fileName . '"';
+            $headers['Content-Disposition'] = 'attachment; filename="'.$fileName.'"';
         } else {
             // For inline viewing, set appropriate content disposition based on file type
             if (str_contains($mimeType, 'pdf') || str_contains($mimeType, 'image')) {
-                $headers['Content-Disposition'] = 'inline; filename="' . $fileName . '"';
+                $headers['Content-Disposition'] = 'inline; filename="'.$fileName.'"';
             } else {
                 // For other file types, force download for security
-                $headers['Content-Disposition'] = 'attachment; filename="' . $fileName . '"';
+                $headers['Content-Disposition'] = 'attachment; filename="'.$fileName.'"';
             }
         }
 
@@ -352,23 +377,23 @@ Route::middleware(['auth'])->group(function () {
     // Handles files stored in storage/app/public/{id}/{filename}
     Route::get('storage/authenticated/{path}', function ($path) {
         // Check if user is authenticated
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             abort(403, 'Unauthorized access to file');
         }
 
         // Path format is: {media_id}/{filename}
-        $fullPath = storage_path('app/public/' . $path);
+        $fullPath = storage_path('app/public/'.$path);
 
         // Security: Prevent directory traversal attacks
         $realPath = realpath($fullPath);
         $storagePath = realpath(storage_path('app/public'));
 
-        if (!$realPath || !str_starts_with($realPath, $storagePath)) {
+        if (! $realPath || ! str_starts_with($realPath, $storagePath)) {
             abort(403, 'Invalid file path');
         }
 
         // Check if file exists
-        if (!file_exists($fullPath)) {
+        if (! file_exists($fullPath)) {
             abort(404, 'File not found');
         }
 
@@ -386,14 +411,14 @@ Route::middleware(['auth'])->group(function () {
         ];
 
         if ($isDownload) {
-            $headers['Content-Disposition'] = 'attachment; filename="' . $fileName . '"';
+            $headers['Content-Disposition'] = 'attachment; filename="'.$fileName.'"';
         } else {
             // For inline viewing, set appropriate content disposition based on file type
             if (str_contains($mimeType, 'pdf') || str_contains($mimeType, 'image')) {
-                $headers['Content-Disposition'] = 'inline; filename="' . $fileName . '"';
+                $headers['Content-Disposition'] = 'inline; filename="'.$fileName.'"';
             } else {
                 // For other file types, force download for security
-                $headers['Content-Disposition'] = 'attachment; filename="' . $fileName . '"';
+                $headers['Content-Disposition'] = 'attachment; filename="'.$fileName.'"';
             }
         }
 
