@@ -803,6 +803,10 @@ class DonorPerfectGiftService
                     $result['check_images_filename'] = 'check_images_'.$startDate->format('Ymd').'_'.$endDate->format('Ymd').'.zip';
                     $result['check_images_token'] = bin2hex(random_bytes(16));
                     $result['image_count'] = $checkImageResult['image_count'];
+                    $result['image_gift_ids'] = $checkImageResult['image_gift_ids'] ?? [];
+
+                    // Update the data file to include image indicator column
+                    $this->addImageIndicatorColumn($dataFilePath, $result['image_gift_ids'], $format);
                 } else {
                     $result['check_images_error'] = $checkImageResult['error'] ?? 'Failed to export check images';
                 }
@@ -868,18 +872,19 @@ class DonorPerfectGiftService
                     $decryptResult = $checkImageService->decryptFile($result['path']);
 
                     if ($decryptResult['success']) {
-                        // Generate organized filename: DonorName_DonorID_GiftID.ext
+                        // Generate organized filename: GiftID_DonorName_DonorID.ext
                         $originalExt = pathinfo($gift['IMAGE_CHECK'], PATHINFO_EXTENSION);
                         $sanitizedDonorName = preg_replace('/[^A-Za-z0-9_-]/', '_', $donorName);
                         $sanitizedDonorName = trim($sanitizedDonorName, '_'); // Remove leading/trailing underscores
                         if (empty($sanitizedDonorName)) {
                             $sanitizedDonorName = 'Unknown_Donor';
                         }
-                        $organizedFilename = "{$sanitizedDonorName}_{$donorId}_{$giftId}.{$originalExt}";
+                        $organizedFilename = "{$giftId}_{$sanitizedDonorName}_{$donorId}.{$originalExt}";
 
                         $imageFiles[] = [
                             'content' => $decryptResult['contents'],
                             'filename' => $organizedFilename,
+                            'gift_id' => $giftId,
                         ];
 
                         Log::debug('Added check image to export', [
@@ -943,6 +948,9 @@ class DonorPerfectGiftService
 
             $zip->close();
 
+            // Collect gift IDs that have images
+            $imageGiftIds = array_map(fn ($img) => $img['gift_id'], $imageFiles);
+
             Log::info('DonorPerfect: Check images exported', [
                 'gift_count' => count($giftsArray),
                 'image_count' => count($imageFiles),
@@ -956,6 +964,7 @@ class DonorPerfectGiftService
                 'zip_path' => $zipPath,
                 'image_count' => count($imageFiles),
                 'failed_count' => count($failedImages),
+                'image_gift_ids' => $imageGiftIds,
             ];
 
         } catch (\Exception $e) {
@@ -1353,5 +1362,111 @@ class DonorPerfectGiftService
         }
 
         return $transformedGift;
+    }
+
+    /**
+     * Add a column to the export file indicating which gifts have check images
+     *
+     * @param  string  $filePath  Path to the export file
+     * @param  array  $imageGiftIds  Array of gift IDs that have images
+     * @param  string  $format  Export format (csv, excel, pdf)
+     */
+    private function addImageIndicatorColumn(string $filePath, array $imageGiftIds, string $format): void
+    {
+        try {
+            if ($format === 'csv') {
+                $this->addImageIndicatorToCsv($filePath, $imageGiftIds);
+            } elseif ($format === 'excel') {
+                $this->addImageIndicatorToExcel($filePath, $imageGiftIds);
+            }
+            // PDF is too complex to modify after generation, skip it
+        } catch (\Exception $e) {
+            Log::warning('Failed to add image indicator column', [
+                'format' => $format,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Add image indicator column to CSV file
+     */
+    private function addImageIndicatorToCsv(string $filePath, array $imageGiftIds): void
+    {
+        $lines = file($filePath);
+        $output = [];
+
+        foreach ($lines as $index => $line) {
+            $line = rtrim($line);
+
+            if ($index === 0) {
+                // Comment line
+                $output[] = $line;
+            } elseif ($index === 1) {
+                // Header line - add new column
+                $output[] = $line.',Check Image Included';
+            } else {
+                // Data line - check if gift_id is in the image list
+                $columns = str_getcsv($line);
+                $giftId = $columns[0] ?? ''; // Assuming gift_id is first column
+
+                $hasImage = in_array($giftId, $imageGiftIds) ? 'Yes' : 'No';
+                $output[] = $line.',"'.$hasImage.'"';
+            }
+        }
+
+        file_put_contents($filePath, implode("\n", $output));
+    }
+
+    /**
+     * Add image indicator column to Excel file
+     */
+    private function addImageIndicatorToExcel(string $filePath, array $imageGiftIds): void
+    {
+        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($filePath);
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $highestRow = $sheet->getHighestRow();
+        $highestColumn = $sheet->getHighestColumn();
+        $nextColumn = ++$highestColumn;
+
+        // Add header
+        $sheet->setCellValue($nextColumn.'2', 'Check Image Included');
+
+        // Style header
+        $sheet->getStyle($nextColumn.'2')->applyFromArray([
+            'font' => [
+                'bold' => true,
+                'color' => ['rgb' => 'FFFFFF'],
+                'size' => 12,
+            ],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '4F46E5'],
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ]);
+
+        // Add data rows
+        for ($row = 3; $row <= $highestRow; $row++) {
+            $giftId = $sheet->getCell('A'.$row)->getValue(); // Assuming gift_id is column A
+            $hasImage = in_array($giftId, $imageGiftIds) ? 'Yes' : 'No';
+            $sheet->setCellValue($nextColumn.$row, $hasImage);
+
+            // Center align the value
+            $sheet->getStyle($nextColumn.$row)->getAlignment()->setHorizontal(
+                \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER
+            );
+        }
+
+        // Auto-size the new column
+        $sheet->getColumnDimension($nextColumn)->setAutoSize(true);
+
+        // Save the file
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save($filePath);
     }
 }
