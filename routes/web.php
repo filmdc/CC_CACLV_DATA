@@ -93,7 +93,7 @@ Route::middleware(['auth'])->group(function () {
         ->middleware(['permission:donor_gifts.configure'])
         ->name('donor-gifts.configuration');
     Route::get('donor-gifts/audit-log', App\Livewire\CheckImageAuditLog::class)
-        ->middleware(['role:admin'])
+        ->middleware(['role:Administrator'])
         ->name('donor-gifts.audit-log');
 
     // Sage Intacct Routes

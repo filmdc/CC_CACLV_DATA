@@ -29,7 +29,7 @@ class CheckImageAuditLog extends Component
     public function mount()
     {
         // Check if user is admin
-        if (!auth()->user()->hasRole('admin')) {
+        if (!auth()->user()->hasRole('Administrator')) {
             abort(403, 'Unauthorized - Admin access only');
         }
     }
