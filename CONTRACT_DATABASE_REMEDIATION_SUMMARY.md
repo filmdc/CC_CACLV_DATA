@@ -1,7 +1,7 @@
 # Contract Database Remediation Summary
 **Branch**: `contract-database-alignment`
 **Date**: October 22, 2025
-**Status**: Phase 1 & 2 Complete
+**Status**: Phase 1, 2 & 3 Complete - Ready for UI Enhancement
 
 ## Overview
 
@@ -126,35 +126,62 @@ contract number, please re-enter it.
 
 ---
 
-## Remaining Work
+---
 
-### Phase 3: Media Collection Reorganization (Next Priority)
+### Phase 3: Media Collection Reorganization ✅ COMPLETE
 
-**Current State**:
-- Contract model: "documents" collection (3,469 files)
-- ContractReportDueDate model: "documents" collection (no files yet)
-- ContractReport model: "documents" collection (no files yet)
+**Migration**: `2025_10_22_230400_update_media_collection_naming_convention.php`
 
-**Issue**: All three models use the same collection name "documents", which is confusing and doesn't match the functional purpose.
+**Problem**: All three models (Contract, ContractReportDueDate, ContractReport) used the same "documents" collection name, causing confusion about document purpose and ownership.
 
-**Planned Changes**:
-1. **Contract**: Keep as "documents" (contract files + supporting docs)
-2. **ContractReportDueDate**: Rename to "templates" (report templates + requirements)
-3. **ContractReport**: Rename to "submissions" (submitted report files)
+**Solution Implemented**:
 
-**Steps Required**:
-- [  ] Create migration to rename media collections
-- [  ] Update `ContractReportDueDate::registerMediaCollections()` to use "templates"
-- [  ] Update `ContractReport::registerMediaCollections()` to use "submissions"
-- [  ] Test media upload/download after changes
+1. **Contract Model**:
+   - Collection: `documents` (unchanged)
+   - Purpose: Contract files and supporting documentation
+   - Uploaded by: Contract managers
+   - Examples: Signed contracts, budgets, amendments
+
+2. **ContractReportDueDate Model**:
+   - Collection: `templates` (changed from "documents")
+   - Purpose: Report templates, instructions, and requirements
+   - Uploaded by: Contract managers
+   - Examples: Report templates, submission guidelines, checklists
+
+3. **ContractReport Model**:
+   - Collection: `submissions` (changed from "documents")
+   - Purpose: Submitted reports from staff
+   - Uploaded by: Staff members assigned to reports
+   - Examples: Completed reports, supporting data files
+
+**Implementation Details**:
+- Updated `registerMediaCollections()` in both models
+- Added proper MIME type restrictions
+- Maintained thumbnail and preview conversions
+- Added legacy `getDocumentsAttribute()` accessors for backwards compatibility
+- Added new dedicated accessors: `getTemplatesAttribute()`, `getSubmissionsAttribute()`
+- Updated `$appends` arrays to include new attribute names
+
+**Benefits**:
+- Clear distinction between document types
+- Easier to understand document workflow
+- Better preparation for nested document hierarchy UI
+- No breaking changes (legacy accessors maintained)
+
+**Impact**:
+- **Before**: Confusing generic "documents" collection for all models
+- **After**: Clear, purpose-driven collection names
+- **Backwards Compatibility**: ✓ Maintained via legacy accessors
 
 ---
 
-### Phase 4: UI Enhancements
+## Remaining Work
+
+### Phase 4: UI Enhancements (Next Priority)
 
 #### 4.1 Contract View Document Hierarchy
-**Current**: Documents shown separately from report due dates
-**Required**: Nested organization:
+**Current**: Table-based view showing report due dates with basic report information
+**Required**: Card-based nested document hierarchy:
 
 ```
 Contract: "2024 CSBG Grant"
@@ -175,15 +202,25 @@ Contract: "2024 CSBG Grant"
         └── Submissions
 ```
 
-**Implementation**:
-- [  ] Update `ContractShow.blade.php` with nested structure
+**Proposed Implementation**:
+- [  ] Replace table view with card-based expandable layout
 - [  ] Add collapsible sections for each due date
-- [  ] Implement visual indicators for document types
-- [  ] Add appropriate upload interfaces
+- [  ] Display templates/requirements from ContractReportDueDate
+- [  ] Display submissions from ContractReport
+- [  ] Add visual indicators for document types (icons, colors)
+- [  ] Implement inline upload interfaces for each document type
+- [  ] Add document preview functionality
+- [  ] Maintain all existing actions (edit, delete, upload)
+
+**Technical Approach**:
+- Use Alpine.js for collapse/expand functionality
+- Maintain Livewire for upload/delete operations
+- Use Tailwind CSS for card styling
+- Keep existing permissions logic intact
 
 ---
 
-### Phase 5: Testing & Documentation
+### Phase 5: Testing & Validation
 
 **Testing**:
 - [  ] Create test suite for all migrations
@@ -245,10 +282,16 @@ All data changes are logged to `storage/logs/laravel.log` with:
 
 ### Commits on `contract-database-alignment` Branch
 
+**Phase 1 & 2: Data Quality**
 1. **fc00002f** - Add comprehensive contract data audit command
-2. **24a3966c** - Add migration to fix numeric-only contract numbers
-3. **7b8c477f** - Add migration to fix archive date inconsistency
+2. **24a3966c** - Add migration to fix numeric-only contract numbers (186 contracts)
+3. **7b8c477f** - Add migration to fix archive date inconsistency (687 contracts)
 4. **55b6a61c** - Remove duplicate fund_code column from contracts table
+5. **08ec868b** - Add comprehensive remediation summary documentation
+
+**Phase 3: Media Collections**
+6. **77111252** - Update media collection naming convention for clarity
+7. **f75b43d8** - Add legacy contract database documentation and comparison report
 
 ---
 
@@ -273,12 +316,25 @@ All data changes are logged to `storage/logs/laravel.log` with:
 
 ## Success Criteria Achieved ✅
 
+**Phase 1 & 2: Data Quality**
 - [x] All contract numbers are semantically correct (no IDs as numbers)
 - [x] No field duplication (fund_code removed)
 - [x] Archive status is consistent across all contracts
 - [x] All foreign keys valid, no orphaned records
 - [x] Complete audit trail maintained
 - [x] All changes logged and reversible where appropriate
+
+**Phase 3: Media Collections**
+- [x] Distinct, purpose-driven media collection names
+- [x] Clear separation: documents vs templates vs submissions
+- [x] Backwards compatibility maintained
+- [x] Proper MIME type restrictions on all collections
+- [x] Documentation migration created and run
+
+**Remaining**
+- [  ] Enhanced UI with nested document hierarchy (Phase 4)
+- [  ] Comprehensive test suite (Phase 5)
+- [  ] User acceptance testing (Phase 5)
 
 ---
 
