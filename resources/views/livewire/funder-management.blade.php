@@ -115,15 +115,13 @@
 
                     <div>
                         <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Address</label>
-                        <textarea wire:model="address" id="address" rows="3" 
-                                  class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
+                        <x-wysiwyg-editor model="address" :rows="3" placeholder="Enter funder address..." id="funder_address" />
                         @error('address') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
 
                     <div>
                         <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
-                        <textarea wire:model="description" id="description" rows="3" 
-                                  class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
+                        <x-wysiwyg-editor model="description" :rows="3" placeholder="Enter funder description..." id="funder_description" />
                         @error('description') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
 
@@ -174,7 +172,7 @@
                                     </button>
                                 </div>
                                 @if($funder->description)
-                                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ Str::limit($funder->description, 50) }}</div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ Str::limit(strip_tags($funder->description), 50) }}</div>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
@@ -285,7 +283,7 @@
                                         @if($selectedFunder->description)
                                             <div>
                                                 <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Description:</span>
-                                                <p class="text-sm text-gray-900 dark:text-white mt-1">{{ $selectedFunder->description }}</p>
+                                                <div class="text-sm text-gray-900 dark:text-white mt-1 rich-text-content">{!! $selectedFunder->description !!}</div>
                                             </div>
                                         @endif
                                         <div>
@@ -335,7 +333,7 @@
                                 @if($selectedFunder->address)
                                     <div class="bg-gray-50 dark:bg-zinc-700 rounded-lg p-4">
                                         <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Address</h4>
-                                        <p class="text-sm text-gray-900 dark:text-white whitespace-pre-line">{{ $selectedFunder->address }}</p>
+                                        <div class="text-sm text-gray-900 dark:text-white rich-text-content">{!! $selectedFunder->address !!}</div>
                                     </div>
                                 @endif
                             </div>

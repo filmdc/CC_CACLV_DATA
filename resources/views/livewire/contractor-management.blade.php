@@ -521,8 +521,7 @@
                                             Notes <span class="text-gray-400">(Optional)</span>
                                         </span>
                                     </label>
-                                    <textarea wire:model="notes" rows="3" placeholder="Enter any additional notes about this contractor..."
-                                              class="w-full rounded-lg border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-emerald-500 focus:ring-emerald-500 transition-colors resize-none"></textarea>
+                                    <x-wysiwyg-editor model="notes" :rows="3" placeholder="Enter any additional notes about this contractor..." id="contractor_notes" />
                                     @error('notes') <span class="text-red-500 text-xs flex items-center mt-1"><svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>{{ $message }}</span> @enderror
                                 </div>
                             </div>
@@ -722,7 +721,7 @@
                     @if($selectedContractor->notes)
                         <div class="mt-6">
                             <h4 class="text-md font-medium text-gray-900 dark:text-white mb-3">Notes</h4>
-                            <p class="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $selectedContractor->notes }}</p>
+                            <div class="text-sm text-gray-700 dark:text-gray-300 rich-text-content">{!! $selectedContractor->notes !!}</div>
                         </div>
                     @endif
 

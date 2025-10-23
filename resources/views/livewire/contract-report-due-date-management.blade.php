@@ -123,8 +123,7 @@
 
                     <div>
                         <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
-                        <textarea wire:model="description" id="description" rows="3" 
-                                  class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                        <x-wysiwyg-editor model="description" :rows="3" placeholder="Describe this due date or report requirement..." id="description" />
                         @error('description') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
 
@@ -190,7 +189,7 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $dueDate->report_name }}</div>
                                 @if($dueDate->description)
-                                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ Str::limit($dueDate->description, 50) }}</div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ Str::limit(strip_tags($dueDate->description), 50) }}</div>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -295,8 +294,7 @@
                         <label for="report_description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Description
                         </label>
-                        <textarea wire:model="report_description" id="report_description" rows="3"
-                                  class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                        <x-wysiwyg-editor model="report_description" :rows="3" placeholder="Describe the report requirements and expectations..." id="report_description" />
                         @error('report_description') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
                     
@@ -394,7 +392,7 @@
                                             <div class="flex-1">
                                                 <h5 class="font-medium text-gray-900 dark:text-white">{{ $report->title }}</h5>
                                                 @if($report->description)
-                                                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ $report->description }}</p>
+                                                    <div class="text-sm text-gray-500 dark:text-gray-400 mt-1 rich-text-content">{!! $report->description !!}</div>
                                                 @endif
                                                 <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">
                                                     Submitted: {{ $report->submitted_date->format('M j, Y g:i A') }}

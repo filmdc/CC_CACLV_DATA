@@ -358,14 +358,14 @@
                                     @if($selectedContract->purpose)
                                         <div>
                                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Purpose</label>
-                                            <p class="text-sm text-gray-900 dark:text-white">{{ $selectedContract->purpose }}</p>
+                                            <div class="text-sm text-gray-900 dark:text-white rich-text-content">{!! $selectedContract->purpose !!}</div>
                                         </div>
                                     @endif
-                                    
+
                                     @if($selectedContract->notes)
                                         <div>
                                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Notes</label>
-                                            <p class="text-sm text-gray-900 dark:text-white">{{ $selectedContract->notes }}</p>
+                                            <div class="text-sm text-gray-900 dark:text-white rich-text-content">{!! $selectedContract->notes !!}</div>
                                         </div>
                                     @endif
                                 </div>
@@ -861,13 +861,13 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
-                            <p class="text-sm text-gray-900 dark:text-white">{{ strip_tags($selectedReport->description) }}</p>
+                            <div class="text-sm text-gray-900 dark:text-white rich-text-content">{!! $selectedReport->description !!}</div>
                         </div>
 
                         @if($selectedReport->notes)
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Notes</label>
-                                <p class="text-sm text-gray-900 dark:text-white">{{ $selectedReport->notes }}</p>
+                                <div class="text-sm text-gray-900 dark:text-white rich-text-content">{!! $selectedReport->notes !!}</div>
                             </div>
                         @endif
 
@@ -1218,7 +1218,7 @@
                                     <div class="flex-1">
                                         <h4 class="font-medium text-gray-900 dark:text-white">{{ $report->title }}</h4>
                                         @if($report->description)
-                                            <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">{{ strip_tags($report->description) }}</p>
+                                            <div class="text-sm text-gray-600 dark:text-gray-300 mt-1 rich-text-content">{!! $report->description !!}</div>
                                         @endif
                                         
                                         <div class="mt-2 space-y-1">

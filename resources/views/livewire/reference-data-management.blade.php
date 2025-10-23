@@ -143,7 +143,7 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
-                        <textarea wire:model="description" rows="2" class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500"></textarea>
+                        <x-wysiwyg-editor model="description" :rows="2" placeholder="Enter description..." id="reference_data_description" />
                         @error('description') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
 
@@ -185,7 +185,7 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900 dark:text-white">{{ $item->label }}</div>
                                 @if($item->description)
-                                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ Str::limit($item->description, 50) }}</div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ Str::limit(strip_tags($item->description), 50) }}</div>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">

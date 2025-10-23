@@ -192,10 +192,172 @@
 
         @livewireScripts
         @fluxScripts
-        
+
         <!-- Jodit Editor JavaScript -->
-        <script src="//unpkg.com/jodit@4.1.16/es2021/jodit.min.js"></script>
-        
+        <script src="https://unpkg.com/jodit@4.1.16/es2021/jodit.min.js"></script>
+
+        <!-- Jodit Editor Initialization Script -->
+        <script>
+        console.log('=== JODIT INITIALIZATION SCRIPT LOADED ===');
+        console.log('Jodit available:', typeof Jodit !== 'undefined');
+        console.log('Livewire available:', typeof Livewire !== 'undefined');
+        </script>
+
+        <script>
+        // Global Jodit Editor Manager - handles multiple editors safely
+        if (typeof window.JoditEditorManager === 'undefined') {
+            window.JoditEditorManager = {
+                editors: {},
+                initialized: false,
+
+                initializeEditor(elementId, model, component) {
+                    // Destroy existing editor if present
+                    if (this.editors[elementId]) {
+                        this.editors[elementId].destruct();
+                        delete this.editors[elementId];
+                    }
+
+                    const element = document.getElementById(elementId);
+                    if (!element) {
+                        console.log(`Element not found: ${elementId}`);
+                        return;
+                    }
+
+                    // Check if Jodit is loaded
+                    if (typeof Jodit === 'undefined') {
+                        console.error('Jodit is not loaded!');
+                        return;
+                    }
+
+                    // Create editor instance
+                    const editor = Jodit.make(element, {
+                        "autofocus": false,
+                        "toolbarSticky": false,
+                        "uploader": {
+                            "insertImageAsBase64URI": true
+                        },
+                        "toolbarButtonSize": "medium",
+                        "showCharsCounter": false,
+                        "showWordsCounter": false,
+                        "showXPathInStatusbar": false,
+                        "defaultActionOnPaste": "insert_clear_html",
+                        "buttons": [
+                            'bold', 'italic', 'underline', '|',
+                            'ul', 'ol', '|',
+                            'left', 'center', 'right', '|',
+                            'link', 'image', '|',
+                            'undo', 'redo'
+                        ],
+                        "height": 200
+                    });
+
+                    // Store editor reference
+                    this.editors[elementId] = editor;
+
+                    // Set up change event with debouncing
+                    let timeout;
+                    editor.events.on('change', (value) => {
+                        clearTimeout(timeout);
+                        timeout = setTimeout(() => {
+                            component.set(model, value);
+                        }, 300);
+                    });
+
+                    console.log(`Jodit editor initialized for: ${elementId}`);
+                    return editor;
+                },
+
+                initializeAllEditors() {
+                    console.log('Initializing all Jodit editors...');
+                    const textareas = document.querySelectorAll('.jodit-textarea');
+                    console.log('Found textareas:', textareas.length);
+
+                    textareas.forEach(textarea => {
+                        const elementId = textarea.getAttribute('data-editor-id');
+                        const model = textarea.getAttribute('data-model');
+
+                        console.log(`Processing textarea: ${elementId}, model: ${model}`);
+
+                        if (elementId && model && window.Livewire) {
+                            const wireIdElement = textarea.closest('[wire\\:id]');
+                            if (wireIdElement) {
+                                const wireId = wireIdElement.getAttribute('wire:id');
+                                const component = Livewire.find(wireId);
+                                if (component) {
+                                    this.initializeEditor(elementId, model, component);
+                                } else {
+                                    console.error(`Livewire component not found for wire:id ${wireId}`);
+                                }
+                            } else {
+                                console.error(`No wire:id found for textarea ${elementId}`);
+                            }
+                        } else {
+                            console.error(`Missing data for textarea ${elementId}: elementId=${elementId}, model=${model}, Livewire=${!!window.Livewire}`);
+                        }
+                    });
+                },
+
+                destroyAll() {
+                    Object.values(this.editors).forEach(editor => {
+                        if (editor && editor.destruct) {
+                            editor.destruct();
+                        }
+                    });
+                    this.editors = {};
+                }
+            };
+
+            // Initialize when Livewire is ready
+            document.addEventListener('livewire:initialized', () => {
+                console.log('Livewire initialized - setting up Jodit');
+                setTimeout(() => {
+                    window.JoditEditorManager.initializeAllEditors();
+                }, 100);
+            });
+
+            // Reinitialize on Livewire navigation
+            document.addEventListener('livewire:navigated', () => {
+                console.log('Livewire navigated - reinitializing Jodit');
+                setTimeout(() => {
+                    window.JoditEditorManager.initializeAllEditors();
+                }, 100);
+            });
+
+            // IMPORTANT: Reinitialize after Livewire updates the DOM
+            Livewire.hook('morph.updated', ({ component, cleanup }) => {
+                console.log('Livewire DOM updated - reinitializing Jodit editors');
+                setTimeout(() => {
+                    window.JoditEditorManager.initializeAllEditors();
+                }, 150);
+            });
+
+            // Also try on commit hook (when Livewire finishes updating)
+            Livewire.hook('commit', ({ component, respond }) => {
+                console.log('Livewire commit - checking for new editors');
+                setTimeout(() => {
+                    window.JoditEditorManager.initializeAllEditors();
+                }, 200);
+            });
+
+            // Clean up on page unload
+            window.addEventListener('beforeunload', () => {
+                window.JoditEditorManager.destroyAll();
+            });
+
+            window.JoditEditorManager.initialized = true;
+        }
+
+        // Initialize editors on DOM ready
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM Ready - checking for Jodit and textareas');
+            setTimeout(() => {
+                if (window.JoditEditorManager) {
+                    window.JoditEditorManager.initializeAllEditors();
+                }
+            }, 500);
+        });
+        </script>
+
         @stack('scripts')
     </body>
 </html>

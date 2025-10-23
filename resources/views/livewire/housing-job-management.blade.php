@@ -392,8 +392,7 @@
                                             Job Description <span class="text-gray-400">(Optional)</span>
                                         </span>
                                     </label>
-                                    <textarea wire:model="job_description" rows="3" placeholder="Detailed description of the work required..."
-                                              class="w-full rounded-lg border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-amber-500 focus:ring-amber-500 transition-colors resize-none"></textarea>
+                                    <x-wysiwyg-editor model="job_description" :rows="3" placeholder="Detailed description of the work required..." id="housing_job_description" />
                                     @error('job_description') <span class="text-red-500 text-xs flex items-center mt-1"><svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>{{ $message }}</span> @enderror
                                 </div>
                             </div>
@@ -729,8 +728,7 @@
                                             Internal Notes <span class="text-gray-400">(Optional)</span>
                                         </span>
                                     </label>
-                                    <textarea wire:model="internal_notes" rows="3" placeholder="Internal notes for this job..."
-                                              class="w-full rounded-lg border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-amber-500 focus:ring-amber-500 transition-colors resize-none"></textarea>
+                                    <x-wysiwyg-editor model="internal_notes" :rows="3" placeholder="Internal notes for this job..." id="housing_job_internal_notes" />
                                     @error('internal_notes') <span class="text-red-500 text-xs flex items-center mt-1"><svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>{{ $message }}</span> @enderror
                                 </div>
                             </div>
@@ -1145,8 +1143,7 @@
                                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                                         Notes <span class="text-red-500">*</span>
                                                     </label>
-                                                    <textarea wire:model="contactNotes" rows="3"
-                                                              class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"></textarea>
+                                                    <x-wysiwyg-editor model="contactNotes" :rows="3" placeholder="Enter contact notes..." id="housing_job_contact_notes" />
                                                     @error('contactNotes') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                                 </div>
                                                 <div class="md:col-span-2">

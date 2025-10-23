@@ -298,16 +298,14 @@
                         <!-- Exit Notes -->
                         <div class="mt-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Exit Notes</label>
-                            <textarea wire:model="exit_notes" rows="3" 
-                                      class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white"></textarea>
+                            <x-wysiwyg-editor model="exit_notes" :rows="3" placeholder="Enter exit notes..." id="enrollment_exit_notes" />
                             @error('exit_notes') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 
                         <!-- Notes -->
                         <div class="mt-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Notes</label>
-                            <textarea wire:model="notes" rows="3" 
-                                      class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-700 text-gray-900 dark:text-white"></textarea>
+                            <x-wysiwyg-editor model="notes" :rows="3" placeholder="Enter notes..." id="enrollment_notes" />
                             @error('notes') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 
