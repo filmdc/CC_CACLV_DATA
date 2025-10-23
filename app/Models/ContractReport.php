@@ -43,7 +43,8 @@ class ContractReport extends Model implements HasMedia
     ];
 
     protected $appends = [
-        'documents',
+        'submissions',
+        'documents', // Legacy support
     ];
 
     public static $searchable = [
@@ -51,6 +52,29 @@ class ContractReport extends Model implements HasMedia
         'description',
         'status',
     ];
+
+    /**
+     * Register media collections
+     */
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('submissions')
+            ->acceptsMimeTypes([
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/vnd.ms-excel',
+                'application/vnd.oasis.opendocument.text',
+                'application/vnd.oasis.opendocument.spreadsheet',
+                'text/plain',
+                'image/jpeg',
+                'image/png',
+                'image/gif',
+                'image/jpg'
+            ])
+            ->useDisk('public');
+    }
 
     /**
      * Register media conversions
@@ -86,11 +110,20 @@ class ContractReport extends Model implements HasMedia
     }
 
     /**
-     * Get documents attached to this report
+     * Get submissions attached to this report
+     */
+    public function getSubmissionsAttribute()
+    {
+        return $this->getMedia('submissions');
+    }
+
+    /**
+     * Get documents attached to this report (legacy accessor)
+     * @deprecated Use getSubmissionsAttribute() instead
      */
     public function getDocumentsAttribute()
     {
-        return $this->getMedia('documents');
+        return $this->getMedia('submissions');
     }
 
     /**

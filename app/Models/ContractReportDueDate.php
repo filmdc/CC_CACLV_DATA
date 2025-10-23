@@ -73,7 +73,8 @@ class ContractReportDueDate extends Model implements HasMedia
     ];
 
     protected $appends = [
-        'documents',
+        'templates',
+        'documents', // Legacy support
         'days_until_due',
         'is_overdue',
     ];
@@ -83,6 +84,29 @@ class ContractReportDueDate extends Model implements HasMedia
         'report_type',
         'status',
     ];
+
+    /**
+     * Register media collections
+     */
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('templates')
+            ->acceptsMimeTypes([
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/vnd.ms-excel',
+                'application/vnd.oasis.opendocument.text',
+                'application/vnd.oasis.opendocument.spreadsheet',
+                'text/plain',
+                'image/jpeg',
+                'image/png',
+                'image/gif',
+                'image/jpg'
+            ])
+            ->useDisk('public');
+    }
 
     /**
      * Register media conversions
@@ -139,11 +163,20 @@ class ContractReportDueDate extends Model implements HasMedia
     }
 
     /**
-     * Get documents attached to this due date
+     * Get templates attached to this due date
+     */
+    public function getTemplatesAttribute()
+    {
+        return $this->getMedia('templates');
+    }
+
+    /**
+     * Get documents attached to this due date (legacy accessor)
+     * @deprecated Use getTemplatesAttribute() instead
      */
     public function getDocumentsAttribute()
     {
-        return $this->getMedia('documents');
+        return $this->getMedia('templates');
     }
 
     /**
