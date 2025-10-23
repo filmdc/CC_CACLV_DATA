@@ -284,155 +284,265 @@
                 </div>
                 
                 @if($contract->reportDueDates->count() > 0)
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700">
-                            <thead>
-                                <tr>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Type
-                                    </th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Due Date
-                                    </th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Status
-                                    </th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Assigned To
-                                    </th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Reports
-                                    </th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                        Actions
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-200 dark:divide-zinc-700">
-                                @foreach($contract->reportDueDates as $dueDate)
-                                    <tr class="{{ $dueDate->due_date < now() && $dueDate->status !== 'completed' ? 'bg-red-50 dark:bg-red-900/20' : '' }}">
-                                        <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                                            <span class="font-medium">{{ ucfirst($dueDate->report_type ?: 'Other') }}</span>
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                                            {{ $dueDate->due_date ? \Carbon\Carbon::parse($dueDate->due_date)->format('M j, Y') : 'N/A' }}
-                                            @if($dueDate->due_date < now() && $dueDate->status !== 'completed')
-                                                <span class="ml-2 text-xs text-red-600 dark:text-red-400">(Overdue)</span>
-                                            @elseif($dueDate->due_date <= now()->addDays(7) && $dueDate->status !== 'completed')
-                                                <span class="ml-2 text-xs text-yellow-600 dark:text-yellow-400">(Due Soon)</span>
+                    <div class="space-y-4">
+                        @foreach($contract->reportDueDates as $dueDate)
+                            @php
+                                $isOverdue = $dueDate->due_date < now() && $dueDate->status !== 'completed';
+                                $isDueSoon = $dueDate->due_date <= now()->addDays(7) && $dueDate->status !== 'completed' && !$isOverdue;
+                                $templates = $dueDate->getMedia('templates');
+                                $submissions = $dueDate->contractReports;
+                            @endphp
+
+                            <!-- Report Due Date Card -->
+                            <div x-data="{ expanded: false }"
+                                 class="border rounded-lg {{ $isOverdue ? 'border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/10' : ($isDueSoon ? 'border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-900/10' : 'border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800') }} transition-all duration-200">
+
+                                <!-- Card Header -->
+                                <div class="p-4">
+                                    <div class="flex items-start justify-between">
+                                        <!-- Left Side: Type, Date, Status -->
+                                        <div class="flex-1">
+                                            <div class="flex items-center space-x-3">
+                                                <!-- Calendar Icon -->
+                                                <div class="flex-shrink-0">
+                                                    <div class="w-12 h-12 rounded-lg {{ $isOverdue ? 'bg-red-100 dark:bg-red-900/30' : ($isDueSoon ? 'bg-yellow-100 dark:bg-yellow-900/30' : 'bg-blue-100 dark:bg-blue-900/30') }} flex items-center justify-center">
+                                                        <svg class="w-6 h-6 {{ $isOverdue ? 'text-red-600 dark:text-red-400' : ($isDueSoon ? 'text-yellow-600 dark:text-yellow-400' : 'text-blue-600 dark:text-blue-400') }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Title and Details -->
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="flex items-center space-x-2">
+                                                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                                                            {{ ucfirst($dueDate->report_type ?: 'Other') }} Report
+                                                        </h3>
+
+                                                        <!-- Status Badge -->
+                                                        @if($dueDate->status === 'completed')
+                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
+                                                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                                                </svg>
+                                                                Completed
+                                                            </span>
+                                                        @elseif($isOverdue)
+                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">
+                                                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                                                                </svg>
+                                                                Overdue
+                                                            </span>
+                                                        @elseif($isDueSoon)
+                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100">
+                                                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                                                </svg>
+                                                                Due Soon
+                                                            </span>
+                                                        @else
+                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100">
+                                                                {{ ucfirst($dueDate->status) }}
+                                                            </span>
+                                                        @endif
+                                                    </div>
+
+                                                    <div class="mt-1 flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
+                                                        <span class="flex items-center">
+                                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                            </svg>
+                                                            Due: {{ $dueDate->due_date ? \Carbon\Carbon::parse($dueDate->due_date)->format('M j, Y') : 'N/A' }}
+                                                        </span>
+
+                                                        @if($dueDate->emails->count() > 0)
+                                                            <span class="flex items-center">
+                                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                                                </svg>
+                                                                {{ $dueDate->emails->count() }} assigned
+                                                            </span>
+                                                        @endif
+
+                                                        <span class="flex items-center">
+                                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                            </svg>
+                                                            {{ $submissions->count() }} submission{{ $submissions->count() !== 1 ? 's' : '' }}
+                                                        </span>
+                                                    </div>
+
+                                                    @if($dueDate->description)
+                                                        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                                                            {!! strip_tags($dueDate->description) !!}
+                                                        </p>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Right Side: Actions -->
+                                        <div class="flex items-center space-x-2 ml-4">
+                                            @if($this->can('contract_reports.create') && $dueDate->status !== 'completed')
+                                                <button wire:click="showUploadReport({{ $dueDate->id }})"
+                                                        class="p-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+                                                        title="Upload Report">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                                    </svg>
+                                                </button>
                                             @endif
-                                        </td>
-                                        <td class="px-4 py-3 text-sm">
-                                            @if($dueDate->status === 'completed')
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
-                                                    Completed
-                                                </span>
-                                            @elseif($dueDate->status === 'pending')
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100">
-                                                    Pending
-                                                </span>
-                                            @else
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100">
-                                                    {{ ucfirst($dueDate->status) }}
-                                                </span>
+
+                                            @if($this->can('due_dates.edit'))
+                                                <button wire:click="showEditDueDate({{ $dueDate->id }})"
+                                                        class="p-2 text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-700 rounded-lg transition-colors"
+                                                        title="Edit">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                    </svg>
+                                                </button>
                                             @endif
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                                            @if($dueDate->emails->count() > 0)
-                                                <button wire:click="showAssignedUsers({{ $dueDate->id }})"
-                                                        class="flex -space-x-2 group cursor-pointer hover:opacity-80 transition-opacity">
-                                                    @foreach($dueDate->emails->take(3) as $email)
-                                                        <div class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-300 dark:bg-zinc-600 text-xs font-medium text-gray-700 dark:text-gray-200 ring-2 ring-white dark:ring-zinc-800 group-hover:ring-blue-500" 
-                                                             title="{{ $email->name ?: $email->email }}">
-                                                            {{ strtoupper(substr($email->name ?: $email->email, 0, 2)) }}
+
+                                            @if($this->can('due_dates.delete'))
+                                                <button wire:click="deleteDueDate({{ $dueDate->id }})"
+                                                        wire:confirm="Are you sure you want to delete this due date?"
+                                                        class="p-2 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                                                        title="Delete">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                    </svg>
+                                                </button>
+                                            @endif
+
+                                            <!-- Expand/Collapse Button -->
+                                            <button @click="expanded = !expanded"
+                                                    class="p-2 text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-700 rounded-lg transition-all"
+                                                    title="View Documents">
+                                                <svg class="w-5 h-5 transition-transform duration-200"
+                                                     :class="{ 'rotate-180': expanded }"
+                                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Expandable Document Section -->
+                                <div x-show="expanded"
+                                     x-collapse
+                                     class="border-t border-gray-200 dark:border-zinc-700">
+
+                                    <div class="p-4 space-y-4">
+                                        <!-- Templates/Requirements Section -->
+                                        <div>
+                                            <div class="flex items-center justify-between mb-2">
+                                                <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center">
+                                                    <svg class="w-4 h-4 mr-2 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                    </svg>
+                                                    Templates & Requirements
+                                                    <span class="ml-2 text-xs text-gray-500 dark:text-gray-400">({{ $templates->count() }} file{{ $templates->count() !== 1 ? 's' : '' }})</span>
+                                                </h4>
+                                            </div>
+
+                                            @if($templates->count() > 0)
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                                    @foreach($templates as $media)
+                                                        <div class="flex items-center justify-between p-3 bg-purple-50 dark:bg-purple-900/10 border border-purple-200 dark:border-purple-800 rounded-lg">
+                                                            <div class="flex items-center space-x-2 min-w-0 flex-1">
+                                                                <svg class="w-5 h-5 flex-shrink-0 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                                                                </svg>
+                                                                <span class="text-sm text-gray-900 dark:text-white truncate" title="{{ $media->name }}">{{ $media->name }}</span>
+                                                                <span class="text-xs text-gray-500 dark:text-gray-400">{{ $media->human_readable_size }}</span>
+                                                            </div>
+                                                            <a href="{{ $media->getUrl() }}" target="_blank"
+                                                               class="ml-2 text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300">
+                                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                                </svg>
+                                                            </a>
                                                         </div>
                                                     @endforeach
-                                                    @if($dueDate->emails->count() > 3)
-                                                        <div class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-400 dark:bg-zinc-500 text-xs font-medium text-white ring-2 ring-white dark:ring-zinc-800 group-hover:ring-blue-500">
-                                                            +{{ $dueDate->emails->count() - 3 }}
-                                                        </div>
-                                                    @endif
-                                                </button>
+                                                </div>
                                             @else
-                                                <span class="text-gray-500 dark:text-gray-400">None</span>
+                                                <p class="text-sm text-gray-500 dark:text-gray-400 italic">No templates uploaded yet</p>
                                             @endif
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                                            {{ $dueDate->contractReports->count() }} uploaded
-                                        </td>
-                                        <td class="px-4 py-3 text-sm">
-                                            <div class="flex items-center space-x-2">
-                                                @if($this->can('contract_reports.create') && $dueDate->status !== 'completed')
-                                                    <button wire:click="showUploadReport({{ $dueDate->id }})" 
-                                                            class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300" 
-                                                            title="Upload Report">
-                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                                                        </svg>
-                                                    </button>
-                                                @endif
-                                                @if($this->can('due_dates.edit'))
-                                                    <button wire:click="showEditDueDate({{ $dueDate->id }})" 
-                                                            class="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-300" 
-                                                            title="Edit">
-                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                                        </svg>
-                                                    </button>
-                                                @endif
-                                                @if($this->can('due_dates.delete'))
-                                                    <button wire:click="deleteDueDate({{ $dueDate->id }})" 
-                                                            wire:confirm="Are you sure you want to delete this due date?"
-                                                            class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300" 
-                                                            title="Delete">
-                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                                        </svg>
-                                                    </button>
-                                                @endif
+                                        </div>
+
+                                        <!-- Submissions Section -->
+                                        <div>
+                                            <div class="flex items-center justify-between mb-2">
+                                                <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center">
+                                                    <svg class="w-4 h-4 mr-2 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                    Submitted Reports
+                                                    <span class="ml-2 text-xs text-gray-500 dark:text-gray-400">({{ $submissions->count() }} report{{ $submissions->count() !== 1 ? 's' : '' }})</span>
+                                                </h4>
                                             </div>
-                                        </td>
-                                    </tr>
-                                    
-                                    @if($dueDate->contractReports->count() > 0)
-                                        <tr>
-                                            <td colspan="6" class="px-4 py-2 bg-gray-50 dark:bg-zinc-900">
-                                                <div class="text-sm">
-                                                    <strong class="text-gray-700 dark:text-gray-300">Uploaded Reports:</strong>
-                                                    <ul class="mt-1 space-y-1">
-                                                        @foreach($dueDate->contractReports as $report)
-                                                            <li class="flex items-center justify-between">
-                                                                <div>
-                                                                    <span class="text-gray-900 dark:text-white">{{ $report->title }}</span>
-                                                                    <span class="text-gray-500 dark:text-gray-400 ml-2">
-                                                                        ({{ $report->submitted_date ? $report->submitted_date->format('M j, Y') : 'N/A' }})
-                                                                    </span>
-                                                                </div>
-                                                                <div class="flex items-center space-x-2">
-                                                                    @foreach($report->getMedia('documents') as $media)
-                                                                        <a href="#" wire:click.prevent="downloadReport({{ $report->id }}, {{ $media->id }})" 
-                                                                           class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-xs">
-                                                                            Download {{ $loop->count > 1 ? '#' . $loop->iteration : '' }}
-                                                                        </a>
-                                                                    @endforeach
-                                                                    @if($this->can('contract_reports.delete'))
-                                                                        <button wire:click="deleteReport({{ $report->id }})" 
-                                                                                wire:confirm="Are you sure you want to delete this report?"
-                                                                                class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-xs">
-                                                                            Delete
-                                                                        </button>
+
+                                            @if($submissions->count() > 0)
+                                                <div class="space-y-2">
+                                                    @foreach($submissions as $report)
+                                                        @php $reportMedia = $report->getMedia('submissions'); @endphp
+                                                        <div class="p-3 bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-800 rounded-lg">
+                                                            <div class="flex items-start justify-between">
+                                                                <div class="flex-1 min-w-0">
+                                                                    <div class="flex items-center space-x-2">
+                                                                        <svg class="w-5 h-5 flex-shrink-0 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                                        </svg>
+                                                                        <span class="text-sm font-medium text-gray-900 dark:text-white">{{ $report->title }}</span>
+                                                                        @if($report->submitted_date)
+                                                                            <span class="text-xs text-gray-500 dark:text-gray-400">
+                                                                                ({{ $report->submitted_date->format('M j, Y') }})
+                                                                            </span>
+                                                                        @endif
+                                                                    </div>
+
+                                                                    @if($reportMedia->count() > 0)
+                                                                        <div class="mt-2 space-y-1">
+                                                                            @foreach($reportMedia as $media)
+                                                                                <div class="flex items-center space-x-2 text-xs">
+                                                                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                                                                                    </svg>
+                                                                                    <span class="text-gray-600 dark:text-gray-400">{{ $media->name }}</span>
+                                                                                    <span class="text-gray-500 dark:text-gray-500">{{ $media->human_readable_size }}</span>
+                                                                                    <a href="{{ $media->getUrl() }}" target="_blank"
+                                                                                       class="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300">
+                                                                                        Download
+                                                                                    </a>
+                                                                                </div>
+                                                                            @endforeach
+                                                                        </div>
                                                                     @endif
                                                                 </div>
-                                                            </li>
-                                                        @endforeach
-                                                    </ul>
+
+                                                                @if($this->can('contract_reports.delete'))
+                                                                    <button wire:click="deleteReport({{ $report->id }})"
+                                                                            wire:confirm="Are you sure you want to delete this report?"
+                                                                            class="ml-2 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
+                                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                                        </svg>
+                                                                    </button>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
                                                 </div>
-                                            </td>
-                                        </tr>
-                                    @endif
-                                @endforeach
-                            </tbody>
-                        </table>
+                                            @else
+                                                <p class="text-sm text-gray-500 dark:text-gray-400 italic">No reports submitted yet</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                 @else
                     <p class="text-gray-500 dark:text-gray-400">No report due dates configured for this contract.</p>
