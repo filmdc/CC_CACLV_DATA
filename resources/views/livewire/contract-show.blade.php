@@ -1,4 +1,4 @@
-<div class="max-w-7xl mx-auto p-6">
+<div class="w-full px-0 py-6">
     <div class="bg-white dark:bg-zinc-800 shadow-lg rounded-lg overflow-hidden">
         <!-- Header -->
         <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6">
@@ -8,6 +8,16 @@
                     <p class="text-blue-100 mt-2">Contract Details</p>
                 </div>
                 <div class="flex space-x-3">
+                    <a href="{{ route('contract.export-pdf', $contract->id) }}"
+                       target="_blank"
+                       class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 2v6h6" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 13H8m8 4H8m2-8h2" />
+                        </svg>
+                        <span>Export PDF</span>
+                    </a>
                     @if ($this->can('contracts.update'))
                         <button wire:click="editContract" 
                                 class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-medium transition-colors">

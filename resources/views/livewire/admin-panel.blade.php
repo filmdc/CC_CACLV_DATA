@@ -1,4 +1,4 @@
-<div class="max-w-7xl mx-auto p-6">
+<div class="w-full px-0 py-6">
     <div class="bg-white shadow-lg rounded-lg overflow-hidden">
         <!-- Header -->
         <div class="bg-purple-600 text-white p-6">

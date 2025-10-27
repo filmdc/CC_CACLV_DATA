@@ -1,4 +1,4 @@
-<div class="max-w-7xl mx-auto p-6">
+<div class="w-full px-0 py-6">
     <div class="bg-white dark:bg-zinc-800 shadow-lg rounded-lg overflow-hidden">
         <!-- Header -->
         <div class="bg-blue-600 text-white p-6">
@@ -141,18 +141,10 @@
                         @error('reminder_intervals') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
 
+                    <!-- Notification Recipients Selector -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Assign Users for Reminders</label>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-40 overflow-y-auto border border-gray-300 dark:border-zinc-600 rounded-md p-3">
-                            @foreach($users as $user)
-                                <label class="flex items-center">
-                                    <input type="checkbox" wire:model="assigned_users" value="{{ $user->id }}" 
-                                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                                    <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{{ $user->name }}</span>
-                                </label>
-                            @endforeach
-                        </div>
-                        @error('assigned_users') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        @livewire('recipient-selector', ['selectedRecipients' => $assigned_recipients], key('recipient-selector-' . ($selectedDueDate?->id ?? 'new')))
+                        @error('assigned_recipients') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="flex justify-end space-x-3 pt-4">
@@ -179,7 +171,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Due Date</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Reports</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Assigned Users</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Recipients</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>

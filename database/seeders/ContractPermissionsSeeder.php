@@ -20,6 +20,7 @@ class ContractPermissionsSeeder extends Seeder
             'contracts.edit' => 'Edit contracts',
             'contracts.delete' => 'Delete contracts',
             'contracts.archive' => 'Archive contracts',
+            'contracts.manage_notifications' => 'Manage contract notification recipients and distribution lists',
             'funders.view' => 'View funders',
             'funders.create' => 'Create funders',
             'funders.edit' => 'Edit funders',
@@ -42,7 +43,7 @@ class ContractPermissionsSeeder extends Seeder
                 [
                     'display_name' => ucwords(str_replace(['.', '_'], [' ', ' '], $name)),
                     'description' => $description,
-                    'category' => 'contracts'
+                    'category' => 'contracts',
                 ]
             );
         }

@@ -31,6 +31,7 @@
                 @if(auth()->user()->hasAnyPermission(['contracts.view', 'funders.view', 'due_dates.view']) || auth()->user()->isAdmin())
                 <flux:navlist.group :heading="__('Contracts')" class="grid">
                     <flux:navlist.item icon="document-text" :href="route('contract.management')" :current="request()->routeIs('contract.management')" wire:navigate>{{ __('Contract Management') }}</flux:navlist.item>
+                    <flux:navlist.item icon="bell" :href="route('notification-recipients.management')" :current="request()->routeIs('notification-recipients.management')" wire:navigate>{{ __('Notification Recipients') }}</flux:navlist.item>
                 </flux:navlist.group>
                 @endif
 
@@ -209,10 +210,26 @@
             window.JoditEditorManager = {
                 editors: {},
                 initialized: false,
+                activeEditorId: null, // Track which editor currently has focus
 
                 initializeEditor(elementId, model, component) {
-                    // Destroy existing editor if present
+                    // NEVER reinitialize an editor that has focus or is already initialized
                     if (this.editors[elementId]) {
+                        // Check if this editor has focus
+                        const existingEditor = this.editors[elementId];
+                        if (existingEditor.selection && existingEditor.selection.isFocused()) {
+                            console.log(`Skipping reinitialization - editor has focus: ${elementId}`);
+                            return this.editors[elementId];
+                        }
+
+                        // Check if this is the active editor
+                        if (this.activeEditorId === elementId) {
+                            console.log(`Skipping reinitialization - active editor: ${elementId}`);
+                            return this.editors[elementId];
+                        }
+
+                        // Only destroy if truly needed
+                        console.log(`Destroying existing editor: ${elementId}`);
                         this.editors[elementId].destruct();
                         delete this.editors[elementId];
                     }
@@ -223,11 +240,19 @@
                         return;
                     }
 
+                    // Skip if element is in a wire:ignore container
+                    if (element.closest('[wire\\:ignore]')) {
+                        console.log(`Skipping editor in wire:ignore container: ${elementId}`);
+                        return;
+                    }
+
                     // Check if Jodit is loaded
                     if (typeof Jodit === 'undefined') {
                         console.error('Jodit is not loaded!');
                         return;
                     }
+
+                    console.log(`Creating new editor: ${elementId}`);
 
                     // Create editor instance
                     const editor = Jodit.make(element, {
@@ -254,13 +279,30 @@
                     // Store editor reference
                     this.editors[elementId] = editor;
 
-                    // Set up change event with debouncing
+                    // Track focus state
+                    editor.events.on('focus', () => {
+                        this.activeEditorId = elementId;
+                        console.log(`Editor focused: ${elementId}`);
+                    });
+
+                    editor.events.on('blur', () => {
+                        if (this.activeEditorId === elementId) {
+                            this.activeEditorId = null;
+                            console.log(`Editor blurred: ${elementId}`);
+                        }
+                    });
+
+                    // Set up change event with increased debouncing and focus check
                     let timeout;
                     editor.events.on('change', (value) => {
                         clearTimeout(timeout);
                         timeout = setTimeout(() => {
-                            component.set(model, value);
-                        }, 300);
+                            // Only update if this editor is still active or has focus
+                            if (this.activeEditorId === elementId || (editor.selection && editor.selection.isFocused())) {
+                                console.log(`Updating Livewire for: ${elementId}`);
+                                component.set(model, value);
+                            }
+                        }, 500); // Increased from 300ms to 500ms
                     });
 
                     console.log(`Jodit editor initialized for: ${elementId}`);
@@ -277,6 +319,12 @@
                         const model = textarea.getAttribute('data-model');
 
                         console.log(`Processing textarea: ${elementId}, model: ${model}`);
+
+                        // Skip if already initialized and active
+                        if (this.editors[elementId] && this.activeEditorId === elementId) {
+                            console.log(`Skipping active editor: ${elementId}`);
+                            return;
+                        }
 
                         if (elementId && model && window.Livewire) {
                             const wireIdElement = textarea.closest('[wire\\:id]');
@@ -323,20 +371,13 @@
                 }, 100);
             });
 
-            // IMPORTANT: Reinitialize after Livewire updates the DOM
-            Livewire.hook('morph.updated', ({ component, cleanup }) => {
-                console.log('Livewire DOM updated - reinitializing Jodit editors');
+            // Initialize editors when new Livewire components are created (e.g., modals)
+            Livewire.hook('component.init', ({ component }) => {
+                console.log('New Livewire component initialized - checking for editors');
+                // Only initialize after a delay to ensure DOM is ready
                 setTimeout(() => {
                     window.JoditEditorManager.initializeAllEditors();
-                }, 150);
-            });
-
-            // Also try on commit hook (when Livewire finishes updating)
-            Livewire.hook('commit', ({ component, respond }) => {
-                console.log('Livewire commit - checking for new editors');
-                setTimeout(() => {
-                    window.JoditEditorManager.initializeAllEditors();
-                }, 200);
+                }, 250);
             });
 
             // Clean up on page unload

@@ -10,12 +10,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class DueDateEmail extends Model
 {
-    use SoftDeletes, Auditable;
+    use Auditable, SoftDeletes;
 
     protected $fillable = [
         'user_id',
         'email',
         'name',
+        'description',
         'active',
         'preferences',
         'created_by',
@@ -46,8 +47,8 @@ class DueDateEmail extends Model
     public function contractReportDueDates(): BelongsToMany
     {
         return $this->belongsToMany(ContractReportDueDate::class, 'contract_report_due_date_emails')
-                    ->withPivot(['reminder_intervals', 'active'])
-                    ->withTimestamps();
+            ->withPivot(['reminder_intervals', 'active'])
+            ->withTimestamps();
     }
 
     /**

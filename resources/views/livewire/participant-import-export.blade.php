@@ -1,4 +1,4 @@
-<div class="max-w-7xl mx-auto p-6">
+<div class="w-full px-0 py-6">
     <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl">
         <div class="p-6">
             <div class="flex items-center justify-between mb-6">

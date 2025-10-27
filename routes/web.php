@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ContractPdfExportController;
 use App\Http\Controllers\ProgramManagerUploadController;
 use App\Services\CheckImageCacheService;
 use Illuminate\Support\Facades\Cache;
@@ -60,9 +61,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('service/{id}', App\Livewire\ServiceShow::class)->name('service.show');
     Route::get('contract-management', App\Livewire\ContractManagement::class)->name('contract.management');
     Route::get('contract/{id}', App\Livewire\ContractShow::class)->name('contract.show');
+    Route::get('contract/{contract}/export-pdf', ContractPdfExportController::class)->name('contract.export-pdf');
     Route::get('contract/{contractId}/document/{mediaId}/preview', [App\Http\Controllers\ContractDocumentController::class, 'preview'])->name('contract.document.preview');
     Route::get('contract/{contractId}/document/{mediaId}/download', [App\Http\Controllers\ContractDocumentController::class, 'download'])->name('contract.document.download');
     Route::get('admin/contract-notification-test', App\Livewire\ContractNotificationTest::class)->name('contract.notification-test')->middleware(['permission:contracts.manage']);
+    Route::get('admin/notification-recipients', App\Livewire\NotificationRecipientsManagement::class)->name('notification-recipients.management')->middleware(['permission:contracts.view']);
     Route::get('funder-management', App\Livewire\FunderManagement::class)->name('funder.management');
     Route::get('funder/{id}', App\Livewire\FunderShow::class)->name('funder.show');
     Route::get('contract-report-due-dates', App\Livewire\ContractReportDueDateManagement::class)->name('contract-report-due-dates.management');

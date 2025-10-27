@@ -1,4 +1,4 @@
-<div class="max-w-7xl mx-auto p-6">
+<div class="w-full px-6 py-6">
     <div class="bg-white dark:bg-zinc-800 shadow-lg rounded-lg overflow-hidden">
         <!-- Header -->
         <div class="bg-green-600 text-white p-6">
@@ -119,7 +119,7 @@
                         --}}
 
                         <div>
-                            <label for="grant_code" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Grant Code</label>
+                            <label for="grant_code" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fund Code</label>
                             <input type="text" wire:model="grant_code" id="grant_code" 
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500">
                             @error('grant_code') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
@@ -294,7 +294,7 @@
                                 </div>
                                 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Grant Code</label>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Fund Code</label>
                                     <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $selectedContract->grant_code ?? 'N/A' }}</p>
                                 </div>
                                 
@@ -952,54 +952,111 @@
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-600">
                 <thead class="bg-gray-50 dark:bg-zinc-700">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Title</th>
-                        <!--th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Contract Number</th-->
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Program</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Funder</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Amount</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Period</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Fund Code</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Title</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Program</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Funder</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Start Date</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">End Date</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                    </tr>
+                    <!-- Filter Row -->
+                    <tr class="bg-gray-100 dark:bg-zinc-800">
+                        <th class="px-2 py-2">
+                            <input type="text" wire:model.live.debounce.300ms="filterGrantCode" placeholder="Filter..."
+                                   class="w-full px-2 py-1 text-xs border border-gray-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-green-500">
+                        </th>
+                        <th class="px-2 py-2">
+                            <input type="text" wire:model.live.debounce.300ms="filterTitle" placeholder="Filter..."
+                                   class="w-full px-2 py-1 text-xs border border-gray-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-green-500">
+                        </th>
+                        <th class="px-2 py-2">
+                            <select wire:model.live="filterProgramId"
+                                    class="w-full px-2 py-1 text-xs border border-gray-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-green-500">
+                                <option value="">All Programs</option>
+                                @foreach($programs as $program)
+                                    <option value="{{ $program->id }}">{{ $program->name }}</option>
+                                @endforeach
+                            </select>
+                        </th>
+                        <th class="px-2 py-2">
+                            <select wire:model.live="filterFunderId"
+                                    class="w-full px-2 py-1 text-xs border border-gray-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-green-500">
+                                <option value="">All Funders</option>
+                                @foreach($funders as $funder)
+                                    <option value="{{ $funder->id }}">{{ $funder->name }}</option>
+                                @endforeach
+                            </select>
+                        </th>
+                        <th class="px-2 py-2">
+                            <input type="date" wire:model.live="filterStartDate"
+                                   class="w-full px-2 py-1 text-xs border border-gray-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-green-500">
+                        </th>
+                        <th class="px-2 py-2">
+                            <input type="date" wire:model.live="filterEndDate"
+                                   class="w-full px-2 py-1 text-xs border border-gray-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-green-500">
+                        </th>
+                        <th class="px-2 py-2">
+                            <!-- No filter for status -->
+                        </th>
+                        <th class="px-2 py-2">
+                            <!-- No filter for actions -->
+                        </th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-zinc-600">
                     @forelse($contracts as $contract)
                         <tr class="{{ $contract->archived ? 'bg-gray-100 dark:bg-zinc-900' : '' }}">
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <!-- Grant Code -->
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <div class="text-sm text-gray-900 dark:text-white font-medium">
+                                    {{ $contract->grant_code ?? 'N/A' }}
+                                </div>
+                            </td>
+                            <!-- Title -->
+                            <td class="px-4 py-3">
                                 <div class="text-sm font-medium">
-                                    <button wire:click="viewContract({{ $contract->id }})" 
+                                    <button wire:click="viewContract({{ $contract->id }})"
                                             class="text-gray-900 dark:text-white hover:text-green-600 dark:hover:text-green-400 hover:underline cursor-pointer transition-colors duration-200">
                                         {{ $contract->title }}
                                     </button>
                                 </div>
-                                @if($contract->grant_code)
-                                    <div class="text-sm text-gray-500 dark:text-gray-400">Grant: {{ $contract->grant_code }}</div>
-                                @endif
                                 @if($contract->reportDueDates->where('status', '!=', 'completed')->count() > 0)
-                                    <div class="text-xs text-orange-600 dark:text-orange-400">{{ $contract->reportDueDates->where('status', '!=', 'completed')->count() }} pending reports</div>
+                                    <div class="text-xs text-orange-600 dark:text-orange-400 mt-1">{{ $contract->reportDueDates->where('status', '!=', 'completed')->count() }} pending reports</div>
                                 @endif
                             </td>
-                            <!-- <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $contract->contract_number ?? 'N/A' }}</td> -->
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $contract->getDisplayProgramNamesWithCount() }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $contract->funder->name ?? 'N/A' }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${{ number_format($contract->amount, 2) }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                <div>{{ $contract->start_date?->format('M j, Y') ?? 'N/A' }}</div>
-                                <div>{{ $contract->end_date?->format('M j, Y') ?? 'Open' }}</div>
+                            <!-- Program -->
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                {{ $contract->getDisplayProgramNamesWithCount() }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
-                                    {{ $contract->status === 'Active' ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300' : 
-                                       ($contract->status === 'Expired' ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300' : 
-                                        ($contract->status === 'Upcoming' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300' : 
-                                         ($contract->status === 'Archived' ? 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300' : 
+                            <!-- Funder -->
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                {{ $contract->funder->name ?? 'N/A' }}
+                            </td>
+                            <!-- Start Date -->
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                {{ $contract->start_date?->format('M j, Y') ?? 'N/A' }}
+                            </td>
+                            <!-- End Date -->
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                {{ $contract->end_date?->format('M j, Y') ?? 'Open' }}
+                            </td>
+                            <!-- Status -->
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
+                                    {{ $contract->status === 'Active' ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300' :
+                                       ($contract->status === 'Expired' ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300' :
+                                        ($contract->status === 'Upcoming' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300' :
+                                         ($contract->status === 'Archived' ? 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300' :
                                           'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300'))) }}">
                                     {{ $contract->status }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <!-- Actions -->
+                            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
-                                    <button wire:click="showEditContract({{ $contract->id }})" 
+                                    <button wire:click="showEditContract({{ $contract->id }})"
                                             class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300">Edit</button>
                                     @if($contract->archived)
                                         <button wire:click="unarchiveContract({{ $contract->id }})"

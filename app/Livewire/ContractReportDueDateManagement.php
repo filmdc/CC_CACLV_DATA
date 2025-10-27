@@ -5,7 +5,6 @@ namespace App\Livewire;
 use App\Models\Contract;
 use App\Models\ContractReport;
 use App\Models\ContractReportDueDate;
-use App\Models\DueDateEmail;
 use App\Models\User;
 use App\Traits\WithPermissionChecks;
 use Livewire\Component;
@@ -14,42 +13,62 @@ use Livewire\WithPagination;
 
 class ContractReportDueDateManagement extends Component
 {
-    use WithPagination, WithPermissionChecks, WithFileUploads;
+    use WithFileUploads, WithPagination, WithPermissionChecks;
+
+    protected $listeners = ['recipientsUpdated'];
 
     public $search = '';
+
     public $contractFilter = '';
+
     public $statusFilter = '';
+
     public $showCreateForm = false;
+
     public $showEditForm = false;
+
     public $showUploadForm = false;
+
     public $selectedDueDate = null;
+
     public $selectedReport = null;
 
     // Form Fields
     public $contract_id = '';
+
     public $report_name = '';
+
     public $due_date = '';
+
     public $description = '';
+
     public $reminder_intervals = [];
+
     public $active = true;
-    public $assigned_users = [];
-    
+
+    public $assigned_recipients = []; // Array of due_date_email IDs (users + distribution lists)
+
     // Report Upload Fields
     public $report_title = '';
+
     public $report_description = '';
+
     public $report_files = [];
+
     public $uploaded_files = [];
 
     // Available options
     public $contracts = [];
+
     public $users = [];
+
     public $reminderIntervalOptions = [
         30 => '30 days before',
         15 => '15 days before',
         7 => '7 days before',
         3 => '3 days before',
         1 => '1 day before',
-        0 => 'On due date'
+        0 => 'On due date',
     ];
 
     public function mount()
@@ -68,6 +87,11 @@ class ContractReportDueDateManagement extends Component
     public function updatedSearch()
     {
         $this->resetPage();
+    }
+
+    public function recipientsUpdated($recipientIds)
+    {
+        $this->assigned_recipients = $recipientIds;
     }
 
     public function updatedContractFilter()
@@ -97,7 +121,7 @@ class ContractReportDueDateManagement extends Component
         $this->showCreateForm = false;
         $this->fillForm();
     }
-    
+
     public function viewDueDate($dueDateId)
     {
         $this->authorizeAction('due_dates.view');
@@ -115,7 +139,7 @@ class ContractReportDueDateManagement extends Component
         $this->description = '';
         $this->reminder_intervals = [30, 15, 7, 3, 1];
         $this->active = true;
-        $this->assigned_users = [];
+        $this->assigned_recipients = [];
     }
 
     public function fillForm()
@@ -127,7 +151,7 @@ class ContractReportDueDateManagement extends Component
             $this->description = $this->selectedDueDate->description;
             $this->reminder_intervals = $this->selectedDueDate->reminder_intervals ?? [30, 15, 7, 3, 1];
             $this->active = $this->selectedDueDate->active;
-            $this->assigned_users = $this->selectedDueDate->emails->pluck('user_id')->filter()->toArray();
+            $this->assigned_recipients = $this->selectedDueDate->emails->pluck('id')->toArray();
         }
     }
 
@@ -143,8 +167,8 @@ class ContractReportDueDateManagement extends Component
             'reminder_intervals' => 'array',
             'reminder_intervals.*' => 'integer|min:0|max:365',
             'active' => 'boolean',
-            'assigned_users' => 'array',
-            'assigned_users.*' => 'exists:users,id',
+            'assigned_recipients' => 'array',
+            'assigned_recipients.*' => 'exists:due_date_emails,id',
         ]);
 
         try {
@@ -158,29 +182,15 @@ class ContractReportDueDateManagement extends Component
                 'created_by' => auth()->id(),
             ]);
 
-            // Assign users
-            if (!empty($this->assigned_users)) {
-                foreach ($this->assigned_users as $userId) {
-                    $user = User::find($userId);
-                    if ($user) {
-                        // Create or find DueDateEmail record
-                        $dueDateEmail = DueDateEmail::firstOrCreate([
-                            'user_id' => $userId,
-                            'email' => $user->email,
-                        ], [
-                            'name' => $user->name,
-                            'active' => true,
-                            'created_by' => auth()->id(),
-                        ]);
-                        
-                        // Attach to due date
-                        $dueDate->emails()->attach($dueDateEmail->id, [
-                            'reminder_intervals' => $this->reminder_intervals,
-                            'active' => true,
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ]);
-                    }
+            // Assign recipients (users + distribution lists)
+            if (! empty($this->assigned_recipients)) {
+                foreach ($this->assigned_recipients as $recipientId) {
+                    $dueDate->emails()->attach($recipientId, [
+                        'reminder_intervals' => $this->reminder_intervals,
+                        'active' => true,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
                 }
             }
 
@@ -189,7 +199,7 @@ class ContractReportDueDateManagement extends Component
             $this->resetForm();
 
         } catch (\Exception $e) {
-            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+            session()->flash('error', 'An error occurred: '.$e->getMessage());
         }
     }
 
@@ -205,8 +215,8 @@ class ContractReportDueDateManagement extends Component
             'reminder_intervals' => 'array',
             'reminder_intervals.*' => 'integer|min:0|max:365',
             'active' => 'boolean',
-            'assigned_users' => 'array',
-            'assigned_users.*' => 'exists:users,id',
+            'assigned_recipients' => 'array',
+            'assigned_recipients.*' => 'exists:due_date_emails,id',
         ]);
 
         try {
@@ -220,30 +230,16 @@ class ContractReportDueDateManagement extends Component
                 'updated_by' => auth()->id(),
             ]);
 
-            // Update assigned users
+            // Update assigned recipients
             $this->selectedDueDate->emails()->detach();
-            if (!empty($this->assigned_users)) {
-                foreach ($this->assigned_users as $userId) {
-                    $user = User::find($userId);
-                    if ($user) {
-                        // Create or find DueDateEmail record
-                        $dueDateEmail = DueDateEmail::firstOrCreate([
-                            'user_id' => $userId,
-                            'email' => $user->email,
-                        ], [
-                            'name' => $user->name,
-                            'active' => true,
-                            'created_by' => auth()->id(),
-                        ]);
-                        
-                        // Attach to due date
-                        $this->selectedDueDate->emails()->attach($dueDateEmail->id, [
-                            'reminder_intervals' => $this->reminder_intervals,
-                            'active' => true,
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ]);
-                    }
+            if (! empty($this->assigned_recipients)) {
+                foreach ($this->assigned_recipients as $recipientId) {
+                    $this->selectedDueDate->emails()->attach($recipientId, [
+                        'reminder_intervals' => $this->reminder_intervals,
+                        'active' => true,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
                 }
             }
 
@@ -253,7 +249,7 @@ class ContractReportDueDateManagement extends Component
             $this->resetForm();
 
         } catch (\Exception $e) {
-            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+            session()->flash('error', 'An error occurred: '.$e->getMessage());
         }
     }
 
@@ -267,7 +263,7 @@ class ContractReportDueDateManagement extends Component
             $dueDate->delete();
             session()->flash('success', 'Report due date deleted successfully.');
         } catch (\Exception $e) {
-            session()->flash('error', 'Cannot delete due date: ' . $e->getMessage());
+            session()->flash('error', 'Cannot delete due date: '.$e->getMessage());
         }
     }
 
@@ -283,10 +279,10 @@ class ContractReportDueDateManagement extends Component
             ]);
             session()->flash('success', 'Due date status updated successfully.');
         } catch (\Exception $e) {
-            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+            session()->flash('error', 'An error occurred: '.$e->getMessage());
         }
     }
-    
+
     public function showUploadReport($dueDateId)
     {
         $this->authorizeAction('contract_reports.create');
@@ -296,18 +292,18 @@ class ContractReportDueDateManagement extends Component
         $this->showEditForm = false;
         $this->resetReportForm();
     }
-    
+
     public function uploadReport()
     {
         $this->authorizeAction('contract_reports.create');
-        
+
         $this->validate([
             'report_title' => 'required|string|max:255',
             'report_description' => 'nullable|string',
             'report_files' => 'required|array|min:1',
             'report_files.*' => 'file|max:102400', // 100MB max per file
         ]);
-        
+
         try {
             // Create the contract report
             $report = ContractReport::create([
@@ -319,15 +315,15 @@ class ContractReportDueDateManagement extends Component
                 'status' => 'submitted',
                 'created_by' => auth()->id(),
             ]);
-            
+
             // Upload files
             foreach ($this->report_files as $file) {
                 $report->addMedia($file->getRealPath())
-                       ->usingName($file->getClientOriginalName())
-                       ->usingFileName($file->hashName())
-                       ->toMediaCollection('documents');
+                    ->usingName($file->getClientOriginalName())
+                    ->usingFileName($file->hashName())
+                    ->toMediaCollection('documents');
             }
-            
+
             // Update due date status if needed
             if ($this->selectedDueDate->status !== 'completed') {
                 $this->selectedDueDate->update([
@@ -335,48 +331,48 @@ class ContractReportDueDateManagement extends Component
                     'updated_by' => auth()->id(),
                 ]);
             }
-            
+
             session()->flash('success', 'Report uploaded successfully.');
             $this->showUploadForm = false;
             $this->resetReportForm();
-            
+
         } catch (\Exception $e) {
-            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+            session()->flash('error', 'An error occurred: '.$e->getMessage());
         }
     }
-    
+
     public function deleteReport($reportId)
     {
         $this->authorizeAction('contract_reports.delete');
-        
+
         try {
             $report = ContractReport::findOrFail($reportId);
             $report->update(['updated_by' => auth()->id()]);
             $report->delete();
             session()->flash('success', 'Report deleted successfully.');
         } catch (\Exception $e) {
-            session()->flash('error', 'Cannot delete report: ' . $e->getMessage());
+            session()->flash('error', 'Cannot delete report: '.$e->getMessage());
         }
     }
-    
+
     public function downloadReport($reportId, $mediaId)
     {
         $this->authorizeAction('contract_reports.view');
-        
+
         try {
             $report = ContractReport::findOrFail($reportId);
             $media = $report->getMedia('documents')->where('id', $mediaId)->first();
-            
+
             if ($media) {
                 return response()->download($media->getPath(), $media->name);
             }
-            
+
             session()->flash('error', 'File not found.');
         } catch (\Exception $e) {
-            session()->flash('error', 'Cannot download file: ' . $e->getMessage());
+            session()->flash('error', 'Cannot download file: '.$e->getMessage());
         }
     }
-    
+
     public function resetReportForm()
     {
         $this->report_title = '';
@@ -390,10 +386,10 @@ class ContractReportDueDateManagement extends Component
     {
         $dueDates = ContractReportDueDate::with(['contract.program', 'contract.funder', 'emails', 'contractReports'])
             ->when($this->search, function ($query) {
-                $query->where('report_name', 'like', '%' . $this->search . '%')
-                      ->orWhereHas('contract', function ($q) {
-                          $q->where('title', 'like', '%' . $this->search . '%');
-                      });
+                $query->where('report_name', 'like', '%'.$this->search.'%')
+                    ->orWhereHas('contract', function ($q) {
+                        $q->where('title', 'like', '%'.$this->search.'%');
+                    });
             })
             ->when($this->contractFilter, function ($query) {
                 $query->where('contract_id', $this->contractFilter);

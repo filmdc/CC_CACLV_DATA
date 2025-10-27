@@ -1,4 +1,4 @@
-<div class="max-w-7xl mx-auto p-6">
+<div class="w-full px-0 py-6">
     <!-- Header -->
     <div class="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-700 dark:to-blue-900 rounded-lg p-6 mb-6">
         <h1 class="text-2xl font-bold text-white mb-2">Enrollment Management</h1>

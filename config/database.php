@@ -83,6 +83,21 @@ return [
             ]) : [],
         ],
 
+        'legacy_contracts' => [
+            'driver' => 'mysql',
+            'host' => '10.55.0.10',
+            'port' => '3306',
+            'database' => 'Contracts',
+            'username' => 'root',
+            'password' => 'Socrates1982!',
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => false,
+            'engine' => null,
+        ],
+
         'pgsql' => [
             'driver' => 'pgsql',
             'url' => env('DB_URL'),

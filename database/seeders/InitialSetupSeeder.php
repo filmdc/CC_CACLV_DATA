@@ -2,22 +2,22 @@
 
 namespace Database\Seeders;
 
+use App\Models\Contract;
+use App\Models\Household;
+use App\Models\Participant;
+use App\Models\Permission;
+use App\Models\Program;
+use App\Models\ProgramEnrollment;
+use App\Models\Role;
+use App\Models\Service;
+use App\Models\ServiceEnrollment;
+use App\Models\SiteSetting;
+use App\Models\User;
+use App\Models\WorkPlan;
+use App\Models\WorkPlanGoal;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use App\Models\User;
-use App\Models\Role;
-use App\Models\Permission;
-use App\Models\Program;
-use App\Models\Service;
-use App\Models\Contract;
-use App\Models\Participant;
-use App\Models\Household;
-use App\Models\WorkPlan;
-use App\Models\WorkPlanGoal;
-use App\Models\SiteSetting;
-use App\Models\ProgramEnrollment;
-use App\Models\ServiceEnrollment;
 
 class InitialSetupSeeder extends Seeder
 {
@@ -112,7 +112,7 @@ class InitialSetupSeeder extends Seeder
             'services.view',
             'enrollments.view',
             'enrollments.create',
-            'enrollments.edit'
+            'enrollments.edit',
         ])->pluck('id');
         $staffRole->permissions()->sync($staffPermissions);
 
@@ -444,14 +444,14 @@ class InitialSetupSeeder extends Seeder
         $permissions = [
             // Access permissions
             ['name' => 'access-admin-panel', 'display_name' => 'Access Admin Panel', 'category' => 'Access'],
-            
+
             // Read Only permissions
             ['name' => 'read-all', 'display_name' => 'Read All', 'category' => 'Read Only'],
-            
+
             // Edit permissions
             ['name' => 'edit-all', 'display_name' => 'Edit All', 'category' => 'Edit'],
             ['name' => 'edit-participants', 'display_name' => 'Edit Participants', 'category' => 'Participants'],
-            
+
             // Participant permissions
             ['name' => 'participants.view', 'display_name' => 'View Participants', 'category' => 'Participants'],
             ['name' => 'participants.create', 'display_name' => 'Create Participants', 'category' => 'Participants'],
@@ -459,76 +459,81 @@ class InitialSetupSeeder extends Seeder
             ['name' => 'participants.delete', 'display_name' => 'Delete Participants', 'category' => 'Participants'],
             ['name' => 'participants.export', 'display_name' => 'Export Participants', 'category' => 'Participants'],
             ['name' => 'participants.import', 'display_name' => 'Import Participants', 'category' => 'Participants'],
-            
+
             // Household permissions
             ['name' => 'households.view', 'display_name' => 'View Households', 'category' => 'Households'],
             ['name' => 'households.create', 'display_name' => 'Create Households', 'category' => 'Households'],
             ['name' => 'households.edit', 'display_name' => 'Edit Households', 'category' => 'Households'],
             ['name' => 'households.delete', 'display_name' => 'Delete Households', 'category' => 'Households'],
-            
+
             // Program permissions
             ['name' => 'programs.view', 'display_name' => 'View Programs', 'category' => 'Programs'],
             ['name' => 'programs.create', 'display_name' => 'Create Programs', 'category' => 'Programs'],
             ['name' => 'programs.edit', 'display_name' => 'Edit Programs', 'category' => 'Programs'],
             ['name' => 'programs.delete', 'display_name' => 'Delete Programs', 'category' => 'Programs'],
-            
+
             // Service permissions
             ['name' => 'services.view', 'display_name' => 'View Services', 'category' => 'Services'],
             ['name' => 'services.create', 'display_name' => 'Create Services', 'category' => 'Services'],
             ['name' => 'services.edit', 'display_name' => 'Edit Services', 'category' => 'Services'],
             ['name' => 'services.delete', 'display_name' => 'Delete Services', 'category' => 'Services'],
-            
+
             // Contract permissions
             ['name' => 'contracts.view', 'display_name' => 'View Contracts', 'category' => 'Contracts'],
             ['name' => 'contracts.create', 'display_name' => 'Create Contracts', 'category' => 'Contracts'],
             ['name' => 'contracts.edit', 'display_name' => 'Edit Contracts', 'category' => 'Contracts'],
             ['name' => 'contracts.delete', 'display_name' => 'Delete Contracts', 'category' => 'Contracts'],
-            
+            ['name' => 'contracts.manage_notifications', 'display_name' => 'Manage Contract Notification Recipients', 'category' => 'Contracts'],
+
             // Work Plan permissions
             ['name' => 'work_plans.view', 'display_name' => 'View Work Plans', 'category' => 'Work Plans'],
             ['name' => 'work_plans.create', 'display_name' => 'Create Work Plans', 'category' => 'Work Plans'],
             ['name' => 'work_plans.edit', 'display_name' => 'Edit Work Plans', 'category' => 'Work Plans'],
             ['name' => 'work_plans.delete', 'display_name' => 'Delete Work Plans', 'category' => 'Work Plans'],
-            
+
             // Work Plan Goal permissions
             ['name' => 'work_plan_goals.view', 'display_name' => 'View Work Plan Goals', 'category' => 'Work Plan Goals'],
             ['name' => 'work_plan_goals.create', 'display_name' => 'Create Work Plan Goals', 'category' => 'Work Plan Goals'],
             ['name' => 'work_plan_goals.edit', 'display_name' => 'Edit Work Plan Goals', 'category' => 'Work Plan Goals'],
             ['name' => 'work_plan_goals.delete', 'display_name' => 'Delete Work Plan Goals', 'category' => 'Work Plan Goals'],
-            
+
             // Enrollment permissions
             ['name' => 'enrollments.view', 'display_name' => 'View Enrollments', 'category' => 'Enrollments'],
             ['name' => 'enrollments.create', 'display_name' => 'Create Enrollments', 'category' => 'Enrollments'],
             ['name' => 'enrollments.edit', 'display_name' => 'Edit Enrollments', 'category' => 'Enrollments'],
             ['name' => 'enrollments.delete', 'display_name' => 'Delete Enrollments', 'category' => 'Enrollments'],
-            
+
             // Poverty Guideline permissions
             ['name' => 'poverty-guidelines.view', 'display_name' => 'View Poverty Guidelines', 'category' => 'Poverty Guidelines'],
             ['name' => 'poverty-guidelines.create', 'display_name' => 'Create Poverty Guidelines', 'category' => 'Poverty Guidelines'],
             ['name' => 'poverty-guidelines.edit', 'display_name' => 'Edit Poverty Guidelines', 'category' => 'Poverty Guidelines'],
             ['name' => 'poverty-guidelines.delete', 'display_name' => 'Delete Poverty Guidelines', 'category' => 'Poverty Guidelines'],
-            
+
             // Reference Data permissions
             ['name' => 'reference-data.view', 'display_name' => 'View Reference Data', 'category' => 'Reference Data'],
             ['name' => 'reference-data.create', 'display_name' => 'Create Reference Data', 'category' => 'Reference Data'],
             ['name' => 'reference-data.edit', 'display_name' => 'Edit Reference Data', 'category' => 'Reference Data'],
             ['name' => 'reference-data.delete', 'display_name' => 'Delete Reference Data', 'category' => 'Reference Data'],
-            
+
             // User Management permissions
             ['name' => 'users.view', 'display_name' => 'View Users', 'category' => 'User Management'],
             ['name' => 'users.create', 'display_name' => 'Create Users', 'category' => 'User Management'],
             ['name' => 'users.edit', 'display_name' => 'Edit Users', 'category' => 'User Management'],
             ['name' => 'users.delete', 'display_name' => 'Delete Users', 'category' => 'User Management'],
-            
+
             // Role permissions
             ['name' => 'roles.view', 'display_name' => 'View Roles', 'category' => 'User Management'],
             ['name' => 'roles.create', 'display_name' => 'Create Roles', 'category' => 'User Management'],
             ['name' => 'roles.edit', 'display_name' => 'Edit Roles', 'category' => 'User Management'],
             ['name' => 'roles.delete', 'display_name' => 'Delete Roles', 'category' => 'User Management'],
-            
+
             // Site Settings permissions
             ['name' => 'site-settings.view', 'display_name' => 'View Site Settings', 'category' => 'Site Settings'],
             ['name' => 'site-settings.edit', 'display_name' => 'Edit Site Settings', 'category' => 'Site Settings'],
+
+            // DonorPerfect / Accounting & Fiscal permissions
+            ['name' => 'donor_gifts.view', 'display_name' => 'View DonorPerfect Gifts', 'description' => 'View the DonorPerfect gifts feed and data', 'category' => 'Accounting & Fiscal'],
+            ['name' => 'donor_gifts.configure', 'display_name' => 'Configure DonorPerfect API', 'description' => 'Configure DonorPerfect API settings and field mappings', 'category' => 'Accounting & Fiscal'],
         ];
 
         foreach ($permissions as $permission) {

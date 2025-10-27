@@ -1,4 +1,4 @@
-<div class="max-w-7xl mx-auto p-6">
+<div class="w-full px-0 py-6">
     <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl">
         <!-- Header -->
         <div class="p-6 border-b border-gray-200 dark:border-zinc-700">
