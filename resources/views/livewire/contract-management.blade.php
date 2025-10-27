@@ -226,9 +226,9 @@
                                                 <span class="text-sm text-gray-700 dark:text-gray-300">{{ $document->name }}</span>
                                             </div>
                                             <div class="flex space-x-2">
-                                                <a href="{{ $document->getAuthenticatedUrl() }}" target="_blank" 
+                                                <a href="{{ route('contract.document.preview', ['contractId' => $selectedContract->id, 'mediaId' => $document->id]) }}" target="_blank"
                                                    class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm">View</a>
-                                                <a href="{{ $document->getDownloadUrl() }}" 
+                                                <a href="{{ route('contract.document.download', ['contractId' => $selectedContract->id, 'mediaId' => $document->id]) }}"
                                                    class="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 text-sm">Download</a>
                                                 <button type="button" wire:click="removeDocument({{ $document->id }})"
                                                         wire:confirm="Are you sure you want to remove this document?"
@@ -393,7 +393,7 @@
                                                         </p>
                                                     </div>
                                                     <div class="flex space-x-3 mt-2 sm:mt-0 sm:ml-4 flex-shrink-0">
-                                                        <a href="{{ $document->getAuthenticatedUrl() }}" target="_blank" 
+                                                        <a href="{{ route('contract.document.preview', ['contractId' => $selectedContract->id, 'mediaId' => $document->id]) }}" target="_blank"
                                                            class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50 transition-colors">
                                                             <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -401,7 +401,7 @@
                                                             </svg>
                                                             View
                                                         </a>
-                                                        <a href="{{ $document->getDownloadUrl() }}" 
+                                                        <a href="{{ route('contract.document.download', ['contractId' => $selectedContract->id, 'mediaId' => $document->id]) }}"
                                                            class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50 transition-colors">
                                                             <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -887,11 +887,11 @@
                                                 </div>
                                             </div>
                                             <div class="flex space-x-2">
-                                                <a href="{{ $document->getAuthenticatedUrl() }}" target="_blank" 
+                                                <a href="{{ route('contract.document.preview', ['contractId' => $selectedReport->contract_id, 'mediaId' => $document->id]) }}" target="_blank"
                                                    class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium">
                                                     View
                                                 </a>
-                                                <a href="{{ $document->getDownloadUrl() }}" 
+                                                <a href="{{ route('contract.document.download', ['contractId' => $selectedReport->contract_id, 'mediaId' => $document->id]) }}"
                                                    class="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 text-sm font-medium">
                                                     Download
                                                 </a>

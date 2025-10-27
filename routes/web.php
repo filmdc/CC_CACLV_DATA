@@ -4,6 +4,7 @@ use App\Http\Controllers\ContractPdfExportController;
 use App\Http\Controllers\ProgramManagerUploadController;
 use App\Services\CheckImageCacheService;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -180,27 +181,114 @@ Route::middleware(['auth'])->group(function () {
 
         // Check if it's a TIFF file that needs conversion
         if (in_array($extension, ['tif', 'tiff'])) {
+            $baseFilename = pathinfo($safeFilename, PATHINFO_FILENAME);
+            $cachedPngsPath = 'check_images/converted/'.$baseFilename;
+
+            // Check if we already have cached PNG conversions
+            $cachedMetadataPath = $cachedPngsPath.'_metadata.json';
+            $pngFiles = [];
+            $useCache = false;
+
+            if (Storage::disk('local')->exists($cachedMetadataPath)) {
+                $cachedMetadata = json_decode(Storage::disk('local')->get($cachedMetadataPath), true);
+
+                // Verify all cached PNG files still exist
+                $allPngsExist = true;
+                foreach ($cachedMetadata['pages'] as $pageInfo) {
+                    $cachedPngPath = 'check_images/converted/'.$pageInfo['filename'];
+                    if (!Storage::disk('local')->exists($cachedPngPath.'.enc')) {
+                        $allPngsExist = false;
+                        break;
+                    }
+                }
+
+                if ($allPngsExist) {
+                    $useCache = true;
+                    $pngFiles = $cachedMetadata['pages'];
+                    $pageCount = $cachedMetadata['page_count'];
+
+                    // Clean up temp file
+                    unlink($tempPath);
+
+                    Log::info('Using cached TIFF conversion', [
+                        'tiff_file' => $safeFilename,
+                        'pages' => $pageCount,
+                    ]);
+
+                    // Return HTML viewer for multi-page check
+                    return response()->view('check-image-viewer', [
+                        'pages' => $pngFiles,
+                        'filename' => $safeFilename,
+                        'pageCount' => $pageCount,
+                    ]);
+                }
+            }
+
+            // If no cache available, attempt lightweight conversion with strict timeout
             try {
-                $imagick = new \Imagick($tempPath);
+                // Set PHP max execution time for this conversion attempt
+                set_time_limit(90); // 90 seconds max for conversion
+
+                // Try to load the TIFF to check page count quickly
+                $imagick = new \Imagick();
+                $imagick->pingImage($tempPath); // Ping is faster than full load
                 $pageCount = $imagick->getNumberImages();
+                $imagick->clear();
 
-                $baseFilename = pathinfo($safeFilename, PATHINFO_FILENAME);
-                $pngFiles = [];
+                // If file is too complex (more than 10 pages), skip on-demand conversion
+                if ($pageCount > 10) {
+                    Log::warning('TIFF too complex for on-demand conversion', [
+                        'file' => $safeFilename,
+                        'pages' => $pageCount,
+                    ]);
 
-                // Convert each page to PNG
+                    // Clean up temp file
+                    unlink($tempPath);
+
+                    // Return a message view instead of trying to convert
+                    return response()->view('check-image-processing', [
+                        'filename' => $safeFilename,
+                        'pageCount' => $pageCount,
+                        'message' => 'This check image has '.$pageCount.' pages and is being processed in the background. Please check back in a few minutes.',
+                    ]);
+                }
+
+                // Attempt quick conversion for simple files (10 pages or less)
                 $imagick = new \Imagick($tempPath);
+                $imagick->setResourceLimit(\Imagick::RESOURCETYPE_TIME, 60); // 60 second hard limit
+
+                // Convert each page to PNG and cache it
                 $pageNum = 0;
                 foreach ($imagick as $page) {
                     $pngFilename = $baseFilename.'_page'.$pageNum.'.png';
 
                     $page->setImageFormat('png');
                     $page->setImageCompression(\Imagick::COMPRESSION_JPEG);
-                    $page->setImageCompressionQuality(85);
+                    $page->setImageCompressionQuality(75); // Lower quality for faster conversion
+
+                    $pngBlob = $page->getImageBlob();
+
+                    // Cache the converted PNG (encrypted)
+                    $cachedPngPath = 'check_images/converted/'.$pngFilename;
+
+                    // Encrypt and store the PNG
+                    $encryptedPng = Crypt::encryptString($pngBlob);
+                    Storage::disk('local')->put($cachedPngPath.'.enc', $encryptedPng);
+
+                    // Store metadata
+                    $pngMetadataPath = 'check_images/metadata/'.$pngFilename.'.json';
+                    Storage::disk('local')->put($pngMetadataPath, json_encode([
+                        'mime_type' => 'image/png',
+                        'size' => strlen($pngBlob),
+                        'checksum' => hash('sha256', $pngBlob),
+                        'created_at' => now()->toIso8601String(),
+                        'source_tiff' => $safeFilename,
+                    ]));
 
                     $pngFiles[] = [
                         'filename' => $pngFilename,
                         'url' => route('donor-gifts.check-image-png', ['filename' => $pngFilename]),
-                        'imageData' => base64_encode($page->getImageBlob()),
+                        'imageData' => base64_encode($pngBlob),
                     ];
 
                     $pageNum++;
@@ -209,10 +297,19 @@ Route::middleware(['auth'])->group(function () {
                 $imagick->clear();
                 $imagick->destroy();
 
+                // Store conversion metadata for future use
+                $conversionMetadata = [
+                    'source_tiff' => $safeFilename,
+                    'page_count' => $pageCount,
+                    'pages' => $pngFiles,
+                    'converted_at' => now()->toIso8601String(),
+                ];
+                Storage::disk('local')->put($cachedMetadataPath, json_encode($conversionMetadata));
+
                 // Clean up temp file
                 unlink($tempPath);
 
-                Log::info('Converted multi-page TIFF', [
+                Log::info('Converted and cached multi-page TIFF', [
                     'tiff_file' => $safeFilename,
                     'pages' => $pageCount,
                     'png_files' => count($pngFiles),
@@ -225,17 +322,40 @@ Route::middleware(['auth'])->group(function () {
                     'pageCount' => $pageCount,
                 ]);
 
-            } catch (\Exception $e) {
+            } catch (\ImagickException $e) {
                 // Clean up temp file on error
                 if (file_exists($tempPath)) {
                     unlink($tempPath);
                 }
 
+                // Check if it's a timeout error
+                if (str_contains($e->getMessage(), 'time limit exceeded')) {
+                    Log::warning('TIFF conversion timeout - file too large', [
+                        'file' => $safeFilename,
+                        'error' => $e->getMessage(),
+                    ]);
+
+                    // Return processing message instead of error
+                    return response()->view('check-image-processing', [
+                        'filename' => $safeFilename,
+                        'pageCount' => null,
+                        'message' => 'This check image is very large and requires additional processing time. Our system is working on it. Please try again in a few minutes.',
+                    ]);
+                }
+
+                // For other errors, log and show error
                 Log::error('Failed to convert TIFF', [
                     'file' => $safeFilename,
                     'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
                 ]);
-                abort(500, 'Failed to convert image for viewing');
+
+                return response()->view('check-image-processing', [
+                    'filename' => $safeFilename,
+                    'pageCount' => null,
+                    'message' => 'Unable to display this check image at this time. Please contact support if this issue persists.',
+                    'error' => true,
+                ]);
             }
         }
 
@@ -292,6 +412,38 @@ Route::middleware(['auth'])->group(function () {
             'Cache-Control' => 'private, max-age=86400',
         ]);
     })->name('donor-gifts.check-image-png');
+
+    // Check if TIFF conversion is complete (for auto-refresh polling)
+    Route::get('donor-gifts/check-cache-status/{filename}', function ($filename) {
+        if (! auth()->check() || ! auth()->user()->hasPermission('donor_gifts.view')) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $safeFilename = basename($filename);
+        $baseFilename = pathinfo($safeFilename, PATHINFO_FILENAME);
+        $cachedMetadataPath = 'check_images/converted/'.$baseFilename.'_metadata.json';
+
+        // Check if cached conversion metadata exists
+        if (Storage::disk('local')->exists($cachedMetadataPath)) {
+            $metadata = json_decode(Storage::disk('local')->get($cachedMetadataPath), true);
+
+            // Verify at least one PNG file exists
+            if (!empty($metadata['pages'])) {
+                $firstPage = $metadata['pages'][0];
+                $cachedPngPath = 'check_images/converted/'.$firstPage['filename'];
+
+                if (Storage::disk('local')->exists($cachedPngPath.'.enc')) {
+                    return response()->json([
+                        'ready' => true,
+                        'page_count' => $metadata['page_count'],
+                        'converted_at' => $metadata['converted_at']
+                    ]);
+                }
+            }
+        }
+
+        return response()->json(['ready' => false]);
+    })->name('donor-gifts.check-cache-status');
 
     // Secure download route for import/export files
     Route::get('secure-download/{token}', function ($token) {
@@ -379,54 +531,121 @@ Route::middleware(['auth'])->group(function () {
     // Authenticated storage route for Spatie Media Library files
     // Handles files stored in storage/app/public/{id}/{filename}
     Route::get('storage/authenticated/{path}', function ($path) {
-        // Check if user is authenticated
-        if (! auth()->check()) {
-            abort(403, 'Unauthorized access to file');
-        }
-
-        // Path format is: {media_id}/{filename}
-        $fullPath = storage_path('app/public/'.$path);
-
-        // Security: Prevent directory traversal attacks
-        $realPath = realpath($fullPath);
-        $storagePath = realpath(storage_path('app/public'));
-
-        if (! $realPath || ! str_starts_with($realPath, $storagePath)) {
-            abort(403, 'Invalid file path');
-        }
-
-        // Check if file exists
-        if (! file_exists($fullPath)) {
-            abort(404, 'File not found');
-        }
-
-        // Get file info
-        $mimeType = mime_content_type($fullPath);
-        $fileName = basename($fullPath);
-
-        // Check if download is requested
-        $isDownload = request()->has('download') && request()->get('download') == '1';
-
-        // Set appropriate headers based on file type and download preference
-        $headers = [
-            'Content-Type' => $mimeType,
-            'Cache-Control' => 'private, max-age=300', // 5 minutes cache
-        ];
-
-        if ($isDownload) {
-            $headers['Content-Disposition'] = 'attachment; filename="'.$fileName.'"';
-        } else {
-            // For inline viewing, set appropriate content disposition based on file type
-            if (str_contains($mimeType, 'pdf') || str_contains($mimeType, 'image')) {
-                $headers['Content-Disposition'] = 'inline; filename="'.$fileName.'"';
-            } else {
-                // For other file types, force download for security
-                $headers['Content-Disposition'] = 'attachment; filename="'.$fileName.'"';
+        try {
+            // Check if user is authenticated
+            if (! auth()->check()) {
+                Log::warning('Unauthenticated access attempt to storage file', [
+                    'path' => $path,
+                    'ip' => request()->ip()
+                ]);
+                abort(403, 'Unauthorized access to file');
             }
-        }
 
-        // Return file response
-        return response()->file($fullPath, $headers);
+            // Path format is: {media_id}/{filename}
+            $fullPath = storage_path('app/public/'.$path);
+
+            Log::info('Storage authenticated file request', [
+                'requested_path' => $path,
+                'full_path' => $fullPath,
+                'user_id' => auth()->id()
+            ]);
+
+            // Security: Prevent directory traversal attacks
+            $realPath = realpath($fullPath);
+            $storagePath = realpath(storage_path('app/public'));
+
+            if (! $storagePath) {
+                Log::error('Storage base path not found', [
+                    'attempted_path' => storage_path('app/public')
+                ]);
+                abort(500, 'Storage system configuration error');
+            }
+
+            if (! $realPath) {
+                Log::warning('File path could not be resolved', [
+                    'requested_path' => $path,
+                    'full_path' => $fullPath
+                ]);
+                abort(404, 'File not found - path could not be resolved');
+            }
+
+            if (! str_starts_with($realPath, $storagePath)) {
+                Log::warning('Directory traversal attempt detected', [
+                    'requested_path' => $path,
+                    'real_path' => $realPath,
+                    'storage_path' => $storagePath,
+                    'user_id' => auth()->id()
+                ]);
+                abort(403, 'Invalid file path - security violation');
+            }
+
+            // Check if file exists
+            if (! file_exists($fullPath)) {
+                Log::warning('Requested file does not exist', [
+                    'path' => $path,
+                    'full_path' => $fullPath,
+                    'real_path' => $realPath
+                ]);
+                abort(404, 'File not found in storage');
+            }
+
+            // Get file info with error handling
+            $mimeType = @mime_content_type($fullPath);
+            if ($mimeType === false) {
+                Log::warning('Could not determine MIME type, using default', [
+                    'file' => $fullPath
+                ]);
+                $mimeType = 'application/octet-stream';
+            }
+
+            $fileName = basename($fullPath);
+
+            // Check if download is requested
+            $isDownload = request()->has('download') && request()->get('download') == '1';
+
+            // Set appropriate headers based on file type and download preference
+            $headers = [
+                'Content-Type' => $mimeType,
+                'Cache-Control' => 'private, max-age=300', // 5 minutes cache
+            ];
+
+            if ($isDownload) {
+                $headers['Content-Disposition'] = 'attachment; filename="'.$fileName.'"';
+            } else {
+                // For inline viewing, set appropriate content disposition based on file type
+                if (str_contains($mimeType, 'pdf') || str_contains($mimeType, 'image')) {
+                    $headers['Content-Disposition'] = 'inline; filename="'.$fileName.'"';
+                } else {
+                    // For other file types, force download for security
+                    $headers['Content-Disposition'] = 'attachment; filename="'.$fileName.'"';
+                }
+            }
+
+            Log::info('Successfully serving file', [
+                'file' => $fileName,
+                'mime_type' => $mimeType,
+                'size' => filesize($fullPath),
+                'is_download' => $isDownload
+            ]);
+
+            // Return file response
+            return response()->file($fullPath, $headers);
+
+        } catch (\Exception $e) {
+            Log::error('Error serving authenticated storage file', [
+                'path' => $path,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => auth()->id() ?? 'guest'
+            ]);
+
+            // Return user-friendly error instead of generic 500
+            if ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
+                throw $e; // Re-throw HTTP exceptions (403, 404, etc.)
+            }
+
+            abort(500, 'Unable to serve file. Please contact support if this issue persists.');
+        }
     })->where('path', '.*')->name('storage.authenticated');
 });
 
