@@ -35,7 +35,7 @@
                 </flux:navlist.group>
                 @endif
 
-                @if(auth()->user()->hasAnyPermission(['properties.view', 'contractors.view', 'housing_jobs.view', 'projects.view']))
+                @if(auth()->user()->hasAnyPermission(['properties.view', 'contractors.view', 'housing_jobs.view', 'projects.view', 'pdf_templates.view']))
                 <flux:navlist.group :heading="__('Housing & Projects')" class="grid">
                     @if(auth()->user()->hasAnyPermission(['housing_jobs.view', 'projects.view']))
                         <flux:navlist.item icon="view-columns" :href="route('projects.management')" :current="request()->routeIs(['projects.management', 'project.management', 'housing-job.management', 'project.pipeline'])" wire:navigate>{{ __('Projects') }}</flux:navlist.item>
@@ -45,6 +45,9 @@
                     @endif
                     @if(auth()->user()->hasPermission('contractors.view'))
                         <flux:navlist.item icon="wrench-screwdriver" :href="route('contractor.management')" :current="request()->routeIs('contractor.management')" wire:navigate>{{ __('Contractors') }}</flux:navlist.item>
+                    @endif
+                    @if(auth()->user()->hasPermission('pdf_templates.view'))
+                        <flux:navlist.item icon="document-text" :href="route('pdf-templates.index')" :current="request()->routeIs('pdf-templates.*')" wire:navigate>{{ __('PDF Form Templates') }}</flux:navlist.item>
                     @endif
                 </flux:navlist.group>
                 @endif
