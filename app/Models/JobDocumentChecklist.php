@@ -25,6 +25,7 @@ class JobDocumentChecklist extends Model
         'rejection_reason',
         'sort_order',
         'created_by',
+        'requires_approval',
     ];
 
     protected $casts = [
@@ -33,6 +34,7 @@ class JobDocumentChecklist extends Model
         'verified_at' => 'datetime',
         'file_size' => 'integer',
         'sort_order' => 'integer',
+        'requires_approval' => 'boolean',
     ];
 
     public function housingJob(): BelongsTo
@@ -104,5 +106,56 @@ class JobDocumentChecklist extends Model
     public function isRejected(): bool
     {
         return $this->status === 'rejected';
+    }
+
+    /**
+     * Check if the document requires approval.
+     */
+    public function requiresApproval(): bool
+    {
+        return (bool) $this->requires_approval;
+    }
+
+    /**
+     * Approve/verify the document.
+     * Alias for verify() to maintain consistency with other document models.
+     */
+    public function approve(User $approver): void
+    {
+        $this->update([
+            'status' => 'verified',
+            'verified_by' => $approver->id,
+            'verified_at' => now(),
+            'rejection_reason' => null,
+        ]);
+    }
+
+    /**
+     * Verify the document (original method).
+     */
+    public function verify(User $verifier): void
+    {
+        $this->approve($verifier);
+    }
+
+    /**
+     * Reject the document with a reason.
+     */
+    public function reject(User $verifier, string $reason): void
+    {
+        $this->update([
+            'status' => 'rejected',
+            'verified_by' => $verifier->id,
+            'verified_at' => now(),
+            'rejection_reason' => $reason,
+        ]);
+    }
+
+    /**
+     * Check if document is approved (alias for isVerified).
+     */
+    public function isApproved(): bool
+    {
+        return $this->isVerified();
     }
 }

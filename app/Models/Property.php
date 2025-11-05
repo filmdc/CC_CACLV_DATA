@@ -69,6 +69,11 @@ class Property extends Model
         return $this->hasMany(PropertyDocument::class);
     }
 
+    public function housingJobs(): HasMany
+    {
+        return $this->hasMany(HousingJob::class);
+    }
+
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');

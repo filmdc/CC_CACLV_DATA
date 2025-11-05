@@ -645,6 +645,133 @@
                         </div>
                     @endif
 
+                    <!-- Documents Section -->
+                    <div class="mt-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="text-md font-medium text-gray-900 dark:text-white">Documents</h4>
+                            @can('properties.update')
+                                <button class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
+                                    Upload Document
+                                </button>
+                            @endcan
+                        </div>
+
+                        @if($selectedProperty->propertyDocuments && $selectedProperty->propertyDocuments->count() > 0)
+                            <div class="space-y-3">
+                                @foreach($selectedProperty->propertyDocuments as $doc)
+                                    <div class="p-4 bg-gray-50 dark:bg-zinc-700 rounded-lg border border-gray-200 dark:border-zinc-600">
+                                        <div class="flex items-start justify-between">
+                                            <div class="flex items-start flex-1">
+                                                <!-- Document Icon -->
+                                                <div class="flex-shrink-0 mr-3 mt-0.5">
+                                                    @if($doc->approval_status === 'approved')
+                                                        <svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                                        </svg>
+                                                    @elseif($doc->approval_status === 'rejected')
+                                                        <svg class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                                        </svg>
+                                                    @elseif($doc->requires_approval && $doc->approval_status === 'pending')
+                                                        <svg class="h-5 w-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                                                        </svg>
+                                                    @else
+                                                        <svg class="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/>
+                                                        </svg>
+                                                    @endif
+                                                </div>
+
+                                                <!-- Document Info -->
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="flex items-center gap-2 mb-1">
+                                                        <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                                            {{ $doc->document_type ?? 'Document' }}
+                                                        </p>
+
+                                                        <!-- Requires Approval Badge -->
+                                                        @if($doc->requires_approval)
+                                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200">
+                                                                <svg class="h-3 w-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                                    <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                                                </svg>
+                                                                Needs Approval
+                                                            </span>
+                                                        @endif
+                                                    </div>
+
+                                                    <!-- Status and Details -->
+                                                    <div class="text-xs text-gray-500 dark:text-gray-400 space-y-1">
+                                                        @if($doc->requires_approval)
+                                                            <div>
+                                                                Status:
+                                                                <span class="font-medium">{{ ucfirst($doc->approval_status ?? 'pending') }}</span>
+                                                            </div>
+                                                        @endif
+
+                                                        @if($doc->uploaded_by)
+                                                            <div>
+                                                                Uploaded: {{ $doc->created_at->format('M d, Y') }}
+                                                            </div>
+                                                        @endif
+
+                                                        <!-- Approved Info -->
+                                                        @if($doc->approval_status === 'approved' && $doc->approvedBy)
+                                                            <div class="flex items-center text-green-600 dark:text-green-400">
+                                                                <svg class="h-3 w-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                                                </svg>
+                                                                Approved by {{ $doc->approvedBy->name }} on {{ $doc->approved_at?->format('M d, Y') }}
+                                                            </div>
+                                                        @endif
+
+                                                        <!-- Rejected Info -->
+                                                        @if($doc->approval_status === 'rejected' && $doc->rejection_reason)
+                                                            <div class="mt-2 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded">
+                                                                <p class="text-xs font-semibold text-red-800 dark:text-red-200">Rejected</p>
+                                                                <p class="text-xs text-red-700 dark:text-red-300 mt-1">{{ $doc->rejection_reason }}</p>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+
+                                                    <!-- Requires Approval Checkbox (PM Only) -->
+                                                    @if(auth()->user()->hasRole('project_manager') || auth()->user()->hasRole('admin'))
+                                                        <div class="mt-2">
+                                                            <label class="flex items-center space-x-2 cursor-pointer">
+                                                                <input type="checkbox"
+                                                                       wire:click="toggleRequiresApproval({{ $doc->id }})"
+                                                                       {{ $doc->requires_approval ? 'checked' : '' }}
+                                                                       class="rounded border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 text-indigo-600 focus:ring-indigo-500">
+                                                                <span class="text-xs text-gray-600 dark:text-gray-400">Requires Approval</span>
+                                                            </label>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+
+                                            <!-- Action Buttons -->
+                                            @if($doc->requires_approval && $doc->approval_status === 'pending' && auth()->user()->can('properties.update'))
+                                                <div class="flex gap-2 ml-3">
+                                                    <button wire:click="approveDocument({{ $doc->id }})"
+                                                            class="px-3 py-1.5 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition">
+                                                        Approve
+                                                    </button>
+                                                    <button wire:click="showRejectModal({{ $doc->id }})"
+                                                            class="px-3 py-1.5 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition">
+                                                        Reject
+                                                    </button>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-sm text-gray-500 dark:text-gray-400">No documents uploaded for this property.</p>
+                        @endif
+                    </div>
+
                     <!-- Notes Section -->
                     <div class="mt-6">
                         <div class="flex justify-between items-center mb-3">
@@ -695,6 +822,43 @@
                             Close
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Rejection Modal -->
+    @if($showApprovalModal)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    Reject Document
+                </h3>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Rejection Reason <span class="text-red-500">*</span>
+                    </label>
+                    <textarea wire:model="rejectionReason"
+                              class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500"
+                              rows="4"
+                              placeholder="Please provide a detailed reason for rejection (minimum 10 characters)"></textarea>
+                    @error('rejectionReason')
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="flex gap-3">
+                    <button wire:click="resetApprovalModal"
+                            class="flex-1 px-4 py-2 border border-gray-300 dark:border-zinc-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-700 transition">
+                        Cancel
+                    </button>
+                    <button wire:click="rejectDocument"
+                            class="flex-1 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition"
+                            wire:loading.attr="disabled">
+                        <span wire:loading.remove>Confirm Rejection</span>
+                        <span wire:loading>Rejecting...</span>
+                    </button>
                 </div>
             </div>
         </div>

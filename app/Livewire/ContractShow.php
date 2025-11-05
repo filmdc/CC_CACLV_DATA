@@ -39,7 +39,18 @@ class ContractShow extends Component
     // Modal states
     public $showAssignedUsersModal = false;
     public $selectedDueDateForUsers = null;
-    
+
+    // Orphan Report Properties (reports without due dates)
+    public $showOrphanReportForm = false;
+    public $orphan_report_title = '';
+    public $orphan_report_description = '';
+    public $orphan_report_documents = [];
+    public $orphan_report_notes = '';
+    public $selectedOrphanReport = null;
+    public $showAssociateModal = false;
+    public $orphanReportToAssociate = null;
+    public $targetDueDateId = null;
+
     // Available options
     public $users = [];
     public $reportTypes = [
@@ -68,6 +79,7 @@ class ContractShow extends Component
             'program',
             'reportDueDates.emails.user',
             'reportDueDates.contractReports.media',
+            'orphanReports.media',
             'media',
             'createdBy',
             'updatedBy'
@@ -357,7 +369,160 @@ class ContractShow extends Component
         $this->showAssignedUsersModal = false;
         $this->selectedDueDateForUsers = null;
     }
-    
+
+    // ========================================
+    // Orphan Report Methods (Reports Without Due Dates)
+    // ========================================
+
+    public function showCreateOrphanReport()
+    {
+        $this->authorizeAction('contract_reports.create_orphan');
+        $this->resetOrphanReportForm();
+        $this->showOrphanReportForm = true;
+    }
+
+    public function resetOrphanReportForm()
+    {
+        $this->orphan_report_title = '';
+        $this->orphan_report_description = '';
+        $this->orphan_report_documents = [];
+        $this->orphan_report_notes = '';
+        $this->selectedOrphanReport = null;
+    }
+
+    public function saveOrphanReport()
+    {
+        $this->authorizeAction('contract_reports.create_orphan');
+
+        $this->validate([
+            'orphan_report_title' => 'required|string|max:255',
+            'orphan_report_description' => 'nullable|string',
+            'orphan_report_documents.*' => 'nullable|file|max:10240',
+            'orphan_report_notes' => 'nullable|string',
+        ], [
+            'orphan_report_title.required' => 'Please enter a report title.',
+            'orphan_report_documents.*.max' => 'Each document must not exceed 10MB.',
+        ]);
+
+        try {
+            $report = ContractReport::create([
+                'contract_id' => $this->contract->id,
+                'contract_report_due_date_id' => null, // Orphan report
+                'title' => $this->orphan_report_title,
+                'description' => $this->orphan_report_description,
+                'submitted_date' => now()->toDateString(),
+                'status' => 'submitted',
+                'notes' => $this->orphan_report_notes,
+                'metadata' => [
+                    'is_orphan_report' => true,
+                    'created_via_ui' => true,
+                ],
+                'created_by' => auth()->id(),
+            ]);
+
+            // Handle document uploads
+            if (!empty($this->orphan_report_documents)) {
+                foreach ($this->orphan_report_documents as $document) {
+                    $report->addMedia($document->getRealPath())
+                        ->usingName($document->getClientOriginalName())
+                        ->usingFileName($document->getClientOriginalName())
+                        ->toMediaCollection('submissions');
+                }
+            }
+
+            session()->flash('success', 'General report created successfully.');
+            $this->loadContract(); // Refresh contract data
+            $this->closeOrphanReportForm();
+
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to create report: ' . $e->getMessage());
+        }
+    }
+
+    public function showAssociateOrphanReport($reportId)
+    {
+        $this->authorizeAction('contract_reports.associate');
+        $this->orphanReportToAssociate = $reportId;
+        $this->targetDueDateId = null;
+        $this->showAssociateModal = true;
+    }
+
+    public function associateOrphanWithDueDate()
+    {
+        $this->authorizeAction('contract_reports.associate');
+
+        $this->validate([
+            'targetDueDateId' => 'required|exists:contract_report_due_dates,id',
+        ], [
+            'targetDueDateId.required' => 'Please select a due date.',
+        ]);
+
+        try {
+            $report = ContractReport::findOrFail($this->orphanReportToAssociate);
+
+            // Verify the due date belongs to the same contract
+            $dueDate = ContractReportDueDate::findOrFail($this->targetDueDateId);
+            if ($dueDate->contract_id !== $this->contract->id) {
+                session()->flash('error', 'Selected due date does not belong to this contract.');
+                return;
+            }
+
+            $report->update([
+                'contract_report_due_date_id' => $this->targetDueDateId,
+                'updated_by' => auth()->id(),
+            ]);
+
+            // Update due date status if needed
+            if ($dueDate->status !== 'completed') {
+                $dueDate->update(['status' => 'completed']);
+            }
+
+            session()->flash('success', 'Report successfully associated with due date.');
+            $this->loadContract(); // Refresh contract data
+            $this->closeAssociateModal();
+
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to associate report: ' . $e->getMessage());
+        }
+    }
+
+    public function deleteOrphanReport($reportId)
+    {
+        $this->authorizeAction('contract_reports.delete');
+
+        try {
+            $report = ContractReport::findOrFail($reportId);
+
+            // Verify report belongs to this contract and is an orphan
+            if ($report->contract_id !== $this->contract->id || !is_null($report->contract_report_due_date_id)) {
+                session()->flash('error', 'Invalid report.');
+                return;
+            }
+
+            $report->update(['updated_by' => auth()->id()]);
+            $report->delete();
+
+            session()->flash('success', 'General report deleted successfully.');
+            $this->loadContract(); // Refresh contract data
+
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to delete report: ' . $e->getMessage());
+        }
+    }
+
+    public function closeOrphanReportForm()
+    {
+        $this->showOrphanReportForm = false;
+        $this->resetOrphanReportForm();
+    }
+
+    public function closeAssociateModal()
+    {
+        $this->showAssociateModal = false;
+        $this->orphanReportToAssociate = null;
+        $this->targetDueDateId = null;
+    }
+
 
     public function render()
     {

@@ -35,17 +35,35 @@
                 </flux:navlist.group>
                 @endif
 
-                @if(auth()->user()->hasAnyPermission(['properties.view', 'contractors.view', 'housing_jobs.view']))
-                <flux:navlist.group :heading="__('Housing Module')" class="grid">
+                @if(auth()->user()->hasAnyPermission(['properties.view', 'contractors.view', 'housing_jobs.view', 'projects.view']))
+                <flux:navlist.group :heading="__('Housing & Projects')" class="grid">
+                    @if(auth()->user()->hasAnyPermission(['housing_jobs.view', 'projects.view']))
+                        <flux:navlist.item icon="view-columns" :href="route('projects.management')" :current="request()->routeIs(['projects.management', 'project.management', 'housing-job.management', 'project.pipeline'])" wire:navigate>{{ __('Projects') }}</flux:navlist.item>
+                    @endif
                     @if(auth()->user()->hasPermission('properties.view'))
-                        <flux:navlist.item icon="home-modern" :href="route('property.management')" :current="request()->routeIs('property.management')" wire:navigate>{{ __('Property Management') }}</flux:navlist.item>
+                        <flux:navlist.item icon="home-modern" :href="route('property.management')" :current="request()->routeIs('property.management')" wire:navigate>{{ __('Properties') }}</flux:navlist.item>
                     @endif
                     @if(auth()->user()->hasPermission('contractors.view'))
-                        <flux:navlist.item icon="wrench-screwdriver" :href="route('contractor.management')" :current="request()->routeIs('contractor.management')" wire:navigate>{{ __('Contractor Management') }}</flux:navlist.item>
+                        <flux:navlist.item icon="wrench-screwdriver" :href="route('contractor.management')" :current="request()->routeIs('contractor.management')" wire:navigate>{{ __('Contractors') }}</flux:navlist.item>
                     @endif
-                    @if(auth()->user()->hasPermission('housing_jobs.view'))
-                        <flux:navlist.item icon="clipboard-document-list" :href="route('housing-job.management')" :current="request()->routeIs('housing-job.management')" wire:navigate>{{ __('Housing Jobs') }}</flux:navlist.item>
-                    @endif
+                </flux:navlist.group>
+                @endif
+
+                @if(auth()->user()->hasPermission('approvals.view_dashboard'))
+                <flux:navlist.group :heading="__('Approvals')" class="grid">
+                    <flux:navlist.item icon="clipboard-document-check" :href="route('approvals.pending')" :current="request()->routeIs('approvals.pending')" wire:navigate>
+                        <div class="flex items-center justify-between w-full">
+                            <span>{{ __('Pending Approvals') }}</span>
+                            @php
+                                $pendingCount = \App\Models\PendingApproval::where('status', 'pending')->count();
+                            @endphp
+                            @if($pendingCount > 0)
+                                <span class="ml-2 px-2 py-0.5 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
+                                    {{ $pendingCount }}
+                                </span>
+                            @endif
+                        </div>
+                    </flux:navlist.item>
                 </flux:navlist.group>
                 @endif
 

@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             PovertyGuidelinesSeeder::class,
             ReferenceDataSeeder::class,
             HousingModuleSeeder::class,
+            ApprovalPermissionsSeeder::class,
         ]);
     }
 }

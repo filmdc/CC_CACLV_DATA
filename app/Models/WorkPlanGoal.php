@@ -13,12 +13,19 @@ class WorkPlanGoal extends Model
         'goal_name',
         'description',
         'target_number',
-        'actual_number'
+        'actual_number',
+        'requires_approval',
+        'approved_at',
+        'approved_by',
+        'approval_status',
+        'rejection_reason',
     ];
 
     protected $casts = [
         'target_number' => 'integer',
-        'actual_number' => 'integer'
+        'actual_number' => 'integer',
+        'approved_at' => 'datetime',
+        'requires_approval' => 'boolean',
     ];
 
     public function workPlan(): BelongsTo
@@ -29,6 +36,14 @@ class WorkPlanGoal extends Model
     public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class);
+    }
+
+    /**
+     * Get the user who approved this goal.
+     */
+    public function approvedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 
     public function getProgressPercentageAttribute(): float
@@ -142,5 +157,89 @@ class WorkPlanGoal extends Model
         } else {
             return 'Needs Attention';
         }
+    }
+
+    /**
+     * Check if the goal is approved.
+     */
+    public function isApproved(): bool
+    {
+        return $this->approval_status === 'approved';
+    }
+
+    /**
+     * Check if the goal is rejected.
+     */
+    public function isRejected(): bool
+    {
+        return $this->approval_status === 'rejected';
+    }
+
+    /**
+     * Check if the goal is pending approval.
+     */
+    public function isPending(): bool
+    {
+        return $this->approval_status === 'pending' || ($this->requires_approval && !$this->approval_status);
+    }
+
+    /**
+     * Check if the goal requires approval.
+     */
+    public function requiresApproval(): bool
+    {
+        return (bool) $this->requires_approval;
+    }
+
+    /**
+     * Approve the goal.
+     */
+    public function approve(User $approver): void
+    {
+        $this->update([
+            'approval_status' => 'approved',
+            'approved_by' => $approver->id,
+            'approved_at' => now(),
+            'rejection_reason' => null,
+        ]);
+    }
+
+    /**
+     * Reject the goal.
+     */
+    public function reject(User $approver, string $reason): void
+    {
+        $this->update([
+            'approval_status' => 'rejected',
+            'approved_by' => $approver->id,
+            'approved_at' => now(),
+            'rejection_reason' => $reason,
+        ]);
+    }
+
+    /**
+     * Reset the approval status.
+     */
+    public function resetApprovalStatus(): void
+    {
+        $this->update([
+            'approval_status' => null,
+            'approved_by' => null,
+            'approved_at' => null,
+            'rejection_reason' => null,
+        ]);
+    }
+
+    /**
+     * Get the status color for UI display.
+     */
+    public function getStatusColorAttribute(): string
+    {
+        return match ($this->approval_status) {
+            'approved' => 'green',
+            'rejected' => 'red',
+            'pending' => 'yellow',
+            default => 'gray',
+        };
     }
 }

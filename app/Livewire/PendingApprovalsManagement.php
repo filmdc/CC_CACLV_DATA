@@ -1,0 +1,294 @@
+<?php
+
+namespace App\Livewire;
+
+use App\Models\PendingApproval;
+use App\Models\ApprovalNotification;
+use App\Models\Program;
+use App\Traits\WithPermissionChecks;
+use Livewire\Component;
+use Livewire\WithPagination;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
+class PendingApprovalsManagement extends Component
+{
+    use WithPagination, WithPermissionChecks;
+
+    public $filterType = 'all';
+    public $filterStatus = 'pending';
+    public $filterProgram = null;
+    public $search = '';
+    public $selectedApproval = null;
+    public $showRejectModal = false;
+    public $rejectionReason = '';
+    public $bulkSelected = [];
+
+    public function mount()
+    {
+        $this->authorizeAction('approvals.view_dashboard');
+    }
+
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedFilterType()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedFilterStatus()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedFilterProgram()
+    {
+        $this->resetPage();
+    }
+
+    public function getPendingApprovalsProperty()
+    {
+        $query = PendingApproval::with([
+            'submittedBy',
+            'approver',
+            'program',
+            'approvable'
+        ]);
+
+        if ($this->filterStatus !== 'all') {
+            $query->where('status', $this->filterStatus);
+        }
+
+        if ($this->filterType !== 'all') {
+            $typeMap = [
+                'documents' => [
+                    'App\Models\PropertyDocument',
+                    'App\Models\ContractorDocument',
+                    'App\Models\JobDocumentChecklist'
+                ],
+                'tasks' => [
+                    'App\Models\WorkPlanGoal'
+                ]
+            ];
+
+            if (isset($typeMap[$this->filterType])) {
+                $query->whereIn('approvable_type', $typeMap[$this->filterType]);
+            }
+        }
+
+        if ($this->filterProgram) {
+            $query->where('program_id', $this->filterProgram);
+        }
+
+        if ($this->search) {
+            $query->where(function ($q) {
+                $q->whereHas('submittedBy', function ($sq) {
+                    $sq->where('name', 'like', '%' . $this->search . '%')
+                        ->orWhere('email', 'like', '%' . $this->search . '%');
+                })
+                ->orWhereHas('program', function ($sq) {
+                    $sq->where('name', 'like', '%' . $this->search . '%');
+                })
+                ->orWhere('item_name', 'like', '%' . $this->search . '%')
+                ->orWhere('item_description', 'like', '%' . $this->search . '%');
+            });
+        }
+
+        return $query->orderBy('submitted_at', 'desc')->paginate(15);
+    }
+
+    public function viewDetails($approvalId)
+    {
+        $approval = PendingApproval::with(['approvable'])->findOrFail($approvalId);
+
+        if ($approval->approvable) {
+            $type = $approval->approvable_type;
+
+            if (str_contains($type, 'WorkPlanGoal')) {
+                return redirect()->route('work-plan.show', $approval->approvable->work_plan_id);
+            }
+        }
+
+        session()->flash('message', 'Item details opened');
+    }
+
+    public function showRejectModal($approvalId)
+    {
+        $this->authorizeAction('approvals.approve_reject');
+        $this->selectedApproval = PendingApproval::findOrFail($approvalId);
+        $this->showRejectModal = true;
+        $this->rejectionReason = '';
+    }
+
+    public function approve($approvalId)
+    {
+        $this->authorizeAction('approvals.approve_reject');
+
+        try {
+            DB::beginTransaction();
+
+            $approval = PendingApproval::findOrFail($approvalId);
+
+            if ($approval->status !== 'pending') {
+                session()->flash('error', 'This approval has already been processed.');
+                DB::rollBack();
+                return;
+            }
+
+            $approval->update([
+                'status' => 'approved',
+                'approver_id' => Auth::id(),
+                'approved_at' => now(),
+            ]);
+
+            if ($approval->approvable) {
+                $approval->approvable->update([
+                    'approval_status' => 'approved',
+                    'approved_by' => Auth::id(),
+                    'approved_at' => now(),
+                ]);
+            }
+
+            ApprovalNotification::create([
+                'pending_approval_id' => $approval->id,
+                'notification_type' => 'approved',
+                'recipient_id' => $approval->submitted_by,
+                'sent_at' => now(),
+            ]);
+
+            DB::commit();
+            session()->flash('message', 'Item approved successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('error', 'Error approving item: ' . $e->getMessage());
+        }
+    }
+
+    public function reject()
+    {
+        $this->authorizeAction('approvals.approve_reject');
+        $this->validate([
+            'rejectionReason' => 'required|string|min:10',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            if ($this->selectedApproval->status !== 'pending') {
+                session()->flash('error', 'This approval has already been processed.');
+                DB::rollBack();
+                $this->showRejectModal = false;
+                return;
+            }
+
+            $this->selectedApproval->update([
+                'status' => 'rejected',
+                'approver_id' => Auth::id(),
+                'approved_at' => now(),
+                'rejection_reason' => $this->rejectionReason,
+            ]);
+
+            if ($this->selectedApproval->approvable) {
+                $this->selectedApproval->approvable->update([
+                    'approval_status' => 'rejected',
+                    'approved_by' => Auth::id(),
+                    'approved_at' => now(),
+                ]);
+            }
+
+            ApprovalNotification::create([
+                'pending_approval_id' => $this->selectedApproval->id,
+                'notification_type' => 'rejected',
+                'recipient_id' => $this->selectedApproval->submitted_by,
+                'sent_at' => now(),
+            ]);
+
+            DB::commit();
+            session()->flash('message', 'Item rejected successfully.');
+            $this->showRejectModal = false;
+            $this->rejectionReason = '';
+            $this->selectedApproval = null;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('error', 'Error rejecting item: ' . $e->getMessage());
+        }
+    }
+
+    public function bulkApprove()
+    {
+        $this->authorizeAction('approvals.approve_reject');
+
+        if (empty($this->bulkSelected)) {
+            session()->flash('error', 'Please select items to approve.');
+            return;
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $approvedCount = 0;
+            foreach ($this->bulkSelected as $approvalId) {
+                $approval = PendingApproval::find($approvalId);
+
+                if (!$approval || $approval->status !== 'pending') {
+                    continue;
+                }
+
+                $approval->update([
+                    'status' => 'approved',
+                    'approver_id' => Auth::id(),
+                    'approved_at' => now(),
+                ]);
+
+                if ($approval->approvable) {
+                    $approval->approvable->update([
+                        'approval_status' => 'approved',
+                        'approved_by' => Auth::id(),
+                        'approved_at' => now(),
+                    ]);
+                }
+
+                ApprovalNotification::create([
+                    'pending_approval_id' => $approval->id,
+                    'notification_type' => 'approved',
+                    'recipient_id' => $approval->submitted_by,
+                    'sent_at' => now(),
+                ]);
+
+                $approvedCount++;
+            }
+
+            DB::commit();
+            session()->flash('message', "Successfully approved {$approvedCount} item(s).");
+            $this->bulkSelected = [];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('error', 'Error approving items: ' . $e->getMessage());
+        }
+    }
+
+    public function resetFilters()
+    {
+        $this->filterType = 'all';
+        $this->filterStatus = 'pending';
+        $this->filterProgram = null;
+        $this->search = '';
+        $this->resetPage();
+    }
+
+    public function render()
+    {
+        $programs = Program::where('active', true)->orderBy('name')->get();
+
+        $pendingCount = PendingApproval::where('status', 'pending')->count();
+
+        return view('livewire.pending-approvals-management', [
+            'approvals' => $this->pendingApprovals,
+            'programs' => $programs,
+            'pendingCount' => $pendingCount,
+        ])->layout('components.layouts.app');
+    }
+}

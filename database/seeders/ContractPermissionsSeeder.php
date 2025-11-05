@@ -27,6 +27,8 @@ class ContractPermissionsSeeder extends Seeder
             'funders.delete' => 'Delete funders',
             'contract_reports.view' => 'View contract reports',
             'contract_reports.create' => 'Create contract reports',
+            'contract_reports.create_orphan' => 'Create general reports without due dates',
+            'contract_reports.associate' => 'Associate general reports with due dates',
             'contract_reports.edit' => 'Edit contract reports',
             'contract_reports.delete' => 'Delete contract reports',
             'contract_reports.approve' => 'Approve contract reports',

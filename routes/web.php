@@ -482,8 +482,31 @@ Route::middleware(['auth'])->group(function () {
     Route::get('property/{id}', App\Livewire\PropertyShow::class)->name('property.show');
     Route::get('contractor-management', App\Livewire\ContractorManagement::class)->name('contractor.management');
     Route::get('contractor/{id}', App\Livewire\ContractorShow::class)->name('contractor.show');
-    Route::get('housing-job-management', App\Livewire\HousingJobManagement::class)->name('housing-job.management');
-    Route::get('housing-job/{id}', App\Livewire\HousingJobShow::class)->name('housing-job.show');
+
+    // Project Management Module Routes (Unified Interface)
+    Route::get('projects', App\Livewire\ProjectsManagement::class)->name('projects.management');
+    Route::get('project/{id}/manage', App\Livewire\ProjectManagement::class)->name('project.management');
+
+    // Approvals Routes
+    Route::get('approvals/pending', App\Livewire\PendingApprovalsManagement::class)
+        ->middleware(['check.permission:approvals.view_dashboard'])
+        ->name('approvals.pending');
+
+    // Approval Email Actions (with signed URLs)
+    Route::get('approvals/{id}/approve', [App\Http\Controllers\ApprovalController::class, 'approveFromEmail'])
+        ->middleware(['signed'])
+        ->name('approval.approve');
+    Route::get('approvals/{id}/reject', [App\Http\Controllers\ApprovalController::class, 'rejectFromEmail'])
+        ->middleware(['signed'])
+        ->name('approval.reject');
+    Route::post('approvals/{id}/reject', [App\Http\Controllers\ApprovalController::class, 'submitRejection'])
+        ->middleware(['signed'])
+        ->name('approval.reject.submit');
+
+    // Legacy redirects for old housing job URLs
+    Route::redirect('housing-job-management', 'projects');
+    Route::redirect('housing-job/{id}', 'projects');
+    Route::redirect('project-pipeline', 'projects');
 
     // Custom storage route for authenticated users (only for specific protected folders)
     Route::get('storage/protected/{path}', function ($path) {

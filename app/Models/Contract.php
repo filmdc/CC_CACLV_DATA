@@ -127,6 +127,16 @@ class Contract extends Model implements HasMedia
     }
 
     /**
+     * Get orphan reports (reports without due dates) for this contract
+     */
+    public function orphanReports(): HasMany
+    {
+        return $this->hasMany(ContractReport::class)
+            ->whereNull('contract_report_due_date_id')
+            ->orderBy('submitted_date', 'desc');
+    }
+
+    /**
      * Get active report due dates
      */
     public function activeReportDueDates(): HasMany

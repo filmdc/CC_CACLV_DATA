@@ -20,12 +20,19 @@ class PropertyDocument extends Model
         'document_date',
         'expiration_date',
         'uploaded_by',
+        'approved_at',
+        'approved_by',
+        'approval_status',
+        'rejection_reason',
+        'requires_approval',
     ];
 
     protected $casts = [
         'document_date' => 'date',
         'expiration_date' => 'date',
         'file_size' => 'integer',
+        'approved_at' => 'datetime',
+        'requires_approval' => 'boolean',
     ];
 
     public function property(): BelongsTo
@@ -36,6 +43,14 @@ class PropertyDocument extends Model
     public function uploadedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'uploaded_by');
+    }
+
+    /**
+     * Get the user who approved this document.
+     */
+    public function approvedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 
     public function getDocumentTypeDisplayAttribute(): string
@@ -92,5 +107,89 @@ class PropertyDocument extends Model
             return Storage::url($this->file_path);
         }
         return null;
+    }
+
+    /**
+     * Check if the document is approved.
+     */
+    public function isApproved(): bool
+    {
+        return $this->approval_status === 'approved';
+    }
+
+    /**
+     * Check if the document is rejected.
+     */
+    public function isRejected(): bool
+    {
+        return $this->approval_status === 'rejected';
+    }
+
+    /**
+     * Check if the document is pending approval.
+     */
+    public function isPending(): bool
+    {
+        return $this->approval_status === 'pending' || ($this->requires_approval && !$this->approval_status);
+    }
+
+    /**
+     * Check if the document requires approval.
+     */
+    public function requiresApproval(): bool
+    {
+        return (bool) $this->requires_approval;
+    }
+
+    /**
+     * Approve the document.
+     */
+    public function approve(User $approver): void
+    {
+        $this->update([
+            'approval_status' => 'approved',
+            'approved_by' => $approver->id,
+            'approved_at' => now(),
+            'rejection_reason' => null,
+        ]);
+    }
+
+    /**
+     * Reject the document.
+     */
+    public function reject(User $approver, string $reason): void
+    {
+        $this->update([
+            'approval_status' => 'rejected',
+            'approved_by' => $approver->id,
+            'approved_at' => now(),
+            'rejection_reason' => $reason,
+        ]);
+    }
+
+    /**
+     * Reset the approval status.
+     */
+    public function resetApprovalStatus(): void
+    {
+        $this->update([
+            'approval_status' => null,
+            'approved_by' => null,
+            'approved_at' => null,
+            'rejection_reason' => null,
+        ]);
+    }
+
+    /**
+     * Get the status color for UI display.
+     */
+    public function getStatusColorAttribute(): string
+    {
+        return match ($this->approval_status) {
+            'approved' => 'green',
+            'rejected' => 'red',
+            'pending' => 'yellow',
+            default => 'gray',
+        };
     }
 }

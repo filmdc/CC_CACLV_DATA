@@ -559,6 +559,124 @@
                 @endif
             </div>
 
+            <!-- General Reports (Reports Without Due Dates) -->
+            <div class="mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-zinc-700 pb-2">
+                        General Reports ({{ $contract->orphanReports->count() }})
+                    </h2>
+                    @if($this->can('contract_reports.create_orphan'))
+                        <button wire:click="showCreateOrphanReport"
+                                class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <svg class="w-5 h-5 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            Create General Report
+                        </button>
+                    @endif
+                </div>
+
+                @if($contract->orphanReports->count() > 0)
+                    <div class="space-y-4">
+                        @foreach($contract->orphanReports as $orphanReport)
+                            <div class="border border-gray-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 p-4 hover:shadow-md transition-shadow">
+                                <div class="flex items-start justify-between">
+                                    <!-- Report Info -->
+                                    <div class="flex-1">
+                                        <div class="flex items-center space-x-2 mb-2">
+                                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                                                {{ $orphanReport->title }}
+                                            </h3>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100">
+                                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                </svg>
+                                                General Report
+                                            </span>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+                                                {{ ucfirst($orphanReport->status) }}
+                                            </span>
+                                        </div>
+
+                                        @if($orphanReport->description)
+                                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                                                {{ strip_tags($orphanReport->description) }}
+                                            </p>
+                                        @endif
+
+                                        <div class="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                                            @if($orphanReport->submitted_date)
+                                                <span class="flex items-center">
+                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                    </svg>
+                                                    Submitted: {{ $orphanReport->submitted_date->format('M j, Y') }}
+                                                </span>
+                                            @endif
+
+                                            @if($orphanReport->submissions->count() > 0)
+                                                <span class="flex items-center">
+                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                                                    </svg>
+                                                    {{ $orphanReport->submissions->count() }} document(s)
+                                                </span>
+                                            @endif
+                                        </div>
+
+                                        <!-- Documents -->
+                                        @if($orphanReport->submissions->count() > 0)
+                                            <div class="mt-3 space-y-2">
+                                                @foreach($orphanReport->submissions as $document)
+                                                    <div class="flex items-center space-x-2 text-sm">
+                                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                        </svg>
+                                                        <a href="{{ route('contract.report.document.download', ['contractId' => $contract->id, 'reportId' => $orphanReport->id, 'mediaId' => $document->id]) }}"
+                                                           class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                                                            {{ $document->name }}
+                                                        </a>
+                                                        <span class="text-gray-400">{{ $document->human_readable_size }}</span>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    <!-- Actions -->
+                                    <div class="flex flex-col space-y-2 ml-4">
+                                        @if($this->can('contract_reports.associate'))
+                                            <button wire:click="showAssociateOrphanReport({{ $orphanReport->id }})"
+                                                    class="px-3 py-1.5 text-xs font-medium text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 rounded-md transition-colors flex items-center space-x-1"
+                                                    title="Associate with Due Date">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                                </svg>
+                                                <span>Link to Due Date</span>
+                                            </button>
+                                        @endif
+
+                                        @if($this->can('contract_reports.delete'))
+                                            <button wire:click="deleteOrphanReport({{ $orphanReport->id }})"
+                                                    onclick="return confirm('Are you sure you want to delete this general report? This action cannot be undone.')"
+                                                    class="px-3 py-1.5 text-xs font-medium text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 rounded-md transition-colors flex items-center space-x-1"
+                                                    title="Delete Report">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                </svg>
+                                                <span>Delete</span>
+                                            </button>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="text-gray-500 dark:text-gray-400">No general reports for this contract. General reports are submissions that aren't linked to a specific due date.</p>
+                @endif
+            </div>
+
             <!-- Notes -->
             @if($contract->notes)
                 <div class="mb-8">
@@ -847,6 +965,172 @@
                             class="px-4 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
                         Close
                     </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Create Orphan Report Modal -->
+    @if($showOrphanReportForm)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 dark:bg-gray-900 dark:bg-opacity-75 flex items-center justify-center z-50 p-4">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                            Create General Report
+                        </h3>
+                        <button wire:click="closeOrphanReportForm"
+                                class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                        General reports are not tied to a specific due date. They can be associated with a due date later if needed.
+                    </p>
+
+                    <form wire:submit.prevent="saveOrphanReport">
+                        <div class="space-y-4">
+                            <!-- Title -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Report Title <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text"
+                                       wire:model="orphan_report_title"
+                                       class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-blue-500 focus:ring-blue-500"
+                                       placeholder="Enter report title"
+                                       required>
+                                @error('orphan_report_title')
+                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Description -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Description
+                                </label>
+                                <textarea wire:model="orphan_report_description"
+                                          rows="4"
+                                          class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-blue-500 focus:ring-blue-500"
+                                          placeholder="Enter report description"></textarea>
+                                @error('orphan_report_description')
+                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Documents -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Upload Documents
+                                </label>
+                                <input type="file"
+                                       wire:model="orphan_report_documents"
+                                       multiple
+                                       class="w-full text-sm text-gray-500 dark:text-gray-400
+                                              file:mr-4 file:py-2 file:px-4
+                                              file:rounded-md file:border-0
+                                              file:text-sm file:font-semibold
+                                              file:bg-blue-50 file:text-blue-700
+                                              hover:file:bg-blue-100
+                                              dark:file:bg-blue-900 dark:file:text-blue-200
+                                              dark:hover:file:bg-blue-800">
+                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                    Upload PDF, Word, Excel, or image files (max 10MB each)
+                                </p>
+                                @error('orphan_report_documents.*')
+                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Notes -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Notes
+                                </label>
+                                <textarea wire:model="orphan_report_notes"
+                                          rows="3"
+                                          class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-blue-500 focus:ring-blue-500"
+                                          placeholder="Additional notes about this report"></textarea>
+                                @error('orphan_report_notes')
+                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200 dark:border-zinc-600">
+                            <button type="button"
+                                    wire:click="closeOrphanReportForm"
+                                    class="px-4 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
+                                Cancel
+                            </button>
+                            <button type="submit"
+                                    class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                Create Report
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Associate Orphan Report Modal -->
+    @if($showAssociateModal)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 dark:bg-gray-900 dark:bg-opacity-75 flex items-center justify-center z-50 p-4">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-md w-full">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                            Link Report to Due Date
+                        </h3>
+                        <button wire:click="closeAssociateModal"
+                                class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                        Select a due date to associate this general report with. The report will be moved to that due date's submissions.
+                    </p>
+
+                    <form wire:submit.prevent="associateOrphanWithDueDate">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Select Due Date <span class="text-red-500">*</span>
+                            </label>
+                            <select wire:model="targetDueDateId"
+                                    class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500"
+                                    required>
+                                <option value="">-- Select a Due Date --</option>
+                                @foreach($contract->reportDueDates as $dueDate)
+                                    <option value="{{ $dueDate->id }}">
+                                        {{ $dueDate->due_date->format('M j, Y') }} - {{ ucfirst($dueDate->report_type) }} Report
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('targetDueDateId')
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="flex justify-end space-x-3">
+                            <button type="button"
+                                    wire:click="closeAssociateModal"
+                                    class="px-4 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
+                                Cancel
+                            </button>
+                            <button type="submit"
+                                    class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                Associate Report
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
