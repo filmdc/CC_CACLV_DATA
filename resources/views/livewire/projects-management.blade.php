@@ -620,9 +620,43 @@
                         <input type="date" wire:model="quick_participant_dob"
                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
                     </div>
+
+                    <!-- Household Address Section -->
+                    <div class="border-t border-gray-200 dark:border-zinc-600 pt-4">
+                        <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Household Address</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Address *</label>
+                                <input type="text" wire:model="quick_participant_address" placeholder="123 Main Street"
+                                       class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                @error('quick_participant_address') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="grid grid-cols-3 gap-3">
+                                <div class="col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">City *</label>
+                                    <input type="text" wire:model="quick_participant_city" placeholder="Las Vegas"
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                    @error('quick_participant_city') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">State *</label>
+                                    <input type="text" wire:model="quick_participant_state" maxlength="2" placeholder="NV"
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md uppercase">
+                                    @error('quick_participant_state') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Zip Code *</label>
+                                <input type="text" wire:model="quick_participant_zip" placeholder="89101"
+                                       class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                @error('quick_participant_zip') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-3">
                         <p class="text-xs text-yellow-800 dark:text-yellow-300">
-                            This creates a basic participant record. Full CSBG intake should be completed later for reporting compliance.
+                            This creates a basic participant record with household address. Full CSBG intake should be completed later for reporting compliance.
                         </p>
                     </div>
                 </div>

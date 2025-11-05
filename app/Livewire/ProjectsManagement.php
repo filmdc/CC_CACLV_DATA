@@ -60,6 +60,10 @@ class ProjectsManagement extends Component
     public $quick_participant_phone = '';
     public $quick_participant_email = '';
     public $quick_participant_dob = '';
+    public $quick_participant_address = '';
+    public $quick_participant_city = '';
+    public $quick_participant_state = '';
+    public $quick_participant_zip = '';
 
     // Quick Property Fields
     public $quick_property_address = '';
@@ -156,6 +160,10 @@ class ProjectsManagement extends Component
             'quick_participant_phone' => 'nullable|string',
             'quick_participant_email' => 'nullable|email',
             'quick_participant_dob' => 'nullable|date',
+            'quick_participant_address' => 'required|string|max:255',
+            'quick_participant_city' => 'required|string|max:100',
+            'quick_participant_state' => 'required|string|size:2',
+            'quick_participant_zip' => 'required|string|max:10',
         ]);
 
         // Auto-create household first
@@ -163,6 +171,15 @@ class ProjectsManagement extends Component
             'household_type' => 'Single Person',
             'household_size' => 1,
             'housing_status' => 'Unknown/not reported',
+        ]);
+
+        // Create household address
+        $household->addresses()->create([
+            'address' => $this->quick_participant_address,
+            'city' => $this->quick_participant_city,
+            'state' => strtoupper($this->quick_participant_state),
+            'zip_code' => $this->quick_participant_zip,
+            'is_current' => true,
         ]);
 
         // Create participant as head of household
@@ -183,7 +200,7 @@ class ProjectsManagement extends Component
 
         session()->flash('success', 'Participant and household created: ' .
                          $participant->first_name . ' ' . $participant->last_name .
-                         ' (Household: ' . $household->household_code . ')');
+                         ' (Household: ' . $household->household_code . ' at ' . $this->quick_participant_address . ')');
     }
 
     public function showQuickPropertyModal()
@@ -229,6 +246,10 @@ class ProjectsManagement extends Component
         $this->quick_participant_phone = '';
         $this->quick_participant_email = '';
         $this->quick_participant_dob = '';
+        $this->quick_participant_address = '';
+        $this->quick_participant_city = '';
+        $this->quick_participant_state = '';
+        $this->quick_participant_zip = '';
     }
 
     protected function resetQuickPropertyForm()
