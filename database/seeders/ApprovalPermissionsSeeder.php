@@ -24,7 +24,18 @@ class ApprovalPermissionsSeeder extends Seeder
             ['name' => 'approvals.bulk_approve', 'display_name' => 'Bulk Approve Multiple Items', 'description' => 'Bulk approve multiple items'],
         ];
 
-        foreach ($approvalPermissions as $permissionData) {
+        // Create PDF Template Permissions
+        $pdfTemplatePermissions = [
+            ['name' => 'pdf_templates.view', 'display_name' => 'View PDF Templates', 'description' => 'View PDF form templates'],
+            ['name' => 'pdf_templates.create', 'display_name' => 'Upload PDF Templates', 'description' => 'Upload new PDF form templates'],
+            ['name' => 'pdf_templates.edit', 'display_name' => 'Edit PDF Templates', 'description' => 'Edit PDF template metadata and field mappings'],
+            ['name' => 'pdf_templates.delete', 'display_name' => 'Delete PDF Templates', 'description' => 'Delete PDF form templates'],
+            ['name' => 'pdf_templates.generate', 'display_name' => 'Generate PDFs from Templates', 'description' => 'Generate filled PDFs from templates'],
+        ];
+
+        $allPermissions = array_merge($approvalPermissions, $pdfTemplatePermissions);
+
+        foreach ($allPermissions as $permissionData) {
             Permission::firstOrCreate(
                 ['name' => $permissionData['name']],
                 $permissionData
@@ -51,6 +62,12 @@ class ApprovalPermissionsSeeder extends Seeder
             'approvals.approve_reject',
             'approvals.bulk_approve',
 
+            // PDF Template permissions
+            'pdf_templates.view',
+            'pdf_templates.create',
+            'pdf_templates.edit',
+            'pdf_templates.generate',
+
             // Document viewing/managing permissions
             'properties.view',
             'properties.documents',
@@ -75,7 +92,7 @@ class ApprovalPermissionsSeeder extends Seeder
             }
         }
 
-        // Update Admin role with all approval permissions
+        // Update Admin role with all approval and PDF template permissions
         $adminRole = Role::where('name', 'admin')->first();
         if ($adminRole) {
             $adminApprovalPermissions = Permission::whereIn('name', [
@@ -85,6 +102,11 @@ class ApprovalPermissionsSeeder extends Seeder
                 'approvals.view_dashboard',
                 'approvals.approve_reject',
                 'approvals.bulk_approve',
+                'pdf_templates.view',
+                'pdf_templates.create',
+                'pdf_templates.edit',
+                'pdf_templates.delete',
+                'pdf_templates.generate',
             ])->get();
 
             foreach ($adminApprovalPermissions as $permission) {

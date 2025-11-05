@@ -503,6 +503,14 @@ Route::middleware(['auth'])->group(function () {
         ->middleware(['signed'])
         ->name('approval.reject.submit');
 
+    // PDF Form Templates Routes
+    Route::get('admin/pdf-templates', App\Livewire\PdfTemplateManagement::class)
+        ->middleware(['check.permission:pdf_templates.view'])
+        ->name('pdf-templates.index');
+    Route::get('admin/pdf-templates/{id}/map-fields', App\Livewire\PdfTemplateFieldMapping::class)
+        ->middleware(['check.permission:pdf_templates.edit'])
+        ->name('pdf-templates.map-fields');
+
     // Legacy redirects for old housing job URLs
     Route::redirect('housing-job-management', 'projects');
     Route::redirect('housing-job/{id}', 'projects');
