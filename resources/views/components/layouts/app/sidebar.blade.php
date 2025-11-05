@@ -67,12 +67,6 @@
                 </flux:navlist.group>
                 @endif
 
-                @if(auth()->user()->hasPermission('pdf_templates.view'))
-                <flux:navlist.group :heading="__('Administration')" class="grid">
-                    <flux:navlist.item icon="document-text" :href="route('pdf-templates.index')" :current="request()->routeIs('pdf-templates.*')" wire:navigate>{{ __('PDF Form Templates') }}</flux:navlist.item>
-                </flux:navlist.group>
-                @endif
-
                 @if(auth()->user()->hasAnyPermission(['reports.csbg']) || auth()->user()->isAdmin())
                 <flux:navlist.group :heading="__('Reports')" class="grid">
                     @if(auth()->user()->hasPermission('reports.csbg') || auth()->user()->isAdmin())
