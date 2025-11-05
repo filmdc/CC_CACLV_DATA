@@ -489,7 +489,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Approvals Routes
     Route::get('approvals/pending', App\Livewire\PendingApprovalsManagement::class)
-        ->middleware(['check.permission:approvals.view_dashboard'])
+        ->middleware(['permission:approvals.view_dashboard'])
         ->name('approvals.pending');
 
     // Approval Email Actions (with signed URLs)
@@ -505,10 +505,10 @@ Route::middleware(['auth'])->group(function () {
 
     // PDF Form Templates Routes
     Route::get('admin/pdf-templates', App\Livewire\PdfTemplateManagement::class)
-        ->middleware(['check.permission:pdf_templates.view'])
+        ->middleware(['permission:pdf_templates.view'])
         ->name('pdf-templates.index');
     Route::get('admin/pdf-templates/{id}/map-fields', App\Livewire\PdfTemplateFieldMapping::class)
-        ->middleware(['check.permission:pdf_templates.edit'])
+        ->middleware(['permission:pdf_templates.edit'])
         ->name('pdf-templates.map-fields');
 
     // Legacy redirects for old housing job URLs
