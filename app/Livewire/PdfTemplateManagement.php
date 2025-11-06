@@ -96,6 +96,14 @@ class PdfTemplateManagement extends Component
         ]);
 
         try {
+            \Log::info('Starting template upload', [
+                'name' => $this->name,
+                'file_original_name' => $this->templateFile->getClientOriginalName(),
+                'file_size' => $this->templateFile->getSize(),
+                'file_path' => $this->templateFile->getRealPath(),
+                'file_exists_at_temp' => file_exists($this->templateFile->getRealPath()),
+            ]);
+
             $template = PdfFormService::createTemplate($this->templateFile, [
                 'name' => $this->name,
                 'description' => $this->description,
