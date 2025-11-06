@@ -35,31 +35,45 @@ class PdfFormService
             // Ensure directory exists
             $directory = storage_path('app/pdf_templates');
             if (!is_dir($directory)) {
-                mkdir($directory, 0755, true);
+                mkdir($directory, 0775, true);
             }
 
-            // Store the file
+            // Store the file - use manual move for better control
             $filename = uniqid() . '_' . time() . '_' . $file->getClientOriginalName();
-            $path = $file->storeAs('pdf_templates', $filename);
+            $destinationPath = $directory . '/' . $filename;
+            $relativePath = 'pdf_templates/' . $filename;
 
-            // Verify file was uploaded
-            $fullPath = storage_path('app/' . $path);
-            \Log::info('PDF template uploaded', [
-                'path' => $path,
-                'full_path' => $fullPath,
-                'file_exists' => file_exists($fullPath),
+            // Get source file path
+            $sourcePath = $file->getRealPath();
+
+            \Log::info('Attempting to move file', [
+                'source' => $sourcePath,
+                'destination' => $destinationPath,
+                'source_exists' => file_exists($sourcePath),
+                'destination_dir_writable' => is_writable($directory),
             ]);
 
-            if (!file_exists($fullPath)) {
-                throw new \Exception("File upload succeeded but file not found at: {$fullPath}");
+            // Try to move the file
+            if (!$file->move($directory, $filename)) {
+                throw new \Exception("Failed to move uploaded file to: {$destinationPath}");
             }
+
+            // Verify file was moved
+            if (!file_exists($destinationPath)) {
+                throw new \Exception("File move reported success but file not found at: {$destinationPath}");
+            }
+
+            \Log::info('PDF template file moved successfully', [
+                'path' => $relativePath,
+                'size' => filesize($destinationPath),
+            ]);
 
             // Create template record
             $template = PdfFormTemplate::create([
                 'name' => $data['name'],
                 'description' => $data['description'] ?? null,
                 'category' => $data['category'] ?? null,
-                'file_path' => $path,
+                'file_path' => $relativePath,
                 'original_filename' => $file->getClientOriginalName(),
                 'mime_type' => 'application/pdf',
                 'file_size' => $file->getSize(),
@@ -91,8 +105,8 @@ class PdfFormService
             DB::rollBack();
 
             // Clean up file if it was uploaded
-            if (isset($path) && Storage::exists($path)) {
-                Storage::delete($path);
+            if (isset($destinationPath) && file_exists($destinationPath)) {
+                @unlink($destinationPath);
             }
 
             throw $e;
