@@ -71,7 +71,7 @@
                 @foreach($filteredItems as $item)
                     <button
                         type="button"
-                        wire:click="selectItem({{ $item['id'] }})"
+                        wire:click="selectItem('{{ $item['id'] }}')"
                         class="w-full px-3 py-2 text-left hover:bg-indigo-50 dark:hover:bg-indigo-900/20
                                {{ $selected == $item['id'] ? 'bg-indigo-100 dark:bg-indigo-900/30' : '' }}
                                focus:outline-none focus:bg-indigo-50 dark:focus:bg-indigo-900/20
