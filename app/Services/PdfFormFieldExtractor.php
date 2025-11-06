@@ -26,15 +26,22 @@ class PdfFormFieldExtractor
 
         try {
             $pdf = new Pdf($pdfPath);
-            $rawFields = $pdf->getDataFields();
+            $dataFields = $pdf->getDataFields();
 
-            if ($rawFields === false || empty($rawFields)) {
-                // No form fields found, or error occurred
+            if ($dataFields === false) {
+                // Error occurred
                 $error = $pdf->getError();
-                if ($error) {
-                    throw new \Exception("PDFtk error: {$error}");
-                }
+                throw new \Exception("PDFtk error: " . ($error ?: 'Unknown error'));
+            }
 
+            // Convert DataFields object to array
+            if (is_object($dataFields)) {
+                $rawFields = iterator_to_array($dataFields);
+            } else {
+                $rawFields = (array) $dataFields;
+            }
+
+            if (empty($rawFields)) {
                 return []; // PDF has no form fields
             }
 
