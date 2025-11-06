@@ -146,7 +146,10 @@ class MilestoneDocument extends Model implements HasMedia
         if ($this->requires_approval) {
             $this->status = 'pending_review';
         } else {
-            $this->status = 'uploaded';
+            // If approval not required, mark as approved immediately
+            $this->status = 'approved';
+            $this->approved_at = now();
+            $this->approved_by = auth()->id();
         }
 
         $this->uploaded_date = now();
