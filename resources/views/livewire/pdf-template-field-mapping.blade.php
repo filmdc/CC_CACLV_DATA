@@ -161,112 +161,58 @@
                 </div>
 
                 <div class="mb-4 p-3 bg-gray-50 dark:bg-zinc-700 rounded">
-                    <div class="flex items-center space-x-2">
-                        <span class="text-lg">{{ $editingField->field_type_icon }}</span>
-                        <span class="text-sm text-gray-600 dark:text-gray-400">
-                            {{ ucfirst($editingField->field_type) }} field
-                        </span>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-lg">{{ $editingField->field_type_icon }}</span>
+                            <span class="text-sm text-gray-600 dark:text-gray-400">
+                                {{ ucfirst($editingField->field_type) }} field
+                            </span>
+                        </div>
+                        @if($suggestedMapping)
+                            @php
+                                $suggested = collect($availableFields)->firstWhere('id', $suggestedMapping);
+                            @endphp
+                            @if($suggested)
+                                <button type="button" wire:click="$set('selectedFieldMapping', '{{ $suggestedMapping }}')"
+                                        class="text-xs px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 rounded hover:bg-green-200">
+                                    💡 Suggestion: {{ $suggested['display'] }}
+                                </button>
+                            @endif
+                        @endif
                     </div>
                 </div>
 
                 <div class="space-y-4">
-                    <!-- Mapping Type -->
+                    <!-- Simplified Single Dropdown -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Mapping Type *</label>
-                        <select wire:model.live="mapping_type"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                            <option value="unmapped">Not Mapped</option>
-                            <option value="model_field">Database Field</option>
-                            <option value="custom_value">Custom Value</option>
-                            <option value="computed">Computed Method</option>
-                        </select>
-                        @error('mapping_type') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Map to Project Data
+                        </label>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                            Search and select which project data should fill this PDF field
+                        </p>
+
+                        <livewire:searchable-select
+                            :items="$availableFields"
+                            :selected="$selectedFieldMapping"
+                            name="field-mapping"
+                            placeholder="Search participant, property, project fields..."
+                            display-field="display"
+                            secondary-field="category"
+                            empty-message="No fields available"
+                            :key="'field-mapping-select-' . $editingFieldId"
+                        />
+
+                        <div class="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded">
+                            <p class="text-xs text-blue-800 dark:text-blue-300">
+                                <strong>Examples:</strong><br>
+                                • "Participant: First Name" - Gets participant's first name<br>
+                                • "Property: Street Address" - Gets property address<br>
+                                • "Household: Household Code" - Gets household code via participant<br>
+                                • "Project: Job Number" - Gets the project/job number
+                            </p>
+                        </div>
                     </div>
-
-                    <!-- Model Field Mapping -->
-                    @if($mapping_type === 'model_field')
-                        <div class="border border-indigo-200 dark:border-indigo-800 rounded-lg p-4 bg-indigo-50 dark:bg-indigo-900/20">
-                            <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Database Field Mapping</h4>
-
-                            <div class="space-y-3">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Model</label>
-                                    <select wire:model="model_name"
-                                            class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                                        <option value="">Select Model</option>
-                                        @foreach($availableModels as $name => $class)
-                                            <option value="{{ $name }}">{{ $name }}</option>
-                                        @endforeach
-                                    </select>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                        Primary model to get data from (e.g., Participant, HousingJob)
-                                    </p>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Relationship Path (Optional)</label>
-                                    <input type="text" wire:model="relationship_path" placeholder="e.g., household, property"
-                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                        For nested data: "household" to access participant's household, "property" for housing job's property
-                                    </p>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Field Name *</label>
-                                    <input type="text" wire:model="model_field" placeholder="e.g., first_name, address_line_1"
-                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                        Database field name from the model
-                                    </p>
-                                </div>
-
-                                <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded p-2">
-                                    <p class="text-xs text-blue-800 dark:text-blue-300">
-                                        <strong>Examples:</strong><br>
-                                        • Participant.first_name<br>
-                                        • Participant.household.household_code<br>
-                                        • HousingJob.property.address_line_1
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-
-                    <!-- Custom Value -->
-                    @if($mapping_type === 'custom_value')
-                        <div class="border border-indigo-200 dark:border-indigo-800 rounded-lg p-4 bg-indigo-50 dark:bg-indigo-900/20">
-                            <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Custom Static Value</h4>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Value</label>
-                                <textarea wire:model="custom_value" rows="3" placeholder="Enter the static value to use for this field..."
-                                          class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md"></textarea>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                    This value will be the same for all generated PDFs (e.g., agency name, program title)
-                                </p>
-                            </div>
-                        </div>
-                    @endif
-
-                    <!-- Computed Method -->
-                    @if($mapping_type === 'computed')
-                        <div class="border border-indigo-200 dark:border-indigo-800 rounded-lg p-4 bg-indigo-50 dark:bg-indigo-900/20">
-                            <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Computed Method</h4>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Method</label>
-                                <select wire:model="computed_method"
-                                        class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                                    <option value="">Select Method</option>
-                                    @foreach($availableComputedMethods as $method => $label)
-                                        <option value="{{ $method }}">{{ $label }}</option>
-                                    @endforeach
-                                </select>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                    Pre-built methods for common calculations and formatting
-                                </p>
-                            </div>
-                        </div>
-                    @endif
                 </div>
 
                 <!-- Modal Actions -->

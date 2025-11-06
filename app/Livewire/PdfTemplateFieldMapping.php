@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\PdfFormTemplate;
 use App\Models\PdfFormFieldMapping;
 use App\Services\PdfFormService;
+use App\Services\PdfFormFieldSuggestionService;
 use App\Traits\WithPermissionChecks;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -29,16 +30,11 @@ class PdfTemplateFieldMapping extends Component
     // Edit modal
     public $showEditModal = false;
     public $editingFieldId = null;
-    public $mapping_type = 'unmapped';
-    public $model_name = '';
-    public $model_field = '';
-    public $relationship_path = '';
-    public $custom_value = '';
-    public $computed_method = '';
+    public $selectedFieldMapping = '';  // The selected field from dropdown
+    public $suggestedMapping = null;   // Auto-suggested mapping
 
-    // Available options for dropdowns
-    public $availableModels = [];
-    public $availableComputedMethods = [];
+    // Available fields for mapping
+    public $availableFields = [];
 
     public function mount($id)
     {
@@ -47,9 +43,8 @@ class PdfTemplateFieldMapping extends Component
         $this->templateId = $id;
         $this->template = PdfFormTemplate::with('fieldMappings')->findOrFail($id);
 
-        // Load available options
-        $this->availableModels = PdfFormService::getAvailableModels();
-        $this->availableComputedMethods = PdfFormService::getComputedMethods();
+        // Load available fields
+        $this->availableFields = PdfFormFieldSuggestionService::getAllAvailableFields();
     }
 
     public function updatedSearch()
@@ -71,37 +66,79 @@ class PdfTemplateFieldMapping extends Component
     {
         $field = PdfFormFieldMapping::findOrFail($id);
         $this->editingFieldId = $id;
-        $this->mapping_type = $field->mapping_type;
-        $this->model_name = $field->model_name ?? '';
-        $this->model_field = $field->model_field ?? '';
-        $this->relationship_path = $field->relationship_path ?? '';
-        $this->custom_value = $field->custom_value ?? '';
-        $this->computed_method = $field->computed_method ?? '';
+
+        // If already mapped, find the matching field ID
+        if ($field->isMapped()) {
+            $this->selectedFieldMapping = $this->buildFieldId($field);
+        } else {
+            $this->selectedFieldMapping = '';
+            // Auto-suggest a mapping
+            $this->suggestedMapping = PdfFormFieldSuggestionService::suggestMapping(
+                $field->field_name,
+                $this->availableFields
+            );
+        }
+
         $this->showEditModal = true;
+    }
+
+    /**
+     * Build field ID from existing mapping
+     */
+    protected function buildFieldId(PdfFormFieldMapping $field): string
+    {
+        $parts = [strtolower($field->model_name ?? 'housingjob')];
+
+        if ($field->relationship_path) {
+            $parts[] = $field->relationship_path;
+        }
+
+        if ($field->model_field) {
+            $parts[] = $field->model_field;
+        }
+
+        return implode('.', $parts);
     }
 
     public function saveFieldMapping()
     {
-        $validated = $this->validate([
-            'mapping_type' => 'required|in:unmapped,model_field,custom_value,computed',
-            'model_name' => 'nullable|string',
-            'model_field' => 'nullable|string',
-            'relationship_path' => 'nullable|string',
-            'custom_value' => 'nullable|string',
-            'computed_method' => 'nullable|string',
-        ]);
-
         $field = PdfFormFieldMapping::findOrFail($this->editingFieldId);
-        $field->update([
-            'mapping_type' => $this->mapping_type,
-            'model_name' => $this->model_name !== '' ? $this->model_name : null,
-            'model_field' => $this->model_field !== '' ? $this->model_field : null,
-            'relationship_path' => $this->relationship_path !== '' ? $this->relationship_path : null,
-            'custom_value' => $this->custom_value !== '' ? $this->custom_value : null,
-            'computed_method' => $this->computed_method !== '' ? $this->computed_method : null,
-        ]);
 
-        session()->flash('success', "Field '{$field->field_name}' mapped successfully");
+        if (empty($this->selectedFieldMapping)) {
+            // Unmap the field
+            $field->update([
+                'mapping_type' => 'unmapped',
+                'model_name' => null,
+                'model_field' => null,
+                'relationship_path' => null,
+                'custom_value' => null,
+                'computed_method' => null,
+            ]);
+
+            session()->flash('success', "Field '{$field->field_name}' unmapped");
+        } else {
+            // Find the selected field configuration
+            $selectedField = collect($this->availableFields)
+                ->firstWhere('id', $this->selectedFieldMapping);
+
+            if (!$selectedField) {
+                session()->flash('error', 'Invalid field selection');
+                return;
+            }
+
+            // Update with the selected mapping
+            $field->update([
+                'mapping_type' => 'model_field',
+                'model_name' => $selectedField['model_name'],
+                'model_field' => $selectedField['model_field'],
+                'relationship_path' => $selectedField['relationship_path'],
+                'custom_value' => null,
+                'computed_method' => null,
+            ]);
+
+            session()->flash('success', "Field '{$field->field_name}' mapped to {$selectedField['display']}");
+        }
+
         $this->showEditModal = false;
         $this->resetEditForm();
         $this->template->refresh();
@@ -126,12 +163,20 @@ class PdfTemplateFieldMapping extends Component
     protected function resetEditForm()
     {
         $this->editingFieldId = null;
-        $this->mapping_type = 'unmapped';
-        $this->model_name = '';
-        $this->model_field = '';
-        $this->relationship_path = '';
-        $this->custom_value = '';
-        $this->computed_method = '';
+        $this->selectedFieldMapping = '';
+        $this->suggestedMapping = null;
+    }
+
+    public function handleFieldSelected($value)
+    {
+        $this->selectedFieldMapping = $value;
+    }
+
+    protected function getListeners()
+    {
+        return [
+            'item-selected-field-mapping' => 'handleFieldSelected',
+        ];
     }
 
     public function render()
