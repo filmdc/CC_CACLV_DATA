@@ -295,9 +295,15 @@
                                                                 @if($document->assignedTo)
                                                                     <span>Assigned: {{ $document->assignedTo->name }}</span>
                                                                 @endif
-                                                                <span class="px-2 py-0.5 rounded {{ $document->status_color === 'green' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ($document->status_color === 'yellow' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : ($document->status_color === 'red' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300')) }}">
-                                                                    {{ ucfirst(str_replace('_', ' ', $document->status)) }}
-                                                                </span>
+                                                                @if($document->isGeneratedFromTemplate())
+                                                                    <span class="px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">
+                                                                        Generated Form
+                                                                    </span>
+                                                                @else
+                                                                    <span class="px-2 py-0.5 rounded {{ $document->status_color === 'green' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ($document->status_color === 'blue' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : ($document->status_color === 'yellow' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : ($document->status_color === 'red' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300'))) }}">
+                                                                        {{ ucfirst(str_replace('_', ' ', $document->status)) }}
+                                                                    </span>
+                                                                @endif
                                                                 @if($document->requires_approval)
                                                                     <span class="px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300">
                                                                         Needs Approval
@@ -1076,7 +1082,7 @@
                         <div class="flex justify-between items-center">
                             <div class="space-x-2">
                                 @if($viewingDocument->status !== 'approved' && $viewerMedia->count() > 0)
-                                    <button wire:click="showUploadDocument({{ $viewingDocument->id }}); $set('showDocumentViewerModal', false)"
+                                    <button wire:click="$set('showDocumentViewerModal', false); showUploadDocument({{ $viewingDocument->id }})"
                                             class="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700">
                                         Add More Files
                                     </button>

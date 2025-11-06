@@ -126,11 +126,20 @@ class MilestoneDocument extends Model implements HasMedia
     {
         return match ($this->status) {
             'not_uploaded' => 'gray',
+            'uploaded' => 'blue',  // Neutral blue for uploaded without approval
             'pending_review' => 'yellow',
             'approved' => 'green',
             'rejected' => 'red',
             default => 'gray',
         };
+    }
+
+    /**
+     * Check if this document was generated from a PDF template
+     */
+    public function isGeneratedFromTemplate(): bool
+    {
+        return $this->hasPdfTemplate() && $this->hasPdfGenerated();
     }
 
     public function getHasFilesAttribute(): bool
@@ -146,10 +155,8 @@ class MilestoneDocument extends Model implements HasMedia
         if ($this->requires_approval) {
             $this->status = 'pending_review';
         } else {
-            // If approval not required, mark as approved immediately
-            $this->status = 'approved';
-            $this->approved_at = now();
-            $this->approved_by = auth()->id();
+            // If approval not required, mark as uploaded (neutral status)
+            $this->status = 'uploaded';
         }
 
         $this->uploaded_date = now();
