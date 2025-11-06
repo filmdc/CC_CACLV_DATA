@@ -65,6 +65,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('contract/{contract}/export-pdf', ContractPdfExportController::class)->name('contract.export-pdf');
     Route::get('contract/{contractId}/document/{mediaId}/preview', [App\Http\Controllers\ContractDocumentController::class, 'preview'])->name('contract.document.preview');
     Route::get('contract/{contractId}/document/{mediaId}/download', [App\Http\Controllers\ContractDocumentController::class, 'download'])->name('contract.document.download');
+
+    // Generic Media Routes (for milestone documents, etc.)
+    Route::get('media/{media}/preview', [App\Http\Controllers\MediaController::class, 'preview'])->name('media.preview');
+    Route::get('media/{media}/download', [App\Http\Controllers\MediaController::class, 'download'])->name('media.download');
     Route::get('admin/contract-notification-test', App\Livewire\ContractNotificationTest::class)->name('contract.notification-test')->middleware(['permission:contracts.manage']);
     Route::get('admin/notification-recipients', App\Livewire\NotificationRecipientsManagement::class)->name('notification-recipients.management')->middleware(['permission:contracts.view']);
     Route::get('funder-management', App\Livewire\FunderManagement::class)->name('funder.management');
