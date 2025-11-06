@@ -59,15 +59,26 @@ class PdfFormFieldExtractor
     /**
      * Parse raw pdftk field data into structured array
      *
-     * @param array $rawFields Raw field data from pdftk
+     * @param array $rawFields Raw field data from pdftk (array of arrays or array of strings)
      * @return array Structured field definitions
      */
     protected static function parseFields(array $rawFields): array
     {
+        // Check if we got an array of field arrays (modern DataFields format)
+        if (isset($rawFields[0]) && is_array($rawFields[0])) {
+            return self::parseFieldArrays($rawFields);
+        }
+
+        // Otherwise parse the old string-based format
         $fields = [];
         $currentField = null;
 
         foreach ($rawFields as $line) {
+            // Skip if line is an array (shouldn't happen but defensive)
+            if (!is_string($line)) {
+                continue;
+            }
+
             // PDFtk outputs field info as key-value pairs
             // Example: "FieldName: participant_first_name"
             if (preg_match('/^([\w]+):\s*(.*)$/', $line, $matches)) {
@@ -112,6 +123,37 @@ class PdfFormFieldExtractor
         // Add the last field
         if ($currentField) {
             $fields[] = $currentField;
+        }
+
+        return self::enrichFields($fields);
+    }
+
+    /**
+     * Parse field data when DataFields returns array of arrays
+     *
+     * @param array $rawFields Array of field arrays
+     * @return array Structured field definitions
+     */
+    protected static function parseFieldArrays(array $rawFields): array
+    {
+        $fields = [];
+
+        foreach ($rawFields as $fieldData) {
+            if (!is_array($fieldData)) {
+                continue;
+            }
+
+            $field = [
+                'name' => $fieldData['FieldName'] ?? $fieldData['name'] ?? 'unknown',
+                'type' => $fieldData['FieldType'] ?? $fieldData['type'] ?? null,
+                'flags' => isset($fieldData['FieldFlags']) ? (array) $fieldData['FieldFlags'] : [],
+                'options' => $fieldData['FieldStateOption'] ?? $fieldData['options'] ?? null,
+                'value' => $fieldData['FieldValue'] ?? null,
+                'value_default' => $fieldData['FieldValueDefault'] ?? null,
+                'justification' => $fieldData['FieldJustification'] ?? null,
+            ];
+
+            $fields[] = $field;
         }
 
         return self::enrichFields($fields);
