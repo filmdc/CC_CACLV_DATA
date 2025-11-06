@@ -46,22 +46,25 @@ class PdfFormService
             // Get source file path
             $sourcePath = $file->getRealPath();
 
-            \Log::info('Attempting to move file', [
+            \Log::info('Attempting to copy file', [
                 'source' => $sourcePath,
                 'destination' => $destinationPath,
                 'source_exists' => file_exists($sourcePath),
                 'destination_dir_writable' => is_writable($directory),
             ]);
 
-            // Try to move the file
-            if (!$file->move($directory, $filename)) {
-                throw new \Exception("Failed to move uploaded file to: {$destinationPath}");
+            // Copy the file (safer than move across directories)
+            if (!copy($sourcePath, $destinationPath)) {
+                throw new \Exception("Failed to copy uploaded file to: {$destinationPath}");
             }
 
-            // Verify file was moved
+            // Verify file was copied
             if (!file_exists($destinationPath)) {
-                throw new \Exception("File move reported success but file not found at: {$destinationPath}");
+                throw new \Exception("File copy reported success but file not found at: {$destinationPath}");
             }
+
+            // Set proper permissions
+            chmod($destinationPath, 0664);
 
             \Log::info('PDF template file moved successfully', [
                 'path' => $relativePath,
