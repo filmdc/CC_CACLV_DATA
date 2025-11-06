@@ -6,8 +6,11 @@
                 <div>
                     <div class="flex items-center space-x-3 mb-2">
                         <a href="{{ route('pdf-templates.index') }}" wire:navigate
-                           class="text-indigo-100 hover:text-white">
-                            ← Back to Templates
+                           class="text-indigo-100 hover:text-white flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                            Back to Templates
                         </a>
                     </div>
                     <h1 class="text-2xl font-bold">{{ $template->name }}</h1>
@@ -19,42 +22,265 @@
             </div>
         </div>
 
-        <!-- Coming Soon Notice -->
-        <div class="p-12 text-center">
-            <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-            </svg>
-            <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-300 mb-2">Field Mapping Interface - Coming in Phase 2</h2>
-            <p class="text-gray-600 dark:text-gray-400 mb-4">
-                This page will allow you to map PDF form fields to database fields from your system.
-            </p>
+        <!-- Success/Error Messages -->
+        @if (session()->has('success'))
+            <div class="p-4 bg-green-50 dark:bg-green-900/20 border-l-4 border-green-400">
+                <p class="text-sm text-green-700 dark:text-green-300">{{ session('success') }}</p>
+            </div>
+        @endif
+        @if (session()->has('error'))
+            <div class="p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-400">
+                <p class="text-sm text-red-700 dark:text-red-300">{{ session('error') }}</p>
+            </div>
+        @endif
 
-            <div class="max-w-2xl mx-auto text-left bg-gray-50 dark:bg-zinc-700 rounded-lg p-6 mt-6">
-                <h3 class="font-semibold text-gray-900 dark:text-white mb-3">Detected Fields in This Template:</h3>
-                <div class="space-y-2">
-                    @foreach($template->fieldMappings as $field)
-                        <div class="flex items-center justify-between p-2 bg-white dark:bg-zinc-800 rounded">
-                            <div class="flex items-center space-x-2">
-                                <span class="text-lg">{{ $field->field_type_icon }}</span>
-                                <div>
-                                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $field->field_name }}</div>
-                                    <div class="text-xs text-gray-500 dark:text-gray-400">{{ $field->field_type }}</div>
-                                </div>
-                            </div>
-                            <span class="text-xs px-2 py-1 rounded {{ $field->isMapped() ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300' }}">
-                                {{ $field->isMapped() ? 'Mapped' : 'Not Mapped' }}
-                            </span>
-                        </div>
-                    @endforeach
+        <!-- Filters -->
+        <div class="p-4 bg-gray-50 dark:bg-zinc-700 border-b dark:border-zinc-600">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
+                    <input type="text" wire:model.live="search" placeholder="Search fields..."
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                </div>
+                <div>
+                    <select wire:model.live="filterMappingType"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                        <option value="">All Mapping Types</option>
+                        <option value="unmapped">Unmapped</option>
+                        <option value="model_field">Database Field</option>
+                        <option value="custom_value">Custom Value</option>
+                        <option value="computed">Computed</option>
+                    </select>
+                </div>
+                <div>
+                    <select wire:model.live="filterFieldType"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                        <option value="">All Field Types</option>
+                        <option value="text">Text</option>
+                        <option value="checkbox">Checkbox</option>
+                        <option value="radio">Radio Button</option>
+                        <option value="dropdown">Dropdown</option>
+                    </select>
                 </div>
             </div>
+        </div>
 
-            <div class="mt-6">
-                <a href="{{ route('pdf-templates.index') }}" wire:navigate
-                   class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
-                    ← Back to Templates
-                </a>
+        <!-- Fields Table -->
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700">
+                <thead class="bg-gray-100 dark:bg-zinc-900">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">PDF Field</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Type</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Mapping</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-zinc-700">
+                    @forelse($fields as $field)
+                        <tr class="hover:bg-gray-50 dark:hover:bg-zinc-700">
+                            <td class="px-4 py-3">
+                                <div class="font-medium text-gray-900 dark:text-white">{{ $field->field_name }}</div>
+                                @if($field->field_label && $field->field_label !== $field->field_name)
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ $field->field_label }}</div>
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <span class="text-lg">{{ $field->field_type_icon }}</span>
+                                <span class="text-xs text-gray-600 dark:text-gray-400 ml-1">{{ $field->field_type }}</span>
+                            </td>
+                            <td class="px-4 py-3">
+                                @if($field->isMapped())
+                                    <div>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                                            {{ $field->mapping_type_label }}
+                                        </span>
+                                        @if($field->full_mapping_path)
+                                            <div class="text-xs text-gray-600 dark:text-gray-400 mt-1 font-mono">
+                                                {{ $field->full_mapping_path }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                @else
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300">
+                                        Not Mapped
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm">
+                                <div class="flex items-center space-x-2">
+                                    <button wire:click="showEditField({{ $field->id }})"
+                                            class="text-indigo-600 dark:text-indigo-400 hover:underline">
+                                        {{ $field->isMapped() ? 'Edit' : 'Map' }}
+                                    </button>
+                                    @if($field->isMapped())
+                                        <button wire:click="unmapField({{ $field->id }})"
+                                                class="text-red-600 dark:text-red-400 hover:underline">
+                                            Unmap
+                                        </button>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="px-4 py-12 text-center text-gray-500 dark:text-gray-400">
+                                No fields found
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        @if($fields->hasPages())
+            <div class="bg-white dark:bg-zinc-800 px-4 py-3 border-t border-gray-200 dark:border-zinc-700">
+                {{ $fields->links() }}
+            </div>
+        @endif
+    </div>
+
+    <!-- Edit Field Mapping Modal -->
+    @if($showEditModal)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                @php
+                    $editingField = $template->fieldMappings->firstWhere('id', $editingFieldId);
+                @endphp
+
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                        Map Field: {{ $editingField->field_name }}
+                    </h3>
+                    <button wire:click="$set('showEditModal', false)"
+                            class="text-gray-500 hover:text-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="mb-4 p-3 bg-gray-50 dark:bg-zinc-700 rounded">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-lg">{{ $editingField->field_type_icon }}</span>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">
+                            {{ ucfirst($editingField->field_type) }} field
+                        </span>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Mapping Type -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Mapping Type *</label>
+                        <select wire:model.live="mapping_type"
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                            <option value="unmapped">Not Mapped</option>
+                            <option value="model_field">Database Field</option>
+                            <option value="custom_value">Custom Value</option>
+                            <option value="computed">Computed Method</option>
+                        </select>
+                        @error('mapping_type') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+                    </div>
+
+                    <!-- Model Field Mapping -->
+                    @if($mapping_type === 'model_field')
+                        <div class="border border-indigo-200 dark:border-indigo-800 rounded-lg p-4 bg-indigo-50 dark:bg-indigo-900/20">
+                            <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Database Field Mapping</h4>
+
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Model</label>
+                                    <select wire:model="model_name"
+                                            class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                        <option value="">Select Model</option>
+                                        @foreach($availableModels as $name => $class)
+                                            <option value="{{ $name }}">{{ $name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        Primary model to get data from (e.g., Participant, HousingJob)
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Relationship Path (Optional)</label>
+                                    <input type="text" wire:model="relationship_path" placeholder="e.g., household, property"
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        For nested data: "household" to access participant's household, "property" for housing job's property
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Field Name *</label>
+                                    <input type="text" wire:model="model_field" placeholder="e.g., first_name, address_line_1"
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        Database field name from the model
+                                    </p>
+                                </div>
+
+                                <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded p-2">
+                                    <p class="text-xs text-blue-800 dark:text-blue-300">
+                                        <strong>Examples:</strong><br>
+                                        • Participant.first_name<br>
+                                        • Participant.household.household_code<br>
+                                        • HousingJob.property.address_line_1
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Custom Value -->
+                    @if($mapping_type === 'custom_value')
+                        <div class="border border-indigo-200 dark:border-indigo-800 rounded-lg p-4 bg-indigo-50 dark:bg-indigo-900/20">
+                            <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Custom Static Value</h4>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Value</label>
+                                <textarea wire:model="custom_value" rows="3" placeholder="Enter the static value to use for this field..."
+                                          class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md"></textarea>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    This value will be the same for all generated PDFs (e.g., agency name, program title)
+                                </p>
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Computed Method -->
+                    @if($mapping_type === 'computed')
+                        <div class="border border-indigo-200 dark:border-indigo-800 rounded-lg p-4 bg-indigo-50 dark:bg-indigo-900/20">
+                            <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Computed Method</h4>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Method</label>
+                                <select wire:model="computed_method"
+                                        class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                    <option value="">Select Method</option>
+                                    @foreach($availableComputedMethods as $method => $label)
+                                        <option value="{{ $method }}">{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    Pre-built methods for common calculations and formatting
+                                </p>
+                            </div>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Modal Actions -->
+                <div class="mt-6 flex justify-end space-x-3 border-t dark:border-zinc-700 pt-6">
+                    <button wire:click="$set('showEditModal', false)"
+                            class="px-4 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300">
+                        Cancel
+                    </button>
+                    <button wire:click="saveFieldMapping"
+                            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                        Save Mapping
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
+    @endif
 </div>
