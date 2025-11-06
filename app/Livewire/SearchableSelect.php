@@ -83,6 +83,13 @@ class SearchableSelect extends Component
 
         // Emit event to parent component
         $this->dispatch('item-selected-' . $this->name, $itemId);
+
+        // Also log for debugging
+        \Log::info('SearchableSelect item selected', [
+            'name' => $this->name,
+            'item_id' => $itemId,
+            'event_name' => 'item-selected-' . $this->name,
+        ]);
     }
 
     public function clearSelection()
