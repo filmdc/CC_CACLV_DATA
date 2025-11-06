@@ -32,6 +32,12 @@ class PdfFormService
         DB::beginTransaction();
 
         try {
+            // Ensure directory exists
+            $directory = storage_path('app/pdf_templates');
+            if (!is_dir($directory)) {
+                mkdir($directory, 0755, true);
+            }
+
             // Store the file
             $filename = uniqid() . '_' . time() . '_' . $file->getClientOriginalName();
             $path = $file->storeAs('pdf_templates', $filename);
