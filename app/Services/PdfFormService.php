@@ -42,6 +42,18 @@ class PdfFormService
             $filename = uniqid() . '_' . time() . '_' . $file->getClientOriginalName();
             $path = $file->storeAs('pdf_templates', $filename);
 
+            // Verify file was uploaded
+            $fullPath = storage_path('app/' . $path);
+            \Log::info('PDF template uploaded', [
+                'path' => $path,
+                'full_path' => $fullPath,
+                'file_exists' => file_exists($fullPath),
+            ]);
+
+            if (!file_exists($fullPath)) {
+                throw new \Exception("File upload succeeded but file not found at: {$fullPath}");
+            }
+
             // Create template record
             $template = PdfFormTemplate::create([
                 'name' => $data['name'],
