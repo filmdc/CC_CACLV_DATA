@@ -67,8 +67,22 @@ class PdfFormService
                 'created_by' => Auth::id(),
             ]);
 
-            // Extract form fields
-            self::scanTemplateFields($template);
+            // Extract form fields (only if pdftk is available)
+            if (PdfFormFieldExtractor::isPdftkAvailable()) {
+                try {
+                    self::scanTemplateFields($template);
+                } catch (\Exception $e) {
+                    // Log but don't fail the upload if field scan fails
+                    \Log::warning('Field scan failed but template was uploaded', [
+                        'template_id' => $template->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            } else {
+                \Log::info('PDFtk not available, skipping field scan', [
+                    'template_id' => $template->id,
+                ]);
+            }
 
             DB::commit();
 
