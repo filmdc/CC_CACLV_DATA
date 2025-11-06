@@ -51,7 +51,13 @@ class ProjectManagement extends Component
     public $document_description = '';
     public $document_assigned_to = '';
     public $document_requires_approval = false;
+    public $document_pdf_template_id = '';
     public $documentFiles = [];
+
+    // PDF Generation
+    public $showGeneratePdfModal = false;
+    public $generatingDocumentId = null;
+    public $flatten_pdf = false;
 
     // Document Upload Form
     public $showDocumentUploadForm = false;
@@ -330,6 +336,7 @@ class ProjectManagement extends Component
             'document_description' => 'nullable|string',
             'document_assigned_to' => 'nullable|exists:users,id',
             'document_requires_approval' => 'boolean',
+            'document_pdf_template_id' => 'nullable|exists:pdf_form_templates,id',
             'documentFiles.*' => 'nullable|file|max:51200',
         ]);
 
@@ -338,6 +345,7 @@ class ProjectManagement extends Component
         try {
             $document = MilestoneDocument::create([
                 'milestone_id' => $this->selectedMilestone,
+                'pdf_template_id' => $this->document_pdf_template_id !== '' ? $this->document_pdf_template_id : null,
                 'document_type' => $this->document_type,
                 'description' => $this->document_description !== '' ? $this->document_description : null,
                 'assigned_to' => $this->document_assigned_to !== '' ? $this->document_assigned_to : null,
@@ -638,6 +646,53 @@ class ProjectManagement extends Component
         $this->refreshJob();
     }
 
+    public function showGeneratePdf($documentId)
+    {
+        $this->generatingDocumentId = $documentId;
+        $this->flatten_pdf = false;
+        $this->showGeneratePdfModal = true;
+    }
+
+    public function generatePdfFromTemplate()
+    {
+        try {
+            $document = MilestoneDocument::with('pdfTemplate')->findOrFail($this->generatingDocumentId);
+
+            if (!$document->hasPdfTemplate()) {
+                session()->flash('error', 'No PDF template assigned to this document');
+                return;
+            }
+
+            // Generate the PDF and attach to document
+            \App\Services\PdfFormService::generateAndAttach(
+                $document->pdfTemplate,
+                $document,
+                $this->job,  // Primary model (HousingJob)
+                [
+                    'flatten' => $this->flatten_pdf,
+                    'additionalContext' => [
+                        'Participant' => $this->job->participant,
+                        'Property' => $this->job->property,
+                        'Contractor' => $this->job->contractor,
+                        'Program' => $this->job->program,
+                        'Service' => $this->job->service,
+                    ],
+                ]
+            );
+
+            session()->flash('success', 'PDF generated and attached successfully!');
+            $this->showGeneratePdfModal = false;
+            $this->generatingDocumentId = null;
+            $this->refreshJob();
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to generate PDF: ' . $e->getMessage());
+            \Log::error('PDF generation failed', [
+                'document_id' => $this->generatingDocumentId,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
     public function updateDocumentStatus($id, $status)
     {
         $document = MilestoneDocument::findOrFail($id);
@@ -851,6 +906,7 @@ class ProjectManagement extends Component
         $this->document_description = '';
         $this->document_assigned_to = '';
         $this->document_requires_approval = false;
+        $this->document_pdf_template_id = '';
         $this->documentFiles = [];
     }
 
@@ -880,9 +936,13 @@ class ProjectManagement extends Component
             ? $this->job->milestones->firstWhere('id', $this->selectedMilestone)
             : null;
 
+        // Get active PDF templates
+        $pdfTemplates = \App\Models\PdfFormTemplate::active()->orderBy('name')->get();
+
         return view('livewire.project-management', [
             'users' => $users,
             'currentMilestone' => $currentMilestone,
+            'pdfTemplates' => $pdfTemplates,
         ]);
     }
 }

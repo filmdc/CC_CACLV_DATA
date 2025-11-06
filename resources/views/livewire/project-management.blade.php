@@ -361,6 +361,17 @@
                                                                 </button>
                                                             @endif
 
+                                                            {{-- Show Generate PDF if template is assigned --}}
+                                                            @if($document->hasPdfTemplate())
+                                                                <button wire:click="showGeneratePdf({{ $document->id }})"
+                                                                        class="px-3 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 flex items-center">
+                                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                                    </svg>
+                                                                    Generate PDF
+                                                                </button>
+                                                            @endif
+
                                                             {{-- Show Upload if no files exist OR if status is explicitly rejected --}}
                                                             @if(!$hasFiles || $document->status === 'rejected')
                                                                 <button wire:click="showUploadDocument({{ $document->id }})"
@@ -668,6 +679,19 @@
                                 <option value="{{ $user->id }}">{{ $user->name }}</option>
                             @endforeach
                         </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">PDF Form Template (Optional)</label>
+                        <select wire:model="document_pdf_template_id"
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                            <option value="">No Template (Manual Upload Only)</option>
+                            @foreach($pdfTemplates as $template)
+                                <option value="{{ $template->id }}">{{ $template->name }} ({{ $template->field_count }} fields)</option>
+                            @endforeach
+                        </select>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            Select a PDF form template to auto-fill with project data
+                        </p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Upload Files (Optional)</label>
@@ -1079,6 +1103,85 @@
                     </div>
                 </div>
             </div>
+        @endif
+    @endif
+
+    <!-- Generate PDF Modal -->
+    @if($showGeneratePdfModal && $generatingDocumentId)
+        @php
+            $generatingDoc = $currentMilestone->documents->firstWhere('id', $generatingDocumentId);
+        @endphp
+        @if($generatingDoc && $generatingDoc->pdfTemplate)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-2xl w-full mx-4">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                        Generate PDF from Template
+                    </h3>
+                    <button wire:click="$set('showGeneratePdfModal', false)"
+                            class="text-gray-500 hover:text-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Template Info -->
+                    <div class="p-4 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg">
+                        <h4 class="font-semibold text-gray-900 dark:text-white mb-2">{{ $generatingDoc->pdfTemplate->name }}</h4>
+                        <div class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                            <div>{{ $generatingDoc->pdfTemplate->field_count }} form fields in template</div>
+                            <div>{{ $generatingDoc->pdfTemplate->mapped_field_count }} fields mapped ({{ $generatingDoc->pdfTemplate->mapping_completion }}%)</div>
+                        </div>
+                    </div>
+
+                    <!-- Project Data Preview -->
+                    <div class="p-4 bg-gray-50 dark:bg-zinc-700 rounded-lg">
+                        <h4 class="font-semibold text-gray-900 dark:text-white mb-2">Data Source</h4>
+                        <div class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                            <div><strong>Participant:</strong> {{ $job->participant ? $job->participant->first_name . ' ' . $job->participant->last_name : 'N/A' }}</div>
+                            <div><strong>Property:</strong> {{ $job->property ? $job->property->address_line_1 : 'N/A' }}</div>
+                            <div><strong>Project:</strong> {{ $job->job_number }} - {{ $job->job_title }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Options -->
+                    <div>
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" wire:model="flatten_pdf"
+                                   class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                            <span class="text-sm text-gray-700 dark:text-gray-300">Flatten PDF (make non-editable)</span>
+                        </label>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-6">
+                            Unchecked: PDF can still be edited after generation. Checked: PDF is read-only.
+                        </p>
+                    </div>
+
+                    <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded p-3">
+                        <p class="text-xs text-yellow-800 dark:text-yellow-300">
+                            This will generate a PDF with data from this project and attach it to this milestone document.
+                            You can download, view, or print the generated PDF.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Modal Actions -->
+                <div class="mt-6 flex justify-end space-x-3 border-t dark:border-zinc-700 pt-6">
+                    <button wire:click="$set('showGeneratePdfModal', false)"
+                            class="px-4 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300">
+                        Cancel
+                    </button>
+                    <button wire:click="generatePdfFromTemplate"
+                            class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Generate PDF
+                    </button>
+                </div>
+            </div>
+        </div>
         @endif
     @endif
 </div>

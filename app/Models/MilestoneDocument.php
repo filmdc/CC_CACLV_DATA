@@ -19,6 +19,7 @@ class MilestoneDocument extends Model implements HasMedia
 
     protected $fillable = [
         'milestone_id',
+        'pdf_template_id',
         'document_type',
         'description',
         'status',
@@ -73,6 +74,32 @@ class MilestoneDocument extends Model implements HasMedia
     public function expenses(): HasMany
     {
         return $this->hasMany(ProjectExpense::class, 'document_id');
+    }
+
+    public function pdfTemplate(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\PdfFormTemplate::class, 'pdf_template_id');
+    }
+
+    public function pdfGenerations(): HasMany
+    {
+        return $this->hasMany(\App\Models\PdfFormGeneration::class, 'milestone_document_id');
+    }
+
+    /**
+     * Check if this document has a PDF template assigned
+     */
+    public function hasPdfTemplate(): bool
+    {
+        return $this->pdf_template_id !== null;
+    }
+
+    /**
+     * Check if PDF has been generated from template
+     */
+    public function hasPdfGenerated(): bool
+    {
+        return $this->pdfGenerations()->where('generation_status', 'success')->exists();
     }
 
     /**
