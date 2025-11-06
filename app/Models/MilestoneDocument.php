@@ -142,7 +142,13 @@ class MilestoneDocument extends Model implements HasMedia
 
     public function markAsUploaded(): bool
     {
-        $this->status = 'pending_review';
+        // Set status based on whether approval is required
+        if ($this->requires_approval) {
+            $this->status = 'pending_review';
+        } else {
+            $this->status = 'uploaded';
+        }
+
         $this->uploaded_date = now();
         return $this->save();
     }
