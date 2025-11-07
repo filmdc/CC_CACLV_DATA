@@ -115,11 +115,11 @@ class SageIntacctSyncService
 
                 $totalSynced += $batchResult['synced'];
                 $totalFailed += $batchResult['failed'];
-                $failedRecords = array_merge($failedRecords, $batchResult['failed_records']);
+                $failedRecords = array_merge($failedRecords, $batchResult['failed_count']);
 
                 // Update sync history progress
-                $syncHistory->synced_records = $totalSynced;
-                $syncHistory->failed_records = $totalFailed;
+                $syncHistory->successful_count = $totalSynced;
+                $syncHistory->failed_count = $totalFailed;
                 $syncHistory->save();
             }
 
@@ -139,7 +139,7 @@ class SageIntacctSyncService
                 'total' => $totalRecords,
                 'synced' => $totalSynced,
                 'failed' => $totalFailed,
-                'failed_records' => $failedRecords,
+                'failed_count' => $failedRecords,
                 'sync_history_id' => $syncHistory->id,
             ];
 
@@ -238,11 +238,11 @@ class SageIntacctSyncService
 
                 $totalSynced += $batchResult['synced'];
                 $totalFailed += $batchResult['failed'];
-                $failedRecords = array_merge($failedRecords, $batchResult['failed_records']);
+                $failedRecords = array_merge($failedRecords, $batchResult['failed_count']);
 
                 // Update sync history progress
-                $syncHistory->synced_records = $totalSynced;
-                $syncHistory->failed_records = $totalFailed;
+                $syncHistory->successful_count = $totalSynced;
+                $syncHistory->failed_count = $totalFailed;
                 $syncHistory->save();
             }
 
@@ -262,7 +262,7 @@ class SageIntacctSyncService
                 'total' => count($gifts),
                 'synced' => $totalSynced,
                 'failed' => $totalFailed,
-                'failed_records' => $failedRecords,
+                'failed_count' => $failedRecords,
                 'sync_history_id' => $syncHistory->id,
             ];
 
@@ -334,7 +334,7 @@ class SageIntacctSyncService
                 $this->updateSyncItem($syncItem, 'synced', null, $result['key'] ?? null);
 
                 // Update sync history
-                $syncHistory->synced_records = 1;
+                $syncHistory->successful_count = 1;
                 $this->updateSyncHistory($syncHistory, 'completed', null);
 
                 Log::info('Sage Intacct: Single gift synced successfully', [
@@ -352,7 +352,7 @@ class SageIntacctSyncService
                 $this->updateSyncItem($syncItem, 'failed', $errorMessage);
 
                 // Update sync history
-                $syncHistory->failed_records = 1;
+                $syncHistory->failed_count = 1;
                 $this->updateSyncHistory($syncHistory, 'completed_with_errors', $errorMessage);
 
                 Log::error('Sage Intacct: Single gift sync failed', [
@@ -509,10 +509,10 @@ class SageIntacctSyncService
         try {
             $historyId = DB::table('sage_intacct_sync_history')->insertGetId([
                 'triggered_by' => 'user:'.$userId,
-                'status' => 'in_progress',
+                'status' => 'running',
                 'total_records' => $totalRecords,
-                'synced_records' => 0,
-                'failed_records' => 0,
+                'successful_count' => 0,
+                'failed_count' => 0,
                 'started_at' => now(),
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -529,10 +529,10 @@ class SageIntacctSyncService
             return (object) [
                 'id' => $historyId,
                 'triggered_by' => $triggeredBy,
-                'status' => 'in_progress',
+                'status' => 'running',
                 'total_records' => $totalRecords,
-                'synced_records' => 0,
-                'failed_records' => 0,
+                'successful_count' => 0,
+                'failed_count' => 0,
                 'save' => function () {
                     // This is a placeholder - updates should use updateSyncHistory
                     return true;
@@ -610,9 +610,9 @@ class SageIntacctSyncService
                     ->where('status', 'completed_with_errors')
                     ->count(),
                 'total_records_synced' => DB::table('sage_intacct_sync_history')
-                    ->sum('synced_records'),
+                    ->sum('successful_count'),
                 'total_records_failed' => DB::table('sage_intacct_sync_history')
-                    ->sum('failed_records'),
+                    ->sum('failed_count'),
                 'pending_items' => DB::table('sage_intacct_sync_items')
                     ->where('status', 'pending')
                     ->count(),
@@ -741,7 +741,7 @@ class SageIntacctSyncService
             return [
                 'synced' => $synced,
                 'failed' => $failed,
-                'failed_records' => $failedRecords,
+                'failed_count' => $failedRecords,
             ];
 
         } catch (\Exception $e) {
@@ -769,7 +769,7 @@ class SageIntacctSyncService
             return [
                 'synced' => 0,
                 'failed' => count($batch),
-                'failed_records' => array_map(function ($gift) use ($e) {
+                'failed_count' => array_map(function ($gift) use ($e) {
                     return [
                         'gift_id' => $gift['gift_id'] ?? 'unknown',
                         'error' => 'Exception: '.$e->getMessage(),
