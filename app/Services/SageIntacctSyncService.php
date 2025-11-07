@@ -507,7 +507,7 @@ class SageIntacctSyncService
     public function createSyncHistory(int $userId, string $triggeredBy, int $totalRecords)
     {
         try {
-            $historyId = DB::table('sage_intacct_sync_histories')->insertGetId([
+            $historyId = DB::table('sage_intacct_sync_history')->insertGetId([
                 'triggered_by' => 'user:'.$userId,
                 'status' => 'in_progress',
                 'total_records' => $totalRecords,
@@ -572,7 +572,7 @@ class SageIntacctSyncService
                 $updateData['error_message'] = $errorMessage;
             }
 
-            DB::table('sage_intacct_sync_histories')
+            DB::table('sage_intacct_sync_history')
                 ->where('id', $history->id)
                 ->update($updateData);
 
@@ -599,19 +599,19 @@ class SageIntacctSyncService
     {
         try {
             $stats = [
-                'total_syncs' => DB::table('sage_intacct_sync_histories')->count(),
-                'successful_syncs' => DB::table('sage_intacct_sync_histories')
+                'total_syncs' => DB::table('sage_intacct_sync_history')->count(),
+                'successful_syncs' => DB::table('sage_intacct_sync_history')
                     ->where('status', 'completed')
                     ->count(),
-                'failed_syncs' => DB::table('sage_intacct_sync_histories')
+                'failed_syncs' => DB::table('sage_intacct_sync_history')
                     ->where('status', 'failed')
                     ->count(),
-                'syncs_with_errors' => DB::table('sage_intacct_sync_histories')
+                'syncs_with_errors' => DB::table('sage_intacct_sync_history')
                     ->where('status', 'completed_with_errors')
                     ->count(),
-                'total_records_synced' => DB::table('sage_intacct_sync_histories')
+                'total_records_synced' => DB::table('sage_intacct_sync_history')
                     ->sum('synced_records'),
-                'total_records_failed' => DB::table('sage_intacct_sync_histories')
+                'total_records_failed' => DB::table('sage_intacct_sync_history')
                     ->sum('failed_records'),
                 'pending_items' => DB::table('sage_intacct_sync_items')
                     ->where('status', 'pending')
@@ -619,7 +619,7 @@ class SageIntacctSyncService
                 'failed_items' => DB::table('sage_intacct_sync_items')
                     ->where('status', 'failed')
                     ->count(),
-                'last_sync' => DB::table('sage_intacct_sync_histories')
+                'last_sync' => DB::table('sage_intacct_sync_history')
                     ->orderBy('created_at', 'desc')
                     ->first(),
             ];
