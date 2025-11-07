@@ -338,7 +338,7 @@ class SageIntacctSyncService
 
             if ($result['success']) {
                 // Update sync item as synced
-                $this->updateSyncItem($syncItem, 'synced', null, $result['key'] ?? null);
+                $this->updateSyncItem($syncItem, 'success', null, $result['key'] ?? null);
 
                 // Update sync history
                 DB::table('sage_intacct_sync_history')
@@ -437,7 +437,7 @@ class SageIntacctSyncService
 
             // Filter out gifts that have already been synced successfully
             $syncedGiftIds = DB::table('sage_intacct_sync_items')
-                ->where('status', 'synced')
+                ->where('status', 'success')
                 ->pluck('gift_id')
                 ->toArray();
 
@@ -706,7 +706,7 @@ class SageIntacctSyncService
                             ->where('sync_history_id', $syncHistory->id)
                             ->where('gift_id', $giftId)
                             ->update([
-                                'status' => 'synced',
+                                'status' => 'success',
                                 'intacct_record_id' => $detail['key'] ?? null,
                                 'synced_at' => now(),
                                 'updated_at' => now(),
@@ -848,7 +848,7 @@ class SageIntacctSyncService
                 'updated_at' => now(),
             ];
 
-            if ($status === 'synced') {
+            if ($status === 'success') {
                 $updateData['synced_at'] = now();
             }
 
