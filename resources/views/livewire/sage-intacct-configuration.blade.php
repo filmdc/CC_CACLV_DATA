@@ -97,10 +97,41 @@
                         </div>
                     @endif
 
-                    <!-- REST API Credentials Section -->
+                    <!-- Authentication Method Selection -->
                     <div>
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">REST API Credentials</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Configure your Sage Intacct REST API OAuth 2.0 credentials.</p>
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Authentication Method</h3>
+                        <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg">
+                            <div class="space-y-3">
+                                <label class="flex items-start space-x-3 cursor-pointer p-3 rounded-md hover:bg-gray-100 dark:hover:bg-zinc-600">
+                                    <input type="radio"
+                                           wire:model.live="auth_method"
+                                           value="xml"
+                                           class="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300">
+                                    <div class="flex-1">
+                                        <div class="font-medium text-gray-900 dark:text-white">XML Web Services (Recommended)</div>
+                                        <div class="text-sm text-gray-600 dark:text-gray-400">Server-to-server authentication with Sender ID. Works behind firewalls. No user authorization needed.</div>
+                                    </div>
+                                </label>
+
+                                <label class="flex items-start space-x-3 cursor-pointer p-3 rounded-md hover:bg-gray-100 dark:hover:bg-zinc-600">
+                                    <input type="radio"
+                                           wire:model.live="auth_method"
+                                           value="oauth"
+                                           class="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300">
+                                    <div class="flex-1">
+                                        <div class="font-medium text-gray-900 dark:text-white">OAuth 2.0 / REST API</div>
+                                        <div class="text-sm text-gray-600 dark:text-gray-400">User-based authentication. Requires publicly accessible callback URL. Each user authorizes individually.</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- XML Web Services Credentials Section -->
+                    @if($auth_method === 'xml')
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">XML Web Services Credentials</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Configure your Sage Intacct Web Services credentials.</p>
                         <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg space-y-4">
                             <!-- Company ID -->
                             <div>
@@ -117,6 +148,80 @@
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Sender ID -->
+                                <div>
+                                    <label for="sender_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Sender ID <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text"
+                                           wire:model="sender_id"
+                                           id="sender_id"
+                                           placeholder="Enter Web Services Sender ID"
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Web Services License Sender ID from Sage</p>
+                                    @error('sender_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+
+                                <!-- Sender Password -->
+                                <div>
+                                    <label for="sender_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Sender Password <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="password"
+                                           wire:model="sender_password"
+                                           id="sender_password"
+                                           placeholder="Enter Sender Password"
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Web Services License Password (encrypted)</p>
+                                    @error('sender_password') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Web Services User ID -->
+                                <div>
+                                    <label for="web_services_user_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Web Services User ID <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text"
+                                           wire:model="web_services_user_id"
+                                           id="web_services_user_id"
+                                           placeholder="Enter Web Services User ID"
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">User ID created in Sage Intacct</p>
+                                    @error('web_services_user_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+
+                                <!-- Web Services Password -->
+                                <div>
+                                    <label for="web_services_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Web Services Password <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="password"
+                                           wire:model="web_services_password"
+                                           id="web_services_password"
+                                           placeholder="Enter Web Services Password"
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">User password (encrypted)</p>
+                                    @error('web_services_password') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    <!-- OAuth REST API Credentials Section -->
+                    @if($auth_method === 'oauth')
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">OAuth REST API Credentials</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Configure your Sage Intacct REST API OAuth 2.0 credentials.</p>
+                        <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-3 mb-4">
+                            <p class="text-sm text-yellow-800 dark:text-yellow-300">
+                                ⚠️ <strong>Note:</strong> OAuth requires a publicly accessible callback URL. This won't work if your server is behind a firewall.
+                            </p>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <!-- Client ID -->
                                 <div>
                                     <label for="client_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -127,7 +232,7 @@
                                            id="client_id"
                                            placeholder="Enter your REST API Client ID"
                                            class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">OAuth 2.0 Client ID from Sage Intacct</p>
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">OAuth 2.0 Client ID from Sage Developer Portal</p>
                                     @error('client_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
 
@@ -159,7 +264,14 @@
                                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Configure this URL in your Sage Intacct OAuth app registration</p>
                                 @error('redirect_uri') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                             </div>
+                        </div>
+                    </div>
+                    @endif
 
+                    <!-- Optional Dimensional Accounting (Both Methods) -->
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Dimensional Accounting (Optional)</h3>
+                        <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg">
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <!-- Location ID -->
                                 <div>
@@ -200,59 +312,60 @@
                                     @error('class_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
                             </div>
-
-                            <!-- My Connection Status -->
-                            @php
-                                $myToken = auth()->user()->sageIntacctToken;
-                                $hasConnection = $myToken && $myToken->hasValidToken();
-                            @endphp
-
-                            <div class="pt-4 border-t border-gray-200 dark:border-zinc-600">
-                                <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">My Connection</h4>
-
-                                @if($hasConnection)
-                                    <!-- Connected status -->
-                                    <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md p-4">
-                                        <div class="flex items-start justify-between">
-                                            <div class="flex-1">
-                                                <p class="text-sm font-medium text-green-800 dark:text-green-300">
-                                                    ✓ Connected to Sage Intacct
-                                                </p>
-                                                <p class="text-xs text-green-600 dark:text-green-400 mt-1">
-                                                    Company: {{ $myToken->company_id }}
-                                                </p>
-                                                <p class="text-xs text-green-600 dark:text-green-400">
-                                                    Token expires: {{ $myToken->expires_at->diffForHumans() }}
-                                                </p>
-                                            </div>
-                                            <button type="button"
-                                                    wire:click="disconnectMyAccount"
-                                                    class="text-xs px-3 py-1 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md border border-red-300 dark:border-red-700">
-                                                Disconnect
-                                            </button>
-                                        </div>
-                                    </div>
-                                @else
-                                    <!-- Not connected -->
-                                    <div class="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-md p-4">
-                                        <p class="text-sm text-orange-800 dark:text-orange-300 mb-2">
-                                            You are not connected to Sage Intacct
-                                        </p>
-                                        <a href="{{ route('intacct.oauth.authorize') }}"
-                                           class="inline-flex items-center px-4 py-2 bg-orange-600 text-white text-sm rounded-md hover:bg-orange-700">
-                                            <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
-                                            </svg>
-                                            Connect to Sage Intacct
-                                        </a>
-                                        <p class="text-xs text-orange-600 dark:text-orange-400 mt-2">
-                                            You'll be redirected to Sage Intacct to authorize access
-                                        </p>
-                                    </div>
-                                @endif
-                            </div>
                         </div>
                     </div>
+
+                    <!-- My OAuth Connection Status (OAuth Mode Only) -->
+                    @if($auth_method === 'oauth')
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">My Connection</h3>
+                        @php
+                            $myToken = auth()->user()->sageIntacctToken;
+                            $hasConnection = $myToken && $myToken->hasValidToken();
+                        @endphp
+
+                        @if($hasConnection)
+                            <!-- Connected status -->
+                            <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md p-4">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-green-800 dark:text-green-300">
+                                            ✓ Connected to Sage Intacct
+                                        </p>
+                                        <p class="text-xs text-green-600 dark:text-green-400 mt-1">
+                                            Company: {{ $myToken->company_id }}
+                                        </p>
+                                        <p class="text-xs text-green-600 dark:text-green-400">
+                                            Token expires: {{ $myToken->expires_at->diffForHumans() }}
+                                        </p>
+                                    </div>
+                                    <button type="button"
+                                            wire:click="disconnectMyAccount"
+                                            class="text-xs px-3 py-1 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md border border-red-300 dark:border-red-700">
+                                        Disconnect
+                                    </button>
+                                </div>
+                            </div>
+                        @else
+                            <!-- Not connected -->
+                            <div class="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-md p-4">
+                                <p class="text-sm text-orange-800 dark:text-orange-300 mb-2">
+                                    You are not connected to Sage Intacct
+                                </p>
+                                <a href="{{ route('intacct.oauth.authorize') }}"
+                                   class="inline-flex items-center px-4 py-2 bg-orange-600 text-white text-sm rounded-md hover:bg-orange-700">
+                                    <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                                    </svg>
+                                    Connect to Sage Intacct
+                                </a>
+                                <p class="text-xs text-orange-600 dark:text-orange-400 mt-2">
+                                    You'll be redirected to Sage Intacct to authorize access
+                                </p>
+                            </div>
+                        @endif
+                    </div>
+                    @endif
 
                     <!-- Code Mapping Toggle -->
                     <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-4">

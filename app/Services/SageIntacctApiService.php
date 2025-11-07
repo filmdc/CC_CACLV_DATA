@@ -7,34 +7,976 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 /**
- * Sage Intacct REST API Service
+ * Hybrid Sage Intacct API Service
  *
- * Handles API communication with Sage Intacct REST API using user OAuth tokens.
+ * Supports BOTH XML Web Services and OAuth 2.0 REST API authentication methods.
+ * Authentication method is determined by $setting->auth_method:
+ * - 'xml': Uses XML Web Services with session-based authentication
+ * - 'oauth': Uses OAuth 2.0 with Bearer token authentication
  */
 class SageIntacctApiService
 {
-    private UserSageIntacctToken $userToken;
-
     private $setting;
+
+    private ?UserSageIntacctToken $userToken = null;
+
+    private ?string $sessionId = null;
 
     private ?string $accessToken = null;
 
     /**
-     * Constructor - accepts user token and settings
+     * Constructor
+     *
+     * @param  mixed  $setting  SageIntacctSetting instance
+     * @param  UserSageIntacctToken|null  $userToken  Required for OAuth, not needed for XML
      */
-    public function __construct(UserSageIntacctToken $userToken, $setting)
+    public function __construct($setting, UserSageIntacctToken $userToken = null)
     {
-        $this->userToken = $userToken;
         $this->setting = $setting;
-        $this->accessToken = $userToken->access_token;
+        $this->userToken = $userToken;
+
+        // Initialize OAuth access token if provided
+        if ($userToken) {
+            $this->accessToken = $userToken->access_token;
+        }
+
+        Log::debug('Sage Intacct API Service initialized', [
+            'auth_method' => $this->setting->auth_method ?? 'xml',
+            'has_user_token' => $userToken !== null,
+        ]);
     }
 
     /**
-     * Ensure we have a valid access token (refresh if needed)
+     * Main authentication method - routes to appropriate auth handler
      */
     public function authenticate(): array
     {
+        if ($this->setting->isXmlApi()) {
+            return $this->authenticateXml();
+        } else {
+            return $this->authenticateOAuth();
+        }
+    }
+
+    /**
+     * Test API connectivity
+     */
+    public function testConnection(): array
+    {
+        if ($this->setting->isXmlApi()) {
+            return $this->testConnectionXml();
+        } else {
+            return $this->testConnectionOAuth();
+        }
+    }
+
+    /**
+     * Create a record in a custom object
+     */
+    public function createCustomObjectRecord(string $objectName, array $fieldData): array
+    {
+        if ($this->setting->isXmlApi()) {
+            return $this->createCustomObjectRecordXml($objectName, $fieldData);
+        } else {
+            return $this->createCustomObjectRecordOAuth($objectName, $fieldData);
+        }
+    }
+
+    /**
+     * Batch create records in a custom object (up to 100 records per batch)
+     */
+    public function batchCreateRecords(string $objectName, array $records): array
+    {
+        if ($this->setting->isXmlApi()) {
+            return $this->batchCreateRecordsXml($objectName, $records);
+        } else {
+            return $this->batchCreateRecordsOAuth($objectName, $records);
+        }
+    }
+
+    // ====================================================================
+    // XML WEB SERVICES AUTHENTICATION & METHODS
+    // ====================================================================
+
+    /**
+     * Authenticate with Sage Intacct XML API and create a session
+     */
+    private function authenticateXml(): array
+    {
         try {
+            if (! $this->setting->isConfigured()) {
+                return [
+                    'success' => false,
+                    'message' => 'Sage Intacct credentials are not fully configured',
+                ];
+            }
+
+            // Build authentication request
+            $xmlRequest = $this->buildAuthenticationXml();
+
+            Log::info('Sage Intacct XML API: Authenticating', [
+                'sender_id' => $this->setting->sender_id,
+                'company_id' => $this->setting->company_id,
+                'user_id' => $this->setting->web_services_user_id,
+            ]);
+
+            // Send authentication request
+            $response = $this->sendXmlRequest($xmlRequest);
+
+            if (! $response['success']) {
+                return [
+                    'success' => false,
+                    'message' => $response['error'] ?? 'Authentication failed',
+                ];
+            }
+
+            // Extract session ID from response
+            $xml = simplexml_load_string($response['xml']);
+            if ($xml === false) {
+                return [
+                    'success' => false,
+                    'message' => 'Failed to parse authentication response',
+                ];
+            }
+
+            // Check for API errors
+            $errormessage = $xml->xpath('//errormessage');
+            if (! empty($errormessage)) {
+                $errorText = (string) $errormessage[0]->error->description2 ?? (string) $errormessage[0]->error->description ?? 'Authentication failed';
+
+                Log::error('Sage Intacct XML authentication failed', [
+                    'error' => $errorText,
+                ]);
+
+                return [
+                    'success' => false,
+                    'message' => 'Authentication failed: '.$errorText,
+                ];
+            }
+
+            // Get session ID
+            $sessionId = $xml->xpath('//authentication/sessionid');
+            if (empty($sessionId)) {
+                return [
+                    'success' => false,
+                    'message' => 'No session ID returned from authentication',
+                ];
+            }
+
+            $this->sessionId = (string) $sessionId[0];
+
+            Log::info('Sage Intacct XML API: Authentication successful', [
+                'session_id' => substr($this->sessionId, 0, 20).'...',
+            ]);
+
+            return [
+                'success' => true,
+                'session_id' => $this->sessionId,
+                'message' => 'Authentication successful',
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Sage Intacct XML authentication exception', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Exception: '.$e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Test XML API connectivity by authenticating
+     */
+    private function testConnectionXml(): array
+    {
+        try {
+            if (! $this->setting->isConfigured()) {
+                return [
+                    'success' => false,
+                    'message' => 'API credentials are not fully configured',
+                ];
+            }
+
+            // Test authentication
+            $authResult = $this->authenticateXml();
+
+            if (! $authResult['success']) {
+                return [
+                    'success' => false,
+                    'message' => $authResult['message'],
+                ];
+            }
+
+            // Try to read a simple function to verify access
+            $testXml = $this->buildXmlRequest('getUserPermissions', []);
+            $response = $this->sendXmlRequest($testXml);
+
+            if (! $response['success']) {
+                return [
+                    'success' => false,
+                    'message' => 'Connection test failed: '.($response['error'] ?? 'Unknown error'),
+                ];
+            }
+
+            return [
+                'success' => true,
+                'message' => 'Connection successful',
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Sage Intacct XML connection test exception', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Exception: '.$e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Create a record in a custom object (XML method)
+     */
+    private function createCustomObjectRecordXml(string $objectName, array $fieldData): array
+    {
+        try {
+            // Ensure we have a session
+            if (! $this->sessionId) {
+                $authResult = $this->authenticateXml();
+                if (! $authResult['success']) {
+                    return [
+                        'success' => false,
+                        'error' => 'Authentication failed: '.($authResult['message'] ?? 'Unknown error'),
+                    ];
+                }
+            }
+
+            // Build create request
+            $parameters = [
+                'CUSTOMOBJECT' => $objectName,
+                'CUSTOMOBJECTFIELDS' => $fieldData,
+            ];
+
+            $xmlRequest = $this->buildXmlRequest('create', $parameters);
+
+            Log::info('Sage Intacct XML API: Creating custom object record', [
+                'object_name' => $objectName,
+                'fields' => array_keys($fieldData),
+            ]);
+
+            // Send request
+            $response = $this->sendXmlRequest($xmlRequest);
+
+            if (! $response['success']) {
+                return [
+                    'success' => false,
+                    'error' => $response['error'] ?? 'Failed to create record',
+                ];
+            }
+
+            // Parse response
+            $result = $this->parseXmlResponse($response['xml']);
+
+            if (! $result['success']) {
+                return [
+                    'success' => false,
+                    'error' => $result['error'] ?? 'Failed to parse response',
+                ];
+            }
+
+            Log::info('Sage Intacct XML API: Record created successfully', [
+                'object_name' => $objectName,
+                'record_key' => $result['key'] ?? 'unknown',
+            ]);
+
+            return [
+                'success' => true,
+                'key' => $result['key'] ?? null,
+                'data' => $result['data'] ?? [],
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Sage Intacct XML createCustomObjectRecord exception', [
+                'object_name' => $objectName,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'error' => 'Exception: '.$e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Batch create records in a custom object (XML method)
+     */
+    private function batchCreateRecordsXml(string $objectName, array $records): array
+    {
+        try {
+            // Validate batch size
+            if (count($records) > 100) {
+                return [
+                    'success' => false,
+                    'error' => 'Batch size exceeds limit of 100 records. Provided: '.count($records),
+                ];
+            }
+
+            if (empty($records)) {
+                return [
+                    'success' => true,
+                    'created' => 0,
+                    'failed' => [],
+                    'message' => 'No records to create',
+                ];
+            }
+
+            // Ensure we have a session
+            if (! $this->sessionId) {
+                $authResult = $this->authenticateXml();
+                if (! $authResult['success']) {
+                    return [
+                        'success' => false,
+                        'error' => 'Authentication failed: '.($authResult['message'] ?? 'Unknown error'),
+                    ];
+                }
+            }
+
+            // Build batch create request with multiple functions
+            $xmlRequest = $this->buildBatchCreateXml($objectName, $records);
+
+            Log::info('Sage Intacct XML API: Batch creating records', [
+                'object_name' => $objectName,
+                'record_count' => count($records),
+            ]);
+
+            // Send request
+            $response = $this->sendXmlRequest($xmlRequest);
+
+            if (! $response['success']) {
+                return [
+                    'success' => false,
+                    'error' => $response['error'] ?? 'Batch create failed',
+                    'created' => 0,
+                    'failed' => $records,
+                ];
+            }
+
+            // Parse batch response
+            $result = $this->parseBatchResponse($response['xml']);
+
+            Log::info('Sage Intacct XML API: Batch create completed', [
+                'object_name' => $objectName,
+                'total' => count($records),
+                'created' => $result['created'],
+                'failed' => count($result['failed']),
+            ]);
+
+            return [
+                'success' => true,
+                'created' => $result['created'],
+                'failed' => $result['failed'],
+                'details' => $result['details'] ?? [],
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Sage Intacct XML batchCreateRecords exception', [
+                'object_name' => $objectName,
+                'record_count' => count($records),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'error' => 'Exception: '.$e->getMessage(),
+                'created' => 0,
+                'failed' => $records,
+            ];
+        }
+    }
+
+    // ====================================================================
+    // XML HELPER METHODS
+    // ====================================================================
+
+    /**
+     * Build XML request structure for Sage Intacct API
+     */
+    private function buildXmlRequest(string $functionName, array $parameters): string
+    {
+        $controlId = $this->generateControlId();
+        $functionId = $this->generateControlId();
+
+        // Build authentication section
+        if ($this->sessionId) {
+            $authSection = '<sessionid>'.htmlspecialchars($this->sessionId).'</sessionid>';
+        } else {
+            $authSection = '<login>
+                <userid>'.htmlspecialchars($this->setting->web_services_user_id).'</userid>
+                <companyid>'.htmlspecialchars($this->setting->company_id).'</companyid>
+                <password>'.htmlspecialchars($this->setting->web_services_password).'</password>
+            </login>';
+        }
+
+        // Build function content
+        $functionContent = $this->buildFunctionContent($functionName, $parameters);
+
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>
+<request>
+    <control>
+        <senderid>'.htmlspecialchars($this->setting->sender_id).'</senderid>
+        <password>'.htmlspecialchars($this->setting->sender_password).'</password>
+        <controlid>'.$controlId.'</controlid>
+        <uniqueid>false</uniqueid>
+        <dtdversion>3.0</dtdversion>
+    </control>
+    <operation>
+        <authentication>
+            '.$authSection.'
+        </authentication>
+        <content>
+            <function controlid="'.$functionId.'">
+                '.$functionContent.'
+            </function>
+        </content>
+    </operation>
+</request>';
+
+        return $xml;
+    }
+
+    /**
+     * Send HTTP request to Sage Intacct XML API
+     */
+    private function sendXmlRequest(string $xmlPayload): array
+    {
+        try {
+            $apiUrl = $this->setting->endpoint_url ?? 'https://api.intacct.com/ia/xml/xmlgw.phtml';
+
+            Log::debug('Sage Intacct XML API: Sending request', [
+                'url' => $apiUrl,
+                'xml_preview' => substr($xmlPayload, 0, 500).'...',
+            ]);
+
+            // Send POST request with XML payload
+            $response = Http::timeout(60)
+                ->withHeaders([
+                    'Content-Type' => 'application/xml',
+                ])
+                ->withBody($xmlPayload, 'application/xml')
+                ->post($apiUrl);
+
+            if (! $response->successful()) {
+                Log::error('Sage Intacct XML API request failed', [
+                    'status' => $response->status(),
+                    'response' => substr($response->body(), 0, 500),
+                ]);
+
+                return [
+                    'success' => false,
+                    'error' => 'API request failed with status: '.$response->status(),
+                ];
+            }
+
+            $responseBody = $response->body();
+
+            Log::debug('Sage Intacct XML API: Response received', [
+                'status' => $response->status(),
+                'preview' => substr($responseBody, 0, 500).'...',
+            ]);
+
+            return [
+                'success' => true,
+                'xml' => $responseBody,
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Sage Intacct XML API sendRequest exception', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'error' => 'Exception: '.$e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Parse XML response and validate
+     */
+    private function parseXmlResponse(string $xmlResponse): array
+    {
+        try {
+            // Suppress XML errors and use internal error handling
+            $previousErrorSetting = libxml_use_internal_errors(true);
+
+            $xml = simplexml_load_string($xmlResponse);
+
+            if ($xml === false) {
+                $errors = libxml_get_errors();
+                libxml_clear_errors();
+                libxml_use_internal_errors($previousErrorSetting);
+
+                $errorMessage = 'XML parsing failed';
+                if (! empty($errors)) {
+                    $errorMessage .= ': '.$errors[0]->message;
+                }
+
+                return [
+                    'success' => false,
+                    'error' => $errorMessage,
+                ];
+            }
+
+            libxml_use_internal_errors($previousErrorSetting);
+
+            // Check for operation errors
+            $operationResult = $xml->xpath('//operation/result/status');
+            if (! empty($operationResult)) {
+                $status = (string) $operationResult[0];
+
+                if ($status === 'failure') {
+                    $errorMessages = $xml->xpath('//operation/result/errormessage/error');
+                    $errorText = 'Operation failed';
+
+                    if (! empty($errorMessages)) {
+                        $errorDetails = [];
+                        foreach ($errorMessages as $error) {
+                            $description = (string) ($error->description2 ?? $error->description ?? 'Unknown error');
+                            $errorDetails[] = $description;
+                        }
+                        $errorText .= ': '.implode('; ', $errorDetails);
+                    }
+
+                    return [
+                        'success' => false,
+                        'error' => $errorText,
+                    ];
+                }
+            }
+
+            // Check for function result
+            $functionResult = $xml->xpath('//function/result/status');
+            if (! empty($functionResult)) {
+                $status = (string) $functionResult[0];
+
+                if ($status === 'failure') {
+                    $errorMessages = $xml->xpath('//function/result/errormessage/error');
+                    $errorText = 'Function failed';
+
+                    if (! empty($errorMessages)) {
+                        $errorDetails = [];
+                        foreach ($errorMessages as $error) {
+                            $description = (string) ($error->description2 ?? $error->description ?? 'Unknown error');
+                            $correction = (string) ($error->correction ?? '');
+                            $errorDetails[] = $description.($correction ? ' ('.$correction.')' : '');
+                        }
+                        $errorText .= ': '.implode('; ', $errorDetails);
+                    }
+
+                    return [
+                        'success' => false,
+                        'error' => $errorText,
+                    ];
+                }
+
+                // Extract key if present (for create operations)
+                $key = $xml->xpath('//function/result/key');
+                $data = $xml->xpath('//function/result/data');
+
+                return [
+                    'success' => true,
+                    'key' => ! empty($key) ? (string) $key[0] : null,
+                    'data' => ! empty($data) ? $this->xmlToArray($data[0]) : [],
+                ];
+            }
+
+            // Success - return raw XML structure as array
+            return [
+                'success' => true,
+                'data' => $this->xmlToArray($xml),
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Sage Intacct XML parsing exception', [
+                'error' => $e->getMessage(),
+                'xml_preview' => substr($xmlResponse, 0, 500),
+            ]);
+
+            return [
+                'success' => false,
+                'error' => 'XML parsing exception: '.$e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Build authentication XML
+     */
+    private function buildAuthenticationXml(): string
+    {
+        $controlId = $this->generateControlId();
+
+        return '<?xml version="1.0" encoding="UTF-8"?>
+<request>
+    <control>
+        <senderid>'.htmlspecialchars($this->setting->sender_id).'</senderid>
+        <password>'.htmlspecialchars($this->setting->sender_password).'</password>
+        <controlid>'.$controlId.'</controlid>
+        <uniqueid>false</uniqueid>
+        <dtdversion>3.0</dtdversion>
+    </control>
+    <operation>
+        <authentication>
+            <login>
+                <userid>'.htmlspecialchars($this->setting->web_services_user_id).'</userid>
+                <companyid>'.htmlspecialchars($this->setting->company_id).'</companyid>
+                <password>'.htmlspecialchars($this->setting->web_services_password).'</password>
+            </login>
+        </authentication>
+        <content>
+            <function controlid="'.$this->generateControlId().'">
+                <getAPISession/>
+            </function>
+        </content>
+    </operation>
+</request>';
+    }
+
+    /**
+     * Build function content based on function name and parameters
+     */
+    private function buildFunctionContent(string $functionName, array $parameters): string
+    {
+        if ($functionName === 'create' && isset($parameters['CUSTOMOBJECT'])) {
+            $objectName = $parameters['CUSTOMOBJECT'];
+            $fields = $parameters['CUSTOMOBJECTFIELDS'] ?? [];
+
+            $fieldsXml = '';
+            foreach ($fields as $fieldName => $fieldValue) {
+                $fieldsXml .= '<'.htmlspecialchars($fieldName).'>'.htmlspecialchars($fieldValue).'</'.htmlspecialchars($fieldName).'>'."\n";
+            }
+
+            return '<create>
+                <'.htmlspecialchars($objectName).'>
+                    '.$fieldsXml.'
+                </'.htmlspecialchars($objectName).'>
+            </create>';
+        }
+
+        // Default: just return function name as empty element
+        return '<'.htmlspecialchars($functionName).'/>';
+    }
+
+    /**
+     * Build batch create XML with multiple functions
+     */
+    private function buildBatchCreateXml(string $objectName, array $records): string
+    {
+        $controlId = $this->generateControlId();
+
+        // Build authentication section
+        if ($this->sessionId) {
+            $authSection = '<sessionid>'.htmlspecialchars($this->sessionId).'</sessionid>';
+        } else {
+            $authSection = '<login>
+                <userid>'.htmlspecialchars($this->setting->web_services_user_id).'</userid>
+                <companyid>'.htmlspecialchars($this->setting->company_id).'</companyid>
+                <password>'.htmlspecialchars($this->setting->web_services_password).'</password>
+            </login>';
+        }
+
+        // Build function for each record
+        $functionsXml = '';
+        foreach ($records as $index => $record) {
+            $functionId = $this->generateControlId();
+
+            $fieldsXml = '';
+            foreach ($record as $fieldName => $fieldValue) {
+                $fieldsXml .= '<'.htmlspecialchars($fieldName).'>'.htmlspecialchars($fieldValue).'</'.htmlspecialchars($fieldName).'>'."\n";
+            }
+
+            $functionsXml .= '<function controlid="'.$functionId.'">
+                <create>
+                    <'.htmlspecialchars($objectName).'>
+                        '.$fieldsXml.'
+                    </'.htmlspecialchars($objectName).'>
+                </create>
+            </function>'."\n";
+        }
+
+        return '<?xml version="1.0" encoding="UTF-8"?>
+<request>
+    <control>
+        <senderid>'.htmlspecialchars($this->setting->sender_id).'</senderid>
+        <password>'.htmlspecialchars($this->setting->sender_password).'</password>
+        <controlid>'.$controlId.'</controlid>
+        <uniqueid>false</uniqueid>
+        <dtdversion>3.0</dtdversion>
+    </control>
+    <operation>
+        <authentication>
+            '.$authSection.'
+        </authentication>
+        <content>
+            '.$functionsXml.'
+        </content>
+    </operation>
+</request>';
+    }
+
+    /**
+     * Parse batch response
+     */
+    private function parseBatchResponse(string $xmlResponse): array
+    {
+        try {
+            $xml = simplexml_load_string($xmlResponse);
+            if ($xml === false) {
+                return [
+                    'created' => 0,
+                    'failed' => [],
+                    'details' => [],
+                ];
+            }
+
+            $created = 0;
+            $failed = [];
+            $details = [];
+
+            // Get all function results
+            $functionResults = $xml->xpath('//function/result');
+
+            foreach ($functionResults as $index => $result) {
+                $status = (string) $result->status;
+
+                if ($status === 'success') {
+                    $created++;
+                    $key = (string) ($result->key ?? '');
+                    $details[] = [
+                        'index' => $index,
+                        'success' => true,
+                        'key' => $key,
+                    ];
+                } else {
+                    $errorMessages = $result->xpath('errormessage/error');
+                    $errorText = 'Unknown error';
+
+                    if (! empty($errorMessages)) {
+                        $errorDetails = [];
+                        foreach ($errorMessages as $error) {
+                            $description = (string) ($error->description2 ?? $error->description ?? 'Unknown error');
+                            $errorDetails[] = $description;
+                        }
+                        $errorText = implode('; ', $errorDetails);
+                    }
+
+                    $failed[] = [
+                        'index' => $index,
+                        'error' => $errorText,
+                    ];
+
+                    $details[] = [
+                        'index' => $index,
+                        'success' => false,
+                        'error' => $errorText,
+                    ];
+                }
+            }
+
+            return [
+                'created' => $created,
+                'failed' => $failed,
+                'details' => $details,
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Sage Intacct batch response parsing exception', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return [
+                'created' => 0,
+                'failed' => [],
+                'details' => [],
+            ];
+        }
+    }
+
+    /**
+     * Upload an attachment to Sage Intacct (XML method only)
+     */
+    public function createAttachment(string $fileName, string $fileContents, string $objectType, string $objectId): array
+    {
+        // Only XML API supports attachment uploads via this method
+        if (! $this->setting->isXmlApi()) {
+            return [
+                'success' => false,
+                'error' => 'Attachment uploads are only supported in XML API mode',
+            ];
+        }
+
+        try {
+            // Ensure we have a valid session
+            if (! $this->sessionId) {
+                $authResult = $this->authenticateXml();
+                if (! $authResult['success']) {
+                    return $authResult;
+                }
+            }
+
+            // Base64 encode file contents for XML transmission
+            $base64Contents = base64_encode($fileContents);
+
+            // Validate file size (Intacct has limits)
+            $sizeMB = strlen($base64Contents) / 1024 / 1024;
+            if ($sizeMB > 100) {
+                return [
+                    'success' => false,
+                    'error' => "Attachment too large: {$sizeMB}MB (max 100MB)",
+                ];
+            }
+
+            Log::info('Sage Intacct XML: Uploading attachment', [
+                'filename' => $fileName,
+                'object_type' => $objectType,
+                'object_id' => $objectId,
+                'size_mb' => round($sizeMB, 2),
+            ]);
+
+            // Build XML request for attachment creation
+            $xmlRequest = $this->buildAttachmentXml(
+                $fileName,
+                $base64Contents,
+                $objectType,
+                $objectId
+            );
+
+            // Send request
+            $response = $this->sendXmlRequest($xmlRequest);
+
+            if (! $response['success']) {
+                Log::error('Sage Intacct attachment upload failed', [
+                    'filename' => $fileName,
+                    'error' => $response['error'] ?? 'Unknown error',
+                ]);
+
+                return [
+                    'success' => false,
+                    'error' => $response['error'] ?? 'Failed to upload attachment',
+                ];
+            }
+
+            // Parse response to check for errors
+            $xml = simplexml_load_string($response['xml']);
+            $errormessage = $xml->xpath('//errormessage');
+
+            if (! empty($errormessage)) {
+                $errorText = (string) ($errormessage[0]->error->description2 ?? $errormessage[0]->error->description ?? 'Attachment upload failed');
+
+                Log::error('Sage Intacct attachment API error', [
+                    'filename' => $fileName,
+                    'error' => $errorText,
+                ]);
+
+                return [
+                    'success' => false,
+                    'error' => $errorText,
+                ];
+            }
+
+            Log::info('Sage Intacct XML: Attachment uploaded successfully', [
+                'filename' => $fileName,
+                'object_type' => $objectType,
+                'object_id' => $objectId,
+            ]);
+
+            return [
+                'success' => true,
+                'message' => 'Attachment uploaded successfully',
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Sage Intacct attachment upload exception', [
+                'filename' => $fileName,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Build XML for attachment creation
+     */
+    private function buildAttachmentXml(string $fileName, string $base64Contents, string $objectType, string $objectId): string
+    {
+        $controlId = 'attachment-'.$objectId.'-'.time();
+        $sanitizedFileName = htmlspecialchars($fileName, ENT_XML1, 'UTF-8');
+
+        return <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<request>
+    <control>
+        <senderid>{$this->setting->sender_id}</senderid>
+        <password>{$this->setting->sender_password}</password>
+        <controlid>{$controlId}</controlid>
+        <uniqueid>false</uniqueid>
+        <dtdversion>3.0</dtdversion>
+    </control>
+    <operation>
+        <authentication>
+            <sessionid>{$this->sessionId}</sessionid>
+        </authentication>
+        <content>
+            <function controlid="{$controlId}">
+                <create>
+                    <SUPDOCATTACHMENT>
+                        <attachmentname>{$sanitizedFileName}</attachmentname>
+                        <attachmenttype>File</attachmenttype>
+                        <attachmentdata>{$base64Contents}</attachmentdata>
+                    </SUPDOCATTACHMENT>
+                </create>
+            </function>
+        </content>
+    </operation>
+</request>
+XML;
+    }
+
+    // ====================================================================
+    // OAUTH 2.0 AUTHENTICATION & METHODS
+    // ====================================================================
+
+    /**
+     * Authenticate with OAuth 2.0 (ensure we have a valid access token)
+     */
+    private function authenticateOAuth(): array
+    {
+        try {
+            // Validate we have a user token
+            if (! $this->userToken) {
+                return [
+                    'success' => false,
+                    'message' => 'OAuth authentication requires a user token',
+                    'requires_reauth' => true,
+                ];
+            }
+
             // Check if token is expired
             if ($this->userToken->isExpired()) {
                 return [
@@ -57,7 +999,7 @@ class SageIntacctApiService
                 'message' => 'Token is valid',
             ];
         } catch (\Exception $e) {
-            Log::error('Sage Intacct authentication check exception', [
+            Log::error('Sage Intacct OAuth authentication check exception', [
                 'user_id' => $this->userToken->user_id,
                 'error' => $e->getMessage(),
             ]);
@@ -85,7 +1027,7 @@ class SageIntacctApiService
 
             $tokenUrl = 'https://api.intacct.com/ia/api/v1/oauth2/token';
 
-            Log::debug('Sage Intacct: Refreshing access token', [
+            Log::debug('Sage Intacct OAuth: Refreshing access token', [
                 'user_id' => $this->userToken->user_id,
             ]);
 
@@ -101,7 +1043,7 @@ class SageIntacctApiService
             if (! $response->successful()) {
                 $error = $response->json();
 
-                Log::error('Sage Intacct token refresh failed', [
+                Log::error('Sage Intacct OAuth token refresh failed', [
                     'user_id' => $this->userToken->user_id,
                     'status' => $response->status(),
                     'error' => $error,
@@ -127,7 +1069,7 @@ class SageIntacctApiService
             // Update local reference
             $this->accessToken = $data['access_token'];
 
-            Log::info('Sage Intacct: Access token refreshed successfully', [
+            Log::info('Sage Intacct OAuth: Access token refreshed successfully', [
                 'user_id' => $this->userToken->user_id,
             ]);
 
@@ -136,7 +1078,7 @@ class SageIntacctApiService
                 'message' => 'Token refreshed successfully',
             ];
         } catch (\Exception $e) {
-            Log::error('Sage Intacct token refresh exception', [
+            Log::error('Sage Intacct OAuth token refresh exception', [
                 'user_id' => $this->userToken->user_id,
                 'error' => $e->getMessage(),
             ]);
@@ -149,13 +1091,21 @@ class SageIntacctApiService
     }
 
     /**
-     * Test API connectivity
+     * Test OAuth API connectivity
      */
-    public function testConnection(): array
+    private function testConnectionOAuth(): array
     {
         try {
+            // Validate we have a user token
+            if (! $this->userToken) {
+                return [
+                    'success' => false,
+                    'message' => 'OAuth authentication requires a user token',
+                ];
+            }
+
             // Ensure token is valid
-            $authResult = $this->authenticate();
+            $authResult = $this->authenticateOAuth();
             if (! $authResult['success']) {
                 return $authResult;
             }
@@ -174,7 +1124,7 @@ class SageIntacctApiService
                 $errorData = $response->json();
                 $errorMessage = $errorData['message'] ?? $errorData['error'] ?? 'Company verification failed';
 
-                Log::error('Sage Intacct company verification failed', [
+                Log::error('Sage Intacct OAuth company verification failed', [
                     'user_id' => $this->userToken->user_id,
                     'status' => $response->status(),
                     'error' => $errorMessage,
@@ -189,7 +1139,7 @@ class SageIntacctApiService
             $companyData = $response->json();
             $companyName = $companyData['name'] ?? $companyData['companyName'] ?? 'Unknown';
 
-            Log::info('Sage Intacct connection test successful', [
+            Log::info('Sage Intacct OAuth connection test successful', [
                 'user_id' => $this->userToken->user_id,
                 'company_id' => $this->userToken->company_id,
                 'company_name' => $companyName,
@@ -202,8 +1152,8 @@ class SageIntacctApiService
                 'is_sandbox' => $this->userToken->isSandbox(),
             ];
         } catch (\Exception $e) {
-            Log::error('Sage Intacct connection test exception', [
-                'user_id' => $this->userToken->user_id,
+            Log::error('Sage Intacct OAuth connection test exception', [
+                'user_id' => $this->userToken->user_id ?? null,
                 'error' => $e->getMessage(),
             ]);
 
@@ -215,14 +1165,22 @@ class SageIntacctApiService
     }
 
     /**
-     * Create a record in a custom object
+     * Create a record in a custom object (OAuth method)
      */
-    public function createCustomObjectRecord(string $objectName, array $fieldData): array
+    private function createCustomObjectRecordOAuth(string $objectName, array $fieldData): array
     {
         try {
+            // Validate we have a user token
+            if (! $this->userToken) {
+                return [
+                    'success' => false,
+                    'error' => 'OAuth authentication requires a user token',
+                ];
+            }
+
             // Sandbox safety check
             if (! $this->userToken->isSandbox()) {
-                Log::warning('Sage Intacct: Creating record in non-sandbox environment', [
+                Log::warning('Sage Intacct OAuth: Creating record in non-sandbox environment', [
                     'user_id' => $this->userToken->user_id,
                     'company_id' => $this->userToken->company_id,
                     'object_name' => $objectName,
@@ -230,7 +1188,7 @@ class SageIntacctApiService
             }
 
             // Ensure valid token
-            $authResult = $this->authenticate();
+            $authResult = $this->authenticateOAuth();
             if (! $authResult['success']) {
                 return [
                     'success' => false,
@@ -241,7 +1199,7 @@ class SageIntacctApiService
             $apiUrl = 'https://api.intacct.com/ia/api/v1/companies/'.urlencode($this->userToken->company_id).
                       '/objects/'.urlencode($objectName);
 
-            Log::info('Sage Intacct API: Creating custom object record', [
+            Log::info('Sage Intacct OAuth API: Creating custom object record', [
                 'user_id' => $this->userToken->user_id,
                 'object_name' => $objectName,
                 'company_id' => $this->userToken->company_id,
@@ -264,7 +1222,7 @@ class SageIntacctApiService
                     $errorMessage .= ': '.implode(', ', $errorData['errors']);
                 }
 
-                Log::error('Sage Intacct record creation failed', [
+                Log::error('Sage Intacct OAuth record creation failed', [
                     'user_id' => $this->userToken->user_id,
                     'status' => $response->status(),
                     'error' => $errorMessage,
@@ -280,7 +1238,7 @@ class SageIntacctApiService
             $result = $response->json();
             $recordKey = $result['id'] ?? $result['key'] ?? $result['recordno'] ?? null;
 
-            Log::info('Sage Intacct API: Record created successfully', [
+            Log::info('Sage Intacct OAuth API: Record created successfully', [
                 'user_id' => $this->userToken->user_id,
                 'object_name' => $objectName,
                 'record_key' => $recordKey,
@@ -292,8 +1250,8 @@ class SageIntacctApiService
                 'data' => $result,
             ];
         } catch (\Exception $e) {
-            Log::error('Sage Intacct createCustomObjectRecord exception', [
-                'user_id' => $this->userToken->user_id,
+            Log::error('Sage Intacct OAuth createCustomObjectRecord exception', [
+                'user_id' => $this->userToken->user_id ?? null,
                 'object_name' => $objectName,
                 'error' => $e->getMessage(),
             ]);
@@ -306,11 +1264,19 @@ class SageIntacctApiService
     }
 
     /**
-     * Batch create records in a custom object (up to 100 records per batch)
+     * Batch create records in a custom object (OAuth method)
      */
-    public function batchCreateRecords(string $objectName, array $records): array
+    private function batchCreateRecordsOAuth(string $objectName, array $records): array
     {
         try {
+            // Validate we have a user token
+            if (! $this->userToken) {
+                return [
+                    'success' => false,
+                    'error' => 'OAuth authentication requires a user token',
+                ];
+            }
+
             // Validate batch size
             if (count($records) > 100) {
                 return [
@@ -330,7 +1296,7 @@ class SageIntacctApiService
 
             // Sandbox safety check
             if (! $this->userToken->isSandbox()) {
-                Log::warning('Sage Intacct: Batch creating records in non-sandbox environment', [
+                Log::warning('Sage Intacct OAuth: Batch creating records in non-sandbox environment', [
                     'user_id' => $this->userToken->user_id,
                     'company_id' => $this->userToken->company_id,
                     'object_name' => $objectName,
@@ -339,7 +1305,7 @@ class SageIntacctApiService
             }
 
             // Ensure valid token
-            $authResult = $this->authenticate();
+            $authResult = $this->authenticateOAuth();
             if (! $authResult['success']) {
                 return [
                     'success' => false,
@@ -350,7 +1316,7 @@ class SageIntacctApiService
             $apiUrl = 'https://api.intacct.com/ia/api/v1/companies/'.urlencode($this->userToken->company_id).
                       '/objects/'.urlencode($objectName).'/batch';
 
-            Log::info('Sage Intacct API: Batch creating records', [
+            Log::info('Sage Intacct OAuth API: Batch creating records', [
                 'user_id' => $this->userToken->user_id,
                 'object_name' => $objectName,
                 'record_count' => count($records),
@@ -368,7 +1334,7 @@ class SageIntacctApiService
                 $errorData = $response->json();
                 $errorMessage = $errorData['message'] ?? $errorData['error'] ?? 'Batch create failed';
 
-                Log::error('Sage Intacct batch create failed', [
+                Log::error('Sage Intacct OAuth batch create failed', [
                     'user_id' => $this->userToken->user_id,
                     'status' => $response->status(),
                     'error' => $errorMessage,
@@ -387,7 +1353,7 @@ class SageIntacctApiService
             $created = $result['created'] ?? $result['success_count'] ?? 0;
             $failedRecords = $result['failed'] ?? $result['errors'] ?? [];
 
-            Log::info('Sage Intacct API: Batch create completed', [
+            Log::info('Sage Intacct OAuth API: Batch create completed', [
                 'user_id' => $this->userToken->user_id,
                 'object_name' => $objectName,
                 'total' => count($records),
@@ -402,8 +1368,8 @@ class SageIntacctApiService
                 'details' => $result['details'] ?? [],
             ];
         } catch (\Exception $e) {
-            Log::error('Sage Intacct batchCreateRecords exception', [
-                'user_id' => $this->userToken->user_id,
+            Log::error('Sage Intacct OAuth batchCreateRecords exception', [
+                'user_id' => $this->userToken->user_id ?? null,
                 'object_name' => $objectName,
                 'record_count' => count($records),
                 'error' => $e->getMessage(),
@@ -418,19 +1384,49 @@ class SageIntacctApiService
         }
     }
 
+    // ====================================================================
+    // SHARED HELPER METHODS
+    // ====================================================================
+
     /**
-     * Get the user token
+     * Convert SimpleXMLElement to array
      */
-    public function getUserToken(): UserSageIntacctToken
+    private function xmlToArray(\SimpleXMLElement $xml): array
     {
-        return $this->userToken;
+        $json = json_encode($xml);
+
+        return json_decode($json, true);
     }
 
     /**
-     * Get the setting instance
+     * Generate unique control ID
+     */
+    private function generateControlId(): string
+    {
+        return 'CAPTRACK_'.time().'_'.uniqid();
+    }
+
+    /**
+     * Get the current setting instance
      */
     public function getSetting()
     {
         return $this->setting;
+    }
+
+    /**
+     * Get the current session ID (XML API only)
+     */
+    public function getSessionId(): ?string
+    {
+        return $this->sessionId;
+    }
+
+    /**
+     * Get the user token (OAuth only)
+     */
+    public function getUserToken(): ?UserSageIntacctToken
+    {
+        return $this->userToken;
     }
 }

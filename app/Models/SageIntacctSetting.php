@@ -43,6 +43,7 @@ class SageIntacctSetting extends Model
         'client_id',
         'client_secret',
         'api_version',
+        'auth_method',
         'user_id',
         'sender_id',
         'sender_password',
@@ -99,20 +100,22 @@ class SageIntacctSetting extends Model
      */
     public function isConfigured(): bool
     {
-        // Check if REST API credentials are configured
-        $hasRestCredentials = ! empty($this->company_id)
-            && ! empty($this->client_id)
-            && ! empty($this->client_secret);
+        $authMethod = $this->auth_method ?? 'xml';
 
-        // Check if XML Web Services credentials are configured
-        $hasXmlCredentials = ! empty($this->company_id)
-            && ! empty($this->sender_id)
-            && ! empty($this->sender_password)
-            && ! empty($this->web_services_user_id)
-            && ! empty($this->web_services_password);
-
-        // Either REST or XML credentials must be complete
-        return $hasRestCredentials || $hasXmlCredentials;
+        if ($authMethod === 'oauth') {
+            // Check if OAuth/REST API credentials are configured
+            return ! empty($this->company_id)
+                && ! empty($this->client_id)
+                && ! empty($this->client_secret)
+                && ! empty($this->redirect_uri);
+        } else {
+            // Check if XML Web Services credentials are configured
+            return ! empty($this->company_id)
+                && ! empty($this->sender_id)
+                && ! empty($this->sender_password)
+                && ! empty($this->web_services_user_id)
+                && ! empty($this->web_services_password);
+        }
     }
 
     /**
@@ -144,11 +147,19 @@ class SageIntacctSetting extends Model
     }
 
     /**
-     * Check if this configuration uses REST API
+     * Check if this configuration uses REST API (OAuth)
      */
     public function isRestApi(): bool
     {
-        return ! empty($this->client_id) && ! empty($this->client_secret);
+        return $this->auth_method === 'oauth';
+    }
+
+    /**
+     * Check if this configuration uses XML Web Services
+     */
+    public function isXmlApi(): bool
+    {
+        return $this->auth_method === 'xml';
     }
 
     /**

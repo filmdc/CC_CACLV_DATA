@@ -17,6 +17,9 @@ class SageIntacctConfiguration extends Component
     // Tab state
     public $activeTab = 'credentials';
 
+    // Authentication Method
+    public $auth_method = 'xml';
+
     // REST API Credentials (App-level)
     public $company_id = '';
 
@@ -88,15 +91,16 @@ class SageIntacctConfiguration extends Component
     public $filterEndDate = '';
 
     protected $rules = [
+        'auth_method' => 'required|in:xml,oauth',
         'company_id' => 'required|string|max:255',
-        'client_id' => 'required|string|max:255',
-        'client_secret' => 'required|string',
-        'redirect_uri' => 'required|url',
+        'client_id' => 'required_if:auth_method,oauth|nullable|string|max:255',
+        'client_secret' => 'required_if:auth_method,oauth|nullable|string',
+        'redirect_uri' => 'required_if:auth_method,oauth|nullable|url',
+        'sender_id' => 'required_if:auth_method,xml|nullable|string|max:255',
+        'sender_password' => 'required_if:auth_method,xml|nullable|string|max:255',
+        'web_services_user_id' => 'required_if:auth_method,xml|nullable|string|max:255',
+        'web_services_password' => 'required_if:auth_method,xml|nullable|string|max:255',
         'user_id' => 'nullable|string|max:255',
-        'sender_id' => 'nullable|string|max:255',
-        'sender_password' => 'nullable|string|max:255',
-        'web_services_user_id' => 'nullable|string|max:255',
-        'web_services_password' => 'nullable|string|max:255',
         'location_id' => 'nullable|string|max:255',
         'department_id' => 'nullable|string|max:255',
         'class_id' => 'nullable|string|max:255',
@@ -122,6 +126,7 @@ class SageIntacctConfiguration extends Component
         $settings = SageIntacctSetting::first();
 
         if ($settings) {
+            $this->auth_method = $settings->auth_method ?? 'xml';
             $this->company_id = $settings->company_id ?? 'CACLV-sandbox';
             $this->client_id = $settings->client_id ?? '';
             $this->client_secret = $settings->client_secret ?? '';
@@ -137,7 +142,8 @@ class SageIntacctConfiguration extends Component
             $this->is_active = $settings->is_active ?? false;
             $this->code_mapping_enabled = $settings->code_mapping_enabled ?? false;
         } else {
-            // No settings exist yet - default to sandbox
+            // No settings exist yet - default to XML for firewalled environments
+            $this->auth_method = 'xml';
             $this->company_id = 'CACLV-sandbox';
             $this->redirect_uri = route('intacct.oauth.callback');
             $this->code_mapping_enabled = false;
@@ -167,6 +173,7 @@ class SageIntacctConfiguration extends Component
             $settings = SageIntacctSetting::first();
 
             $data = [
+                'auth_method' => $this->auth_method,
                 'company_id' => $this->company_id,
                 'client_id' => $this->client_id,
                 'client_secret' => $this->client_secret,
@@ -181,7 +188,9 @@ class SageIntacctConfiguration extends Component
                 'class_id' => $this->class_id,
                 'is_active' => $this->is_active,
                 'code_mapping_enabled' => $this->code_mapping_enabled,
-                'endpoint_url' => 'https://api.intacct.com',
+                'endpoint_url' => $this->auth_method === 'xml'
+                    ? 'https://api.intacct.com/ia/xml/xmlgw.phtml'
+                    : 'https://api.intacct.com',
             ];
 
             if ($settings) {

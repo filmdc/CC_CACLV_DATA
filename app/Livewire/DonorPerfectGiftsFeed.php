@@ -398,16 +398,6 @@ class DonorPerfectGiftsFeed extends Component
             return;
         }
 
-        // Check if user has valid OAuth token
-        $userToken = auth()->user()->sageIntacctToken;
-
-        if (! $userToken || ! $userToken->hasValidToken()) {
-            session()->flash('error', 'You must connect to Sage Intacct first.');
-            $this->showSyncModal = false;
-
-            return redirect()->route('intacct.oauth.authorize');
-        }
-
         try {
             $this->syncInProgress = true;
 
@@ -421,9 +411,25 @@ class DonorPerfectGiftsFeed extends Component
                 throw new \Exception('Sage Intacct is not configured');
             }
 
-            // Initialize Sage Intacct services
-            $apiService = new \App\Services\SageIntacctApiService($userToken, $intacctSetting);
-            $syncService = new \App\Services\SageIntacctSyncService($apiService, $intacctSetting, $userToken);
+            // Check auth method and initialize services accordingly
+            if ($intacctSetting->isXmlApi()) {
+                // XML mode - no user token needed
+                $apiService = new \App\Services\SageIntacctApiService($intacctSetting);
+                $syncService = new \App\Services\SageIntacctSyncService($apiService, $intacctSetting);
+            } else {
+                // OAuth mode - requires user token
+                $userToken = auth()->user()->sageIntacctToken;
+
+                if (! $userToken || ! $userToken->hasValidToken()) {
+                    session()->flash('error', 'You must connect to Sage Intacct first.');
+                    $this->showSyncModal = false;
+
+                    return redirect()->route('intacct.oauth.authorize');
+                }
+
+                $apiService = new \App\Services\SageIntacctApiService($intacctSetting, $userToken);
+                $syncService = new \App\Services\SageIntacctSyncService($apiService, $intacctSetting, $userToken);
+            }
 
             // Get gifts to sync
             $result = $giftService->getGiftsWithMetadata($startDate, $endDate, $this->search);

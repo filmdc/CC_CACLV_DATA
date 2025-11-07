@@ -191,15 +191,17 @@
                 </button>
 
                 <div class="flex items-center space-x-2">
-                    <!-- Sage Intacct Connection Status & Sync Button -->
+                    <!-- Sage Intacct Sync Button -->
                     @if($intacctConfigured && $this->can('intacct.sync'))
                         @php
+                            $intacctSetting = \App\Models\SageIntacctSetting::getActive();
+                            $isXmlMode = $intacctSetting && $intacctSetting->isXmlApi();
                             $userToken = auth()->user()->sageIntacctToken;
                             $hasValidToken = $userToken && $userToken->hasValidToken();
                         @endphp
 
-                        @if($hasValidToken)
-                            <!-- User is connected - show sync button -->
+                        @if($isXmlMode)
+                            <!-- XML mode - always show sync button (no user connection needed) -->
                             <button wire:click="toggleSyncModal"
                                     class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 flex items-center">
                                 <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -210,19 +212,38 @@
                                     <span class="ml-2 px-2 py-0.5 bg-purple-800 rounded-full text-xs">{{ $selectedCount }}</span>
                                 @endif
                             </button>
-                            <!-- Connection status badge -->
-                            <span class="text-xs px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-md">
-                                ✓ Connected ({{ $userToken->company_id }})
+                            <!-- Auth method badge -->
+                            <span class="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-md">
+                                XML Web Services
                             </span>
                         @else
-                            <!-- User not connected - show connect button -->
-                            <a href="{{ route('intacct.oauth.authorize') }}"
-                               class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 flex items-center">
-                                <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
-                                </svg>
-                                Connect to Sage Intacct
-                            </a>
+                            <!-- OAuth mode - check user connection -->
+                            @if($hasValidToken)
+                                <!-- User is connected - show sync button -->
+                                <button wire:click="toggleSyncModal"
+                                        class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 flex items-center">
+                                    <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                                    </svg>
+                                    Sync to Intacct
+                                    @if($selectedCount > 0)
+                                        <span class="ml-2 px-2 py-0.5 bg-purple-800 rounded-full text-xs">{{ $selectedCount }}</span>
+                                    @endif
+                                </button>
+                                <!-- Connection status badge -->
+                                <span class="text-xs px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-md">
+                                    ✓ OAuth Connected ({{ $userToken->company_id }})
+                                </span>
+                            @else
+                                <!-- User not connected - show connect button -->
+                                <a href="{{ route('intacct.oauth.authorize') }}"
+                                   class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 flex items-center">
+                                    <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                                    </svg>
+                                    Connect to Sage Intacct
+                                </a>
+                            @endif
                         @endif
                     @endif
 

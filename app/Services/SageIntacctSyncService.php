@@ -36,7 +36,9 @@ class SageIntacctSyncService
     {
         try {
             // Sandbox safety check
-            if (! $this->setting->isSandbox()) {
+            $isSandbox = $this->userToken ? $this->userToken->isSandbox() : $this->setting->isSandbox();
+
+            if (! $isSandbox) {
                 Log::warning('Sage Intacct: Syncing to non-sandbox environment', [
                     'company_id' => $this->setting->company_id,
                     'start_date' => $startDate->toDateString(),
@@ -47,13 +49,14 @@ class SageIntacctSyncService
             Log::info('Sage Intacct: Starting gift sync', [
                 'start_date' => $startDate->toDateString(),
                 'end_date' => $endDate->toDateString(),
-                'user_id' => $userId ?? $this->userToken->user_id,
-                'is_sandbox' => $this->userToken->isSandbox(),
+                'user_id' => $userId ?? ($this->userToken ? $this->userToken->user_id : 'system'),
+                'is_sandbox' => $isSandbox,
+                'auth_method' => $this->setting->auth_method ?? 'xml',
             ]);
 
             // Create sync history record
             $syncHistory = $this->createSyncHistory(
-                $userId ?? $this->userToken->user_id,
+                $userId ?? ($this->userToken ? $this->userToken->user_id : 0),
                 'manual',
                 0 // Will be updated after we get the gifts
             );
@@ -196,7 +199,7 @@ class SageIntacctSyncService
 
             // Create sync history record
             $syncHistory = $this->createSyncHistory(
-                $userId ?? $this->userToken->user_id,
+                $userId ?? ($this->userToken ? $this->userToken->user_id : 0),
                 $userId ? 'manual_retry' : 'automatic_retry',
                 $unsyncedGifts->count()
             );
@@ -301,7 +304,7 @@ class SageIntacctSyncService
 
             // Create a temporary sync history for this single gift
             $syncHistory = $this->createSyncHistory(
-                $userId ?? $this->userToken->user_id,
+                $userId ?? ($this->userToken ? $this->userToken->user_id : 0),
                 $userId ? 'manual_single' : 'automatic_single',
                 1
             );
