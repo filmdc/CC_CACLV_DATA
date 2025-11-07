@@ -804,7 +804,7 @@ class SageIntacctSyncService
             $itemId = DB::table('sage_intacct_sync_items')->insertGetId([
                 'sync_history_id' => $syncHistory->id,
                 'gift_id' => $giftData['gift_id'] ?? null,
-                'gift_data' => json_encode($giftData),
+                'gift_cache_id' => null, // TODO: Link to gift cache if needed
                 'status' => $status,
                 'created_at' => now(),
                 'updated_at' => now(),
