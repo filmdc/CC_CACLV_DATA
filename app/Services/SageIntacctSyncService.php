@@ -128,7 +128,7 @@ class SageIntacctSyncService
             }
 
             // Update sync history status
-            $finalStatus = $totalFailed > 0 ? 'completed_with_errors' : 'completed';
+            $finalStatus = $totalFailed > 0 ? 'partial' : 'completed';
             $errorMessage = $totalFailed > 0 ? "Failed to sync {$totalFailed} records" : null;
             $this->updateSyncHistory($syncHistory, $finalStatus, $errorMessage);
 
@@ -254,7 +254,7 @@ class SageIntacctSyncService
             }
 
             // Update sync history status
-            $finalStatus = $totalFailed > 0 ? 'completed_with_errors' : 'completed';
+            $finalStatus = $totalFailed > 0 ? 'partial' : 'completed';
             $errorMessage = $totalFailed > 0 ? "Failed to sync {$totalFailed} records" : null;
             $this->updateSyncHistory($syncHistory, $finalStatus, $errorMessage);
 
@@ -324,7 +324,7 @@ class SageIntacctSyncService
             }
 
             // Transform gift data
-            $fieldMappings = $this->setting->getFieldMappings();
+            $fieldMappings = $this->setting->fieldMappings()->orderBy('order')->get()->toArray();
             $transformedGift = $this->transformGiftForIntacct($giftData, $fieldMappings);
 
             // Create sync item record
@@ -575,7 +575,7 @@ class SageIntacctSyncService
                 'updated_at' => now(),
             ];
 
-            if ($status === 'completed' || $status === 'completed_with_errors' || $status === 'failed') {
+            if ($status === 'completed' || $status === 'partial' || $status === 'failed') {
                 $updateData['completed_at'] = now();
             }
 
@@ -618,7 +618,7 @@ class SageIntacctSyncService
                     ->where('status', 'failed')
                     ->count(),
                 'syncs_with_errors' => DB::table('sage_intacct_sync_history')
-                    ->where('status', 'completed_with_errors')
+                    ->where('status', 'partial')
                     ->count(),
                 'total_records_synced' => DB::table('sage_intacct_sync_history')
                     ->sum('successful_count'),
@@ -657,7 +657,7 @@ class SageIntacctSyncService
     private function syncBatch(array $batch, $syncHistory): array
     {
         try {
-            $fieldMappings = $this->setting->getFieldMappings();
+            $fieldMappings = $this->setting->fieldMappings()->orderBy('order')->get()->toArray();
 
             // Transform all gifts in batch
             $transformedRecords = [];
