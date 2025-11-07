@@ -54,10 +54,6 @@ class ProjectManagement extends Component
     public $document_pdf_template_id = '';
     public $documentFiles = [];
 
-    // PDF Generation
-    public $showGeneratePdfModal = false;
-    public $generatingDocumentId = null;
-    public $flatten_pdf = false;
 
     // Document Upload Form
     public $showDocumentUploadForm = false;
@@ -363,12 +359,38 @@ class ProjectManagement extends Component
                 }
             }
 
+            // Auto-generate PDF if template is selected
+            if ($document->pdf_template_id) {
+                $template = \App\Models\PdfFormTemplate::find($document->pdf_template_id);
+                if ($template) {
+                    \App\Services\PdfFormService::generateAndAttach(
+                        $template,
+                        $document,
+                        $this->job,
+                        [
+                            'flatten' => false,
+                            'additionalContext' => [
+                                'Participant' => $this->job->participant,
+                                'Property' => $this->job->property,
+                                'Contractor' => $this->job->contractor,
+                                'Program' => $this->job->program,
+                                'Service' => $this->job->service,
+                            ],
+                        ]
+                    );
+                }
+            }
+
             DB::commit();
 
             $successMessage = 'Document requirement created successfully';
 
             if (!empty($this->documentFiles)) {
                 $successMessage .= ' – ' . $uploadSummary['uploaded'] . ' file(s) uploaded';
+            }
+
+            if ($document->pdf_template_id) {
+                $successMessage .= ' – PDF form auto-generated and filled';
             }
 
             session()->flash('success', $successMessage);
@@ -646,30 +668,26 @@ class ProjectManagement extends Component
         $this->refreshJob();
     }
 
-    public function showGeneratePdf($documentId)
-    {
-        $this->generatingDocumentId = $documentId;
-        $this->flatten_pdf = false;
-        $this->showGeneratePdfModal = true;
-    }
-
-    public function generatePdfFromTemplate()
+    public function regeneratePdf($documentId)
     {
         try {
-            $document = MilestoneDocument::with('pdfTemplate')->findOrFail($this->generatingDocumentId);
+            $document = MilestoneDocument::with('pdfTemplate')->findOrFail($documentId);
 
             if (!$document->hasPdfTemplate()) {
                 session()->flash('error', 'No PDF template assigned to this document');
                 return;
             }
 
-            // Generate the PDF and attach to document
+            // Clear existing generated PDFs
+            $document->pdfGenerations()->where('generation_status', 'success')->delete();
+
+            // Regenerate the PDF and attach
             \App\Services\PdfFormService::generateAndAttach(
                 $document->pdfTemplate,
                 $document,
-                $this->job,  // Primary model (HousingJob)
+                $this->job,
                 [
-                    'flatten' => $this->flatten_pdf,
+                    'flatten' => false,
                     'additionalContext' => [
                         'Participant' => $this->job->participant,
                         'Property' => $this->job->property,
@@ -680,14 +698,12 @@ class ProjectManagement extends Component
                 ]
             );
 
-            session()->flash('success', 'PDF generated and attached successfully!');
-            $this->showGeneratePdfModal = false;
-            $this->generatingDocumentId = null;
+            session()->flash('success', 'PDF regenerated successfully with updated project data!');
             $this->refreshJob();
         } catch (\Exception $e) {
-            session()->flash('error', 'Failed to generate PDF: ' . $e->getMessage());
-            \Log::error('PDF generation failed', [
-                'document_id' => $this->generatingDocumentId,
+            session()->flash('error', 'Failed to regenerate PDF: ' . $e->getMessage());
+            \Log::error('PDF regeneration failed', [
+                'document_id' => $documentId,
                 'error' => $e->getMessage(),
             ]);
         }
