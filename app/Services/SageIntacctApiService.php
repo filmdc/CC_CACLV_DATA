@@ -30,7 +30,7 @@ class SageIntacctApiService
      * @param  mixed  $setting  SageIntacctSetting instance
      * @param  UserSageIntacctToken|null  $userToken  Required for OAuth, not needed for XML
      */
-    public function __construct($setting, UserSageIntacctToken $userToken = null)
+    public function __construct($setting, ?UserSageIntacctToken $userToken = null)
     {
         $this->setting = $setting;
         $this->userToken = $userToken;
@@ -154,9 +154,21 @@ class SageIntacctApiService
                 ];
             }
 
-            // Get session ID
-            $sessionId = $xml->xpath('//authentication/sessionid');
+            // Get session ID from getAPISession response
+            // Try multiple possible locations for session ID
+            $sessionId = $xml->xpath('//result/data/api/sessionid');
             if (empty($sessionId)) {
+                $sessionId = $xml->xpath('//data/api/sessionid');
+            }
+            if (empty($sessionId)) {
+                $sessionId = $xml->xpath('//sessionid');
+            }
+            if (empty($sessionId)) {
+                // Log the response for debugging
+                Log::error('Sage Intacct: No session ID found in response', [
+                    'response_preview' => substr($response['xml'], 0, 1000),
+                ]);
+
                 return [
                     'success' => false,
                     'message' => 'No session ID returned from authentication',
