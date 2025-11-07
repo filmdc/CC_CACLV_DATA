@@ -702,7 +702,7 @@ class SageIntacctSyncService
                             ->where('gift_id', $giftId)
                             ->update([
                                 'status' => 'synced',
-                                'intacct_record_key' => $detail['key'] ?? null,
+                                'intacct_record_id' => $detail['key'] ?? null,
                                 'synced_at' => now(),
                                 'updated_at' => now(),
                             ]);
@@ -852,7 +852,7 @@ class SageIntacctSyncService
             }
 
             if ($intacctKey !== null) {
-                $updateData['intacct_record_key'] = $intacctKey;
+                $updateData['intacct_record_id'] = $intacctKey;
             }
 
             DB::table('sage_intacct_sync_items')
