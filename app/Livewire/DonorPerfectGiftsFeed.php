@@ -364,29 +364,22 @@ class DonorPerfectGiftsFeed extends Component
     public function getSyncStatus($giftData)
     {
         // Check if this gift has been synced to Intacct
-        // Look for sync record in the cache table
+        // Look for sync record in the sage_intacct_sync_items table
         $giftId = $giftData['gift_id'] ?? null;
         if (! $giftId) {
             return 'pending';
         }
 
-        $cache = \App\Models\DonorPerfectGiftCache::where('gift_id', $giftId)->first();
+        $syncItem = \App\Models\SageIntacctSyncItem::where('gift_id', $giftId)
+            ->orderBy('created_at', 'desc')
+            ->first();
 
-        if (! $cache) {
+        if (! $syncItem) {
             return 'pending';
         }
 
-        // Check if intacct_synced_at field exists and is populated
-        if (isset($cache->intacct_synced_at) && $cache->intacct_synced_at) {
-            return 'synced';
-        }
-
-        // Check if sync failed
-        if (isset($cache->intacct_sync_error) && $cache->intacct_sync_error) {
-            return 'failed';
-        }
-
-        return 'pending';
+        // Return the status from the sync item
+        return $syncItem->status; // 'pending', 'success', or 'failed'
     }
 
     public function syncToIntacct(DonorPerfectGiftService $giftService)
