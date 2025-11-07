@@ -9,15 +9,19 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * SageIntacctSetting Model
  *
  * Stores Sage Intacct API configuration and credentials.
- * Supports multiple configurations but only one can be active at a time.
+ * Supports both REST API and XML Web Services authentication.
+ * Only one configuration can be active at a time.
  *
  * @property int $id
  * @property string $company_id
+ * @property string|null $client_id REST API Client ID
+ * @property string|null $client_secret REST API Client Secret (Encrypted)
+ * @property string $api_version REST API version (default: v1)
  * @property string|null $user_id
  * @property string $sender_id
  * @property string $sender_password Encrypted
- * @property string $web_services_user_id
- * @property string $web_services_password Encrypted
+ * @property string|null $web_services_user_id
+ * @property string|null $web_services_password Encrypted
  * @property string|null $location_id
  * @property string|null $department_id
  * @property string|null $class_id
@@ -36,6 +40,9 @@ class SageIntacctSetting extends Model
 
     protected $fillable = [
         'company_id',
+        'client_id',
+        'client_secret',
+        'api_version',
         'user_id',
         'sender_id',
         'sender_password',
@@ -53,6 +60,7 @@ class SageIntacctSetting extends Model
     ];
 
     protected $casts = [
+        'client_secret' => 'encrypted',
         'sender_password' => 'encrypted',
         'web_services_password' => 'encrypted',
         'is_active' => 'boolean',
@@ -78,8 +86,6 @@ class SageIntacctSetting extends Model
 
     /**
      * Get the currently active Sage Intacct setting
-     *
-     * @return self|null
      */
     public static function getActive(): ?self
     {
@@ -88,23 +94,28 @@ class SageIntacctSetting extends Model
 
     /**
      * Check if all required configuration fields are set
-     *
-     * @return bool
+     * Supports both REST API and XML Web Services credentials
      */
     public function isConfigured(): bool
     {
-        return !empty($this->company_id)
-            && !empty($this->user_id)
-            && !empty($this->sender_id)
-            && !empty($this->sender_password)
-            && !empty($this->web_services_user_id)
-            && !empty($this->web_services_password);
+        // Check if REST API credentials are configured
+        $hasRestCredentials = ! empty($this->company_id)
+            && ! empty($this->client_id)
+            && ! empty($this->client_secret);
+
+        // Check if XML Web Services credentials are configured
+        $hasXmlCredentials = ! empty($this->company_id)
+            && ! empty($this->sender_id)
+            && ! empty($this->sender_password)
+            && ! empty($this->web_services_user_id)
+            && ! empty($this->web_services_password);
+
+        // Either REST or XML credentials must be complete
+        return $hasRestCredentials || $hasXmlCredentials;
     }
 
     /**
      * Activate this configuration (deactivates all others)
-     *
-     * @return bool
      */
     public function activate(): bool
     {
@@ -117,8 +128,6 @@ class SageIntacctSetting extends Model
 
     /**
      * Update the last sync timestamp
-     *
-     * @return bool
      */
     public function updateLastSync(): bool
     {
@@ -127,11 +136,37 @@ class SageIntacctSetting extends Model
 
     /**
      * Check if code mapping is enabled
-     *
-     * @return bool
      */
     public function isCodeMappingEnabled(): bool
     {
         return $this->code_mapping_enabled ?? false;
+    }
+
+    /**
+     * Check if this configuration uses REST API
+     */
+    public function isRestApi(): bool
+    {
+        return ! empty($this->client_id) && ! empty($this->client_secret);
+    }
+
+    /**
+     * Check if this configuration is for sandbox environment
+     */
+    public function isSandbox(): bool
+    {
+        return strtolower($this->company_id) === 'caclv-sandbox';
+    }
+
+    /**
+     * Get the appropriate endpoint URL for the API type
+     */
+    public function getEndpointUrl(): string
+    {
+        if ($this->isRestApi()) {
+            return $this->endpoint_url ?? 'https://api.intacct.com';
+        }
+
+        return $this->endpoint_url ?? 'https://api.intacct.com/ia/xml/xmlgw.phtml';
     }
 }

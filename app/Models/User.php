@@ -79,6 +79,14 @@ class User extends Authenticatable
     }
 
     /**
+     * The user's Sage Intacct OAuth token.
+     */
+    public function sageIntacctToken()
+    {
+        return $this->hasOne(UserSageIntacctToken::class);
+    }
+
+    /**
      * Check if the user has a specific role.
      */
     public function hasRole(string $role): bool

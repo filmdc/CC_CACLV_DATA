@@ -2,10 +2,10 @@
 
 namespace App\Livewire;
 
-use App\Models\SageIntacctSetting;
-use App\Models\SageIntacctFieldMapping;
-use App\Models\SageIntacctSyncHistory;
 use App\Models\DonorPerfectSetting;
+use App\Models\SageIntacctFieldMapping;
+use App\Models\SageIntacctSetting;
+use App\Models\SageIntacctSyncHistory;
 use App\Services\SageIntacctApiService;
 use App\Traits\WithPermissionChecks;
 use Livewire\Component;
@@ -18,51 +18,83 @@ class SageIntacctConfiguration extends Component
     // Tab state
     public $activeTab = 'credentials';
 
-    // API Credentials
+    // REST API Credentials (Primary)
     public $company_id = '';
+
+    public $client_id = '';
+
+    public $client_secret = '';
+
+    // XML Web Services Credentials (Optional/Legacy)
     public $user_id = '';
+
     public $sender_id = '';
+
     public $sender_password = '';
+
     public $web_services_user_id = '';
+
     public $web_services_password = '';
+
+    // Dimensional Accounting (Optional)
     public $location_id = '';
+
     public $department_id = '';
+
     public $class_id = '';
+
+    // Flags
     public $is_active = false;
+
     public $code_mapping_enabled = false;
 
     // Connection test
     public $testConnectionResult = null;
+
     public $showTestResult = false;
 
     // Field Mapping
     public $showAddMappingForm = false;
+
     public $mapping_dp_field = '';
+
     public $mapping_intacct_field = '';
+
     public $mapping_is_required = false;
+
     public $mapping_transformation = '';
 
     // Code Mapping properties
     public $selectedFieldType = 'gl_code';
+
     public $mappings = [];
+
     public $editingMappingId = null;
+
     public $editingIntacctCode = '';
+
     public $showOnlyUnmapped = false;
+
     public $showArchived = false;
+
     public $mappingNotes = '';
 
     // Sync History filters
     public $filterStatus = '';
+
     public $filterStartDate = '';
+
     public $filterEndDate = '';
 
     protected $rules = [
         'company_id' => 'required|string|max:255',
-        'user_id' => 'required|string|max:255',
-        'sender_id' => 'required|string|max:255',
-        'sender_password' => 'required|string|max:255',
-        'web_services_user_id' => 'required|string|max:255',
-        'web_services_password' => 'required|string|max:255',
+        'client_id' => 'required|string|max:255',
+        'client_secret' => 'required|string',
+        'user_id' => 'nullable|string|max:255',
+        'sender_id' => 'nullable|string|max:255',
+        'sender_password' => 'nullable|string|max:255',
+        'web_services_user_id' => 'nullable|string|max:255',
+        'web_services_password' => 'nullable|string|max:255',
         'location_id' => 'nullable|string|max:255',
         'department_id' => 'nullable|string|max:255',
         'class_id' => 'nullable|string|max:255',
@@ -71,11 +103,8 @@ class SageIntacctConfiguration extends Component
 
     protected $messages = [
         'company_id.required' => 'Company ID is required.',
-        'user_id.required' => 'User ID is required.',
-        'sender_id.required' => 'Sender ID is required.',
-        'sender_password.required' => 'Sender Password is required.',
-        'web_services_user_id.required' => 'Web Services User ID is required.',
-        'web_services_password.required' => 'Web Services Password is required.',
+        'client_id.required' => 'Client ID is required for REST API authentication.',
+        'client_secret.required' => 'Client Secret is required for REST API authentication.',
     ];
 
     public function mount()
@@ -89,7 +118,9 @@ class SageIntacctConfiguration extends Component
         $settings = SageIntacctSetting::first();
 
         if ($settings) {
-            $this->company_id = $settings->company_id ?? '';
+            $this->company_id = $settings->company_id ?? 'CACLV-sandbox';
+            $this->client_id = $settings->client_id ?? '';
+            $this->client_secret = $settings->client_secret ?? '';
             $this->user_id = $settings->user_id ?? '';
             $this->sender_id = $settings->sender_id ?? '';
             $this->sender_password = $settings->sender_password ?? '';
@@ -101,7 +132,8 @@ class SageIntacctConfiguration extends Component
             $this->is_active = $settings->is_active ?? false;
             $this->code_mapping_enabled = $settings->code_mapping_enabled ?? false;
         } else {
-            // No settings exist yet - default code mapping to false but allow access
+            // No settings exist yet - default to sandbox
+            $this->company_id = 'CACLV-sandbox';
             $this->code_mapping_enabled = false;
         }
 
@@ -130,6 +162,8 @@ class SageIntacctConfiguration extends Component
 
             $data = [
                 'company_id' => $this->company_id,
+                'client_id' => $this->client_id,
+                'client_secret' => $this->client_secret,
                 'user_id' => $this->user_id,
                 'sender_id' => $this->sender_id,
                 'sender_password' => $this->sender_password,
@@ -140,6 +174,7 @@ class SageIntacctConfiguration extends Component
                 'class_id' => $this->class_id,
                 'is_active' => $this->is_active,
                 'code_mapping_enabled' => $this->code_mapping_enabled,
+                'endpoint_url' => 'https://api.intacct.com',
             ];
 
             if ($settings) {
@@ -150,7 +185,7 @@ class SageIntacctConfiguration extends Component
 
             session()->flash('success', 'Sage Intacct credentials saved successfully.');
         } catch (\Exception $e) {
-            session()->flash('error', 'Failed to save credentials: ' . $e->getMessage());
+            session()->flash('error', 'Failed to save credentials: '.$e->getMessage());
         }
     }
 
@@ -160,11 +195,8 @@ class SageIntacctConfiguration extends Component
 
         $this->validate([
             'company_id' => 'required|string',
-            'user_id' => 'required|string',
-            'sender_id' => 'required|string',
-            'sender_password' => 'required|string',
-            'web_services_user_id' => 'required|string',
-            'web_services_password' => 'required|string',
+            'client_id' => 'required|string',
+            'client_secret' => 'required|string',
         ]);
 
         $this->showTestResult = true;
@@ -172,34 +204,41 @@ class SageIntacctConfiguration extends Component
 
         try {
             // Create temporary setting object for testing
-            $tempSetting = new SageIntacctSetting();
+            $tempSetting = new SageIntacctSetting;
             $tempSetting->company_id = $this->company_id;
-            $tempSetting->user_id = $this->user_id;
-            $tempSetting->sender_id = $this->sender_id;
-            $tempSetting->sender_password = $this->sender_password;
-            $tempSetting->web_services_user_id = $this->web_services_user_id;
-            $tempSetting->web_services_password = $this->web_services_password;
+            $tempSetting->client_id = $this->client_id;
+            $tempSetting->client_secret = $this->client_secret;
+            $tempSetting->endpoint_url = 'https://api.intacct.com';
 
             $apiService = new SageIntacctApiService($tempSetting);
             $result = $apiService->testConnection();
 
             if ($result['success']) {
+                $companyName = $result['company_name'] ?? 'Unknown Company';
+                $isSandbox = $result['is_sandbox'] ?? false;
+
+                $message = 'Connection successful! Connected to: '.$companyName;
+                if ($isSandbox) {
+                    $message .= ' (Sandbox Environment)';
+                }
+
                 $this->testConnectionResult = [
                     'success' => true,
-                    'message' => 'Connection successful! API is responding correctly.',
-                    'details' => $result['details'] ?? null,
+                    'message' => $message,
+                    'details' => $result,
+                    'is_sandbox' => $isSandbox,
                 ];
             } else {
                 $this->testConnectionResult = [
                     'success' => false,
-                    'message' => 'Connection failed: ' . ($result['error'] ?? 'Unknown error'),
-                    'details' => $result['details'] ?? null,
+                    'message' => $result['message'] ?? 'Connection failed',
+                    'details' => $result,
                 ];
             }
         } catch (\Exception $e) {
             $this->testConnectionResult = [
                 'success' => false,
-                'message' => 'Connection test failed: ' . $e->getMessage(),
+                'message' => 'Connection test failed: '.$e->getMessage(),
                 'details' => null,
             ];
         }
@@ -240,8 +279,9 @@ class SageIntacctConfiguration extends Component
 
         try {
             $settings = SageIntacctSetting::first();
-            if (!$settings) {
+            if (! $settings) {
                 session()->flash('error', 'Please save Intacct credentials first.');
+
                 return;
             }
 
@@ -272,7 +312,7 @@ class SageIntacctConfiguration extends Component
             $this->showAddMappingForm = false;
             $this->resetMappingForm();
         } catch (\Exception $e) {
-            session()->flash('error', 'Failed to save mapping: ' . $e->getMessage());
+            session()->flash('error', 'Failed to save mapping: '.$e->getMessage());
         }
     }
 
@@ -285,7 +325,7 @@ class SageIntacctConfiguration extends Component
                 session()->flash('success', 'Field mapping deleted successfully.');
             }
         } catch (\Exception $e) {
-            session()->flash('error', 'Failed to delete mapping: ' . $e->getMessage());
+            session()->flash('error', 'Failed to delete mapping: '.$e->getMessage());
         }
     }
 
@@ -293,7 +333,7 @@ class SageIntacctConfiguration extends Component
     {
         try {
             $mapping = SageIntacctFieldMapping::find($mappingId);
-            if (!$mapping) {
+            if (! $mapping) {
                 return;
             }
 
@@ -312,7 +352,7 @@ class SageIntacctConfiguration extends Component
                 session()->flash('success', 'Mapping order updated.');
             }
         } catch (\Exception $e) {
-            session()->flash('error', 'Failed to reorder mapping: ' . $e->getMessage());
+            session()->flash('error', 'Failed to reorder mapping: '.$e->getMessage());
         }
     }
 
@@ -330,7 +370,6 @@ class SageIntacctConfiguration extends Component
         $this->mapping_transformation = '';
         $this->editingMappingId = null;
     }
-
 
     public function updatedFilterStatus()
     {
@@ -358,9 +397,10 @@ class SageIntacctConfiguration extends Component
     public function getAvailableDpFieldsProperty()
     {
         $dpSettings = DonorPerfectSetting::first();
-        if ($dpSettings && !empty($dpSettings->selected_fields)) {
+        if ($dpSettings && ! empty($dpSettings->selected_fields)) {
             return $dpSettings->selected_fields;
         }
+
         return [];
     }
 
@@ -381,7 +421,7 @@ class SageIntacctConfiguration extends Component
             $query->unmapped();
         }
 
-        if (!$this->showArchived) {
+        if (! $this->showArchived) {
             $query->active();
         }
 
@@ -393,18 +433,18 @@ class SageIntacctConfiguration extends Component
         $this->authorizeAction('intacct.configure');
 
         try {
-            $giftService = new \App\Services\DonorPerfectGiftService();
+            $giftService = new \App\Services\DonorPerfectGiftService;
             $result = $giftService->discoverAndSyncCodes(90);
 
             if ($result['success']) {
                 session()->flash('success', "Code discovery complete! Found {$result['new']} new code(s).");
             } else {
-                session()->flash('error', 'Code discovery failed: ' . ($result['error'] ?? 'Unknown error'));
+                session()->flash('error', 'Code discovery failed: '.($result['error'] ?? 'Unknown error'));
             }
 
             $this->loadMappings($this->selectedFieldType);
         } catch (\Exception $e) {
-            session()->flash('error', 'Failed to discover codes: ' . $e->getMessage());
+            session()->flash('error', 'Failed to discover codes: '.$e->getMessage());
         }
     }
 
@@ -440,7 +480,7 @@ class SageIntacctConfiguration extends Component
                 $this->loadMappings($this->selectedFieldType);
             }
         } catch (\Exception $e) {
-            session()->flash('error', 'Failed to save mapping: ' . $e->getMessage());
+            session()->flash('error', 'Failed to save mapping: '.$e->getMessage());
         }
     }
 
@@ -468,7 +508,7 @@ class SageIntacctConfiguration extends Component
                 $this->loadMappings($this->selectedFieldType);
             }
         } catch (\Exception $e) {
-            session()->flash('error', 'Failed to toggle archive: ' . $e->getMessage());
+            session()->flash('error', 'Failed to toggle archive: '.$e->getMessage());
         }
     }
 
@@ -485,7 +525,7 @@ class SageIntacctConfiguration extends Component
             session()->flash('success', "Archived {$count} unmapped code(s).");
             $this->loadMappings($this->selectedFieldType);
         } catch (\Exception $e) {
-            session()->flash('error', 'Failed to archive codes: ' . $e->getMessage());
+            session()->flash('error', 'Failed to archive codes: '.$e->getMessage());
         }
     }
 
@@ -500,7 +540,6 @@ class SageIntacctConfiguration extends Component
         $this->loadMappings($this->selectedFieldType);
         $this->resetPage();
     }
-
 
     public function render()
     {

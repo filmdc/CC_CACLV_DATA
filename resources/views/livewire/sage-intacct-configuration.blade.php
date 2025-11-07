@@ -66,91 +66,83 @@
             <!-- Credentials Tab -->
             @if($activeTab === 'credentials')
                 <form wire:submit="saveCredentials" class="space-y-6">
-                    <!-- API Credentials Section -->
+                    <!-- Sandbox Warning -->
+                    @if(strtolower($company_id ?? '') !== 'caclv-sandbox')
+                        <div class="p-4 bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm text-yellow-700 dark:text-yellow-300 font-medium">Warning: Not using sandbox environment</p>
+                                    <p class="text-sm text-yellow-600 dark:text-yellow-400 mt-1">For testing, use Company ID: <code class="bg-yellow-100 dark:bg-yellow-800 px-2 py-1 rounded">CACLV-sandbox</code></p>
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        <div class="p-4 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-400">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm text-blue-700 dark:text-blue-300 font-medium">Sandbox Environment Active</p>
+                                    <p class="text-sm text-blue-600 dark:text-blue-400 mt-1">You're safely testing with the sandbox company.</p>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- REST API Credentials Section -->
                     <div>
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">API Credentials</h3>
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">REST API Credentials</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Configure your Sage Intacct REST API OAuth 2.0 credentials.</p>
                         <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg space-y-4">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <!-- Company ID -->
-                                <div>
-                                    <label for="company_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        Company ID <span class="text-red-500">*</span>
-                                    </label>
-                                    <input type="text"
-                                           wire:model="company_id"
-                                           id="company_id"
-                                           placeholder="Enter your Intacct Company ID"
-                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                    @error('company_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                                </div>
-
-                                <!-- User ID -->
-                                <div>
-                                    <label for="user_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        User ID <span class="text-red-500">*</span>
-                                    </label>
-                                    <input type="text"
-                                           wire:model="user_id"
-                                           id="user_id"
-                                           placeholder="Enter your Intacct User ID"
-                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                    @error('user_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                                </div>
+                            <!-- Company ID -->
+                            <div>
+                                <label for="company_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Company ID <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text"
+                                       wire:model.live="company_id"
+                                       id="company_id"
+                                       placeholder="CACLV-sandbox"
+                                       class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Your Sage Intacct company identifier (use CACLV-sandbox for testing)</p>
+                                @error('company_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <!-- Sender ID -->
+                                <!-- Client ID -->
                                 <div>
-                                    <label for="sender_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        Sender ID <span class="text-red-500">*</span>
+                                    <label for="client_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Client ID <span class="text-red-500">*</span>
                                     </label>
                                     <input type="text"
-                                           wire:model="sender_id"
-                                           id="sender_id"
-                                           placeholder="Enter Sender ID"
+                                           wire:model="client_id"
+                                           id="client_id"
+                                           placeholder="Enter your REST API Client ID"
                                            class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                    @error('sender_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">OAuth 2.0 Client ID from Sage Intacct</p>
+                                    @error('client_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
 
-                                <!-- Sender Password -->
+                                <!-- Client Secret -->
                                 <div>
-                                    <label for="sender_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        Sender Password <span class="text-red-500">*</span>
+                                    <label for="client_secret" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Client Secret <span class="text-red-500">*</span>
                                     </label>
                                     <input type="password"
-                                           wire:model="sender_password"
-                                           id="sender_password"
-                                           placeholder="Enter Sender Password"
+                                           wire:model="client_secret"
+                                           id="client_secret"
+                                           placeholder="Enter your REST API Client Secret"
                                            class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                    @error('sender_password') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <!-- Web Services User ID -->
-                                <div>
-                                    <label for="web_services_user_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        Web Services User ID <span class="text-red-500">*</span>
-                                    </label>
-                                    <input type="text"
-                                           wire:model="web_services_user_id"
-                                           id="web_services_user_id"
-                                           placeholder="Enter Web Services User ID"
-                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                    @error('web_services_user_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                                </div>
-
-                                <!-- Web Services Password -->
-                                <div>
-                                    <label for="web_services_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        Web Services Password <span class="text-red-500">*</span>
-                                    </label>
-                                    <input type="password"
-                                           wire:model="web_services_password"
-                                           id="web_services_password"
-                                           placeholder="Enter Web Services Password"
-                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                    @error('web_services_password') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">OAuth 2.0 Client Secret (encrypted)</p>
+                                    @error('client_secret') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
                             </div>
 
@@ -217,9 +209,9 @@
                                         <p class="text-sm {{ $testConnectionResult['success'] ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300' }}">
                                             {{ $testConnectionResult['message'] }}
                                         </p>
-                                        @if($testConnectionResult['details'])
-                                            <div class="mt-2 text-xs {{ $testConnectionResult['success'] ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
-                                                {{ $testConnectionResult['details'] }}
+                                        @if(isset($testConnectionResult['is_sandbox']) && $testConnectionResult['is_sandbox'])
+                                            <div class="mt-2 text-xs text-blue-600 dark:text-blue-400">
+                                                ✓ Sandbox environment
                                             </div>
                                         @endif
                                     </div>

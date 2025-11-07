@@ -3,12 +3,13 @@
 namespace App\Services;
 
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class SageIntacctSyncService
 {
     private SageIntacctApiService $apiService;
+
     private $setting;
 
     /**
@@ -23,18 +24,28 @@ class SageIntacctSyncService
     /**
      * Sync gifts for a specific date range
      *
-     * @param Carbon $startDate Start date for gift sync
-     * @param Carbon $endDate End date for gift sync
-     * @param int|null $userId User ID who triggered the sync
+     * @param  Carbon  $startDate  Start date for gift sync
+     * @param  Carbon  $endDate  End date for gift sync
+     * @param  int|null  $userId  User ID who triggered the sync
      * @return array Result with success boolean, statistics, and optional error
      */
     public function syncGifts(Carbon $startDate, Carbon $endDate, ?int $userId = null): array
     {
         try {
+            // Sandbox safety check
+            if (! $this->setting->isSandbox()) {
+                Log::warning('Sage Intacct: Syncing to non-sandbox environment', [
+                    'company_id' => $this->setting->company_id,
+                    'start_date' => $startDate->toDateString(),
+                    'end_date' => $endDate->toDateString(),
+                ]);
+            }
+
             Log::info('Sage Intacct: Starting gift sync', [
                 'start_date' => $startDate->toDateString(),
                 'end_date' => $endDate->toDateString(),
-                'user_id' => $userId
+                'user_id' => $userId,
+                'is_sandbox' => $this->setting->isSandbox(),
             ]);
 
             // Create sync history record
@@ -43,10 +54,10 @@ class SageIntacctSyncService
                 0 // Will be updated after we get the gifts
             );
 
-            if (!$syncHistory) {
+            if (! $syncHistory) {
                 return [
                     'success' => false,
-                    'error' => 'Failed to create sync history record'
+                    'error' => 'Failed to create sync history record',
                 ];
             }
 
@@ -58,7 +69,7 @@ class SageIntacctSyncService
 
                 Log::info('Sage Intacct: No gifts to sync', [
                     'start_date' => $startDate->toDateString(),
-                    'end_date' => $endDate->toDateString()
+                    'end_date' => $endDate->toDateString(),
                 ]);
 
                 return [
@@ -66,7 +77,7 @@ class SageIntacctSyncService
                     'total' => 0,
                     'synced' => 0,
                     'failed' => 0,
-                    'message' => 'No gifts to sync for the specified date range'
+                    'message' => 'No gifts to sync for the specified date range',
                 ];
             }
 
@@ -76,7 +87,7 @@ class SageIntacctSyncService
             $syncHistory->save();
 
             Log::info('Sage Intacct: Found gifts to sync', [
-                'count' => $totalRecords
+                'count' => $totalRecords,
             ]);
 
             // Process gifts in batches of 100
@@ -90,7 +101,7 @@ class SageIntacctSyncService
                 Log::info('Sage Intacct: Processing batch', [
                     'batch_number' => $batchIndex + 1,
                     'batch_size' => count($batch),
-                    'total_batches' => count($batches)
+                    'total_batches' => count($batches),
                 ]);
 
                 $batchResult = $this->syncBatch($batch, $syncHistory);
@@ -113,7 +124,7 @@ class SageIntacctSyncService
             Log::info('Sage Intacct: Gift sync completed', [
                 'total' => $totalRecords,
                 'synced' => $totalSynced,
-                'failed' => $totalFailed
+                'failed' => $totalFailed,
             ]);
 
             return [
@@ -122,7 +133,7 @@ class SageIntacctSyncService
                 'synced' => $totalSynced,
                 'failed' => $totalFailed,
                 'failed_records' => $failedRecords,
-                'sync_history_id' => $syncHistory->id
+                'sync_history_id' => $syncHistory->id,
             ];
 
         } catch (\Exception $e) {
@@ -130,7 +141,7 @@ class SageIntacctSyncService
                 'start_date' => $startDate->toDateString(),
                 'end_date' => $endDate->toDateString(),
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             // Update sync history if it exists
@@ -140,10 +151,10 @@ class SageIntacctSyncService
 
             return [
                 'success' => false,
-                'error' => 'Exception: ' . $e->getMessage(),
+                'error' => 'Exception: '.$e->getMessage(),
                 'total' => 0,
                 'synced' => 0,
-                'failed' => 0
+                'failed' => 0,
             ];
         }
     }
@@ -151,14 +162,14 @@ class SageIntacctSyncService
     /**
      * Sync all unsynced gifts
      *
-     * @param int|null $userId User ID who triggered the sync
+     * @param  int|null  $userId  User ID who triggered the sync
      * @return array Result with success boolean, statistics, and optional error
      */
     public function syncUnsyncedGifts(?int $userId = null): array
     {
         try {
             Log::info('Sage Intacct: Starting unsynced gifts sync', [
-                'user_id' => $userId
+                'user_id' => $userId,
             ]);
 
             // Get all unsynced gifts from sync items table
@@ -175,7 +186,7 @@ class SageIntacctSyncService
                     'total' => 0,
                     'synced' => 0,
                     'failed' => 0,
-                    'message' => 'No unsynced gifts found'
+                    'message' => 'No unsynced gifts found',
                 ];
             }
 
@@ -185,10 +196,10 @@ class SageIntacctSyncService
                 $unsyncedGifts->count()
             );
 
-            if (!$syncHistory) {
+            if (! $syncHistory) {
                 return [
                     'success' => false,
-                    'error' => 'Failed to create sync history record'
+                    'error' => 'Failed to create sync history record',
                 ];
             }
 
@@ -198,7 +209,7 @@ class SageIntacctSyncService
             })->toArray();
 
             Log::info('Sage Intacct: Found unsynced gifts', [
-                'count' => count($gifts)
+                'count' => count($gifts),
             ]);
 
             // Process gifts in batches of 100
@@ -212,7 +223,7 @@ class SageIntacctSyncService
                 Log::info('Sage Intacct: Processing unsynced batch', [
                     'batch_number' => $batchIndex + 1,
                     'batch_size' => count($batch),
-                    'total_batches' => count($batches)
+                    'total_batches' => count($batches),
                 ]);
 
                 $batchResult = $this->syncBatch($batch, $syncHistory);
@@ -235,7 +246,7 @@ class SageIntacctSyncService
             Log::info('Sage Intacct: Unsynced gifts sync completed', [
                 'total' => count($gifts),
                 'synced' => $totalSynced,
-                'failed' => $totalFailed
+                'failed' => $totalFailed,
             ]);
 
             return [
@@ -244,13 +255,13 @@ class SageIntacctSyncService
                 'synced' => $totalSynced,
                 'failed' => $totalFailed,
                 'failed_records' => $failedRecords,
-                'sync_history_id' => $syncHistory->id
+                'sync_history_id' => $syncHistory->id,
             ];
 
         } catch (\Exception $e) {
             Log::error('Sage Intacct syncUnsyncedGifts exception', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             // Update sync history if it exists
@@ -260,10 +271,10 @@ class SageIntacctSyncService
 
             return [
                 'success' => false,
-                'error' => 'Exception: ' . $e->getMessage(),
+                'error' => 'Exception: '.$e->getMessage(),
                 'total' => 0,
                 'synced' => 0,
-                'failed' => 0
+                'failed' => 0,
             ];
         }
     }
@@ -271,8 +282,8 @@ class SageIntacctSyncService
     /**
      * Sync a single gift
      *
-     * @param array $giftData Gift data from DonorPerfect
-     * @param int|null $userId User ID who triggered the sync
+     * @param  array  $giftData  Gift data from DonorPerfect
+     * @param  int|null  $userId  User ID who triggered the sync
      * @return array Result with success boolean and optional error
      */
     public function syncSingleGift(array $giftData, ?int $userId = null): array
@@ -280,7 +291,7 @@ class SageIntacctSyncService
         try {
             Log::info('Sage Intacct: Syncing single gift', [
                 'gift_id' => $giftData['gift_id'] ?? 'unknown',
-                'user_id' => $userId
+                'user_id' => $userId,
             ]);
 
             // Create a temporary sync history for this single gift
@@ -289,10 +300,10 @@ class SageIntacctSyncService
                 1
             );
 
-            if (!$syncHistory) {
+            if (! $syncHistory) {
                 return [
                     'success' => false,
-                    'error' => 'Failed to create sync history record'
+                    'error' => 'Failed to create sync history record',
                 ];
             }
 
@@ -319,12 +330,12 @@ class SageIntacctSyncService
 
                 Log::info('Sage Intacct: Single gift synced successfully', [
                     'gift_id' => $giftData['gift_id'] ?? 'unknown',
-                    'intacct_key' => $result['key'] ?? null
+                    'intacct_key' => $result['key'] ?? null,
                 ]);
 
                 return [
                     'success' => true,
-                    'intacct_key' => $result['key'] ?? null
+                    'intacct_key' => $result['key'] ?? null,
                 ];
             } else {
                 // Update sync item as failed
@@ -337,12 +348,12 @@ class SageIntacctSyncService
 
                 Log::error('Sage Intacct: Single gift sync failed', [
                     'gift_id' => $giftData['gift_id'] ?? 'unknown',
-                    'error' => $errorMessage
+                    'error' => $errorMessage,
                 ]);
 
                 return [
                     'success' => false,
-                    'error' => $errorMessage
+                    'error' => $errorMessage,
                 ];
             }
 
@@ -350,7 +361,7 @@ class SageIntacctSyncService
             Log::error('Sage Intacct syncSingleGift exception', [
                 'gift_id' => $giftData['gift_id'] ?? 'unknown',
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             // Update sync history if it exists
@@ -360,7 +371,7 @@ class SageIntacctSyncService
 
             return [
                 'success' => false,
-                'error' => 'Exception: ' . $e->getMessage()
+                'error' => 'Exception: '.$e->getMessage(),
             ];
         }
     }
@@ -368,8 +379,8 @@ class SageIntacctSyncService
     /**
      * Get syncable gifts from DonorPerfect for a date range
      *
-     * @param Carbon $startDate Start date
-     * @param Carbon $endDate End date
+     * @param  Carbon  $startDate  Start date
+     * @param  Carbon  $endDate  End date
      * @return array Array of gift data
      */
     public function getSyncableGifts(Carbon $startDate, Carbon $endDate): array
@@ -380,8 +391,9 @@ class SageIntacctSyncService
                 ->where('is_active', true)
                 ->first();
 
-            if (!$dpSetting) {
+            if (! $dpSetting) {
                 Log::warning('Sage Intacct: No active DonorPerfect settings found');
+
                 return [];
             }
 
@@ -389,16 +401,17 @@ class SageIntacctSyncService
             $dpSettingModel = new \App\Models\DonorPerfectSetting((array) $dpSetting);
 
             // Get gifts from cache
-            $dpGiftService = new DonorPerfectGiftService();
+            $dpGiftService = new DonorPerfectGiftService;
             $gifts = $dpGiftService->getCachedGifts(
                 $startDate->format('Y-m-d'),
                 $endDate->format('Y-m-d')
             );
 
-            if (!$gifts['success']) {
+            if (! $gifts['success']) {
                 Log::warning('Sage Intacct: Failed to get DonorPerfect gifts', [
-                    'error' => $gifts['error'] ?? 'Unknown error'
+                    'error' => $gifts['error'] ?? 'Unknown error',
                 ]);
+
                 return [];
             }
 
@@ -410,13 +423,14 @@ class SageIntacctSyncService
 
             $unsyncedGifts = array_filter($gifts['gifts'] ?? [], function ($gift) use ($syncedGiftIds) {
                 $giftId = $gift['gift_id'] ?? null;
-                return $giftId && !in_array($giftId, $syncedGiftIds);
+
+                return $giftId && ! in_array($giftId, $syncedGiftIds);
             });
 
             Log::info('Sage Intacct: Filtered syncable gifts', [
                 'total_gifts' => count($gifts['gifts'] ?? []),
                 'already_synced' => count($syncedGiftIds),
-                'syncable' => count($unsyncedGifts)
+                'syncable' => count($unsyncedGifts),
             ]);
 
             return array_values($unsyncedGifts);
@@ -424,7 +438,7 @@ class SageIntacctSyncService
         } catch (\Exception $e) {
             Log::error('Sage Intacct getSyncableGifts exception', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return [];
@@ -434,8 +448,8 @@ class SageIntacctSyncService
     /**
      * Transform gift data for Sage Intacct using field mappings
      *
-     * @param array $giftData Raw gift data from DonorPerfect
-     * @param array $fieldMappings Field mappings from settings
+     * @param  array  $giftData  Raw gift data from DonorPerfect
+     * @param  array  $fieldMappings  Field mappings from settings
      * @return array Transformed data ready for Intacct
      */
     public function transformGiftForIntacct(array $giftData, array $fieldMappings): array
@@ -446,7 +460,7 @@ class SageIntacctSyncService
             $dpField = $mapping['donor_perfect_field'] ?? null;
             $intacctField = $mapping['intacct_field'] ?? null;
 
-            if (!$dpField || !$intacctField) {
+            if (! $dpField || ! $intacctField) {
                 continue;
             }
 
@@ -467,7 +481,7 @@ class SageIntacctSyncService
         Log::debug('Sage Intacct: Transformed gift data', [
             'gift_id' => $giftData['gift_id'] ?? 'unknown',
             'mapped_fields' => count($transformed),
-            'fields' => array_keys($transformed)
+            'fields' => array_keys($transformed),
         ]);
 
         return $transformed;
@@ -476,8 +490,8 @@ class SageIntacctSyncService
     /**
      * Create sync history record
      *
-     * @param string $triggeredBy How the sync was triggered
-     * @param int $totalRecords Total records to sync
+     * @param  string  $triggeredBy  How the sync was triggered
+     * @param  int  $totalRecords  Total records to sync
      * @return mixed Sync history model instance or null
      */
     public function createSyncHistory(string $triggeredBy, int $totalRecords)
@@ -491,13 +505,13 @@ class SageIntacctSyncService
                 'failed_records' => 0,
                 'started_at' => now(),
                 'created_at' => now(),
-                'updated_at' => now()
+                'updated_at' => now(),
             ]);
 
             Log::info('Sage Intacct: Created sync history', [
                 'id' => $historyId,
                 'triggered_by' => $triggeredBy,
-                'total_records' => $totalRecords
+                'total_records' => $totalRecords,
             ]);
 
             // Return a simple object with the necessary properties
@@ -508,16 +522,16 @@ class SageIntacctSyncService
                 'total_records' => $totalRecords,
                 'synced_records' => 0,
                 'failed_records' => 0,
-                'save' => function () use ($historyId) {
+                'save' => function () {
                     // This is a placeholder - updates should use updateSyncHistory
                     return true;
-                }
+                },
             ];
 
         } catch (\Exception $e) {
             Log::error('Sage Intacct createSyncHistory exception', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return null;
@@ -527,17 +541,16 @@ class SageIntacctSyncService
     /**
      * Update sync history record
      *
-     * @param mixed $history Sync history instance
-     * @param string $status New status
-     * @param string|null $errorMessage Optional error message
-     * @return void
+     * @param  mixed  $history  Sync history instance
+     * @param  string  $status  New status
+     * @param  string|null  $errorMessage  Optional error message
      */
     public function updateSyncHistory($history, string $status, ?string $errorMessage = null): void
     {
         try {
             $updateData = [
                 'status' => $status,
-                'updated_at' => now()
+                'updated_at' => now(),
             ];
 
             if ($status === 'completed' || $status === 'completed_with_errors' || $status === 'failed') {
@@ -555,13 +568,13 @@ class SageIntacctSyncService
             Log::info('Sage Intacct: Updated sync history', [
                 'id' => $history->id,
                 'status' => $status,
-                'has_error' => $errorMessage !== null
+                'has_error' => $errorMessage !== null,
             ]);
 
         } catch (\Exception $e) {
             Log::error('Sage Intacct updateSyncHistory exception', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
         }
     }
@@ -597,7 +610,7 @@ class SageIntacctSyncService
                     ->count(),
                 'last_sync' => DB::table('sage_intacct_sync_histories')
                     ->orderBy('created_at', 'desc')
-                    ->first()
+                    ->first(),
             ];
 
             return $stats;
@@ -605,7 +618,7 @@ class SageIntacctSyncService
         } catch (\Exception $e) {
             Log::error('Sage Intacct getSyncStatistics exception', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return [];
@@ -615,8 +628,8 @@ class SageIntacctSyncService
     /**
      * Sync a batch of gifts
      *
-     * @param array $batch Array of gift data
-     * @param mixed $syncHistory Sync history instance
+     * @param  array  $batch  Array of gift data
+     * @param  mixed  $syncHistory  Sync history instance
      * @return array Result with synced/failed counts
      */
     private function syncBatch(array $batch, $syncHistory): array
@@ -656,7 +669,7 @@ class SageIntacctSyncService
                     $index = $detail['index'];
                     $giftId = $giftIdMap[$index] ?? null;
 
-                    if (!$giftId) {
+                    if (! $giftId) {
                         continue;
                     }
 
@@ -669,7 +682,7 @@ class SageIntacctSyncService
                                 'status' => 'synced',
                                 'intacct_record_key' => $detail['key'] ?? null,
                                 'synced_at' => now(),
-                                'updated_at' => now()
+                                'updated_at' => now(),
                             ]);
                     } else {
                         // Update as failed
@@ -679,12 +692,12 @@ class SageIntacctSyncService
                             ->update([
                                 'status' => 'failed',
                                 'error_message' => $detail['error'] ?? 'Unknown error',
-                                'updated_at' => now()
+                                'updated_at' => now(),
                             ]);
 
                         $failedRecords[] = [
                             'gift_id' => $giftId,
-                            'error' => $detail['error'] ?? 'Unknown error'
+                            'error' => $detail['error'] ?? 'Unknown error',
                         ];
                     }
                 }
@@ -694,7 +707,7 @@ class SageIntacctSyncService
 
                 foreach ($batch as $giftData) {
                     $giftId = $giftData['gift_id'] ?? null;
-                    if (!$giftId) {
+                    if (! $giftId) {
                         continue;
                     }
 
@@ -704,12 +717,12 @@ class SageIntacctSyncService
                         ->update([
                             'status' => 'failed',
                             'error_message' => $result['error'] ?? 'Batch failed',
-                            'updated_at' => now()
+                            'updated_at' => now(),
                         ]);
 
                     $failedRecords[] = [
                         'gift_id' => $giftId,
-                        'error' => $result['error'] ?? 'Batch failed'
+                        'error' => $result['error'] ?? 'Batch failed',
                     ];
                 }
             }
@@ -717,14 +730,14 @@ class SageIntacctSyncService
             return [
                 'synced' => $synced,
                 'failed' => $failed,
-                'failed_records' => $failedRecords
+                'failed_records' => $failedRecords,
             ];
 
         } catch (\Exception $e) {
             Log::error('Sage Intacct syncBatch exception', [
                 'batch_size' => count($batch),
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             // Mark all as failed
@@ -736,8 +749,8 @@ class SageIntacctSyncService
                         ->where('gift_id', $giftId)
                         ->update([
                             'status' => 'failed',
-                            'error_message' => 'Exception: ' . $e->getMessage(),
-                            'updated_at' => now()
+                            'error_message' => 'Exception: '.$e->getMessage(),
+                            'updated_at' => now(),
                         ]);
                 }
             }
@@ -748,9 +761,9 @@ class SageIntacctSyncService
                 'failed_records' => array_map(function ($gift) use ($e) {
                     return [
                         'gift_id' => $gift['gift_id'] ?? 'unknown',
-                        'error' => 'Exception: ' . $e->getMessage()
+                        'error' => 'Exception: '.$e->getMessage(),
                     ];
-                }, $batch)
+                }, $batch),
             ];
         }
     }
@@ -758,9 +771,9 @@ class SageIntacctSyncService
     /**
      * Create sync item record
      *
-     * @param mixed $syncHistory Sync history instance
-     * @param array $giftData Gift data
-     * @param string $status Initial status
+     * @param  mixed  $syncHistory  Sync history instance
+     * @param  array  $giftData  Gift data
+     * @param  string  $status  Initial status
      * @return mixed Sync item instance
      */
     private function createSyncItem($syncHistory, array $giftData, string $status)
@@ -772,20 +785,20 @@ class SageIntacctSyncService
                 'gift_data' => json_encode($giftData),
                 'status' => $status,
                 'created_at' => now(),
-                'updated_at' => now()
+                'updated_at' => now(),
             ]);
 
             return (object) [
                 'id' => $itemId,
                 'sync_history_id' => $syncHistory->id,
                 'gift_id' => $giftData['gift_id'] ?? null,
-                'status' => $status
+                'status' => $status,
             ];
 
         } catch (\Exception $e) {
             Log::error('Sage Intacct createSyncItem exception', [
                 'gift_id' => $giftData['gift_id'] ?? 'unknown',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return null;
@@ -795,18 +808,17 @@ class SageIntacctSyncService
     /**
      * Update sync item record
      *
-     * @param mixed $syncItem Sync item instance
-     * @param string $status New status
-     * @param string|null $errorMessage Optional error message
-     * @param string|null $intacctKey Optional Intacct record key
-     * @return void
+     * @param  mixed  $syncItem  Sync item instance
+     * @param  string  $status  New status
+     * @param  string|null  $errorMessage  Optional error message
+     * @param  string|null  $intacctKey  Optional Intacct record key
      */
     private function updateSyncItem($syncItem, string $status, ?string $errorMessage = null, ?string $intacctKey = null): void
     {
         try {
             $updateData = [
                 'status' => $status,
-                'updated_at' => now()
+                'updated_at' => now(),
             ];
 
             if ($status === 'synced') {
@@ -828,7 +840,7 @@ class SageIntacctSyncService
         } catch (\Exception $e) {
             Log::error('Sage Intacct updateSyncItem exception', [
                 'sync_item_id' => $syncItem->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
         }
     }
@@ -836,8 +848,8 @@ class SageIntacctSyncService
     /**
      * Apply transformation to a value
      *
-     * @param mixed $value Original value
-     * @param string $transformation Transformation type
+     * @param  mixed  $value  Original value
+     * @param  string  $transformation  Transformation type
      * @return mixed Transformed value
      */
     private function applyTransformation($value, string $transformation)
