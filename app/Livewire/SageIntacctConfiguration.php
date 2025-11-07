@@ -47,6 +47,9 @@ class SageIntacctConfiguration extends Component
 
     public $class_id = '';
 
+    // Settings
+    public $custom_object_name = 'Donor Perfect Gifts';
+
     // Flags
     public $is_active = false;
 
@@ -139,6 +142,7 @@ class SageIntacctConfiguration extends Component
             $this->location_id = $settings->location_id ?? '';
             $this->department_id = $settings->department_id ?? '';
             $this->class_id = $settings->class_id ?? '';
+            $this->custom_object_name = $settings->custom_object_name ?? 'Donor Perfect Gifts';
             $this->is_active = $settings->is_active ?? false;
             $this->code_mapping_enabled = $settings->code_mapping_enabled ?? false;
         } else {
@@ -186,6 +190,7 @@ class SageIntacctConfiguration extends Component
                 'location_id' => $this->location_id,
                 'department_id' => $this->department_id,
                 'class_id' => $this->class_id,
+                'custom_object_name' => $this->custom_object_name,
                 'is_active' => $this->is_active,
                 'code_mapping_enabled' => $this->code_mapping_enabled,
                 'endpoint_url' => $this->auth_method === 'xml'

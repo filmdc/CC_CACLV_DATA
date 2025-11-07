@@ -317,11 +317,11 @@
                                     <td class="px-4 py-4 text-center">
                                         @php
                                             $syncStatus = $this->getSyncStatus($gift);
-                                            $cache = \App\Models\DonorPerfectGiftCache::where('gift_id', $gift['gift_id'] ?? null)->first();
+                                            $syncItem = \App\Models\SageIntacctSyncItem::where('gift_id', $gift['gift_id'] ?? null)->orderBy('created_at', 'desc')->first();
                                         @endphp
-                                        @if($syncStatus === 'synced')
+                                        @if($syncStatus === 'synced' || $syncStatus === 'success')
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
-                                                  title="Synced on {{ $cache && $cache->intacct_synced_at ? $cache->intacct_synced_at->format('M d, Y g:i A') : '' }}">
+                                                  title="Synced on {{ $syncItem && $syncItem->synced_at ? $syncItem->synced_at->format('M d, Y g:i A') : '' }}">
                                                 <svg class="h-3 w-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                                                 </svg>

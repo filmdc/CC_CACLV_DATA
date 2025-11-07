@@ -315,6 +315,31 @@
                         </div>
                     </div>
 
+                    <!-- Sync Settings -->
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Sync Settings</h3>
+                        <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg">
+                            <div>
+                                <label for="custom_object_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Custom Object Name <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text"
+                                       wire:model="custom_object_name"
+                                       id="custom_object_name"
+                                       placeholder="Enter the custom object name in Sage Intacct"
+                                       class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                    The name of the custom object in Sage Intacct where gift data will be stored.
+                                    <strong>This object must already exist in your Sage Intacct account.</strong>
+                                </p>
+                                <p class="mt-1 text-xs text-blue-600 dark:text-blue-400">
+                                    Default: "Donor Perfect Gifts" - Create this custom object in Sage Intacct with the appropriate fields.
+                                </p>
+                                @error('custom_object_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- My OAuth Connection Status (OAuth Mode Only) -->
                     @if($auth_method === 'oauth')
                     <div>
