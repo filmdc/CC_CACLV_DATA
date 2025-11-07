@@ -197,7 +197,7 @@ class SageIntacctOAuthController extends Controller
                 'success' => true,
                 'access_token' => $data['access_token'],
                 'refresh_token' => $data['refresh_token'] ?? null,
-                'expires_in' => $data['expires_in'] ?? 3600,
+                'expires_in' => $data['expires_in'] ?? 300, // Default 5 minutes per Sage documentation
                 'token_type' => $data['token_type'] ?? 'Bearer',
                 'scope' => $data['scope'] ?? null,
                 'company_id' => $data['company_id'] ?? $settings->company_id,

@@ -117,9 +117,10 @@ class SageIntacctApiService
             $data = $response->json();
 
             // Update token in database
+            // Note: Sage Intacct tokens typically expire in 300 seconds (5 minutes)
             $this->userToken->updateToken(
                 $data['access_token'],
-                $data['expires_in'] ?? 3600,
+                $data['expires_in'] ?? 300,
                 $data['refresh_token'] ?? null
             );
 

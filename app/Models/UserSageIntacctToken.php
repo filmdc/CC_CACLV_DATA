@@ -60,11 +60,12 @@ class UserSageIntacctToken extends Model
     }
 
     /**
-     * Check if the token needs refresh (expires in < 5 minutes)
+     * Check if the token needs refresh (expires in < 2 minutes)
+     * Note: Sage Intacct tokens expire in 5 minutes, so refresh early
      */
     public function needsRefresh(): bool
     {
-        return $this->expires_at->subMinutes(5)->isPast();
+        return $this->expires_at->subMinutes(2)->isPast();
     }
 
     /**
