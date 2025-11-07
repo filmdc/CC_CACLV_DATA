@@ -2,106 +2,64 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Cache;
+use App\Models\UserSageIntacctToken;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 /**
  * Sage Intacct REST API Service
  *
- * Handles authentication and API communication with Sage Intacct REST API.
- * Uses OAuth 2.0 for authentication and JSON for data exchange.
+ * Handles API communication with Sage Intacct REST API using user OAuth tokens.
  */
 class SageIntacctApiService
 {
+    private UserSageIntacctToken $userToken;
+
     private $setting;
 
     private ?string $accessToken = null;
 
-    private const TOKEN_CACHE_KEY_PREFIX = 'sage_intacct_token_';
-
     /**
-     * Constructor - accepts SageIntacctSetting instance
+     * Constructor - accepts user token and settings
      */
-    public function __construct($setting)
+    public function __construct(UserSageIntacctToken $userToken, $setting)
     {
+        $this->userToken = $userToken;
         $this->setting = $setting;
+        $this->accessToken = $userToken->access_token;
     }
 
     /**
-     * Authenticate with Sage Intacct and get OAuth access token
-     *
-     * @return array Result with success boolean and optional message
+     * Ensure we have a valid access token (refresh if needed)
      */
     public function authenticate(): array
     {
         try {
-            if (! $this->setting->isConfigured()) {
+            // Check if token is expired
+            if ($this->userToken->isExpired()) {
                 return [
                     'success' => false,
-                    'message' => 'Sage Intacct credentials are not fully configured',
+                    'message' => 'Token expired - user must re-authorize',
+                    'requires_reauth' => true,
                 ];
             }
 
-            // Check if we should use REST API
-            if (! $this->setting->isRestApi()) {
-                return [
-                    'success' => false,
-                    'message' => 'REST API credentials (Client ID and Client Secret) are required',
-                ];
+            // Refresh if needed (expires in < 5 minutes)
+            if ($this->userToken->needsRefresh()) {
+                return $this->refreshAccessToken();
             }
 
-            // Check cache first
-            $cacheKey = self::TOKEN_CACHE_KEY_PREFIX.$this->setting->id;
-            $cachedToken = Cache::get($cacheKey);
-
-            if ($cachedToken) {
-                $this->accessToken = $cachedToken;
-                Log::info('Sage Intacct API: Using cached access token');
-
-                return [
-                    'success' => true,
-                    'access_token' => $this->accessToken,
-                    'message' => 'Using cached authentication token',
-                ];
-            }
-
-            Log::info('Sage Intacct API: Authenticating with OAuth 2.0', [
-                'client_id' => substr($this->setting->client_id, 0, 10).'...',
-                'company_id' => $this->setting->company_id,
-            ]);
-
-            // Get OAuth token
-            $tokenResult = $this->fetchOAuthToken();
-
-            if (! $tokenResult['success']) {
-                return [
-                    'success' => false,
-                    'message' => $tokenResult['message'] ?? 'Authentication failed',
-                ];
-            }
-
-            $this->accessToken = $tokenResult['access_token'];
-
-            // Cache the token (expires in ~1 hour, cache for 55 minutes to be safe)
-            $expiresIn = $tokenResult['expires_in'] ?? 3300;
-            Cache::put($cacheKey, $this->accessToken, now()->addSeconds($expiresIn - 300));
-
-            Log::info('Sage Intacct API: Authentication successful', [
-                'expires_in' => $expiresIn,
-            ]);
+            // Token is valid
+            $this->accessToken = $this->userToken->access_token;
 
             return [
                 'success' => true,
-                'access_token' => $this->accessToken,
-                'expires_in' => $expiresIn,
-                'message' => 'Authentication successful',
+                'message' => 'Token is valid',
             ];
-
         } catch (\Exception $e) {
-            Log::error('Sage Intacct authentication exception', [
+            Log::error('Sage Intacct authentication check exception', [
+                'user_id' => $this->userToken->user_id,
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
             ]);
 
             return [
@@ -112,63 +70,73 @@ class SageIntacctApiService
     }
 
     /**
-     * Fetch OAuth 2.0 access token from Sage Intacct
-     *
-     * @return array Result with access_token and expires_in
+     * Refresh the user's access token using refresh token
      */
-    private function fetchOAuthToken(): array
+    private function refreshAccessToken(): array
     {
         try {
-            $tokenUrl = rtrim($this->setting->getEndpointUrl(), '/').'/oauth/token';
+            if (! $this->userToken->refresh_token) {
+                return [
+                    'success' => false,
+                    'message' => 'No refresh token available - user must re-authorize',
+                    'requires_reauth' => true,
+                ];
+            }
 
-            Log::debug('Sage Intacct: Requesting OAuth token', [
-                'url' => $tokenUrl,
-                'company_id' => $this->setting->company_id,
+            $tokenUrl = 'https://api.intacct.com/ia/api/v1/oauth2/token';
+
+            Log::debug('Sage Intacct: Refreshing access token', [
+                'user_id' => $this->userToken->user_id,
             ]);
 
             $response = Http::asForm()
                 ->timeout(30)
                 ->post($tokenUrl, [
-                    'grant_type' => 'client_credentials',
+                    'grant_type' => 'refresh_token',
+                    'refresh_token' => $this->userToken->refresh_token,
                     'client_id' => $this->setting->client_id,
                     'client_secret' => $this->setting->client_secret,
-                    'company_id' => $this->setting->company_id,
                 ]);
 
             if (! $response->successful()) {
-                $errorBody = $response->json();
-                $errorMessage = $errorBody['error_description'] ?? $errorBody['error'] ?? 'Token request failed';
+                $error = $response->json();
 
-                Log::error('Sage Intacct OAuth token request failed', [
+                Log::error('Sage Intacct token refresh failed', [
+                    'user_id' => $this->userToken->user_id,
                     'status' => $response->status(),
-                    'error' => $errorMessage,
-                    'response' => $response->body(),
+                    'error' => $error,
                 ]);
 
                 return [
                     'success' => false,
-                    'message' => 'OAuth failed: '.$errorMessage,
+                    'message' => 'Token refresh failed - user must re-authorize',
+                    'requires_reauth' => true,
                 ];
             }
 
             $data = $response->json();
 
-            if (empty($data['access_token'])) {
-                return [
-                    'success' => false,
-                    'message' => 'No access token in response',
-                ];
-            }
+            // Update token in database
+            $this->userToken->updateToken(
+                $data['access_token'],
+                $data['expires_in'] ?? 3600,
+                $data['refresh_token'] ?? null
+            );
+
+            // Update local reference
+            $this->accessToken = $data['access_token'];
+
+            Log::info('Sage Intacct: Access token refreshed successfully', [
+                'user_id' => $this->userToken->user_id,
+            ]);
 
             return [
                 'success' => true,
-                'access_token' => $data['access_token'],
-                'expires_in' => $data['expires_in'] ?? 3600,
-                'token_type' => $data['token_type'] ?? 'Bearer',
+                'message' => 'Token refreshed successfully',
             ];
-
         } catch (\Exception $e) {
-            Log::error('Sage Intacct getAccessToken exception', [
+            Log::error('Sage Intacct token refresh exception', [
+                'user_id' => $this->userToken->user_id,
                 'error' => $e->getMessage(),
             ]);
 
@@ -180,32 +148,19 @@ class SageIntacctApiService
     }
 
     /**
-     * Test API connectivity by authenticating and making a simple API call
-     *
-     * @return array Result with success boolean and message
+     * Test API connectivity
      */
     public function testConnection(): array
     {
         try {
-            if (! $this->setting->isConfigured()) {
-                return [
-                    'success' => false,
-                    'message' => 'API credentials are not fully configured',
-                ];
-            }
-
-            // Test authentication
+            // Ensure token is valid
             $authResult = $this->authenticate();
-
             if (! $authResult['success']) {
-                return [
-                    'success' => false,
-                    'message' => $authResult['message'],
-                ];
+                return $authResult;
             }
 
-            // Verify company access by checking company info endpoint
-            $apiUrl = rtrim($this->setting->getEndpointUrl(), '/').'/v1/companies/'.urlencode($this->setting->company_id);
+            // Verify company access
+            $apiUrl = 'https://api.intacct.com/ia/api/v1/companies/'.urlencode($this->userToken->company_id);
 
             $response = Http::timeout(30)
                 ->withHeaders([
@@ -219,6 +174,7 @@ class SageIntacctApiService
                 $errorMessage = $errorData['message'] ?? $errorData['error'] ?? 'Company verification failed';
 
                 Log::error('Sage Intacct company verification failed', [
+                    'user_id' => $this->userToken->user_id,
                     'status' => $response->status(),
                     'error' => $errorMessage,
                 ]);
@@ -233,7 +189,8 @@ class SageIntacctApiService
             $companyName = $companyData['name'] ?? $companyData['companyName'] ?? 'Unknown';
 
             Log::info('Sage Intacct connection test successful', [
-                'company_id' => $this->setting->company_id,
+                'user_id' => $this->userToken->user_id,
+                'company_id' => $this->userToken->company_id,
                 'company_name' => $companyName,
             ]);
 
@@ -241,13 +198,12 @@ class SageIntacctApiService
                 'success' => true,
                 'message' => 'Connection successful to '.$companyName,
                 'company_name' => $companyName,
-                'is_sandbox' => $this->setting->isSandbox(),
+                'is_sandbox' => $this->userToken->isSandbox(),
             ];
-
         } catch (\Exception $e) {
             Log::error('Sage Intacct connection test exception', [
+                'user_id' => $this->userToken->user_id,
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
             ]);
 
             return [
@@ -259,40 +215,35 @@ class SageIntacctApiService
 
     /**
      * Create a record in a custom object
-     *
-     * @param  string  $objectName  Custom object name in Sage Intacct
-     * @param  array  $fieldData  Associative array of field names and values
-     * @return array Result with success boolean and optional error or record key
      */
     public function createCustomObjectRecord(string $objectName, array $fieldData): array
     {
         try {
             // Sandbox safety check
-            if (! $this->setting->isSandbox()) {
+            if (! $this->userToken->isSandbox()) {
                 Log::warning('Sage Intacct: Creating record in non-sandbox environment', [
-                    'company_id' => $this->setting->company_id,
+                    'user_id' => $this->userToken->user_id,
+                    'company_id' => $this->userToken->company_id,
                     'object_name' => $objectName,
                 ]);
             }
 
-            // Ensure we have a valid token
-            if (! $this->accessToken) {
-                $authResult = $this->authenticate();
-                if (! $authResult['success']) {
-                    return [
-                        'success' => false,
-                        'error' => 'Authentication failed: '.($authResult['message'] ?? 'Unknown error'),
-                    ];
-                }
+            // Ensure valid token
+            $authResult = $this->authenticate();
+            if (! $authResult['success']) {
+                return [
+                    'success' => false,
+                    'error' => 'Authentication failed: '.($authResult['message'] ?? 'Unknown error'),
+                ];
             }
 
-            $apiUrl = rtrim($this->setting->getEndpointUrl(), '/').
-                      '/v1/companies/'.urlencode($this->setting->company_id).
+            $apiUrl = 'https://api.intacct.com/ia/api/v1/companies/'.urlencode($this->userToken->company_id).
                       '/objects/'.urlencode($objectName);
 
             Log::info('Sage Intacct API: Creating custom object record', [
+                'user_id' => $this->userToken->user_id,
                 'object_name' => $objectName,
-                'company_id' => $this->setting->company_id,
+                'company_id' => $this->userToken->company_id,
                 'fields' => array_keys($fieldData),
             ]);
 
@@ -308,12 +259,12 @@ class SageIntacctApiService
                 $errorData = $response->json();
                 $errorMessage = $errorData['message'] ?? $errorData['error'] ?? 'Failed to create record';
 
-                // Include validation errors if present
                 if (isset($errorData['errors']) && is_array($errorData['errors'])) {
                     $errorMessage .= ': '.implode(', ', $errorData['errors']);
                 }
 
                 Log::error('Sage Intacct record creation failed', [
+                    'user_id' => $this->userToken->user_id,
                     'status' => $response->status(),
                     'error' => $errorMessage,
                     'object_name' => $objectName,
@@ -329,6 +280,7 @@ class SageIntacctApiService
             $recordKey = $result['id'] ?? $result['key'] ?? $result['recordno'] ?? null;
 
             Log::info('Sage Intacct API: Record created successfully', [
+                'user_id' => $this->userToken->user_id,
                 'object_name' => $objectName,
                 'record_key' => $recordKey,
             ]);
@@ -338,12 +290,11 @@ class SageIntacctApiService
                 'key' => $recordKey,
                 'data' => $result,
             ];
-
         } catch (\Exception $e) {
             Log::error('Sage Intacct createCustomObjectRecord exception', [
+                'user_id' => $this->userToken->user_id,
                 'object_name' => $objectName,
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
             ]);
 
             return [
@@ -355,10 +306,6 @@ class SageIntacctApiService
 
     /**
      * Batch create records in a custom object (up to 100 records per batch)
-     *
-     * @param  string  $objectName  Custom object name in Sage Intacct
-     * @param  array  $records  Array of associative arrays, each representing a record
-     * @return array Result with success boolean, created count, and failed records
      */
     public function batchCreateRecords(string $objectName, array $records): array
     {
@@ -381,30 +328,29 @@ class SageIntacctApiService
             }
 
             // Sandbox safety check
-            if (! $this->setting->isSandbox()) {
+            if (! $this->userToken->isSandbox()) {
                 Log::warning('Sage Intacct: Batch creating records in non-sandbox environment', [
-                    'company_id' => $this->setting->company_id,
+                    'user_id' => $this->userToken->user_id,
+                    'company_id' => $this->userToken->company_id,
                     'object_name' => $objectName,
                     'record_count' => count($records),
                 ]);
             }
 
-            // Ensure we have a valid token
-            if (! $this->accessToken) {
-                $authResult = $this->authenticate();
-                if (! $authResult['success']) {
-                    return [
-                        'success' => false,
-                        'error' => 'Authentication failed: '.($authResult['message'] ?? 'Unknown error'),
-                    ];
-                }
+            // Ensure valid token
+            $authResult = $this->authenticate();
+            if (! $authResult['success']) {
+                return [
+                    'success' => false,
+                    'error' => 'Authentication failed: '.($authResult['message'] ?? 'Unknown error'),
+                ];
             }
 
-            $apiUrl = rtrim($this->setting->getEndpointUrl(), '/').
-                      '/v1/companies/'.urlencode($this->setting->company_id).
+            $apiUrl = 'https://api.intacct.com/ia/api/v1/companies/'.urlencode($this->userToken->company_id).
                       '/objects/'.urlencode($objectName).'/batch';
 
             Log::info('Sage Intacct API: Batch creating records', [
+                'user_id' => $this->userToken->user_id,
                 'object_name' => $objectName,
                 'record_count' => count($records),
             ]);
@@ -422,6 +368,7 @@ class SageIntacctApiService
                 $errorMessage = $errorData['message'] ?? $errorData['error'] ?? 'Batch create failed';
 
                 Log::error('Sage Intacct batch create failed', [
+                    'user_id' => $this->userToken->user_id,
                     'status' => $response->status(),
                     'error' => $errorMessage,
                 ]);
@@ -436,11 +383,11 @@ class SageIntacctApiService
 
             $result = $response->json();
 
-            // Parse batch response results
             $created = $result['created'] ?? $result['success_count'] ?? 0;
             $failedRecords = $result['failed'] ?? $result['errors'] ?? [];
 
             Log::info('Sage Intacct API: Batch create completed', [
+                'user_id' => $this->userToken->user_id,
                 'object_name' => $objectName,
                 'total' => count($records),
                 'created' => $created,
@@ -453,13 +400,12 @@ class SageIntacctApiService
                 'failed' => $failedRecords,
                 'details' => $result['details'] ?? [],
             ];
-
         } catch (\Exception $e) {
             Log::error('Sage Intacct batchCreateRecords exception', [
+                'user_id' => $this->userToken->user_id,
                 'object_name' => $objectName,
                 'record_count' => count($records),
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
             ]);
 
             return [
@@ -472,49 +418,18 @@ class SageIntacctApiService
     }
 
     /**
-     * Refresh the access token
-     *
-     * @return array Result with success boolean
+     * Get the user token
      */
-    public function refreshToken(): array
+    public function getUserToken(): UserSageIntacctToken
     {
-        // Clear cached token
-        $cacheKey = self::TOKEN_CACHE_KEY_PREFIX.$this->setting->id;
-        Cache::forget($cacheKey);
-
-        // Get new token
-        return $this->authenticate();
+        return $this->userToken;
     }
 
     /**
-     * Get the current access token (authenticate if not already done)
-     */
-    public function getAccessToken(): ?string
-    {
-        if (! $this->accessToken) {
-            $result = $this->authenticate();
-            if (! $result['success']) {
-                return null;
-            }
-        }
-
-        return $this->accessToken;
-    }
-
-    /**
-     * Get the current setting instance
+     * Get the setting instance
      */
     public function getSetting()
     {
         return $this->setting;
-    }
-
-    /**
-     * Clear the cached token for this setting
-     */
-    public function clearTokenCache(): void
-    {
-        $cacheKey = self::TOKEN_CACHE_KEY_PREFIX.$this->setting->id;
-        Cache::forget($cacheKey);
     }
 }

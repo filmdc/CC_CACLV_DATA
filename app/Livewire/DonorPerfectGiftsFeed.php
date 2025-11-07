@@ -398,13 +398,34 @@ class DonorPerfectGiftsFeed extends Component
             return;
         }
 
+        // Check if user has valid OAuth token
+        $userToken = auth()->user()->sageIntacctToken;
+
+        if (! $userToken || ! $userToken->hasValidToken()) {
+            session()->flash('error', 'You must connect to Sage Intacct first.');
+            $this->showSyncModal = false;
+
+            return redirect()->route('intacct.oauth.authorize');
+        }
+
         try {
             $this->syncInProgress = true;
 
             $startDate = Carbon::parse($this->startDate);
             $endDate = Carbon::parse($this->endDate);
 
-            // Get all gifts or selected gifts
+            // Get Sage Intacct settings
+            $intacctSetting = \App\Models\SageIntacctSetting::getActive();
+
+            if (! $intacctSetting) {
+                throw new \Exception('Sage Intacct is not configured');
+            }
+
+            // Initialize Sage Intacct services
+            $apiService = new \App\Services\SageIntacctApiService($userToken, $intacctSetting);
+            $syncService = new \App\Services\SageIntacctSyncService($apiService, $intacctSetting, $userToken);
+
+            // Get gifts to sync
             $result = $giftService->getGiftsWithMetadata($startDate, $endDate, $this->search);
 
             if (! $result['success']) {
@@ -427,54 +448,26 @@ class DonorPerfectGiftsFeed extends Component
                 throw new \Exception('No gifts selected for sync');
             }
 
-            $syncedCount = 0;
-            $failedCount = 0;
-            $errors = [];
-
-            foreach ($giftsToSync as $gift) {
-                try {
-                    // TODO: Implement actual Intacct API sync
-                    // For now, just mark as synced in the cache
-                    $giftId = $gift['gift_id'] ?? null;
-
-                    if ($giftId) {
-                        $cache = \App\Models\DonorPerfectGiftCache::updateOrCreate(
-                            ['gift_id' => $giftId],
-                            [
-                                'gift_data' => json_encode($gift),
-                                'intacct_synced_at' => now(),
-                                'intacct_sync_error' => null,
-                            ]
-                        );
-                        $syncedCount++;
-                    }
-                } catch (\Exception $e) {
-                    $failedCount++;
-                    $errors[] = "Gift {$gift['gift_id']}: ".$e->getMessage();
-
-                    // Log the error in the cache
-                    if (isset($gift['gift_id'])) {
-                        \App\Models\DonorPerfectGiftCache::updateOrCreate(
-                            ['gift_id' => $gift['gift_id']],
-                            [
-                                'gift_data' => json_encode($gift),
-                                'intacct_sync_error' => $e->getMessage(),
-                            ]
-                        );
-                    }
-                }
-            }
+            // Perform sync using Sage Intacct sync service
+            $syncResult = $syncService->syncGifts($startDate, $endDate, auth()->id());
 
             $this->syncInProgress = false;
             $this->showSyncModal = false;
             $this->selectedGiftsForSync = [];
 
-            $message = "Sync completed: {$syncedCount} synced";
-            if ($failedCount > 0) {
-                $message .= ", {$failedCount} failed";
-            }
+            if ($syncResult['success']) {
+                $syncedCount = $syncResult['synced'] ?? 0;
+                $failedCount = $syncResult['failed'] ?? 0;
 
-            session()->flash('success', $message);
+                $message = "Sync completed: {$syncedCount} synced";
+                if ($failedCount > 0) {
+                    $message .= ", {$failedCount} failed";
+                }
+
+                session()->flash('success', $message);
+            } else {
+                throw new \Exception($syncResult['error'] ?? 'Sync failed');
+            }
 
             if (! empty($errors)) {
                 session()->flash('error', 'Some errors occurred: '.implode('; ', array_slice($errors, 0, 3)));

@@ -16,6 +16,7 @@ class SageIntacctSyncGifts extends Command
      * @var string
      */
     protected $signature = 'intacct:sync-gifts
+                            {--user-id= : User ID whose OAuth token to use for sync}
                             {--start-date= : Start date for sync (YYYY-MM-DD)}
                             {--end-date= : End date for sync (YYYY-MM-DD)}
                             {--retry-failed : Retry previously failed syncs}
@@ -55,10 +56,40 @@ class SageIntacctSyncGifts extends Command
             return Command::FAILURE;
         }
 
+        // Get user token for OAuth authentication
+        $userId = $this->option('user-id');
+
+        if (! $userId) {
+            $this->error('User ID is required for OAuth-based sync.');
+            $this->info('Usage: php artisan intacct:sync-gifts --user-id=1');
+
+            return Command::FAILURE;
+        }
+
+        $user = \App\Models\User::find($userId);
+
+        if (! $user) {
+            $this->error('User not found with ID: '.$userId);
+
+            return Command::FAILURE;
+        }
+
+        $userToken = $user->sageIntacctToken;
+
+        if (! $userToken || ! $userToken->hasValidToken()) {
+            $this->error('User does not have a valid Sage Intacct OAuth token.');
+            $this->info('The user must authorize access via the web interface first.');
+
+            return Command::FAILURE;
+        }
+
+        $this->info('Using OAuth token for user: '.$user->name.' (ID: '.$userId.')');
+        $this->newLine();
+
         // Sandbox safety check
-        if (! $setting->isSandbox() && ! $this->option('force')) {
+        if (! $userToken->isSandbox() && ! $this->option('force')) {
             $this->warn('WARNING: You are syncing to a PRODUCTION environment!');
-            $this->warn('Company ID: '.$setting->company_id);
+            $this->warn('Company ID: '.$userToken->company_id);
             $this->newLine();
 
             if (! $this->confirm('Are you sure you want to continue?', false)) {
@@ -66,8 +97,8 @@ class SageIntacctSyncGifts extends Command
 
                 return Command::SUCCESS;
             }
-        } elseif ($setting->isSandbox()) {
-            $this->info('✓ Using sandbox environment: '.$setting->company_id);
+        } elseif ($userToken->isSandbox()) {
+            $this->info('✓ Using sandbox environment: '.$userToken->company_id);
         }
 
         $this->newLine();
@@ -80,16 +111,16 @@ class SageIntacctSyncGifts extends Command
 
         // Determine sync mode
         if ($this->option('retry-failed')) {
-            return $this->retryFailedSync($setting);
+            return $this->retryFailedSync($setting, $userToken);
         } else {
-            return $this->syncDateRange($setting);
+            return $this->syncDateRange($setting, $userToken);
         }
     }
 
     /**
      * Sync gifts for a specific date range
      */
-    private function syncDateRange(SageIntacctSetting $setting): int
+    private function syncDateRange(SageIntacctSetting $setting, $userToken): int
     {
         // Get date range
         $startDate = $this->option('start-date')
@@ -110,8 +141,8 @@ class SageIntacctSyncGifts extends Command
         }
 
         // Initialize services
-        $apiService = new SageIntacctApiService($setting);
-        $syncService = new SageIntacctSyncService($apiService, $setting);
+        $apiService = new SageIntacctApiService($userToken, $setting);
+        $syncService = new SageIntacctSyncService($apiService, $setting, $userToken);
 
         // Test connection first
         $this->info('Testing connection...');
@@ -133,7 +164,7 @@ class SageIntacctSyncGifts extends Command
             // The actual sync happens inside syncGifts
         });
 
-        $result = $syncService->syncGifts($startDate, $endDate, null);
+        $result = $syncService->syncGifts($startDate, $endDate, $userToken->user_id);
 
         $this->newLine(2);
 
@@ -162,7 +193,7 @@ class SageIntacctSyncGifts extends Command
     /**
      * Retry failed syncs
      */
-    private function retryFailedSync(SageIntacctSetting $setting): int
+    private function retryFailedSync(SageIntacctSetting $setting, $userToken): int
     {
         $this->info('Retrying failed sync items...');
         $this->newLine();
@@ -174,8 +205,8 @@ class SageIntacctSyncGifts extends Command
         }
 
         // Initialize services
-        $apiService = new SageIntacctApiService($setting);
-        $syncService = new SageIntacctSyncService($apiService, $setting);
+        $apiService = new SageIntacctApiService($userToken, $setting);
+        $syncService = new SageIntacctSyncService($apiService, $setting, $userToken);
 
         // Test connection first
         $this->info('Testing connection...');
@@ -192,7 +223,7 @@ class SageIntacctSyncGifts extends Command
 
         // Retry failed syncs
         $this->info('Starting retry...');
-        $result = $syncService->syncUnsyncedGifts(null);
+        $result = $syncService->syncUnsyncedGifts($userToken->user_id);
 
         $this->newLine();
 

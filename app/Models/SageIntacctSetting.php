@@ -52,6 +52,7 @@ class SageIntacctSetting extends Model
         'department_id',
         'class_id',
         'endpoint_url',
+        'redirect_uri',
         'custom_object_name',
         'sync_schedule',
         'is_active',

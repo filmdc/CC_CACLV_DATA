@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             ReferenceDataSeeder::class,
             HousingModuleSeeder::class,
             ApprovalPermissionsSeeder::class,
+            DonorPerfectSeeder::class,
         ]);
     }
 }

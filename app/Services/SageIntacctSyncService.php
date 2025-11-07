@@ -12,13 +12,16 @@ class SageIntacctSyncService
 
     private $setting;
 
+    private $userToken;
+
     /**
-     * Constructor - accepts SageIntacctApiService and SageIntacctSetting instances
+     * Constructor - accepts SageIntacctApiService, SageIntacctSetting, and UserSageIntacctToken instances
      */
-    public function __construct(SageIntacctApiService $apiService, $setting)
+    public function __construct(SageIntacctApiService $apiService, $setting, $userToken = null)
     {
         $this->apiService = $apiService;
         $this->setting = $setting;
+        $this->userToken = $userToken ?? $apiService->getUserToken();
     }
 
     /**
@@ -44,13 +47,14 @@ class SageIntacctSyncService
             Log::info('Sage Intacct: Starting gift sync', [
                 'start_date' => $startDate->toDateString(),
                 'end_date' => $endDate->toDateString(),
-                'user_id' => $userId,
-                'is_sandbox' => $this->setting->isSandbox(),
+                'user_id' => $userId ?? $this->userToken->user_id,
+                'is_sandbox' => $this->userToken->isSandbox(),
             ]);
 
             // Create sync history record
             $syncHistory = $this->createSyncHistory(
-                $userId ? 'manual' : 'automatic',
+                $userId ?? $this->userToken->user_id,
+                'manual',
                 0 // Will be updated after we get the gifts
             );
 
@@ -192,6 +196,7 @@ class SageIntacctSyncService
 
             // Create sync history record
             $syncHistory = $this->createSyncHistory(
+                $userId ?? $this->userToken->user_id,
                 $userId ? 'manual_retry' : 'automatic_retry',
                 $unsyncedGifts->count()
             );
@@ -296,6 +301,7 @@ class SageIntacctSyncService
 
             // Create a temporary sync history for this single gift
             $syncHistory = $this->createSyncHistory(
+                $userId ?? $this->userToken->user_id,
                 $userId ? 'manual_single' : 'automatic_single',
                 1
             );
@@ -490,15 +496,16 @@ class SageIntacctSyncService
     /**
      * Create sync history record
      *
+     * @param  int  $userId  User ID who triggered the sync
      * @param  string  $triggeredBy  How the sync was triggered
      * @param  int  $totalRecords  Total records to sync
      * @return mixed Sync history model instance or null
      */
-    public function createSyncHistory(string $triggeredBy, int $totalRecords)
+    public function createSyncHistory(int $userId, string $triggeredBy, int $totalRecords)
     {
         try {
             $historyId = DB::table('sage_intacct_sync_histories')->insertGetId([
-                'triggered_by' => $triggeredBy,
+                'triggered_by' => 'user:'.$userId,
                 'status' => 'in_progress',
                 'total_records' => $totalRecords,
                 'synced_records' => 0,
@@ -510,6 +517,7 @@ class SageIntacctSyncService
 
             Log::info('Sage Intacct: Created sync history', [
                 'id' => $historyId,
+                'user_id' => $userId,
                 'triggered_by' => $triggeredBy,
                 'total_records' => $totalRecords,
             ]);

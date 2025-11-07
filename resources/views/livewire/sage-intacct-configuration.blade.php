@@ -146,6 +146,20 @@
                                 </div>
                             </div>
 
+                            <!-- Redirect URI -->
+                            <div>
+                                <label for="redirect_uri" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    OAuth Redirect URI <span class="text-red-500">*</span>
+                                </label>
+                                <input type="url"
+                                       wire:model="redirect_uri"
+                                       id="redirect_uri"
+                                       readonly
+                                       class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-600 dark:text-gray-300 rounded-md bg-gray-100">
+                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Configure this URL in your Sage Intacct OAuth app registration</p>
+                                @error('redirect_uri') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            </div>
+
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <!-- Location ID -->
                                 <div>
@@ -187,33 +201,53 @@
                                 </div>
                             </div>
 
-                            <!-- Test Connection Button -->
-                            <div class="pt-2">
-                                <button type="button"
-                                        wire:click="testConnection"
-                                        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                                        wire:loading.attr="disabled">
-                                    <span wire:loading.remove wire:target="testConnection">Test Connection</span>
-                                    <span wire:loading wire:target="testConnection" class="flex items-center">
-                                        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        Testing...
-                                    </span>
-                                </button>
+                            <!-- My Connection Status -->
+                            @php
+                                $myToken = auth()->user()->sageIntacctToken;
+                                $hasConnection = $myToken && $myToken->hasValidToken();
+                            @endphp
 
-                                <!-- Test Result -->
-                                @if($showTestResult && $testConnectionResult)
-                                    <div class="mt-3 p-3 rounded-md {{ $testConnectionResult['success'] ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800' }}">
-                                        <p class="text-sm {{ $testConnectionResult['success'] ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300' }}">
-                                            {{ $testConnectionResult['message'] }}
-                                        </p>
-                                        @if(isset($testConnectionResult['is_sandbox']) && $testConnectionResult['is_sandbox'])
-                                            <div class="mt-2 text-xs text-blue-600 dark:text-blue-400">
-                                                ✓ Sandbox environment
+                            <div class="pt-4 border-t border-gray-200 dark:border-zinc-600">
+                                <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">My Connection</h4>
+
+                                @if($hasConnection)
+                                    <!-- Connected status -->
+                                    <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md p-4">
+                                        <div class="flex items-start justify-between">
+                                            <div class="flex-1">
+                                                <p class="text-sm font-medium text-green-800 dark:text-green-300">
+                                                    ✓ Connected to Sage Intacct
+                                                </p>
+                                                <p class="text-xs text-green-600 dark:text-green-400 mt-1">
+                                                    Company: {{ $myToken->company_id }}
+                                                </p>
+                                                <p class="text-xs text-green-600 dark:text-green-400">
+                                                    Token expires: {{ $myToken->expires_at->diffForHumans() }}
+                                                </p>
                                             </div>
-                                        @endif
+                                            <button type="button"
+                                                    wire:click="disconnectMyAccount"
+                                                    class="text-xs px-3 py-1 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md border border-red-300 dark:border-red-700">
+                                                Disconnect
+                                            </button>
+                                        </div>
+                                    </div>
+                                @else
+                                    <!-- Not connected -->
+                                    <div class="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-md p-4">
+                                        <p class="text-sm text-orange-800 dark:text-orange-300 mb-2">
+                                            You are not connected to Sage Intacct
+                                        </p>
+                                        <a href="{{ route('intacct.oauth.authorize') }}"
+                                           class="inline-flex items-center px-4 py-2 bg-orange-600 text-white text-sm rounded-md hover:bg-orange-700">
+                                            <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                                            </svg>
+                                            Connect to Sage Intacct
+                                        </a>
+                                        <p class="text-xs text-orange-600 dark:text-orange-400 mt-2">
+                                            You'll be redirected to Sage Intacct to authorize access
+                                        </p>
                                     </div>
                                 @endif
                             </div>

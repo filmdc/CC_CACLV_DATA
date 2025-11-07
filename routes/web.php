@@ -134,6 +134,19 @@ Route::middleware(['auth'])->group(function () {
         ->name('sage-intacct.configuration')
         ->middleware(['auth']);
 
+    // Sage Intacct OAuth Routes
+    Route::get('/intacct/oauth/authorize', [\App\Http\Controllers\SageIntacctOAuthController::class, 'authorize'])
+        ->name('intacct.oauth.authorize')
+        ->middleware(['auth', 'permission:intacct.sync']);
+
+    Route::get('/intacct/oauth/callback', [\App\Http\Controllers\SageIntacctOAuthController::class, 'callback'])
+        ->name('intacct.oauth.callback')
+        ->middleware(['auth']);
+
+    Route::post('/intacct/oauth/disconnect', [\App\Http\Controllers\SageIntacctOAuthController::class, 'disconnect'])
+        ->name('intacct.oauth.disconnect')
+        ->middleware(['auth', 'permission:intacct.sync']);
+
     // Serve cached check images (authenticated, encrypted, auto-convert TIFF to PNG)
     Route::get('donor-gifts/check-image/{filename}', function ($filename) {
         // Verify user is authenticated and has permission

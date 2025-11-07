@@ -6,7 +6,6 @@ use App\Models\DonorPerfectSetting;
 use App\Models\SageIntacctFieldMapping;
 use App\Models\SageIntacctSetting;
 use App\Models\SageIntacctSyncHistory;
-use App\Services\SageIntacctApiService;
 use App\Traits\WithPermissionChecks;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -18,12 +17,14 @@ class SageIntacctConfiguration extends Component
     // Tab state
     public $activeTab = 'credentials';
 
-    // REST API Credentials (Primary)
+    // REST API Credentials (App-level)
     public $company_id = '';
 
     public $client_id = '';
 
     public $client_secret = '';
+
+    public $redirect_uri = '';
 
     // XML Web Services Credentials (Optional/Legacy)
     public $user_id = '';
@@ -90,6 +91,7 @@ class SageIntacctConfiguration extends Component
         'company_id' => 'required|string|max:255',
         'client_id' => 'required|string|max:255',
         'client_secret' => 'required|string',
+        'redirect_uri' => 'required|url',
         'user_id' => 'nullable|string|max:255',
         'sender_id' => 'nullable|string|max:255',
         'sender_password' => 'nullable|string|max:255',
@@ -105,6 +107,8 @@ class SageIntacctConfiguration extends Component
         'company_id.required' => 'Company ID is required.',
         'client_id.required' => 'Client ID is required for REST API authentication.',
         'client_secret.required' => 'Client Secret is required for REST API authentication.',
+        'redirect_uri.required' => 'Redirect URI is required for OAuth.',
+        'redirect_uri.url' => 'Redirect URI must be a valid URL.',
     ];
 
     public function mount()
@@ -121,6 +125,7 @@ class SageIntacctConfiguration extends Component
             $this->company_id = $settings->company_id ?? 'CACLV-sandbox';
             $this->client_id = $settings->client_id ?? '';
             $this->client_secret = $settings->client_secret ?? '';
+            $this->redirect_uri = $settings->redirect_uri ?? route('intacct.oauth.callback');
             $this->user_id = $settings->user_id ?? '';
             $this->sender_id = $settings->sender_id ?? '';
             $this->sender_password = $settings->sender_password ?? '';
@@ -134,6 +139,7 @@ class SageIntacctConfiguration extends Component
         } else {
             // No settings exist yet - default to sandbox
             $this->company_id = 'CACLV-sandbox';
+            $this->redirect_uri = route('intacct.oauth.callback');
             $this->code_mapping_enabled = false;
         }
 
@@ -164,6 +170,7 @@ class SageIntacctConfiguration extends Component
                 'company_id' => $this->company_id,
                 'client_id' => $this->client_id,
                 'client_secret' => $this->client_secret,
+                'redirect_uri' => $this->redirect_uri,
                 'user_id' => $this->user_id,
                 'sender_id' => $this->sender_id,
                 'sender_password' => $this->sender_password,
@@ -189,65 +196,15 @@ class SageIntacctConfiguration extends Component
         }
     }
 
-    public function testConnection()
+    public function disconnectMyAccount()
     {
-        $this->authorizeAction('intacct.configure');
+        $user = auth()->user();
+        $token = $user->sageIntacctToken;
 
-        $this->validate([
-            'company_id' => 'required|string',
-            'client_id' => 'required|string',
-            'client_secret' => 'required|string',
-        ]);
-
-        $this->showTestResult = true;
-        $this->testConnectionResult = null;
-
-        try {
-            // Create temporary setting object for testing
-            $tempSetting = new SageIntacctSetting;
-            $tempSetting->company_id = $this->company_id;
-            $tempSetting->client_id = $this->client_id;
-            $tempSetting->client_secret = $this->client_secret;
-            $tempSetting->endpoint_url = 'https://api.intacct.com';
-
-            $apiService = new SageIntacctApiService($tempSetting);
-            $result = $apiService->testConnection();
-
-            if ($result['success']) {
-                $companyName = $result['company_name'] ?? 'Unknown Company';
-                $isSandbox = $result['is_sandbox'] ?? false;
-
-                $message = 'Connection successful! Connected to: '.$companyName;
-                if ($isSandbox) {
-                    $message .= ' (Sandbox Environment)';
-                }
-
-                $this->testConnectionResult = [
-                    'success' => true,
-                    'message' => $message,
-                    'details' => $result,
-                    'is_sandbox' => $isSandbox,
-                ];
-            } else {
-                $this->testConnectionResult = [
-                    'success' => false,
-                    'message' => $result['message'] ?? 'Connection failed',
-                    'details' => $result,
-                ];
-            }
-        } catch (\Exception $e) {
-            $this->testConnectionResult = [
-                'success' => false,
-                'message' => 'Connection test failed: '.$e->getMessage(),
-                'details' => null,
-            ];
+        if ($token) {
+            $token->delete();
+            session()->flash('success', 'Your Sage Intacct account has been disconnected.');
         }
-    }
-
-    public function closeTestResult()
-    {
-        $this->showTestResult = false;
-        $this->testConnectionResult = null;
     }
 
     public function showAddMapping()
