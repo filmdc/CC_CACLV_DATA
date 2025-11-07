@@ -769,6 +769,13 @@ class SageIntacctApiService
             // Get all function results
             $functionResults = $xml->xpath('//function/result');
 
+            // Debug: Log if no results found
+            if (empty($functionResults)) {
+                Log::warning('Sage Intacct: No function results found in batch response', [
+                    'xml_preview' => substr($xmlResponse, 0, 2000),
+                ]);
+            }
+
             foreach ($functionResults as $index => $result) {
                 $status = (string) $result->status;
 

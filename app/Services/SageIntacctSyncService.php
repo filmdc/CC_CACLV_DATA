@@ -72,7 +72,7 @@ class SageIntacctSyncService
             $gifts = $this->getSyncableGifts($startDate, $endDate);
 
             if (empty($gifts)) {
-                $this->updateSyncHistory($syncHistory, 'completed', null);
+                $this->updateSyncHistory($syncHistory, 'success', null);
 
                 Log::info('Sage Intacct: No gifts to sync', [
                     'start_date' => $startDate->toDateString(),
@@ -128,7 +128,7 @@ class SageIntacctSyncService
             }
 
             // Update sync history status
-            $finalStatus = $totalFailed > 0 ? 'partial' : 'completed';
+            $finalStatus = $totalFailed > 0 ? 'partial' : 'success';
             $errorMessage = $totalFailed > 0 ? "Failed to sync {$totalFailed} records" : null;
             $this->updateSyncHistory($syncHistory, $finalStatus, $errorMessage);
 
@@ -254,7 +254,7 @@ class SageIntacctSyncService
             }
 
             // Update sync history status
-            $finalStatus = $totalFailed > 0 ? 'partial' : 'completed';
+            $finalStatus = $totalFailed > 0 ? 'partial' : 'success';
             $errorMessage = $totalFailed > 0 ? "Failed to sync {$totalFailed} records" : null;
             $this->updateSyncHistory($syncHistory, $finalStatus, $errorMessage);
 
@@ -575,7 +575,7 @@ class SageIntacctSyncService
                 'updated_at' => now(),
             ];
 
-            if ($status === 'completed' || $status === 'partial' || $status === 'failed') {
+            if ($status === 'success' || $status === 'partial' || $status === 'failed') {
                 $updateData['completed_at'] = now();
             }
 
@@ -612,7 +612,7 @@ class SageIntacctSyncService
             $stats = [
                 'total_syncs' => DB::table('sage_intacct_sync_history')->count(),
                 'successful_syncs' => DB::table('sage_intacct_sync_history')
-                    ->where('status', 'completed')
+                    ->where('status', 'success')
                     ->count(),
                 'failed_syncs' => DB::table('sage_intacct_sync_history')
                     ->where('status', 'failed')
