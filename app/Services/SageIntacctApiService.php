@@ -766,8 +766,11 @@ class SageIntacctApiService
             $failed = [];
             $details = [];
 
-            // Get all function results
-            $functionResults = $xml->xpath('//function/result');
+            // Get all function results (try both paths)
+            $functionResults = $xml->xpath('//operation/result');
+            if (empty($functionResults)) {
+                $functionResults = $xml->xpath('//function/result');
+            }
 
             // Debug: Log if no results found
             if (empty($functionResults)) {
