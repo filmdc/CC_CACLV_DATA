@@ -492,6 +492,11 @@ class SageIntacctSyncService
                 $value = $this->applyTransformation($value, $mapping['transformation']);
             }
 
+            // Apply code mappings if available (GL, Campaign, Solicit, Sub-Solicit)
+            if ($value !== null && $this->setting->isCodeMappingEnabled()) {
+                $value = $this->applyCodeMapping($dpField, $value);
+            }
+
             // Only include non-null values
             if ($value !== null) {
                 $transformed[$intacctField] = $value;
@@ -865,6 +870,50 @@ class SageIntacctSyncService
                 'error' => $e->getMessage(),
             ]);
         }
+    }
+
+    /**
+     * Apply code mapping to translate DonorPerfect codes to Sage Intacct codes
+     *
+     * @param  string  $dpField  DonorPerfect field name
+     * @param  mixed  $value  Original DonorPerfect code
+     * @return mixed Mapped Sage Intacct code or original value
+     */
+    private function applyCodeMapping(string $dpField, $value)
+    {
+        // Map DonorPerfect field names to code mapping field types
+        $fieldTypeMap = [
+            'gl_code' => 'gl_code',
+            'campaign' => 'campaign',
+            'solicit_code' => 'solicit_code',
+            'sub_solicit_code' => 'sub_solicit_code',
+        ];
+
+        // Check if this field has code mappings
+        if (! isset($fieldTypeMap[$dpField])) {
+            return $value; // Not a code field, return original value
+        }
+
+        $fieldType = $fieldTypeMap[$dpField];
+
+        // Look up the code mapping
+        $mapping = \App\Models\DonorPerfectCodeMapping::where('field_type', $fieldType)
+            ->where('dp_code', $value)
+            ->whereNotNull('intacct_code')
+            ->first();
+
+        if ($mapping && ! empty($mapping->intacct_code)) {
+            Log::debug('Sage Intacct: Applied code mapping', [
+                'field' => $dpField,
+                'dp_code' => $value,
+                'intacct_code' => $mapping->intacct_code,
+            ]);
+
+            return $mapping->intacct_code;
+        }
+
+        // No mapping found, use original value
+        return $value;
     }
 
     /**
