@@ -173,6 +173,24 @@
                            placeholder="Search donors, amounts..."
                            class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
+
+                <!-- Sync Status Filter -->
+                @if($intacctConfigured)
+                <div>
+                    <label for="syncStatusFilter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Sync Status
+                    </label>
+                    <select wire:model.live="syncStatusFilter"
+                            id="syncStatusFilter"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="all">All Gifts</option>
+                        <option value="not_synced">Not Synced</option>
+                        <option value="success">Successfully Synced</option>
+                        <option value="failed">Failed to Sync</option>
+                        <option value="pending">Pending</option>
+                    </select>
+                </div>
+                @endif
             </div>
 
             <!-- Action Buttons -->
@@ -292,10 +310,63 @@
                                 @if($intacctConfigured)
                                 <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Sync Status</th>
                                 @endif
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Gift Date</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Amount</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">GL Code</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Campaign</th>
+                                <!-- Sortable Headers -->
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-700" wire:click="sortBy('gift_date')">
+                                    <div class="flex items-center">
+                                        Gift Date
+                                        @if($sortField === 'gift_date')
+                                            <svg class="ml-1 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                                                @if($sortDirection === 'asc')
+                                                    <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
+                                                @else
+                                                    <path d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"/>
+                                                @endif
+                                            </svg>
+                                        @endif
+                                    </div>
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-700" wire:click="sortBy('amount')">
+                                    <div class="flex items-center">
+                                        Amount
+                                        @if($sortField === 'amount')
+                                            <svg class="ml-1 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                                                @if($sortDirection === 'asc')
+                                                    <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
+                                                @else
+                                                    <path d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"/>
+                                                @endif
+                                            </svg>
+                                        @endif
+                                    </div>
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-700" wire:click="sortBy('gl_code')">
+                                    <div class="flex items-center">
+                                        GL Code
+                                        @if($sortField === 'gl_code')
+                                            <svg class="ml-1 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                                                @if($sortDirection === 'asc')
+                                                    <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
+                                                @else
+                                                    <path d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"/>
+                                                @endif
+                                            </svg>
+                                        @endif
+                                    </div>
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-700" wire:click="sortBy('campaign')">
+                                    <div class="flex items-center">
+                                        Campaign
+                                        @if($sortField === 'campaign')
+                                            <svg class="ml-1 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                                                @if($sortDirection === 'asc')
+                                                    <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
+                                                @else
+                                                    <path d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"/>
+                                                @endif
+                                            </svg>
+                                        @endif
+                                    </div>
+                                </th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Solicitation Code</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Sub-Solicit Code</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Payment Type</th>

@@ -19,6 +19,12 @@ class DonorPerfectGiftsFeed extends Component
 
     public $endDate;
 
+    public $syncStatusFilter = 'all'; // all, success, failed, pending, not_synced
+
+    public $sortField = 'gift_date';
+
+    public $sortDirection = 'desc';
+
     public $showExportModal = false;
 
     public $showMappedCodes = true; // Toggle to show/hide mapped codes in table
@@ -102,6 +108,23 @@ class DonorPerfectGiftsFeed extends Component
 
     public function updatedEndDate()
     {
+        $this->resetPage();
+    }
+
+    public function updatedSyncStatusFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+
         $this->resetPage();
     }
 
@@ -511,6 +534,30 @@ class DonorPerfectGiftsFeed extends Component
             }
 
             $gifts = $result['gifts'];
+
+            // Filter by sync status if selected
+            if ($this->syncStatusFilter !== 'all') {
+                $gifts = $gifts->filter(function ($gift) {
+                    $syncStatus = $this->getSyncStatus($gift);
+
+                    switch ($this->syncStatusFilter) {
+                        case 'success':
+                            return $syncStatus === 'success';
+                        case 'failed':
+                            return $syncStatus === 'failed';
+                        case 'pending':
+                            return $syncStatus === 'pending';
+                        case 'not_synced':
+                            return $syncStatus === 'pending'; // Not synced yet
+                        default:
+                            return true;
+                    }
+                });
+            }
+
+            // Sort by selected field
+            $gifts = $gifts->sortBy($this->sortField, SORT_REGULAR, $this->sortDirection === 'desc')
+                ->values(); // Re-index after sorting
 
             // Paginate results
             $perPage = 15;
