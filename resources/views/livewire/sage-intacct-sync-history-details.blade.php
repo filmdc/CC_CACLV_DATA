@@ -7,7 +7,7 @@
                     <h1 class="text-2xl font-bold">Sync Run Details #{{ $syncHistory->id }}</h1>
                     <p class="text-indigo-100 mt-2">Started: {{ $syncHistory->started_at->format('M d, Y H:i:s') }}</p>
                 </div>
-                <a href="{{ route('intacct.configuration') }}?tab=sync-history"
+                <a href="{{ route('sage-intacct.configuration') }}?tab=sync-history"
                    class="px-4 py-2 bg-white text-indigo-600 rounded-md hover:bg-indigo-50 font-medium">
                     &larr; Back to Sync History
                 </a>
