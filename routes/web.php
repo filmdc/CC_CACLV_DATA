@@ -134,6 +134,10 @@ Route::middleware(['auth'])->group(function () {
         ->name('sage-intacct.configuration')
         ->middleware(['auth']);
 
+    Route::get('/accounting/sage-intacct/sync-history/{id}', \App\Livewire\SageIntacctSyncHistoryDetails::class)
+        ->name('intacct.sync-history.details')
+        ->middleware(['auth', 'permission:intacct.view']);
+
     // Sage Intacct OAuth Routes
     Route::get('/intacct/oauth/authorize', [\App\Http\Controllers\SageIntacctOAuthController::class, 'authorize'])
         ->name('intacct.oauth.authorize')

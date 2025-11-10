@@ -703,7 +703,8 @@
                                 </thead>
                                 <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-zinc-700">
                                     @foreach($syncHistory as $sync)
-                                        <tr class="hover:bg-gray-50 dark:hover:bg-zinc-700 cursor-pointer">
+                                        <tr class="hover:bg-gray-50 dark:hover:bg-zinc-700 cursor-pointer"
+                                            onclick="window.location='{{ route('intacct.sync-history.details', $sync->id) }}'">
                                             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                                                 {{ $sync->started_at->format('M d, Y H:i') }}
                                             </td>
