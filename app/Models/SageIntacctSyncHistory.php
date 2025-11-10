@@ -33,18 +33,31 @@ class SageIntacctSyncHistory extends Model
         'status',
         'started_at',
         'completed_at',
+        'sync_start_date',
+        'sync_end_date',
+        'executed_by_user_id',
+        'environment_info',
+        'configuration_snapshot',
         'total_records',
         'successful_count',
         'failed_count',
+        'skipped_count',
         'error_message',
+        'sync_notes',
+        'triggered_by',
     ];
 
     protected $casts = [
         'started_at' => 'datetime',
         'completed_at' => 'datetime',
+        'sync_start_date' => 'date',
+        'sync_end_date' => 'date',
+        'environment_info' => 'array',
+        'configuration_snapshot' => 'array',
         'total_records' => 'integer',
         'successful_count' => 'integer',
         'failed_count' => 'integer',
+        'skipped_count' => 'integer',
     ];
 
     /**
@@ -61,6 +74,14 @@ class SageIntacctSyncHistory extends Model
     public function setting(): BelongsTo
     {
         return $this->belongsTo(SageIntacctSetting::class, 'setting_id');
+    }
+
+    /**
+     * Get the user who executed this sync
+     */
+    public function executedBy(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\User::class, 'executed_by_user_id');
     }
 
     /**

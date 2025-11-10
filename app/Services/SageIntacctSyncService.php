@@ -54,11 +54,21 @@ class SageIntacctSyncService
                 'auth_method' => $this->setting->auth_method ?? 'xml',
             ]);
 
-            // Create sync history record
+            // Capture environment information
+            $environmentInfo = $this->captureEnvironmentInfo();
+
+            // Capture configuration snapshot
+            $configurationSnapshot = $this->captureConfigurationSnapshot();
+
+            // Create sync history record with detailed information
             $syncHistory = $this->createSyncHistory(
                 $userId ?? ($this->userToken ? $this->userToken->user_id : 0),
                 'manual',
-                0 // Will be updated after we get the gifts
+                0, // Will be updated after we get the gifts
+                $startDate,
+                $endDate,
+                $environmentInfo,
+                $configurationSnapshot
             );
 
             if (! $syncHistory) {
@@ -518,18 +528,35 @@ class SageIntacctSyncService
      * @param  int  $userId  User ID who triggered the sync
      * @param  string  $triggeredBy  How the sync was triggered
      * @param  int  $totalRecords  Total records to sync
+     * @param  Carbon|null  $startDate  Sync start date
+     * @param  Carbon|null  $endDate  Sync end date
+     * @param  array|null  $environmentInfo  Environment information
+     * @param  array|null  $configurationSnapshot  Configuration snapshot
      * @return mixed Sync history model instance or null
      */
-    public function createSyncHistory(int $userId, string $triggeredBy, int $totalRecords)
-    {
+    public function createSyncHistory(
+        int $userId,
+        string $triggeredBy,
+        int $totalRecords,
+        ?Carbon $startDate = null,
+        ?Carbon $endDate = null,
+        ?array $environmentInfo = null,
+        ?array $configurationSnapshot = null
+    ) {
         try {
             $historyId = DB::table('sage_intacct_sync_history')->insertGetId([
                 'triggered_by' => 'user:'.$userId,
+                'executed_by_user_id' => $userId,
                 'status' => 'running',
                 'total_records' => $totalRecords,
                 'successful_count' => 0,
                 'failed_count' => 0,
+                'skipped_count' => 0,
                 'started_at' => now(),
+                'sync_start_date' => $startDate?->toDateString(),
+                'sync_end_date' => $endDate?->toDateString(),
+                'environment_info' => $environmentInfo ? json_encode($environmentInfo) : null,
+                'configuration_snapshot' => $configurationSnapshot ? json_encode($configurationSnapshot) : null,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -539,6 +566,7 @@ class SageIntacctSyncService
                 'user_id' => $userId,
                 'triggered_by' => $triggeredBy,
                 'total_records' => $totalRecords,
+                'date_range' => $startDate && $endDate ? $startDate->toDateString().' to '.$endDate->toDateString() : 'N/A',
             ]);
 
             // Return a simple object with the necessary properties
@@ -549,6 +577,7 @@ class SageIntacctSyncService
                 'total_records' => $totalRecords,
                 'successful_count' => 0,
                 'failed_count' => 0,
+                'skipped_count' => 0,
                 'save' => function () {
                     // This is a placeholder - updates should use updateSyncHistory
                     return true;
@@ -667,14 +696,16 @@ class SageIntacctSyncService
             // Transform all gifts in batch
             $transformedRecords = [];
             $giftIdMap = []; // Map index to gift_id for tracking
+            $transformedMap = []; // Map gift_id to transformed data
 
             foreach ($batch as $index => $giftData) {
                 $transformed = $this->transformGiftForIntacct($giftData, $fieldMappings);
                 $transformedRecords[] = $transformed;
                 $giftIdMap[$index] = $giftData['gift_id'] ?? null;
+                $transformedMap[$giftData['gift_id'] ?? null] = $transformed;
 
-                // Create sync item record
-                $this->createSyncItem($syncHistory, $giftData, 'pending');
+                // Create sync item record with transformed data
+                $this->createSyncItem($syncHistory, $giftData, 'pending', $transformed);
             }
 
             // Send batch to Intacct
@@ -700,8 +731,10 @@ class SageIntacctSyncService
                         continue;
                     }
 
+                    $transformed = $transformedMap[$giftId] ?? [];
+
                     if ($detail['success']) {
-                        // Update as synced
+                        // Update as synced with API details
                         DB::table('sage_intacct_sync_items')
                             ->where('sync_history_id', $syncHistory->id)
                             ->where('gift_id', $giftId)
@@ -709,16 +742,20 @@ class SageIntacctSyncService
                                 'status' => 'success',
                                 'intacct_record_id' => $detail['key'] ?? null,
                                 'synced_at' => now(),
+                                'api_request' => json_encode($transformed),
+                                'api_response' => json_encode($detail),
                                 'updated_at' => now(),
                             ]);
                     } else {
-                        // Update as failed
+                        // Update as failed with API details
                         DB::table('sage_intacct_sync_items')
                             ->where('sync_history_id', $syncHistory->id)
                             ->where('gift_id', $giftId)
                             ->update([
                                 'status' => 'failed',
                                 'error_message' => $detail['error'] ?? 'Unknown error',
+                                'api_request' => json_encode($transformed),
+                                'api_response' => json_encode($detail),
                                 'updated_at' => now(),
                             ]);
 
@@ -738,12 +775,16 @@ class SageIntacctSyncService
                         continue;
                     }
 
+                    $transformed = $transformedMap[$giftId] ?? [];
+
                     DB::table('sage_intacct_sync_items')
                         ->where('sync_history_id', $syncHistory->id)
                         ->where('gift_id', $giftId)
                         ->update([
                             'status' => 'failed',
                             'error_message' => $result['error'] ?? 'Batch failed',
+                            'api_request' => json_encode($transformed),
+                            'api_response' => json_encode($result),
                             'updated_at' => now(),
                         ]);
 
@@ -801,15 +842,18 @@ class SageIntacctSyncService
      * @param  mixed  $syncHistory  Sync history instance
      * @param  array  $giftData  Gift data
      * @param  string  $status  Initial status
+     * @param  array|null  $transformedData  Transformed data for Intacct
      * @return mixed Sync item instance
      */
-    private function createSyncItem($syncHistory, array $giftData, string $status)
+    private function createSyncItem($syncHistory, array $giftData, string $status, ?array $transformedData = null)
     {
         try {
             $itemId = DB::table('sage_intacct_sync_items')->insertGetId([
                 'sync_history_id' => $syncHistory->id,
                 'gift_id' => $giftData['gift_id'] ?? null,
                 'gift_cache_id' => null, // TODO: Link to gift cache if needed
+                'gift_data' => json_encode($giftData),
+                'transformed_data' => $transformedData ? json_encode($transformedData) : null,
                 'status' => $status,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -839,9 +883,17 @@ class SageIntacctSyncService
      * @param  string  $status  New status
      * @param  string|null  $errorMessage  Optional error message
      * @param  string|null  $intacctKey  Optional Intacct record key
+     * @param  array|null  $apiRequest  Optional API request data
+     * @param  array|null  $apiResponse  Optional API response data
      */
-    private function updateSyncItem($syncItem, string $status, ?string $errorMessage = null, ?string $intacctKey = null): void
-    {
+    private function updateSyncItem(
+        $syncItem,
+        string $status,
+        ?string $errorMessage = null,
+        ?string $intacctKey = null,
+        ?array $apiRequest = null,
+        ?array $apiResponse = null
+    ): void {
         try {
             $updateData = [
                 'status' => $status,
@@ -858,6 +910,14 @@ class SageIntacctSyncService
 
             if ($intacctKey !== null) {
                 $updateData['intacct_record_id'] = $intacctKey;
+            }
+
+            if ($apiRequest !== null) {
+                $updateData['api_request'] = json_encode($apiRequest);
+            }
+
+            if ($apiResponse !== null) {
+                $updateData['api_response'] = json_encode($apiResponse);
             }
 
             DB::table('sage_intacct_sync_items')
@@ -952,5 +1012,51 @@ class SageIntacctSyncService
             default:
                 return $value;
         }
+    }
+
+    /**
+     * Capture environment information for debugging
+     *
+     * @return array Environment details
+     */
+    private function captureEnvironmentInfo(): array
+    {
+        return [
+            'php_version' => phpversion(),
+            'laravel_version' => app()->version(),
+            'server_software' => $_SERVER['SERVER_SOFTWARE'] ?? 'unknown',
+            'server_name' => $_SERVER['SERVER_NAME'] ?? 'unknown',
+            'server_addr' => $_SERVER['SERVER_ADDR'] ?? 'unknown',
+            'http_host' => $_SERVER['HTTP_HOST'] ?? 'unknown',
+            'app_env' => config('app.env'),
+            'app_debug' => config('app.debug'),
+            'database_connection' => config('database.default'),
+            'timestamp' => now()->toIso8601String(),
+            'timezone' => config('app.timezone'),
+            'memory_limit' => ini_get('memory_limit'),
+            'max_execution_time' => ini_get('max_execution_time'),
+        ];
+    }
+
+    /**
+     * Capture configuration snapshot for debugging
+     *
+     * @return array Configuration details
+     */
+    private function captureConfigurationSnapshot(): array
+    {
+        return [
+            'setting_id' => $this->setting->id ?? null,
+            'company_id' => $this->setting->company_id ?? null,
+            'entity_id' => $this->setting->entity_id ?? null,
+            'custom_object_name' => $this->setting->custom_object_name ?? null,
+            'auth_method' => $this->setting->auth_method ?? 'xml',
+            'is_sandbox' => $this->setting->isSandbox() ?? false,
+            'code_mapping_enabled' => $this->setting->isCodeMappingEnabled() ?? false,
+            'field_mappings_count' => $this->setting->fieldMappings()->count() ?? 0,
+            'user_token_id' => $this->userToken->id ?? null,
+            'user_id' => $this->userToken->user_id ?? null,
+            'has_valid_token' => $this->userToken ? $this->userToken->hasValidToken() : null,
+        ];
     }
 }
