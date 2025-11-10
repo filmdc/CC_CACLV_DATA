@@ -539,7 +539,17 @@
                                                 @else
                                                     {{-- Fallback: copy UNC path to clipboard --}}
                                                     <button type="button"
-                                                            onclick="event.stopPropagation(); navigator.clipboard.writeText('{{ addslashes($gift['IMAGE_CHECK']) }}').then(() => { alert('Check image path copied to clipboard!\\n\\n{{ addslashes($gift['IMAGE_CHECK']) }}\\n\\nPaste this into Windows Explorer to open the file.'); });"
+                                                            onclick="event.stopPropagation();
+                                                                const path = '{{ addslashes($gift['IMAGE_CHECK']) }}';
+                                                                if (navigator.clipboard && navigator.clipboard.writeText) {
+                                                                    navigator.clipboard.writeText(path).then(() => {
+                                                                        alert('Check image path copied to clipboard!\\n\\n' + path + '\\n\\nPaste this into Windows Explorer to open the file.');
+                                                                    }).catch(() => {
+                                                                        prompt('Copy this path to clipboard:', path);
+                                                                    });
+                                                                } else {
+                                                                    prompt('Copy this path to clipboard:', path);
+                                                                }"
                                                             class="text-orange-600 hover:text-orange-800 dark:text-orange-400 dark:hover:text-orange-300"
                                                             title="Copy network path: {{ $gift['IMAGE_CHECK'] }}">
                                                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
