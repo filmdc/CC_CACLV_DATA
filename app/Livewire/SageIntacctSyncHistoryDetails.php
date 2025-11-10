@@ -26,7 +26,7 @@ class SageIntacctSyncHistoryDetails extends Component
 
     public function mount($id)
     {
-        $this->authorizeAction('intacct.view');
+        $this->authorizeAction('intacct.configure');
 
         $this->syncHistoryId = $id;
         $this->loadSyncHistory();
