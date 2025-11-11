@@ -1032,7 +1032,7 @@ class SageIntacctApiService
         <content>
             <function controlid="{$functionId}">
                 <create_supdoc>
-                    <supdocname>{$sanitizedSupdocName}</supdocname>
+                    <supdocid>{$sanitizedSupdocName}</supdocid>
                     <supdocfoldername>{$sanitizedFolderName}</supdocfoldername>
                     <supdocdescription>{$sanitizedDescription}</supdocdescription>
                     <attachments>
