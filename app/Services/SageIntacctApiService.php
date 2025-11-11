@@ -888,11 +888,23 @@ class SageIntacctApiService
                 $folderName = env('INTACCT_ATTACHMENT_FOLDER', 'Gift_Check_Images');
             }
 
-            // Generate unique SUPDOC name
-            $supdocName = 'CheckImage_'.$fileName.'_'.time();
+            // Generate unique SUPDOCID (max 20 characters per Intacct requirements)
+            // Format: CHK-{gift_id}-{timestamp_last_6_digits}
+            // Example: CHK-196375-891696
+            $timestamp = substr(time(), -6); // Last 6 digits of timestamp
+            $supdocId = 'CHK-'.$fileName.'-'.$timestamp;
+
+            // Ensure it fits within 20 char limit
+            if (strlen($supdocId) > 20) {
+                // Use just gift ID from filename if too long
+                preg_match('/Gift_(\d+)_/', $fileName, $matches);
+                $giftId = $matches[1] ?? substr($fileName, 0, 6);
+                $supdocId = 'CHK-'.$giftId.'-'.$timestamp;
+            }
 
             Log::info('Sage Intacct XML: Creating SUPDOC attachment', [
-                'supdoc_name' => $supdocName,
+                'supdocid' => $supdocId,
+                'supdocid_length' => strlen($supdocId),
                 'filename' => $fileName,
                 'extension' => $fileExtension,
                 'folder' => $folderName,
@@ -901,7 +913,7 @@ class SageIntacctApiService
 
             // Build XML request for create_supdoc
             $xmlRequest = $this->buildSupdocXml(
-                $supdocName,
+                $supdocId,
                 $fileName,
                 $fileExtension,
                 $base64Contents,
@@ -914,7 +926,7 @@ class SageIntacctApiService
 
             if (! $response['success']) {
                 Log::error('Sage Intacct SUPDOC creation failed', [
-                    'supdoc_name' => $supdocName,
+                    'supdocid' => $supdocId,
                     'error' => $response['error'] ?? 'Unknown error',
                 ]);
 
@@ -949,7 +961,7 @@ class SageIntacctApiService
             // If still no SUPDOCID, the creation failed
             if (empty($supdocid)) {
                 Log::error('Sage Intacct XML: SUPDOC creation failed - no SUPDOCID returned', [
-                    'supdoc_name' => $supdocName,
+                    'requested_supdocid' => $supdocId,
                     'parse_result' => $parseResult,
                     'response_preview' => substr($response['xml'], 0, 1000),
                 ]);
@@ -961,14 +973,13 @@ class SageIntacctApiService
             }
 
             Log::info('Sage Intacct XML: SUPDOC created successfully', [
-                'supdoc_name' => $supdocName,
-                'supdocid' => $supdocid,
+                'requested_supdocid' => $supdocId,
+                'returned_supdocid' => $supdocid,
             ]);
 
             return [
                 'success' => true,
                 'supdocid' => $supdocid,
-                'supdoc_name' => $supdocName,
                 'message' => 'SUPDOC created successfully',
             ];
 
@@ -989,7 +1000,7 @@ class SageIntacctApiService
     /**
      * Build XML for SUPDOC creation
      *
-     * @param  string  $supdocName  Unique name for the SUPDOC
+     * @param  string  $supdocId  Unique ID for the SUPDOC (max 20 characters)
      * @param  string  $fileName  File name without extension
      * @param  string  $fileExtension  File extension without dot
      * @param  string  $base64Contents  Base64 encoded file contents
@@ -998,7 +1009,7 @@ class SageIntacctApiService
      * @return string XML request
      */
     private function buildSupdocXml(
-        string $supdocName,
+        string $supdocId,
         string $fileName,
         string $fileExtension,
         string $base64Contents,
@@ -1009,7 +1020,7 @@ class SageIntacctApiService
         $functionId = 'func-'.time().'-'.uniqid();
 
         // Sanitize XML content
-        $sanitizedSupdocName = htmlspecialchars($supdocName, ENT_XML1, 'UTF-8');
+        $sanitizedSupdocId = htmlspecialchars($supdocId, ENT_XML1, 'UTF-8');
         $sanitizedFolderName = htmlspecialchars($folderName, ENT_XML1, 'UTF-8');
         $sanitizedDescription = htmlspecialchars($description ?: 'Check image', ENT_XML1, 'UTF-8');
         $sanitizedFileName = htmlspecialchars($fileName, ENT_XML1, 'UTF-8');
