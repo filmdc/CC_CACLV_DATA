@@ -90,10 +90,20 @@ class SageIntacctSyncService
                     'count' => count($gifts),
                 ]);
             } else {
-                // Get all syncable gifts from DonorPerfect
-                $gifts = $this->getSyncableGifts($startDate, $endDate);
+                // Get all gifts from DonorPerfect (don't filter by local sync status)
+                $dpGiftService = new DonorPerfectGiftService;
+                $result = $dpGiftService->getCachedGifts(
+                    $startDate->format('Y-m-d'),
+                    $endDate->format('Y-m-d')
+                );
 
-                Log::info('Sage Intacct: Retrieved all syncable gifts from date range', [
+                if (! $result['success']) {
+                    throw new \Exception($result['error'] ?? 'Failed to get gifts');
+                }
+
+                $gifts = $result['gifts'] ?? [];
+
+                Log::info('Sage Intacct: Retrieved all gifts from date range', [
                     'count' => count($gifts),
                 ]);
             }
@@ -111,47 +121,96 @@ class SageIntacctSyncService
                     'total' => 0,
                     'synced' => 0,
                     'failed' => 0,
+                    'skipped' => 0,
                     'message' => 'No gifts to sync for the specified date range',
                 ];
             }
 
-            // Update total records in sync history
+            // Query Intacct for existing records (source of truth)
+            $existingRecords = $this->getExistingIntacctRecords($gifts);
+
+            // Categorize: create/update/skip
+            $categorized = $this->categorizeGifts($gifts, $existingRecords);
+
             $totalRecords = count($gifts);
+            $toCreate = count($categorized['create']);
+            $toUpdate = count($categorized['update']);
+            $toSkip = count($categorized['skip']);
+
+            // Update total records in sync history
             DB::table('sage_intacct_sync_history')
                 ->where('id', $syncHistory->id)
-                ->update(['total_records' => $totalRecords]);
+                ->update([
+                    'total_records' => $totalRecords,
+                    'skipped_count' => $toSkip,
+                ]);
 
-            Log::info('Sage Intacct: Found gifts to sync', [
-                'count' => $totalRecords,
+            Log::info('Sage Intacct: Sync plan determined', [
+                'total' => $totalRecords,
+                'to_create' => $toCreate,
+                'to_update' => $toUpdate,
+                'to_skip' => $toSkip,
             ]);
 
-            // Process gifts in batches of 100
-            $batchSize = 100;
-            $batches = array_chunk($gifts, $batchSize);
+            // Process CREATE operations in batches
             $totalSynced = 0;
             $totalFailed = 0;
             $failedRecords = [];
 
-            foreach ($batches as $batchIndex => $batch) {
-                Log::info('Sage Intacct: Processing batch', [
-                    'batch_number' => $batchIndex + 1,
-                    'batch_size' => count($batch),
-                    'total_batches' => count($batches),
+            if (! empty($categorized['create'])) {
+                $batchSize = 100;
+                $batches = array_chunk($categorized['create'], $batchSize);
+
+                foreach ($batches as $batchIndex => $batch) {
+                    Log::info('Sage Intacct: Processing CREATE batch', [
+                        'batch_number' => $batchIndex + 1,
+                        'batch_size' => count($batch),
+                        'total_batches' => count($batches),
+                    ]);
+
+                    $batchResult = $this->syncBatch($batch, $syncHistory);
+
+                    $totalSynced += $batchResult['synced'];
+                    $totalFailed += $batchResult['failed'];
+                    $failedRecords = array_merge($failedRecords, $batchResult['failed_count']);
+
+                    // Update sync history progress
+                    DB::table('sage_intacct_sync_history')
+                        ->where('id', $syncHistory->id)
+                        ->update([
+                            'successful_count' => $totalSynced,
+                            'failed_count' => $totalFailed,
+                        ]);
+                }
+            }
+
+            // Process UPDATE operations individually
+            if (! empty($categorized['update'])) {
+                Log::info('Sage Intacct: Processing UPDATE operations', [
+                    'count' => count($categorized['update']),
                 ]);
 
-                $batchResult = $this->syncBatch($batch, $syncHistory);
+                foreach ($categorized['update'] as $gift) {
+                    $updateResult = $this->updateGiftRecord($gift, $syncHistory);
 
-                $totalSynced += $batchResult['synced'];
-                $totalFailed += $batchResult['failed'];
-                $failedRecords = array_merge($failedRecords, $batchResult['failed_count']);
+                    if ($updateResult['success']) {
+                        $totalSynced++;
+                    } else {
+                        $totalFailed++;
+                        $failedRecords[] = [
+                            'gift_id' => $gift['gift_id'] ?? 'unknown',
+                            'error' => $updateResult['error'] ?? 'Update failed',
+                        ];
+                    }
 
-                // Update sync history progress
-                DB::table('sage_intacct_sync_history')
-                    ->where('id', $syncHistory->id)
-                    ->update([
-                        'successful_count' => $totalSynced,
-                        'failed_count' => $totalFailed,
-                    ]);
+                    // Update sync history progress
+                    DB::table('sage_intacct_sync_history')
+                        ->where('id', $syncHistory->id)
+                        ->update([
+                            'successful_count' => $totalSynced,
+                            'failed_count' => $totalFailed,
+                        ]);
+                }
             }
 
             // Update sync history status
@@ -161,7 +220,9 @@ class SageIntacctSyncService
 
             Log::info('Sage Intacct: Gift sync completed', [
                 'total' => $totalRecords,
-                'synced' => $totalSynced,
+                'created' => $toCreate - $totalFailed, // Subtract failures
+                'updated' => $toUpdate,
+                'skipped' => $toSkip,
                 'failed' => $totalFailed,
             ]);
 
@@ -170,6 +231,9 @@ class SageIntacctSyncService
                 'total' => $totalRecords,
                 'synced' => $totalSynced,
                 'failed' => $totalFailed,
+                'skipped' => $toSkip,
+                'created' => $toCreate,
+                'updated' => $toUpdate,
                 'failed_count' => $failedRecords,
                 'sync_history_id' => $syncHistory->id,
             ];
@@ -1101,6 +1165,256 @@ class SageIntacctSyncService
 
             return null;
         }
+    }
+
+    /**
+     * Update a single gift record in Intacct
+     *
+     * @param  array  $giftData  Gift data with changes
+     * @param  mixed  $syncHistory  Sync history instance
+     * @return array Result with success status
+     */
+    private function updateGiftRecord(array $giftData, $syncHistory): array
+    {
+        try {
+            $giftId = $giftData['gift_id'] ?? 'unknown';
+            $recordKey = $giftData['_intacct_record_key'] ?? null;
+            $changes = $giftData['_changes'] ?? [];
+
+            if (! $recordKey) {
+                return [
+                    'success' => false,
+                    'error' => 'No record key provided for update',
+                ];
+            }
+
+            Log::info('Sage Intacct: Updating gift record', [
+                'gift_id' => $giftId,
+                'record_key' => $recordKey,
+                'changes' => $changes,
+            ]);
+
+            // Upload attachment if needed
+            $supdocid = null;
+            if (in_array('attachment_added', $changes)) {
+                $supdocid = $this->uploadCheckImageAttachment($giftData);
+                if ($supdocid) {
+                    Log::info('Sage Intacct: Attachment uploaded for update', [
+                        'gift_id' => $giftId,
+                        'supdocid' => $supdocid,
+                    ]);
+                }
+            }
+
+            // Transform gift data
+            $fieldMappings = $this->setting->fieldMappings()->orderBy('order')->get()->toArray();
+            $transformed = $this->transformGiftForIntacct($giftData, $fieldMappings);
+
+            // Add SUPDOCID if attachment was uploaded
+            if ($supdocid) {
+                $transformed['SUPDOCID'] = $supdocid;
+            }
+
+            // Create sync item record
+            $syncItem = $this->createSyncItem($syncHistory, $giftData, 'pending', $transformed);
+
+            // Send update to Intacct
+            $updateResult = $this->apiService->updateCustomObjectRecord(
+                $this->setting->custom_object_name,
+                $recordKey,
+                $transformed
+            );
+
+            if ($updateResult['success']) {
+                // Update sync item as synced
+                $this->updateSyncItem($syncItem, 'success', null, $recordKey, $transformed, $updateResult);
+
+                Log::info('Sage Intacct: Gift updated successfully', [
+                    'gift_id' => $giftId,
+                    'record_key' => $recordKey,
+                    'had_attachment' => $supdocid !== null,
+                ]);
+
+                return ['success' => true];
+            } else {
+                // Update sync item as failed
+                $errorMessage = $updateResult['error'] ?? 'Update failed';
+                $this->updateSyncItem($syncItem, 'failed', $errorMessage, null, $transformed, $updateResult);
+
+                Log::error('Sage Intacct: Gift update failed', [
+                    'gift_id' => $giftId,
+                    'error' => $errorMessage,
+                ]);
+
+                return [
+                    'success' => false,
+                    'error' => $errorMessage,
+                ];
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Sage Intacct updateGiftRecord exception', [
+                'gift_id' => $giftData['gift_id'] ?? 'unknown',
+                'error' => $e->getMessage(),
+            ]);
+
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Get existing records from Sage Intacct for comparison
+     *
+     * @param  array  $gifts  Array of gift data from DonorPerfect
+     * @return array Existing records keyed by gift_id
+     */
+    private function getExistingIntacctRecords(array $gifts): array
+    {
+        try {
+            $giftIds = array_column($gifts, 'gift_id');
+
+            if (empty($giftIds)) {
+                return [];
+            }
+
+            Log::info('Sage Intacct: Querying existing records from Intacct', [
+                'gift_count' => count($giftIds),
+            ]);
+
+            $queryResult = $this->apiService->queryCustomObjectRecords(
+                $this->setting->custom_object_name,
+                $giftIds
+            );
+
+            if (! $queryResult['success']) {
+                Log::warning('Sage Intacct: Query failed, assuming no existing records', [
+                    'error' => $queryResult['error'] ?? 'Unknown error',
+                ]);
+
+                return [];
+            }
+
+            Log::info('Sage Intacct: Retrieved existing records', [
+                'found_count' => count($queryResult['records']),
+            ]);
+
+            return $queryResult['records'];
+
+        } catch (\Exception $e) {
+            Log::error('Sage Intacct getExistingIntacctRecords exception', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return [];
+        }
+    }
+
+    /**
+     * Detect changes between local gift and Intacct record
+     *
+     * @param  array  $localGift  Gift data from DonorPerfect
+     * @param  array  $intacctRecord  Existing record from Intacct
+     * @return array List of changed fields
+     */
+    private function detectChanges(array $localGift, array $intacctRecord): array
+    {
+        $changes = [];
+
+        // Compare amount
+        $localAmount = number_format((float) ($localGift['amount'] ?? 0), 2, '.', '');
+        $intacctAmount = number_format((float) ($intacctRecord['amount'] ?? 0), 2, '.', '');
+        if ($localAmount != $intacctAmount) {
+            $changes[] = 'amount';
+        }
+
+        // Compare gift date
+        if (($localGift['gift_date'] ?? '') != ($intacctRecord['gift_date'] ?? '')) {
+            $changes[] = 'gift_date';
+        }
+
+        // Compare GL code (after mapping)
+        $localGlCode = $this->applyCodeMapping('gl_code', $localGift['gl_code'] ?? '');
+        if ($localGlCode != ($intacctRecord['gift_gl_code'] ?? '')) {
+            $changes[] = 'gl_code';
+        }
+
+        // Compare campaign (after mapping)
+        $localCampaign = $this->applyCodeMapping('campaign', $localGift['campaign'] ?? '');
+        if ($localCampaign != ($intacctRecord['gift_campaign'] ?? '')) {
+            $changes[] = 'campaign';
+        }
+
+        // Check for new attachment
+        if (! empty($localGift['IMAGE_CHECK_URL']) && empty($intacctRecord['SUPDOCID'])) {
+            $changes[] = 'attachment_added';
+        }
+
+        return $changes;
+    }
+
+    /**
+     * Categorize gifts into create/update/skip based on Intacct records
+     *
+     * @param  array  $gifts  Gifts to sync
+     * @param  array  $existingRecords  Existing records from Intacct
+     * @return array Categorized gifts
+     */
+    private function categorizeGifts(array $gifts, array $existingRecords): array
+    {
+        $create = [];
+        $update = [];
+        $skip = [];
+
+        foreach ($gifts as $gift) {
+            $giftId = $gift['gift_id'] ?? null;
+            if (! $giftId) {
+                continue;
+            }
+
+            // Check if exists in Intacct
+            if (isset($existingRecords[$giftId])) {
+                // Record exists - check for changes
+                $changes = $this->detectChanges($gift, $existingRecords[$giftId]);
+
+                if (empty($changes)) {
+                    // No changes - skip
+                    $skip[] = $gift;
+                    Log::debug('Sage Intacct: Gift identical to Intacct record, skipping', [
+                        'gift_id' => $giftId,
+                    ]);
+                } else {
+                    // Has changes - update
+                    $gift['_intacct_record_key'] = $existingRecords[$giftId]['RECORDNO'] ?? null;
+                    $gift['_changes'] = $changes;
+                    $update[] = $gift;
+                    Log::info('Sage Intacct: Gift has changes, will update', [
+                        'gift_id' => $giftId,
+                        'changes' => $changes,
+                    ]);
+                }
+            } else {
+                // Record doesn't exist - create
+                $create[] = $gift;
+                Log::debug('Sage Intacct: Gift not in Intacct, will create', [
+                    'gift_id' => $giftId,
+                ]);
+            }
+        }
+
+        Log::info('Sage Intacct: Gifts categorized', [
+            'create' => count($create),
+            'update' => count($update),
+            'skip' => count($skip),
+        ]);
+
+        return [
+            'create' => $create,
+            'update' => $update,
+            'skip' => $skip,
+        ];
     }
 
     /**

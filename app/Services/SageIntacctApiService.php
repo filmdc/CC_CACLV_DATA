@@ -328,6 +328,183 @@ class SageIntacctApiService
     }
 
     /**
+     * Query custom object records (XML method)
+     *
+     * @param  string  $objectName  Custom object name
+     * @param  array  $giftIds  Array of gift IDs to query
+     * @return array Result with existing records keyed by gift_id
+     */
+    public function queryCustomObjectRecords(string $objectName, array $giftIds): array
+    {
+        if (! $this->setting->isXmlApi()) {
+            return [
+                'success' => false,
+                'error' => 'Query is only supported in XML API mode',
+            ];
+        }
+
+        try {
+            // Ensure we have a session
+            if (! $this->sessionId) {
+                $authResult = $this->authenticateXml();
+                if (! $authResult['success']) {
+                    return [
+                        'success' => false,
+                        'error' => 'Authentication failed: '.($authResult['message'] ?? 'Unknown error'),
+                    ];
+                }
+            }
+
+            if (empty($giftIds)) {
+                return ['success' => true, 'records' => []];
+            }
+
+            // Build query filter for donor_perfect_gift_id IN (...)
+            $giftIdList = implode(',', array_map('intval', $giftIds));
+            $query = "donor_perfect_gift_id IN ({$giftIdList})";
+
+            Log::info('Sage Intacct XML: Querying existing records', [
+                'object_name' => $objectName,
+                'gift_count' => count($giftIds),
+                'query' => $query,
+            ]);
+
+            // Build readByQuery XML request
+            $parameters = [
+                'object' => $objectName,
+                'query' => $query,
+                'fields' => '*', // Get all fields
+                'pagesize' => 1000,
+            ];
+
+            $xmlRequest = $this->buildReadByQueryXml($objectName, $query);
+
+            // Send request
+            $response = $this->sendXmlRequest($xmlRequest);
+
+            if (! $response['success']) {
+                return [
+                    'success' => false,
+                    'error' => $response['error'] ?? 'Query failed',
+                ];
+            }
+
+            // Parse response
+            $parseResult = $this->parseQueryResponse($response['xml']);
+
+            if (! $parseResult['success']) {
+                return [
+                    'success' => false,
+                    'error' => $parseResult['error'] ?? 'Failed to parse query response',
+                ];
+            }
+
+            Log::info('Sage Intacct XML: Query completed', [
+                'object_name' => $objectName,
+                'records_found' => count($parseResult['records']),
+            ]);
+
+            return [
+                'success' => true,
+                'records' => $parseResult['records'],
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Sage Intacct queryCustomObjectRecords exception', [
+                'object_name' => $objectName,
+                'error' => $e->getMessage(),
+            ]);
+
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Update an existing custom object record (XML method)
+     *
+     * @param  string  $objectName  Custom object name
+     * @param  string  $recordKey  The RECORDNO or key of the record to update
+     * @param  array  $fieldData  Fields to update
+     * @return array Result with success status
+     */
+    public function updateCustomObjectRecord(string $objectName, string $recordKey, array $fieldData): array
+    {
+        if (! $this->setting->isXmlApi()) {
+            return [
+                'success' => false,
+                'error' => 'Update is only supported in XML API mode',
+            ];
+        }
+
+        try {
+            // Ensure we have a session
+            if (! $this->sessionId) {
+                $authResult = $this->authenticateXml();
+                if (! $authResult['success']) {
+                    return [
+                        'success' => false,
+                        'error' => 'Authentication failed: '.($authResult['message'] ?? 'Unknown error'),
+                    ];
+                }
+            }
+
+            Log::info('Sage Intacct XML: Updating custom object record', [
+                'object_name' => $objectName,
+                'record_key' => $recordKey,
+                'fields' => array_keys($fieldData),
+            ]);
+
+            // Build update request
+            $xmlRequest = $this->buildUpdateXml($objectName, $recordKey, $fieldData);
+
+            // Send request
+            $response = $this->sendXmlRequest($xmlRequest);
+
+            if (! $response['success']) {
+                return [
+                    'success' => false,
+                    'error' => $response['error'] ?? 'Update failed',
+                ];
+            }
+
+            // Parse response
+            $parseResult = $this->parseXmlResponse($response['xml']);
+
+            if (! $parseResult['success']) {
+                return [
+                    'success' => false,
+                    'error' => $parseResult['error'] ?? 'Failed to parse update response',
+                ];
+            }
+
+            Log::info('Sage Intacct XML: Record updated successfully', [
+                'object_name' => $objectName,
+                'record_key' => $recordKey,
+            ]);
+
+            return [
+                'success' => true,
+                'key' => $recordKey,
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Sage Intacct updateCustomObjectRecord exception', [
+                'object_name' => $objectName,
+                'record_key' => $recordKey,
+                'error' => $e->getMessage(),
+            ]);
+
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
      * Batch create records in a custom object (XML method)
      */
     private function batchCreateRecordsXml(string $objectName, array $records): array
@@ -688,6 +865,158 @@ class SageIntacctApiService
 
         // Default: just return function name as empty element
         return '<'.htmlspecialchars($functionName).'/>';
+    }
+
+    /**
+     * Build XML for readByQuery request
+     */
+    private function buildReadByQueryXml(string $objectName, string $query, int $pagesize = 1000): string
+    {
+        $controlId = $this->generateControlId();
+        $functionId = $this->generateControlId();
+
+        $authSection = $this->sessionId
+            ? '<sessionid>'.htmlspecialchars($this->sessionId).'</sessionid>'
+            : '<login>
+                <userid>'.htmlspecialchars($this->setting->web_services_user_id).'</userid>
+                <companyid>'.htmlspecialchars($this->setting->company_id).'</companyid>
+                <password>'.htmlspecialchars($this->setting->web_services_password).'</password>
+            </login>';
+
+        $sanitizedObjectName = htmlspecialchars($objectName);
+        $sanitizedQuery = htmlspecialchars($query);
+
+        return <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<request>
+    <control>
+        <senderid>{$this->setting->sender_id}</senderid>
+        <password>{$this->setting->sender_password}</password>
+        <controlid>{$controlId}</controlid>
+        <uniqueid>false</uniqueid>
+        <dtdversion>3.0</dtdversion>
+    </control>
+    <operation>
+        <authentication>
+            {$authSection}
+        </authentication>
+        <content>
+            <function controlid="{$functionId}">
+                <readByQuery>
+                    <object>{$sanitizedObjectName}</object>
+                    <query>{$sanitizedQuery}</query>
+                    <fields>*</fields>
+                    <pagesize>{$pagesize}</pagesize>
+                </readByQuery>
+            </function>
+        </content>
+    </operation>
+</request>
+XML;
+    }
+
+    /**
+     * Build XML for update request
+     */
+    private function buildUpdateXml(string $objectName, string $recordKey, array $fieldData): string
+    {
+        $controlId = $this->generateControlId();
+        $functionId = $this->generateControlId();
+
+        $authSection = $this->sessionId
+            ? '<sessionid>'.htmlspecialchars($this->sessionId).'</sessionid>'
+            : '<login>
+                <userid>'.htmlspecialchars($this->setting->web_services_user_id).'</userid>
+                <companyid>'.htmlspecialchars($this->setting->company_id).'</companyid>
+                <password>'.htmlspecialchars($this->setting->web_services_password).'</password>
+            </login>';
+
+        $sanitizedObjectName = htmlspecialchars($objectName);
+        $sanitizedRecordKey = htmlspecialchars($recordKey);
+
+        $fieldsXml = '';
+        foreach ($fieldData as $fieldName => $fieldValue) {
+            $fieldsXml .= '<'.htmlspecialchars($fieldName).'>'.htmlspecialchars($fieldValue).'</'.htmlspecialchars($fieldName).'>'."\n";
+        }
+
+        return <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<request>
+    <control>
+        <senderid>{$this->setting->sender_id}</senderid>
+        <password>{$this->setting->sender_password}</password>
+        <controlid>{$controlId}</controlid>
+        <uniqueid>false</uniqueid>
+        <dtdversion>3.0</dtdversion>
+    </control>
+    <operation>
+        <authentication>
+            {$authSection}
+        </authentication>
+        <content>
+            <function controlid="{$functionId}">
+                <update>
+                    <{$sanitizedObjectName}>
+                        <RECORDNO>{$sanitizedRecordKey}</RECORDNO>
+                        {$fieldsXml}
+                    </{$sanitizedObjectName}>
+                </update>
+            </function>
+        </content>
+    </operation>
+</request>
+XML;
+    }
+
+    /**
+     * Parse query response and extract records
+     */
+    private function parseQueryResponse(string $xmlResponse): array
+    {
+        try {
+            $xml = simplexml_load_string($xmlResponse);
+            if ($xml === false) {
+                return ['success' => false, 'error' => 'XML parsing failed'];
+            }
+
+            // Check for errors
+            $errormessage = $xml->xpath('//errormessage');
+            if (! empty($errormessage)) {
+                $errorText = (string) ($errormessage[0]->error->description2 ?? $errormessage[0]->error->description ?? 'Query failed');
+
+                return ['success' => false, 'error' => $errorText];
+            }
+
+            // Extract records from response
+            $recordNodes = $xml->xpath('//data/'.$this->setting->custom_object_name);
+
+            $records = [];
+            foreach ($recordNodes as $record) {
+                $recordData = [];
+                foreach ($record->children() as $field) {
+                    $fieldName = $field->getName();
+                    $fieldValue = (string) $field;
+                    $recordData[$fieldName] = $fieldValue;
+                }
+
+                // Key by donor_perfect_gift_id for easy lookup
+                if (isset($recordData['donor_perfect_gift_id'])) {
+                    $records[$recordData['donor_perfect_gift_id']] = $recordData;
+                }
+            }
+
+            return [
+                'success' => true,
+                'records' => $records,
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Parse query response exception', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
     }
 
     /**

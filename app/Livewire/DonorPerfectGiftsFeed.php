@@ -499,13 +499,27 @@ class DonorPerfectGiftsFeed extends Component
             $this->selectedGiftsForSync = [];
 
             if ($syncResult['success']) {
-                $syncedCount = $syncResult['synced'] ?? 0;
-                $failedCount = $syncResult['failed'] ?? 0;
+                $created = $syncResult['created'] ?? 0;
+                $updated = $syncResult['updated'] ?? 0;
+                $skipped = $syncResult['skipped'] ?? 0;
+                $failed = $syncResult['failed'] ?? 0;
+                $synced = $syncResult['synced'] ?? 0;
 
-                $message = "Sync completed: {$syncedCount} synced";
-                if ($failedCount > 0) {
-                    $message .= ", {$failedCount} failed";
+                $messageParts = [];
+                if ($created > 0) {
+                    $messageParts[] = "{$created} created";
                 }
+                if ($updated > 0) {
+                    $messageParts[] = "{$updated} updated";
+                }
+                if ($skipped > 0) {
+                    $messageParts[] = "{$skipped} skipped (no changes)";
+                }
+                if ($failed > 0) {
+                    $messageParts[] = "{$failed} failed";
+                }
+
+                $message = 'Sync completed: '.implode(', ', $messageParts);
 
                 session()->flash('success', $message);
             } else {
