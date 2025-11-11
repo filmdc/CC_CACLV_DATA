@@ -30,9 +30,10 @@ class SageIntacctSyncService
      * @param  Carbon  $startDate  Start date for gift sync
      * @param  Carbon  $endDate  End date for gift sync
      * @param  int|null  $userId  User ID who triggered the sync
+     * @param  array|null  $specificGifts  Optional array of specific gifts to sync (if null, syncs all unsynced)
      * @return array Result with success boolean, statistics, and optional error
      */
-    public function syncGifts(Carbon $startDate, Carbon $endDate, ?int $userId = null): array
+    public function syncGifts(Carbon $startDate, Carbon $endDate, ?int $userId = null, ?array $specificGifts = null): array
     {
         try {
             // Sandbox safety check
@@ -52,6 +53,8 @@ class SageIntacctSyncService
                 'user_id' => $userId ?? ($this->userToken ? $this->userToken->user_id : 'system'),
                 'is_sandbox' => $isSandbox,
                 'auth_method' => $this->setting->auth_method ?? 'xml',
+                'specific_gifts_provided' => $specificGifts !== null,
+                'specific_gifts_count' => $specificGifts ? count($specificGifts) : 0,
             ]);
 
             // Capture environment information
@@ -78,8 +81,22 @@ class SageIntacctSyncService
                 ];
             }
 
-            // Get syncable gifts from DonorPerfect
-            $gifts = $this->getSyncableGifts($startDate, $endDate);
+            // Get gifts to sync - use specific gifts if provided, otherwise get all unsynced
+            if ($specificGifts !== null) {
+                // Convert collection to array if needed
+                $gifts = is_array($specificGifts) ? $specificGifts : $specificGifts->toArray();
+
+                Log::info('Sage Intacct: Using specific gifts provided by caller', [
+                    'count' => count($gifts),
+                ]);
+            } else {
+                // Get all syncable gifts from DonorPerfect
+                $gifts = $this->getSyncableGifts($startDate, $endDate);
+
+                Log::info('Sage Intacct: Retrieved all syncable gifts from date range', [
+                    'count' => count($gifts),
+                ]);
+            }
 
             if (empty($gifts)) {
                 $this->updateSyncHistory($syncHistory, 'success', null);

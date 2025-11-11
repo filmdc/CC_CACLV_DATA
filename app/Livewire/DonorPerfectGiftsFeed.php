@@ -457,21 +457,42 @@ class DonorPerfectGiftsFeed extends Component
             $allGifts = $result['gifts'];
 
             // Filter to selected gifts if any are selected
+            $giftsToSync = null;
             if (! empty($this->selectedGiftsForSync)) {
+                // User selected specific gifts - sync only those
                 $giftsToSync = $allGifts->whereIn('gift_id', $this->selectedGiftsForSync);
+
+                Log::info('DonorPerfect: Syncing selected gifts only', [
+                    'selected_count' => count($this->selectedGiftsForSync),
+                    'filtered_count' => $giftsToSync->count(),
+                    'selected_ids' => $this->selectedGiftsForSync,
+                ]);
+
+                // Validate we have gifts after filtering
+                if ($giftsToSync->isEmpty()) {
+                    throw new \Exception('No gifts found matching your selection');
+                }
             } else {
-                // Sync all visible gifts on current page
+                // No gifts selected - sync all VISIBLE gifts on current page only
                 $perPage = 15;
                 $currentPage = $this->getPage();
                 $giftsToSync = $allGifts->forPage($currentPage, $perPage);
-            }
 
-            if ($giftsToSync->isEmpty()) {
-                throw new \Exception('No gifts selected for sync');
+                Log::info('DonorPerfect: No gifts selected, syncing all visible gifts on current page', [
+                    'page' => $currentPage,
+                    'per_page' => $perPage,
+                    'visible_count' => $giftsToSync->count(),
+                ]);
             }
 
             // Perform sync using Sage Intacct sync service
-            $syncResult = $syncService->syncGifts($startDate, $endDate, auth()->id());
+            // Pass the filtered gifts array
+            $syncResult = $syncService->syncGifts(
+                $startDate,
+                $endDate,
+                auth()->id(),
+                $giftsToSync->toArray()
+            );
 
             $this->syncInProgress = false;
             $this->showSyncModal = false;
