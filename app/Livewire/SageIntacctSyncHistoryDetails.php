@@ -75,7 +75,10 @@ class SageIntacctSyncHistoryDetails extends Component
     public function getEnvironmentInfo()
     {
         if ($this->syncHistory && $this->syncHistory->environment_info) {
-            return json_decode($this->syncHistory->environment_info, true);
+            // Already decoded by model cast, return directly
+            return is_array($this->syncHistory->environment_info)
+                ? $this->syncHistory->environment_info
+                : json_decode($this->syncHistory->environment_info, true);
         }
 
         return null;
@@ -84,7 +87,10 @@ class SageIntacctSyncHistoryDetails extends Component
     public function getConfigurationSnapshot()
     {
         if ($this->syncHistory && $this->syncHistory->configuration_snapshot) {
-            return json_decode($this->syncHistory->configuration_snapshot, true);
+            // Already decoded by model cast, return directly
+            return is_array($this->syncHistory->configuration_snapshot)
+                ? $this->syncHistory->configuration_snapshot
+                : json_decode($this->syncHistory->configuration_snapshot, true);
         }
 
         return null;

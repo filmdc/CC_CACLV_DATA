@@ -693,16 +693,36 @@ class SageIntacctSyncService
         try {
             $fieldMappings = $this->setting->fieldMappings()->orderBy('order')->get()->toArray();
 
-            // Transform all gifts in batch
+            // Transform all gifts in batch and upload attachments
             $transformedRecords = [];
             $giftIdMap = []; // Map index to gift_id for tracking
             $transformedMap = []; // Map gift_id to transformed data
+            $attachmentMap = []; // Map gift_id to SUPDOCID
 
             foreach ($batch as $index => $giftData) {
+                $giftId = $giftData['gift_id'] ?? null;
+
+                // Upload check image attachment if available (before creating gift record)
+                $supdocid = $this->uploadCheckImageAttachment($giftData);
+                if ($supdocid) {
+                    $attachmentMap[$giftId] = $supdocid;
+                    Log::info('Sage Intacct: Attachment uploaded for gift', [
+                        'gift_id' => $giftId,
+                        'supdocid' => $supdocid,
+                    ]);
+                }
+
+                // Transform gift data (will include SUPDOCID if available)
                 $transformed = $this->transformGiftForIntacct($giftData, $fieldMappings);
+
+                // Add SUPDOCID to transformed data if attachment was uploaded
+                if (isset($attachmentMap[$giftId])) {
+                    $transformed['SUPDOCID'] = $attachmentMap[$giftId];
+                }
+
                 $transformedRecords[] = $transformed;
-                $giftIdMap[$index] = $giftData['gift_id'] ?? null;
-                $transformedMap[$giftData['gift_id'] ?? null] = $transformed;
+                $giftIdMap[$index] = $giftId;
+                $transformedMap[$giftId] = $transformed;
 
                 // Create sync item record with transformed data
                 $this->createSyncItem($syncHistory, $giftData, 'pending', $transformed);
@@ -929,6 +949,125 @@ class SageIntacctSyncService
                 'sync_item_id' => $syncItem->id,
                 'error' => $e->getMessage(),
             ]);
+        }
+    }
+
+    /**
+     * Upload check image as attachment to Sage Intacct
+     *
+     * @param  array  $giftData  Gift data with IMAGE_CHECK_URL
+     * @return array|null Returns SUPDOCID on success, null on failure
+     */
+    private function uploadCheckImageAttachment(array $giftData): ?string
+    {
+        try {
+            // Check if check image uploads are enabled
+            if (! $this->setting->include_check_images ?? false) {
+                return null;
+            }
+
+            // Check if gift has a cached check image URL
+            if (empty($giftData['IMAGE_CHECK_URL'])) {
+                Log::debug('Sage Intacct: Gift has no cached check image, skipping attachment', [
+                    'gift_id' => $giftData['gift_id'] ?? 'unknown',
+                ]);
+
+                return null;
+            }
+
+            $giftId = $giftData['gift_id'] ?? 'unknown';
+
+            // Use CheckImageCacheService to retrieve the cached image
+            $checkImageService = new \App\Services\CheckImageCacheService;
+
+            // Extract filename from gift data (format: giftid_filename.ext)
+            $cacheFilename = basename(parse_url($giftData['IMAGE_CHECK_URL'], PHP_URL_PATH));
+            $storagePath = 'check_images/'.str_replace('.enc', '', $cacheFilename);
+
+            // Decrypt the cached file
+            $decryptResult = $checkImageService->decryptFile($storagePath);
+
+            if (! $decryptResult['success']) {
+                Log::warning('Sage Intacct: Failed to decrypt check image, skipping attachment', [
+                    'gift_id' => $giftId,
+                    'error' => $decryptResult['error'] ?? 'Unknown error',
+                ]);
+
+                return null;
+            }
+
+            $fileContents = $decryptResult['contents'];
+            $metadata = $decryptResult['metadata'] ?? [];
+
+            // Check file size against limit
+            $fileSizeMB = strlen($fileContents) / 1024 / 1024;
+            $maxSizeMB = $this->setting->attachment_max_size_mb ?? 10;
+
+            if ($fileSizeMB > $maxSizeMB) {
+                Log::warning('Sage Intacct: Check image too large for attachment', [
+                    'gift_id' => $giftId,
+                    'size_mb' => round($fileSizeMB, 2),
+                    'max_mb' => $maxSizeMB,
+                ]);
+
+                return null;
+            }
+
+            // Extract file info
+            $originalName = $metadata['original_name'] ?? $cacheFilename;
+            $pathInfo = pathinfo($originalName);
+            $fileName = $pathInfo['filename'] ?? 'check_'.$giftId;
+            $fileExtension = $pathInfo['extension'] ?? 'jpg';
+
+            // Prepare description
+            $donorName = trim(($giftData['first_name'] ?? '').' '.($giftData['last_name'] ?? ''));
+            $amount = $giftData['amount'] ?? '0.00';
+            $giftDate = $giftData['gift_date'] ?? 'unknown';
+
+            $description = "Check image for Gift #{$giftId} - {$donorName} - \${$amount} - {$giftDate}";
+
+            Log::info('Sage Intacct: Uploading check image attachment', [
+                'gift_id' => $giftId,
+                'filename' => $fileName,
+                'extension' => $fileExtension,
+                'size_mb' => round($fileSizeMB, 2),
+            ]);
+
+            // Upload using SageIntacctApiService
+            $uploadResult = $this->apiService->createAttachment(
+                $fileName,
+                $fileContents,
+                $fileExtension,
+                $description,
+                $this->setting->attachment_folder_name ?? 'Gift_Check_Images'
+            );
+
+            if ($uploadResult['success']) {
+                $supdocid = $uploadResult['supdocid'] ?? null;
+
+                Log::info('Sage Intacct: Check image attachment uploaded successfully', [
+                    'gift_id' => $giftId,
+                    'supdocid' => $supdocid,
+                ]);
+
+                return $supdocid;
+            } else {
+                Log::error('Sage Intacct: Check image attachment upload failed', [
+                    'gift_id' => $giftId,
+                    'error' => $uploadResult['error'] ?? 'Unknown error',
+                ]);
+
+                return null;
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Sage Intacct uploadCheckImageAttachment exception', [
+                'gift_id' => $giftData['gift_id'] ?? 'unknown',
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return null;
         }
     }
 

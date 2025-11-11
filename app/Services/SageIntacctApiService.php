@@ -836,10 +836,22 @@ class SageIntacctApiService
     }
 
     /**
-     * Upload an attachment to Sage Intacct (XML method only)
+     * Upload an attachment to Sage Intacct using create_supdoc (XML method only)
+     *
+     * @param  string  $fileName  Original filename (without extension)
+     * @param  string  $fileContents  Binary file contents
+     * @param  string  $fileExtension  File extension (without dot, e.g., 'jpg', 'pdf')
+     * @param  string  $description  Description for the attachment
+     * @param  string  $folderName  Sage Intacct folder name (default: from env)
+     * @return array Result with success status and SUPDOCID
      */
-    public function createAttachment(string $fileName, string $fileContents, string $objectType, string $objectId): array
-    {
+    public function createAttachment(
+        string $fileName,
+        string $fileContents,
+        string $fileExtension,
+        string $description = '',
+        string $folderName = ''
+    ): array {
         // Only XML API supports attachment uploads via this method
         if (! $this->setting->isXmlApi()) {
             return [
@@ -860,76 +872,94 @@ class SageIntacctApiService
             // Base64 encode file contents for XML transmission
             $base64Contents = base64_encode($fileContents);
 
-            // Validate file size (Intacct has limits)
+            // Validate file size (Intacct recommends keeping under 10MB for performance)
             $sizeMB = strlen($base64Contents) / 1024 / 1024;
-            if ($sizeMB > 100) {
+            $maxSizeMB = env('INTACCT_ATTACHMENT_MAX_SIZE_MB', 10);
+
+            if ($sizeMB > $maxSizeMB) {
                 return [
                     'success' => false,
-                    'error' => "Attachment too large: {$sizeMB}MB (max 100MB)",
+                    'error' => 'Attachment too large: '.round($sizeMB, 2)."MB (max {$maxSizeMB}MB)",
                 ];
             }
 
-            Log::info('Sage Intacct XML: Uploading attachment', [
+            // Use folder from parameter or fall back to env config
+            if (empty($folderName)) {
+                $folderName = env('INTACCT_ATTACHMENT_FOLDER', 'Gift_Check_Images');
+            }
+
+            // Generate unique SUPDOC name
+            $supdocName = 'CheckImage_'.$fileName.'_'.time();
+
+            Log::info('Sage Intacct XML: Creating SUPDOC attachment', [
+                'supdoc_name' => $supdocName,
                 'filename' => $fileName,
-                'object_type' => $objectType,
-                'object_id' => $objectId,
+                'extension' => $fileExtension,
+                'folder' => $folderName,
                 'size_mb' => round($sizeMB, 2),
             ]);
 
-            // Build XML request for attachment creation
-            $xmlRequest = $this->buildAttachmentXml(
+            // Build XML request for create_supdoc
+            $xmlRequest = $this->buildSupdocXml(
+                $supdocName,
                 $fileName,
+                $fileExtension,
                 $base64Contents,
-                $objectType,
-                $objectId
+                $folderName,
+                $description
             );
 
             // Send request
             $response = $this->sendXmlRequest($xmlRequest);
 
             if (! $response['success']) {
-                Log::error('Sage Intacct attachment upload failed', [
-                    'filename' => $fileName,
+                Log::error('Sage Intacct SUPDOC creation failed', [
+                    'supdoc_name' => $supdocName,
                     'error' => $response['error'] ?? 'Unknown error',
                 ]);
 
                 return [
                     'success' => false,
-                    'error' => $response['error'] ?? 'Failed to upload attachment',
+                    'error' => $response['error'] ?? 'Failed to create SUPDOC',
                 ];
             }
 
-            // Parse response to check for errors
-            $xml = simplexml_load_string($response['xml']);
-            $errormessage = $xml->xpath('//errormessage');
+            // Parse response
+            $parseResult = $this->parseXmlResponse($response['xml']);
 
-            if (! empty($errormessage)) {
-                $errorText = (string) ($errormessage[0]->error->description2 ?? $errormessage[0]->error->description ?? 'Attachment upload failed');
-
-                Log::error('Sage Intacct attachment API error', [
-                    'filename' => $fileName,
-                    'error' => $errorText,
-                ]);
-
+            if (! $parseResult['success']) {
                 return [
                     'success' => false,
-                    'error' => $errorText,
+                    'error' => $parseResult['error'] ?? 'Failed to parse SUPDOC response',
                 ];
             }
 
-            Log::info('Sage Intacct XML: Attachment uploaded successfully', [
-                'filename' => $fileName,
-                'object_type' => $objectType,
-                'object_id' => $objectId,
+            // Extract SUPDOCID from response
+            $supdocid = $parseResult['key'] ?? null;
+
+            if (empty($supdocid)) {
+                // Try to extract from data
+                $xml = simplexml_load_string($response['xml']);
+                $supdocidNodes = $xml->xpath('//supdocid');
+                if (! empty($supdocidNodes)) {
+                    $supdocid = (string) $supdocidNodes[0];
+                }
+            }
+
+            Log::info('Sage Intacct XML: SUPDOC created successfully', [
+                'supdoc_name' => $supdocName,
+                'supdocid' => $supdocid,
             ]);
 
             return [
                 'success' => true,
-                'message' => 'Attachment uploaded successfully',
+                'supdocid' => $supdocid,
+                'supdoc_name' => $supdocName,
+                'message' => 'SUPDOC created successfully',
             ];
 
         } catch (\Exception $e) {
-            Log::error('Sage Intacct attachment upload exception', [
+            Log::error('Sage Intacct SUPDOC creation exception', [
                 'filename' => $fileName,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
@@ -943,12 +973,33 @@ class SageIntacctApiService
     }
 
     /**
-     * Build XML for attachment creation
+     * Build XML for SUPDOC creation
+     *
+     * @param  string  $supdocName  Unique name for the SUPDOC
+     * @param  string  $fileName  File name without extension
+     * @param  string  $fileExtension  File extension without dot
+     * @param  string  $base64Contents  Base64 encoded file contents
+     * @param  string  $folderName  Intacct folder name
+     * @param  string  $description  Description for the SUPDOC
+     * @return string XML request
      */
-    private function buildAttachmentXml(string $fileName, string $base64Contents, string $objectType, string $objectId): string
-    {
-        $controlId = 'attachment-'.$objectId.'-'.time();
+    private function buildSupdocXml(
+        string $supdocName,
+        string $fileName,
+        string $fileExtension,
+        string $base64Contents,
+        string $folderName,
+        string $description
+    ): string {
+        $controlId = 'supdoc-'.time().'-'.uniqid();
+        $functionId = 'func-'.time().'-'.uniqid();
+
+        // Sanitize XML content
+        $sanitizedSupdocName = htmlspecialchars($supdocName, ENT_XML1, 'UTF-8');
+        $sanitizedFolderName = htmlspecialchars($folderName, ENT_XML1, 'UTF-8');
+        $sanitizedDescription = htmlspecialchars($description ?: 'Check image', ENT_XML1, 'UTF-8');
         $sanitizedFileName = htmlspecialchars($fileName, ENT_XML1, 'UTF-8');
+        $sanitizedExtension = htmlspecialchars($fileExtension, ENT_XML1, 'UTF-8');
 
         return <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
@@ -965,14 +1016,19 @@ class SageIntacctApiService
             <sessionid>{$this->sessionId}</sessionid>
         </authentication>
         <content>
-            <function controlid="{$controlId}">
-                <create>
-                    <SUPDOCATTACHMENT>
-                        <attachmentname>{$sanitizedFileName}</attachmentname>
-                        <attachmenttype>File</attachmenttype>
-                        <attachmentdata>{$base64Contents}</attachmentdata>
-                    </SUPDOCATTACHMENT>
-                </create>
+            <function controlid="{$functionId}">
+                <create_supdoc>
+                    <supdocname>{$sanitizedSupdocName}</supdocname>
+                    <supdocfoldername>{$sanitizedFolderName}</supdocfoldername>
+                    <supdocdescription>{$sanitizedDescription}</supdocdescription>
+                    <attachments>
+                        <attachment>
+                            <attachmentname>{$sanitizedFileName}</attachmentname>
+                            <attachmenttype>{$sanitizedExtension}</attachmenttype>
+                            <attachmentdata>{$base64Contents}</attachmentdata>
+                        </attachment>
+                    </attachments>
+                </create_supdoc>
             </function>
         </content>
     </operation>

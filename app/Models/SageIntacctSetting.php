@@ -59,6 +59,9 @@ class SageIntacctSetting extends Model
         'is_active',
         'last_sync_at',
         'code_mapping_enabled',
+        'include_check_images',
+        'attachment_folder_name',
+        'attachment_max_size_mb',
     ];
 
     protected $casts = [
@@ -68,6 +71,8 @@ class SageIntacctSetting extends Model
         'is_active' => 'boolean',
         'last_sync_at' => 'datetime',
         'code_mapping_enabled' => 'boolean',
+        'include_check_images' => 'boolean',
+        'attachment_max_size_mb' => 'integer',
     ];
 
     /**
