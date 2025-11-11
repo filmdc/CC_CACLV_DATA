@@ -946,6 +946,20 @@ class SageIntacctApiService
                 }
             }
 
+            // If still no SUPDOCID, the creation failed
+            if (empty($supdocid)) {
+                Log::error('Sage Intacct XML: SUPDOC creation failed - no SUPDOCID returned', [
+                    'supdoc_name' => $supdocName,
+                    'parse_result' => $parseResult,
+                    'response_preview' => substr($response['xml'], 0, 1000),
+                ]);
+
+                return [
+                    'success' => false,
+                    'error' => 'SUPDOC creation failed - no SUPDOCID returned. Check XML format and field names.',
+                ];
+            }
+
             Log::info('Sage Intacct XML: SUPDOC created successfully', [
                 'supdoc_name' => $supdocName,
                 'supdocid' => $supdocid,

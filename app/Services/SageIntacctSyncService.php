@@ -1030,11 +1030,16 @@ class SageIntacctSyncService
                 return null;
             }
 
-            // Extract file info
+            // Extract file info - use basename to get just the filename, not full path
             $originalName = $metadata['original_name'] ?? $cacheFilename;
-            $pathInfo = pathinfo($originalName);
+            $baseFilename = basename($originalName); // Strip any directory path
+            $pathInfo = pathinfo($baseFilename);
             $fileName = $pathInfo['filename'] ?? 'check_'.$giftId;
-            $fileExtension = $pathInfo['extension'] ?? 'jpg';
+            $fileExtension = strtolower($pathInfo['extension'] ?? 'jpg'); // Lowercase extension
+
+            // Sanitize filename for XML/Intacct (remove special chars)
+            $fileName = preg_replace('/[^A-Za-z0-9_-]/', '_', $fileName);
+            $fileName = 'Gift_'.$giftId.'_'.$fileName;
 
             // Prepare description
             $donorName = trim(($giftData['first_name'] ?? '').' '.($giftData['last_name'] ?? ''));
@@ -1061,6 +1066,16 @@ class SageIntacctSyncService
 
             if ($uploadResult['success']) {
                 $supdocid = $uploadResult['supdocid'] ?? null;
+
+                // Verify we actually got a SUPDOCID back
+                if (empty($supdocid)) {
+                    Log::error('Sage Intacct: SUPDOC created but no SUPDOCID returned', [
+                        'gift_id' => $giftId,
+                        'upload_result' => $uploadResult,
+                    ]);
+
+                    return null;
+                }
 
                 Log::info('Sage Intacct: Check image attachment uploaded successfully', [
                     'gift_id' => $giftId,
