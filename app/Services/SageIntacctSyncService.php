@@ -794,31 +794,47 @@ class SageIntacctSyncService
         try {
             $fieldMappings = $this->setting->fieldMappings()->orderBy('order')->get()->toArray();
 
-            // Transform all gifts in batch and upload attachments
+            // Transform all gifts in batch and prepare attachments
             $transformedRecords = [];
             $giftIdMap = []; // Map index to gift_id for tracking
             $transformedMap = []; // Map gift_id to transformed data
-            $attachmentMap = []; // Map gift_id to SUPDOCID
+            $attachmentMap = []; // Map gift_id to file data array
 
             foreach ($batch as $index => $giftData) {
                 $giftId = $giftData['gift_id'] ?? null;
 
-                // Upload check image attachment if available (before creating gift record)
-                $supdocid = $this->uploadCheckImageAttachment($giftData);
-                if ($supdocid) {
-                    $attachmentMap[$giftId] = $supdocid;
-                    Log::info('Sage Intacct: Attachment uploaded for gift', [
+                // Prepare check image data for Document File attribute
+                $fileData = $this->uploadCheckImageAttachment($giftData);
+                if ($fileData) {
+                    $attachmentMap[$giftId] = $fileData;
+                    Log::info('Sage Intacct: Document File data prepared for gift', [
                         'gift_id' => $giftId,
-                        'supdocid' => $supdocid,
+                        'filename' => $fileData['filename'],
+                        'content_type' => $fileData['content_type'],
                     ]);
                 }
 
-                // Transform gift data (will include SUPDOCID if available)
+                // Transform gift data
                 $transformed = $this->transformGiftForIntacct($giftData, $fieldMappings);
 
-                // Add SUPDOCID to transformed data if attachment was uploaded
+                // Add Document File attribute fields if attachment was prepared
                 if (isset($attachmentMap[$giftId])) {
-                    $transformed['SUPDOCID'] = $attachmentMap[$giftId];
+                    $fileData = $attachmentMap[$giftId];
+
+                    // Get Document File field name from config (default: 'file')
+                    $fileField = env('INTACCT_DOCUMENT_FILE_FIELD', 'file');
+
+                    // Populate the three required fields for Document File attribute
+                    $transformed[$fileField.'_contenttype'] = $fileData['content_type'];
+                    $transformed[$fileField.'_filename'] = $fileData['filename'];
+                    $transformed[$fileField] = $fileData['base64_content'];
+
+                    Log::debug('Sage Intacct: Added Document File attribute fields to gift record', [
+                        'gift_id' => $giftId,
+                        'field_name' => $fileField,
+                        'filename' => $fileData['filename'],
+                        'content_type' => $fileData['content_type'],
+                    ]);
                 }
 
                 $transformedRecords[] = $transformed;
@@ -869,41 +885,6 @@ class SageIntacctSyncService
                                 'api_response' => json_encode($detail),
                                 'updated_at' => now(),
                             ]);
-
-                        // Link SUPDOC attachment if one was uploaded
-                        Log::debug('Sage Intacct: Checking if SUPDOC should be linked', [
-                            'gift_id' => $giftId,
-                            'has_record_key' => ! empty($recordKey),
-                            'has_attachment' => isset($attachmentMap[$giftId]),
-                            'attachment_map_keys' => array_keys($attachmentMap),
-                        ]);
-
-                        if ($recordKey && isset($attachmentMap[$giftId])) {
-                            $supdocid = $attachmentMap[$giftId];
-
-                            Log::info('Sage Intacct: Linking SUPDOC to gift record', [
-                                'gift_id' => $giftId,
-                                'supdocid' => $supdocid,
-                                'record_key' => $recordKey,
-                            ]);
-
-                            $linkResult = $this->apiService->linkSupdocToRecord($supdocid, $recordKey);
-
-                            if ($linkResult['success']) {
-                                Log::info('Sage Intacct: SUPDOC linked successfully', [
-                                    'gift_id' => $giftId,
-                                    'supdocid' => $supdocid,
-                                    'record_key' => $recordKey,
-                                ]);
-                            } else {
-                                Log::error('Sage Intacct: Failed to link SUPDOC to gift', [
-                                    'gift_id' => $giftId,
-                                    'supdocid' => $supdocid,
-                                    'record_key' => $recordKey,
-                                    'error' => $linkResult['error'] ?? 'Unknown error',
-                                ]);
-                            }
-                        }
                     } else {
                         // Update as failed with API details
                         DB::table('sage_intacct_sync_items')
@@ -1091,12 +1072,12 @@ class SageIntacctSyncService
     }
 
     /**
-     * Upload check image as attachment to Sage Intacct
+     * Prepare check image data for Document File attribute
      *
      * @param  array  $giftData  Gift data with IMAGE_CHECK_URL
-     * @return array|null Returns SUPDOCID on success, null on failure
+     * @return array|null Returns file data array on success, null on failure
      */
-    private function uploadCheckImageAttachment(array $giftData): ?string
+    private function uploadCheckImageAttachment(array $giftData): ?array
     {
         try {
             // Check if check image uploads are enabled
@@ -1214,58 +1195,35 @@ class SageIntacctSyncService
 
             // Sanitize filename for XML/Intacct (remove special chars)
             $fileName = preg_replace('/[^A-Za-z0-9_-]/', '_', $fileName);
-            $fileName = 'Gift_'.$giftId.'_'.$fileName;
+            $fullFilename = 'Gift_'.$giftId.'_'.$fileName.'.'.$fileExtension;
 
-            // Prepare description
-            $donorName = trim(($giftData['first_name'] ?? '').' '.($giftData['last_name'] ?? ''));
-            $amount = $giftData['amount'] ?? '0.00';
-            $giftDate = $giftData['gift_date'] ?? 'unknown';
+            // Determine MIME type based on file extension
+            $contentType = match ($fileExtension) {
+                'jpg', 'jpeg' => 'image/jpeg',
+                'png' => 'image/png',
+                'gif' => 'image/gif',
+                'tif', 'tiff' => 'image/tiff',
+                'pdf' => 'application/pdf',
+                default => 'application/octet-stream',
+            };
 
-            $description = "Check image for Gift #{$giftId} - {$donorName} - \${$amount} - {$giftDate}";
+            // Encode file contents to base64 for Document File attribute
+            $base64Content = base64_encode($fileContents);
 
-            Log::info('Sage Intacct: Uploading check image attachment', [
+            Log::info('Sage Intacct: Prepared Document File attribute data', [
                 'gift_id' => $giftId,
-                'filename' => $fileName,
-                'extension' => $fileExtension,
+                'filename' => $fullFilename,
+                'content_type' => $contentType,
                 'size_mb' => round(strlen($fileContents) / 1024 / 1024, 2),
+                'base64_size_mb' => round(strlen($base64Content) / 1024 / 1024, 2),
             ]);
 
-            // Upload using SageIntacctApiService
-            $uploadResult = $this->apiService->createAttachment(
-                $fileName,
-                $fileContents,
-                $fileExtension,
-                $description,
-                $this->setting->attachment_folder_name ?? 'Gift_Check_Images'
-            );
-
-            if ($uploadResult['success']) {
-                $supdocid = $uploadResult['supdocid'] ?? null;
-
-                // Verify we actually got a SUPDOCID back
-                if (empty($supdocid)) {
-                    Log::error('Sage Intacct: SUPDOC created but no SUPDOCID returned', [
-                        'gift_id' => $giftId,
-                        'upload_result' => $uploadResult,
-                    ]);
-
-                    return null;
-                }
-
-                Log::info('Sage Intacct: Check image attachment uploaded successfully', [
-                    'gift_id' => $giftId,
-                    'supdocid' => $supdocid,
-                ]);
-
-                return $supdocid;
-            } else {
-                Log::error('Sage Intacct: Check image attachment upload failed', [
-                    'gift_id' => $giftId,
-                    'error' => $uploadResult['error'] ?? 'Unknown error',
-                ]);
-
-                return null;
-            }
+            // Return file data array for Document File attribute
+            return [
+                'content_type' => $contentType,
+                'filename' => $fullFilename,
+                'base64_content' => $base64Content,
+            ];
 
         } catch (\Exception $e) {
             Log::error('Sage Intacct uploadCheckImageAttachment exception', [
@@ -1305,14 +1263,15 @@ class SageIntacctSyncService
                 'changes' => $changes,
             ]);
 
-            // Upload attachment if needed
-            $supdocid = null;
+            // Prepare attachment file data if needed
+            $fileData = null;
             if (in_array('attachment_added', $changes)) {
-                $supdocid = $this->uploadCheckImageAttachment($giftData);
-                if ($supdocid) {
-                    Log::info('Sage Intacct: Attachment uploaded for update', [
+                $fileData = $this->uploadCheckImageAttachment($giftData);
+                if ($fileData) {
+                    Log::info('Sage Intacct: Document File data prepared for update', [
                         'gift_id' => $giftId,
-                        'supdocid' => $supdocid,
+                        'filename' => $fileData['filename'],
+                        'content_type' => $fileData['content_type'],
                     ]);
                 }
             }
@@ -1321,9 +1280,22 @@ class SageIntacctSyncService
             $fieldMappings = $this->setting->fieldMappings()->orderBy('order')->get()->toArray();
             $transformed = $this->transformGiftForIntacct($giftData, $fieldMappings);
 
-            // Add SUPDOCID if attachment was uploaded
-            if ($supdocid) {
-                $transformed['SUPDOCID'] = $supdocid;
+            // Add Document File attribute fields if attachment was prepared
+            if ($fileData) {
+                // Get Document File field name from config (default: 'file')
+                $fileField = env('INTACCT_DOCUMENT_FILE_FIELD', 'file');
+
+                // Populate the three required fields for Document File attribute
+                $transformed[$fileField.'_contenttype'] = $fileData['content_type'];
+                $transformed[$fileField.'_filename'] = $fileData['filename'];
+                $transformed[$fileField] = $fileData['base64_content'];
+
+                Log::info('Sage Intacct: Added Document File attribute fields for update', [
+                    'gift_id' => $giftId,
+                    'field_name' => $fileField,
+                    'filename' => $fileData['filename'],
+                    'content_type' => $fileData['content_type'],
+                ]);
             }
 
             // Create sync item record
@@ -1348,36 +1320,10 @@ class SageIntacctSyncService
                 // Update sync item as synced
                 $this->updateSyncItem($syncItem, 'success', null, $recordKey, $transformed, $updateResult);
 
-                // Link SUPDOC attachment if one was uploaded
-                if ($supdocid && $recordKey) {
-                    Log::info('Sage Intacct: Linking SUPDOC to updated gift record', [
-                        'gift_id' => $giftId,
-                        'supdocid' => $supdocid,
-                        'record_key' => $recordKey,
-                    ]);
-
-                    $linkResult = $this->apiService->linkSupdocToRecord($supdocid, $recordKey);
-
-                    if ($linkResult['success']) {
-                        Log::info('Sage Intacct: SUPDOC linked successfully to updated gift', [
-                            'gift_id' => $giftId,
-                            'supdocid' => $supdocid,
-                            'record_key' => $recordKey,
-                        ]);
-                    } else {
-                        Log::error('Sage Intacct: Failed to link SUPDOC to updated gift', [
-                            'gift_id' => $giftId,
-                            'supdocid' => $supdocid,
-                            'record_key' => $recordKey,
-                            'error' => $linkResult['error'] ?? 'Unknown error',
-                        ]);
-                    }
-                }
-
                 Log::info('Sage Intacct: Gift updated successfully', [
                     'gift_id' => $giftId,
                     'record_key' => $recordKey,
-                    'had_attachment' => $supdocid !== null,
+                    'had_attachment' => $fileData !== null,
                 ]);
 
                 return ['success' => true];
