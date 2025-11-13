@@ -328,6 +328,92 @@ class SageIntacctApiService
     }
 
     /**
+     * Inspect custom object definition to see available fields
+     *
+     * @param  string  $objectName  Custom object name
+     * @return array Result with field definitions
+     */
+    public function inspectObjectDefinition(string $objectName): array
+    {
+        if (! $this->setting->isXmlApi()) {
+            return [
+                'success' => false,
+                'error' => 'Inspect is only supported in XML API mode',
+            ];
+        }
+
+        try {
+            // Ensure we have a session
+            if (! $this->sessionId) {
+                $authResult = $this->authenticateXml();
+                if (! $authResult['success']) {
+                    return [
+                        'success' => false,
+                        'error' => 'Authentication failed: '.($authResult['message'] ?? 'Unknown error'),
+                    ];
+                }
+            }
+
+            Log::info('Sage Intacct XML: Inspecting object definition', [
+                'object_name' => $objectName,
+            ]);
+
+            // Use lookup function to get object metadata
+            $xmlRequest = $this->buildLookupXml($objectName);
+
+            // Send request
+            $response = $this->sendXmlRequest($xmlRequest);
+
+            if (! $response['success']) {
+                return [
+                    'success' => false,
+                    'error' => $response['error'] ?? 'Lookup failed',
+                ];
+            }
+
+            // Parse to get field list
+            $xml = simplexml_load_string($response['xml']);
+
+            // Extract all field names from the Type definition
+            $fields = [];
+            $typeNodes = $xml->xpath('//Type');
+
+            if (! empty($typeNodes)) {
+                foreach ($typeNodes[0]->children() as $field) {
+                    $fieldName = $field->getName();
+                    $fields[] = [
+                        'name' => $fieldName,
+                        'type' => (string) $field['type'] ?? 'unknown',
+                    ];
+                }
+            }
+
+            Log::info('Sage Intacct XML: Object inspection completed', [
+                'object_name' => $objectName,
+                'field_count' => count($fields),
+            ]);
+
+            return [
+                'success' => true,
+                'object_name' => $objectName,
+                'fields' => $fields,
+                'raw_xml' => $response['xml'],
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Sage Intacct inspectObjectDefinition exception', [
+                'object_name' => $objectName,
+                'error' => $e->getMessage(),
+            ]);
+
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
      * Query custom object records (XML method)
      *
      * @param  string  $objectName  Custom object name
@@ -868,6 +954,50 @@ class SageIntacctApiService
     }
 
     /**
+     * Build XML for lookup request (inspect object definition)
+     */
+    private function buildLookupXml(string $objectName): string
+    {
+        $controlId = $this->generateControlId();
+        $functionId = $this->generateControlId();
+
+        $authSection = $this->sessionId
+            ? '<sessionid>'.htmlspecialchars($this->sessionId).'</sessionid>'
+            : '<login>
+                <userid>'.htmlspecialchars($this->setting->web_services_user_id).'</userid>
+                <companyid>'.htmlspecialchars($this->setting->company_id).'</companyid>
+                <password>'.htmlspecialchars($this->setting->web_services_password).'</password>
+            </login>';
+
+        $sanitizedObjectName = htmlspecialchars($objectName);
+
+        return <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<request>
+    <control>
+        <senderid>{$this->setting->sender_id}</senderid>
+        <password>{$this->setting->sender_password}</password>
+        <controlid>{$controlId}</controlid>
+        <uniqueid>false</uniqueid>
+        <dtdversion>3.0</dtdversion>
+    </control>
+    <operation>
+        <authentication>
+            {$authSection}
+        </authentication>
+        <content>
+            <function controlid="{$functionId}">
+                <lookup>
+                    <object>{$sanitizedObjectName}</object>
+                </lookup>
+            </function>
+        </content>
+    </operation>
+</request>
+XML;
+    }
+
+    /**
      * Build XML for readByQuery request
      */
     private function buildReadByQueryXml(string $objectName, string $query, int $pagesize = 1000): string
@@ -939,7 +1069,8 @@ XML;
             $fieldsXml .= '<'.htmlspecialchars($fieldName).'>'.htmlspecialchars($fieldValue).'</'.htmlspecialchars($fieldName).'>'."\n";
         }
 
-        return <<<XML
+        // Note: Custom objects use <id> instead of <RECORDNO>
+        $xml = <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <request>
     <control>
@@ -957,7 +1088,7 @@ XML;
             <function controlid="{$functionId}">
                 <update>
                     <{$sanitizedObjectName}>
-                        <RECORDNO>{$sanitizedRecordKey}</RECORDNO>
+                        <id>{$sanitizedRecordKey}</id>
                         {$fieldsXml}
                     </{$sanitizedObjectName}>
                 </update>
@@ -966,6 +1097,16 @@ XML;
     </operation>
 </request>
 XML;
+
+        Log::debug('Sage Intacct: Built update XML', [
+            'record_key' => $recordKey,
+            'sanitized_record_key' => $sanitizedRecordKey,
+            'object_name' => $objectName,
+            'fields' => array_keys($fieldData),
+            'xml_sample' => substr($xml, strpos($xml, '<update>'), 500),
+        ]);
+
+        return $xml;
     }
 
     /**
@@ -1279,11 +1420,16 @@ XML;
             $supdocid = $parseResult['key'] ?? null;
 
             if (empty($supdocid)) {
-                // Try to extract from data
+                // Try to extract from nested data structure
+                $supdocid = $parseResult['data']['operation']['result']['key'] ?? null;
+            }
+
+            if (empty($supdocid)) {
+                // Try to extract from XML directly
                 $xml = simplexml_load_string($response['xml']);
-                $supdocidNodes = $xml->xpath('//supdocid');
-                if (! empty($supdocidNodes)) {
-                    $supdocid = (string) $supdocidNodes[0];
+                $keyNodes = $xml->xpath('//result/key');
+                if (! empty($keyNodes)) {
+                    $supdocid = (string) $keyNodes[0];
                 }
             }
 
@@ -1324,6 +1470,131 @@ XML;
                 'error' => $e->getMessage(),
             ];
         }
+    }
+
+    /**
+     * Link SUPDOC to a gift record (XML method only)
+     *
+     * @param  string  $supdocId  The SUPDOCID to update
+     * @param  string  $recordKey  The RECORDNO of the gift to link to
+     * @return array Result with success status
+     */
+    public function linkSupdocToRecord(string $supdocId, string $recordKey): array
+    {
+        // Only XML API supports this operation
+        if (! $this->setting->isXmlApi()) {
+            return [
+                'success' => false,
+                'error' => 'SUPDOC linking is only supported in XML API mode',
+            ];
+        }
+
+        try {
+            // Ensure we have a valid session
+            if (! $this->sessionId) {
+                $authResult = $this->authenticateXml();
+                if (! $authResult['success']) {
+                    return $authResult;
+                }
+            }
+
+            Log::info('Sage Intacct XML: Linking SUPDOC to record', [
+                'supdocid' => $supdocId,
+                'record_key' => $recordKey,
+            ]);
+
+            // Build update_supdoc XML request
+            $xmlRequest = $this->buildSupdocLinkXml($supdocId, $recordKey);
+
+            // Send request
+            $response = $this->sendXmlRequest($xmlRequest);
+
+            if (! $response['success']) {
+                Log::error('Sage Intacct SUPDOC linking failed', [
+                    'supdocid' => $supdocId,
+                    'record_key' => $recordKey,
+                    'error' => $response['error'] ?? 'Unknown error',
+                ]);
+
+                return [
+                    'success' => false,
+                    'error' => $response['error'] ?? 'Failed to link SUPDOC',
+                ];
+            }
+
+            // Parse response
+            $parseResult = $this->parseXmlResponse($response['xml']);
+
+            if (! $parseResult['success']) {
+                return [
+                    'success' => false,
+                    'error' => $parseResult['error'] ?? 'Failed to parse SUPDOC link response',
+                ];
+            }
+
+            Log::info('Sage Intacct XML: SUPDOC linked successfully', [
+                'supdocid' => $supdocId,
+                'record_key' => $recordKey,
+            ]);
+
+            return [
+                'success' => true,
+                'message' => 'SUPDOC linked successfully',
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Sage Intacct SUPDOC linking exception', [
+                'supdocid' => $supdocId,
+                'record_key' => $recordKey,
+                'error' => $e->getMessage(),
+            ]);
+
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Build XML for linking SUPDOC to a record
+     *
+     * @param  string  $supdocId  The SUPDOCID to update
+     * @param  string  $recordKey  The RECORDNO to link to
+     * @return string XML request
+     */
+    private function buildSupdocLinkXml(string $supdocId, string $recordKey): string
+    {
+        $controlId = 'supdoc-link-'.time().'-'.uniqid();
+        $functionId = 'func-'.time().'-'.uniqid();
+
+        $sanitizedSupdocId = htmlspecialchars($supdocId, ENT_XML1, 'UTF-8');
+        $sanitizedRecordKey = htmlspecialchars($recordKey, ENT_XML1, 'UTF-8');
+
+        return <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<request>
+    <control>
+        <senderid>{$this->setting->sender_id}</senderid>
+        <password>{$this->setting->sender_password}</password>
+        <controlid>{$controlId}</controlid>
+        <uniqueid>false</uniqueid>
+        <dtdversion>3.0</dtdversion>
+    </control>
+    <operation>
+        <authentication>
+            <sessionid>{$this->sessionId}</sessionid>
+        </authentication>
+        <content>
+            <function controlid="{$functionId}">
+                <update_supdoc key="{$sanitizedSupdocId}">
+                    <supdockey>{$sanitizedRecordKey}</supdockey>
+                </update_supdoc>
+            </function>
+        </content>
+    </operation>
+</request>
+XML;
     }
 
     /**
@@ -1372,12 +1643,13 @@ XML;
         <content>
             <function controlid="{$functionId}">
                 <create_supdoc>
-                    <supdocid>{$sanitizedSupdocName}</supdocid>
+                    <supdocid>{$sanitizedSupdocId}</supdocid>
+                    <supdocname>{$sanitizedFileName}.{$sanitizedExtension}</supdocname>
                     <supdocfoldername>{$sanitizedFolderName}</supdocfoldername>
                     <supdocdescription>{$sanitizedDescription}</supdocdescription>
                     <attachments>
                         <attachment>
-                            <attachmentname>{$sanitizedFileName}</attachmentname>
+                            <attachmentname>{$sanitizedFileName}.{$sanitizedExtension}</attachmentname>
                             <attachmenttype>{$sanitizedExtension}</attachmenttype>
                             <attachmentdata>{$base64Contents}</attachmentdata>
                         </attachment>

@@ -191,25 +191,45 @@ class SageIntacctSyncService
                 ]);
 
                 foreach ($categorized['update'] as $gift) {
-                    $updateResult = $this->updateGiftRecord($gift, $syncHistory);
+                    $giftId = $gift['gift_id'] ?? 'unknown';
 
-                    if ($updateResult['success']) {
-                        $totalSynced++;
-                    } else {
+                    Log::debug('Sage Intacct: About to update gift', [
+                        'gift_id' => $giftId,
+                        'has_record_key' => isset($gift['_intacct_record_key']),
+                        'changes' => $gift['_changes'] ?? [],
+                    ]);
+
+                    try {
+                        $updateResult = $this->updateGiftRecord($gift, $syncHistory);
+
+                        Log::debug('Sage Intacct: Update result received', [
+                            'gift_id' => $giftId,
+                            'success' => $updateResult['success'],
+                            'error' => $updateResult['error'] ?? null,
+                        ]);
+
+                        if ($updateResult['success']) {
+                            $totalSynced++;
+                        } else {
+                            $totalFailed++;
+                            $failedRecords[] = [
+                                'gift_id' => $giftId,
+                                'error' => $updateResult['error'] ?? 'Update failed',
+                            ];
+                        }
+                    } catch (\Exception $e) {
+                        Log::error('Sage Intacct: Exception during updateGiftRecord', [
+                            'gift_id' => $giftId,
+                            'error' => $e->getMessage(),
+                            'trace' => $e->getTraceAsString(),
+                        ]);
+
                         $totalFailed++;
                         $failedRecords[] = [
-                            'gift_id' => $gift['gift_id'] ?? 'unknown',
-                            'error' => $updateResult['error'] ?? 'Update failed',
+                            'gift_id' => $giftId,
+                            'error' => 'Exception: '.$e->getMessage(),
                         ];
                     }
-
-                    // Update sync history progress
-                    DB::table('sage_intacct_sync_history')
-                        ->where('id', $syncHistory->id)
-                        ->update([
-                            'successful_count' => $totalSynced,
-                            'failed_count' => $totalFailed,
-                        ]);
                 }
             }
 
@@ -835,18 +855,55 @@ class SageIntacctSyncService
                     $transformed = $transformedMap[$giftId] ?? [];
 
                     if ($detail['success']) {
+                        $recordKey = $detail['key'] ?? null;
+
                         // Update as synced with API details
                         DB::table('sage_intacct_sync_items')
                             ->where('sync_history_id', $syncHistory->id)
                             ->where('gift_id', $giftId)
                             ->update([
                                 'status' => 'success',
-                                'intacct_record_id' => $detail['key'] ?? null,
+                                'intacct_record_id' => $recordKey,
                                 'synced_at' => now(),
                                 'api_request' => json_encode($transformed),
                                 'api_response' => json_encode($detail),
                                 'updated_at' => now(),
                             ]);
+
+                        // Link SUPDOC attachment if one was uploaded
+                        Log::debug('Sage Intacct: Checking if SUPDOC should be linked', [
+                            'gift_id' => $giftId,
+                            'has_record_key' => ! empty($recordKey),
+                            'has_attachment' => isset($attachmentMap[$giftId]),
+                            'attachment_map_keys' => array_keys($attachmentMap),
+                        ]);
+
+                        if ($recordKey && isset($attachmentMap[$giftId])) {
+                            $supdocid = $attachmentMap[$giftId];
+
+                            Log::info('Sage Intacct: Linking SUPDOC to gift record', [
+                                'gift_id' => $giftId,
+                                'supdocid' => $supdocid,
+                                'record_key' => $recordKey,
+                            ]);
+
+                            $linkResult = $this->apiService->linkSupdocToRecord($supdocid, $recordKey);
+
+                            if ($linkResult['success']) {
+                                Log::info('Sage Intacct: SUPDOC linked successfully', [
+                                    'gift_id' => $giftId,
+                                    'supdocid' => $supdocid,
+                                    'record_key' => $recordKey,
+                                ]);
+                            } else {
+                                Log::error('Sage Intacct: Failed to link SUPDOC to gift', [
+                                    'gift_id' => $giftId,
+                                    'supdocid' => $supdocid,
+                                    'record_key' => $recordKey,
+                                    'error' => $linkResult['error'] ?? 'Unknown error',
+                                ]);
+                            }
+                        }
                     } else {
                         // Update as failed with API details
                         DB::table('sage_intacct_sync_items')
@@ -1101,6 +1158,60 @@ class SageIntacctSyncService
             $fileName = $pathInfo['filename'] ?? 'check_'.$giftId;
             $fileExtension = strtolower($pathInfo['extension'] ?? 'jpg'); // Lowercase extension
 
+            // Convert TIF/TIFF to JPEG for better compatibility and smaller size
+            if (in_array($fileExtension, ['tif', 'tiff'])) {
+                try {
+                    // Write temp file for conversion (must have .tif extension for convertTiffToJpeg)
+                    $tempTif = tempnam(sys_get_temp_dir(), 'tif_').'.tif';
+                    file_put_contents($tempTif, $fileContents);
+
+                    // Use CheckImageCacheService conversion method
+                    $convertResult = $checkImageService->convertTiffToJpeg($tempTif);
+
+                    Log::debug('Sage Intacct: Conversion result', [
+                        'gift_id' => $giftId,
+                        'success' => $convertResult['success'],
+                        'optimized' => $convertResult['optimized'] ?? false,
+                        'path' => $convertResult['path'] ?? null,
+                        'path_exists' => isset($convertResult['path']) ? file_exists($convertResult['path']) : false,
+                        'temp_tif_exists' => file_exists($tempTif),
+                    ]);
+
+                    if ($convertResult['success'] && $convertResult['optimized']) {
+                        // Read converted JPEG
+                        if (file_exists($convertResult['path'])) {
+                            $fileContents = file_get_contents($convertResult['path']);
+                            $fileExtension = 'jpg';
+
+                            Log::info('Sage Intacct: Converted TIF to JPEG before upload', [
+                                'gift_id' => $giftId,
+                                'new_size_mb' => round(strlen($fileContents) / 1024 / 1024, 2),
+                            ]);
+
+                            // Clean up converted file
+                            @unlink($convertResult['path']);
+                        } else {
+                            Log::warning('Sage Intacct: Converted file path does not exist', [
+                                'gift_id' => $giftId,
+                                'expected_path' => $convertResult['path'],
+                            ]);
+                        }
+                    }
+
+                    // Clean up temp file (and .jpg if it exists)
+                    @unlink($tempTif);
+                    $tempJpg = preg_replace('/\.tif$/i', '.jpg', $tempTif);
+                    if (file_exists($tempJpg)) {
+                        @unlink($tempJpg);
+                    }
+                } catch (\Exception $e) {
+                    Log::warning('Sage Intacct: Failed to convert TIF to JPEG, uploading as-is', [
+                        'gift_id' => $giftId,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+
             // Sanitize filename for XML/Intacct (remove special chars)
             $fileName = preg_replace('/[^A-Za-z0-9_-]/', '_', $fileName);
             $fileName = 'Gift_'.$giftId.'_'.$fileName;
@@ -1116,7 +1227,7 @@ class SageIntacctSyncService
                 'gift_id' => $giftId,
                 'filename' => $fileName,
                 'extension' => $fileExtension,
-                'size_mb' => round($fileSizeMB, 2),
+                'size_mb' => round(strlen($fileContents) / 1024 / 1024, 2),
             ]);
 
             // Upload using SageIntacctApiService
@@ -1218,6 +1329,14 @@ class SageIntacctSyncService
             // Create sync item record
             $syncItem = $this->createSyncItem($syncHistory, $giftData, 'pending', $transformed);
 
+            Log::debug('Sage Intacct: About to send update to API', [
+                'gift_id' => $giftId,
+                'object_name' => $this->setting->custom_object_name,
+                'record_key' => $recordKey,
+                'record_key_length' => strlen($recordKey ?? ''),
+                'field_count' => count($transformed),
+            ]);
+
             // Send update to Intacct
             $updateResult = $this->apiService->updateCustomObjectRecord(
                 $this->setting->custom_object_name,
@@ -1228,6 +1347,32 @@ class SageIntacctSyncService
             if ($updateResult['success']) {
                 // Update sync item as synced
                 $this->updateSyncItem($syncItem, 'success', null, $recordKey, $transformed, $updateResult);
+
+                // Link SUPDOC attachment if one was uploaded
+                if ($supdocid && $recordKey) {
+                    Log::info('Sage Intacct: Linking SUPDOC to updated gift record', [
+                        'gift_id' => $giftId,
+                        'supdocid' => $supdocid,
+                        'record_key' => $recordKey,
+                    ]);
+
+                    $linkResult = $this->apiService->linkSupdocToRecord($supdocid, $recordKey);
+
+                    if ($linkResult['success']) {
+                        Log::info('Sage Intacct: SUPDOC linked successfully to updated gift', [
+                            'gift_id' => $giftId,
+                            'supdocid' => $supdocid,
+                            'record_key' => $recordKey,
+                        ]);
+                    } else {
+                        Log::error('Sage Intacct: Failed to link SUPDOC to updated gift', [
+                            'gift_id' => $giftId,
+                            'supdocid' => $supdocid,
+                            'record_key' => $recordKey,
+                            'error' => $linkResult['error'] ?? 'Unknown error',
+                        ]);
+                    }
+                }
 
                 Log::info('Sage Intacct: Gift updated successfully', [
                     'gift_id' => $giftId,
@@ -1387,7 +1532,16 @@ class SageIntacctSyncService
                     ]);
                 } else {
                     // Has changes - update
-                    $gift['_intacct_record_key'] = $existingRecords[$giftId]['RECORDNO'] ?? null;
+                    // Note: Sage Intacct returns RECORDNO as 'id' in query results
+                    $recordKey = $existingRecords[$giftId]['id'] ?? $existingRecords[$giftId]['RECORDNO'] ?? null;
+
+                    Log::debug('Sage Intacct: Extracting record key for update', [
+                        'gift_id' => $giftId,
+                        'record_key' => $recordKey,
+                        'existing_record_keys' => array_keys($existingRecords[$giftId]),
+                    ]);
+
+                    $gift['_intacct_record_key'] = $recordKey;
                     $gift['_changes'] = $changes;
                     $update[] = $gift;
                     Log::info('Sage Intacct: Gift has changes, will update', [

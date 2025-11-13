@@ -626,7 +626,13 @@ class CheckImageCacheService
             // Check current file size
             $currentSize = filesize($filePath);
 
-            // Skip optimization if already under target size
+            // Determine optimization strategy based on MIME type
+            // Always convert TIFF to JPEG regardless of size (better compatibility)
+            if (in_array($mimeType, ['image/tiff', 'image/tif'])) {
+                return $this->convertTiffToJpeg($filePath);
+            }
+
+            // For other image types, skip optimization if already under target size
             if ($currentSize < ($this->targetSizeKB * 1024)) {
                 Log::info('Image already under target size, skipping optimization', [
                     'file' => basename($filePath),
@@ -640,11 +646,6 @@ class CheckImageCacheService
                     'path' => $filePath,
                     'reason' => 'already_optimized',
                 ];
-            }
-
-            // Determine optimization strategy based on MIME type
-            if (in_array($mimeType, ['image/tiff', 'image/tif'])) {
-                return $this->convertTiffToJpeg($filePath);
             }
 
             if (in_array($mimeType, ['image/jpeg', 'image/jpg', 'image/png'])) {
@@ -690,7 +691,7 @@ class CheckImageCacheService
      * @param  string  $tiffPath  Absolute path to TIFF file
      * @return array Result with optimized file path
      */
-    private function convertTiffToJpeg(string $tiffPath): array
+    public function convertTiffToJpeg(string $tiffPath): array
     {
         try {
             // Check if ImageMagick is available
@@ -709,17 +710,17 @@ class CheckImageCacheService
             $originalSize = filesize($tiffPath);
             $outputPath = preg_replace('/\.(tif|tiff)$/i', '.jpg', $tiffPath);
 
-            // ImageMagick command
+            // ImageMagick command - use [0] to convert only first page for multi-page TIFFs
             $command = sprintf(
                 'convert %s -resize %dx%d\> -quality %d -colorspace RGB %s 2>&1',
-                escapeshellarg($tiffPath),
+                escapeshellarg($tiffPath.'[0]'),
                 $this->maxWidth,
                 $this->maxHeight,
                 $this->jpegQuality,
                 escapeshellarg($outputPath)
             );
 
-            Log::info('Converting TIFF to JPEG', [
+            Log::info('Converting TIFF to JPEG (first page only for multi-page TIFFs)', [
                 'input' => basename($tiffPath),
                 'output' => basename($outputPath),
                 'max_dimensions' => "{$this->maxWidth}x{$this->maxHeight}",
