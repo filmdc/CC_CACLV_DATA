@@ -533,6 +533,13 @@ class SageIntacctApiService
 
             $xmlRequest = $this->buildXmlRequest('batch', [], $functionContent);
 
+            // Log sample of first receipt for debugging
+            if (count($receipts) > 0) {
+                Log::debug('Sage Intacct XML API: Sample receipt XML (first receipt)', [
+                    'first_function' => substr($functionContent, 0, 1000),
+                ]);
+            }
+
             // Send request
             $response = $this->sendXmlRequest($xmlRequest);
 
@@ -549,6 +556,27 @@ class SageIntacctApiService
             $details = [];
 
             $xml = simplexml_load_string($response['xml']);
+
+            // Check for control-level failure first
+            $controlStatus = (string) $xml->control->status;
+            if ($controlStatus === 'failure') {
+                $errorMsg = (string) $xml->errormessage->error->description2
+                    ?? (string) $xml->errormessage->error->description
+                    ?? 'Unknown control-level error';
+                $errorCode = (string) $xml->errormessage->error->errorno ?? 'N/A';
+
+                Log::error('Sage Intacct XML API: Control-level error in batch', [
+                    'error_code' => $errorCode,
+                    'error_message' => $errorMsg,
+                    'full_response' => substr($response['xml'], 0, 2000),
+                ]);
+
+                return [
+                    'success' => false,
+                    'error' => "Control-level error [{$errorCode}]: {$errorMsg}",
+                ];
+            }
+
             $results = $xml->xpath('//result');
 
             foreach ($results as $index => $result) {
@@ -566,12 +594,30 @@ class SageIntacctApiService
                     $errorMsg = (string) $result->errormessage->error->description2
                         ?? (string) $result->errormessage->error->description
                         ?? 'Unknown error';
+                    $errorCode = (string) $result->errormessage->error->errorno ?? 'N/A';
+
+                    Log::warning('Sage Intacct XML API: Other Receipt creation failed', [
+                        'index' => $index,
+                        'error_code' => $errorCode,
+                        'error_message' => $errorMsg,
+                    ]);
+
                     $details[] = [
                         'success' => false,
                         'error' => $errorMsg,
                         'index' => $index,
                     ];
                 }
+            }
+
+            // Log errors if any failures occurred
+            if ($failed > 0) {
+                Log::warning('Sage Intacct XML API: Batch had failures', [
+                    'total' => count($receipts),
+                    'created' => $created,
+                    'failed' => $failed,
+                    'failure_details' => array_filter($details, fn ($d) => ! $d['success']),
+                ]);
             }
 
             Log::info('Sage Intacct XML API: Batch create Other Receipts completed', [
@@ -873,7 +919,7 @@ class SageIntacctApiService
     /**
      * Build XML request structure for Sage Intacct API
      */
-    private function buildXmlRequest(string $functionName, array $parameters): string
+    private function buildXmlRequest(string $functionName, array $parameters, ?string $preBuildFunctionContent = null): string
     {
         $controlId = $this->generateControlId();
         $functionId = $this->generateControlId();
@@ -889,8 +935,16 @@ class SageIntacctApiService
             </login>';
         }
 
-        // Build function content
-        $functionContent = $this->buildFunctionContent($functionName, $parameters);
+        // Build function content - use pre-built content if provided
+        // For batch operations, pre-built content already contains <function> tags
+        if ($preBuildFunctionContent !== null) {
+            $contentSection = $preBuildFunctionContent;
+        } else {
+            $functionContent = $this->buildFunctionContent($functionName, $parameters);
+            $contentSection = '<function controlid="'.$functionId.'">
+                '.$functionContent.'
+            </function>';
+        }
 
         $xml = '<?xml version="1.0" encoding="UTF-8"?>
 <request>
@@ -906,9 +960,7 @@ class SageIntacctApiService
             '.$authSection.'
         </authentication>
         <content>
-            <function controlid="'.$functionId.'">
-                '.$functionContent.'
-            </function>
+            '.$contentSection.'
         </content>
     </operation>
 </request>';

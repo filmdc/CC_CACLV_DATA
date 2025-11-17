@@ -698,10 +698,10 @@ class SageIntacctSyncService
             $accountData['depositdate'] = $depositDate;
         }
 
-        // Get dimension values (Location, Project, Department) - apply code mappings
+        // Get dimension values (Location, Project, Class) - apply code mappings
         $location = null;
         $project = null;
-        $department = null;
+        $class = null;
 
         if ($this->setting->isCodeMappingEnabled()) {
             // Campaign → Location
@@ -714,19 +714,19 @@ class SageIntacctSyncService
                 $project = $this->applyCodeMapping('solicit_code', $giftData['solicit_code']);
             }
 
-            // Sub-solicitation → Department
+            // Sub-solicitation → Class (for Other Receipts, use classid not departmentid)
             if (! empty($giftData['sub_solicit_code'])) {
-                $department = $this->applyCodeMapping('sub_solicit_code', $giftData['sub_solicit_code']);
+                $class = $this->applyCodeMapping('sub_solicit_code', $giftData['sub_solicit_code']);
             }
         }
 
         // Validate required dimensions are present (skip if any are missing)
-        if (! $location || ! $project || ! $department) {
+        if (! $location || ! $project || ! $class) {
             Log::warning('Sage Intacct: Skipping gift - missing required dimensions', [
                 'gift_id' => $giftData['gift_id'] ?? 'unknown',
                 'location' => $location ?: 'MISSING',
                 'project' => $project ?: 'MISSING',
-                'department' => $department ?: 'MISSING',
+                'class' => $class ?: 'MISSING',
                 'campaign' => $giftData['campaign'] ?? null,
                 'solicit_code' => $giftData['solicit_code'] ?? null,
                 'sub_solicit_code' => $giftData['sub_solicit_code'] ?? null,
@@ -742,7 +742,7 @@ class SageIntacctSyncService
             'memo' => $giftData['gift_narrative'] ?? $giftData['campaign'] ?? 'Donation',
             'locationid' => $location,    // Location dimension (from campaign)
             'projectid' => $project,      // Project dimension (from solicit_code)
-            'departmentid' => $department, // Department dimension (from sub_solicit_code)
+            'classid' => $class,          // Class dimension (from sub_solicit_code) - NOT departmentid for Other Receipts
         ];
 
         // Build receipt data
@@ -1016,7 +1016,7 @@ class SageIntacctSyncService
 
             if ($result['success']) {
                 $synced = $result['created'];
-                $failed = count($result['failed']);
+                $failed = $result['failed']; // Already an integer, don't count
 
                 // Update sync items based on batch results
                 foreach ($result['details'] as $detail) {
