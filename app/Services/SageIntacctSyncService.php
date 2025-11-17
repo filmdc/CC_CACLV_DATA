@@ -704,19 +704,40 @@ class SageIntacctSyncService
         $class = null;
 
         if ($this->setting->isCodeMappingEnabled()) {
-            // Campaign → Location
+            // STEP 1: Map campaign → location first
             if (! empty($giftData['campaign'])) {
                 $location = $this->applyCodeMapping('campaign', $giftData['campaign']);
             }
 
-            // Solicitation → Project (shows as "Program" in screenshot)
-            if (! empty($giftData['solicit_code'])) {
+            // STEP 2: Check if this location has a campaign override (conditional mapping)
+            $campaignOverride = null;
+            if ($location) {
+                $campaignOverride = \App\Models\CampaignServiceOverride::where('intacct_location_code', $location)
+                    ->where('is_active', true)
+                    ->first();
+
+                if ($campaignOverride) {
+                    Log::info('Sage Intacct: Using campaign-based override for location', [
+                        'gift_id' => $giftData['gift_id'] ?? 'unknown',
+                        'dp_campaign' => $giftData['campaign'] ?? null,
+                        'mapped_location' => $location,
+                        'override_service' => $campaignOverride->service_code,
+                        'override_project' => $campaignOverride->project_code,
+                    ]);
+                }
+            }
+
+            // STEP 3: Apply project mapping (use override if available)
+            if ($campaignOverride && $campaignOverride->project_code) {
+                $project = $campaignOverride->project_code;
+            } elseif (! empty($giftData['solicit_code'])) {
                 $project = $this->applyCodeMapping('solicit_code', $giftData['solicit_code']);
             }
 
-            // Sub-solicitation → Class (API field: classid, shows as "Service" in your UI)
-            // Note: departmentid is NOT supported for Other Receipts, but classid is
-            if (! empty($giftData['sub_solicit_code'])) {
+            // STEP 4: Apply service/class mapping (use override if available)
+            if ($campaignOverride) {
+                $class = $campaignOverride->service_code;
+            } elseif (! empty($giftData['sub_solicit_code'])) {
                 $class = $this->applyCodeMapping('sub_solicit_code', $giftData['sub_solicit_code']);
             }
         }
