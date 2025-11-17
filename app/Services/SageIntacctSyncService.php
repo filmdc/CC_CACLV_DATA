@@ -758,13 +758,14 @@ class SageIntacctSyncService
         }
 
         // Build line item with dimensions
+        // NOTE: Department dimension is renamed to "Service" in your Sage Intacct UI
         $lineItem = [
             'glaccountno' => $glAccount,
             'amount' => $giftData['amount'] ?? '0.00',
             'memo' => $giftData['gift_narrative'] ?? $giftData['campaign'] ?? 'Donation',
-            'locationid' => $location,    // Location dimension (from campaign)
-            'projectid' => $project,      // Project dimension (from solicit_code) - shows as "Program" in UI
-            'classid' => $class,          // Class dimension (from sub_solicit_code) - renamed to "Service" in your UI
+            'locationid' => $location,       // Location dimension (from campaign)
+            'projectid' => $project,         // Project dimension (from solicit_code) - shows as "Program" in UI
+            'departmentid' => $class,        // Department dimension (from sub_solicit_code) - renamed to "Service" in your UI
         ];
 
         // Build receipt data
