@@ -652,8 +652,18 @@ class SageIntacctSyncService
         $lastName = trim($giftData['last_name'] ?? '');
         $payee = trim($firstName.' '.$lastName) ?: 'Anonymous Donor';
 
-        // Get payment method from mapping table
+        // Get payment method from mapping table (with gift_type fallback)
         $dpPaymentType = $giftData['PAYMENT_TYPE'] ?? $giftData['payment_type'] ?? null;
+
+        // If payment_type is empty, try gift_type as fallback
+        if (empty($dpPaymentType) && ! empty($giftData['gift_type'])) {
+            $dpPaymentType = $giftData['gift_type'];
+            Log::debug('Sage Intacct: Using gift_type as payment_type fallback', [
+                'gift_id' => $giftData['gift_id'] ?? 'unknown',
+                'gift_type' => $giftData['gift_type'],
+            ]);
+        }
+
         $paymentMethod = \App\Models\DonorPerfectPaymentMethodMapping::getIntacctPaymentMethod($dpPaymentType);
 
         // Get GL account (apply code mapping if enabled)
