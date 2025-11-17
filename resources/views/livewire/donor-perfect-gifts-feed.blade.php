@@ -230,6 +230,26 @@
                                     <span class="ml-2 px-2 py-0.5 bg-purple-800 rounded-full text-xs">{{ $selectedCount }}</span>
                                 @endif
                             </button>
+
+                            <!-- Select All Pages Button -->
+                            <button wire:click="selectAllPages"
+                                    class="px-3 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 flex items-center"
+                                    title="Select all gifts across all pages">
+                                <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                                </svg>
+                                Select All Pages
+                            </button>
+
+                            @if($selectedCount > 0)
+                            <!-- Deselect All Button -->
+                            <button wire:click="deselectAllForSync"
+                                    class="px-3 py-2 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                                    title="Clear all selections">
+                                Clear Selection
+                            </button>
+                            @endif
+
                             <!-- Auth method badge -->
                             <span class="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-md">
                                 XML Web Services
@@ -248,6 +268,26 @@
                                         <span class="ml-2 px-2 py-0.5 bg-purple-800 rounded-full text-xs">{{ $selectedCount }}</span>
                                     @endif
                                 </button>
+
+                                <!-- Select All Pages Button -->
+                                <button wire:click="selectAllPages"
+                                        class="px-3 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 flex items-center"
+                                        title="Select all gifts across all pages">
+                                    <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                                    </svg>
+                                    Select All Pages
+                                </button>
+
+                                @if($selectedCount > 0)
+                                <!-- Deselect All Button -->
+                                <button wire:click="deselectAllForSync"
+                                        class="px-3 py-2 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                                        title="Clear all selections">
+                                    Clear Selection
+                                </button>
+                                @endif
+
                                 <!-- Connection status badge -->
                                 <span class="text-xs px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-md">
                                     ✓ OAuth Connected ({{ $userToken->company_id }})

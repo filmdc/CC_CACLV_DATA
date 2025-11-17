@@ -363,11 +363,40 @@ class DonorPerfectGiftsFeed extends Component
                 $perPage = 15;
                 $currentPage = $this->getPage();
                 $visibleGifts = $gifts->forPage($currentPage, $perPage);
+                $visibleIds = $visibleGifts->pluck('gift_id')->toArray();
 
-                $this->selectedGiftsForSync = $visibleGifts->pluck('gift_id')->toArray();
+                // Check if all visible gifts are already selected
+                $allVisibleSelected = count(array_intersect($visibleIds, $this->selectedGiftsForSync)) === count($visibleIds);
+
+                if ($allVisibleSelected) {
+                    // Deselect current page
+                    $this->selectedGiftsForSync = array_values(array_diff($this->selectedGiftsForSync, $visibleIds));
+                } else {
+                    // Add current page to selection (merge, not replace)
+                    $this->selectedGiftsForSync = array_values(array_unique(array_merge($this->selectedGiftsForSync, $visibleIds)));
+                }
             }
         } catch (\Exception $e) {
             session()->flash('error', 'Failed to select gifts: '.$e->getMessage());
+        }
+    }
+
+    public function selectAllPages(DonorPerfectGiftService $giftService)
+    {
+        try {
+            $startDate = Carbon::parse($this->startDate);
+            $endDate = Carbon::parse($this->endDate);
+
+            $result = $giftService->getGiftsWithMetadata($startDate, $endDate, $this->search);
+
+            if ($result['success']) {
+                // Select ALL gifts across all pages
+                $this->selectedGiftsForSync = $result['gifts']->pluck('gift_id')->toArray();
+
+                session()->flash('success', 'Selected all '.count($this->selectedGiftsForSync).' gifts across all pages.');
+            }
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to select all gifts: '.$e->getMessage());
         }
     }
 
