@@ -698,10 +698,10 @@ class SageIntacctSyncService
             $accountData['depositdate'] = $depositDate;
         }
 
-        // Get dimension values (Location, Project, Class) - apply code mappings
+        // Get dimension values (Location, Project, Service/Item) - apply code mappings
         $location = null;
         $project = null;
-        $class = null;
+        $item = null;
 
         if ($this->setting->isCodeMappingEnabled()) {
             // Campaign → Location
@@ -714,19 +714,19 @@ class SageIntacctSyncService
                 $project = $this->applyCodeMapping('solicit_code', $giftData['solicit_code']);
             }
 
-            // Sub-solicitation → Class (for Other Receipts, use classid not departmentid)
+            // Sub-solicitation → Service/Item (itemid is what GL accounts require for "Service")
             if (! empty($giftData['sub_solicit_code'])) {
-                $class = $this->applyCodeMapping('sub_solicit_code', $giftData['sub_solicit_code']);
+                $item = $this->applyCodeMapping('sub_solicit_code', $giftData['sub_solicit_code']);
             }
         }
 
         // Validate required dimensions are present (skip if any are missing)
-        if (! $location || ! $project || ! $class) {
+        if (! $location || ! $project || ! $item) {
             Log::warning('Sage Intacct: Skipping gift - missing required dimensions', [
                 'gift_id' => $giftData['gift_id'] ?? 'unknown',
                 'location' => $location ?: 'MISSING',
                 'project' => $project ?: 'MISSING',
-                'class' => $class ?: 'MISSING',
+                'item' => $item ?: 'MISSING',
                 'campaign' => $giftData['campaign'] ?? null,
                 'solicit_code' => $giftData['solicit_code'] ?? null,
                 'sub_solicit_code' => $giftData['sub_solicit_code'] ?? null,
@@ -742,7 +742,7 @@ class SageIntacctSyncService
             'memo' => $giftData['gift_narrative'] ?? $giftData['campaign'] ?? 'Donation',
             'locationid' => $location,    // Location dimension (from campaign)
             'projectid' => $project,      // Project dimension (from solicit_code)
-            'classid' => $class,          // Class dimension (from sub_solicit_code) - NOT departmentid for Other Receipts
+            'itemid' => $item,            // Service/Item dimension (from sub_solicit_code) - this is what "Service" means in Sage Intacct
         ];
 
         // Build receipt data
@@ -1759,7 +1759,19 @@ class SageIntacctSyncService
             return $mapping->intacct_code;
         }
 
-        // No mapping found, use original value
+        // No mapping found - log warning and use default for sub-solicitation (Service/Item)
+        if ($dpField === 'sub_solicit_code') {
+            $defaultService = $this->setting->default_service_id ?? 'S14999';
+            Log::warning('Sage Intacct: No Service/Item mapping found for sub-solicitation code, using default', [
+                'field' => $dpField,
+                'dp_code' => $value,
+                'default_used' => $defaultService,
+            ]);
+
+            return $defaultService;
+        }
+
+        // For other fields, return the original value if no mapping found
         return $value;
     }
 

@@ -1989,6 +1989,7 @@ XML;
             // Add dimension fields if provided
             $locationXml = isset($lineItem['locationid']) ? '<locationid>'.htmlspecialchars($lineItem['locationid'], ENT_XML1, 'UTF-8').'</locationid>' : '';
             $projectXml = isset($lineItem['projectid']) ? '<projectid>'.htmlspecialchars($lineItem['projectid'], ENT_XML1, 'UTF-8').'</projectid>' : '';
+            $itemXml = isset($lineItem['itemid']) ? '<itemid>'.htmlspecialchars($lineItem['itemid'], ENT_XML1, 'UTF-8').'</itemid>' : '';
             $departmentXml = isset($lineItem['departmentid']) ? '<departmentid>'.htmlspecialchars($lineItem['departmentid'], ENT_XML1, 'UTF-8').'</departmentid>' : '';
             $classXml = isset($lineItem['classid']) ? '<classid>'.htmlspecialchars($lineItem['classid'], ENT_XML1, 'UTF-8').'</classid>' : '';
 
@@ -1999,6 +2000,7 @@ XML;
                     {$memo}
                     {$locationXml}
                     {$projectXml}
+                    {$itemXml}
                     {$departmentXml}
                     {$classXml}
                 </lineitem>
