@@ -698,10 +698,10 @@ class SageIntacctSyncService
             $accountData['depositdate'] = $depositDate;
         }
 
-        // Get dimension values (Location, Project, Service/Item) - apply code mappings
+        // Get dimension values (Location, Project, Class/Service) - apply code mappings
         $location = null;
         $project = null;
-        $item = null;
+        $class = null;
 
         if ($this->setting->isCodeMappingEnabled()) {
             // Campaign → Location
@@ -709,24 +709,25 @@ class SageIntacctSyncService
                 $location = $this->applyCodeMapping('campaign', $giftData['campaign']);
             }
 
-            // Solicitation → Project
+            // Solicitation → Project (shows as "Program" in screenshot)
             if (! empty($giftData['solicit_code'])) {
                 $project = $this->applyCodeMapping('solicit_code', $giftData['solicit_code']);
             }
 
-            // Sub-solicitation → Service/Item (itemid is what GL accounts require for "Service")
+            // Sub-solicitation → Class (API field: classid, shows as "Service" in your UI)
+            // Note: departmentid is NOT supported for Other Receipts, but classid is
             if (! empty($giftData['sub_solicit_code'])) {
-                $item = $this->applyCodeMapping('sub_solicit_code', $giftData['sub_solicit_code']);
+                $class = $this->applyCodeMapping('sub_solicit_code', $giftData['sub_solicit_code']);
             }
         }
 
         // Validate required dimensions are present (skip if any are missing)
-        if (! $location || ! $project || ! $item) {
+        if (! $location || ! $project || ! $class) {
             Log::warning('Sage Intacct: Skipping gift - missing required dimensions', [
                 'gift_id' => $giftData['gift_id'] ?? 'unknown',
                 'location' => $location ?: 'MISSING',
                 'project' => $project ?: 'MISSING',
-                'item' => $item ?: 'MISSING',
+                'class' => $class ?: 'MISSING',
                 'campaign' => $giftData['campaign'] ?? null,
                 'solicit_code' => $giftData['solicit_code'] ?? null,
                 'sub_solicit_code' => $giftData['sub_solicit_code'] ?? null,
@@ -741,8 +742,8 @@ class SageIntacctSyncService
             'amount' => $giftData['amount'] ?? '0.00',
             'memo' => $giftData['gift_narrative'] ?? $giftData['campaign'] ?? 'Donation',
             'locationid' => $location,    // Location dimension (from campaign)
-            'projectid' => $project,      // Project dimension (from solicit_code)
-            'itemid' => $item,            // Service/Item dimension (from sub_solicit_code) - this is what "Service" means in Sage Intacct
+            'projectid' => $project,      // Project dimension (from solicit_code) - shows as "Program" in UI
+            'classid' => $class,          // Class dimension (from sub_solicit_code) - renamed to "Service" in your UI
         ];
 
         // Build receipt data
@@ -1759,16 +1760,17 @@ class SageIntacctSyncService
             return $mapping->intacct_code;
         }
 
-        // No mapping found - log warning and use default for sub-solicitation (Service/Item)
+        // No mapping found - log warning and use default for sub-solicitation (Class/Service)
         if ($dpField === 'sub_solicit_code') {
-            $defaultService = $this->setting->default_service_id ?? 'S14999';
-            Log::warning('Sage Intacct: No Service/Item mapping found for sub-solicitation code, using default', [
+            $defaultClass = $this->setting->default_service_id ?? 'S14999';
+            Log::warning('Sage Intacct: No Class/Service mapping found for sub-solicitation code, using default', [
                 'field' => $dpField,
                 'dp_code' => $value,
-                'default_used' => $defaultService,
+                'default_used' => $defaultClass,
+                'note' => 'Class dimension (classid) - renamed to "Service" in UI',
             ]);
 
-            return $defaultService;
+            return $defaultClass;
         }
 
         // For other fields, return the original value if no mapping found
