@@ -624,6 +624,131 @@ class SageIntacctSyncService
     }
 
     /**
+     * Transform DonorPerfect gift data to Sage Intacct Other Receipt format
+     *
+     * @param  array  $giftData  Gift data from DonorPerfect
+     * @param  array|null  $fileData  Optional file data for attachment
+     * @return array Other Receipt data ready for API
+     */
+    private function transformGiftToOtherReceipt(array $giftData, ?array $fileData = null): array
+    {
+        // Build payee name from donor info
+        $firstName = trim($giftData['first_name'] ?? '');
+        $lastName = trim($giftData['last_name'] ?? '');
+        $payee = trim($firstName.' '.$lastName) ?: 'Anonymous Donor';
+
+        // Get payment method from mapping table
+        $dpPaymentType = $giftData['PAYMENT_TYPE'] ?? $giftData['payment_type'] ?? null;
+        $paymentMethod = \App\Models\DonorPerfectPaymentMethodMapping::getIntacctPaymentMethod($dpPaymentType);
+
+        // Get GL account (apply code mapping if enabled)
+        $glCode = $giftData['gl_code'] ?? null;
+        if ($this->setting->isCodeMappingEnabled() && $glCode) {
+            $glCode = $this->applyCodeMapping('gl_code', $glCode);
+        }
+
+        // For Other Receipts, GL account is required and cannot use default
+        // If no GL code provided or mapping failed, return null to skip this gift
+        if (! $glCode) {
+            Log::warning('Sage Intacct: Skipping gift - missing GL code for Other Receipt', [
+                'gift_id' => $giftData['gift_id'] ?? 'unknown',
+                'gl_code_raw' => $giftData['gl_code'] ?? null,
+            ]);
+
+            return null;
+        }
+
+        $glAccount = $glCode;
+
+        // Prepare dates
+        $giftDate = \Carbon\Carbon::parse($giftData['gift_date'] ?? now())->format('Y-m-d');
+        $depositDate = now()->format('Y-m-d'); // Current date per user requirement
+
+        // Build account field (bank or undeposited funds)
+        $accountData = [];
+        if ($this->setting->use_undeposited_funds) {
+            $accountData['undepglaccountno'] = $this->setting->undeposited_gl_account ?? '10300';
+        } else {
+            $accountData['bankaccountid'] = $this->setting->bank_account_id;
+            $accountData['depositdate'] = $depositDate;
+        }
+
+        // Get dimension values (Program, Fund, Service) - apply code mappings
+        $program = null;
+        $fund = null;
+        $service = null;
+
+        if ($this->setting->isCodeMappingEnabled()) {
+            // Campaign → Program
+            if (! empty($giftData['campaign'])) {
+                $program = $this->applyCodeMapping('campaign', $giftData['campaign']);
+            }
+
+            // Solicitation → Fund
+            if (! empty($giftData['solicit_code'])) {
+                $fund = $this->applyCodeMapping('solicit_code', $giftData['solicit_code']);
+            }
+
+            // Sub-solicitation → Service
+            if (! empty($giftData['sub_solicit_code'])) {
+                $service = $this->applyCodeMapping('sub_solicit_code', $giftData['sub_solicit_code']);
+            }
+        }
+
+        // Validate required dimensions are present (skip if any are missing)
+        if (! $program || ! $fund || ! $service) {
+            Log::warning('Sage Intacct: Skipping gift - missing required dimensions', [
+                'gift_id' => $giftData['gift_id'] ?? 'unknown',
+                'program' => $program ?: 'MISSING',
+                'fund' => $fund ?: 'MISSING',
+                'service' => $service ?: 'MISSING',
+                'campaign' => $giftData['campaign'] ?? null,
+                'solicit_code' => $giftData['solicit_code'] ?? null,
+                'sub_solicit_code' => $giftData['sub_solicit_code'] ?? null,
+            ]);
+
+            return null;
+        }
+
+        // Build line item with dimensions
+        $lineItem = [
+            'glaccountno' => $glAccount,
+            'amount' => $giftData['amount'] ?? '0.00',
+            'memo' => $giftData['gift_narrative'] ?? $giftData['campaign'] ?? 'Donation',
+            'projectid' => $program,  // Program dimension
+            'classid' => $fund,       // Fund dimension
+            'locationid' => $service, // Service dimension
+        ];
+
+        // Build receipt data
+        $receiptData = array_merge([
+            'paymentdate' => $giftDate,
+            'payee' => $payee,
+            'receiveddate' => $giftDate,
+            'paymentmethod' => $paymentMethod,
+            'refid' => (string) $giftData['gift_id'],
+            'description' => $giftData['gift_narrative'] ?? "Gift from DonorPerfect #{$giftData['gift_id']}",
+            'receiptitems' => [$lineItem],
+        ], $accountData);
+
+        // Add SUPDOC if file attachment was prepared
+        if ($fileData && isset($fileData['supdocid'])) {
+            $receiptData['supdocid'] = $fileData['supdocid'];
+        }
+
+        Log::debug('Sage Intacct: Transformed gift to Other Receipt', [
+            'gift_id' => $giftData['gift_id'] ?? 'unknown',
+            'payee' => $payee,
+            'payment_method' => $paymentMethod,
+            'dp_payment_type' => $dpPaymentType,
+            'gl_account' => $glAccount,
+            'amount' => $giftData['amount'] ?? '0.00',
+        ]);
+
+        return $receiptData;
+    }
+
+    /**
      * Create sync history record
      *
      * @param  int  $userId  User ID who triggered the sync
@@ -803,38 +928,36 @@ class SageIntacctSyncService
             foreach ($batch as $index => $giftData) {
                 $giftId = $giftData['gift_id'] ?? null;
 
-                // Prepare check image data for Document File attribute
+                // Prepare check image attachment
                 $fileData = $this->uploadCheckImageAttachment($giftData);
                 if ($fileData) {
                     $attachmentMap[$giftId] = $fileData;
-                    Log::info('Sage Intacct: Document File data prepared for gift', [
-                        'gift_id' => $giftId,
-                        'filename' => $fileData['filename'],
-                        'content_type' => $fileData['content_type'],
-                    ]);
                 }
 
-                // Transform gift data
-                $transformed = $this->transformGiftForIntacct($giftData, $fieldMappings);
+                // Transform based on destination type
+                if ($this->setting->use_other_receipts) {
+                    // Transform to Other Receipt format
+                    $transformed = $this->transformGiftToOtherReceipt($giftData, $fileData);
 
-                // Add Document File attribute fields if attachment was prepared
-                if (isset($attachmentMap[$giftId])) {
-                    $fileData = $attachmentMap[$giftId];
+                    // Skip if transformation returned null (missing required fields/codes)
+                    if ($transformed === null) {
+                        $this->createSyncItem($syncHistory, $giftData, 'skipped', [
+                            'skip_reason' => 'Missing required GL code or dimensions',
+                        ]);
 
-                    // Get Document File field name from config (default: 'file')
-                    $fileField = env('INTACCT_DOCUMENT_FILE_FIELD', 'file');
+                        continue;
+                    }
+                } else {
+                    // Transform to Custom Object format
+                    $transformed = $this->transformGiftForIntacct($giftData, $fieldMappings);
 
-                    // Populate the three required fields for Document File attribute
-                    $transformed[$fileField.'_contenttype'] = $fileData['content_type'];
-                    $transformed[$fileField.'_filename'] = $fileData['filename'];
-                    $transformed[$fileField] = $fileData['base64_content'];
-
-                    Log::debug('Sage Intacct: Added Document File attribute fields to gift record', [
-                        'gift_id' => $giftId,
-                        'field_name' => $fileField,
-                        'filename' => $fileData['filename'],
-                        'content_type' => $fileData['content_type'],
-                    ]);
+                    // Add Document File attribute fields if attachment was prepared
+                    if ($fileData && isset($fileData['base64_content'])) {
+                        $fileField = env('INTACCT_DOCUMENT_FILE_FIELD', 'file');
+                        $transformed[$fileField.'_contenttype'] = $fileData['content_type'];
+                        $transformed[$fileField.'_filename'] = $fileData['filename'];
+                        $transformed[$fileField] = $fileData['base64_content'];
+                    }
                 }
 
                 $transformedRecords[] = $transformed;
@@ -845,11 +968,22 @@ class SageIntacctSyncService
                 $this->createSyncItem($syncHistory, $giftData, 'pending', $transformed);
             }
 
-            // Send batch to Intacct
-            $result = $this->apiService->batchCreateRecords(
-                $this->setting->custom_object_name,
-                $transformedRecords
-            );
+            // Send batch to Intacct based on destination type
+            if ($this->setting->use_other_receipts) {
+                Log::info('Sage Intacct: Creating Other Receipts batch', [
+                    'batch_size' => count($transformedRecords),
+                ]);
+                $result = $this->apiService->batchCreateOtherReceipts($transformedRecords);
+            } else {
+                Log::info('Sage Intacct: Creating custom object batch', [
+                    'object_name' => $this->setting->custom_object_name,
+                    'batch_size' => count($transformedRecords),
+                ]);
+                $result = $this->apiService->batchCreateRecords(
+                    $this->setting->custom_object_name,
+                    $transformedRecords
+                );
+            }
 
             $synced = 0;
             $failed = 0;
@@ -1207,23 +1341,66 @@ class SageIntacctSyncService
                 default => 'application/octet-stream',
             };
 
-            // Encode file contents to base64 for Document File attribute
-            $base64Content = base64_encode($fileContents);
+            // Check if using Other Receipts (SUPDOC) or Custom Object (Document File)
+            if ($this->setting->use_other_receipts) {
+                // For Other Receipts: Create SUPDOC and return supdocid
+                $description = "Check image for Gift #{$giftId}";
+                if (! empty($giftData['first_name']) || ! empty($giftData['last_name'])) {
+                    $donorName = trim(($giftData['first_name'] ?? '').' '.($giftData['last_name'] ?? ''));
+                    $description .= " - {$donorName}";
+                }
+                if (! empty($giftData['amount'])) {
+                    $description .= ' - $'.number_format($giftData['amount'], 2);
+                }
 
-            Log::info('Sage Intacct: Prepared Document File attribute data', [
-                'gift_id' => $giftId,
-                'filename' => $fullFilename,
-                'content_type' => $contentType,
-                'size_mb' => round(strlen($fileContents) / 1024 / 1024, 2),
-                'base64_size_mb' => round(strlen($base64Content) / 1024 / 1024, 2),
-            ]);
+                Log::info('Sage Intacct: Creating SUPDOC for Other Receipt', [
+                    'gift_id' => $giftId,
+                    'filename' => $fullFilename,
+                    'size_mb' => round(strlen($fileContents) / 1024 / 1024, 2),
+                ]);
 
-            // Return file data array for Document File attribute
-            return [
-                'content_type' => $contentType,
-                'filename' => $fullFilename,
-                'base64_content' => $base64Content,
-            ];
+                $supdocResult = $this->apiService->createAttachment(
+                    $fullFilename,
+                    $fileContents,
+                    $fileExtension,
+                    $description,
+                    $this->setting->attachment_folder_name ?? 'DP_Check_Images'
+                );
+
+                if ($supdocResult['success']) {
+                    $supdocid = $supdocResult['supdocid'] ?? null;
+                    Log::info('Sage Intacct: SUPDOC created for Other Receipt', [
+                        'gift_id' => $giftId,
+                        'supdocid' => $supdocid,
+                    ]);
+
+                    return ['supdocid' => $supdocid];
+                } else {
+                    Log::error('Sage Intacct: SUPDOC creation failed', [
+                        'gift_id' => $giftId,
+                        'error' => $supdocResult['error'] ?? 'Unknown error',
+                    ]);
+
+                    return null;
+                }
+            } else {
+                // For Custom Object: Return Document File attribute data
+                $base64Content = base64_encode($fileContents);
+
+                Log::info('Sage Intacct: Prepared Document File attribute data', [
+                    'gift_id' => $giftId,
+                    'filename' => $fullFilename,
+                    'content_type' => $contentType,
+                    'size_mb' => round(strlen($fileContents) / 1024 / 1024, 2),
+                    'base64_size_mb' => round(strlen($base64Content) / 1024 / 1024, 2),
+                ]);
+
+                return [
+                    'content_type' => $contentType,
+                    'filename' => $fullFilename,
+                    'base64_content' => $base64Content,
+                ];
+            }
 
         } catch (\Exception $e) {
             Log::error('Sage Intacct uploadCheckImageAttachment exception', [

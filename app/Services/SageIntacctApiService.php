@@ -414,6 +414,194 @@ class SageIntacctApiService
     }
 
     /**
+     * Create an Other Receipt in Sage Intacct
+     *
+     * @param  array  $receiptData  Other Receipt data
+     * @return array Result with success status and record key
+     */
+    public function createOtherReceipt(array $receiptData): array
+    {
+        if (! $this->setting->isXmlApi()) {
+            return [
+                'success' => false,
+                'error' => 'Other Receipts are only supported in XML API mode',
+            ];
+        }
+
+        try {
+            // Ensure we have a session
+            if (! $this->sessionId) {
+                $authResult = $this->authenticateXml();
+                if (! $authResult['success']) {
+                    return [
+                        'success' => false,
+                        'error' => 'Authentication failed: '.($authResult['message'] ?? 'Unknown error'),
+                    ];
+                }
+            }
+
+            Log::info('Sage Intacct XML API: Creating Other Receipt', [
+                'refid' => $receiptData['refid'] ?? 'unknown',
+                'amount' => $receiptData['amount'] ?? 'unknown',
+                'paymentmethod' => $receiptData['paymentmethod'] ?? 'unknown',
+            ]);
+
+            // Build Other Receipt XML
+            $xmlRequest = $this->buildOtherReceiptXml($receiptData);
+
+            // Send request
+            $response = $this->sendXmlRequest($xmlRequest);
+
+            if (! $response['success']) {
+                return [
+                    'success' => false,
+                    'error' => $response['error'] ?? 'Failed to create Other Receipt',
+                ];
+            }
+
+            // Parse response
+            $result = $this->parseXmlResponse($response['xml']);
+
+            if (! $result['success']) {
+                return [
+                    'success' => false,
+                    'error' => $result['error'] ?? 'Failed to parse response',
+                ];
+            }
+
+            Log::info('Sage Intacct XML API: Other Receipt created successfully', [
+                'refid' => $receiptData['refid'] ?? 'unknown',
+                'record_key' => $result['key'] ?? 'unknown',
+            ]);
+
+            return [
+                'success' => true,
+                'key' => $result['key'] ?? null,
+                'data' => $result['data'] ?? [],
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Sage Intacct createOtherReceipt exception', [
+                'refid' => $receiptData['refid'] ?? 'unknown',
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Batch create multiple Other Receipts
+     *
+     * @param  array  $receipts  Array of Other Receipt data
+     * @return array Result with created/failed counts
+     */
+    public function batchCreateOtherReceipts(array $receipts): array
+    {
+        if (! $this->setting->isXmlApi()) {
+            return [
+                'success' => false,
+                'error' => 'Other Receipts are only supported in XML API mode',
+            ];
+        }
+
+        try {
+            // Ensure we have a session
+            if (! $this->sessionId) {
+                $authResult = $this->authenticateXml();
+                if (! $authResult['success']) {
+                    return [
+                        'success' => false,
+                        'error' => 'Authentication failed: '.($authResult['message'] ?? 'Unknown error'),
+                    ];
+                }
+            }
+
+            Log::info('Sage Intacct XML API: Batch creating Other Receipts', [
+                'record_count' => count($receipts),
+            ]);
+
+            // Build batch request with multiple receipt functions
+            $functionContent = '';
+            foreach ($receipts as $index => $receiptData) {
+                $functionContent .= $this->buildOtherReceiptFunctionContent($receiptData, $index);
+            }
+
+            $xmlRequest = $this->buildXmlRequest('batch', [], $functionContent);
+
+            // Send request
+            $response = $this->sendXmlRequest($xmlRequest);
+
+            if (! $response['success']) {
+                return [
+                    'success' => false,
+                    'error' => $response['error'] ?? 'Batch creation failed',
+                ];
+            }
+
+            // Parse batch response
+            $created = 0;
+            $failed = 0;
+            $details = [];
+
+            $xml = simplexml_load_string($response['xml']);
+            $results = $xml->xpath('//result');
+
+            foreach ($results as $index => $result) {
+                $status = (string) $result->status;
+                if ($status === 'success') {
+                    $created++;
+                    $key = (string) $result->data->othercashreceipt->RECORDNO ?? null;
+                    $details[] = [
+                        'success' => true,
+                        'key' => $key,
+                        'index' => $index,
+                    ];
+                } else {
+                    $failed++;
+                    $errorMsg = (string) $result->errormessage->error->description2
+                        ?? (string) $result->errormessage->error->description
+                        ?? 'Unknown error';
+                    $details[] = [
+                        'success' => false,
+                        'error' => $errorMsg,
+                        'index' => $index,
+                    ];
+                }
+            }
+
+            Log::info('Sage Intacct XML API: Batch create Other Receipts completed', [
+                'total' => count($receipts),
+                'created' => $created,
+                'failed' => $failed,
+            ]);
+
+            return [
+                'success' => true,
+                'created' => $created,
+                'failed' => $failed,
+                'total' => count($receipts),
+                'details' => $details,
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Sage Intacct batchCreateOtherReceipts exception', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
      * Query custom object records (XML method)
      *
      * @param  string  $objectName  Custom object name
@@ -1660,6 +1848,150 @@ XML;
     </operation>
 </request>
 XML;
+    }
+
+    /**
+     * Build Other Receipt XML request
+     *
+     * @param  array  $receiptData  Other Receipt data
+     * @return string XML request
+     */
+    private function buildOtherReceiptXml(array $receiptData): string
+    {
+        $controlId = 'receipt-'.time().'-'.uniqid();
+        $functionId = 'func-'.time().'-'.uniqid();
+
+        $functionContent = $this->buildOtherReceiptFunctionContent($receiptData, 0);
+
+        return <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<request>
+    <control>
+        <senderid>{$this->setting->sender_id}</senderid>
+        <password>{$this->setting->sender_password}</password>
+        <controlid>{$controlId}</controlid>
+        <uniqueid>false</uniqueid>
+        <dtdversion>3.0</dtdversion>
+    </control>
+    <operation>
+        <authentication>
+            <sessionid>{$this->sessionId}</sessionid>
+        </authentication>
+        <content>
+            {$functionContent}
+        </content>
+    </operation>
+</request>
+XML;
+    }
+
+    /**
+     * Build Other Receipt function content for batch or single request
+     *
+     * @param  array  $receiptData  Other Receipt data
+     * @param  int  $index  Index for control ID
+     * @return string XML function content
+     */
+    private function buildOtherReceiptFunctionContent(array $receiptData, int $index): string
+    {
+        $controlId = 'receipt-'.$index.'-'.uniqid();
+
+        // Parse dates to year/month/day structure
+        $paymentDate = $this->parseDateToArray($receiptData['paymentdate']);
+        $receivedDate = $this->parseDateToArray($receiptData['receiveddate']);
+        $depositDate = isset($receiptData['depositdate']) ? $this->parseDateToArray($receiptData['depositdate']) : null;
+
+        // Sanitize required fields
+        $payee = htmlspecialchars($receiptData['payee'], ENT_XML1, 'UTF-8');
+        $paymentMethod = htmlspecialchars($receiptData['paymentmethod'], ENT_XML1, 'UTF-8');
+        $refId = htmlspecialchars($receiptData['refid'] ?? '', ENT_XML1, 'UTF-8');
+        $description = htmlspecialchars($receiptData['description'] ?? '', ENT_XML1, 'UTF-8');
+
+        // Build date XML
+        $paymentDateXml = "<paymentdate><year>{$paymentDate['year']}</year><month>{$paymentDate['month']}</month><day>{$paymentDate['day']}</day></paymentdate>";
+        $receivedDateXml = "<receiveddate><year>{$receivedDate['year']}</year><month>{$receivedDate['month']}</month><day>{$receivedDate['day']}</day></receiveddate>";
+
+        // Build bank account or undeposited funds field
+        $accountXml = '';
+        if (! empty($receiptData['bankaccountid'])) {
+            $bankAccountId = htmlspecialchars($receiptData['bankaccountid'], ENT_XML1, 'UTF-8');
+            $accountXml = "<bankaccountid>{$bankAccountId}</bankaccountid>";
+
+            // Add deposit date if using bank account
+            if ($depositDate) {
+                $accountXml .= "<depositdate><year>{$depositDate['year']}</year><month>{$depositDate['month']}</month><day>{$depositDate['day']}</day></depositdate>";
+            }
+        } elseif (! empty($receiptData['undepglaccountno'])) {
+            $undepAccount = htmlspecialchars($receiptData['undepglaccountno'], ENT_XML1, 'UTF-8');
+            $accountXml = "<undepglaccountno>{$undepAccount}</undepglaccountno>";
+        }
+
+        // Build line items
+        $lineItemsXml = '';
+        $lineItems = $receiptData['receiptitems'] ?? [];
+        foreach ($lineItems as $lineItem) {
+            $glAccountNo = htmlspecialchars($lineItem['glaccountno'], ENT_XML1, 'UTF-8');
+            $amount = number_format((float) $lineItem['amount'], 2, '.', '');
+            $memo = isset($lineItem['memo']) ? '<memo>'.htmlspecialchars($lineItem['memo'], ENT_XML1, 'UTF-8').'</memo>' : '';
+
+            // Add dimension fields if provided
+            $projectXml = isset($lineItem['projectid']) ? '<projectid>'.htmlspecialchars($lineItem['projectid'], ENT_XML1, 'UTF-8').'</projectid>' : '';
+            $classXml = isset($lineItem['classid']) ? '<classid>'.htmlspecialchars($lineItem['classid'], ENT_XML1, 'UTF-8').'</classid>' : '';
+            $locationXml = isset($lineItem['locationid']) ? '<locationid>'.htmlspecialchars($lineItem['locationid'], ENT_XML1, 'UTF-8').'</locationid>' : '';
+
+            $lineItemsXml .= <<<LINEITEM
+                <lineitem>
+                    <glaccountno>{$glAccountNo}</glaccountno>
+                    <amount>{$amount}</amount>
+                    {$memo}
+                    {$projectXml}
+                    {$classXml}
+                    {$locationXml}
+                </lineitem>
+LINEITEM;
+        }
+
+        // Add optional SUPDOC attachment if provided
+        $supdocXml = '';
+        if (! empty($receiptData['supdocid'])) {
+            $supdocid = htmlspecialchars($receiptData['supdocid'], ENT_XML1, 'UTF-8');
+            $supdocXml = "<supdocid>{$supdocid}</supdocid>";
+        }
+
+        return <<<XML
+            <function controlid="{$controlId}">
+                <record_otherreceipt>
+                    {$paymentDateXml}
+                    <payee>{$payee}</payee>
+                    {$receivedDateXml}
+                    <paymentmethod>{$paymentMethod}</paymentmethod>
+                    {$accountXml}
+                    <refid>{$refId}</refid>
+                    <description>{$description}</description>
+                    {$supdocXml}
+                    <receiptitems>
+                        {$lineItemsXml}
+                    </receiptitems>
+                </record_otherreceipt>
+            </function>
+XML;
+    }
+
+    /**
+     * Parse date string to array with year/month/day
+     *
+     * @param  string  $dateString  Date string (Y-m-d format)
+     * @return array Array with year, month, day keys
+     */
+    private function parseDateToArray(string $dateString): array
+    {
+        $date = \Carbon\Carbon::parse($dateString);
+
+        return [
+            'year' => $date->year,
+            'month' => str_pad($date->month, 2, '0', STR_PAD_LEFT),
+            'day' => str_pad($date->day, 2, '0', STR_PAD_LEFT),
+        ];
     }
 
     // ====================================================================

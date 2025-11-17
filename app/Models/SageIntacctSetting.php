@@ -62,6 +62,12 @@ class SageIntacctSetting extends Model
         'include_check_images',
         'attachment_folder_name',
         'attachment_max_size_mb',
+        'use_other_receipts',
+        'use_undeposited_funds',
+        'bank_account_id',
+        'undeposited_gl_account',
+        'default_gl_account',
+        'default_payment_method',
     ];
 
     protected $casts = [
@@ -73,6 +79,8 @@ class SageIntacctSetting extends Model
         'code_mapping_enabled' => 'boolean',
         'include_check_images' => 'boolean',
         'attachment_max_size_mb' => 'integer',
+        'use_other_receipts' => 'boolean',
+        'use_undeposited_funds' => 'boolean',
     ];
 
     /**
