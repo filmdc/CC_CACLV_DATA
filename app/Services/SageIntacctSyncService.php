@@ -126,11 +126,26 @@ class SageIntacctSyncService
                 ];
             }
 
-            // Query Intacct for existing records (source of truth)
-            $existingRecords = $this->getExistingIntacctRecords($gifts);
+            // Query Intacct for existing records (only for custom object, not Other Receipts)
+            $existingRecords = [];
+            $categorized = [];
 
-            // Categorize: create/update/skip
-            $categorized = $this->categorizeGifts($gifts, $existingRecords);
+            if ($this->setting->use_other_receipts) {
+                // For Other Receipts: Create all as new receipts (no query-compare)
+                Log::info('Sage Intacct: Using Other Receipts mode - creating all as new receipts', [
+                    'gift_count' => count($gifts),
+                ]);
+
+                $categorized = [
+                    'create' => $gifts,
+                    'update' => [],
+                    'skip' => [],
+                ];
+            } else {
+                // For Custom Object: Use query-compare-sync logic
+                $existingRecords = $this->getExistingIntacctRecords($gifts);
+                $categorized = $this->categorizeGifts($gifts, $existingRecords);
+            }
 
             $totalRecords = count($gifts);
             $toCreate = count($categorized['create']);
