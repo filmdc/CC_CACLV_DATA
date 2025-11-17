@@ -699,12 +699,12 @@
                                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Records</th>
                                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Success</th>
                                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Failed</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-zinc-700">
                                     @foreach($syncHistory as $sync)
-                                        <tr class="hover:bg-gray-50 dark:hover:bg-zinc-700 cursor-pointer"
-                                            onclick="window.location='{{ route('intacct.sync-history.details', $sync->id) }}'">
+                                        <tr class="hover:bg-gray-50 dark:hover:bg-zinc-700">
                                             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                                                 {{ $sync->started_at->format('M d, Y H:i') }}
                                             </td>
@@ -738,6 +738,16 @@
                                             </td>
                                             <td class="px-4 py-3 whitespace-nowrap text-sm text-red-600 dark:text-red-400">
                                                 {{ $sync->failed_count }}
+                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm">
+                                                <a href="{{ route('intacct.sync-history.details', $sync->id) }}"
+                                                   class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20">
+                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                    </svg>
+                                                    View Details
+                                                </a>
                                             </td>
                                         </tr>
                                     @endforeach
