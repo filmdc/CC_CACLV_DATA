@@ -1935,18 +1935,20 @@ XML;
             $memo = isset($lineItem['memo']) ? '<memo>'.htmlspecialchars($lineItem['memo'], ENT_XML1, 'UTF-8').'</memo>' : '';
 
             // Add dimension fields if provided
-            $projectXml = isset($lineItem['projectid']) ? '<projectid>'.htmlspecialchars($lineItem['projectid'], ENT_XML1, 'UTF-8').'</projectid>' : '';
-            $classXml = isset($lineItem['classid']) ? '<classid>'.htmlspecialchars($lineItem['classid'], ENT_XML1, 'UTF-8').'</classid>' : '';
             $locationXml = isset($lineItem['locationid']) ? '<locationid>'.htmlspecialchars($lineItem['locationid'], ENT_XML1, 'UTF-8').'</locationid>' : '';
+            $projectXml = isset($lineItem['projectid']) ? '<projectid>'.htmlspecialchars($lineItem['projectid'], ENT_XML1, 'UTF-8').'</projectid>' : '';
+            $departmentXml = isset($lineItem['departmentid']) ? '<departmentid>'.htmlspecialchars($lineItem['departmentid'], ENT_XML1, 'UTF-8').'</departmentid>' : '';
+            $classXml = isset($lineItem['classid']) ? '<classid>'.htmlspecialchars($lineItem['classid'], ENT_XML1, 'UTF-8').'</classid>' : '';
 
             $lineItemsXml .= <<<LINEITEM
                 <lineitem>
                     <glaccountno>{$glAccountNo}</glaccountno>
                     <amount>{$amount}</amount>
                     {$memo}
-                    {$projectXml}
-                    {$classXml}
                     {$locationXml}
+                    {$projectXml}
+                    {$departmentXml}
+                    {$classXml}
                 </lineitem>
 LINEITEM;
         }

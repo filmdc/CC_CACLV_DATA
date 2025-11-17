@@ -673,35 +673,35 @@ class SageIntacctSyncService
             $accountData['depositdate'] = $depositDate;
         }
 
-        // Get dimension values (Program, Fund, Service) - apply code mappings
-        $program = null;
-        $fund = null;
-        $service = null;
+        // Get dimension values (Location, Project, Department) - apply code mappings
+        $location = null;
+        $project = null;
+        $department = null;
 
         if ($this->setting->isCodeMappingEnabled()) {
-            // Campaign → Program
+            // Campaign → Location
             if (! empty($giftData['campaign'])) {
-                $program = $this->applyCodeMapping('campaign', $giftData['campaign']);
+                $location = $this->applyCodeMapping('campaign', $giftData['campaign']);
             }
 
-            // Solicitation → Fund
+            // Solicitation → Project
             if (! empty($giftData['solicit_code'])) {
-                $fund = $this->applyCodeMapping('solicit_code', $giftData['solicit_code']);
+                $project = $this->applyCodeMapping('solicit_code', $giftData['solicit_code']);
             }
 
-            // Sub-solicitation → Service
+            // Sub-solicitation → Department
             if (! empty($giftData['sub_solicit_code'])) {
-                $service = $this->applyCodeMapping('sub_solicit_code', $giftData['sub_solicit_code']);
+                $department = $this->applyCodeMapping('sub_solicit_code', $giftData['sub_solicit_code']);
             }
         }
 
         // Validate required dimensions are present (skip if any are missing)
-        if (! $program || ! $fund || ! $service) {
+        if (! $location || ! $project || ! $department) {
             Log::warning('Sage Intacct: Skipping gift - missing required dimensions', [
                 'gift_id' => $giftData['gift_id'] ?? 'unknown',
-                'program' => $program ?: 'MISSING',
-                'fund' => $fund ?: 'MISSING',
-                'service' => $service ?: 'MISSING',
+                'location' => $location ?: 'MISSING',
+                'project' => $project ?: 'MISSING',
+                'department' => $department ?: 'MISSING',
                 'campaign' => $giftData['campaign'] ?? null,
                 'solicit_code' => $giftData['solicit_code'] ?? null,
                 'sub_solicit_code' => $giftData['sub_solicit_code'] ?? null,
@@ -715,9 +715,9 @@ class SageIntacctSyncService
             'glaccountno' => $glAccount,
             'amount' => $giftData['amount'] ?? '0.00',
             'memo' => $giftData['gift_narrative'] ?? $giftData['campaign'] ?? 'Donation',
-            'projectid' => $program,  // Program dimension
-            'classid' => $fund,       // Fund dimension
-            'locationid' => $service, // Service dimension
+            'locationid' => $location,    // Location dimension (from campaign)
+            'projectid' => $project,      // Project dimension (from solicit_code)
+            'departmentid' => $department, // Department dimension (from sub_solicit_code)
         ];
 
         // Build receipt data
