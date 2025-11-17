@@ -20,7 +20,7 @@ class SageIntacctSyncHistoryDetails extends Component
 
     public $searchGiftId = '';
 
-    public $showItemDetails = false;
+    public $showModal = false;
 
     public $selectedItem = null;
 
@@ -48,7 +48,7 @@ class SageIntacctSyncHistoryDetails extends Component
         $this->resetPage();
     }
 
-    public function showItemDetails($itemId)
+    public function viewItemDetails($itemId)
     {
         $this->selectedItem = DB::table('sage_intacct_sync_items')
             ->where('id', $itemId)
@@ -63,12 +63,12 @@ class SageIntacctSyncHistoryDetails extends Component
             $this->selectedItem->validation_errors = json_decode($this->selectedItem->validation_errors, true);
         }
 
-        $this->showItemDetails = true;
+        $this->showModal = true;
     }
 
-    public function closeItemDetails()
+    public function closeModal()
     {
-        $this->showItemDetails = false;
+        $this->showModal = false;
         $this->selectedItem = null;
     }
 

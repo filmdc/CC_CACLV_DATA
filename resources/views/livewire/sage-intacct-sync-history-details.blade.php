@@ -248,8 +248,8 @@
                                         @endif
                                     </td>
                                     <td class="px-4 py-3 whitespace-nowrap text-sm">
-                                        <button wire:click="showItemDetails({{ $item->id }})"
-                                                class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
+                                        <button wire:click="viewItemDetails({{ $item->id }})"
+                                                class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium">
                                             View Details
                                         </button>
                                     </td>
@@ -276,13 +276,13 @@
     </div>
 
     <!-- Item Details Modal -->
-    @if($showItemDetails && $selectedItem)
+    @if($showModal && $selectedItem)
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 p-4">
             <div class="bg-white dark:bg-zinc-800 rounded-lg max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col">
                 <!-- Modal Header -->
                 <div class="bg-indigo-600 text-white p-4 rounded-t-lg flex justify-between items-center">
                     <h3 class="text-lg font-bold">Gift Details - {{ $selectedItem->gift_id }}</h3>
-                    <button wire:click="closeItemDetails" class="text-white hover:text-gray-200">
+                    <button wire:click="closeModal" class="text-white hover:text-gray-200">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -375,7 +375,7 @@
 
                 <!-- Modal Footer -->
                 <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-b-lg flex justify-end">
-                    <button wire:click="closeItemDetails"
+                    <button wire:click="closeModal"
                             class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
                         Close
                     </button>
