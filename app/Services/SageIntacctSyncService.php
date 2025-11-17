@@ -643,9 +643,9 @@ class SageIntacctSyncService
      *
      * @param  array  $giftData  Gift data from DonorPerfect
      * @param  array|null  $fileData  Optional file data for attachment
-     * @return array Other Receipt data ready for API
+     * @return array|null Other Receipt data ready for API, or null if gift should be skipped
      */
-    private function transformGiftToOtherReceipt(array $giftData, ?array $fileData = null): array
+    private function transformGiftToOtherReceipt(array $giftData, ?array $fileData = null): ?array
     {
         // Build payee name from donor info
         $firstName = trim($giftData['first_name'] ?? '');
