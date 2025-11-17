@@ -793,6 +793,8 @@ class SageIntacctSyncService
             'dp_payment_type' => $dpPaymentType,
             'gl_account' => $glAccount,
             'amount' => $giftData['amount'] ?? '0.00',
+            'has_attachment' => isset($receiptData['supdocid']),
+            'supdocid' => $receiptData['supdocid'] ?? null,
         ]);
 
         return $receiptData;
@@ -1422,6 +1424,8 @@ class SageIntacctSyncService
                     Log::info('Sage Intacct: SUPDOC created for Other Receipt', [
                         'gift_id' => $giftId,
                         'supdocid' => $supdocid,
+                        'filename' => $fullFilename,
+                        'size_mb' => round(strlen($fileContents) / 1024 / 1024, 2),
                     ]);
 
                     return ['supdocid' => $supdocid];
