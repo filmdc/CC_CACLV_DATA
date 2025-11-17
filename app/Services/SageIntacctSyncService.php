@@ -758,14 +758,16 @@ class SageIntacctSyncService
         }
 
         // Build line item with dimensions
-        // NOTE: Department dimension is renamed to "Service" in your Sage Intacct UI
+        // CRITICAL: Field order matters! departmentid must come before projectid in XML
+        // CRITICAL: GL account 40100 requires BOTH departmentid (Service) AND classid (Restriction)
         $lineItem = [
             'glaccountno' => $glAccount,
             'amount' => $giftData['amount'] ?? '0.00',
             'memo' => $giftData['gift_narrative'] ?? $giftData['campaign'] ?? 'Donation',
-            'locationid' => $location,       // Location dimension (from campaign)
-            'projectid' => $project,         // Project dimension (from solicit_code) - shows as "Program" in UI
-            'departmentid' => $class,        // Department dimension (from sub_solicit_code) - renamed to "Service" in your UI
+            'locationid' => $location,       // Location dimension → "Program" in UI
+            'departmentid' => $class,        // Department dimension → "Service" in UI
+            'projectid' => $project,         // Project dimension → "Fund" in UI
+            'classid' => '0',                // Class dimension → "Restriction" in UI (0 = Unrestricted)
         ];
 
         // Build receipt data

@@ -1999,9 +1999,9 @@ XML;
                     <amount>{$amount}</amount>
                     {$memo}
                     {$locationXml}
+                    {$departmentXml}
                     {$projectXml}
                     {$itemXml}
-                    {$departmentXml}
                     {$classXml}
                 </lineitem>
 LINEITEM;
