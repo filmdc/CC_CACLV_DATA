@@ -1,8 +1,9 @@
 # Other Receipts API Issue - Resolution Summary
 
 **Date:** November 17, 2025
-**Issue:** Confusion about dimension field names for Other Receipt creation
-**Status:** ✅ **RESOLVED**
+**Issue:** Other Receipt creation failing with dimension errors
+**Status:** ✅ **RESOLVED AND TESTED**
+**Test Record:** Reference ID `COMPLETE-1763414550` created in Sage Intacct
 
 ---
 
@@ -40,24 +41,25 @@ You renamed **Department** → **"Service"** in the UI, leading to confusion:
 
 ## The Solution
 
-### Code Fix (SageIntacctSyncService.php:768):
+### Code Fix (SageIntacctSyncService.php:763-771):
 
-**CORRECT:**
+**CORRECT - All 4 Dimensions Required:**
 ```php
 $lineItem = [
     'glaccountno' => $glAccount,
     'amount' => $giftData['amount'] ?? '0.00',
     'memo' => $giftData['gift_narrative'] ?? $giftData['campaign'] ?? 'Donation',
-    'locationid' => $location,       // Location → Program
-    'projectid' => $project,         // Project → Fund
-    'departmentid' => $class,        // Department → Service ✅ CORRECT
+    'locationid' => $location,       // Location → Program (from campaign)
+    'departmentid' => $class,        // Department → Service (from sub_solicit_code) ✅
+    'projectid' => $project,         // Project → Fund (from solicit_code)
+    'classid' => '0',                // Class → Restriction (0 = Unrestricted) ✅
 ];
 ```
 
-**WRONG:**
-```php
-'classid' => $class,  // ❌ Class is for Restrictions, not Services
-```
+**CRITICAL:**
+- Field ordering matters! `departmentid` must come BEFORE `projectid` in array (affects XML ordering)
+- GL account 40100 requires BOTH `departmentid` AND `classid`
+- Class IDs: 0=Unrestricted, 1=Temp Restricted, 2=Board Designated, 3=Perm Restricted, 4=Donor Restricted
 
 ### API Documentation Confirms:
 
@@ -73,7 +75,7 @@ According to [Sage Intacct Other Receipt API](https://developer.intacct.com/api/
 
 ## Test Results
 
-### Successful Test with Correct Mapping:
+### Final Successful Test (All 4 Dimensions):
 
 ```php
 Test Receipt:
@@ -81,21 +83,33 @@ Test Receipt:
   Location (Program): P1000 (ADMIN-Administration)
   Department (Service): S10999 (AS999-Undesignated Service)
   Project (Fund): F8000
+  Class (Restriction): 0 (Unrestricted)
   Amount: $100.00
 
 Result: ✅ SUCCESS!
+Record: COMPLETE-1763414550 (viewable in Sage Intacct)
+Date: 2025-11-17
 ```
 
-The Other Receipt was created successfully in Sage Intacct sandbox.
+The Other Receipt was created successfully in Sage Intacct sandbox with all 4 dimensions validated.
+
+### Failed Test Attempts (for documentation):
+
+1. ❌ Without `departmentid` after `projectid` → "Element not expected" error
+2. ❌ Without `classid` → "account 40100 requires a Restriction" error
+3. ✅ With correct field order and all dimensions → **SUCCESS**
 
 ## DonorPerfect → Sage Intacct Mapping
 
 ```
 campaign         → locationid (Program)
-solicit_code     → projectid (Fund)
 sub_solicit_code → departmentid (Service)
+solicit_code     → projectid (Fund)
+(hardcoded)      → classid = '0' (Restriction: Unrestricted)
 gl_code          → glaccountno
 ```
+
+**Note:** `classid` is hardcoded to '0' (Unrestricted) for all donations. Update this if you need to support restricted funds.
 
 ### Code Mappings in Database:
 
