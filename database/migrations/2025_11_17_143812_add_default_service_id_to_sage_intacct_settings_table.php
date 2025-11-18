@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::table('sage_intacct_settings', function (Blueprint $table) {
             // Default Service/Item ID for Other Receipts when sub-solicitation has no mapping
-            $table->string('default_service_id')->default('S14999')->after('default_payment_method');
+            if (!Schema::hasColumn('sage_intacct_settings', 'default_service_id')) {
+                $table->string('default_service_id')->default('S14999')->after('default_payment_method');
+            }
         });
     }
 

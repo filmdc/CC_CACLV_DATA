@@ -12,22 +12,25 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('sage_intacct_settings', function (Blueprint $table) {
-            // OAuth credentials
-            $table->string('oauth_client_id')->nullable()->after('web_services_password');
-            $table->text('oauth_client_secret')->nullable()->after('oauth_client_id'); // Encrypted
-            $table->string('oauth_redirect_uri')->nullable()->after('oauth_client_secret');
+            // Check if columns don't already exist before adding them
+            if (!Schema::hasColumn('sage_intacct_settings', 'oauth_client_id')) {
+                // OAuth credentials
+                $table->string('oauth_client_id')->nullable()->after('web_services_password');
+                $table->text('oauth_client_secret')->nullable()->after('oauth_client_id'); // Encrypted
+                $table->string('oauth_redirect_uri')->nullable()->after('oauth_client_secret');
 
-            // OAuth tokens
-            $table->text('oauth_access_token')->nullable()->after('oauth_redirect_uri'); // Encrypted
-            $table->text('oauth_refresh_token')->nullable()->after('oauth_access_token'); // Encrypted
-            $table->timestamp('oauth_token_expires_at')->nullable()->after('oauth_refresh_token');
-            $table->timestamp('oauth_connected_at')->nullable()->after('oauth_token_expires_at');
+                // OAuth tokens
+                $table->text('oauth_access_token')->nullable()->after('oauth_redirect_uri'); // Encrypted
+                $table->text('oauth_refresh_token')->nullable()->after('oauth_access_token'); // Encrypted
+                $table->timestamp('oauth_token_expires_at')->nullable()->after('oauth_refresh_token');
+                $table->timestamp('oauth_connected_at')->nullable()->after('oauth_token_expires_at');
 
-            // Authentication method: 'credentials' (XML Web Services) or 'oauth'
-            $table->enum('auth_method', ['credentials', 'oauth'])->default('credentials')->after('oauth_connected_at');
+                // Authentication method: 'credentials' (XML Web Services) or 'oauth'
+                $table->enum('auth_method', ['credentials', 'oauth'])->default('credentials')->after('oauth_connected_at');
 
-            // Index for token expiration checks
-            $table->index('oauth_token_expires_at');
+                // Index for token expiration checks
+                $table->index('oauth_token_expires_at');
+            }
         });
     }
 
