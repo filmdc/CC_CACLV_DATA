@@ -301,6 +301,13 @@ class ProjectsManagement extends Component
     public function showCreateJob()
     {
         $this->resetForm();
+
+        // Auto-select CAH program by default
+        $cahProgram = Program::where('name', 'LIKE', '%CAH%')->first();
+        if ($cahProgram) {
+            $this->program_id = $cahProgram->id;
+        }
+
         $this->showCreateForm = true;
     }
 
