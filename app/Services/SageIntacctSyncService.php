@@ -732,17 +732,19 @@ class SageIntacctSyncService
                 $project = $campaignOverride->project_code;
             } elseif (! empty($giftData['solicit_code'])) {
                 // Try conditional mapping first, fall back to standard mapping
+                // IMPORTANT: Pass the mapped Intacct location code, not the DP campaign code
                 $result = $this->applyConditionalMapping(
-                    $giftData['campaign'] ?? null,
+                    $location,
                     'solicit_code',
                     $giftData['solicit_code']
                 );
 
                 if ($result['skip']) {
-                    // Code is not allowed for this campaign
-                    Log::warning('Sage Intacct: Skipping gift - solicitation code not allowed for campaign', [
+                    // Code is not allowed for this Intacct location
+                    Log::warning('Sage Intacct: Skipping gift - solicitation code not allowed for location', [
                         'gift_id' => $giftData['gift_id'] ?? 'unknown',
-                        'campaign' => $giftData['campaign'] ?? null,
+                        'dp_campaign' => $giftData['campaign'] ?? null,
+                        'intacct_location' => $location,
                         'solicit_code' => $giftData['solicit_code'],
                         'reason' => $result['reason'],
                     ]);
@@ -758,17 +760,19 @@ class SageIntacctSyncService
                 $class = $campaignOverride->service_code;
             } elseif (! empty($giftData['sub_solicit_code'])) {
                 // Try conditional mapping first, fall back to standard mapping
+                // IMPORTANT: Pass the mapped Intacct location code, not the DP campaign code
                 $result = $this->applyConditionalMapping(
-                    $giftData['campaign'] ?? null,
+                    $location,
                     'sub_solicit_code',
                     $giftData['sub_solicit_code']
                 );
 
                 if ($result['skip']) {
-                    // Code is not allowed for this campaign
-                    Log::warning('Sage Intacct: Skipping gift - sub-solicitation code not allowed for campaign', [
+                    // Code is not allowed for this Intacct location
+                    Log::warning('Sage Intacct: Skipping gift - sub-solicitation code not allowed for location', [
                         'gift_id' => $giftData['gift_id'] ?? 'unknown',
-                        'campaign' => $giftData['campaign'] ?? null,
+                        'dp_campaign' => $giftData['campaign'] ?? null,
+                        'intacct_location' => $location,
                         'sub_solicit_code' => $giftData['sub_solicit_code'],
                         'reason' => $result['reason'],
                     ]);
@@ -1848,19 +1852,23 @@ class SageIntacctSyncService
      *
      * This method implements both validation (allowlist) and conditional mapping.
      * It checks if:
-     * 1. A conditional mapping exists for the campaign + field + code combination
-     * 2. If conditional rules exist for the campaign, validates the code is allowed
-     * 3. Falls back to standard mapping if no conditional rules exist for the campaign
+     * 1. A conditional mapping exists for the Intacct location + field + code combination
+     * 2. If conditional rules exist for the location, validates the code is allowed
+     * 3. Falls back to standard mapping if no conditional rules exist for the location
      *
-     * @param  string|null  $campaignCode  Campaign code from DonorPerfect
+     * IMPORTANT: This method receives the MAPPED Sage Intacct location code (e.g., P1000),
+     * NOT the original DonorPerfect campaign code. This is because dimensional compatibility
+     * rules belong to Sage Intacct, not DonorPerfect.
+     *
+     * @param  string|null  $intacctLocationCode  Sage Intacct location code (e.g., P1000, P1400)
      * @param  string  $fieldType  Field type (solicit_code, sub_solicit_code)
      * @param  string  $dpCode  DonorPerfect code value
      * @return array ['skip' => bool, 'mapped_code' => string|null, 'reason' => string|null]
      */
-    private function applyConditionalMapping(?string $campaignCode, string $fieldType, string $dpCode): array
+    private function applyConditionalMapping(?string $intacctLocationCode, string $fieldType, string $dpCode): array
     {
-        // If no campaign code, fall back to standard mapping (can't apply conditional logic)
-        if (empty($campaignCode)) {
+        // If no location code, fall back to standard mapping (can't apply conditional logic)
+        if (empty($intacctLocationCode)) {
             $standardMapping = $this->applyCodeMapping($fieldType, $dpCode);
 
             return [
@@ -1870,16 +1878,16 @@ class SageIntacctSyncService
             ];
         }
 
-        // Check if this campaign has ANY conditional rules for this field type
-        $hasConditionalRules = \App\Models\ConditionalCodeMapping::hasRulesForCampaign($campaignCode, $fieldType);
+        // Check if this Intacct location has ANY conditional rules for this field type
+        $hasConditionalRules = \App\Models\ConditionalCodeMapping::hasRulesForLocation($intacctLocationCode, $fieldType);
 
         if (! $hasConditionalRules) {
-            // No conditional rules exist for this campaign + field type combination
+            // No conditional rules exist for this location + field type combination
             // Use standard mapping without validation
             $standardMapping = $this->applyCodeMapping($fieldType, $dpCode);
 
-            Log::debug('Sage Intacct: No conditional rules for campaign, using standard mapping', [
-                'campaign' => $campaignCode,
+            Log::debug('Sage Intacct: No conditional rules for location, using standard mapping', [
+                'intacct_location' => $intacctLocationCode,
                 'field_type' => $fieldType,
                 'dp_code' => $dpCode,
                 'mapped_code' => $standardMapping,
@@ -1893,7 +1901,7 @@ class SageIntacctSyncService
         }
 
         // Conditional rules exist - attempt to get conditional mapping
-        $conditionalMapping = \App\Models\ConditionalCodeMapping::getMapping($campaignCode, $fieldType, $dpCode);
+        $conditionalMapping = \App\Models\ConditionalCodeMapping::getMapping($intacctLocationCode, $fieldType, $dpCode);
 
         if ($conditionalMapping) {
             // Conditional mapping found - use it
@@ -1906,12 +1914,12 @@ class SageIntacctSyncService
 
         // Conditional rules exist but this specific code is not in the allowlist
         // SKIP this gift with detailed error
-        $allowedCodes = \App\Models\ConditionalCodeMapping::getAllowedCodes($campaignCode, $fieldType);
+        $allowedCodes = \App\Models\ConditionalCodeMapping::getAllowedCodes($intacctLocationCode, $fieldType);
 
         return [
             'skip' => true,
             'mapped_code' => null,
-            'reason' => "Campaign '{$campaignCode}' does not allow {$fieldType} '{$dpCode}'. Allowed codes: ".implode(', ', $allowedCodes),
+            'reason' => "Intacct location '{$intacctLocationCode}' does not allow {$fieldType} '{$dpCode}'. Allowed codes: ".implode(', ', $allowedCodes),
         ];
     }
 

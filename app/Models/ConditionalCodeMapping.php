@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 class ConditionalCodeMapping extends Model
 {
     protected $fillable = [
-        'campaign_code',
+        'intacct_location_code',
         'field_type',
         'dp_code',
         'intacct_code',
@@ -23,11 +23,11 @@ class ConditionalCodeMapping extends Model
     ];
 
     /**
-     * Scope: Filter by campaign code
+     * Scope: Filter by Sage Intacct location code
      */
-    public function scopeForCampaign($query, string $campaignCode)
+    public function scopeForLocation($query, string $intacctLocationCode)
     {
-        return $query->where('campaign_code', $campaignCode);
+        return $query->where('intacct_location_code', $intacctLocationCode);
     }
 
     /**
@@ -47,12 +47,12 @@ class ConditionalCodeMapping extends Model
     }
 
     /**
-     * Get the Intacct code for a specific campaign + field type + DP code combination
+     * Get the Intacct code for a specific Intacct location + field type + DP code combination
      * Returns null if no mapping exists
      */
-    public static function getMapping(string $campaignCode, string $fieldType, string $dpCode): ?string
+    public static function getMapping(string $intacctLocationCode, string $fieldType, string $dpCode): ?string
     {
-        $mapping = self::where('campaign_code', $campaignCode)
+        $mapping = self::where('intacct_location_code', $intacctLocationCode)
             ->where('field_type', $fieldType)
             ->where('dp_code', $dpCode)
             ->where('is_active', true)
@@ -61,7 +61,7 @@ class ConditionalCodeMapping extends Model
 
         if ($mapping) {
             Log::info('Conditional code mapping applied', [
-                'campaign' => $campaignCode,
+                'intacct_location' => $intacctLocationCode,
                 'field_type' => $fieldType,
                 'dp_code' => $dpCode,
                 'intacct_code' => $mapping->intacct_code,
@@ -73,24 +73,24 @@ class ConditionalCodeMapping extends Model
     }
 
     /**
-     * Check if a campaign has ANY conditional rules defined for a specific field type
+     * Check if an Intacct location has ANY conditional rules defined for a specific field type
      * Used to determine if validation should be applied
      */
-    public static function hasRulesForCampaign(string $campaignCode, string $fieldType): bool
+    public static function hasRulesForLocation(string $intacctLocationCode, string $fieldType): bool
     {
-        return self::where('campaign_code', $campaignCode)
+        return self::where('intacct_location_code', $intacctLocationCode)
             ->where('field_type', $fieldType)
             ->where('is_active', true)
             ->exists();
     }
 
     /**
-     * Get all allowed DP codes for a specific campaign + field type combination
+     * Get all allowed DP codes for a specific Intacct location + field type combination
      * Returns empty array if no rules exist (meaning all codes are allowed)
      */
-    public static function getAllowedCodes(string $campaignCode, string $fieldType): array
+    public static function getAllowedCodes(string $intacctLocationCode, string $fieldType): array
     {
-        return self::where('campaign_code', $campaignCode)
+        return self::where('intacct_location_code', $intacctLocationCode)
             ->where('field_type', $fieldType)
             ->where('is_active', true)
             ->pluck('dp_code')
@@ -98,19 +98,19 @@ class ConditionalCodeMapping extends Model
     }
 
     /**
-     * Check if a specific DP code is allowed for a campaign + field type combination
-     * If no rules exist for this campaign, all codes are allowed (returns true)
+     * Check if a specific DP code is allowed for an Intacct location + field type combination
+     * If no rules exist for this location, all codes are allowed (returns true)
      * If rules exist but the code is not in the list, returns false
      */
-    public static function isCodeAllowed(string $campaignCode, string $fieldType, string $dpCode): bool
+    public static function isCodeAllowed(string $intacctLocationCode, string $fieldType, string $dpCode): bool
     {
-        // If no rules exist for this campaign + field type, all codes are allowed
-        if (!self::hasRulesForCampaign($campaignCode, $fieldType)) {
+        // If no rules exist for this location + field type, all codes are allowed
+        if (!self::hasRulesForLocation($intacctLocationCode, $fieldType)) {
             return true;
         }
 
         // Rules exist, so check if this specific code is in the allowed list
-        return self::where('campaign_code', $campaignCode)
+        return self::where('intacct_location_code', $intacctLocationCode)
             ->where('field_type', $fieldType)
             ->where('dp_code', $dpCode)
             ->where('is_active', true)
@@ -118,15 +118,15 @@ class ConditionalCodeMapping extends Model
     }
 
     /**
-     * Get all active conditional mappings grouped by campaign
+     * Get all active conditional mappings grouped by Intacct location
      */
-    public static function getActiveByCompany(): \Illuminate\Database\Eloquent\Collection
+    public static function getActiveByLocation(): \Illuminate\Database\Eloquent\Collection
     {
         return self::where('is_active', true)
-            ->orderBy('campaign_code')
+            ->orderBy('intacct_location_code')
             ->orderBy('field_type')
             ->orderBy('priority', 'desc')
             ->get()
-            ->groupBy('campaign_code');
+            ->groupBy('intacct_location_code');
     }
 }

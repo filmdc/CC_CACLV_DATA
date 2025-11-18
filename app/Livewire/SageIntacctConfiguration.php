@@ -91,7 +91,7 @@ class SageIntacctConfiguration extends Component
 
     public $editingConditionalMappingId = null;
 
-    public $conditional_campaign_code = '';
+    public $conditional_intacct_location_code = '';
 
     public $conditional_field_type = 'solicit_code';
 
@@ -555,7 +555,7 @@ class SageIntacctConfiguration extends Component
         $mapping = \App\Models\ConditionalCodeMapping::findOrFail($id);
 
         $this->editingConditionalMappingId = $mapping->id;
-        $this->conditional_campaign_code = $mapping->campaign_code;
+        $this->conditional_intacct_location_code = $mapping->intacct_location_code;
         $this->conditional_field_type = $mapping->field_type;
         $this->conditional_dp_code = $mapping->dp_code;
         $this->conditional_intacct_code = $mapping->intacct_code;
@@ -574,14 +574,14 @@ class SageIntacctConfiguration extends Component
         $this->authorizeAction('intacct.configure');
 
         $this->validate([
-            'conditional_campaign_code' => 'required|string|max:255',
+            'conditional_intacct_location_code' => 'required|string|max:255',
             'conditional_field_type' => 'required|in:solicit_code,sub_solicit_code',
             'conditional_dp_code' => 'required|string|max:255',
             'conditional_intacct_code' => 'required|string|max:255',
             'conditional_priority' => 'nullable|integer|min:0',
             'conditional_notes' => 'nullable|string',
         ], [
-            'conditional_campaign_code.required' => 'Campaign code is required',
+            'conditional_intacct_location_code.required' => 'Sage Intacct location code is required',
             'conditional_field_type.required' => 'Field type is required',
             'conditional_dp_code.required' => 'DonorPerfect code is required',
             'conditional_intacct_code.required' => 'Sage Intacct code is required',
@@ -592,7 +592,7 @@ class SageIntacctConfiguration extends Component
                 // Update existing mapping
                 $mapping = \App\Models\ConditionalCodeMapping::findOrFail($this->editingConditionalMappingId);
                 $mapping->update([
-                    'campaign_code' => $this->conditional_campaign_code,
+                    'intacct_location_code' => $this->conditional_intacct_location_code,
                     'field_type' => $this->conditional_field_type,
                     'dp_code' => $this->conditional_dp_code,
                     'intacct_code' => $this->conditional_intacct_code,
@@ -604,7 +604,7 @@ class SageIntacctConfiguration extends Component
             } else {
                 // Create new mapping
                 \App\Models\ConditionalCodeMapping::create([
-                    'campaign_code' => $this->conditional_campaign_code,
+                    'intacct_location_code' => $this->conditional_intacct_location_code,
                     'field_type' => $this->conditional_field_type,
                     'dp_code' => $this->conditional_dp_code,
                     'intacct_code' => $this->conditional_intacct_code,
@@ -618,7 +618,7 @@ class SageIntacctConfiguration extends Component
             $this->cancelConditionalMappingForm();
         } catch (\Illuminate\Database\QueryException $e) {
             if ($e->errorInfo[1] == 1062) { // Duplicate entry error
-                session()->flash('error', 'A conditional mapping already exists for this campaign + field type + code combination.');
+                session()->flash('error', 'A conditional mapping already exists for this location + field type + code combination.');
             } else {
                 session()->flash('error', 'Failed to save conditional mapping: '.$e->getMessage());
             }
@@ -674,7 +674,7 @@ class SageIntacctConfiguration extends Component
     private function resetConditionalMappingForm()
     {
         $this->editingConditionalMappingId = null;
-        $this->conditional_campaign_code = '';
+        $this->conditional_intacct_location_code = '';
         $this->conditional_field_type = 'solicit_code';
         $this->conditional_dp_code = '';
         $this->conditional_intacct_code = '';

@@ -924,10 +924,10 @@
                 <div class="mt-8 border-t border-gray-200 dark:border-zinc-700 pt-6">
                     <div class="mb-4 flex items-center justify-between">
                         <div>
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Campaign-Specific Conditional Mappings</h3>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Location-Specific Conditional Mappings</h3>
                             <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                These conditional mappings enforce campaign-specific rules. If a campaign has conditional rules defined,
-                                only the codes listed below are allowed for that campaign, and they will map to campaign-specific Intacct codes.
+                                These conditional mappings enforce Sage Intacct location-specific dimensional compatibility rules.
+                                If a location has conditional rules defined, only the codes listed below are allowed for that location.
                             </p>
                         </div>
                         <button wire:click="showCreateConditionalMappingForm"
@@ -938,22 +938,22 @@
 
                     @php
                         $conditionalMappings = \App\Models\ConditionalCodeMapping::where('field_type', $selectedFieldType)
-                            ->orderBy('campaign_code')
+                            ->orderBy('intacct_location_code')
                             ->orderBy('priority', 'desc')
                             ->get()
-                            ->groupBy('campaign_code');
+                            ->groupBy('intacct_location_code');
                     @endphp
 
                     @if($conditionalMappings->count() > 0)
                         <div class="space-y-6">
-                            @foreach($conditionalMappings as $campaignCode => $mappings)
+                            @foreach($conditionalMappings as $locationCode => $mappings)
                             <div class="border border-gray-200 dark:border-zinc-700 rounded-lg p-4 bg-gray-50 dark:bg-zinc-900/50">
                                 <div class="mb-3">
                                     <h4 class="text-md font-semibold text-gray-900 dark:text-white">
-                                        Campaign: <span class="font-mono text-indigo-600 dark:text-indigo-400">{{ $campaignCode }}</span>
+                                        Intacct Location: <span class="font-mono text-indigo-600 dark:text-indigo-400">{{ $locationCode }}</span>
                                     </h4>
                                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                        {{ $mappings->count() }} {{ $selectedFieldType === 'solicit_code' ? 'solicitation' : 'sub-solicitation' }} code(s) for this campaign
+                                        {{ $mappings->count() }} {{ $selectedFieldType === 'solicit_code' ? 'solicitation' : 'sub-solicitation' }} code(s) allowed for this location
                                     </p>
                                 </div>
                                 <div class="overflow-x-auto">
@@ -1038,24 +1038,24 @@
                                 {{ $editingConditionalMappingId ? 'Edit' : 'Create' }} Conditional Mapping
                             </h3>
                             <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                Define a campaign-specific code mapping rule for {{ $selectedFieldType === 'solicit_code' ? 'solicitation codes' : 'sub-solicitation codes' }}.
+                                Define a location-specific code mapping rule to enforce Sage Intacct dimensional compatibility for {{ $selectedFieldType === 'solicit_code' ? 'solicitation codes' : 'sub-solicitation codes' }}.
                             </p>
                         </div>
 
                         <form wire:submit.prevent="saveConditionalMapping" class="space-y-4">
                             <div class="grid grid-cols-2 gap-4">
-                                <!-- Campaign Code -->
+                                <!-- Intacct Location Code -->
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        Campaign Code <span class="text-red-500">*</span>
+                                        Intacct Location Code <span class="text-red-500">*</span>
                                     </label>
                                     <input type="text"
-                                           wire:model="conditional_campaign_code"
+                                           wire:model="conditional_intacct_location_code"
                                            class="w-full px-3 py-2 border rounded-md dark:bg-zinc-700 dark:border-zinc-600 dark:text-white focus:ring-indigo-500 focus:border-indigo-500"
-                                           placeholder="e.g., FB, SS, AD"
+                                           placeholder="e.g., P1000, P1400, P1600"
                                            {{ $editingConditionalMappingId ? 'disabled' : '' }}>
-                                    @error('conditional_campaign_code') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">DonorPerfect campaign code</p>
+                                    @error('conditional_intacct_location_code') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Sage Intacct location/program code</p>
                                 </div>
 
                                 <!-- Field Type -->
