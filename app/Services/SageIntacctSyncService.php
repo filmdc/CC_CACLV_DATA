@@ -1300,10 +1300,13 @@ class SageIntacctSyncService
     }
 
     /**
-     * Prepare check image data for Document File attribute
+     * Prepare check image attachment for Other Receipt or Custom Object
      *
-     * @param  array  $giftData  Gift data with IMAGE_CHECK_URL
-     * @return array|null Returns file data array on success, null on failure
+     * Retrieves cached check image and creates SUPDOC for Other Receipts or
+     * returns Document File data for Custom Objects.
+     *
+     * @param  array  $giftData  Gift data with IMAGE_CHECK field (UNC path)
+     * @return array|null Returns ['supdocid' => string] for Other Receipts or file data for Custom Objects, null on failure
      */
     private function uploadCheckImageAttachment(array $giftData): ?array
     {
@@ -1313,9 +1316,9 @@ class SageIntacctSyncService
                 return null;
             }
 
-            // Check if gift has a cached check image URL
-            if (empty($giftData['IMAGE_CHECK_URL'])) {
-                Log::debug('Sage Intacct: Gift has no cached check image, skipping attachment', [
+            // Check if gift has a check image UNC path
+            if (empty($giftData['IMAGE_CHECK'])) {
+                Log::debug('Sage Intacct: Gift has no check image, skipping attachment', [
                     'gift_id' => $giftData['gift_id'] ?? 'unknown',
                 ]);
 
@@ -1327,9 +1330,49 @@ class SageIntacctSyncService
             // Use CheckImageCacheService to retrieve the cached image
             $checkImageService = new \App\Services\CheckImageCacheService;
 
-            // Extract filename from gift data (format: giftid_filename.ext)
-            $cacheFilename = basename(parse_url($giftData['IMAGE_CHECK_URL'], PHP_URL_PATH));
-            $storagePath = 'check_images/'.str_replace('.enc', '', $cacheFilename);
+            // Extract filename from UNC path and construct cache filename
+            // UNC format: \\Server\Share\Path\To\File.ext
+            // Cache format: giftid_slugified-filename.ext
+            $uncPath = $giftData['IMAGE_CHECK'];
+
+            // Normalize Windows backslashes to forward slashes for basename() on Linux
+            $normalizedPath = str_replace('\\', '/', $uncPath);
+            $originalFileName = basename($normalizedPath);
+
+            $pathInfo = pathinfo($originalFileName);
+            $sluggedName = \Illuminate\Support\Str::slug($pathInfo['filename'] ?? 'check');
+            $extension = strtolower($pathInfo['extension'] ?? 'tif');
+            $cacheFilename = "{$giftId}_{$sluggedName}.{$extension}";
+            $storagePath = 'check_images/'.$cacheFilename;
+
+            Log::debug('Sage Intacct: Attempting to retrieve check image for attachment', [
+                'gift_id' => $giftId,
+                'unc_path' => $uncPath,
+                'cache_filename' => $cacheFilename,
+                'storage_path' => $storagePath,
+            ]);
+
+            // Check if file is cached, if not, cache it now
+            $encryptedPath = $storagePath.'.enc';
+            if (! \Storage::disk('local')->exists($encryptedPath)) {
+                Log::info('Sage Intacct: Check image not cached, fetching from SMB share', [
+                    'gift_id' => $giftId,
+                    'unc_path' => $uncPath,
+                ]);
+
+                // Cache the image from UNC path
+                $cacheResult = $checkImageService->cacheImageFromUncPath($uncPath, $giftId);
+
+                if (! $cacheResult['success']) {
+                    Log::warning('Sage Intacct: Failed to cache check image from SMB, skipping attachment', [
+                        'gift_id' => $giftId,
+                        'unc_path' => $uncPath,
+                        'error' => $cacheResult['error'] ?? 'Unknown error',
+                    ]);
+
+                    return null;
+                }
+            }
 
             // Decrypt the cached file
             $decryptResult = $checkImageService->decryptFile($storagePath);
@@ -1337,6 +1380,9 @@ class SageIntacctSyncService
             if (! $decryptResult['success']) {
                 Log::warning('Sage Intacct: Failed to decrypt check image, skipping attachment', [
                     'gift_id' => $giftId,
+                    'unc_path' => $uncPath,
+                    'cache_filename' => $cacheFilename,
+                    'storage_path' => $storagePath,
                     'error' => $decryptResult['error'] ?? 'Unknown error',
                 ]);
 
