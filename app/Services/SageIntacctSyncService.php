@@ -727,18 +727,56 @@ class SageIntacctSyncService
                 }
             }
 
-            // STEP 3: Apply project mapping (use override if available)
+            // STEP 3: Apply project mapping (use override if available, then conditional mapping)
             if ($campaignOverride && $campaignOverride->project_code) {
                 $project = $campaignOverride->project_code;
             } elseif (! empty($giftData['solicit_code'])) {
-                $project = $this->applyCodeMapping('solicit_code', $giftData['solicit_code']);
+                // Try conditional mapping first, fall back to standard mapping
+                $result = $this->applyConditionalMapping(
+                    $giftData['campaign'] ?? null,
+                    'solicit_code',
+                    $giftData['solicit_code']
+                );
+
+                if ($result['skip']) {
+                    // Code is not allowed for this campaign
+                    Log::warning('Sage Intacct: Skipping gift - solicitation code not allowed for campaign', [
+                        'gift_id' => $giftData['gift_id'] ?? 'unknown',
+                        'campaign' => $giftData['campaign'] ?? null,
+                        'solicit_code' => $giftData['solicit_code'],
+                        'reason' => $result['reason'],
+                    ]);
+
+                    return null;
+                }
+
+                $project = $result['mapped_code'];
             }
 
-            // STEP 4: Apply service/class mapping (use override if available)
+            // STEP 4: Apply service/class mapping (use override if available, then conditional mapping)
             if ($campaignOverride) {
                 $class = $campaignOverride->service_code;
             } elseif (! empty($giftData['sub_solicit_code'])) {
-                $class = $this->applyCodeMapping('sub_solicit_code', $giftData['sub_solicit_code']);
+                // Try conditional mapping first, fall back to standard mapping
+                $result = $this->applyConditionalMapping(
+                    $giftData['campaign'] ?? null,
+                    'sub_solicit_code',
+                    $giftData['sub_solicit_code']
+                );
+
+                if ($result['skip']) {
+                    // Code is not allowed for this campaign
+                    Log::warning('Sage Intacct: Skipping gift - sub-solicitation code not allowed for campaign', [
+                        'gift_id' => $giftData['gift_id'] ?? 'unknown',
+                        'campaign' => $giftData['campaign'] ?? null,
+                        'sub_solicit_code' => $giftData['sub_solicit_code'],
+                        'reason' => $result['reason'],
+                    ]);
+
+                    return null;
+                }
+
+                $class = $result['mapped_code'];
             }
         }
 
@@ -1803,6 +1841,78 @@ class SageIntacctSyncService
 
         // For other fields, return the original value if no mapping found
         return $value;
+    }
+
+    /**
+     * Apply conditional code mapping with validation
+     *
+     * This method implements both validation (allowlist) and conditional mapping.
+     * It checks if:
+     * 1. A conditional mapping exists for the campaign + field + code combination
+     * 2. If conditional rules exist for the campaign, validates the code is allowed
+     * 3. Falls back to standard mapping if no conditional rules exist for the campaign
+     *
+     * @param  string|null  $campaignCode  Campaign code from DonorPerfect
+     * @param  string  $fieldType  Field type (solicit_code, sub_solicit_code)
+     * @param  string  $dpCode  DonorPerfect code value
+     * @return array ['skip' => bool, 'mapped_code' => string|null, 'reason' => string|null]
+     */
+    private function applyConditionalMapping(?string $campaignCode, string $fieldType, string $dpCode): array
+    {
+        // If no campaign code, fall back to standard mapping (can't apply conditional logic)
+        if (empty($campaignCode)) {
+            $standardMapping = $this->applyCodeMapping($fieldType, $dpCode);
+
+            return [
+                'skip' => false,
+                'mapped_code' => $standardMapping,
+                'reason' => null,
+            ];
+        }
+
+        // Check if this campaign has ANY conditional rules for this field type
+        $hasConditionalRules = \App\Models\ConditionalCodeMapping::hasRulesForCampaign($campaignCode, $fieldType);
+
+        if (! $hasConditionalRules) {
+            // No conditional rules exist for this campaign + field type combination
+            // Use standard mapping without validation
+            $standardMapping = $this->applyCodeMapping($fieldType, $dpCode);
+
+            Log::debug('Sage Intacct: No conditional rules for campaign, using standard mapping', [
+                'campaign' => $campaignCode,
+                'field_type' => $fieldType,
+                'dp_code' => $dpCode,
+                'mapped_code' => $standardMapping,
+            ]);
+
+            return [
+                'skip' => false,
+                'mapped_code' => $standardMapping,
+                'reason' => null,
+            ];
+        }
+
+        // Conditional rules exist - attempt to get conditional mapping
+        $conditionalMapping = \App\Models\ConditionalCodeMapping::getMapping($campaignCode, $fieldType, $dpCode);
+
+        if ($conditionalMapping) {
+            // Conditional mapping found - use it
+            return [
+                'skip' => false,
+                'mapped_code' => $conditionalMapping,
+                'reason' => null,
+            ];
+        }
+
+        // Conditional rules exist but this specific code is not in the allowlist
+        // SKIP this gift with detailed error
+        $allowedCodes = \App\Models\ConditionalCodeMapping::getAllowedCodes($campaignCode, $fieldType);
+
+        return [
+            'skip' => true,
+            'mapped_code' => null,
+            'reason' => "Campaign '{$campaignCode}' does not allow {$fieldType} '{$dpCode}'. Allowed codes: ".implode(', ', $allowedCodes),
+        ];
     }
 
     /**

@@ -918,6 +918,84 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Conditional Code Mappings Section (for solicit_code and sub_solicit_code only) -->
+                @if(in_array($selectedFieldType, ['solicit_code', 'sub_solicit_code']))
+                <div class="mt-8 border-t border-gray-200 dark:border-zinc-700 pt-6">
+                    <div class="mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Campaign-Specific Conditional Mappings</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                            These conditional mappings enforce campaign-specific rules. If a campaign has conditional rules defined,
+                            only the codes listed below are allowed for that campaign, and they will map to campaign-specific Intacct codes.
+                        </p>
+                    </div>
+
+                    @php
+                        $conditionalMappings = \App\Models\ConditionalCodeMapping::where('field_type', $selectedFieldType)
+                            ->where('is_active', true)
+                            ->orderBy('campaign_code')
+                            ->orderBy('priority', 'desc')
+                            ->get()
+                            ->groupBy('campaign_code');
+                    @endphp
+
+                    @if($conditionalMappings->count() > 0)
+                        <div class="space-y-6">
+                            @foreach($conditionalMappings as $campaignCode => $mappings)
+                            <div class="border border-gray-200 dark:border-zinc-700 rounded-lg p-4 bg-gray-50 dark:bg-zinc-900/50">
+                                <div class="mb-3">
+                                    <h4 class="text-md font-semibold text-gray-900 dark:text-white">
+                                        Campaign: <span class="font-mono text-indigo-600 dark:text-indigo-400">{{ $campaignCode }}</span>
+                                    </h4>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        {{ $mappings->count() }} allowed {{ $selectedFieldType === 'solicit_code' ? 'solicitation' : 'sub-solicitation' }} codes for this campaign
+                                    </p>
+                                </div>
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700">
+                                        <thead class="bg-white dark:bg-zinc-800">
+                                            <tr>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">DP Code</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">→ Intacct Code</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Priority</th>
+                                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Notes</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-zinc-700">
+                                            @foreach($mappings as $mapping)
+                                            <tr>
+                                                <td class="px-4 py-2 text-sm text-gray-900 dark:text-white font-mono">
+                                                    {{ $mapping->dp_code }}
+                                                </td>
+                                                <td class="px-4 py-2 text-sm text-gray-900 dark:text-white font-mono">
+                                                    <span class="text-green-600 dark:text-green-400">{{ $mapping->intacct_code }}</span>
+                                                </td>
+                                                <td class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
+                                                    {{ $mapping->priority }}
+                                                </td>
+                                                <td class="px-4 py-2 text-sm text-gray-600 dark:text-gray-400">
+                                                    {{ $mapping->notes ?: '—' }}
+                                                </td>
+                                            </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="text-center py-8 bg-gray-50 dark:bg-zinc-900/50 rounded-lg border border-gray-200 dark:border-zinc-700">
+                            <p class="text-gray-500 dark:text-gray-400">
+                                No conditional mappings configured for {{ $selectedFieldType === 'solicit_code' ? 'Solicitation Code' : 'Sub-Solicitation Code' }}.
+                            </p>
+                            <p class="text-sm text-gray-400 dark:text-gray-500 mt-2">
+                                Conditional mappings are defined in the database seeder (ConditionalCodeMappingSeeder).
+                            </p>
+                        </div>
+                    @endif
+                </div>
+                @endif
             </div>
             @endif
         </div>
