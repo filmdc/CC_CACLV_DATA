@@ -466,7 +466,9 @@
                                         @if($codeMappingEnabled && $showMappedCodes)
                                             @php
                                                 $dpCode = $gift['gl_code'] ?? '';
-                                                $intacctCode = \App\Models\DonorPerfectCodeMapping::getMappingFor('gl_code', $dpCode);
+                                                $mapping = $this->getDisplayCodeMapping($gift, 'gl_code');
+                                                $intacctCode = $mapping['code'];
+                                                $mappingSource = $mapping['source'];
                                             @endphp
                                             <div class="space-y-0.5">
                                                 <div class="font-mono text-gray-600 dark:text-gray-400 text-xs">
@@ -490,7 +492,9 @@
                                         @if($codeMappingEnabled && $showMappedCodes)
                                             @php
                                                 $dpCode = $gift['campaign'] ?? '';
-                                                $intacctCode = \App\Models\DonorPerfectCodeMapping::getMappingFor('campaign', $dpCode);
+                                                $mapping = $this->getDisplayCodeMapping($gift, 'campaign');
+                                                $intacctCode = $mapping['code'];
+                                                $mappingSource = $mapping['source'];
                                             @endphp
                                             <div class="space-y-0.5">
                                                 <div class="font-mono text-gray-600 dark:text-gray-400 text-xs">
@@ -514,15 +518,24 @@
                                         @if($codeMappingEnabled && $showMappedCodes)
                                             @php
                                                 $dpCode = $gift['solicit_code'] ?? '';
-                                                $intacctCode = \App\Models\DonorPerfectCodeMapping::getMappingFor('solicit_code', $dpCode);
+                                                $mapping = $this->getDisplayCodeMapping($gift, 'solicit_code');
+                                                $intacctCode = $mapping['code'];
+                                                $mappingSource = $mapping['source'];
                                             @endphp
                                             <div class="space-y-0.5">
                                                 <div class="font-mono text-gray-600 dark:text-gray-400 text-xs">
                                                     DP: {{ $dpCode ?: '—' }}
                                                 </div>
                                                 @if($intacctCode)
-                                                    <div class="font-mono text-indigo-600 dark:text-indigo-400 font-semibold text-sm">
-                                                        ✓ {{ $intacctCode }}
+                                                    <div class="flex items-center space-x-1">
+                                                        <div class="font-mono text-indigo-600 dark:text-indigo-400 font-semibold text-sm">
+                                                            ✓ {{ $intacctCode }}
+                                                        </div>
+                                                        @if($mappingSource === 'conditional')
+                                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300" title="Uses location-specific conditional mapping">
+                                                                C
+                                                            </span>
+                                                        @endif
                                                     </div>
                                                 @else
                                                     <div class="font-mono text-yellow-600 dark:text-yellow-400 text-xs italic">
@@ -538,15 +551,24 @@
                                         @if($codeMappingEnabled && $showMappedCodes)
                                             @php
                                                 $dpCode = $gift['sub_solicit_code'] ?? '';
-                                                $intacctCode = \App\Models\DonorPerfectCodeMapping::getMappingFor('sub_solicit_code', $dpCode);
+                                                $mapping = $this->getDisplayCodeMapping($gift, 'sub_solicit_code');
+                                                $intacctCode = $mapping['code'];
+                                                $mappingSource = $mapping['source'];
                                             @endphp
                                             <div class="space-y-0.5">
                                                 <div class="font-mono text-gray-600 dark:text-gray-400 text-xs">
                                                     DP: {{ $dpCode ?: '—' }}
                                                 </div>
                                                 @if($intacctCode)
-                                                    <div class="font-mono text-indigo-600 dark:text-indigo-400 font-semibold text-sm">
-                                                        ✓ {{ $intacctCode }}
+                                                    <div class="flex items-center space-x-1">
+                                                        <div class="font-mono text-indigo-600 dark:text-indigo-400 font-semibold text-sm">
+                                                            ✓ {{ $intacctCode }}
+                                                        </div>
+                                                        @if($mappingSource === 'conditional')
+                                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300" title="Uses location-specific conditional mapping">
+                                                                C
+                                                            </span>
+                                                        @endif
                                                     </div>
                                                 @else
                                                     <div class="font-mono text-yellow-600 dark:text-yellow-400 text-xs italic">

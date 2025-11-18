@@ -655,4 +655,50 @@ class DonorPerfectGiftsFeed extends Component
             ])->layout('components.layouts.app');
         }
     }
+
+    /**
+     * Get the correct Intacct code mapping for display
+     * Replicates the sync's conditional mapping priority logic
+     *
+     * @param  array  $gift  Gift data
+     * @param  string  $fieldType  Field type (gl_code, campaign, solicit_code, sub_solicit_code)
+     * @return array ['code' => string, 'source' => string] Source: 'conditional' or 'standard'
+     */
+    public function getDisplayCodeMapping(array $gift, string $fieldType): array
+    {
+        $dpCode = $gift[$fieldType] ?? '';
+
+        if (empty($dpCode)) {
+            return ['code' => '', 'source' => null];
+        }
+
+        // For solicit_code and sub_solicit_code, check conditional mappings first
+        if (in_array($fieldType, ['solicit_code', 'sub_solicit_code'])) {
+            // First, we need to map the campaign to Intacct location
+            $dpCampaign = $gift['campaign'] ?? '';
+            $intacctLocation = null;
+
+            if ($dpCampaign) {
+                $intacctLocation = \App\Models\DonorPerfectCodeMapping::getMappingFor('campaign', $dpCampaign);
+            }
+
+            // If we have a location, check for conditional mapping
+            if ($intacctLocation) {
+                $conditionalCode = \App\Models\ConditionalCodeMapping::getMapping(
+                    $intacctLocation,
+                    $fieldType,
+                    $dpCode
+                );
+
+                if ($conditionalCode) {
+                    return ['code' => $conditionalCode, 'source' => 'conditional'];
+                }
+            }
+        }
+
+        // Fall back to standard mapping
+        $standardCode = \App\Models\DonorPerfectCodeMapping::getMappingFor($fieldType, $dpCode);
+
+        return ['code' => $standardCode ?: $dpCode, 'source' => 'standard'];
+    }
 }
