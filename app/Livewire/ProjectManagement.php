@@ -265,6 +265,8 @@ class ProjectManagement extends Component
 
         if ($this->editingTask) {
             $task = MilestoneTask::findOrFail($this->editingTask);
+            $previousAssignee = $task->assigned_to;
+
             $task->update([
                 'name' => $this->task_name,
                 'description' => $this->task_description !== '' ? $this->task_description : null,
@@ -273,9 +275,16 @@ class ProjectManagement extends Component
                 'requires_approval' => $this->task_requires_approval,
                 'updated_by' => Auth::id(),
             ]);
+
+            // Send notification if assigned to a new user or re-assigned
+            if ($this->task_assigned_to && $this->task_assigned_to !== $previousAssignee) {
+                $assignee = User::find($this->task_assigned_to);
+                $assignee->notify(new \App\Notifications\TaskAssignedNotification($task, $this->job));
+            }
+
             session()->flash('success', 'Task updated successfully');
         } else {
-            MilestoneTask::create([
+            $task = MilestoneTask::create([
                 'milestone_id' => $this->selectedMilestone,
                 'name' => $this->task_name,
                 'description' => $this->task_description !== '' ? $this->task_description : null,
@@ -284,6 +293,13 @@ class ProjectManagement extends Component
                 'requires_approval' => $this->task_requires_approval,
                 'created_by' => Auth::id(),
             ]);
+
+            // Send notification if assigned to a user
+            if ($this->task_assigned_to) {
+                $assignee = User::find($this->task_assigned_to);
+                $assignee->notify(new \App\Notifications\TaskAssignedNotification($task, $this->job));
+            }
+
             session()->flash('success', 'Task created successfully');
         }
 
@@ -382,6 +398,12 @@ class ProjectManagement extends Component
             }
 
             DB::commit();
+
+            // Send notification if assigned to a user
+            if ($this->document_assigned_to) {
+                $assignee = User::find($this->document_assigned_to);
+                $assignee->notify(new \App\Notifications\DocumentAssignedNotification($document, $this->job));
+            }
 
             $successMessage = 'Document requirement created successfully';
 
@@ -947,7 +969,25 @@ class ProjectManagement extends Component
 
     public function render()
     {
-        $users = User::where('active', true)->orderBy('name')->get();
+        // Get only users who have access to the CAH program
+        $cahProgram = \App\Models\Program::where('name', 'LIKE', '%CAH%')->first();
+
+        $users = User::where('active', true)
+            ->where(function($query) use ($cahProgram) {
+                // Include admins and Contract Managers (have access to all programs)
+                $query->whereHas('roles', function($q) {
+                    $q->whereIn('name', ['Admin', 'Contract Manager']);
+                })
+                // Or users specifically assigned to the CAH program
+                ->when($cahProgram, function($q) use ($cahProgram) {
+                    $q->orWhereHas('programs', function($pq) use ($cahProgram) {
+                        $pq->where('program_id', $cahProgram->id);
+                    });
+                });
+            })
+            ->orderBy('name')
+            ->get();
+
         $currentMilestone = $this->selectedMilestone
             ? $this->job->milestones->firstWhere('id', $this->selectedMilestone)
             : null;
