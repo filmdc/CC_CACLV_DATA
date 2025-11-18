@@ -583,7 +583,35 @@ class SageIntacctApiService
                 $status = (string) $result->status;
                 if ($status === 'success') {
                     $created++;
-                    $key = (string) $result->data->othercashreceipt->RECORDNO ?? null;
+
+                    // Try multiple possible XML paths for RECORDNO (Intacct uses different node names)
+                    $key = null;
+                    if (isset($result->data->otherreceipt)) {
+                        $key = (string) $result->data->otherreceipt->RECORDNO;
+                    } elseif (isset($result->data->othercashreceipt)) {
+                        $key = (string) $result->data->othercashreceipt->RECORDNO;
+                    } elseif (isset($result->data)) {
+                        // Try to find any RECORDNO in data
+                        $recordnos = $result->data->xpath('.//RECORDNO');
+                        if (! empty($recordnos)) {
+                            $key = (string) $recordnos[0];
+                        }
+                    }
+
+                    if ($key) {
+                        Log::debug('Sage Intacct: Other Receipt created', [
+                            'index' => $index,
+                            'recordno' => $key,
+                            'data_structure' => isset($result->data->otherreceipt) ? 'otherreceipt' : (isset($result->data->othercashreceipt) ? 'othercashreceipt' : 'unknown'),
+                        ]);
+                    } else {
+                        // No RECORDNO found - log the actual XML structure
+                        Log::warning('Sage Intacct: Other Receipt created but RECORDNO not found in response', [
+                            'index' => $index,
+                            'result_xml' => $result->asXML(),
+                        ]);
+                    }
+
                     $details[] = [
                         'success' => true,
                         'key' => $key,
