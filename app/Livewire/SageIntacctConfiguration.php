@@ -86,6 +86,25 @@ class SageIntacctConfiguration extends Component
 
     public $mappingNotes = '';
 
+    // Conditional Code Mapping properties
+    public $showConditionalMappingForm = false;
+
+    public $editingConditionalMappingId = null;
+
+    public $conditional_campaign_code = '';
+
+    public $conditional_field_type = 'solicit_code';
+
+    public $conditional_dp_code = '';
+
+    public $conditional_intacct_code = '';
+
+    public $conditional_priority = 0;
+
+    public $conditional_notes = '';
+
+    public $conditional_is_active = true;
+
     // Sync History filters
     public $filterStatus = '';
 
@@ -510,6 +529,159 @@ class SageIntacctConfiguration extends Component
     {
         $this->loadMappings($this->selectedFieldType);
         $this->resetPage();
+    }
+
+    // ========================================================================
+    // Conditional Code Mapping CRUD Methods
+    // ========================================================================
+
+    /**
+     * Show the create conditional mapping form
+     */
+    public function showCreateConditionalMappingForm()
+    {
+        $this->authorizeAction('intacct.configure');
+        $this->resetConditionalMappingForm();
+        $this->showConditionalMappingForm = true;
+    }
+
+    /**
+     * Show the edit conditional mapping form
+     */
+    public function showEditConditionalMappingForm($id)
+    {
+        $this->authorizeAction('intacct.configure');
+
+        $mapping = \App\Models\ConditionalCodeMapping::findOrFail($id);
+
+        $this->editingConditionalMappingId = $mapping->id;
+        $this->conditional_campaign_code = $mapping->campaign_code;
+        $this->conditional_field_type = $mapping->field_type;
+        $this->conditional_dp_code = $mapping->dp_code;
+        $this->conditional_intacct_code = $mapping->intacct_code;
+        $this->conditional_priority = $mapping->priority;
+        $this->conditional_notes = $mapping->notes ?? '';
+        $this->conditional_is_active = $mapping->is_active;
+
+        $this->showConditionalMappingForm = true;
+    }
+
+    /**
+     * Save a new conditional mapping
+     */
+    public function saveConditionalMapping()
+    {
+        $this->authorizeAction('intacct.configure');
+
+        $this->validate([
+            'conditional_campaign_code' => 'required|string|max:255',
+            'conditional_field_type' => 'required|in:solicit_code,sub_solicit_code',
+            'conditional_dp_code' => 'required|string|max:255',
+            'conditional_intacct_code' => 'required|string|max:255',
+            'conditional_priority' => 'nullable|integer|min:0',
+            'conditional_notes' => 'nullable|string',
+        ], [
+            'conditional_campaign_code.required' => 'Campaign code is required',
+            'conditional_field_type.required' => 'Field type is required',
+            'conditional_dp_code.required' => 'DonorPerfect code is required',
+            'conditional_intacct_code.required' => 'Sage Intacct code is required',
+        ]);
+
+        try {
+            if ($this->editingConditionalMappingId) {
+                // Update existing mapping
+                $mapping = \App\Models\ConditionalCodeMapping::findOrFail($this->editingConditionalMappingId);
+                $mapping->update([
+                    'campaign_code' => $this->conditional_campaign_code,
+                    'field_type' => $this->conditional_field_type,
+                    'dp_code' => $this->conditional_dp_code,
+                    'intacct_code' => $this->conditional_intacct_code,
+                    'priority' => $this->conditional_priority ?? 0,
+                    'notes' => $this->conditional_notes,
+                    'is_active' => $this->conditional_is_active,
+                ]);
+                session()->flash('success', 'Conditional mapping updated successfully.');
+            } else {
+                // Create new mapping
+                \App\Models\ConditionalCodeMapping::create([
+                    'campaign_code' => $this->conditional_campaign_code,
+                    'field_type' => $this->conditional_field_type,
+                    'dp_code' => $this->conditional_dp_code,
+                    'intacct_code' => $this->conditional_intacct_code,
+                    'priority' => $this->conditional_priority ?? 0,
+                    'notes' => $this->conditional_notes,
+                    'is_active' => $this->conditional_is_active,
+                ]);
+                session()->flash('success', 'Conditional mapping created successfully.');
+            }
+
+            $this->cancelConditionalMappingForm();
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($e->errorInfo[1] == 1062) { // Duplicate entry error
+                session()->flash('error', 'A conditional mapping already exists for this campaign + field type + code combination.');
+            } else {
+                session()->flash('error', 'Failed to save conditional mapping: '.$e->getMessage());
+            }
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to save conditional mapping: '.$e->getMessage());
+        }
+    }
+
+    /**
+     * Delete a conditional mapping
+     */
+    public function deleteConditionalMapping($id)
+    {
+        $this->authorizeAction('intacct.configure');
+
+        try {
+            $mapping = \App\Models\ConditionalCodeMapping::findOrFail($id);
+            $mapping->delete();
+            session()->flash('success', 'Conditional mapping deleted successfully.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to delete conditional mapping: '.$e->getMessage());
+        }
+    }
+
+    /**
+     * Toggle active status of a conditional mapping
+     */
+    public function toggleConditionalMappingActive($id)
+    {
+        $this->authorizeAction('intacct.configure');
+
+        try {
+            $mapping = \App\Models\ConditionalCodeMapping::findOrFail($id);
+            $mapping->update(['is_active' => ! $mapping->is_active]);
+            session()->flash('success', 'Conditional mapping status updated.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to update conditional mapping: '.$e->getMessage());
+        }
+    }
+
+    /**
+     * Cancel and reset the conditional mapping form
+     */
+    public function cancelConditionalMappingForm()
+    {
+        $this->showConditionalMappingForm = false;
+        $this->resetConditionalMappingForm();
+    }
+
+    /**
+     * Reset conditional mapping form fields
+     */
+    private function resetConditionalMappingForm()
+    {
+        $this->editingConditionalMappingId = null;
+        $this->conditional_campaign_code = '';
+        $this->conditional_field_type = 'solicit_code';
+        $this->conditional_dp_code = '';
+        $this->conditional_intacct_code = '';
+        $this->conditional_priority = 0;
+        $this->conditional_notes = '';
+        $this->conditional_is_active = true;
+        $this->resetErrorBag();
     }
 
     public function render()
