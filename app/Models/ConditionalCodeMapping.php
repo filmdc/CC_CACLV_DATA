@@ -23,6 +23,46 @@ class ConditionalCodeMapping extends Model
     ];
 
     /**
+     * Boot method to register model events
+     */
+    protected static function booted(): void
+    {
+        // When a conditional mapping is created, updated, or deleted,
+        // invalidate the gift cache so unsynced gifts will be revalidated
+        static::created(function ($mapping) {
+            self::invalidateGiftCache($mapping);
+        });
+
+        static::updated(function ($mapping) {
+            self::invalidateGiftCache($mapping);
+        });
+
+        static::deleted(function ($mapping) {
+            self::invalidateGiftCache($mapping);
+        });
+    }
+
+    /**
+     * Invalidate gift cache for affected location
+     * This ensures unsynced gifts will be revalidated against new rules
+     */
+    private static function invalidateGiftCache($mapping): void
+    {
+        $clearedCount = \App\Models\DonorPerfectGiftCache::where(function ($query) {
+            $query->where('synced_to_intacct', false)
+                  ->orWhereNull('synced_to_intacct');
+        })->delete();
+
+        Log::info('Conditional mapping changed - gift cache invalidated', [
+            'intacct_location_code' => $mapping->intacct_location_code,
+            'field_type' => $mapping->field_type,
+            'dp_code' => $mapping->dp_code,
+            'cache_entries_cleared' => $clearedCount,
+            'reason' => 'Unsynced gifts will be re-fetched and revalidated on next sync',
+        ]);
+    }
+
+    /**
      * Scope: Filter by Sage Intacct location code
      */
     public function scopeForLocation($query, string $intacctLocationCode)

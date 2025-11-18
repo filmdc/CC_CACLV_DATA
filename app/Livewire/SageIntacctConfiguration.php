@@ -600,7 +600,7 @@ class SageIntacctConfiguration extends Component
                     'notes' => $this->conditional_notes,
                     'is_active' => $this->conditional_is_active,
                 ]);
-                session()->flash('success', 'Conditional mapping updated successfully.');
+                session()->flash('success', 'Conditional mapping updated successfully. Gift cache invalidated - unsynced gifts will be revalidated on next sync.');
             } else {
                 // Create new mapping
                 \App\Models\ConditionalCodeMapping::create([
@@ -612,7 +612,7 @@ class SageIntacctConfiguration extends Component
                     'notes' => $this->conditional_notes,
                     'is_active' => $this->conditional_is_active,
                 ]);
-                session()->flash('success', 'Conditional mapping created successfully.');
+                session()->flash('success', 'Conditional mapping created successfully. Gift cache invalidated - unsynced gifts will be revalidated on next sync.');
             }
 
             $this->cancelConditionalMappingForm();
@@ -637,7 +637,7 @@ class SageIntacctConfiguration extends Component
         try {
             $mapping = \App\Models\ConditionalCodeMapping::findOrFail($id);
             $mapping->delete();
-            session()->flash('success', 'Conditional mapping deleted successfully.');
+            session()->flash('success', 'Conditional mapping deleted successfully. Gift cache invalidated - unsynced gifts will be revalidated on next sync.');
         } catch (\Exception $e) {
             session()->flash('error', 'Failed to delete conditional mapping: '.$e->getMessage());
         }
@@ -653,7 +653,7 @@ class SageIntacctConfiguration extends Component
         try {
             $mapping = \App\Models\ConditionalCodeMapping::findOrFail($id);
             $mapping->update(['is_active' => ! $mapping->is_active]);
-            session()->flash('success', 'Conditional mapping status updated.');
+            session()->flash('success', 'Conditional mapping status updated. Gift cache invalidated - unsynced gifts will be revalidated on next sync.');
         } catch (\Exception $e) {
             session()->flash('error', 'Failed to update conditional mapping: '.$e->getMessage());
         }
