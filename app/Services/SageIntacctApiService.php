@@ -533,10 +533,12 @@ class SageIntacctApiService
 
             $xmlRequest = $this->buildXmlRequest('batch', [], $functionContent);
 
-            // Log sample of first receipt for debugging
+            // Log complete XML for first receipt for debugging
             if (count($receipts) > 0) {
-                Log::debug('Sage Intacct XML API: Sample receipt XML (first receipt)', [
-                    'first_function' => substr($functionContent, 0, 1000),
+                $firstFunction = $this->buildOtherReceiptFunctionContent($receipts[0], 0);
+                Log::debug('Sage Intacct XML API: Complete first receipt XML', [
+                    'receipt_data' => $receipts[0],
+                    'xml_function' => $firstFunction,
                 ]);
             }
 
@@ -623,11 +625,31 @@ class SageIntacctApiService
                         ?? (string) $result->errormessage->error->description
                         ?? 'Unknown error';
                     $errorCode = (string) $result->errormessage->error->errorno ?? 'N/A';
+                    $errorCorrection = (string) $result->errormessage->error->correction ?? '';
+
+                    // Get the receipt data that failed
+                    $failedReceipt = $receipts[$index] ?? null;
 
                     Log::warning('Sage Intacct XML API: Other Receipt creation failed', [
                         'index' => $index,
                         'error_code' => $errorCode,
                         'error_message' => $errorMsg,
+                        'error_correction' => $errorCorrection,
+                        'gift_id' => $failedReceipt['refid'] ?? null,
+                        'dimensions' => [
+                            'locationid' => $failedReceipt['receiptitems'][0]['locationid'] ?? null,
+                            'departmentid' => $failedReceipt['receiptitems'][0]['departmentid'] ?? null,
+                            'projectid' => $failedReceipt['receiptitems'][0]['projectid'] ?? null,
+                            'classid' => $failedReceipt['receiptitems'][0]['classid'] ?? null,
+                        ],
+                        'accounts' => [
+                            'glaccountno' => $failedReceipt['receiptitems'][0]['glaccountno'] ?? null,
+                            'undepglaccountno' => $failedReceipt['undepglaccountno'] ?? null,
+                            'bankaccountid' => $failedReceipt['bankaccountid'] ?? null,
+                        ],
+                        'payment_method' => $failedReceipt['paymentmethod'] ?? null,
+                        'supdocid' => $failedReceipt['supdocid'] ?? null,
+                        'full_error_xml' => $result->asXML(),
                     ]);
 
                     $details[] = [
