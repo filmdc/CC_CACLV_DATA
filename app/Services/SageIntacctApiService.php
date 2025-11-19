@@ -1740,11 +1740,14 @@ XML;
             Log::info('Sage Intacct XML: SUPDOC created successfully', [
                 'requested_supdocid' => $supdocId,
                 'returned_supdocid' => $supdocid,
+                'using_for_linking' => $supdocId,
             ]);
 
+            // Use the requested SUPDOCID (not the returned one) for linking
+            // Sage Intacct requires referencing the SUPDOCID you specified in create_supdoc
             return [
                 'success' => true,
-                'supdocid' => $supdocid,
+                'supdocid' => $supdocId,
                 'message' => 'SUPDOC created successfully',
             ];
 
