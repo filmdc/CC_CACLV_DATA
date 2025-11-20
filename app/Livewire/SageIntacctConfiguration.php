@@ -160,8 +160,20 @@ class SageIntacctConfiguration extends Component
 
     public function mount()
     {
-        $this->authorizeAction('intacct.configure');
+        // Allow viewing if user has sync view permission or admin permission
+        if (!$this->canAny(['sage.sync.view', 'intacct.configure'])) {
+            abort(403, 'Unauthorized access to Sage Intacct configuration.');
+        }
+
         $this->loadExistingSettings();
+    }
+
+    /**
+     * Check if user can edit API configuration (admin only)
+     */
+    protected function canEditApiConfig(): bool
+    {
+        return $this->can('intacct.configure') || $this->isAdmin();
     }
 
     protected function loadExistingSettings()
@@ -209,7 +221,10 @@ class SageIntacctConfiguration extends Component
 
     public function saveCredentials()
     {
-        $this->authorizeAction('intacct.configure');
+        // Only admins can edit API credentials
+        if (!$this->canEditApiConfig()) {
+            abort(403, 'Only administrators can modify API configuration.');
+        }
 
         $this->validate();
 
@@ -283,6 +298,8 @@ class SageIntacctConfiguration extends Component
 
     public function saveFieldMapping()
     {
+        $this->authorizeAction('sage.mappings.edit');
+
         $this->validate([
             'mapping_dp_field' => 'required|string|max:255',
             'mapping_intacct_field' => 'required|string|max:255',
@@ -329,6 +346,8 @@ class SageIntacctConfiguration extends Component
 
     public function deleteFieldMapping($mappingId)
     {
+        $this->authorizeAction('sage.mappings.edit');
+
         try {
             $mapping = SageIntacctFieldMapping::find($mappingId);
             if ($mapping) {
@@ -342,6 +361,8 @@ class SageIntacctConfiguration extends Component
 
     public function moveFieldMapping($mappingId, $direction)
     {
+        $this->authorizeAction('sage.mappings.edit');
+
         try {
             $mapping = SageIntacctFieldMapping::find($mappingId);
             if (! $mapping) {
@@ -471,7 +492,7 @@ class SageIntacctConfiguration extends Component
 
     public function saveMapping($id)
     {
-        $this->authorizeAction('intacct.configure');
+        $this->authorizeAction('sage.code_mappings.edit');
 
         $this->validate([
             'editingIntacctCode' => 'required|string|max:255',
@@ -504,7 +525,7 @@ class SageIntacctConfiguration extends Component
 
     public function toggleArchive($id)
     {
-        $this->authorizeAction('intacct.configure');
+        $this->authorizeAction('sage.code_mappings.edit');
 
         try {
             $mapping = \App\Models\DonorPerfectCodeMapping::find($id);
@@ -525,7 +546,7 @@ class SageIntacctConfiguration extends Component
 
     public function bulkArchiveUnmapped()
     {
-        $this->authorizeAction('intacct.configure');
+        $this->authorizeAction('sage.code_mappings.edit');
 
         try {
             $count = \App\Models\DonorPerfectCodeMapping::forFieldType($this->selectedFieldType)
@@ -592,7 +613,7 @@ class SageIntacctConfiguration extends Component
      */
     public function saveConditionalMapping()
     {
-        $this->authorizeAction('intacct.configure');
+        $this->authorizeAction('sage.conditional_mappings.edit');
 
         $this->validate([
             'conditional_intacct_location_code' => 'required|string|max:255',
@@ -653,7 +674,7 @@ class SageIntacctConfiguration extends Component
      */
     public function deleteConditionalMapping($id)
     {
-        $this->authorizeAction('intacct.configure');
+        $this->authorizeAction('sage.conditional_mappings.edit');
 
         try {
             $mapping = \App\Models\ConditionalCodeMapping::findOrFail($id);
@@ -746,7 +767,7 @@ class SageIntacctConfiguration extends Component
      */
     public function saveSyncFilter()
     {
-        $this->authorizeAction('intacct.configure');
+        $this->authorizeAction('sage.filters.edit');
 
         $this->validate([
             'sync_filter_name' => 'required|string|max:255',
@@ -805,7 +826,7 @@ class SageIntacctConfiguration extends Component
      */
     public function deleteSyncFilter($id)
     {
-        $this->authorizeAction('intacct.configure');
+        $this->authorizeAction('sage.filters.edit');
 
         try {
             $filter = \App\Models\SageIntacctSyncFilter::findOrFail($id);

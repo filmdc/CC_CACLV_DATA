@@ -52,7 +52,10 @@ class DonorPerfectConfiguration extends Component
 
     public function mount()
     {
-        $this->authorizeAction('donor_gifts.configure');
+        // Allow viewing if user has sync view permission or admin permission
+        if (!$this->canAny(['donorperfect.sync.view', 'donor_gifts.configure'])) {
+            abort(403, 'Unauthorized access to DonorPerfect configuration.');
+        }
 
         $this->initializeAvailableFields();
         $this->loadExistingSettings();
@@ -139,7 +142,10 @@ class DonorPerfectConfiguration extends Component
 
     public function save()
     {
-        $this->authorizeAction('donor_gifts.configure');
+        // Only admins can edit API configuration
+        if (!$this->can('donor_gifts.configure') && !$this->isAdmin()) {
+            abort(403, 'Only administrators can modify DonorPerfect API configuration.');
+        }
 
         $this->validate();
 
