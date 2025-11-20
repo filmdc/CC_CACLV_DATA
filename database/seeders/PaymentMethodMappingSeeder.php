@@ -7,7 +7,26 @@ use Illuminate\Database\Seeder;
 class PaymentMethodMappingSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Seed payment method mappings for DonorPerfect → Sage Intacct sync
+     *
+     * This seeder creates mappings for both payment_type and gift_type fields.
+     * When payment_type is blank, the sync service falls back to gift_type,
+     * so we map common values from both fields.
+     *
+     * Gift Type Distribution (as of 2025-11-19):
+     * - CK (438) - Checks
+     * - CC (272) - Credit Cards
+     * - WEB (262) - Web Donations (typically credit cards)
+     * - VISAEFT (166) - Visa Electronic Funds Transfer
+     * - MCEFT (88) - MasterCard EFT
+     * - PAYPAL (78) - PayPal
+     * - SC (72) - Unknown (Stock Certificate?)
+     * - ACHEFT (34) - ACH EFT
+     * - ACH (27) - ACH
+     * - DISCOVEREFT (13) - Discover EFT
+     * - SN (13) - Unknown
+     * - AMEXEFT (9) - American Express EFT
+     * - CA (6) - Cash
      */
     public function run(): void
     {
@@ -33,6 +52,22 @@ class PaymentMethodMappingSeeder extends Seeder
             ['dp_payment_type' => 'MO', 'intacct_payment_method' => 'Cash', 'order' => 22], // Money Order
             ['dp_payment_type' => 'GK', 'intacct_payment_method' => 'Cash', 'order' => 23], // Gift in Kind (treat as cash)
             ['dp_payment_type' => 'ST', 'intacct_payment_method' => 'Cash', 'order' => 24], // Stock (treat as cash)
+
+            // Credit Card gift_type codes (electronic payments)
+            ['dp_payment_type' => 'CC', 'intacct_payment_method' => 'Credit Card', 'order' => 30], // Credit Card gift type
+            ['dp_payment_type' => 'VISAEFT', 'intacct_payment_method' => 'Credit Card', 'order' => 31], // Visa EFT
+            ['dp_payment_type' => 'MCEFT', 'intacct_payment_method' => 'Credit Card', 'order' => 32], // MasterCard EFT
+            ['dp_payment_type' => 'AMEXEFT', 'intacct_payment_method' => 'Credit Card', 'order' => 33], // American Express EFT
+            ['dp_payment_type' => 'DISCOVEREFT', 'intacct_payment_method' => 'Credit Card', 'order' => 34], // Discover EFT
+            ['dp_payment_type' => 'WEB', 'intacct_payment_method' => 'Credit Card', 'order' => 35], // Web donation (typically CC)
+
+            // EFT / Electronic payment types
+            ['dp_payment_type' => 'ACHEFT', 'intacct_payment_method' => 'EFT', 'order' => 36], // ACH Electronic Funds Transfer
+            ['dp_payment_type' => 'PAYPAL', 'intacct_payment_method' => 'EFT', 'order' => 37], // PayPal
+
+            // Unknown types - need investigation but map conservatively to Cash for now
+            ['dp_payment_type' => 'SC', 'intacct_payment_method' => 'Cash', 'order' => 50], // SC - Unknown, possibly Stock Certificate
+            ['dp_payment_type' => 'SN', 'intacct_payment_method' => 'Cash', 'order' => 51], // SN - Unknown
 
             // Default fallback (NULL means any unmatched value)
             ['dp_payment_type' => null, 'intacct_payment_method' => 'Cash', 'is_default' => true, 'order' => 999],

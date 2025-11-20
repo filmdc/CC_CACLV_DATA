@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             HousingModuleSeeder::class,
             ApprovalPermissionsSeeder::class,
             DonorPerfectSeeder::class,
+            PaymentMethodMappingSeeder::class,
             ConditionalCodeMappingSeeder::class,
         ]);
     }
