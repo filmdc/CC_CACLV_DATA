@@ -105,6 +105,27 @@ class SageIntacctConfiguration extends Component
 
     public $conditional_is_active = true;
 
+    // Sync Filter properties
+    public $showSyncFilterForm = false;
+
+    public $editingSyncFilterId = null;
+
+    public $sync_filter_name = '';
+
+    public $sync_filter_field_name = '';
+
+    public $sync_filter_operator = 'equals';
+
+    public $sync_filter_value = '';
+
+    public $sync_filter_action = 'exclude';
+
+    public $sync_filter_priority = 0;
+
+    public $sync_filter_description = '';
+
+    public $sync_filter_is_active = true;
+
     // Sync History filters
     public $filterStatus = '';
 
@@ -681,6 +702,159 @@ class SageIntacctConfiguration extends Component
         $this->conditional_priority = 0;
         $this->conditional_notes = '';
         $this->conditional_is_active = true;
+        $this->resetErrorBag();
+    }
+
+    // ========================================================================
+    // Sync Filter CRUD Methods
+    // ========================================================================
+
+    /**
+     * Show the create sync filter form
+     */
+    public function showCreateSyncFilterForm()
+    {
+        $this->authorizeAction('intacct.configure');
+        $this->resetSyncFilterForm();
+        $this->showSyncFilterForm = true;
+    }
+
+    /**
+     * Show the edit sync filter form
+     */
+    public function showEditSyncFilterForm($id)
+    {
+        $this->authorizeAction('intacct.configure');
+
+        $filter = \App\Models\SageIntacctSyncFilter::findOrFail($id);
+
+        $this->editingSyncFilterId = $filter->id;
+        $this->sync_filter_name = $filter->name;
+        $this->sync_filter_field_name = $filter->field_name;
+        $this->sync_filter_operator = $filter->operator;
+        $this->sync_filter_value = $filter->value;
+        $this->sync_filter_action = $filter->action;
+        $this->sync_filter_priority = $filter->priority;
+        $this->sync_filter_description = $filter->description ?? '';
+        $this->sync_filter_is_active = $filter->is_active;
+
+        $this->showSyncFilterForm = true;
+    }
+
+    /**
+     * Save a sync filter
+     */
+    public function saveSyncFilter()
+    {
+        $this->authorizeAction('intacct.configure');
+
+        $this->validate([
+            'sync_filter_name' => 'required|string|max:255',
+            'sync_filter_field_name' => 'required|string|max:255',
+            'sync_filter_operator' => 'required|in:equals,not_equals,contains,not_contains,greater_than,less_than,greater_or_equal,less_or_equal,is_empty,is_not_empty',
+            'sync_filter_value' => 'nullable|string|max:255',
+            'sync_filter_action' => 'required|in:exclude,include',
+            'sync_filter_priority' => 'nullable|integer|min:0',
+            'sync_filter_description' => 'nullable|string',
+        ], [
+            'sync_filter_name.required' => 'Filter name is required',
+            'sync_filter_field_name.required' => 'Field name is required',
+            'sync_filter_operator.required' => 'Operator is required',
+        ]);
+
+        try {
+            if ($this->editingSyncFilterId) {
+                // Update existing filter
+                $filter = \App\Models\SageIntacctSyncFilter::findOrFail($this->editingSyncFilterId);
+                $filter->update([
+                    'name' => $this->sync_filter_name,
+                    'field_name' => $this->sync_filter_field_name,
+                    'operator' => $this->sync_filter_operator,
+                    'value' => $this->sync_filter_value,
+                    'action' => $this->sync_filter_action,
+                    'priority' => $this->sync_filter_priority ?? 0,
+                    'description' => $this->sync_filter_description,
+                    'is_active' => $this->sync_filter_is_active,
+                ]);
+                session()->flash('success', 'Sync filter updated successfully.');
+            } else {
+                // Create new filter
+                \App\Models\SageIntacctSyncFilter::create([
+                    'name' => $this->sync_filter_name,
+                    'field_name' => $this->sync_filter_field_name,
+                    'operator' => $this->sync_filter_operator,
+                    'value' => $this->sync_filter_value,
+                    'action' => $this->sync_filter_action,
+                    'filter_group' => 0,
+                    'group_logic' => 'OR',
+                    'priority' => $this->sync_filter_priority ?? 0,
+                    'description' => $this->sync_filter_description,
+                    'is_active' => $this->sync_filter_is_active,
+                ]);
+                session()->flash('success', 'Sync filter created successfully.');
+            }
+
+            $this->cancelSyncFilterForm();
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to save sync filter: '.$e->getMessage());
+        }
+    }
+
+    /**
+     * Delete a sync filter
+     */
+    public function deleteSyncFilter($id)
+    {
+        $this->authorizeAction('intacct.configure');
+
+        try {
+            $filter = \App\Models\SageIntacctSyncFilter::findOrFail($id);
+            $filter->delete();
+            session()->flash('success', 'Sync filter deleted successfully.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to delete sync filter: '.$e->getMessage());
+        }
+    }
+
+    /**
+     * Toggle active status of a sync filter
+     */
+    public function toggleSyncFilterActive($id)
+    {
+        $this->authorizeAction('intacct.configure');
+
+        try {
+            $filter = \App\Models\SageIntacctSyncFilter::findOrFail($id);
+            $filter->update(['is_active' => ! $filter->is_active]);
+            session()->flash('success', 'Sync filter status updated.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to update sync filter: '.$e->getMessage());
+        }
+    }
+
+    /**
+     * Cancel and reset the sync filter form
+     */
+    public function cancelSyncFilterForm()
+    {
+        $this->showSyncFilterForm = false;
+        $this->resetSyncFilterForm();
+    }
+
+    /**
+     * Reset sync filter form fields
+     */
+    private function resetSyncFilterForm()
+    {
+        $this->editingSyncFilterId = null;
+        $this->sync_filter_name = '';
+        $this->sync_filter_field_name = '';
+        $this->sync_filter_operator = 'equals';
+        $this->sync_filter_value = '';
+        $this->sync_filter_action = 'exclude';
+        $this->sync_filter_priority = 0;
+        $this->sync_filter_description = '';
+        $this->sync_filter_is_active = true;
         $this->resetErrorBag();
     }
 
