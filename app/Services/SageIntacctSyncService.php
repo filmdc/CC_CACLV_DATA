@@ -1022,6 +1022,17 @@ class SageIntacctSyncService
             foreach ($batch as $index => $giftData) {
                 $giftId = $giftData['gift_id'] ?? null;
 
+                // Apply sync filters to determine if this gift should be excluded
+                $filterResult = \App\Models\SageIntacctSyncFilter::shouldFilterGift($giftData);
+
+                if ($filterResult['should_filter']) {
+                    $this->createSyncItem($syncHistory, $giftData, 'filtered', [
+                        'filter_reason' => $filterResult['reason'],
+                    ]);
+
+                    continue; // Skip this gift
+                }
+
                 // Prepare check image attachment
                 $fileData = $this->uploadCheckImageAttachment($giftData);
                 if ($fileData) {

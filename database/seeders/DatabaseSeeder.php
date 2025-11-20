@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             DonorPerfectSeeder::class,
             PaymentMethodMappingSeeder::class,
             ConditionalCodeMappingSeeder::class,
+            SageIntacctSyncFilterSeeder::class,
         ]);
     }
 }
