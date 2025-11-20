@@ -410,6 +410,12 @@
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Solicitation Code</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Sub-Solicit Code</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Payment Type</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-700" wire:click="sortBy('gift_type')">
+                                    Gift Type
+                                    @if($sortField === 'gift_type')
+                                        <span class="ml-1">{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
+                                    @endif
+                                </th>
                                 <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
@@ -582,6 +588,24 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white cursor-pointer" wire:click="showGiftDetails({{ json_encode($gift) }})">
                                         {{ $gift['payment_type'] ?? '-' }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm cursor-pointer" wire:click="showGiftDetails({{ json_encode($gift) }})">
+                                        @php
+                                            $giftType = $gift['gift_type'] ?? '';
+                                            $filterResult = \App\Models\SageIntacctSyncFilter::shouldFilterGift($gift);
+                                            $willFilter = $filterResult['should_filter'];
+                                        @endphp
+                                        <div class="flex items-center space-x-2">
+                                            <span class="font-mono {{ $willFilter ? 'text-red-600 dark:text-red-400 font-semibold' : 'text-gray-900 dark:text-white' }}">
+                                                {{ $giftType ?: '—' }}
+                                            </span>
+                                            @if($willFilter)
+                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
+                                                      title="{{ $filterResult['reason'] ?? 'Will be filtered out of sync' }}">
+                                                    ⊗
+                                                </span>
+                                            @endif
+                                        </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
                                         <div class="flex items-center justify-center space-x-2">
