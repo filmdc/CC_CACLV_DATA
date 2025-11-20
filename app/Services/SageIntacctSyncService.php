@@ -1015,9 +1015,12 @@ class SageIntacctSyncService
 
             // Transform all gifts in batch and prepare attachments
             $transformedRecords = [];
-            $giftIdMap = []; // Map index to gift_id for tracking
+            $giftIdMap = []; // Map transformed array index to gift_id for tracking
             $transformedMap = []; // Map gift_id to transformed data
             $attachmentMap = []; // Map gift_id to file data array
+            $transformedIndex = 0; // Track actual position in $transformedRecords array
+            $skippedCount = 0;
+            $filteredCount = 0;
 
             foreach ($batch as $index => $giftData) {
                 $giftId = $giftData['gift_id'] ?? null;
@@ -1028,6 +1031,13 @@ class SageIntacctSyncService
                 if ($filterResult['should_filter']) {
                     $this->createSyncItem($syncHistory, $giftData, 'filtered', [
                         'filter_reason' => $filterResult['reason'],
+                    ]);
+
+                    $filteredCount++;
+                    Log::debug('Sage Intacct: Gift filtered, not added to batch', [
+                        'gift_id' => $giftId,
+                        'batch_position' => $index,
+                        'reason' => $filterResult['reason'],
                     ]);
 
                     continue; // Skip this gift
@@ -1050,6 +1060,13 @@ class SageIntacctSyncService
                             'skip_reason' => 'Missing required GL code or dimensions',
                         ]);
 
+                        $skippedCount++;
+                        Log::debug('Sage Intacct: Gift skipped, not added to batch', [
+                            'gift_id' => $giftId,
+                            'batch_position' => $index,
+                            'reason' => 'Missing required GL code or dimensions',
+                        ]);
+
                         continue;
                     }
                 } else {
@@ -1066,12 +1083,29 @@ class SageIntacctSyncService
                 }
 
                 $transformedRecords[] = $transformed;
-                $giftIdMap[$index] = $giftId;
+                $giftIdMap[$transformedIndex] = $giftId; // Use actual transformed array index
                 $transformedMap[$giftId] = $transformed;
+
+                Log::debug('Sage Intacct: Gift added to batch', [
+                    'gift_id' => $giftId,
+                    'batch_position' => $index,
+                    'transformed_index' => $transformedIndex,
+                ]);
+
+                $transformedIndex++; // Increment after adding to transformed records
 
                 // Create sync item record with transformed data
                 $this->createSyncItem($syncHistory, $giftData, 'pending', $transformed);
             }
+
+            // Log batch summary for debugging
+            Log::info('Sage Intacct: Batch transformation complete', [
+                'original_batch_size' => count($batch),
+                'transformed_records' => count($transformedRecords),
+                'filtered_gifts' => $filteredCount,
+                'skipped_gifts' => $skippedCount,
+                'gift_id_map_size' => count($giftIdMap),
+            ]);
 
             // Send batch to Intacct based on destination type
             if ($this->setting->use_other_receipts) {
@@ -1104,6 +1138,10 @@ class SageIntacctSyncService
                     $giftId = $giftIdMap[$index] ?? null;
 
                     if (! $giftId) {
+                        Log::warning('Sage Intacct: Batch result index not found in gift ID map', [
+                            'batch_index' => $index,
+                            'available_indexes' => array_keys($giftIdMap),
+                        ]);
                         continue;
                     }
 
@@ -1111,6 +1149,12 @@ class SageIntacctSyncService
 
                     if ($detail['success']) {
                         $recordKey = $detail['key'] ?? null;
+
+                        Log::debug('Sage Intacct: Gift synced successfully', [
+                            'gift_id' => $giftId,
+                            'batch_index' => $index,
+                            'intacct_record_id' => $recordKey,
+                        ]);
 
                         // Update as synced with API details
                         DB::table('sage_intacct_sync_items')
@@ -1125,6 +1169,18 @@ class SageIntacctSyncService
                                 'updated_at' => now(),
                             ]);
                     } else {
+                        Log::warning('Sage Intacct: Gift sync failed', [
+                            'gift_id' => $giftId,
+                            'batch_index' => $index,
+                            'error' => $detail['error'] ?? 'Unknown error',
+                            'transformed_data_sample' => [
+                                'amount' => $transformed['receiptitems'][0]['amount'] ?? $transformed['amount'] ?? 'N/A',
+                                'locationid' => $transformed['receiptitems'][0]['locationid'] ?? $transformed['locationid'] ?? 'N/A',
+                                'projectid' => $transformed['receiptitems'][0]['projectid'] ?? $transformed['projectid'] ?? 'N/A',
+                                'departmentid' => $transformed['receiptitems'][0]['departmentid'] ?? $transformed['departmentid'] ?? 'N/A',
+                            ],
+                        ]);
+
                         // Update as failed with API details
                         DB::table('sage_intacct_sync_items')
                             ->where('sync_history_id', $syncHistory->id)
