@@ -195,6 +195,7 @@
 
             <!-- Action Buttons -->
             <div class="flex items-center justify-between">
+                @if($this->canAny(['donorperfect.sync.refresh', 'donor_gifts.view', 'donor_gifts.configure']))
                 <button wire:click="refreshData"
                         class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
                         wire:loading.attr="disabled">
@@ -207,10 +208,13 @@
                         Refreshing...
                     </span>
                 </button>
+                @else
+                <div></div>
+                @endif
 
                 <div class="flex items-center space-x-2">
                     <!-- Sage Intacct Sync Button -->
-                    @if($intacctConfigured && $this->can('intacct.sync'))
+                    @if($intacctConfigured && $this->canAny(['sage.sync.perform', 'intacct.sync']))
                         @php
                             $intacctSetting = \App\Models\SageIntacctSetting::getActive();
                             $isXmlMode = $intacctSetting && $intacctSetting->isXmlApi();
@@ -338,7 +342,7 @@
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700">
                         <thead class="bg-gray-50 dark:bg-zinc-700">
                             <tr>
-                                @if($intacctConfigured && $this->can('intacct.sync'))
+                                @if($intacctConfigured && $this->canAny(['sage.sync.perform', 'intacct.sync']))
                                 <th scope="col" class="px-4 py-3 text-center">
                                     <input type="checkbox"
                                            wire:click="selectAllForSync"
@@ -422,7 +426,7 @@
                         <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-zinc-700">
                             @foreach($gifts as $gift)
                                 <tr class="hover:bg-gray-50 dark:hover:bg-zinc-700">
-                                    @if($intacctConfigured && $this->can('intacct.sync'))
+                                    @if($intacctConfigured && $this->canAny(['sage.sync.perform', 'intacct.sync']))
                                     <td class="px-4 py-4 text-center" onclick="event.stopPropagation()">
                                         <input type="checkbox"
                                                wire:model.live="selectedGiftsForSync"

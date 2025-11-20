@@ -55,5 +55,12 @@ class DonorPerfectSageSyncRoleSeeder extends Seeder
         foreach ($permissions as $permission) {
             $this->command->info("  - {$permission->name}: {$permission->description}");
         }
+
+        // Also add these permissions to Administrator role so admins have full access
+        $adminRole = Role::where('name', 'Administrator')->first();
+        if ($adminRole) {
+            $adminRole->permissions()->syncWithoutDetaching($permissions->pluck('id'));
+            $this->command->info("\nAlso added sync permissions to Administrator role for full admin access.");
+        }
     }
 }

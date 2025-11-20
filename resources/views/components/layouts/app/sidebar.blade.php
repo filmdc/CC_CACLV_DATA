@@ -78,18 +78,18 @@
                 </flux:navlist.group>
                 @endif
 
-                @if(auth()->user()->hasAnyPermission(['donor_gifts.view', 'donor_gifts.configure', 'intacct.configure']))
+                @if(auth()->user()->hasAnyPermission(['donor_gifts.view', 'donor_gifts.configure', 'donorperfect.sync.view', 'intacct.configure', 'sage.sync.view', 'sage.sync.perform']))
                 <flux:navlist.group :heading="__('Accounting & Fiscal')" class="grid">
-                    @if(auth()->user()->hasPermission('donor_gifts.view'))
+                    @if(auth()->user()->hasAnyPermission(['donor_gifts.view', 'donorperfect.sync.view']))
                         <flux:navlist.item icon="currency-dollar" :href="route('donor-gifts.feed')" :current="request()->routeIs('donor-gifts.feed')" wire:navigate>{{ __('DonorPerfect Gifts') }}</flux:navlist.item>
                     @endif
-                    @if(auth()->user()->hasPermission('donor_gifts.configure'))
+                    @if(auth()->user()->hasAnyPermission(['donor_gifts.configure', 'donorperfect.sync.view']))
                         <flux:navlist.item icon="cog" :href="route('donor-gifts.configuration')" :current="request()->routeIs('donor-gifts.configuration')" wire:navigate>{{ __('DP Configuration') }}</flux:navlist.item>
                     @endif
                     @if(auth()->user()->hasRole('Administrator'))
                         <flux:navlist.item icon="document-text" :href="route('donor-gifts.audit-log')" :current="request()->routeIs('donor-gifts.audit-log')" wire:navigate>{{ __('Check Image Audit Log') }}</flux:navlist.item>
                     @endif
-                    @if(auth()->user()->hasPermission('intacct.configure'))
+                    @if(auth()->user()->hasAnyPermission(['intacct.configure', 'sage.sync.view']))
                         <flux:navlist.item icon="cloud-arrow-up" :href="route('sage-intacct.configuration')" :current="request()->routeIs('sage-intacct.configuration')" wire:navigate>{{ __('Sage Intacct Sync') }}</flux:navlist.item>
                     @endif
                 </flux:navlist.group>
