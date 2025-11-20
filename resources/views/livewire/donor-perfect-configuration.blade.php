@@ -40,7 +40,8 @@
         <!-- Configuration Form -->
         <div class="p-6">
             <form wire:submit="save" class="space-y-6">
-                <!-- API Credentials Section -->
+                @if($this->can('donor_gifts.configure') || $this->isAdmin())
+                <!-- API Credentials Section (Admin Only) -->
                 <div>
                     <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">API Credentials</h3>
                     <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg space-y-4">
@@ -142,6 +143,30 @@
                         </div>
                     </div>
                 </div>
+                @else
+                <!-- Read-Only View for Non-Admins -->
+                <div class="bg-gray-50 dark:bg-zinc-700 p-6 rounded-lg border-2 border-gray-300 dark:border-zinc-600">
+                    <div class="flex items-start">
+                        <svg class="h-6 w-6 text-gray-400 mr-3 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-900 dark:text-white">API Configuration (Admin Only)</h4>
+                            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                                API credentials and authentication settings are restricted to administrators for security reasons.
+                            </p>
+                            <div class="mt-3 text-sm text-gray-700 dark:text-gray-300">
+                                <p><strong>Current Setup:</strong></p>
+                                <ul class="mt-2 space-y-1 list-disc list-inside">
+                                    <li>API URL: <span class="font-mono text-xs bg-gray-200 dark:bg-zinc-600 px-2 py-1 rounded">{{ $api_url ?: 'Not configured' }}</span></li>
+                                    <li>Cache Duration: <span class="font-mono text-xs bg-gray-200 dark:bg-zinc-600 px-2 py-1 rounded">{{ $cache_duration }} seconds</span></li>
+                                    <li>Status: <span class="font-semibold {{ $is_active ? 'text-green-600 dark:text-green-400' : 'text-gray-500' }}">{{ $is_active ? 'Active' : 'Inactive' }}</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
 
                 <!-- Field Selection Section -->
                 <div>
@@ -332,7 +357,8 @@
                     </div>
                 </div>
 
-                <!-- Action Buttons -->
+                <!-- Action Buttons (Admin Only) -->
+                @if($this->can('donor_gifts.configure') || $this->isAdmin())
                 <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-zinc-600">
                     <a href="{{ route('donor-gifts.feed') }}"
                        wire:navigate
@@ -352,6 +378,7 @@
                         </span>
                     </button>
                 </div>
+                @endif
             </form>
         </div>
     </div>

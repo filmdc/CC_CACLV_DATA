@@ -123,7 +123,7 @@ Route::middleware(['auth'])->group(function () {
         ->middleware(['auth', 'permission:donor_gifts.view'])
         ->name('donor-gifts.download-export');
     Route::get('donor-gifts/configuration', App\Livewire\DonorPerfectConfiguration::class)
-        ->middleware(['permission:donor_gifts.configure'])
+        ->middleware(['auth', 'permission:donorperfect.sync.view|donor_gifts.configure'])
         ->name('donor-gifts.configuration');
     Route::get('donor-gifts/audit-log', App\Livewire\CheckImageAuditLog::class)
         ->middleware(['role:Administrator'])
@@ -132,11 +132,11 @@ Route::middleware(['auth'])->group(function () {
     // Sage Intacct Routes
     Route::get('/accounting/sage-intacct/configuration', \App\Livewire\SageIntacctConfiguration::class)
         ->name('sage-intacct.configuration')
-        ->middleware(['auth']);
+        ->middleware(['auth', 'permission:sage.sync.view|intacct.configure']);
 
     Route::get('/accounting/sage-intacct/sync-history/{id}', \App\Livewire\SageIntacctSyncHistoryDetails::class)
         ->name('intacct.sync-history.details')
-        ->middleware(['auth']);
+        ->middleware(['auth', 'permission:sage.sync.view|intacct.configure']);
 
     // Sage Intacct OAuth Routes
     Route::get('/intacct/oauth/authorize', [\App\Http\Controllers\SageIntacctOAuthController::class, 'authorize'])

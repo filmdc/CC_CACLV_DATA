@@ -130,6 +130,8 @@ class DonorPerfectGiftsFeed extends Component
 
     public function refreshData(DonorPerfectGiftService $giftService)
     {
+        $this->authorizeAction('donorperfect.sync.refresh');
+
         try {
             // Clear cache and reload
             $giftService->clearCache();
@@ -436,9 +438,9 @@ class DonorPerfectGiftsFeed extends Component
 
     public function syncToIntacct(DonorPerfectGiftService $giftService)
     {
-        // Check permission
-        if (! $this->can('intacct.sync')) {
-            session()->flash('error', 'You do not have permission to sync to Intacct.');
+        // Check permission (allow new sync permission or legacy permission)
+        if (! $this->canAny(['sage.sync.perform', 'intacct.sync'])) {
+            session()->flash('error', 'You do not have permission to sync to Sage Intacct.');
 
             return;
         }
