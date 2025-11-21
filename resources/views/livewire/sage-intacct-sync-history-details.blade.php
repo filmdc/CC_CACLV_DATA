@@ -152,6 +152,39 @@
                 @endif
             </div>
 
+            <!-- Reset Gifts Section (for Sync Managers and Admins) -->
+            @if($this->canAny(['sage.sync.perform', 'intacct.configure']))
+                @php
+                    $successfulGiftsCount = DB::table('sage_intacct_sync_items')
+                        ->where('sync_history_id', $syncHistory->id)
+                        ->where('status', 'success')
+                        ->count();
+                @endphp
+
+                @if($successfulGiftsCount > 0)
+                <div class="bg-orange-50 dark:bg-orange-900/20 border-l-4 border-orange-400 p-4 rounded-lg">
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-start">
+                            <svg class="h-6 w-6 text-orange-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                            </svg>
+                            <div>
+                                <h4 class="text-sm font-medium text-orange-800 dark:text-orange-300">Reset Synced Gifts</h4>
+                                <p class="text-sm text-orange-700 dark:text-orange-400 mt-1">
+                                    If you deleted these receipts from Sage Intacct and need to re-sync them, you can reset their status here.
+                                    <strong>{{ $successfulGiftsCount }}</strong> gift(s) from this sync are marked as successfully synced.
+                                </p>
+                            </div>
+                        </div>
+                        <button wire:click="confirmResetAllGifts"
+                                class="ml-4 px-4 py-2 bg-orange-600 text-white text-sm rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 whitespace-nowrap">
+                            Reset All Gifts
+                        </button>
+                    </div>
+                </div>
+                @endif
+            @endif
+
             <!-- Filters -->
             <div class="bg-gray-50 dark:bg-zinc-700 rounded-lg p-4">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -378,6 +411,79 @@
                     <button wire:click="closeModal"
                             class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
                         Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Reset Confirmation Modal -->
+    @if($showResetConfirmation)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-lg w-full mx-4">
+                <!-- Modal Header -->
+                <div class="bg-orange-600 text-white p-6 rounded-t-lg">
+                    <h3 class="text-xl font-bold flex items-center">
+                        <svg class="h-6 w-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        Confirm Reset
+                    </h3>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="p-6">
+                    <div class="space-y-4">
+                        <p class="text-gray-700 dark:text-gray-300">
+                            You are about to reset <strong class="text-orange-600 dark:text-orange-400">{{ $successfulGiftsCount ?? 0 }} successfully synced gift(s)</strong> from this sync job.
+                        </p>
+
+                        <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-4">
+                            <p class="text-sm text-yellow-800 dark:text-yellow-300">
+                                <strong>What this does:</strong>
+                            </p>
+                            <ul class="list-disc list-inside text-sm text-yellow-700 dark:text-yellow-400 mt-2 space-y-1">
+                                <li>Changes gift status from "success" to "pending"</li>
+                                <li>Clears Sage Intacct record IDs</li>
+                                <li>Allows these gifts to be synced again</li>
+                                <li>Does NOT delete anything from Sage Intacct</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
+                            <p class="text-sm text-red-800 dark:text-red-300">
+                                <strong>Before resetting:</strong>
+                            </p>
+                            <ul class="list-disc list-inside text-sm text-red-700 dark:text-red-400 mt-2 space-y-1">
+                                <li>Make sure you've deleted the receipts from Sage Intacct first</li>
+                                <li>Otherwise you'll create duplicates when you re-sync</li>
+                                <li>This action cannot be easily undone</li>
+                            </ul>
+                        </div>
+
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">
+                            Are you sure you want to proceed?
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-b-lg flex justify-end space-x-3">
+                    <button wire:click="cancelReset"
+                            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-zinc-600 border border-gray-300 dark:border-zinc-500 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-500">
+                        Cancel
+                    </button>
+                    <button wire:click="resetAllGifts"
+                            class="px-4 py-2 text-sm font-medium text-white bg-orange-600 border border-transparent rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            wire:loading.attr="disabled">
+                        <span wire:loading.remove wire:target="resetAllGifts">Yes, Reset All Gifts</span>
+                        <span wire:loading wire:target="resetAllGifts" class="flex items-center">
+                            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Resetting...
+                        </span>
                     </button>
                 </div>
             </div>

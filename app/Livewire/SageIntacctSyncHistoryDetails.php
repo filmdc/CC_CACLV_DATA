@@ -24,9 +24,14 @@ class SageIntacctSyncHistoryDetails extends Component
 
     public $selectedItem = null;
 
+    public $showResetConfirmation = false;
+
     public function mount($id)
     {
-        $this->authorizeAction('intacct.configure');
+        // Allow viewing if user has sync view permission or admin permission
+        if (!$this->canAny(['sage.sync.view', 'intacct.configure'])) {
+            abort(403, 'Unauthorized access to sync history.');
+        }
 
         $this->syncHistoryId = $id;
         $this->loadSyncHistory();
@@ -70,6 +75,73 @@ class SageIntacctSyncHistoryDetails extends Component
     {
         $this->showModal = false;
         $this->selectedItem = null;
+    }
+
+    public function confirmResetAllGifts()
+    {
+        // Check permission
+        $this->authorizeAction('sage.sync.perform');
+
+        $this->showResetConfirmation = true;
+    }
+
+    public function cancelReset()
+    {
+        $this->showResetConfirmation = false;
+    }
+
+    public function resetAllGifts()
+    {
+        // Check permission
+        $this->authorizeAction('sage.sync.perform');
+
+        try {
+            // Get count before reset
+            $successCount = DB::table('sage_intacct_sync_items')
+                ->where('sync_history_id', $this->syncHistoryId)
+                ->where('status', 'success')
+                ->count();
+
+            if ($successCount === 0) {
+                session()->flash('warning', 'No successfully synced gifts found in this sync job to reset.');
+                $this->showResetConfirmation = false;
+                return;
+            }
+
+            // Reset all successfully synced items to pending
+            DB::table('sage_intacct_sync_items')
+                ->where('sync_history_id', $this->syncHistoryId)
+                ->where('status', 'success')
+                ->update([
+                    'status' => 'pending',
+                    'intacct_record_id' => null,
+                    'synced_at' => null,
+                    'error_message' => null,
+                    'updated_at' => now(),
+                ]);
+
+            // Log the reset action
+            \Log::info('Sage Intacct: Sync gifts reset for re-sync', [
+                'sync_history_id' => $this->syncHistoryId,
+                'reset_count' => $successCount,
+                'user_id' => auth()->id(),
+                'user_name' => auth()->user()->name,
+            ]);
+
+            session()->flash('success', "Successfully reset {$successCount} gift(s) to pending status. These gifts can now be synced again.");
+
+            $this->showResetConfirmation = false;
+            $this->loadSyncHistory();
+
+        } catch (\Exception $e) {
+            \Log::error('Sage Intacct: Reset gifts failed', [
+                'sync_history_id' => $this->syncHistoryId,
+                'error' => $e->getMessage(),
+            ]);
+
+            session()->flash('error', 'Failed to reset gifts: ' . $e->getMessage());
+            $this->showResetConfirmation = false;
+        }
     }
 
     public function getEnvironmentInfo()
