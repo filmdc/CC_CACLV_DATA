@@ -96,21 +96,30 @@ class SageIntacctSyncHistoryDetails extends Component
         $this->authorizeAction('sage.sync.perform');
 
         try {
-            // Get count before reset
-            $successCount = DB::table('sage_intacct_sync_items')
+            // STEP 1: Get all gift_ids from this sync that have success status
+            $giftIds = DB::table('sage_intacct_sync_items')
                 ->where('sync_history_id', $this->syncHistoryId)
                 ->where('status', 'success')
-                ->count();
+                ->pluck('gift_id')
+                ->unique()
+                ->toArray();
 
-            if ($successCount === 0) {
+            if (empty($giftIds)) {
                 session()->flash('warning', 'No successfully synced gifts found in this sync job to reset.');
                 $this->showResetConfirmation = false;
                 return;
             }
 
-            // Reset all successfully synced items to pending
-            DB::table('sage_intacct_sync_items')
-                ->where('sync_history_id', $this->syncHistoryId)
+            // STEP 2: Count how many records across ALL syncs will be reset
+            $totalRecordsToReset = DB::table('sage_intacct_sync_items')
+                ->whereIn('gift_id', $giftIds)
+                ->where('status', 'success')
+                ->count();
+
+            // STEP 3: Reset ALL occurrences of these gift_ids across ALL sync_history_ids
+            // This ensures duplicate prevention won't block them
+            $resetCount = DB::table('sage_intacct_sync_items')
+                ->whereIn('gift_id', $giftIds)
                 ->where('status', 'success')
                 ->update([
                     'status' => 'pending',
@@ -121,14 +130,16 @@ class SageIntacctSyncHistoryDetails extends Component
                 ]);
 
             // Log the reset action
-            \Log::info('Sage Intacct: Sync gifts reset for re-sync', [
+            \Log::info('Sage Intacct: Sync gifts reset for re-sync (cross-sync reset)', [
                 'sync_history_id' => $this->syncHistoryId,
-                'reset_count' => $successCount,
+                'unique_gift_ids' => count($giftIds),
+                'total_records_reset' => $resetCount,
+                'gift_ids' => $giftIds,
                 'user_id' => auth()->id(),
                 'user_name' => auth()->user()->name,
             ]);
 
-            session()->flash('success', "Successfully reset {$successCount} gift(s) to pending status. These gifts can now be synced again.");
+            session()->flash('success', "Successfully reset {$resetCount} record(s) for " . count($giftIds) . " unique gift(s) across all sync jobs. These gifts can now be synced again.");
 
             $this->showResetConfirmation = false;
             $this->loadSyncHistory();

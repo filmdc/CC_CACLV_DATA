@@ -155,10 +155,24 @@
             <!-- Reset Gifts Section (for Sync Managers and Admins) -->
             @if($this->canAny(['sage.sync.perform', 'intacct.configure']))
                 @php
-                    $successfulGiftsCount = DB::table('sage_intacct_sync_items')
+                    // Get gift_ids from this sync with success status
+                    $giftIdsInThisSync = DB::table('sage_intacct_sync_items')
                         ->where('sync_history_id', $syncHistory->id)
                         ->where('status', 'success')
-                        ->count();
+                        ->pluck('gift_id')
+                        ->unique()
+                        ->toArray();
+
+                    $successfulGiftsCount = count($giftIdsInThisSync);
+
+                    // Count total records across ALL syncs that will be reset
+                    $totalRecordsAcrossAllSyncs = 0;
+                    if (!empty($giftIdsInThisSync)) {
+                        $totalRecordsAcrossAllSyncs = DB::table('sage_intacct_sync_items')
+                            ->whereIn('gift_id', $giftIdsInThisSync)
+                            ->where('status', 'success')
+                            ->count();
+                    }
                 @endphp
 
                 @if($successfulGiftsCount > 0)
@@ -169,10 +183,15 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                             </svg>
                             <div>
-                                <h4 class="text-sm font-medium text-orange-800 dark:text-orange-300">Reset Synced Gifts</h4>
+                                <h4 class="text-sm font-medium text-orange-800 dark:text-orange-300">Reset Synced Gifts for Re-Sync</h4>
                                 <p class="text-sm text-orange-700 dark:text-orange-400 mt-1">
                                     If you deleted these receipts from Sage Intacct and need to re-sync them, you can reset their status here.
-                                    <strong>{{ $successfulGiftsCount }}</strong> gift(s) from this sync are marked as successfully synced.
+                                </p>
+                                <p class="text-sm text-orange-700 dark:text-orange-400 mt-1">
+                                    This sync has <strong>{{ $successfulGiftsCount }}</strong> successfully synced gift(s).
+                                    @if($totalRecordsAcrossAllSyncs > $successfulGiftsCount)
+                                        <span class="font-semibold">(Will reset {{ $totalRecordsAcrossAllSyncs }} total records across all sync jobs)</span>
+                                    @endif
                                 </p>
                             </div>
                         </div>
@@ -419,6 +438,24 @@
 
     <!-- Reset Confirmation Modal -->
     @if($showResetConfirmation)
+        @php
+            // Recalculate for modal display
+            $giftIdsToReset = DB::table('sage_intacct_sync_items')
+                ->where('sync_history_id', $syncHistory->id)
+                ->where('status', 'success')
+                ->pluck('gift_id')
+                ->unique()
+                ->toArray();
+
+            $totalRecordsToReset = 0;
+            if (!empty($giftIdsToReset)) {
+                $totalRecordsToReset = DB::table('sage_intacct_sync_items')
+                    ->whereIn('gift_id', $giftIdsToReset)
+                    ->where('status', 'success')
+                    ->count();
+            }
+        @endphp
+
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
             <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-lg w-full mx-4">
                 <!-- Modal Header -->
@@ -435,17 +472,28 @@
                 <div class="p-6">
                     <div class="space-y-4">
                         <p class="text-gray-700 dark:text-gray-300">
-                            You are about to reset <strong class="text-orange-600 dark:text-orange-400">{{ $successfulGiftsCount ?? 0 }} successfully synced gift(s)</strong> from this sync job.
+                            You are about to reset <strong class="text-orange-600 dark:text-orange-400">{{ count($giftIdsToReset) }} unique gift(s)</strong> from this sync job.
                         </p>
+
+                        @if($totalRecordsToReset > count($giftIdsToReset))
+                        <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-4">
+                            <p class="text-sm text-blue-800 dark:text-blue-300">
+                                <strong>Cross-Sync Reset:</strong>
+                            </p>
+                            <p class="text-sm text-blue-700 dark:text-blue-400 mt-1">
+                                These gifts appear in multiple sync jobs. This will reset <strong>{{ $totalRecordsToReset }} total records</strong> across all sync jobs to ensure they can be re-synced without issues.
+                            </p>
+                        </div>
+                        @endif
 
                         <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-4">
                             <p class="text-sm text-yellow-800 dark:text-yellow-300">
                                 <strong>What this does:</strong>
                             </p>
                             <ul class="list-disc list-inside text-sm text-yellow-700 dark:text-yellow-400 mt-2 space-y-1">
-                                <li>Changes gift status from "success" to "pending"</li>
+                                <li>Changes gift status from "success" to "pending" across ALL syncs</li>
                                 <li>Clears Sage Intacct record IDs</li>
-                                <li>Allows these gifts to be synced again</li>
+                                <li>Completely unlocks these gifts for re-syncing</li>
                                 <li>Does NOT delete anything from Sage Intacct</li>
                             </ul>
                         </div>
