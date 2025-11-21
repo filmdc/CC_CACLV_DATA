@@ -30,24 +30,29 @@ class ParticipantImportTest extends TestCase
         $this->user = User::factory()->create();
         $this->actingAs($this->user);
         
-        // Create reference data set
-        $this->referenceDataSet = ReferenceDataSet::create([
-            'name' => 'Test CSBG Data Set',
-            'description' => 'Test reference data for import testing',
-            'version' => 'v1.0.0',
-            'is_active' => true,
-            'is_draft' => false,
-            'is_import_default' => true,
-            'activated_at' => now(),
-            'created_by' => $this->user->id
-        ]);
+        // Create or get existing reference data set (handles RefreshDatabase cleanup timing)
+        $this->referenceDataSet = ReferenceDataSet::firstOrCreate(
+            [
+                'version' => 'v1.0.0-test',
+            ],
+            [
+                'name' => 'Test CSBG Data Set',
+                'description' => 'Test reference data for import testing',
+                'is_active' => true,
+                'is_draft' => false,
+                'is_import_default' => true,
+                'activated_at' => now(),
+                'created_by' => $this->user->id
+            ]
+        );
         
         // Seed reference data
         $this->seedReferenceData();
-        
-        // Initialize import service
+
+        // Initialize import service with required dependencies
         $transformer = new ReferenceDataTransformationService();
-        $this->importService = new ParticipantImportService($transformer);
+        $duplicateDetection = new \App\Services\DuplicateDetectionService();
+        $this->importService = new ParticipantImportService($transformer, $duplicateDetection);
     }
 
     private function seedReferenceData(): void

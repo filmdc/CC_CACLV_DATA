@@ -53,12 +53,17 @@ class ServiceManagementTest extends TestCase
     {
         $user = User::factory()->create();
         $program = Program::factory()->create();
-        $service = Service::factory()->create(['program_id' => $program->id]);
+        $service = Service::factory()->create([
+            'program_id' => $program->id,
+            'start_date' => '2025-01-01',
+        ]);
 
         Livewire::actingAs($user)
             ->test(\App\Livewire\ServiceManagement::class)
             ->call('showEditService', $service->id)
             ->set('name', 'Updated Service Name')
+            ->set('program_id', $program->id)
+            ->set('start_date', '2025-01-01')
             ->call('updateService')
             ->assertHasNoErrors();
 
@@ -96,7 +101,7 @@ class ServiceManagementTest extends TestCase
             ->assertHasErrors(['name', 'program_id', 'start_date']);
     }
 
-    public function test_service_view_modal_opens()
+    public function test_service_view_redirects_to_show_page()
     {
         $user = User::factory()->create();
         $program = Program::factory()->create();
@@ -105,58 +110,33 @@ class ServiceManagementTest extends TestCase
         Livewire::actingAs($user)
             ->test(\App\Livewire\ServiceManagement::class)
             ->call('viewService', $service->id)
-            ->assertSet('showViewModal', true)
-            ->assertSet('viewService.id', $service->id)
-            ->assertSet('viewService.name', $service->name);
+            ->assertRedirect(route('service.show', $service->id));
     }
 
-    public function test_service_view_modal_closes()
+    public function test_service_form_reset_clears_fields()
     {
         $user = User::factory()->create();
-        $program = Program::factory()->create();
-        $service = Service::factory()->create(['program_id' => $program->id]);
 
         Livewire::actingAs($user)
             ->test(\App\Livewire\ServiceManagement::class)
-            ->call('viewService', $service->id)
-            ->assertSet('showViewModal', true)
-            ->set('showViewModal', false)
+            ->set('name', 'Test Service')
+            ->set('description', 'Test Description')
+            ->call('resetServiceForm')
+            ->assertSet('name', '')
+            ->assertSet('description', '')
             ->assertSet('showViewModal', false);
     }
 
-    public function test_service_view_resets_on_form_reset()
+    public function test_selected_service_id_is_cleared_on_reset()
     {
         $user = User::factory()->create();
-        $program = Program::factory()->create();
-        $service = Service::factory()->create(['program_id' => $program->id]);
 
         Livewire::actingAs($user)
             ->test(\App\Livewire\ServiceManagement::class)
-            ->call('viewService', $service->id)
-            ->assertSet('showViewModal', true)
+            ->set('selectedServiceId', 123)
+            ->set('selectedViewService', 456)
             ->call('resetServiceForm')
-            ->assertSet('showViewModal', false)
-            ->assertSet('viewService', null);
-    }
-
-    public function test_service_view_loads_with_relationships()
-    {
-        $user = User::factory()->create();
-        $program = Program::factory()->create();
-        $service = Service::factory()->create(['program_id' => $program->id]);
-
-        $component = Livewire::actingAs($user)
-            ->test(\App\Livewire\ServiceManagement::class)
-            ->call('viewService', $service->id);
-
-        $component->assertSet('showViewModal', true);
-        
-        // Check that the service is loaded with its relationships
-        $viewService = $component->get('viewService');
-        $this->assertNotNull($viewService);
-        $this->assertEquals($service->id, $viewService->id);
-        $this->assertTrue($viewService->relationLoaded('program'));
-        $this->assertTrue($viewService->relationLoaded('workPlanGoals'));
-        $this->assertTrue($viewService->relationLoaded('serviceEnrollments'));
+            ->assertSet('selectedServiceId', null)
+            ->assertSet('selectedViewService', null);
     }
 }

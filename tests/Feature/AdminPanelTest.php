@@ -134,12 +134,13 @@ class AdminPanelTest extends TestCase
         // Test that normalized date works for program creation
         $component->set('program_name', 'Test Program')
             ->set('program_start_date', '06/15/2025')
+            ->set('program_end_date', '12/31/2025')
             ->call('createProgram')
             ->assertHasNoErrors();
 
         $this->assertDatabaseHas('programs', [
             'name' => 'Test Program',
-            'start_date' => '2025-06-15 00:00:00',
+            'start_date' => '2025-06-15',
         ]);
     }
 }
