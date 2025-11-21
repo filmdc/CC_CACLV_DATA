@@ -19,7 +19,18 @@ class CheckPermission
             abort(403, 'Unauthorized access.');
         }
 
-        if (!$request->user()->hasAnyPermission($permissions)) {
+        // Handle comma-separated permissions (e.g., "perm1,perm2")
+        $permissionList = [];
+        foreach ($permissions as $permission) {
+            if (str_contains($permission, ',')) {
+                // Split comma-separated permissions
+                $permissionList = array_merge($permissionList, array_map('trim', explode(',', $permission)));
+            } else {
+                $permissionList[] = $permission;
+            }
+        }
+
+        if (!$request->user()->hasAnyPermission($permissionList)) {
             abort(403, 'You do not have the required permission to access this resource.');
         }
 
