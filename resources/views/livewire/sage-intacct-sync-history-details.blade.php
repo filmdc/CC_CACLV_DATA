@@ -101,16 +101,11 @@
                                 <dt class="text-sm text-gray-600 dark:text-gray-400">Reset At:</dt>
                                 <dd class="text-sm font-medium text-gray-900 dark:text-white">{{ $syncHistory->reset_at->format('M d, Y H:i:s') }}</dd>
                             </div>
-                            @if($syncHistory->reset_by_user_id)
-                                @php
-                                    $resetByUser = \App\Models\User::find($syncHistory->reset_by_user_id);
-                                @endphp
-                                @if($resetByUser)
-                                    <div class="flex justify-between">
-                                        <dt class="text-sm text-gray-600 dark:text-gray-400">Reset By:</dt>
-                                        <dd class="text-sm font-medium text-gray-900 dark:text-white">{{ $resetByUser->name }}</dd>
-                                    </div>
-                                @endif
+                            @if($syncHistory->resetBy)
+                                <div class="flex justify-between">
+                                    <dt class="text-sm text-gray-600 dark:text-gray-400">Reset By:</dt>
+                                    <dd class="text-sm font-medium text-gray-900 dark:text-white">{{ $syncHistory->resetBy->name }}</dd>
+                                </div>
                             @endif
                         @endif
                     </dl>

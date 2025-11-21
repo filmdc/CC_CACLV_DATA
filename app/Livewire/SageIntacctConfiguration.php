@@ -891,6 +891,7 @@ class SageIntacctConfiguration extends Component
         }
 
         $syncHistory = SageIntacctSyncHistory::query()
+            ->with('resetBy') // Eager load reset user to prevent N+1 queries
             ->when($this->filterStatus, function ($query) {
                 $query->where('status', $this->filterStatus);
             })

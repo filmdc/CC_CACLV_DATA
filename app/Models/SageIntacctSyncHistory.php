@@ -33,6 +33,9 @@ class SageIntacctSyncHistory extends Model
         'status',
         'started_at',
         'completed_at',
+        'reset_at',
+        'reset_by_user_id',
+        'reset_count',
         'sync_start_date',
         'sync_end_date',
         'executed_by_user_id',
@@ -50,6 +53,7 @@ class SageIntacctSyncHistory extends Model
     protected $casts = [
         'started_at' => 'datetime',
         'completed_at' => 'datetime',
+        'reset_at' => 'datetime',
         'sync_start_date' => 'date',
         'sync_end_date' => 'date',
         'environment_info' => 'array',
@@ -58,6 +62,7 @@ class SageIntacctSyncHistory extends Model
         'successful_count' => 'integer',
         'failed_count' => 'integer',
         'skipped_count' => 'integer',
+        'reset_count' => 'integer',
     ];
 
     /**
@@ -82,6 +87,14 @@ class SageIntacctSyncHistory extends Model
     public function executedBy(): BelongsTo
     {
         return $this->belongsTo(\App\Models\User::class, 'executed_by_user_id');
+    }
+
+    /**
+     * Get the user who reset this sync
+     */
+    public function resetBy(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\User::class, 'reset_by_user_id');
     }
 
     /**

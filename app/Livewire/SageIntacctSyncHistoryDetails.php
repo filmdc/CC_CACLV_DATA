@@ -39,7 +39,7 @@ class SageIntacctSyncHistoryDetails extends Component
 
     public function loadSyncHistory()
     {
-        $this->syncHistory = SageIntacctSyncHistory::with('syncItems')
+        $this->syncHistory = SageIntacctSyncHistory::with(['syncItems', 'resetBy'])
             ->findOrFail($this->syncHistoryId);
     }
 
