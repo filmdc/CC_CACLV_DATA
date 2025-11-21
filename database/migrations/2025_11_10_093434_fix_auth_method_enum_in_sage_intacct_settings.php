@@ -12,6 +12,18 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Check if auth_method column exists and needs fixing
+        if (!Schema::hasTable('sage_intacct_settings') || !Schema::hasColumn('sage_intacct_settings', 'auth_method')) {
+            return;
+        }
+
+        // Check if column already has correct enum values
+        $columnInfo = DB::select("SHOW COLUMNS FROM sage_intacct_settings WHERE Field = 'auth_method'");
+        if (!empty($columnInfo) && str_contains($columnInfo[0]->Type, 'xml')) {
+            // Already has correct enum values, skip
+            return;
+        }
+
         // First, convert enum to varchar to allow updating values
         DB::statement("ALTER TABLE sage_intacct_settings MODIFY COLUMN auth_method VARCHAR(20) NOT NULL DEFAULT 'xml'");
 

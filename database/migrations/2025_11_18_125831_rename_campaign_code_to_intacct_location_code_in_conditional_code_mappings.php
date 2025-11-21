@@ -66,13 +66,14 @@ return new class extends Migration
         // Step 4: Remove duplicate rows that resulted from consolidating multiple DP campaigns
         // to the same Intacct location (e.g., FB, SF, SHFB_FY22-23 all → P1400)
         // Keep the row with the lowest ID (oldest) for each unique combination
+        // Use the correct column name (might be campaign_code or intacct_location_code)
         DB::statement("
             DELETE t1 FROM conditional_code_mappings t1
             INNER JOIN (
-                SELECT MIN(id) as min_id, intacct_location_code, field_type, dp_code
+                SELECT MIN(id) as min_id, {$columnName}, field_type, dp_code
                 FROM conditional_code_mappings
-                GROUP BY intacct_location_code, field_type, dp_code
-            ) t2 ON t1.intacct_location_code = t2.intacct_location_code
+                GROUP BY {$columnName}, field_type, dp_code
+            ) t2 ON t1.{$columnName} = t2.{$columnName}
                 AND t1.field_type = t2.field_type
                 AND t1.dp_code = t2.dp_code
             WHERE t1.id > t2.min_id
