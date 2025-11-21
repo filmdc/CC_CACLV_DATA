@@ -153,7 +153,7 @@
             </div>
 
             <!-- Reset Gifts Section (for Sync Managers and Admins) -->
-            @if($this->canAny(['sage.sync.perform', 'intacct.configure']))
+            @if(auth()->user()->hasAnyPermission(['sage.sync.perform', 'intacct.configure']))
                 @php
                     // Get gift_ids from this sync with success status
                     $giftIdsInThisSync = DB::table('sage_intacct_sync_items')
