@@ -89,6 +89,28 @@ class SageIntacctSyncService
                 Log::info('Sage Intacct: Using specific gifts provided by caller', [
                     'count' => count($gifts),
                 ]);
+
+                // CRITICAL: Filter out already successfully synced gifts to prevent duplicates
+                $syncedGiftIds = DB::table('sage_intacct_sync_items')
+                    ->where('status', 'success')
+                    ->pluck('gift_id')
+                    ->toArray();
+
+                $originalCount = count($gifts);
+                $gifts = array_filter($gifts, function ($gift) use ($syncedGiftIds) {
+                    $giftId = $gift['gift_id'] ?? null;
+                    return $giftId && ! in_array($giftId, $syncedGiftIds);
+                });
+                $gifts = array_values($gifts); // Re-index array
+
+                $filteredCount = $originalCount - count($gifts);
+
+                Log::info('Sage Intacct: Filtered already-synced gifts from selection', [
+                    'original_count' => $originalCount,
+                    'already_synced' => $filteredCount,
+                    'remaining_to_sync' => count($gifts),
+                    'synced_gift_ids' => $syncedGiftIds,
+                ]);
             } else {
                 // Get all gifts from DonorPerfect (don't filter by local sync status)
                 $dpGiftService = new DonorPerfectGiftService;
@@ -106,14 +128,41 @@ class SageIntacctSyncService
                 Log::info('Sage Intacct: Retrieved all gifts from date range', [
                     'count' => count($gifts),
                 ]);
+
+                // Filter out already successfully synced gifts
+                $syncedGiftIds = DB::table('sage_intacct_sync_items')
+                    ->where('status', 'success')
+                    ->pluck('gift_id')
+                    ->toArray();
+
+                $originalCount = count($gifts);
+                $gifts = array_filter($gifts, function ($gift) use ($syncedGiftIds) {
+                    $giftId = $gift['gift_id'] ?? null;
+                    return $giftId && ! in_array($giftId, $syncedGiftIds);
+                });
+                $gifts = array_values($gifts); // Re-index array
+
+                Log::info('Sage Intacct: Filtered already-synced gifts', [
+                    'total_gifts' => $originalCount,
+                    'already_synced' => count($syncedGiftIds),
+                    'syncable' => count($gifts),
+                ]);
             }
 
             if (empty($gifts)) {
                 $this->updateSyncHistory($syncHistory, 'success', null);
 
+                $message = 'No gifts to sync for the specified date range';
+
+                // If we filtered out gifts, provide more specific message
+                if (isset($filteredCount) && $filteredCount > 0) {
+                    $message = "All {$filteredCount} selected gift(s) have already been synced successfully. No duplicates created.";
+                }
+
                 Log::info('Sage Intacct: No gifts to sync', [
                     'start_date' => $startDate->toDateString(),
                     'end_date' => $endDate->toDateString(),
+                    'reason' => isset($filteredCount) && $filteredCount > 0 ? 'all_already_synced' : 'no_gifts_in_range',
                 ]);
 
                 return [
@@ -122,7 +171,7 @@ class SageIntacctSyncService
                     'synced' => 0,
                     'failed' => 0,
                     'skipped' => 0,
-                    'message' => 'No gifts to sync for the specified date range',
+                    'message' => $message,
                 ];
             }
 

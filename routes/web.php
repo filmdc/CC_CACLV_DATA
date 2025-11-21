@@ -95,7 +95,7 @@ Route::middleware(['auth'])->group(function () {
 
     // DonorPerfect Routes
     Route::get('donor-gifts', App\Livewire\DonorPerfectGiftsFeed::class)
-        ->middleware(['permission:donor_gifts.view'])
+        ->middleware(['auth', 'permission:donor_gifts.view,donorperfect.sync.view'])
         ->name('donor-gifts.feed');
     Route::get('donor-gifts/download-export/{type}', function ($type) {
         $exportData = session()->get('export_downloads');

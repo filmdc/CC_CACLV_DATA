@@ -425,21 +425,24 @@
                         </thead>
                         <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-zinc-700">
                             @foreach($gifts as $gift)
-                                <tr class="hover:bg-gray-50 dark:hover:bg-zinc-700">
+                                @php
+                                    $syncStatus = $this->getSyncStatus($gift);
+                                    $syncItem = \App\Models\SageIntacctSyncItem::where('gift_id', $gift['gift_id'] ?? null)->orderBy('created_at', 'desc')->first();
+                                    $isAlreadySynced = ($syncStatus === 'synced' || $syncStatus === 'success');
+                                @endphp
+                                <tr class="hover:bg-gray-50 dark:hover:bg-zinc-700 {{ $isAlreadySynced ? 'opacity-60' : '' }}">
                                     @if($intacctConfigured && $this->canAny(['sage.sync.perform', 'intacct.sync']))
                                     <td class="px-4 py-4 text-center" onclick="event.stopPropagation()">
                                         <input type="checkbox"
                                                wire:model.live="selectedGiftsForSync"
                                                value="{{ $gift['gift_id'] ?? '' }}"
-                                               class="rounded border-gray-300 dark:border-zinc-600 text-purple-600 focus:ring-purple-500">
+                                               class="rounded border-gray-300 dark:border-zinc-600 text-purple-600 focus:ring-purple-500 {{ $isAlreadySynced ? 'cursor-not-allowed' : '' }}"
+                                               {{ $isAlreadySynced ? 'disabled' : '' }}
+                                               title="{{ $isAlreadySynced ? 'Already synced successfully' : 'Select for sync' }}">
                                     </td>
                                     @endif
                                     @if($intacctConfigured)
                                     <td class="px-4 py-4 text-center">
-                                        @php
-                                            $syncStatus = $this->getSyncStatus($gift);
-                                            $syncItem = \App\Models\SageIntacctSyncItem::where('gift_id', $gift['gift_id'] ?? null)->orderBy('created_at', 'desc')->first();
-                                        @endphp
                                         @if($syncStatus === 'synced' || $syncStatus === 'success')
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
                                                   title="Synced on {{ $syncItem && $syncItem->synced_at ? $syncItem->synced_at->format('M d, Y g:i A') : '' }}">
