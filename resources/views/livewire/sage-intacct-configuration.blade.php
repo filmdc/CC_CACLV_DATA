@@ -744,23 +744,39 @@
                                                 {{ $sync->completed_at ? $sync->completed_at->format('M d, Y H:i') : '-' }}
                                             </td>
                                             <td class="px-4 py-3 whitespace-nowrap">
-                                                @if($sync->status === 'success')
-                                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                                        Success
-                                                    </span>
-                                                @elseif($sync->status === 'failed')
-                                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
-                                                        Failed
-                                                    </span>
-                                                @elseif($sync->status === 'partial')
-                                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
-                                                        Partial
-                                                    </span>
-                                                @else
-                                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-                                                        Running
-                                                    </span>
-                                                @endif
+                                                <div class="flex items-center space-x-2">
+                                                    @if($sync->status === 'success')
+                                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                                                            Success
+                                                        </span>
+                                                    @elseif($sync->status === 'failed')
+                                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
+                                                            Failed
+                                                        </span>
+                                                    @elseif($sync->status === 'partial')
+                                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
+                                                            Partial
+                                                        </span>
+                                                    @else
+                                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                                            Running
+                                                        </span>
+                                                    @endif
+
+                                                    @if($sync->reset_at)
+                                                        @php
+                                                            $resetUser = $sync->reset_by_user_id ? \App\Models\User::find($sync->reset_by_user_id) : null;
+                                                            $resetDate = \Carbon\Carbon::parse($sync->reset_at);
+                                                        @endphp
+                                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200"
+                                                              title="Reset {{ $sync->reset_count > 1 ? $sync->reset_count . ' times, last' : '' }} on {{ $resetDate->format('M d, Y g:i A') }}{{ $resetUser ? ' by ' . $resetUser->name : '' }}">
+                                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                                            </svg>
+                                                            Reset{{ $sync->reset_count > 1 ? ' ×' . $sync->reset_count : '' }}
+                                                        </span>
+                                                    @endif
+                                                </div>
                                             </td>
                                             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                                                 {{ $sync->total_records }}

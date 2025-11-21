@@ -129,6 +129,16 @@ class SageIntacctSyncHistoryDetails extends Component
                     'updated_at' => now(),
                 ]);
 
+            // STEP 4: Update sync_history table to track this reset
+            DB::table('sage_intacct_sync_history')
+                ->where('id', $this->syncHistoryId)
+                ->update([
+                    'reset_at' => now(),
+                    'reset_by_user_id' => auth()->id(),
+                    'reset_count' => DB::raw('reset_count + 1'),
+                    'updated_at' => now(),
+                ]);
+
             // Log the reset action
             \Log::info('Sage Intacct: Sync gifts reset for re-sync (cross-sync reset)', [
                 'sync_history_id' => $this->syncHistoryId,

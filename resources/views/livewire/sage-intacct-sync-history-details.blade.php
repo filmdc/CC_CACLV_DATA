@@ -84,6 +84,35 @@
                             <dt class="text-sm text-gray-600 dark:text-gray-400">Triggered By:</dt>
                             <dd class="text-sm font-medium text-gray-900 dark:text-white">{{ $syncHistory->triggered_by ?? 'N/A' }}</dd>
                         </div>
+
+                        @if($syncHistory->reset_at)
+                            <div class="flex justify-between">
+                                <dt class="text-sm text-gray-600 dark:text-gray-400">Reset Status:</dt>
+                                <dd class="text-sm font-medium">
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200">
+                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                        </svg>
+                                        Reset {{ $syncHistory->reset_count > 1 ? $syncHistory->reset_count . ' times' : '' }}
+                                    </span>
+                                </dd>
+                            </div>
+                            <div class="flex justify-between">
+                                <dt class="text-sm text-gray-600 dark:text-gray-400">Reset At:</dt>
+                                <dd class="text-sm font-medium text-gray-900 dark:text-white">{{ $syncHistory->reset_at->format('M d, Y H:i:s') }}</dd>
+                            </div>
+                            @if($syncHistory->reset_by_user_id)
+                                @php
+                                    $resetByUser = \App\Models\User::find($syncHistory->reset_by_user_id);
+                                @endphp
+                                @if($resetByUser)
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm text-gray-600 dark:text-gray-400">Reset By:</dt>
+                                        <dd class="text-sm font-medium text-gray-900 dark:text-white">{{ $resetByUser->name }}</dd>
+                                    </div>
+                                @endif
+                            @endif
+                        @endif
                     </dl>
 
                     @if($syncHistory->error_message)
