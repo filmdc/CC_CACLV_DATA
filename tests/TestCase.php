@@ -20,19 +20,11 @@ abstract class TestCase extends BaseTestCase
 
     private function configureDatabaseConnection(): void
     {
-        if (extension_loaded('pdo_sqlite')) {
-            $this->app['config']->set('database.default', 'sqlite');
-            $this->app['config']->set('database.connections.sqlite', [
-                'driver' => 'sqlite',
-                'database' => ':memory:',
-                'prefix' => '',
-                'foreign_key_constraints' => true,
-            ]);
-
-            DB::setDefaultConnection('sqlite');
-            return;
-        }
-
+        // Use MySQL for testing to match production environment
+        // This ensures tests accurately reflect production behavior with:
+        // - MySQL-specific features (JSON queries, ENUM types)
+        // - Foreign key constraints behavior
+        // - Complex sync logic queries
         $defaultConnection = $this->app['config']->get('database.default');
         DB::setDefaultConnection($defaultConnection);
     }

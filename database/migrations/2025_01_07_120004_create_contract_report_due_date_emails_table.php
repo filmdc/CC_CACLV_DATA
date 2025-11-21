@@ -11,6 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Skip if table already exists (created by later migration)
+        if (Schema::hasTable('contract_report_due_date_emails')) {
+            return;
+        }
+
+        // Skip if required tables don't exist yet
+        if (!Schema::hasTable('contract_report_due_dates') || !Schema::hasTable('due_date_emails')) {
+            return;
+        }
+
         Schema::create('contract_report_due_date_emails', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('contract_report_due_date_id');

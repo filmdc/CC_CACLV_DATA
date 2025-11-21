@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('sage_intacct_settings', function (Blueprint $table) {
-            $table->enum('auth_method', ['xml', 'oauth'])->default('xml')->after('api_version');
-        });
+        // Check if column already exists (may have been added by earlier migration)
+        if (!Schema::hasColumn('sage_intacct_settings', 'auth_method')) {
+            Schema::table('sage_intacct_settings', function (Blueprint $table) {
+                $table->enum('auth_method', ['xml', 'oauth'])->default('xml')->after('api_version');
+            });
+        }
     }
 
     /**

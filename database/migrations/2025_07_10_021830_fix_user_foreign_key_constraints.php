@@ -21,6 +21,8 @@ return new class extends Migration
                 } catch (\Throwable $e) {
                     // Foreign key might already be updated; ignore
                 }
+                // Make column nullable to support onDelete('set null')
+                $table->unsignedBigInteger('user_id')->nullable()->change();
                 $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
             });
         }

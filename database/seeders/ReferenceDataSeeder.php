@@ -10,6 +10,9 @@ class ReferenceDataSeeder extends Seeder
 {
     public function run(): void
     {
+        // Get first user ID or null (for testing environments)
+        $firstUserId = \App\Models\User::first()?->id;
+
         // Create ONE unified CSBG-compliant reference data set
         $dataSet = ReferenceDataSet::updateOrCreate(
             ['name' => 'CSBG 2025 Standard'],
@@ -19,7 +22,7 @@ class ReferenceDataSeeder extends Seeder
                 'is_active' => true,
                 'is_draft' => false,
                 'activated_at' => now(),
-                'created_by' => 1 // Assuming admin user ID is 1
+                'created_by' => $firstUserId // Use first user or null for testing
             ]
         );
 

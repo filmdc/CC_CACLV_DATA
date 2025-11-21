@@ -11,6 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Skip if table already exists (created by later migration)
+        if (Schema::hasTable('contract_report_due_dates')) {
+            return;
+        }
+
+        // Skip if contracts table doesn't exist yet (will be created by later migration)
+        if (!Schema::hasTable('contracts')) {
+            return;
+        }
+
         Schema::create('contract_report_due_dates', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('contract_id');
@@ -27,11 +37,11 @@ return new class extends Migration
             $table->softDeletes();
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
-            
+
             $table->foreign('contract_id')->references('id')->on('contracts')->onDelete('cascade');
             $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
             $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
-            
+
             $table->index(['contract_id', 'due_date']);
             $table->index(['status', 'active']);
             $table->index(['due_date', 'reminder_sent']);
