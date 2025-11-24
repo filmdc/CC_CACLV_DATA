@@ -457,6 +457,26 @@
 
         <!-- Data Table -->
         <div class="p-6">
+            <!-- Selection Summary Banner -->
+            @if($selectedCount > 0)
+            <div class="mb-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-md p-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2 text-sm text-purple-800 dark:text-purple-300">
+                        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span>
+                            <strong>{{ $selectedCount }}</strong> gift(s) selected for sync
+                        </span>
+                    </div>
+                    <button wire:click="deselectAllForSync"
+                            class="text-sm text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300 underline">
+                        Clear Selection
+                    </button>
+                </div>
+            </div>
+            @endif
+
             <div class="overflow-x-auto">
                 <!-- Loading State -->
                 <div wire:loading wire:target="refreshData,startDate,endDate,search,giftTypeFilter,paymentTypeFilter,glCodeFilter,campaignFilter,solicitCodeFilter,subSolicitCodeFilter,syncStatusFilter"
@@ -478,11 +498,15 @@
                             <tr>
                                 @if($intacctConfigured && $this->canAny(['sage.sync.perform', 'intacct.sync']))
                                 <th scope="col" class="px-4 py-3 text-center">
+                                    @php
+                                        $visibleGiftIds = $gifts->pluck('gift_id')->filter()->toArray();
+                                        $allVisibleSelected = !empty($visibleGiftIds) && count(array_intersect($visibleGiftIds, $selectedGiftsForSync)) === count($visibleGiftIds);
+                                    @endphp
                                     <input type="checkbox"
                                            wire:click="selectAllForSync"
-                                           @if($selectedCount > 0) checked @endif
+                                           @if($allVisibleSelected) checked @endif
                                            class="rounded border-gray-300 dark:border-zinc-600 text-purple-600 focus:ring-purple-500"
-                                           title="Select all visible gifts">
+                                           title="{{ $allVisibleSelected ? 'Deselect all visible gifts' : 'Select all visible gifts' }}">
                                 </th>
                                 @endif
                                 @if($intacctConfigured)
@@ -563,8 +587,13 @@
                                     $syncStatus = $this->getSyncStatus($gift);
                                     $syncItem = \App\Models\SageIntacctSyncItem::where('gift_id', $gift['gift_id'] ?? null)->orderBy('created_at', 'desc')->first();
                                     $isAlreadySynced = ($syncStatus === 'synced' || $syncStatus === 'success');
+                                    $isSelected = in_array($gift['gift_id'] ?? null, $selectedGiftsForSync);
                                 @endphp
-                                <tr class="hover:bg-gray-50 dark:hover:bg-zinc-700 {{ $isAlreadySynced ? 'opacity-60' : '' }}">
+                                <tr class="
+                                    {{ $isSelected ? 'bg-purple-50 dark:bg-purple-900/20 border-l-4 border-purple-500' : '' }}
+                                    {{ $isAlreadySynced ? 'opacity-60' : '' }}
+                                    {{ !$isSelected ? 'hover:bg-gray-50 dark:hover:bg-zinc-700' : 'hover:bg-purple-100 dark:hover:bg-purple-900/30' }}
+                                ">
                                     @if($intacctConfigured && $this->canAny(['sage.sync.perform', 'intacct.sync']))
                                     <td class="px-4 py-4 text-center" onclick="event.stopPropagation()">
                                         <input type="checkbox"
