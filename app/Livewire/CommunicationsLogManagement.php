@@ -3,10 +3,10 @@
 namespace App\Livewire;
 
 use App\Models\CommunicationLog;
-use App\Models\Participant;
-use App\Models\Household;
-use App\Models\Property;
 use App\Models\Contractor;
+use App\Models\Household;
+use App\Models\Participant;
+use App\Models\Property;
 use App\Traits\WithPermissionChecks;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -18,38 +18,74 @@ class CommunicationsLogManagement extends Component
 
     // Search and Filters
     public $search = '';
+
     public $typeFilter = '';
+
     public $categoryFilter = '';
+
     public $priorityFilter = '';
+
     public $directionFilter = '';
+
     public $followUpFilter = '';
+
     public $dateFrom = '';
+
     public $dateTo = '';
 
     // Form state
     public $showForm = false;
+
     public $editingId = null;
+
+    // Entity search fields
+    public $participantSearch = '';
+
+    public $householdSearch = '';
+
+    public $propertySearch = '';
+
+    public $contractorSearch = '';
 
     // Form fields
     public $participant_id = '';
+
     public $household_id = '';
+
     public $property_id = '';
+
     public $contractor_id = '';
+
     public $communication_date = '';
+
     public $communication_type = 'phone_call';
+
     public $direction = 'outgoing';
+
     public $contact_name = '';
+
     public $contact_phone = '';
+
     public $contact_email = '';
+
     public $contact_organization = '';
+
     public $contact_role = '';
+
     public $subject = '';
+
     public $summary = '';
+
     public $notes = '';
+
     public $outcome = '';
+
     public $category = 'general';
+
     public $priority = 'normal';
+
     public $follow_up_date = '';
+
     public $follow_up_action = '';
 
     protected $queryString = [
@@ -209,6 +245,10 @@ class CommunicationsLogManagement extends Component
         $this->household_id = '';
         $this->property_id = '';
         $this->contractor_id = '';
+        $this->participantSearch = '';
+        $this->householdSearch = '';
+        $this->propertySearch = '';
+        $this->contractorSearch = '';
         $this->communication_date = '';
         $this->communication_type = 'phone_call';
         $this->direction = 'outgoing';
@@ -263,7 +303,7 @@ class CommunicationsLogManagement extends Component
         }
 
         if ($this->dateTo) {
-            $query->where('communication_date', '<=', $this->dateTo . ' 23:59:59');
+            $query->where('communication_date', '<=', $this->dateTo.' 23:59:59');
         }
 
         $logs = $query->paginate(20);
@@ -273,11 +313,68 @@ class CommunicationsLogManagement extends Component
         $overdueFollowUps = CommunicationLog::overdueFollowUp()->count();
         $todayCount = CommunicationLog::whereDate('communication_date', today())->count();
 
-        // Get options for linking
-        $participants = Participant::select('id', 'first_name', 'last_name')->orderBy('last_name')->get();
-        $households = Household::select('id', 'household_code')->orderBy('household_code')->get();
-        $properties = Property::select('id', 'address_line_1', 'city')->orderBy('address_line_1')->get();
-        $contractors = Contractor::select('id', 'company_name')->orderBy('company_name')->get();
+        // Get options for linking with search filtering
+        $participants = Participant::select('id', 'first_name', 'last_name')
+            ->when($this->participantSearch, function ($query) {
+                $query->where(function ($q) {
+                    $q->where('first_name', 'like', '%'.$this->participantSearch.'%')
+                        ->orWhere('last_name', 'like', '%'.$this->participantSearch.'%')
+                        ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ['%'.$this->participantSearch.'%'])
+                        ->orWhereRaw("CONCAT(last_name, ', ', first_name) LIKE ?", ['%'.$this->participantSearch.'%']);
+                });
+            })
+            ->when($this->participant_id, function ($query) {
+                // Always include the currently selected participant
+                $query->orWhere('id', $this->participant_id);
+            })
+            ->orderBy('last_name')
+            ->limit(50)
+            ->get();
+
+        $households = Household::select('id', 'household_code')
+            ->when($this->householdSearch, function ($query) {
+                $query->where('household_code', 'like', '%'.$this->householdSearch.'%');
+            })
+            ->when($this->household_id, function ($query) {
+                // Always include the currently selected household
+                $query->orWhere('id', $this->household_id);
+            })
+            ->orderBy('household_code')
+            ->limit(50)
+            ->get();
+
+        $properties = Property::select('id', 'address_line_1', 'city', 'state', 'zip_code')
+            ->when($this->propertySearch, function ($query) {
+                $query->where(function ($q) {
+                    $q->where('address_line_1', 'like', '%'.$this->propertySearch.'%')
+                        ->orWhere('city', 'like', '%'.$this->propertySearch.'%')
+                        ->orWhere('zip_code', 'like', '%'.$this->propertySearch.'%');
+                });
+            })
+            ->when($this->property_id, function ($query) {
+                // Always include the currently selected property
+                $query->orWhere('id', $this->property_id);
+            })
+            ->orderBy('address_line_1')
+            ->limit(50)
+            ->get();
+
+        $contractors = Contractor::select('id', 'company_name', 'contact_first_name', 'contact_last_name')
+            ->when($this->contractorSearch, function ($query) {
+                $query->where(function ($q) {
+                    $q->where('company_name', 'like', '%'.$this->contractorSearch.'%')
+                        ->orWhere('contact_first_name', 'like', '%'.$this->contractorSearch.'%')
+                        ->orWhere('contact_last_name', 'like', '%'.$this->contractorSearch.'%')
+                        ->orWhereRaw("CONCAT(contact_first_name, ' ', contact_last_name) LIKE ?", ['%'.$this->contractorSearch.'%']);
+                });
+            })
+            ->when($this->contractor_id, function ($query) {
+                // Always include the currently selected contractor
+                $query->orWhere('id', $this->contractor_id);
+            })
+            ->orderBy('company_name')
+            ->limit(50)
+            ->get();
 
         return view('livewire.communications-log-management', [
             'logs' => $logs,

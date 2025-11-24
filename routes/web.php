@@ -92,6 +92,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('duplicate-resolution', App\Livewire\DuplicateResolutionManagement::class)->name('duplicate.resolution');
     Route::get('admin-panel', App\Livewire\AdminPanel::class)->name('admin.panel');
     Route::get('reports', App\Livewire\ReportingManagement::class)->name('reports');
+    Route::get('communications-log', App\Livewire\CommunicationsLogManagement::class)->name('communications-log.management');
 
     // DonorPerfect Routes
     Route::get('donor-gifts', App\Livewire\DonorPerfectGiftsFeed::class)

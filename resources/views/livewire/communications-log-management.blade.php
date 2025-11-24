@@ -459,6 +459,10 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Participant</label>
+                                <input type="text"
+                                       wire:model.live.debounce.300ms="participantSearch"
+                                       placeholder="Search participants..."
+                                       class="w-full px-3 py-1.5 mb-1 text-sm border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
                                 <select wire:model="participant_id"
                                         class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
                                     <option value="">None</option>
@@ -466,9 +470,16 @@
                                         <option value="{{ $participant->id }}">{{ $participant->last_name }}, {{ $participant->first_name }}</option>
                                     @endforeach
                                 </select>
+                                @if($participantSearch && $participants->count() === 50)
+                                    <p class="text-xs text-amber-600 dark:text-amber-400 mt-1">Showing first 50 results. Refine your search for more specific results.</p>
+                                @endif
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Household</label>
+                                <input type="text"
+                                       wire:model.live.debounce.300ms="householdSearch"
+                                       placeholder="Search household code..."
+                                       class="w-full px-3 py-1.5 mb-1 text-sm border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
                                 <select wire:model="household_id"
                                         class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
                                     <option value="">None</option>
@@ -476,9 +487,16 @@
                                         <option value="{{ $household->id }}">{{ $household->household_code }}</option>
                                     @endforeach
                                 </select>
+                                @if($householdSearch && $households->count() === 50)
+                                    <p class="text-xs text-amber-600 dark:text-amber-400 mt-1">Showing first 50 results. Refine your search for more specific results.</p>
+                                @endif
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Property</label>
+                                <input type="text"
+                                       wire:model.live.debounce.300ms="propertySearch"
+                                       placeholder="Search address..."
+                                       class="w-full px-3 py-1.5 mb-1 text-sm border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
                                 <select wire:model="property_id"
                                         class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
                                     <option value="">None</option>
@@ -486,16 +504,31 @@
                                         <option value="{{ $property->id }}">{{ $property->address_line_1 }}, {{ $property->city }}</option>
                                     @endforeach
                                 </select>
+                                @if($propertySearch && $properties->count() === 50)
+                                    <p class="text-xs text-amber-600 dark:text-amber-400 mt-1">Showing first 50 results. Refine your search for more specific results.</p>
+                                @endif
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contractor</label>
+                                <input type="text"
+                                       wire:model.live.debounce.300ms="contractorSearch"
+                                       placeholder="Search contractors..."
+                                       class="w-full px-3 py-1.5 mb-1 text-sm border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
                                 <select wire:model="contractor_id"
                                         class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
                                     <option value="">None</option>
                                     @foreach($contractors as $contractor)
-                                        <option value="{{ $contractor->id }}">{{ $contractor->company_name }}</option>
+                                        <option value="{{ $contractor->id }}">
+                                            {{ $contractor->company_name }}
+                                            @if($contractor->contact_first_name || $contractor->contact_last_name)
+                                                ({{ trim($contractor->contact_first_name . ' ' . $contractor->contact_last_name) }})
+                                            @endif
+                                        </option>
                                     @endforeach
                                 </select>
+                                @if($contractorSearch && $contractors->count() === 50)
+                                    <p class="text-xs text-amber-600 dark:text-amber-400 mt-1">Showing first 50 results. Refine your search for more specific results.</p>
+                                @endif
                             </div>
                         </div>
                     </div>
