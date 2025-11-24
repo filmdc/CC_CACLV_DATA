@@ -599,9 +599,10 @@
                                         <input type="checkbox"
                                                wire:model.live="selectedGiftsForSync"
                                                value="{{ $gift['gift_id'] ?? '' }}"
+                                               @if($isSelected) checked @endif
                                                class="rounded border-gray-300 dark:border-zinc-600 text-purple-600 focus:ring-purple-500 {{ $isAlreadySynced ? 'cursor-not-allowed' : '' }}"
                                                {{ $isAlreadySynced ? 'disabled' : '' }}
-                                               title="{{ $isAlreadySynced ? 'Already synced successfully' : 'Select for sync' }}">
+                                               title="{{ $isAlreadySynced ? 'Already synced successfully' : ($isSelected ? 'Selected for sync - click to deselect' : 'Select for sync') }}">
                                     </td>
                                     @endif
                                     @if($intacctConfigured)
