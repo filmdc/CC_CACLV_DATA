@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasLegacySyncScopes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +11,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Program extends Model
 {
-    use HasFactory;
+    use HasFactory, HasLegacySyncScopes;
+
     protected $fillable = [
         'name',
         'description',
@@ -135,22 +137,4 @@ class Program extends Model
         return $query->where('active', true);
     }
 
-    /**
-     * Scope to find by legacy ID
-     */
-    public function scopeByLegacyId($query, $legacyId)
-    {
-        return $query->where('legacy_id', $legacyId);
-    }
-
-    /**
-     * Scope to get programs that need sync
-     */
-    public function scopeNeedsSync($query, $hours = 1)
-    {
-        return $query->where(function ($q) use ($hours) {
-            $q->whereNull('last_synced_at')
-              ->orWhere('last_synced_at', '<', now()->subHours($hours));
-        });
-    }
 }

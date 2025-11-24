@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\Auditable;
+use App\Traits\HasLegacySyncScopes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -14,7 +15,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Contract extends Model implements HasMedia
 {
-    use SoftDeletes, InteractsWithMedia, Auditable;
+    use SoftDeletes, InteractsWithMedia, Auditable, HasLegacySyncScopes;
 
     protected $fillable = [
         'title',
@@ -340,22 +341,4 @@ class Contract extends Model implements HasMedia
         return "{$firstProgram} (+{$count} programs)";
     }
 
-    /**
-     * Scope to find contracts by legacy ID
-     */
-    public function scopeByLegacyId($query, $legacyId)
-    {
-        return $query->where('legacy_id', $legacyId);
-    }
-
-    /**
-     * Scope to get contracts that need sync (not synced recently)
-     */
-    public function scopeNeedsSync($query, $hours = 1)
-    {
-        return $query->where(function ($q) use ($hours) {
-            $q->whereNull('last_synced_at')
-              ->orWhere('last_synced_at', '<', now()->subHours($hours));
-        });
-    }
 }

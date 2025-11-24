@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProgramManagerUploadController extends Controller
 {
@@ -79,7 +81,7 @@ class ProgramManagerUploadController extends Controller
     /**
      * Provide import templates for public program managers.
      */
-    public function downloadTemplate(string $type)
+    public function downloadTemplate(string $type): RedirectResponse|BinaryFileResponse|StreamedResponse
     {
         switch ($type) {
             case 'general':

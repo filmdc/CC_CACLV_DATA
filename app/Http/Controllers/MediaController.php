@@ -2,26 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class MediaController extends Controller
 {
     /**
      * Preview a media file
      */
-    public function preview(Media $media)
+    public function preview(Media $media): BinaryFileResponse
     {
-        // Check if user has access (you can add authorization here)
-        if (!auth()->check()) {
-            abort(403);
-        }
-
-        $path = $media->getPath();
-
-        if (!file_exists($path)) {
-            abort(404, 'File not found');
-        }
+        $path = $this->ensureAccessibleMedia($media);
 
         return response()->file($path, [
             'Content-Type' => $media->mime_type,
@@ -32,19 +24,25 @@ class MediaController extends Controller
     /**
      * Download a media file
      */
-    public function download(Media $media)
+    public function download(Media $media): BinaryFileResponse
     {
-        // Check if user has access
-        if (!auth()->check()) {
-            abort(403);
-        }
+        $path = $this->ensureAccessibleMedia($media);
+
+        return response()->download($path, $media->file_name);
+    }
+
+    /**
+     * Ensure the authenticated user can access the requested media record.
+     */
+    private function ensureAccessibleMedia(Media $media): string
+    {
+        abort_unless(Auth::check(), 403, 'Unauthorized');
 
         $path = $media->getPath();
-
-        if (!file_exists($path)) {
+        if (!is_string($path) || !file_exists($path)) {
             abort(404, 'File not found');
         }
 
-        return response()->download($path, $media->file_name);
+        return $path;
     }
 }

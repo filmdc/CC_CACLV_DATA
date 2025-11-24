@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\SageIntacctSetting;
 use App\Models\UserSageIntacctToken;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -14,15 +15,16 @@ class SageIntacctOAuthController extends Controller
     /**
      * Redirect user to Sage Intacct OAuth authorization page
      */
-    public function authorize(Request $request)
+    public function authorize(Request $request): RedirectResponse
     {
         // Get active Sage Intacct settings
         $settings = SageIntacctSetting::getActive();
 
         if (! $settings || ! $settings->isConfigured()) {
-            return redirect()
-                ->route('sage-intacct.configuration')
-                ->with('error', 'Sage Intacct is not configured. Please configure the integration first.');
+            return $this->configurationRedirect(
+                'error',
+                'Sage Intacct is not configured. Please configure the integration first.'
+            );
         }
 
         // Generate state token for CSRF protection
@@ -52,7 +54,7 @@ class SageIntacctOAuthController extends Controller
     /**
      * Handle OAuth callback from Sage Intacct
      */
-    public function callback(Request $request)
+    public function callback(Request $request): RedirectResponse
     {
         // Validate state parameter (CSRF protection)
         $expectedState = session('sage_intacct_oauth_state');
@@ -65,9 +67,10 @@ class SageIntacctOAuthController extends Controller
                 'actual' => $actualState,
             ]);
 
-            return redirect()
-                ->route('sage-intacct.configuration')
-                ->with('error', 'OAuth authentication failed: Invalid state parameter');
+            return $this->configurationRedirect(
+                'error',
+                'OAuth authentication failed: Invalid state parameter'
+            );
         }
 
         // Clear state from session
@@ -84,27 +87,30 @@ class SageIntacctOAuthController extends Controller
                 'description' => $errorDescription,
             ]);
 
-            return redirect()
-                ->route('sage-intacct.configuration')
-                ->with('error', 'OAuth authorization failed: '.$errorDescription);
+            return $this->configurationRedirect(
+                'error',
+                'OAuth authorization failed: '.$errorDescription
+            );
         }
 
         // Get authorization code
         $authorizationCode = $request->get('code');
 
         if (! $authorizationCode) {
-            return redirect()
-                ->route('sage-intacct.configuration')
-                ->with('error', 'OAuth authentication failed: No authorization code received');
+            return $this->configurationRedirect(
+                'error',
+                'OAuth authentication failed: No authorization code received'
+            );
         }
 
         // Exchange authorization code for access token
         $tokenResult = $this->exchangeCodeForToken($authorizationCode);
 
         if (! $tokenResult['success']) {
-            return redirect()
-                ->route('sage-intacct.configuration')
-                ->with('error', 'Failed to obtain access token: '.$tokenResult['message']);
+            return $this->configurationRedirect(
+                'error',
+                'Failed to obtain access token: '.$tokenResult['message']
+            );
         }
 
         // Store tokens for the user
@@ -115,15 +121,13 @@ class SageIntacctOAuthController extends Controller
             'company_id' => $tokenResult['company_id'] ?? null,
         ]);
 
-        return redirect()
-            ->route('sage-intacct.configuration')
-            ->with('success', 'Successfully connected to Sage Intacct!');
+        return $this->configurationRedirect('success', 'Successfully connected to Sage Intacct!');
     }
 
     /**
      * Disconnect user's Sage Intacct account
      */
-    public function disconnect(Request $request)
+    public function disconnect(Request $request): RedirectResponse
     {
         $user = auth()->user();
         $token = $user->sageIntacctToken;
@@ -257,5 +261,15 @@ class SageIntacctOAuthController extends Controller
             ]);
             // Don't fail the disconnect operation if revoke fails
         }
+    }
+
+    /**
+     * Provide a consistent redirect target for configuration messaging.
+     */
+    private function configurationRedirect(string $type, string $message): RedirectResponse
+    {
+        return redirect()
+            ->route('sage-intacct.configuration')
+            ->with($type, $message);
     }
 }

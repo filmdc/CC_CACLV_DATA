@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use App\Traits\Auditable;
+use App\Traits\HasLegacySyncScopes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Funder extends Model
 {
-    use SoftDeletes, Auditable;
+    use SoftDeletes, Auditable, HasLegacySyncScopes;
 
     protected $fillable = [
         'name',
@@ -71,22 +72,4 @@ class Funder extends Model
         return $this->code ? "{$this->name} ({$this->code})" : $this->name;
     }
 
-    /**
-     * Scope to find by legacy ID
-     */
-    public function scopeByLegacyId($query, $legacyId)
-    {
-        return $query->where('legacy_id', $legacyId);
-    }
-
-    /**
-     * Scope to get funders that need sync
-     */
-    public function scopeNeedsSync($query, $hours = 1)
-    {
-        return $query->where(function ($q) use ($hours) {
-            $q->whereNull('last_synced_at')
-              ->orWhere('last_synced_at', '<', now()->subHours($hours));
-        });
-    }
 }

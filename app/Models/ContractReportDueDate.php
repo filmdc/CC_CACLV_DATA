@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\Auditable;
+use App\Traits\HasLegacySyncScopes;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,7 +16,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class ContractReportDueDate extends Model implements HasMedia
 {
-    use SoftDeletes, InteractsWithMedia, Auditable;
+    use SoftDeletes, InteractsWithMedia, Auditable, HasLegacySyncScopes;
 
     public const STATUS_OPTIONS = [
         'pending' => 'Pending',
@@ -298,25 +299,6 @@ class ContractReportDueDate extends Model implements HasMedia
             $dateTime .= ' ' . $this->due_time;
         }
         return $dateTime;
-    }
-
-    /**
-     * Scope to find by legacy ID
-     */
-    public function scopeByLegacyId($query, $legacyId)
-    {
-        return $query->where('legacy_id', $legacyId);
-    }
-
-    /**
-     * Scope to get items that need sync
-     */
-    public function scopeNeedsSync($query, $hours = 1)
-    {
-        return $query->where(function ($q) use ($hours) {
-            $q->whereNull('last_synced_at')
-              ->orWhere('last_synced_at', '<', now()->subHours($hours));
-        });
     }
 
     /**
