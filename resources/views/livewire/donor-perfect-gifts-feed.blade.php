@@ -226,8 +226,109 @@
                 @endif
             </div>
 
+            <!-- Additional Filters Row -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mt-4">
+                <!-- Gift Type Filter -->
+                <div>
+                    <label for="giftTypeFilter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Gift Type
+                    </label>
+                    <select wire:model.live="giftTypeFilter"
+                            id="giftTypeFilter"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                        <option value="">All Types</option>
+                        @foreach($uniqueGiftTypes as $type)
+                            <option value="{{ $type }}">{{ $type }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Payment Type Filter -->
+                <div>
+                    <label for="paymentTypeFilter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Payment Type
+                    </label>
+                    <select wire:model.live="paymentTypeFilter"
+                            id="paymentTypeFilter"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                        <option value="">All Payments</option>
+                        @foreach($uniquePaymentTypes as $type)
+                            <option value="{{ $type }}">{{ $type }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- GL Code Filter -->
+                <div>
+                    <label for="glCodeFilter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        GL Code
+                    </label>
+                    <select wire:model.live="glCodeFilter"
+                            id="glCodeFilter"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                        <option value="">All GL Codes</option>
+                        @foreach($uniqueGlCodes as $code)
+                            <option value="{{ $code }}">{{ $code }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Campaign Filter -->
+                <div>
+                    <label for="campaignFilter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Campaign
+                    </label>
+                    <select wire:model.live="campaignFilter"
+                            id="campaignFilter"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                        <option value="">All Campaigns</option>
+                        @foreach($uniqueCampaigns as $campaign)
+                            <option value="{{ $campaign }}">{{ $campaign }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Solicit Code Filter -->
+                <div>
+                    <label for="solicitCodeFilter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Solicit Code
+                    </label>
+                    <select wire:model.live="solicitCodeFilter"
+                            id="solicitCodeFilter"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                        <option value="">All Solicit Codes</option>
+                        @foreach($uniqueSolicitCodes as $code)
+                            <option value="{{ $code }}">{{ $code }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Sub-Solicit Code Filter -->
+                <div>
+                    <label for="subSolicitCodeFilter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Sub-Solicit Code
+                    </label>
+                    <select wire:model.live="subSolicitCodeFilter"
+                            id="subSolicitCodeFilter"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                        <option value="">All Sub-Solicit Codes</option>
+                        @foreach($uniqueSubSolicitCodes as $code)
+                            <option value="{{ $code }}">{{ $code }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+            <!-- Clear Filters Button -->
+            <div class="mt-4 flex justify-end">
+                <button wire:click="clearAllFilters"
+                        class="px-3 py-1.5 text-sm bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400">
+                    Clear All Filters
+                </button>
+            </div>
+
             <!-- Action Buttons -->
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between mt-4">
                 @if($this->canAny(['donorperfect.sync.refresh', 'donor_gifts.view', 'donor_gifts.configure']))
                 <button wire:click="refreshData"
                         class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -358,7 +459,7 @@
         <div class="p-6">
             <div class="overflow-x-auto">
                 <!-- Loading State -->
-                <div wire:loading wire:target="refreshData,startDate,endDate,search"
+                <div wire:loading wire:target="refreshData,startDate,endDate,search,giftTypeFilter,paymentTypeFilter,glCodeFilter,campaignFilter,solicitCodeFilter,subSolicitCodeFilter,syncStatusFilter"
                      class="flex items-center justify-center py-12">
                     <div class="flex items-center space-x-3">
                         <svg class="animate-spin h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24">
@@ -370,7 +471,7 @@
                 </div>
 
                 <!-- Table -->
-                <div wire:loading.remove wire:target="refreshData,startDate,endDate,search">
+                <div wire:loading.remove wire:target="refreshData,startDate,endDate,search,giftTypeFilter,paymentTypeFilter,glCodeFilter,campaignFilter,solicitCodeFilter,subSolicitCodeFilter,syncStatusFilter">
                     @if($gifts && count($gifts) > 0)
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700">
                         <thead class="bg-gray-50 dark:bg-zinc-700">

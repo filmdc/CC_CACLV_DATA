@@ -24,6 +24,18 @@ class DonorPerfectGiftsFeed extends Component
 
     public $syncStatusFilter = 'all'; // all, success, failed, pending, not_synced
 
+    public $giftTypeFilter = '';
+
+    public $paymentTypeFilter = '';
+
+    public $glCodeFilter = '';
+
+    public $campaignFilter = '';
+
+    public $solicitCodeFilter = '';
+
+    public $subSolicitCodeFilter = '';
+
     public $sortField = 'gift_date';
 
     public $sortDirection = 'desc';
@@ -191,6 +203,49 @@ class DonorPerfectGiftsFeed extends Component
 
     public function updatedSyncStatusFilter()
     {
+        $this->resetPage();
+    }
+
+    public function updatedGiftTypeFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPaymentTypeFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedGlCodeFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedCampaignFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedSolicitCodeFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedSubSolicitCodeFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function clearAllFilters()
+    {
+        $this->giftTypeFilter = '';
+        $this->paymentTypeFilter = '';
+        $this->glCodeFilter = '';
+        $this->campaignFilter = '';
+        $this->solicitCodeFilter = '';
+        $this->subSolicitCodeFilter = '';
+        $this->syncStatusFilter = 'all';
+        $this->search = '';
         $this->resetPage();
     }
 
@@ -1238,6 +1293,14 @@ class DonorPerfectGiftsFeed extends Component
 
             $gifts = $result['gifts'];
 
+            // Extract unique values for filter dropdowns (before filtering)
+            $uniqueGiftTypes = $gifts->pluck('gift_type')->filter()->unique()->sort()->values();
+            $uniquePaymentTypes = $gifts->pluck('payment_type')->filter()->unique()->sort()->values();
+            $uniqueGlCodes = $gifts->pluck('gl_code')->filter()->unique()->sort()->values();
+            $uniqueCampaigns = $gifts->pluck('campaign')->filter()->unique()->sort()->values();
+            $uniqueSolicitCodes = $gifts->pluck('solicit_code')->filter()->unique()->sort()->values();
+            $uniqueSubSolicitCodes = $gifts->pluck('sub_solicit_code')->filter()->unique()->sort()->values();
+
             // Filter by sync status if selected
             if ($this->syncStatusFilter !== 'all') {
                 $gifts = $gifts->filter(function ($gift) {
@@ -1255,6 +1318,43 @@ class DonorPerfectGiftsFeed extends Component
                         default:
                             return true;
                     }
+                });
+            }
+
+            // Apply additional filters
+            if (! empty($this->giftTypeFilter)) {
+                $gifts = $gifts->filter(function ($gift) {
+                    return ($gift['gift_type'] ?? '') === $this->giftTypeFilter;
+                });
+            }
+
+            if (! empty($this->paymentTypeFilter)) {
+                $gifts = $gifts->filter(function ($gift) {
+                    return ($gift['payment_type'] ?? '') === $this->paymentTypeFilter;
+                });
+            }
+
+            if (! empty($this->glCodeFilter)) {
+                $gifts = $gifts->filter(function ($gift) {
+                    return ($gift['gl_code'] ?? '') === $this->glCodeFilter;
+                });
+            }
+
+            if (! empty($this->campaignFilter)) {
+                $gifts = $gifts->filter(function ($gift) {
+                    return ($gift['campaign'] ?? '') === $this->campaignFilter;
+                });
+            }
+
+            if (! empty($this->solicitCodeFilter)) {
+                $gifts = $gifts->filter(function ($gift) {
+                    return ($gift['solicit_code'] ?? '') === $this->solicitCodeFilter;
+                });
+            }
+
+            if (! empty($this->subSolicitCodeFilter)) {
+                $gifts = $gifts->filter(function ($gift) {
+                    return ($gift['sub_solicit_code'] ?? '') === $this->subSolicitCodeFilter;
                 });
             }
 
@@ -1305,6 +1405,13 @@ class DonorPerfectGiftsFeed extends Component
                 'fieldMappings' => $fieldMappings,
                 'availableDpFields' => $this->availableDpFields,
                 'syncHistory' => $syncHistory,
+                // Filter options
+                'uniqueGiftTypes' => $uniqueGiftTypes,
+                'uniquePaymentTypes' => $uniquePaymentTypes,
+                'uniqueGlCodes' => $uniqueGlCodes,
+                'uniqueCampaigns' => $uniqueCampaigns,
+                'uniqueSolicitCodes' => $uniqueSolicitCodes,
+                'uniqueSubSolicitCodes' => $uniqueSubSolicitCodes,
             ])->layout('components.layouts.app');
         } catch (\Exception $e) {
             return view('livewire.donor-perfect-gifts-feed', [
