@@ -13,6 +13,9 @@ class DonorPerfectGiftsFeed extends Component
 {
     use WithPagination, WithPermissionChecks;
 
+    // Tab state
+    public $activeTab = 'gifts';
+
     public $search = '';
 
     public $startDate;
@@ -58,6 +61,81 @@ class DonorPerfectGiftsFeed extends Component
     public $dataFileUrl = ''; // URL for data file download
 
     public $checkImagesUrl = ''; // URL for check images ZIP download
+
+    // Field Mapping properties
+    public $showAddMappingForm = false;
+
+    public $editingMappingId = null;
+
+    public $mapping_dp_field = '';
+
+    public $mapping_intacct_field = '';
+
+    public $mapping_is_required = false;
+
+    public $mapping_transformation = '';
+
+    // Code Mapping properties
+    public $selectedFieldType = 'gl_code';
+
+    public $mappings = [];
+
+    public $editingCodeMappingId = null;
+
+    public $editingIntacctCode = '';
+
+    public $showOnlyUnmapped = false;
+
+    public $showArchived = false;
+
+    public $mappingNotes = '';
+
+    // Conditional Code Mapping properties
+    public $showConditionalMappingForm = false;
+
+    public $editingConditionalMappingId = null;
+
+    public $conditional_intacct_location_code = '';
+
+    public $conditional_field_type = 'solicit_code';
+
+    public $conditional_dp_code = '';
+
+    public $conditional_intacct_code = '';
+
+    public $conditional_priority = 0;
+
+    public $conditional_notes = '';
+
+    public $conditional_is_active = true;
+
+    // Sync Filter properties
+    public $showSyncFilterForm = false;
+
+    public $editingSyncFilterId = null;
+
+    public $sync_filter_name = '';
+
+    public $sync_filter_field_name = '';
+
+    public $sync_filter_operator = 'equals';
+
+    public $sync_filter_value = '';
+
+    public $sync_filter_action = 'exclude';
+
+    public $sync_filter_priority = 0;
+
+    public $sync_filter_description = '';
+
+    public $sync_filter_is_active = true;
+
+    // Sync History filters
+    public $filterStatus = '';
+
+    public $filterStartDate = '';
+
+    public $filterEndDate = '';
 
     public function mount()
     {
@@ -567,6 +645,565 @@ class DonorPerfectGiftsFeed extends Component
         }
     }
 
+    // ========================================
+    // TAB MANAGEMENT METHODS
+    // ========================================
+
+    public function setActiveTab($tab)
+    {
+        $this->activeTab = $tab;
+
+        // Load initial data based on tab
+        if ($tab === 'code_mappings') {
+            $this->loadMappings($this->selectedFieldType);
+        }
+    }
+
+    // ========================================
+    // FIELD MAPPINGS TAB METHODS
+    // ========================================
+
+    public function showAddMapping()
+    {
+        $this->showAddMappingForm = true;
+        $this->editingMappingId = null;
+        $this->resetMappingForm();
+    }
+
+    public function editFieldMapping($mappingId)
+    {
+        $mapping = \App\Models\SageIntacctFieldMapping::find($mappingId);
+        if ($mapping) {
+            $this->editingMappingId = $mappingId;
+            $this->showAddMappingForm = true;
+            $this->mapping_dp_field = $mapping->donor_perfect_field;
+            $this->mapping_intacct_field = $mapping->intacct_field;
+            $this->mapping_is_required = $mapping->is_required;
+            $this->mapping_transformation = $mapping->default_value ?? '';
+        }
+    }
+
+    public function saveFieldMapping()
+    {
+        $this->authorizeAction('sage.mappings.edit');
+
+        $this->validate([
+            'mapping_dp_field' => 'required|string|max:255',
+            'mapping_intacct_field' => 'required|string|max:255',
+        ]);
+
+        try {
+            $settings = \App\Models\SageIntacctSetting::first();
+            if (! $settings) {
+                session()->flash('error', 'Please save Intacct credentials first.');
+
+                return;
+            }
+
+            $data = [
+                'setting_id' => $settings->id,
+                'donor_perfect_field' => $this->mapping_dp_field,
+                'intacct_field' => $this->mapping_intacct_field,
+                'is_required' => $this->mapping_is_required,
+                'default_value' => $this->mapping_transformation ?: null,
+            ];
+
+            if ($this->editingMappingId) {
+                $mapping = \App\Models\SageIntacctFieldMapping::find($this->editingMappingId);
+                if ($mapping) {
+                    $mapping->update($data);
+                    session()->flash('success', 'Field mapping updated successfully.');
+                }
+            } else {
+                $maxOrder = \App\Models\SageIntacctFieldMapping::where('setting_id', $settings->id)->max('order') ?? 0;
+                $data['order'] = $maxOrder + 1;
+                \App\Models\SageIntacctFieldMapping::create($data);
+                session()->flash('success', 'Field mapping created successfully.');
+            }
+
+            $this->showAddMappingForm = false;
+            $this->resetMappingForm();
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to save mapping: '.$e->getMessage());
+        }
+    }
+
+    public function deleteFieldMapping($mappingId)
+    {
+        $this->authorizeAction('sage.mappings.edit');
+
+        try {
+            $mapping = \App\Models\SageIntacctFieldMapping::find($mappingId);
+            if ($mapping) {
+                $mapping->delete();
+                session()->flash('success', 'Field mapping deleted successfully.');
+            }
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to delete mapping: '.$e->getMessage());
+        }
+    }
+
+    public function moveFieldMapping($mappingId, $direction)
+    {
+        $this->authorizeAction('sage.mappings.edit');
+
+        try {
+            $mapping = \App\Models\SageIntacctFieldMapping::find($mappingId);
+            if (! $mapping) {
+                return;
+            }
+
+            $currentOrder = $mapping->order;
+            $newOrder = $direction === 'up' ? $currentOrder - 1 : $currentOrder + 1;
+
+            $swapMapping = \App\Models\SageIntacctFieldMapping::where('setting_id', $mapping->setting_id)
+                ->where('order', $newOrder)
+                ->first();
+
+            if ($swapMapping) {
+                $mapping->update(['order' => $newOrder]);
+                $swapMapping->update(['order' => $currentOrder]);
+                session()->flash('success', 'Mapping order updated.');
+            }
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to reorder mapping: '.$e->getMessage());
+        }
+    }
+
+    public function cancelFieldMapping()
+    {
+        $this->showAddMappingForm = false;
+        $this->resetMappingForm();
+    }
+
+    protected function resetMappingForm()
+    {
+        $this->mapping_dp_field = '';
+        $this->mapping_intacct_field = '';
+        $this->mapping_is_required = false;
+        $this->mapping_transformation = '';
+        $this->editingMappingId = null;
+    }
+
+    public function getAvailableDpFieldsProperty()
+    {
+        $dpSettings = \App\Models\DonorPerfectSetting::first();
+        if ($dpSettings && ! empty($dpSettings->selected_fields)) {
+            return $dpSettings->selected_fields;
+        }
+
+        return [];
+    }
+
+    // ========================================
+    // CODE MAPPINGS TAB METHODS
+    // ========================================
+
+    public function selectFieldType($type)
+    {
+        $this->selectedFieldType = $type;
+        $this->loadMappings($type);
+        $this->resetPage();
+    }
+
+    public function loadMappings($fieldType)
+    {
+        $query = \App\Models\DonorPerfectCodeMapping::forFieldType($fieldType);
+
+        if ($this->showOnlyUnmapped) {
+            $query->unmapped();
+        }
+
+        if (! $this->showArchived) {
+            $query->active();
+        }
+
+        $this->mappings = $query->orderBy('dp_code')->get();
+    }
+
+    public function discoverNewCodes()
+    {
+        $this->authorizeAction('intacct.configure');
+
+        try {
+            $giftService = new \App\Services\DonorPerfectGiftService;
+            $result = $giftService->discoverAndSyncCodes(90);
+
+            if ($result['success']) {
+                session()->flash('success', "Code discovery complete! Found {$result['new']} new code(s).");
+            } else {
+                session()->flash('error', 'Code discovery failed: '.($result['error'] ?? 'Unknown error'));
+            }
+
+            $this->loadMappings($this->selectedFieldType);
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to discover codes: '.$e->getMessage());
+        }
+    }
+
+    public function editMapping($id)
+    {
+        $mapping = \App\Models\DonorPerfectCodeMapping::find($id);
+        if ($mapping) {
+            $this->editingCodeMappingId = $id;
+            $this->editingIntacctCode = $mapping->intacct_code ?? '';
+            $this->mappingNotes = $mapping->notes ?? '';
+        }
+    }
+
+    public function saveMapping($id)
+    {
+        $this->authorizeAction('sage.code_mappings.edit');
+
+        $this->validate([
+            'editingIntacctCode' => 'required|string|max:255',
+        ], [
+            'editingIntacctCode.required' => 'Intacct code is required',
+        ]);
+
+        try {
+            $mapping = \App\Models\DonorPerfectCodeMapping::find($id);
+            if ($mapping) {
+                $mapping->setMapping($this->editingIntacctCode);
+                $mapping->notes = $this->mappingNotes;
+                $mapping->save();
+
+                session()->flash('success', 'Code mapping saved successfully.');
+                $this->cancelEdit();
+                $this->loadMappings($this->selectedFieldType);
+            }
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to save mapping: '.$e->getMessage());
+        }
+    }
+
+    public function cancelEdit()
+    {
+        $this->editingCodeMappingId = null;
+        $this->editingIntacctCode = '';
+        $this->mappingNotes = '';
+    }
+
+    public function toggleArchive($id)
+    {
+        $this->authorizeAction('sage.code_mappings.edit');
+
+        try {
+            $mapping = \App\Models\DonorPerfectCodeMapping::find($id);
+            if ($mapping) {
+                if ($mapping->is_archived) {
+                    $mapping->markAsActive();
+                    session()->flash('success', 'Code unarchived successfully.');
+                } else {
+                    $mapping->markAsArchived();
+                    session()->flash('success', 'Code archived successfully.');
+                }
+                $this->loadMappings($this->selectedFieldType);
+            }
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to toggle archive: '.$e->getMessage());
+        }
+    }
+
+    public function bulkArchiveUnmapped()
+    {
+        $this->authorizeAction('sage.code_mappings.edit');
+
+        try {
+            $count = \App\Models\DonorPerfectCodeMapping::forFieldType($this->selectedFieldType)
+                ->unmapped()
+                ->active()
+                ->update(['is_archived' => true]);
+
+            session()->flash('success', "Archived {$count} unmapped code(s).");
+            $this->loadMappings($this->selectedFieldType);
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to archive codes: '.$e->getMessage());
+        }
+    }
+
+    public function updatedShowOnlyUnmapped()
+    {
+        $this->loadMappings($this->selectedFieldType);
+        $this->resetPage();
+    }
+
+    public function updatedShowArchived()
+    {
+        $this->loadMappings($this->selectedFieldType);
+        $this->resetPage();
+    }
+
+    // Conditional Code Mapping Methods
+
+    public function showCreateConditionalMappingForm()
+    {
+        $this->authorizeAction('intacct.configure');
+        $this->resetConditionalMappingForm();
+        $this->showConditionalMappingForm = true;
+    }
+
+    public function showEditConditionalMappingForm($id)
+    {
+        $this->authorizeAction('intacct.configure');
+
+        $mapping = \App\Models\ConditionalCodeMapping::findOrFail($id);
+
+        $this->editingConditionalMappingId = $mapping->id;
+        $this->conditional_intacct_location_code = $mapping->intacct_location_code;
+        $this->conditional_field_type = $mapping->field_type;
+        $this->conditional_dp_code = $mapping->dp_code;
+        $this->conditional_intacct_code = $mapping->intacct_code;
+        $this->conditional_priority = $mapping->priority;
+        $this->conditional_notes = $mapping->notes ?? '';
+        $this->conditional_is_active = $mapping->is_active;
+
+        $this->showConditionalMappingForm = true;
+    }
+
+    public function saveConditionalMapping()
+    {
+        $this->authorizeAction('sage.conditional_mappings.edit');
+
+        $this->validate([
+            'conditional_intacct_location_code' => 'required|string|max:255',
+            'conditional_field_type' => 'required|in:solicit_code,sub_solicit_code',
+            'conditional_dp_code' => 'required|string|max:255',
+            'conditional_intacct_code' => 'required|string|max:255',
+            'conditional_priority' => 'nullable|integer|min:0',
+            'conditional_notes' => 'nullable|string',
+        ]);
+
+        try {
+            if ($this->editingConditionalMappingId) {
+                $mapping = \App\Models\ConditionalCodeMapping::findOrFail($this->editingConditionalMappingId);
+                $mapping->update([
+                    'intacct_location_code' => $this->conditional_intacct_location_code,
+                    'field_type' => $this->conditional_field_type,
+                    'dp_code' => $this->conditional_dp_code,
+                    'intacct_code' => $this->conditional_intacct_code,
+                    'priority' => $this->conditional_priority ?? 0,
+                    'notes' => $this->conditional_notes,
+                    'is_active' => $this->conditional_is_active,
+                ]);
+                session()->flash('success', 'Conditional mapping updated successfully.');
+            } else {
+                \App\Models\ConditionalCodeMapping::create([
+                    'intacct_location_code' => $this->conditional_intacct_location_code,
+                    'field_type' => $this->conditional_field_type,
+                    'dp_code' => $this->conditional_dp_code,
+                    'intacct_code' => $this->conditional_intacct_code,
+                    'priority' => $this->conditional_priority ?? 0,
+                    'notes' => $this->conditional_notes,
+                    'is_active' => $this->conditional_is_active,
+                ]);
+                session()->flash('success', 'Conditional mapping created successfully.');
+            }
+
+            $this->cancelConditionalMappingForm();
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to save conditional mapping: '.$e->getMessage());
+        }
+    }
+
+    public function deleteConditionalMapping($id)
+    {
+        $this->authorizeAction('sage.conditional_mappings.edit');
+
+        try {
+            $mapping = \App\Models\ConditionalCodeMapping::findOrFail($id);
+            $mapping->delete();
+            session()->flash('success', 'Conditional mapping deleted successfully.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to delete conditional mapping: '.$e->getMessage());
+        }
+    }
+
+    public function toggleConditionalMappingActive($id)
+    {
+        $this->authorizeAction('intacct.configure');
+
+        try {
+            $mapping = \App\Models\ConditionalCodeMapping::findOrFail($id);
+            $mapping->update(['is_active' => ! $mapping->is_active]);
+            session()->flash('success', 'Conditional mapping status updated.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to update conditional mapping: '.$e->getMessage());
+        }
+    }
+
+    public function cancelConditionalMappingForm()
+    {
+        $this->showConditionalMappingForm = false;
+        $this->resetConditionalMappingForm();
+    }
+
+    private function resetConditionalMappingForm()
+    {
+        $this->editingConditionalMappingId = null;
+        $this->conditional_intacct_location_code = '';
+        $this->conditional_field_type = 'solicit_code';
+        $this->conditional_dp_code = '';
+        $this->conditional_intacct_code = '';
+        $this->conditional_priority = 0;
+        $this->conditional_notes = '';
+        $this->conditional_is_active = true;
+        $this->resetErrorBag();
+    }
+
+    // ========================================
+    // SYNC HISTORY TAB METHODS
+    // ========================================
+
+    public function updatedFilterStatus()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedFilterStartDate()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedFilterEndDate()
+    {
+        $this->resetPage();
+    }
+
+    public function clearFilters()
+    {
+        $this->filterStatus = '';
+        $this->filterStartDate = '';
+        $this->filterEndDate = '';
+        $this->resetPage();
+    }
+
+    // ========================================
+    // SYNC FILTERS TAB METHODS
+    // ========================================
+
+    public function showCreateSyncFilterForm()
+    {
+        $this->authorizeAction('intacct.configure');
+        $this->resetSyncFilterForm();
+        $this->showSyncFilterForm = true;
+    }
+
+    public function showEditSyncFilterForm($id)
+    {
+        $this->authorizeAction('intacct.configure');
+
+        $filter = \App\Models\SageIntacctSyncFilter::findOrFail($id);
+
+        $this->editingSyncFilterId = $filter->id;
+        $this->sync_filter_name = $filter->name;
+        $this->sync_filter_field_name = $filter->field_name;
+        $this->sync_filter_operator = $filter->operator;
+        $this->sync_filter_value = $filter->value;
+        $this->sync_filter_action = $filter->action;
+        $this->sync_filter_priority = $filter->priority;
+        $this->sync_filter_description = $filter->description ?? '';
+        $this->sync_filter_is_active = $filter->is_active;
+
+        $this->showSyncFilterForm = true;
+    }
+
+    public function saveSyncFilter()
+    {
+        $this->authorizeAction('sage.filters.edit');
+
+        $this->validate([
+            'sync_filter_name' => 'required|string|max:255',
+            'sync_filter_field_name' => 'required|string|max:255',
+            'sync_filter_operator' => 'required|in:equals,not_equals,contains,not_contains,greater_than,less_than,greater_or_equal,less_or_equal,is_empty,is_not_empty',
+            'sync_filter_value' => 'nullable|string|max:255',
+            'sync_filter_action' => 'required|in:exclude,include',
+            'sync_filter_priority' => 'nullable|integer|min:0',
+            'sync_filter_description' => 'nullable|string',
+        ]);
+
+        try {
+            if ($this->editingSyncFilterId) {
+                $filter = \App\Models\SageIntacctSyncFilter::findOrFail($this->editingSyncFilterId);
+                $filter->update([
+                    'name' => $this->sync_filter_name,
+                    'field_name' => $this->sync_filter_field_name,
+                    'operator' => $this->sync_filter_operator,
+                    'value' => $this->sync_filter_value,
+                    'action' => $this->sync_filter_action,
+                    'priority' => $this->sync_filter_priority ?? 0,
+                    'description' => $this->sync_filter_description,
+                    'is_active' => $this->sync_filter_is_active,
+                ]);
+                session()->flash('success', 'Sync filter updated successfully.');
+            } else {
+                \App\Models\SageIntacctSyncFilter::create([
+                    'name' => $this->sync_filter_name,
+                    'field_name' => $this->sync_filter_field_name,
+                    'operator' => $this->sync_filter_operator,
+                    'value' => $this->sync_filter_value,
+                    'action' => $this->sync_filter_action,
+                    'filter_group' => 0,
+                    'group_logic' => 'OR',
+                    'priority' => $this->sync_filter_priority ?? 0,
+                    'description' => $this->sync_filter_description,
+                    'is_active' => $this->sync_filter_is_active,
+                ]);
+                session()->flash('success', 'Sync filter created successfully.');
+            }
+
+            $this->cancelSyncFilterForm();
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to save sync filter: '.$e->getMessage());
+        }
+    }
+
+    public function deleteSyncFilter($id)
+    {
+        $this->authorizeAction('sage.filters.edit');
+
+        try {
+            $filter = \App\Models\SageIntacctSyncFilter::findOrFail($id);
+            $filter->delete();
+            session()->flash('success', 'Sync filter deleted successfully.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to delete sync filter: '.$e->getMessage());
+        }
+    }
+
+    public function toggleSyncFilterActive($id)
+    {
+        $this->authorizeAction('intacct.configure');
+
+        try {
+            $filter = \App\Models\SageIntacctSyncFilter::findOrFail($id);
+            $filter->update(['is_active' => ! $filter->is_active]);
+            session()->flash('success', 'Sync filter status updated.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to update sync filter: '.$e->getMessage());
+        }
+    }
+
+    public function cancelSyncFilterForm()
+    {
+        $this->showSyncFilterForm = false;
+        $this->resetSyncFilterForm();
+    }
+
+    private function resetSyncFilterForm()
+    {
+        $this->editingSyncFilterId = null;
+        $this->sync_filter_name = '';
+        $this->sync_filter_field_name = '';
+        $this->sync_filter_operator = 'equals';
+        $this->sync_filter_value = '';
+        $this->sync_filter_action = 'exclude';
+        $this->sync_filter_priority = 0;
+        $this->sync_filter_description = '';
+        $this->sync_filter_is_active = true;
+        $this->resetErrorBag();
+    }
+
     public function render(DonorPerfectGiftService $giftService)
     {
         try {
@@ -636,6 +1273,23 @@ class DonorPerfectGiftsFeed extends Component
                 ['path' => request()->url()]
             );
 
+            // Get tab-specific data
+            $settings = \App\Models\SageIntacctSetting::first();
+
+            // Field Mappings tab data
+            $fieldMappings = $settings
+                ? \App\Models\SageIntacctFieldMapping::where('setting_id', $settings->id)->orderBy('order')->get()
+                : collect();
+
+            // Sync History tab data
+            $syncHistory = \App\Models\SageIntacctSyncHistory::query()
+                ->with('resetBy')
+                ->when($this->filterStatus, fn ($query) => $query->where('status', $this->filterStatus))
+                ->when($this->filterStartDate, fn ($query) => $query->whereDate('started_at', '>=', $this->filterStartDate))
+                ->when($this->filterEndDate, fn ($query) => $query->whereDate('started_at', '<=', $this->filterEndDate))
+                ->orderBy('started_at', 'desc')
+                ->paginate(15);
+
             return view('livewire.donor-perfect-gifts-feed', [
                 'gifts' => $paginatedGifts,
                 'isConfigured' => true,
@@ -647,6 +1301,10 @@ class DonorPerfectGiftsFeed extends Component
                 'selectedCount' => count($this->selectedGiftsForSync),
                 'codeMappingEnabled' => $this->codeMappingEnabled,
                 'useIntacctCodes' => $this->useIntacctCodes,
+                // Tab data
+                'fieldMappings' => $fieldMappings,
+                'availableDpFields' => $this->availableDpFields,
+                'syncHistory' => $syncHistory,
             ])->layout('components.layouts.app');
         } catch (\Exception $e) {
             return view('livewire.donor-perfect-gifts-feed', [

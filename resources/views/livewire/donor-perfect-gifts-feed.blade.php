@@ -111,6 +111,39 @@
         </div>
         @endif
 
+        <!-- Tabs -->
+        <div class="border-b border-gray-200 dark:border-zinc-700">
+            <nav class="flex -mb-px">
+                <button wire:click="setActiveTab('gifts')"
+                        class="px-6 py-4 text-sm font-medium border-b-2 {{ $activeTab === 'gifts' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300' }}">
+                    Gifts Feed
+                </button>
+                @if($codeMappingEnabled ?? false)
+                <button wire:click="setActiveTab('field-mappings')"
+                        class="px-6 py-4 text-sm font-medium border-b-2 {{ $activeTab === 'field-mappings' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300' }}">
+                    Field Mappings
+                </button>
+                <button wire:click="setActiveTab('code_mappings')"
+                        class="px-6 py-4 text-sm font-medium border-b-2 {{ $activeTab === 'code_mappings' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300' }}">
+                    Code Mappings
+                </button>
+                <button wire:click="setActiveTab('sync-history')"
+                        class="px-6 py-4 text-sm font-medium border-b-2 {{ $activeTab === 'sync-history' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300' }}">
+                    Sync History
+                </button>
+                <button wire:click="setActiveTab('sync_filters')"
+                        class="px-6 py-4 text-sm font-medium border-b-2 {{ $activeTab === 'sync_filters' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300' }}">
+                    Sync Filters
+                </button>
+                @endif
+            </nav>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="p-6">
+            <!-- Gifts Feed Tab -->
+            @if($activeTab === 'gifts')
+
         <!-- Code Mapping Mode Indicator -->
         @if($isConfigured && $codeMappingEnabled)
         <div class="p-4 border-b border-gray-200 dark:border-zinc-700">
@@ -1146,4 +1179,18 @@
         </div>
     </div>
     @endif
+
+            @endif
+            <!-- End Gifts Tab -->
+
+            <!-- Include the tab content files from Sage Intacct Configuration -->
+            @include('livewire.partials.field-mappings-tab')
+            @include('livewire.partials.code-mappings-tab')
+            @include('livewire.partials.sync-history-tab')
+            @include('livewire.partials.sync-filters-tab')
+
+        </div>
+        <!-- End Tab Content -->
+
+    </div>
 </div>
