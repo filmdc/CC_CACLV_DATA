@@ -98,9 +98,24 @@
                 </flux:navlist.group>
                 @endif
 
-                @if(auth()->user()->hasAnyPermission(['users.view', 'roles.view', 'poverty_guidelines.view', 'reference_data.view', 'reference_data_sets.view', 'admin.access']) || auth()->user()->isAdmin())
+                @if(auth()->user()->hasAnyPermission(['users.view', 'roles.view', 'poverty_guidelines.view', 'reference_data.view', 'reference_data_sets.view', 'admin.access', 'feedback.view_all']) || auth()->user()->isAdmin())
                 <flux:navlist.group :heading="__('Administration')" class="grid">
                     <flux:navlist.item icon="cog-6-tooth" :href="route('admin.panel')" :current="request()->routeIs('admin.panel')" wire:navigate>{{ __('Admin Panel') }}</flux:navlist.item>
+                    @if(auth()->user()->hasPermission('feedback.view_all'))
+                        <flux:navlist.item icon="chat-bubble-bottom-center-text" :href="route('feedback.management')" :current="request()->routeIs('feedback.management')" wire:navigate>
+                            <div class="flex items-center justify-between w-full">
+                                <span>{{ __('User Feedback') }}</span>
+                                @php
+                                    $feedbackCount = \App\Models\Feedback::where('status', 'new')->count();
+                                @endphp
+                                @if($feedbackCount > 0)
+                                    <span class="ml-2 px-2 py-0.5 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                                        {{ $feedbackCount }}
+                                    </span>
+                                @endif
+                            </div>
+                        </flux:navlist.item>
+                    @endif
                 </flux:navlist.group>
                 @endif
             </flux:navlist>
@@ -212,6 +227,11 @@
                 </flux:menu>
             </flux:dropdown>
         </flux:header>
+
+        <!-- Feedback Widget (Floating Button) -->
+        @auth
+            @livewire('feedback-widget')
+        @endauth
 
         {{ $slot }}
 

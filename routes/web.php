@@ -94,6 +94,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('reports', App\Livewire\ReportingManagement::class)->name('reports');
     Route::get('communications-log', App\Livewire\CommunicationsLogManagement::class)->name('communications-log.management');
 
+    // Feedback Routes
+    Route::get('admin/feedback', App\Livewire\FeedbackManagement::class)
+        ->middleware(['permission:feedback.view_all'])
+        ->name('feedback.management');
+
     // DonorPerfect Routes
     Route::get('donor-gifts', App\Livewire\DonorPerfectGiftsFeed::class)
         ->middleware(['auth', 'permission:donor_gifts.view,donorperfect.sync.view'])
