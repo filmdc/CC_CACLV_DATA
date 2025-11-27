@@ -2,22 +2,29 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
-use App\Models\User;
-use App\Models\ServiceEnrollment;
-use App\Models\ProgramEnrollment;
-use App\Models\PendingApproval;
-use App\Models\PropertyDocument;
+use App\Listeners\LogFailedLogin;
+use App\Listeners\LogLockout;
+use App\Listeners\LogSuccessfulLogin;
+use App\Listeners\LogSuccessfulLogout;
 use App\Models\ContractorDocument;
 use App\Models\JobDocumentChecklist;
 use App\Models\MilestoneDocument;
-use App\Observers\ServiceEnrollmentObserver;
-use App\Observers\ProgramEnrollmentObserver;
-use App\Observers\PendingApprovalObserver;
+use App\Models\PendingApproval;
+use App\Models\ProgramEnrollment;
+use App\Models\PropertyDocument;
+use App\Models\ServiceEnrollment;
+use App\Models\User;
 use App\Observers\DocumentObserver;
+use App\Observers\PendingApprovalObserver;
+use App\Observers\ProgramEnrollmentObserver;
+use App\Observers\ServiceEnrollmentObserver;
+use Illuminate\Auth\Events\Failed;
+use Illuminate\Auth\Events\Lockout;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Logout;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -39,6 +46,12 @@ class AppServiceProvider extends ServiceProvider
             // Check if user has the permission through their roles
             return $user->hasPermission($ability) ? true : null;
         });
+
+        // Register Auth Event Listeners for login audit logging
+        Event::listen(Login::class, LogSuccessfulLogin::class);
+        Event::listen(Logout::class, LogSuccessfulLogout::class);
+        Event::listen(Failed::class, LogFailedLogin::class);
+        Event::listen(Lockout::class, LogLockout::class);
 
         // Register Model Observers
         ServiceEnrollment::observe(ServiceEnrollmentObserver::class);
