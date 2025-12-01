@@ -98,9 +98,12 @@
                 </flux:navlist.group>
                 @endif
 
-                @if(auth()->user()->hasAnyPermission(['users.view', 'roles.view', 'poverty_guidelines.view', 'reference_data.view', 'reference_data_sets.view', 'admin.access', 'feedback.view_all', 'audit.login_view']) || auth()->user()->isAdmin())
+                @if(auth()->user()->hasAnyPermission(['users.view', 'roles.view', 'poverty_guidelines.view', 'reference_data.view', 'reference_data_sets.view', 'admin.access', 'feedback.view_all', 'audit.login_view', 'documentation.manage']) || auth()->user()->isAdmin())
                 <flux:navlist.group :heading="__('Administration')" class="grid">
                     <flux:navlist.item icon="cog-6-tooth" :href="route('admin.panel')" :current="request()->routeIs('admin.panel')" wire:navigate>{{ __('Admin Panel') }}</flux:navlist.item>
+                    @if(auth()->user()->hasPermission('documentation.manage'))
+                        <flux:navlist.item icon="book-open" :href="route('admin.documentation.articles')" :current="request()->routeIs('admin.documentation.*')" wire:navigate>{{ __('Manage Docs') }}</flux:navlist.item>
+                    @endif
                     @if(auth()->user()->hasPermission('feedback.view_all'))
                         <flux:navlist.item icon="chat-bubble-bottom-center-text" :href="route('feedback.management')" :current="request()->routeIs('feedback.management')" wire:navigate>
                             <div class="flex items-center justify-between w-full">
@@ -126,11 +129,7 @@
             <flux:spacer />
 
             <flux:navlist variant="outline">
-                <flux:navlist.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-                {{ __('Repository') }}
-                </flux:navlist.item>
-
-                <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
+                <flux:navlist.item icon="book-open-text" :href="route('documentation.index')" :current="request()->routeIs('documentation.*')" wire:navigate>
                 {{ __('Documentation') }}
                 </flux:navlist.item>
             </flux:navlist>
@@ -234,6 +233,7 @@
         <!-- Feedback Widget (Floating Button) -->
         @auth
             @livewire('feedback-widget')
+            @livewire('help-widget')
         @endauth
 
         {{ $slot }}

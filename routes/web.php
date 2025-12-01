@@ -104,6 +104,24 @@ Route::middleware(['auth'])->group(function () {
         ->middleware(['permission:audit.login_view'])
         ->name('audit.login');
 
+    // Documentation Routes
+    Route::get('documentation', App\Livewire\DocumentationViewer::class)
+        ->name('documentation.index');
+    Route::get('documentation/bookmarks', App\Livewire\DocumentationViewer::class)
+        ->name('documentation.bookmarks');
+    Route::get('documentation/{category}', App\Livewire\DocumentationViewer::class)
+        ->name('documentation.category');
+    Route::get('documentation/{category}/{article}', App\Livewire\DocumentationViewer::class)
+        ->name('documentation.article');
+
+    // Admin Documentation Management Routes
+    Route::get('admin/documentation/categories', App\Livewire\DocumentationCategoryManagement::class)
+        ->middleware(['permission:documentation.manage'])
+        ->name('admin.documentation.categories');
+    Route::get('admin/documentation/articles', App\Livewire\DocumentationArticleManagement::class)
+        ->middleware(['permission:documentation.manage'])
+        ->name('admin.documentation.articles');
+
     // DonorPerfect Routes
     Route::get('donor-gifts', App\Livewire\DonorPerfectGiftsFeed::class)
         ->middleware(['auth', 'permission:donor_gifts.view,donorperfect.sync.view'])
