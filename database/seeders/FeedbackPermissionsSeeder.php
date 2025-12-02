@@ -49,31 +49,15 @@ class FeedbackPermissionsSeeder extends Seeder
             }
         }
 
-        // Assign limited permissions to Project Manager role
-        $projectManagerRole = Role::where('name', 'project_manager')->first();
-        if ($projectManagerRole) {
-            $projectManagerPermissions = Permission::whereIn('name', [
-                'feedback.submit',
-                'feedback.view_own',
-                'feedback.view_all',
-                'feedback.manage',
-            ])->get();
-
-            foreach ($projectManagerPermissions as $permission) {
-                if (! $projectManagerRole->permissions->contains($permission->id)) {
-                    $projectManagerRole->permissions()->attach($permission->id);
-                }
-            }
-        }
-
-        // Assign basic permissions to all other roles (submit and view own)
+        // Assign basic permissions to all non-admin roles (submit and view own)
+        // Note: feedback.view_all, feedback.manage are admin-only permissions
         $basicPermissions = Permission::whereIn('name', [
             'feedback.submit',
             'feedback.view_own',
         ])->get();
 
-        $otherRoles = Role::whereNotIn('name', ['Administrator', 'project_manager'])->get();
-        foreach ($otherRoles as $role) {
+        $nonAdminRoles = Role::where('name', '!=', 'Administrator')->get();
+        foreach ($nonAdminRoles as $role) {
             foreach ($basicPermissions as $permission) {
                 if (! $role->permissions->contains($permission->id)) {
                     $role->permissions()->attach($permission->id);

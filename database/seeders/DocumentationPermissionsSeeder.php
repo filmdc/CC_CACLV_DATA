@@ -40,26 +40,12 @@ class DocumentationPermissionsSeeder extends Seeder
             }
         }
 
-        // Assign view and view_internal permissions to Project Manager role
-        $projectManagerRole = Role::where('name', 'project_manager')->first();
-        if ($projectManagerRole) {
-            $pmPermissions = Permission::whereIn('name', [
-                'documentation.view',
-                'documentation.view_internal',
-            ])->get();
-
-            foreach ($pmPermissions as $permission) {
-                if (! $projectManagerRole->permissions->contains($permission->id)) {
-                    $projectManagerRole->permissions()->attach($permission->id);
-                }
-            }
-        }
-
-        // Assign view permission to all other roles
+        // Assign view permission to all non-admin roles
+        // Note: documentation.view_internal and documentation.manage are admin-only
         $viewPermission = Permission::where('name', 'documentation.view')->first();
         if ($viewPermission) {
-            $otherRoles = Role::whereNotIn('name', ['Administrator', 'project_manager'])->get();
-            foreach ($otherRoles as $role) {
+            $nonAdminRoles = Role::where('name', '!=', 'Administrator')->get();
+            foreach ($nonAdminRoles as $role) {
                 if (! $role->permissions->contains($viewPermission->id)) {
                     $role->permissions()->attach($viewPermission->id);
                 }

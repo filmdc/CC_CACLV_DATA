@@ -45,14 +45,7 @@ class LoginAuditPermissionsSeeder extends Seeder
             }
         }
 
-        // Assign view permission to project_manager role
-        $pmRole = Role::where('name', 'project_manager')->first();
-        if ($pmRole) {
-            $viewPermission = Permission::where('name', 'audit.login_view')->first();
-            if ($viewPermission && ! $pmRole->permissions->contains($viewPermission->id)) {
-                $pmRole->permissions()->attach($viewPermission->id);
-            }
-        }
+        // Note: Login audit is an admin-only feature - do not assign to non-admin roles
 
         $this->command->info('Login audit permissions created and assigned successfully.');
     }
