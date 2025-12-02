@@ -5,9 +5,9 @@ namespace App\Livewire;
 use App\Models\Contractor;
 use App\Models\ReferenceData;
 use App\Traits\WithPermissionChecks;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Illuminate\Support\Facades\Auth;
 
 class ContractorManagement extends Component
 {
@@ -15,41 +15,77 @@ class ContractorManagement extends Component
 
     // UI State
     public $search = '';
+
     public $showCreateForm = false;
+
     public $showEditForm = false;
+
     public $selectedContractor = null;
+
     public $showDetails = false;
+
     public $selectedContractorId = null;
+
     public $filterStatus = '';
+
     public $filterExpiredLicense = false;
+
     public $filterExpiredInsurance = false;
 
     // Form Fields
     public $company_name = '';
+
     public $contact_first_name = '';
+
     public $contact_last_name = '';
+
     public $email = '';
+
     public $phone = '';
+
     public $fax = '';
+
     public $address_line_1 = '';
+
     public $address_line_2 = '';
+
     public $city = '';
+
     public $state = '';
+
     public $zip_code = '';
+
     public $license_number = '';
+
     public $license_expiration = '';
+
     public $insurance_provider = '';
+
     public $insurance_policy_number = '';
+
     public $insurance_expiration = '';
+
     public $liability_coverage_amount = '';
+
     public $ein = '';
+
     public $services_offered = [];
+
     public $status = 'active';
+
     public $notes = '';
 
     // Services selection
     public $availableServices = [];
+
     public $selectedServices = [];
+
+    // Document approval
+    public $showApprovalModal = false;
+
+    public $rejectionReason = '';
+
+    public $documentToReject = null;
 
     protected $rules = [
         'company_name' => 'required|string|max:255',
@@ -129,8 +165,16 @@ class ContractorManagement extends Component
 
     public function viewDetails($contractorId)
     {
-        // Redirect to the contractor show page instead of opening a modal
-        return redirect()->route('contractor.show', $contractorId);
+        $this->selectedContractor = Contractor::with([
+            'jobs.property',
+            'jobs.program',
+            'contractorDocuments.approvedBy',
+            'contractorDocuments.uploadedBy',
+        ])->findOrFail($contractorId);
+
+        $this->showDetails = true;
+        $this->showCreateForm = false;
+        $this->showEditForm = false;
     }
 
     public function save()
@@ -169,7 +213,7 @@ class ContractorManagement extends Component
             $this->showCreateForm = false;
             $this->resetForm();
         } catch (\Exception $e) {
-            session()->flash('error', 'Error creating contractor: ' . $e->getMessage());
+            session()->flash('error', 'Error creating contractor: '.$e->getMessage());
         }
     }
 
@@ -208,27 +252,28 @@ class ContractorManagement extends Component
             $this->showEditForm = false;
             $this->resetForm();
         } catch (\Exception $e) {
-            session()->flash('error', 'Error updating contractor: ' . $e->getMessage());
+            session()->flash('error', 'Error updating contractor: '.$e->getMessage());
         }
     }
 
     public function delete($contractorId)
     {
         $this->authorizeAction('contractors.delete');
-        
+
         try {
             $contractor = Contractor::findOrFail($contractorId);
-            
+
             // Check if contractor has associated jobs
             if ($contractor->jobs()->exists()) {
                 session()->flash('error', 'Cannot delete contractor with associated housing jobs.');
+
                 return;
             }
-            
+
             $contractor->delete();
             session()->flash('message', 'Contractor deleted successfully.');
         } catch (\Exception $e) {
-            session()->flash('error', 'Error deleting contractor: ' . $e->getMessage());
+            session()->flash('error', 'Error deleting contractor: '.$e->getMessage());
         }
     }
 
@@ -296,18 +341,92 @@ class ContractorManagement extends Component
         $this->notes = $this->selectedContractor->notes;
     }
 
+    public function showRejectModal($documentId)
+    {
+        $this->documentToReject = $documentId;
+        $this->rejectionReason = '';
+        $this->showApprovalModal = true;
+    }
+
+    public function resetApprovalModal()
+    {
+        $this->showApprovalModal = false;
+        $this->rejectionReason = '';
+        $this->documentToReject = null;
+    }
+
+    public function approveDocument($documentId)
+    {
+        $this->authorizeAction('contractors.edit');
+
+        try {
+            $document = \App\Models\ContractorDocument::findOrFail($documentId);
+            $document->update([
+                'approval_status' => 'approved',
+                'approved_by' => Auth::id(),
+                'approved_at' => now(),
+            ]);
+
+            $this->selectedContractor->load('contractorDocuments.approvedBy');
+            session()->flash('message', 'Document approved successfully.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error approving document: '.$e->getMessage());
+        }
+    }
+
+    public function rejectDocument()
+    {
+        $this->authorizeAction('contractors.edit');
+
+        $this->validate([
+            'rejectionReason' => 'required|string|min:10',
+        ]);
+
+        try {
+            $document = \App\Models\ContractorDocument::findOrFail($this->documentToReject);
+            $document->update([
+                'approval_status' => 'rejected',
+                'rejection_reason' => $this->rejectionReason,
+                'approved_by' => Auth::id(),
+                'approved_at' => now(),
+            ]);
+
+            $this->selectedContractor->load('contractorDocuments.approvedBy');
+            $this->resetApprovalModal();
+            session()->flash('message', 'Document rejected successfully.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error rejecting document: '.$e->getMessage());
+        }
+    }
+
+    public function toggleRequiresApproval($documentId)
+    {
+        $this->authorizeAction('contractors.edit');
+
+        try {
+            $document = \App\Models\ContractorDocument::findOrFail($documentId);
+            $document->update([
+                'requires_approval' => ! $document->requires_approval,
+            ]);
+
+            $this->selectedContractor->load('contractorDocuments.approvedBy');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error updating document: '.$e->getMessage());
+        }
+    }
+
     public function render()
     {
         // Build the contractors query
         $query = Contractor::with(['jobs'])
             ->when($this->search, function ($q) {
                 $q->where(function ($query) {
-                    $query->where('company_name', 'like', '%' . $this->search . '%')
-                        ->orWhere('contact_first_name', 'like', '%' . $this->search . '%')
-                        ->orWhere('contact_last_name', 'like', '%' . $this->search . '%')
-                        ->orWhere('email', 'like', '%' . $this->search . '%')
-                        ->orWhere('phone', 'like', '%' . $this->search . '%')
-                        ->orWhere('license_number', 'like', '%' . $this->search . '%');
+                    $query->where('company_name', 'like', '%'.$this->search.'%')
+                        ->orWhere('contact_first_name', 'like', '%'.$this->search.'%')
+                        ->orWhere('contact_last_name', 'like', '%'.$this->search.'%')
+                        ->orWhere('email', 'like', '%'.$this->search.'%')
+                        ->orWhere('phone', 'like', '%'.$this->search.'%')
+                        ->orWhere('license_number', 'like', '%'.$this->search.'%');
                 });
             })
             ->when($this->filterStatus, function ($q) {

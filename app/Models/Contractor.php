@@ -51,6 +51,11 @@ class Contractor extends Model
         return $this->hasMany(ContractorDocument::class);
     }
 
+    public function contractorDocuments(): HasMany
+    {
+        return $this->hasMany(ContractorDocument::class);
+    }
+
     public function housingJobs(): HasMany
     {
         return $this->hasMany(HousingJob::class);
@@ -69,25 +74,26 @@ class Contractor extends Model
     public function getContactNameAttribute(): ?string
     {
         if ($this->contact_first_name || $this->contact_last_name) {
-            return trim($this->contact_first_name . ' ' . $this->contact_last_name);
+            return trim($this->contact_first_name.' '.$this->contact_last_name);
         }
+
         return null;
     }
 
     public function getFullAddressAttribute(): ?string
     {
-        if (!$this->address_line_1) {
+        if (! $this->address_line_1) {
             return null;
         }
-        
+
         $address = $this->address_line_1;
         if ($this->address_line_2) {
-            $address .= ', ' . $this->address_line_2;
+            $address .= ', '.$this->address_line_2;
         }
         if ($this->city && $this->state && $this->zip_code) {
-            $address .= ', ' . $this->city . ', ' . $this->state . ' ' . $this->zip_code;
+            $address .= ', '.$this->city.', '.$this->state.' '.$this->zip_code;
         }
-        
+
         return $address;
     }
 

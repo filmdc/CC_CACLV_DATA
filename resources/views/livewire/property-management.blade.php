@@ -146,8 +146,8 @@
                                         class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 mr-3">
                                     View
                                 </button>
-                                @can('properties.update')
-                                    <button wire:click="showEditForm({{ $property->id }})" 
+                                @can('properties.edit')
+                                    <button wire:click="showEditForm({{ $property->id }})"
                                             class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 mr-3">
                                         Edit
                                     </button>
@@ -649,7 +649,7 @@
                     <div class="mt-6">
                         <div class="flex justify-between items-center mb-3">
                             <h4 class="text-md font-medium text-gray-900 dark:text-white">Documents</h4>
-                            @can('properties.update')
+                            @can('properties.edit')
                                 <button class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
                                     Upload Document
                                 </button>
@@ -751,7 +751,7 @@
                                             </div>
 
                                             <!-- Action Buttons -->
-                                            @if($doc->requires_approval && $doc->approval_status === 'pending' && auth()->user()->can('properties.update'))
+                                            @if($doc->requires_approval && $doc->approval_status === 'pending' && auth()->user()->can('properties.edit'))
                                                 <div class="flex gap-2 ml-3">
                                                     <button wire:click="approveDocument({{ $doc->id }})"
                                                             class="px-3 py-1.5 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition">
@@ -776,8 +776,8 @@
                     <div class="mt-6">
                         <div class="flex justify-between items-center mb-3">
                             <h4 class="text-md font-medium text-gray-900 dark:text-white">Notes</h4>
-                            @can('properties.update')
-                                <button wire:click="$set('showNotesForm', true)" 
+                            @can('properties.edit')
+                                <button wire:click="$set('showNotesForm', true)"
                                         class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
                                     Add Note
                                 </button>

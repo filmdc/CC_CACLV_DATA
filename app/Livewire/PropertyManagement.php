@@ -2,15 +2,15 @@
 
 namespace App\Livewire;
 
-use App\Models\Property;
-use App\Models\Participant;
 use App\Models\Household;
-use App\Models\ReferenceData;
+use App\Models\Participant;
 use App\Models\Program;
+use App\Models\Property;
+use App\Models\ReferenceData;
 use App\Traits\WithPermissionChecks;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Illuminate\Support\Facades\Auth;
 
 class PropertyManagement extends Component
 {
@@ -18,35 +18,65 @@ class PropertyManagement extends Component
 
     // UI State
     public $search = '';
+
     public $showCreateForm = false;
+
     public $showEditForm = false;
+
     public $selectedProperty = null;
+
     public $showDetails = false;
+
     public $selectedPropertyId = null;
+
     public $filterStatus = '';
+
     public $filterType = '';
+
     public $filterProgram = '';
 
     // Form Fields
     public $participant_id = '';
+
     public $household_id = '';
+
     public $property_type_id = '';
+
     public $address_line_1 = '';
+
     public $address_line_2 = '';
+
     public $city = '';
+
     public $state = '';
+
     public $zip_code = '';
+
     public $county = '';
+
     public $year_built = '';
+
     public $bedrooms = '';
+
     public $bathrooms = '';
+
     public $square_footage = '';
+
     public $property_description = '';
+
     public $status = 'active';
 
     // Notes form
     public $showNotesForm = false;
+
     public $noteContent = '';
+
+    // Document approval
+    public $showApprovalModal = false;
+
+    public $rejectionReason = '';
+
+    public $documentToReject = null;
 
     protected function rules()
     {
@@ -60,7 +90,7 @@ class PropertyManagement extends Component
             'state' => 'required|string|size:2',
             'zip_code' => 'required|string|regex:/^\d{5}(-\d{4})?$/',
             'county' => 'required|string|max:100',
-            'year_built' => 'nullable|integer|min:1800|max:' . (date('Y') + 1),
+            'year_built' => 'nullable|integer|min:1800|max:'.(date('Y') + 1),
             'bedrooms' => 'nullable|integer|min:0|max:20',
             'bathrooms' => 'nullable|numeric|min:0|max:20',
             'square_footage' => 'nullable|integer|min:0',
@@ -115,8 +145,19 @@ class PropertyManagement extends Component
 
     public function viewDetails($propertyId)
     {
-        // Redirect to the property show page instead of opening a modal
-        return redirect()->route('property.show', $propertyId);
+        $this->selectedProperty = Property::with([
+            'participant',
+            'household.participants',
+            'propertyType',
+            'jobs.contractor',
+            'notes.createdBy',
+            'propertyDocuments.approvedBy',
+            'propertyDocuments.uploadedBy',
+        ])->findOrFail($propertyId);
+
+        $this->showDetails = true;
+        $this->showCreateForm = false;
+        $this->showEditForm = false;
     }
 
     public function save()
@@ -149,7 +190,7 @@ class PropertyManagement extends Component
             $this->showCreateForm = false;
             $this->resetFormFields();
         } catch (\Exception $e) {
-            session()->flash('error', 'Error creating property: ' . $e->getMessage());
+            session()->flash('error', 'Error creating property: '.$e->getMessage());
         }
     }
 
@@ -182,27 +223,28 @@ class PropertyManagement extends Component
             $this->showEditForm = false;
             $this->resetFormFields();
         } catch (\Exception $e) {
-            session()->flash('error', 'Error updating property: ' . $e->getMessage());
+            session()->flash('error', 'Error updating property: '.$e->getMessage());
         }
     }
 
     public function delete($propertyId)
     {
         $this->authorizeAction('properties.delete');
-        
+
         try {
             $property = Property::findOrFail($propertyId);
-            
+
             // Check if property has associated jobs
             if ($property->jobs()->exists()) {
                 session()->flash('error', 'Cannot delete property with associated housing jobs.');
+
                 return;
             }
-            
+
             $property->delete();
             session()->flash('message', 'Property deleted successfully.');
         } catch (\Exception $e) {
-            session()->flash('error', 'Error deleting property: ' . $e->getMessage());
+            session()->flash('error', 'Error deleting property: '.$e->getMessage());
         }
     }
 
@@ -219,13 +261,13 @@ class PropertyManagement extends Component
 
             $this->noteContent = '';
             $this->showNotesForm = false;
-            
+
             // Refresh the selected property to get updated notes
             $this->selectedProperty->load('notes.createdBy');
-            
+
             session()->flash('message', 'Note added successfully.');
         } catch (\Exception $e) {
-            session()->flash('error', 'Error adding note: ' . $e->getMessage());
+            session()->flash('error', 'Error adding note: '.$e->getMessage());
         }
     }
 
@@ -281,6 +323,80 @@ class PropertyManagement extends Component
         $this->status = $this->selectedProperty->status;
     }
 
+    public function showRejectModal($documentId)
+    {
+        $this->documentToReject = $documentId;
+        $this->rejectionReason = '';
+        $this->showApprovalModal = true;
+    }
+
+    public function resetApprovalModal()
+    {
+        $this->showApprovalModal = false;
+        $this->rejectionReason = '';
+        $this->documentToReject = null;
+    }
+
+    public function approveDocument($documentId)
+    {
+        $this->authorizeAction('properties.edit');
+
+        try {
+            $document = \App\Models\PropertyDocument::findOrFail($documentId);
+            $document->update([
+                'approval_status' => 'approved',
+                'approved_by' => Auth::id(),
+                'approved_at' => now(),
+            ]);
+
+            $this->selectedProperty->load('propertyDocuments.approvedBy');
+            session()->flash('message', 'Document approved successfully.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error approving document: '.$e->getMessage());
+        }
+    }
+
+    public function rejectDocument()
+    {
+        $this->authorizeAction('properties.edit');
+
+        $this->validate([
+            'rejectionReason' => 'required|string|min:10',
+        ]);
+
+        try {
+            $document = \App\Models\PropertyDocument::findOrFail($this->documentToReject);
+            $document->update([
+                'approval_status' => 'rejected',
+                'rejection_reason' => $this->rejectionReason,
+                'approved_by' => Auth::id(),
+                'approved_at' => now(),
+            ]);
+
+            $this->selectedProperty->load('propertyDocuments.approvedBy');
+            $this->resetApprovalModal();
+            session()->flash('message', 'Document rejected successfully.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error rejecting document: '.$e->getMessage());
+        }
+    }
+
+    public function toggleRequiresApproval($documentId)
+    {
+        $this->authorizeAction('properties.edit');
+
+        try {
+            $document = \App\Models\PropertyDocument::findOrFail($documentId);
+            $document->update([
+                'requires_approval' => ! $document->requires_approval,
+            ]);
+
+            $this->selectedProperty->load('propertyDocuments.approvedBy');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error updating document: '.$e->getMessage());
+        }
+    }
+
     public function render()
     {
         // Get programs with housing module enabled
@@ -293,15 +409,15 @@ class PropertyManagement extends Component
         $query = Property::with(['participant', 'household', 'propertyType', 'jobs'])
             ->when($this->search, function ($q) {
                 $q->where(function ($query) {
-                    $query->where('address_line_1', 'like', '%' . $this->search . '%')
-                        ->orWhere('city', 'like', '%' . $this->search . '%')
-                        ->orWhere('zip_code', 'like', '%' . $this->search . '%')
+                    $query->where('address_line_1', 'like', '%'.$this->search.'%')
+                        ->orWhere('city', 'like', '%'.$this->search.'%')
+                        ->orWhere('zip_code', 'like', '%'.$this->search.'%')
                         ->orWhereHas('participant', function ($q) {
-                            $q->where('first_name', 'like', '%' . $this->search . '%')
-                                ->orWhere('last_name', 'like', '%' . $this->search . '%');
+                            $q->where('first_name', 'like', '%'.$this->search.'%')
+                                ->orWhere('last_name', 'like', '%'.$this->search.'%');
                         })
                         ->orWhereHas('household', function ($q) {
-                            $q->where('code', 'like', '%' . $this->search . '%');
+                            $q->where('code', 'like', '%'.$this->search.'%');
                         });
                 });
             })

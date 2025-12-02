@@ -159,8 +159,8 @@
                                         class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-900 dark:hover:text-emerald-300 mr-3">
                                     View
                                 </button>
-                                @can('contractors.update')
-                                    <button wire:click="showEditForm({{ $contractor->id }})" 
+                                @can('contractors.edit')
+                                    <button wire:click="showEditForm({{ $contractor->id }})"
                                             class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 mr-3">
                                         Edit
                                     </button>
@@ -764,7 +764,7 @@
                     <div class="mt-6">
                         <div class="flex justify-between items-center mb-3">
                             <h4 class="text-md font-medium text-gray-900 dark:text-white">Documents</h4>
-                            @can('contractors.update')
+                            @can('contractors.edit')
                                 <button class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
                                     Upload Document
                                 </button>
@@ -880,7 +880,7 @@
                                             </div>
 
                                             <!-- Action Buttons -->
-                                            @if($doc->requires_approval && $doc->approval_status === 'pending' && auth()->user()->can('contractors.update'))
+                                            @if($doc->requires_approval && $doc->approval_status === 'pending' && auth()->user()->can('contractors.edit'))
                                                 <div class="flex gap-2 ml-3">
                                                     <button wire:click="approveDocument({{ $doc->id }})"
                                                             class="px-3 py-1.5 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition">

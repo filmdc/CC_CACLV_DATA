@@ -69,6 +69,11 @@ class Property extends Model
         return $this->hasMany(PropertyDocument::class);
     }
 
+    public function propertyDocuments(): HasMany
+    {
+        return $this->hasMany(PropertyDocument::class);
+    }
+
     public function housingJobs(): HasMany
     {
         return $this->hasMany(HousingJob::class);
@@ -88,10 +93,10 @@ class Property extends Model
     {
         $address = $this->address_line_1;
         if ($this->address_line_2) {
-            $address .= ', ' . $this->address_line_2;
+            $address .= ', '.$this->address_line_2;
         }
-        $address .= ', ' . $this->city . ', ' . $this->state . ' ' . $this->zip_code;
-        
+        $address .= ', '.$this->city.', '.$this->state.' '.$this->zip_code;
+
         return $address;
     }
 }
