@@ -22,7 +22,7 @@ class ProjectPipeline extends Component
     public function mount()
     {
         // Check if user has permission to view projects
-        $this->authorizeAny(['housing_jobs.view', 'projects.view']);
+        $this->authorizeAction('projects.view');
     }
 
     public function updatedSearch()

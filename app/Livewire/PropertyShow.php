@@ -46,7 +46,7 @@ class PropertyShow extends Component
      */
     public function approveDocument($documentId)
     {
-        $this->authorizeAction('properties.update');
+        $this->authorizeAction('properties.approve_documents');
 
         try {
             $document = PropertyDocument::findOrFail($documentId);
@@ -82,7 +82,7 @@ class PropertyShow extends Component
      */
     public function rejectDocument($documentId = null, $reason = null)
     {
-        $this->authorizeAction('properties.update');
+        $this->authorizeAction('properties.approve_documents');
 
         $docId = $documentId ?? $this->approvalDocumentId;
         $rejectionReason = $reason ?? $this->rejectionReason;
@@ -116,7 +116,7 @@ class PropertyShow extends Component
      */
     public function toggleRequiresApproval($documentId)
     {
-        $this->authorizeAction('properties.update');
+        $this->authorizeAction('properties.edit');
 
         try {
             $document = PropertyDocument::findOrFail($documentId);

@@ -35,9 +35,9 @@
                 </flux:navlist.group>
                 @endif
 
-                @if(auth()->user()->hasAnyPermission(['properties.view', 'contractors.view', 'housing_jobs.view', 'projects.view', 'pdf_templates.view', 'communications_log.view']))
+                @if(auth()->user()->hasAnyPermission(['properties.view', 'contractors.view', 'projects.view', 'pdf_templates.view', 'communications_log.view']))
                 <flux:navlist.group :heading="__('Housing & Projects')" class="grid">
-                    @if(auth()->user()->hasAnyPermission(['housing_jobs.view', 'projects.view']))
+                    @if(auth()->user()->hasPermission('projects.view'))
                         <flux:navlist.item icon="view-columns" :href="route('projects.management')" :current="request()->routeIs(['projects.management', 'project.management', 'housing-job.management', 'project.pipeline'])" wire:navigate>{{ __('Projects') }}</flux:navlist.item>
                     @endif
                     @if(auth()->user()->hasPermission('properties.view'))

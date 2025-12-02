@@ -23,8 +23,9 @@ class DatabaseSeeder extends Seeder
             InitialSetupSeeder::class,
             PovertyGuidelinesSeeder::class,
             ReferenceDataSeeder::class,
+            ProjectHousingPermissionsSeeder::class, // Consolidated permissions seeder - must run before HousingModuleSeeder
             HousingModuleSeeder::class,
-            ApprovalPermissionsSeeder::class,
+            ApprovalPermissionsSeeder::class, // Now just a stub for backwards compatibility
             DonorPerfectSeeder::class,
             PaymentMethodMappingSeeder::class,
             ConditionalCodeMappingSeeder::class,

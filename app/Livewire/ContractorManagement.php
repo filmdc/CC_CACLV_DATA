@@ -119,7 +119,7 @@ class ContractorManagement extends Component
 
     public function showEditForm($contractorId)
     {
-        $this->authorizeAction('contractors.update');
+        $this->authorizeAction('contractors.edit');
         $this->selectedContractor = Contractor::findOrFail($contractorId);
         $this->fillFormFromContractor();
         $this->showEditForm = true;
@@ -175,7 +175,7 @@ class ContractorManagement extends Component
 
     public function update()
     {
-        $this->authorizeAction('contractors.update');
+        $this->authorizeAction('contractors.edit');
         $this->validate();
 
         try {

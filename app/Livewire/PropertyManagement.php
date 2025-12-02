@@ -105,7 +105,7 @@ class PropertyManagement extends Component
 
     public function showEditForm($propertyId)
     {
-        $this->authorizeAction('properties.update');
+        $this->authorizeAction('properties.edit');
         $this->selectedProperty = Property::findOrFail($propertyId);
         $this->fillFormFromProperty();
         $this->showEditForm = true;
@@ -155,7 +155,7 @@ class PropertyManagement extends Component
 
     public function update()
     {
-        $this->authorizeAction('properties.update');
+        $this->authorizeAction('properties.edit');
         $this->validate();
 
         try {
@@ -208,7 +208,7 @@ class PropertyManagement extends Component
 
     public function addNote()
     {
-        $this->authorizeAction('properties.update');
+        $this->authorizeAction('properties.notes');
         $this->validate(['noteContent' => 'required|string']);
 
         try {

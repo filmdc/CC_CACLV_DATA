@@ -102,7 +102,7 @@ class ProjectManagement extends Component
             'expenses'
         ])->findOrFail($id);
 
-        $this->authorizeAny(['housing_jobs.view', 'projects.view']);
+        $this->authorizeAction('projects.view');
 
         // Fix any inconsistent document states on load
         foreach ($this->job->milestones as $milestone) {

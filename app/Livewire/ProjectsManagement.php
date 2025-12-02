@@ -83,7 +83,7 @@ class ProjectsManagement extends Component
 
     public function mount()
     {
-        $this->authorizeAny(['housing_jobs.view', 'projects.view']);
+        $this->authorizeAction('projects.view');
         $this->request_date = date('Y-m-d');
     }
 

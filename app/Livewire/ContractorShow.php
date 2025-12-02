@@ -42,7 +42,7 @@ class ContractorShow extends Component
      */
     public function approveDocument($documentId)
     {
-        $this->authorizeAction('contractors.update');
+        $this->authorizeAction('contractors.approve_documents');
 
         try {
             $document = ContractorDocument::findOrFail($documentId);
@@ -78,7 +78,7 @@ class ContractorShow extends Component
      */
     public function rejectDocument($documentId = null, $reason = null)
     {
-        $this->authorizeAction('contractors.update');
+        $this->authorizeAction('contractors.approve_documents');
 
         $docId = $documentId ?? $this->approvalDocumentId;
         $rejectionReason = $reason ?? $this->rejectionReason;
@@ -112,7 +112,7 @@ class ContractorShow extends Component
      */
     public function toggleRequiresApproval($documentId)
     {
-        $this->authorizeAction('contractors.update');
+        $this->authorizeAction('contractors.edit');
 
         try {
             $document = ContractorDocument::findOrFail($documentId);

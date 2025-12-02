@@ -2,12 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-use App\Models\ReferenceDataSet;
 use App\Models\ReferenceData;
-use App\Models\Permission;
-use App\Models\Role;
+use App\Models\ReferenceDataSet;
+use Illuminate\Database\Seeder;
 
 class HousingModuleSeeder extends Seeder
 {
@@ -25,7 +22,7 @@ class HousingModuleSeeder extends Seeder
                 'version' => 'HOUSING_1.0',
                 'is_active' => true,
                 'is_draft' => false,
-                'activated_at' => now()
+                'activated_at' => now(),
             ]
         );
 
@@ -37,7 +34,7 @@ class HousingModuleSeeder extends Seeder
                 'version' => 'HOUSING_JOB_1.0',
                 'is_active' => true,
                 'is_draft' => false,
-                'activated_at' => now()
+                'activated_at' => now(),
             ]
         );
 
@@ -55,13 +52,13 @@ class HousingModuleSeeder extends Seeder
                 [
                     'reference_data_set_id' => $propertyTypeSet->id,
                     'category' => 'property_type',
-                    'value' => $propertyType['value']
+                    'value' => $propertyType['value'],
                 ],
                 array_merge($propertyType, [
                     'reference_data_set_id' => $propertyTypeSet->id,
                     'category' => 'property_type',
                     'active' => true,
-                    'sort_order' => $index
+                    'sort_order' => $index,
                 ])
             );
         }
@@ -89,13 +86,13 @@ class HousingModuleSeeder extends Seeder
                 [
                     'reference_data_set_id' => $jobTypeSet->id,
                     'category' => 'housing_job_type',
-                    'value' => $jobType['value']
+                    'value' => $jobType['value'],
                 ],
                 array_merge($jobType, [
                     'reference_data_set_id' => $jobTypeSet->id,
                     'category' => 'housing_job_type',
                     'active' => true,
-                    'sort_order' => $index
+                    'sort_order' => $index,
                 ])
             );
         }
@@ -109,7 +106,7 @@ class HousingModuleSeeder extends Seeder
                 'version' => 'CONTR_SVC_1.0',
                 'is_active' => true,
                 'is_draft' => false,
-                'activated_at' => now()
+                'activated_at' => now(),
             ]
         );
 
@@ -136,13 +133,13 @@ class HousingModuleSeeder extends Seeder
                 [
                     'reference_data_set_id' => $contractorServiceSet->id,
                     'category' => 'contractor_service',
-                    'value' => $service['value']
+                    'value' => $service['value'],
                 ],
                 array_merge($service, [
                     'reference_data_set_id' => $contractorServiceSet->id,
                     'category' => 'contractor_service',
                     'active' => true,
-                    'sort_order' => $index
+                    'sort_order' => $index,
                 ])
             );
         }
@@ -156,7 +153,7 @@ class HousingModuleSeeder extends Seeder
                 'version' => 'CONTACT_TYPE_1.0',
                 'is_active' => true,
                 'is_draft' => false,
-                'activated_at' => now()
+                'activated_at' => now(),
             ]
         );
 
@@ -174,135 +171,20 @@ class HousingModuleSeeder extends Seeder
                 [
                     'reference_data_set_id' => $contactTypeSet->id,
                     'category' => 'contact_type',
-                    'value' => $contactType['value']
+                    'value' => $contactType['value'],
                 ],
                 array_merge($contactType, [
                     'reference_data_set_id' => $contactTypeSet->id,
                     'category' => 'contact_type',
                     'active' => true,
-                    'sort_order' => $index
+                    'sort_order' => $index,
                 ])
             );
         }
 
-        // Create Housing Module Permissions
-        $housingPermissions = [
-            // Properties
-            ['name' => 'properties.view', 'display_name' => 'View Properties', 'description' => 'View property records'],
-            ['name' => 'properties.create', 'display_name' => 'Create Properties', 'description' => 'Create new property records'],
-            ['name' => 'properties.update', 'display_name' => 'Update Properties', 'description' => 'Update existing property records'],
-            ['name' => 'properties.delete', 'display_name' => 'Delete Properties', 'description' => 'Delete property records'],
-            ['name' => 'properties.documents', 'display_name' => 'Manage Property Documents', 'description' => 'Upload and manage property documents'],
-            ['name' => 'properties.notes', 'display_name' => 'Manage Property Notes', 'description' => 'Add and manage property notes'],
-            
-            // Contractors
-            ['name' => 'contractors.view', 'display_name' => 'View Contractors', 'description' => 'View contractor records'],
-            ['name' => 'contractors.create', 'display_name' => 'Create Contractors', 'description' => 'Create new contractor records'],
-            ['name' => 'contractors.update', 'display_name' => 'Update Contractors', 'description' => 'Update existing contractor records'],
-            ['name' => 'contractors.delete', 'display_name' => 'Delete Contractors', 'description' => 'Delete contractor records'],
-            ['name' => 'contractors.documents', 'display_name' => 'Manage Contractor Documents', 'description' => 'Upload and manage contractor documents'],
-            
-            // Jobs
-            ['name' => 'housing_jobs.view', 'display_name' => 'View Housing Jobs', 'description' => 'View housing job records'],
-            ['name' => 'housing_jobs.create', 'display_name' => 'Create Housing Jobs', 'description' => 'Create new housing job records'],
-            ['name' => 'housing_jobs.update', 'display_name' => 'Update Housing Jobs', 'description' => 'Update existing housing job records'],
-            ['name' => 'housing_jobs.delete', 'display_name' => 'Delete Housing Jobs', 'description' => 'Delete housing job records'],
-            ['name' => 'housing_jobs.approve', 'display_name' => 'Approve Housing Jobs', 'description' => 'Approve housing jobs for work'],
-            ['name' => 'housing_jobs.contacts', 'display_name' => 'Manage Job Contacts', 'description' => 'Add and manage job contact ledger entries'],
-            ['name' => 'housing_jobs.documents', 'display_name' => 'Manage Job Documents', 'description' => 'Upload and manage job document checklist'],
-            ['name' => 'housing_jobs.verify_documents', 'display_name' => 'Verify Job Documents', 'description' => 'Verify uploaded job documents'],
-            
-            // Reports
-            ['name' => 'housing.reports.view', 'display_name' => 'View Housing Reports', 'description' => 'View housing module reports'],
-            ['name' => 'housing.reports.export', 'display_name' => 'Export Housing Reports', 'description' => 'Export housing module reports'],
-            
-            // Module Management
-            ['name' => 'housing.module.manage', 'display_name' => 'Manage Housing Module', 'description' => 'Enable/disable housing module for programs'],
-        ];
+        // Note: Permissions and roles are now managed by ProjectHousingPermissionsSeeder
+        // This seeder only handles reference data (property types, job types, contractor services, contact types)
 
-        foreach ($housingPermissions as $permissionData) {
-            Permission::firstOrCreate(
-                ['name' => $permissionData['name']],
-                $permissionData
-            );
-        }
-
-        // Assign all housing permissions to Admin role
-        $adminRole = Role::where('name', 'admin')->first();
-        if ($adminRole) {
-            $housingPermissionModels = Permission::whereIn('name', [
-                'properties.view', 'properties.create', 'properties.update', 'properties.delete', 'properties.documents', 'properties.notes',
-                'contractors.view', 'contractors.create', 'contractors.update', 'contractors.delete', 'contractors.documents',
-                'housing_jobs.view', 'housing_jobs.create', 'housing_jobs.update', 'housing_jobs.delete', 'housing_jobs.approve', 
-                'housing_jobs.contacts', 'housing_jobs.documents', 'housing_jobs.verify_documents',
-                'housing.reports.view', 'housing.reports.export', 'housing.module.manage'
-            ])->get();
-            foreach ($housingPermissionModels as $permission) {
-                if (!$adminRole->permissions->contains($permission->id)) {
-                    $adminRole->permissions()->attach($permission->id);
-                }
-            }
-        }
-
-        // Create Housing Coordinator role with specific permissions
-        $housingCoordinatorRole = Role::firstOrCreate(
-            ['name' => 'housing_coordinator'],
-            [
-                'display_name' => 'Housing Coordinator',
-                'description' => 'Manages housing rehabilitation programs and jobs'
-            ]
-        );
-
-        $coordinatorPermissions = Permission::whereIn('name', [
-            'properties.view',
-            'properties.create',
-            'properties.update',
-            'properties.documents',
-            'properties.notes',
-            'contractors.view',
-            'contractors.create',
-            'contractors.update',
-            'contractors.documents',
-            'housing_jobs.view',
-            'housing_jobs.create',
-            'housing_jobs.update',
-            'housing_jobs.contacts',
-            'housing_jobs.documents',
-            'housing.reports.view',
-            'participants.view',
-            'households.view',
-        ])->get();
-
-        foreach ($coordinatorPermissions as $permission) {
-            if (!$housingCoordinatorRole->permissions->contains($permission->id)) {
-                $housingCoordinatorRole->permissions()->attach($permission->id);
-            }
-        }
-
-        // Create Housing Manager role with additional permissions
-        $housingManagerRole = Role::firstOrCreate(
-            ['name' => 'housing_manager'],
-            [
-                'display_name' => 'Housing Manager',
-                'description' => 'Supervises housing rehabilitation programs with approval authority'
-            ]
-        );
-
-        $managerPermissions = Permission::whereIn('name', [
-            'properties.view', 'properties.create', 'properties.update', 'properties.delete', 'properties.documents', 'properties.notes',
-            'contractors.view', 'contractors.create', 'contractors.update', 'contractors.delete', 'contractors.documents',
-            'housing_jobs.view', 'housing_jobs.create', 'housing_jobs.update', 'housing_jobs.delete', 'housing_jobs.approve', 
-            'housing_jobs.contacts', 'housing_jobs.documents', 'housing_jobs.verify_documents',
-            'housing.reports.view', 'housing.reports.export', 'housing.module.manage',
-            'participants.view', 'households.view'
-        ])->get();
-
-        foreach ($managerPermissions as $permission) {
-            if (!$housingManagerRole->permissions->contains($permission->id)) {
-                $housingManagerRole->permissions()->attach($permission->id);
-            }
-        }
-
-        $this->command->info('Housing module reference data and permissions seeded successfully.');
+        $this->command->info('Housing module reference data seeded successfully.');
     }
 }
