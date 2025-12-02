@@ -1,8 +1,8 @@
-<div class="relative" x-data="{ open: @entangle('isOpen') }" @click.away="open = false">
+<div class="relative" x-data="{ isDropdownOpen: @entangle('isOpen').live }" @click.away="isDropdownOpen = false" wire:ignore.self>
     <!-- Selected Item Display / Trigger Button -->
     <button
         type="button"
-        @click="open = !open"
+        @click="isDropdownOpen = !isDropdownOpen"
         class="w-full px-3 py-2 text-left border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500
                {{ $selectedItem ? 'border-gray-300 dark:border-zinc-600' : 'border-gray-300 dark:border-zinc-600' }}
                {{ $required && !$selected ? 'border-red-300' : '' }}
@@ -34,7 +34,7 @@
                         </svg>
                     </button>
                 @endif
-                <svg class="w-5 h-5 text-gray-400" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-gray-400" :class="{ 'rotate-180': isDropdownOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                 </svg>
             </div>
@@ -43,7 +43,7 @@
 
     <!-- Dropdown Menu -->
     <div
-        x-show="open"
+        x-show="isDropdownOpen"
         x-transition:enter="transition ease-out duration-100"
         x-transition:enter-start="transform opacity-0 scale-95"
         x-transition:enter-end="transform opacity-100 scale-100"
