@@ -380,7 +380,7 @@
                                 secondary-field="secondary"
                                 :required="true"
                                 empty-message="No heads of household found. Create a new participant above."
-                                :key="'participant-select-' . now()->timestamp"
+                                :key="'participant-select-create'"
                             />
                             @error('participant_id') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -422,7 +422,7 @@
                                 display-field="display"
                                 secondary-field="secondary"
                                 :required="true"
-                                :key="'property-select-' . ($participant_id ?: 'no-participant') . '-' . now()->timestamp"
+                                :key="'property-select-' . ($participant_id ?: 'none')"
                             />
                             @error('property_id') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
                         </div>
@@ -437,7 +437,7 @@
                                 placeholder="Search contractors by company name..."
                                 display-field="display"
                                 secondary-field="secondary"
-                                :key="'contractor-select-' . now()->timestamp"
+                                :key="'contractor-select-create'"
                             />
                         </div>
                     </div>
