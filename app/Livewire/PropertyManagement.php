@@ -227,6 +227,23 @@ class PropertyManagement extends Component
         }
     }
 
+    public function toggleStatus($propertyId)
+    {
+        $this->authorizeAction('properties.edit');
+
+        try {
+            $property = Property::findOrFail($propertyId);
+            $newStatus = $property->status === 'active' ? 'inactive' : 'active';
+            $property->update([
+                'status' => $newStatus,
+                'updated_by' => Auth::id(),
+            ]);
+            session()->flash('message', "Property status changed to {$newStatus}.");
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error changing status: '.$e->getMessage());
+        }
+    }
+
     public function delete($propertyId)
     {
         $this->authorizeAction('properties.delete');

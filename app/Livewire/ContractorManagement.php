@@ -256,6 +256,23 @@ class ContractorManagement extends Component
         }
     }
 
+    public function toggleStatus($contractorId)
+    {
+        $this->authorizeAction('contractors.edit');
+
+        try {
+            $contractor = Contractor::findOrFail($contractorId);
+            $newStatus = $contractor->status === 'active' ? 'inactive' : 'active';
+            $contractor->update([
+                'status' => $newStatus,
+                'updated_by' => Auth::id(),
+            ]);
+            session()->flash('message', "Contractor status changed to {$newStatus}.");
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error changing status: '.$e->getMessage());
+        }
+    }
+
     public function delete($contractorId)
     {
         $this->authorizeAction('contractors.delete');
