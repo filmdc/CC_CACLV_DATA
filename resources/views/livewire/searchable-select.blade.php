@@ -1,13 +1,11 @@
-<div class="relative" x-data="{ isDropdownOpen: @entangle('isOpen').live }" @click.away="isDropdownOpen = false" wire:ignore.self>
-    <!-- Selected Item Display / Trigger Button -->
-    <button
-        type="button"
-        @click="isDropdownOpen = !isDropdownOpen"
-        class="w-full px-3 py-2 text-left border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500
+<div class="relative" x-data="{ isDropdownOpen: @entangle('isOpen').live }" @click.away="isDropdownOpen = false">
+    <!-- Selected Item Display / Trigger -->
+    <div class="w-full px-3 py-2 text-left border rounded-md focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500
                {{ $selectedItem ? 'border-gray-300 dark:border-zinc-600' : 'border-gray-300 dark:border-zinc-600' }}
                {{ $required && !$selected ? 'border-red-300' : '' }}
                bg-white dark:bg-zinc-700 text-gray-900 dark:text-white
-               hover:border-gray-400 dark:hover:border-zinc-500">
+               hover:border-gray-400 dark:hover:border-zinc-500 cursor-pointer"
+         @click="isDropdownOpen = !isDropdownOpen">
 
         <div class="flex items-center justify-between">
             <div class="flex-1 min-w-0">
@@ -25,21 +23,22 @@
 
             <div class="flex items-center ml-2 space-x-1">
                 @if($selectedItem && !$required)
-                    <button
-                        type="button"
+                    <span
                         wire:click.stop="clearSelection"
-                        class="p-1 hover:bg-gray-100 dark:hover:bg-zinc-600 rounded">
+                        class="p-1 hover:bg-gray-100 dark:hover:bg-zinc-600 rounded cursor-pointer"
+                        role="button"
+                        tabindex="0">
                         <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
-                    </button>
+                    </span>
                 @endif
-                <svg class="w-5 h-5 text-gray-400" :class="{ 'rotate-180': isDropdownOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-gray-400 transition-transform" :class="{ 'rotate-180': isDropdownOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                 </svg>
             </div>
         </div>
-    </button>
+    </div>
 
     <!-- Dropdown Menu -->
     <div
@@ -51,31 +50,31 @@
         x-transition:leave-start="transform opacity-100 scale-100"
         x-transition:leave-end="transform opacity-0 scale-95"
         class="absolute z-50 w-full mt-1 bg-white dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md shadow-lg"
-        style="display: none;">
+        style="display: none;"
+        @click.stop>
 
         <!-- Search Input -->
         <div class="p-2 border-b border-gray-200 dark:border-zinc-600">
             <input
                 type="text"
-                wire:model.live="search"
+                wire:model.live.debounce.150ms="search"
                 placeholder="Type to search..."
                 class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md
                        bg-white dark:bg-zinc-800 text-gray-900 dark:text-white
-                       focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-                @click.stop>
+                       focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
         </div>
 
         <!-- Items List -->
         <div class="max-h-60 overflow-y-auto">
             @if(count($filteredItems) > 0)
                 @foreach($filteredItems as $item)
-                    <button
-                        type="button"
+                    <div
+                        wire:key="item-{{ $item['id'] }}"
                         wire:click="selectItem('{{ $item['id'] }}')"
                         class="w-full px-3 py-2 text-left hover:bg-indigo-50 dark:hover:bg-indigo-900/20
                                {{ $selected == $item['id'] ? 'bg-indigo-100 dark:bg-indigo-900/30' : '' }}
                                focus:outline-none focus:bg-indigo-50 dark:focus:bg-indigo-900/20
-                               border-b border-gray-100 dark:border-zinc-600 last:border-b-0">
+                               border-b border-gray-100 dark:border-zinc-600 last:border-b-0 cursor-pointer">
                         <div class="truncate font-medium text-gray-900 dark:text-white text-sm">
                             {{ $item[$displayField] ?? 'Unknown' }}
                         </div>
@@ -84,7 +83,7 @@
                                 {{ $item[$secondaryField] }}
                             </div>
                         @endif
-                    </button>
+                    </div>
                 @endforeach
             @else
                 <div class="px-3 py-6 text-center text-sm text-gray-500 dark:text-gray-400">
