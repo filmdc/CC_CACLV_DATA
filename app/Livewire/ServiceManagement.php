@@ -2,9 +2,10 @@
 
 namespace App\Livewire;
 
-use App\Models\Service;
 use App\Models\Program;
+use App\Models\Service;
 use App\Traits\WithPermissionChecks;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -13,22 +14,34 @@ class ServiceManagement extends Component
     use WithPagination, WithPermissionChecks;
 
     public $search = '';
+
     public $selectedServiceId = null;
+
     public $showCreateForm = false;
+
     public $showEditForm = false;
+
     public $showViewModal = false;
+
     public $selectedViewService = null;
+
     public $filterProgramId = null;
-    
+
     protected $queryString = ['filterProgramId' => ['as' => 'program']];
 
     // Service Form Fields
     public $name = '';
+
     public $description = '';
+
     public $program_id = '';
+
     public $start_date = '';
+
     public $end_date = '';
+
     public $active = true;
+
     public $notes = '';
 
     public function mount()
@@ -39,6 +52,34 @@ class ServiceManagement extends Component
         }
     }
 
+    /**
+     * Check if the current user can edit services for a specific program.
+     * Admins and Contract Managers can edit any program.
+     * Other users can only edit programs they are assigned to.
+     */
+    public function canEditProgram($programId): bool
+    {
+        $user = Auth::user();
+
+        return $user->hasAccessToProgram($programId);
+    }
+
+    /**
+     * Get the program IDs that the current user can edit.
+     */
+    public function getEditableProgramIds(): array
+    {
+        $user = Auth::user();
+
+        // Admins and Contract Managers can edit all programs
+        if ($user->isAdmin() || $user->hasRole('Contract Manager')) {
+            return Program::pluck('id')->toArray();
+        }
+
+        // Other users can only edit their assigned programs
+        return $user->programs()->pluck('programs.id')->toArray();
+    }
+
     public function updatedSearch()
     {
         $this->resetPage();
@@ -46,14 +87,22 @@ class ServiceManagement extends Component
 
     public function showCreateService()
     {
+        // Check if user has any editable programs
+        $editablePrograms = $this->getEditableProgramIds();
+        if (empty($editablePrograms)) {
+            session()->flash('error', 'You do not have permission to create services. You must be assigned to at least one program.');
+
+            return;
+        }
+
         $this->showCreateForm = true;
         $this->showEditForm = false;
         $this->showViewModal = false;
         $this->selectedServiceId = null;
         $this->resetServiceForm();
-        
-        // Set default program if filtering by program
-        if ($this->filterProgramId) {
+
+        // Set default program if filtering by program and user has access
+        if ($this->filterProgramId && $this->canEditProgram($this->filterProgramId)) {
             $this->program_id = $this->filterProgramId;
         }
     }
@@ -62,6 +111,13 @@ class ServiceManagement extends Component
     {
         $service = Service::find($serviceId);
         if ($service) {
+            // Check if user can edit this program
+            if (! $this->canEditProgram($service->program_id)) {
+                session()->flash('error', 'You do not have permission to edit services for this program.');
+
+                return;
+            }
+
             $this->selectedServiceId = $serviceId;
             $this->showEditForm = true;
             $this->showCreateForm = false;
@@ -90,7 +146,7 @@ class ServiceManagement extends Component
         $this->selectedServiceId = null;
     }
 
-    public function fillServiceForm(Service $service = null)
+    public function fillServiceForm(?Service $service = null)
     {
         $service = $service ?? ($this->selectedServiceId ? Service::find($this->selectedServiceId) : null);
 
@@ -121,6 +177,13 @@ class ServiceManagement extends Component
             'notes' => 'nullable|string',
         ]);
 
+        // Verify user has access to the selected program
+        if (! $this->canEditProgram($this->program_id)) {
+            session()->flash('error', 'You do not have permission to create services for this program.');
+
+            return;
+        }
+
         try {
             Service::create([
                 'name' => $this->name,
@@ -135,9 +198,9 @@ class ServiceManagement extends Component
             session()->flash('success', 'Service created successfully.');
             $this->showCreateForm = false;
             $this->resetServiceForm();
-            
+
         } catch (\Exception $e) {
-            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+            session()->flash('error', 'An error occurred: '.$e->getMessage());
         }
     }
 
@@ -155,8 +218,23 @@ class ServiceManagement extends Component
         try {
             $service = $this->selectedServiceId ? Service::find($this->selectedServiceId) : null;
 
-            if (!$service) {
+            if (! $service) {
                 session()->flash('error', 'Selected service is no longer available.');
+
+                return;
+            }
+
+            // Verify user has access to the service's current program
+            if (! $this->canEditProgram($service->program_id)) {
+                session()->flash('error', 'You do not have permission to edit services for this program.');
+
+                return;
+            }
+
+            // If changing programs, verify user has access to the new program too
+            if ($this->program_id != $service->program_id && ! $this->canEditProgram($this->program_id)) {
+                session()->flash('error', 'You do not have permission to move services to this program.');
+
                 return;
             }
 
@@ -174,9 +252,9 @@ class ServiceManagement extends Component
             $this->showEditForm = false;
             $this->selectedServiceId = null;
             $this->resetServiceForm();
-            
+
         } catch (\Exception $e) {
-            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+            session()->flash('error', 'An error occurred: '.$e->getMessage());
         }
     }
 
@@ -184,7 +262,14 @@ class ServiceManagement extends Component
     {
         $service = Service::find($serviceId);
         if ($service) {
-            $service->update(['active' => !$service->active]);
+            // Verify user has access to the service's program
+            if (! $this->canEditProgram($service->program_id)) {
+                session()->flash('error', 'You do not have permission to modify services for this program.');
+
+                return;
+            }
+
+            $service->update(['active' => ! $service->active]);
             session()->flash('success', 'Service status updated successfully.');
         }
     }
@@ -194,11 +279,18 @@ class ServiceManagement extends Component
         try {
             $service = Service::find($serviceId);
             if ($service) {
+                // Verify user has access to the service's program
+                if (! $this->canEditProgram($service->program_id)) {
+                    session()->flash('error', 'You do not have permission to delete services for this program.');
+
+                    return;
+                }
+
                 $service->delete();
                 session()->flash('success', 'Service deleted successfully.');
             }
         } catch (\Exception $e) {
-            session()->flash('error', 'Cannot delete service: ' . $e->getMessage());
+            session()->flash('error', 'Cannot delete service: '.$e->getMessage());
         }
     }
 
@@ -210,15 +302,31 @@ class ServiceManagement extends Component
             })
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
-                    $q->where('name', 'like', '%' . $this->search . '%')
-                      ->orWhere('description', 'like', '%' . $this->search . '%');
+                    $q->where('name', 'like', '%'.$this->search.'%')
+                        ->orWhere('description', 'like', '%'.$this->search.'%');
                 });
             })
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
+        // Get all programs for display
         $programs = Program::active()->regularPrograms()->orderBy('name')->get();
-        
+
+        // Get editable program IDs for the current user
+        $editableProgramIds = $this->getEditableProgramIds();
+
+        // For the form dropdown, show only editable programs for non-admins
+        $user = Auth::user();
+        if ($user->isAdmin() || $user->hasRole('Contract Manager')) {
+            $editablePrograms = $programs;
+        } else {
+            $editablePrograms = Program::active()
+                ->regularPrograms()
+                ->whereIn('id', $editableProgramIds)
+                ->orderBy('name')
+                ->get();
+        }
+
         $filteredProgram = null;
         if ($this->filterProgramId) {
             $filteredProgram = Program::find($this->filterProgramId);
@@ -227,6 +335,8 @@ class ServiceManagement extends Component
         return view('livewire.service-management', [
             'services' => $services,
             'programs' => $programs,
+            'editablePrograms' => $editablePrograms,
+            'editableProgramIds' => $editableProgramIds,
             'filteredProgram' => $filteredProgram,
             'selectedService' => $this->selectedService,
         ])->layout('components.layouts.app');

@@ -57,6 +57,23 @@ class ContractPermissionsSeeder extends Seeder
             $adminRole->permissions()->syncWithoutDetaching($permissions);
         }
 
-        $this->command->info('Contract permissions created and assigned to admin role.');
+        // Assign notification-related permissions to Contract Manager roles
+        $contractManagerPermissions = [
+            'contracts.manage_notifications',
+            'due_dates.view',
+            'due_dates.create',
+            'due_dates.edit',
+            'due_dates.delete',
+            'due_date_emails.manage',
+        ];
+
+        $contractManagerRoles = Role::whereIn('name', ['contract_manager', 'Contract Manager'])->get();
+        $cmPermissions = Permission::whereIn('name', $contractManagerPermissions)->get();
+
+        foreach ($contractManagerRoles as $role) {
+            $role->permissions()->syncWithoutDetaching($cmPermissions);
+        }
+
+        $this->command->info('Contract permissions created and assigned to admin and contract manager roles.');
     }
 }

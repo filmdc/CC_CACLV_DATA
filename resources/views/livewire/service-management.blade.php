@@ -92,10 +92,10 @@
                             <label for="program_id" class="block text-sm font-medium text-gray-700 mb-1">
                                 Program <span class="text-red-500">*</span>
                             </label>
-                            <select wire:model="program_id" id="program_id" 
+                            <select wire:model="program_id" id="program_id"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500">
                                 <option value="">Select program...</option>
-                                @foreach($programs as $program)
+                                @foreach($editablePrograms as $program)
                                     <option value="{{ $program->id }}">{{ $program->name }}</option>
                                 @endforeach
                             </select>
@@ -175,10 +175,10 @@
                             <label for="edit_program_id" class="block text-sm font-medium text-gray-700 mb-1">
                                 Program <span class="text-red-500">*</span>
                             </label>
-                            <select wire:model="program_id" id="edit_program_id" 
+                            <select wire:model="program_id" id="edit_program_id"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500">
                                 <option value="">Select program...</option>
-                                @foreach($programs as $program)
+                                @foreach($editablePrograms as $program)
                                     <option value="{{ $program->id }}">{{ $program->name }}</option>
                                 @endforeach
                             </select>
@@ -267,18 +267,18 @@
                                     </div>
                                 </div>
                                 <div class="flex items-center space-x-2">
-                                    @if($this->can('services.edit'))
-                                        <button wire:click="showEditService({{ $service->id }})" 
+                                    @if($this->can('services.edit') && in_array($service->program_id, $editableProgramIds))
+                                        <button wire:click="showEditService({{ $service->id }})"
                                                 class="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200">
                                             Edit
                                         </button>
-                                        <button wire:click="toggleServiceStatus({{ $service->id }})" 
+                                        <button wire:click="toggleServiceStatus({{ $service->id }})"
                                                 class="px-3 py-1 text-sm rounded {{ $service->active ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200' }}">
                                             {{ $service->active ? 'Deactivate' : 'Activate' }}
                                         </button>
                                     @endif
-                                    @if($this->can('services.delete'))
-                                        <button wire:click="deleteService({{ $service->id }})" 
+                                    @if($this->can('services.delete') && in_array($service->program_id, $editableProgramIds))
+                                        <button wire:click="deleteService({{ $service->id }})"
                                                 wire:confirm="Are you sure you want to delete this service?"
                                                 class="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200">
                                             Delete
@@ -495,11 +495,13 @@
                                 @endif
                             </div>
                             <div class="flex space-x-3">
-                                <button wire:click="showEditService({{ $selectedViewService->id }})" 
-                                        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    Edit Service
-                                </button>
-                                <button wire:click="$set('showViewModal', false)" 
+                                @if($this->can('services.edit') && in_array($selectedViewService->program_id, $editableProgramIds))
+                                    <button wire:click="showEditService({{ $selectedViewService->id }})"
+                                            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        Edit Service
+                                    </button>
+                                @endif
+                                <button wire:click="$set('showViewModal', false)"
                                         class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-zinc-600 border border-gray-300 dark:border-zinc-500 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-500 focus:outline-none focus:ring-2 focus:ring-teal-500">
                                     Close
                                 </button>

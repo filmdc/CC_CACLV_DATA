@@ -62,7 +62,7 @@
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Program *</label>
                             <select wire:model="program_id" class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500">
                                 <option value="">Select Program</option>
-                                @foreach($programs as $program)
+                                @foreach($editablePrograms as $program)
                                     <option value="{{ $program->id }}">{{ $program->name }}</option>
                                 @endforeach
                             </select>
@@ -155,22 +155,24 @@
                                     <button wire:click="viewWorkPlan({{ $workPlan->id }})" class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300">
                                         View
                                     </button>
-                                    <button wire:click="showEditWorkPlan({{ $workPlan->id }})" class="text-teal-600 dark:text-teal-400 hover:text-teal-900 dark:hover:text-teal-300">
-                                        Edit
-                                    </button>
-                                    <button 
-                                        wire:click="toggleWorkPlanStatus({{ $workPlan->id }})"
-                                        class="text-{{ $workPlan->active ? 'yellow' : 'green' }}-600 dark:text-{{ $workPlan->active ? 'yellow' : 'green' }}-400 hover:text-{{ $workPlan->active ? 'yellow' : 'green' }}-900 dark:hover:text-{{ $workPlan->active ? 'yellow' : 'green' }}-300"
-                                    >
-                                        {{ $workPlan->active ? 'Deactivate' : 'Activate' }}
-                                    </button>
-                                    <button 
-                                        wire:click="deleteWorkPlan({{ $workPlan->id }})"
-                                        onclick="return confirm('Are you sure you want to delete this work plan?')"
-                                        class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
-                                    >
-                                        Delete
-                                    </button>
+                                    @if(in_array($workPlan->program_id, $editableProgramIds))
+                                        <button wire:click="showEditWorkPlan({{ $workPlan->id }})" class="text-teal-600 dark:text-teal-400 hover:text-teal-900 dark:hover:text-teal-300">
+                                            Edit
+                                        </button>
+                                        <button
+                                            wire:click="toggleWorkPlanStatus({{ $workPlan->id }})"
+                                            class="{{ $workPlan->active ? 'text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300' : 'text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300' }}"
+                                        >
+                                            {{ $workPlan->active ? 'Deactivate' : 'Activate' }}
+                                        </button>
+                                        <button
+                                            wire:click="deleteWorkPlan({{ $workPlan->id }})"
+                                            onclick="return confirm('Are you sure you want to delete this work plan?')"
+                                            class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                                        >
+                                            Delete
+                                        </button>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -360,13 +362,13 @@
 
                         <!-- Modal Footer -->
                         <div class="flex justify-end mt-6">
-                            @if($selectedViewWorkPlan->goals->count() > 0)
-                                <button wire:click="syncWorkPlanGoals({{ $selectedViewWorkPlan->id }})" 
+                            @if($selectedViewWorkPlan->goals->count() > 0 && in_array($selectedViewWorkPlan->program_id, $editableProgramIds))
+                                <button wire:click="syncWorkPlanGoals({{ $selectedViewWorkPlan->id }})"
                                         class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 mr-3">
                                     Sync Goals
                                 </button>
                             @endif
-                            <button wire:click="$set('showViewModal', false)" 
+                            <button wire:click="$set('showViewModal', false)"
                                     class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-zinc-600 border border-gray-300 dark:border-zinc-500 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-500 focus:outline-none focus:ring-2 focus:ring-teal-500">
                                 Close
                             </button>
