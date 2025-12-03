@@ -17,7 +17,7 @@ class CommunicationsLogPermissionsSeeder extends Seeder
         $communicationsPermissions = [
             ['name' => 'communications_log.view', 'display_name' => 'View Communications Log', 'description' => 'View communications log entries'],
             ['name' => 'communications_log.create', 'display_name' => 'Create Communications Log', 'description' => 'Create new communications log entries'],
-            ['name' => 'communications_log.update', 'display_name' => 'Update Communications Log', 'description' => 'Update existing communications log entries'],
+            ['name' => 'communications_log.edit', 'display_name' => 'Edit Communications Log', 'description' => 'Edit existing communications log entries'],
             ['name' => 'communications_log.delete', 'display_name' => 'Delete Communications Log', 'description' => 'Delete communications log entries'],
         ];
 
@@ -34,7 +34,7 @@ class CommunicationsLogPermissionsSeeder extends Seeder
             $allCommunicationsPermissions = Permission::whereIn('name', [
                 'communications_log.view',
                 'communications_log.create',
-                'communications_log.update',
+                'communications_log.edit',
                 'communications_log.delete',
             ])->get();
 
@@ -51,7 +51,7 @@ class CommunicationsLogPermissionsSeeder extends Seeder
             $projectManagerPermissions = Permission::whereIn('name', [
                 'communications_log.view',
                 'communications_log.create',
-                'communications_log.update',
+                'communications_log.edit',
             ])->get();
 
             foreach ($projectManagerPermissions as $permission) {
