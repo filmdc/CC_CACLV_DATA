@@ -277,7 +277,7 @@
 
                             <div class="flex items-start space-x-2 ml-4">
                                 @if($log->follow_up_date && !$log->follow_up_completed)
-                                    @can('communications_log.update')
+                                    @can('communications_log.edit')
                                     <button wire:click="markFollowUpComplete({{ $log->id }})"
                                             wire:confirm="Mark this follow-up as complete?"
                                             class="px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700">
@@ -285,7 +285,7 @@
                                     </button>
                                     @endcan
                                 @endif
-                                @can('communications_log.update')
+                                @can('communications_log.edit')
                                 <button wire:click="showEditForm({{ $log->id }})"
                                         class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -339,6 +339,18 @@
                     {{ $editingId ? 'Edit Communication' : 'New Communication Entry' }}
                 </h3>
 
+                <!-- Validation Errors Display -->
+                @if ($errors->any())
+                    <div class="mb-4 p-4 bg-red-50 dark:bg-red-900/50 border border-red-200 dark:border-red-700 rounded-md">
+                        <h4 class="text-sm font-medium text-red-800 dark:text-red-200 mb-2">Please correct the following errors:</h4>
+                        <ul class="list-disc list-inside text-sm text-red-700 dark:text-red-300">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Date/Time -->
                     <div>
@@ -391,18 +403,6 @@
                             <option value="scheduling">Scheduling</option>
                             <option value="documentation">Documentation</option>
                             <option value="other">Other</option>
-                        </select>
-                    </div>
-
-                    <!-- Priority -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Priority *</label>
-                        <select wire:model="priority"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                            <option value="low">Low</option>
-                            <option value="normal">Normal</option>
-                            <option value="high">High</option>
-                            <option value="urgent">Urgent</option>
                         </select>
                     </div>
 
@@ -497,7 +497,7 @@
                                        wire:model.live.debounce.300ms="propertySearch"
                                        placeholder="Search address..."
                                        class="w-full px-3 py-1.5 mb-1 text-sm border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                                <select wire:model="property_id"
+                                <select wire:model.live="property_id"
                                         class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
                                     <option value="">None</option>
                                     @foreach($properties as $property)
@@ -533,32 +533,13 @@
                         </div>
                     </div>
 
-                    <!-- Subject -->
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subject *</label>
-                        <input type="text" wire:model="subject" placeholder="Brief description of the communication"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                        @error('subject') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
-                    </div>
+                    <!-- Subject (hidden - auto-generated from property address) -->
+                    <input type="hidden" wire:model="subject">
 
                     <!-- Summary -->
                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Summary</label>
                         <textarea wire:model="summary" rows="2" placeholder="Brief summary of the communication..."
-                                  class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md"></textarea>
-                    </div>
-
-                    <!-- Notes -->
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Detailed Notes</label>
-                        <textarea wire:model="notes" rows="3" placeholder="Detailed notes about the communication..."
-                                  class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md"></textarea>
-                    </div>
-
-                    <!-- Outcome -->
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Outcome</label>
-                        <textarea wire:model="outcome" rows="2" placeholder="Result of the communication..."
                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md"></textarea>
                     </div>
 

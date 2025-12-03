@@ -120,6 +120,20 @@ class CommunicationsLogManagement extends Component
         $this->resetPage();
     }
 
+    public function updatedPropertyId($value)
+    {
+        // Auto-populate subject from property address when property is selected
+        if ($value) {
+            $property = Property::find($value);
+            if ($property) {
+                $this->subject = $property->address_line_1;
+                if ($property->city) {
+                    $this->subject .= ', '.$property->city;
+                }
+            }
+        }
+    }
+
     public function showCreateForm()
     {
         $this->authorizeAction('communications_log.create');
@@ -130,7 +144,7 @@ class CommunicationsLogManagement extends Component
 
     public function showEditForm($id)
     {
-        $this->authorizeAction('communications_log.update');
+        $this->authorizeAction('communications_log.edit');
         $log = CommunicationLog::findOrFail($id);
 
         $this->editingId = $id;
@@ -160,6 +174,22 @@ class CommunicationsLogManagement extends Component
 
     public function save()
     {
+        // Auto-generate subject from property address if not set
+        if (empty($this->subject) && $this->property_id) {
+            $property = Property::find($this->property_id);
+            if ($property) {
+                $this->subject = $property->address_line_1;
+                if ($property->city) {
+                    $this->subject .= ', '.$property->city;
+                }
+            }
+        }
+
+        // If still no subject, use a default
+        if (empty($this->subject)) {
+            $this->subject = 'Communication on '.now()->format('M d, Y');
+        }
+
         $this->validate([
             'communication_date' => 'required|date',
             'communication_type' => 'required|in:phone_call,email,in_person,site_visit,video_call,text,mail,voicemail,fax,other',
@@ -207,7 +237,7 @@ class CommunicationsLogManagement extends Component
         ];
 
         if ($this->editingId) {
-            $this->authorizeAction('communications_log.update');
+            $this->authorizeAction('communications_log.edit');
             $log = CommunicationLog::findOrFail($this->editingId);
             $data['updated_by'] = Auth::id();
             $log->update($data);
@@ -232,7 +262,7 @@ class CommunicationsLogManagement extends Component
 
     public function markFollowUpComplete($id)
     {
-        $this->authorizeAction('communications_log.update');
+        $this->authorizeAction('communications_log.edit');
         $log = CommunicationLog::findOrFail($id);
         $log->markFollowUpCompleted(Auth::id());
         session()->flash('success', 'Follow-up marked as complete.');
