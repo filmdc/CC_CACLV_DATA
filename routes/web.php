@@ -79,6 +79,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('work-plan-goal-management', App\Livewire\WorkPlanGoalManagement::class)->name('work-plan-goal.management');
     Route::get('work-plan-goal/{id}', App\Livewire\WorkPlanGoalShow::class)->name('work-plan-goal.show');
     Route::get('role-permission-management', App\Livewire\RolePermissionManagement::class)->name('role-permission.management');
+    Route::get('role-permission-export-import', App\Livewire\RolePermissionExportImport::class)->name('role-permission.export-import');
     Route::get('role/{id}', App\Livewire\RoleShow::class)->name('role.show');
     Route::get('permission/{id}', App\Livewire\PermissionShow::class)->name('permission.show');
     Route::get('user-management', App\Livewire\UserManagement::class)->name('user.management');

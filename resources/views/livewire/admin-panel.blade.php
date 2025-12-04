@@ -338,10 +338,14 @@
                                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-zinc-600 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
                                     Manage Permissions
                                 </a>
+                                <a href="{{ route('role-permission.export-import') }}" wire:navigate
+                                   class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-zinc-600 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
+                                    Export/Import Roles
+                                </a>
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Recent Users -->
                     <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 shadow">
                         <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Recent Users</h3>
@@ -1094,13 +1098,22 @@
                 <div class="space-y-6">
                     <div class="flex justify-between items-center">
                         <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Roles & Permissions Management</h2>
-                        <a href="{{ route('role-permission.management') }}" wire:navigate
-                           class="inline-flex items-center px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-md hover:bg-purple-700">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                            </svg>
-                            Manage Roles & Permissions
-                        </a>
+                        <div class="flex gap-2">
+                            <a href="{{ route('role-permission.export-import') }}" wire:navigate
+                               class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                                </svg>
+                                Export/Import
+                            </a>
+                            <a href="{{ route('role-permission.management') }}" wire:navigate
+                               class="inline-flex items-center px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-md hover:bg-purple-700">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                </svg>
+                                Manage Roles & Permissions
+                            </a>
+                        </div>
                     </div>
                     
                     <div class="bg-gray-50 dark:bg-zinc-700 rounded-lg p-6">
