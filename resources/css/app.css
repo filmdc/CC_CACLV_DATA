@@ -150,3 +150,163 @@ select:focus[data-flux-control] {
     border-left-color: rgb(75, 85, 99);
     color: rgb(156, 163, 175);
 }
+
+/* Tables */
+.rich-text-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.875rem;
+}
+
+.rich-text-content thead {
+    background-color: rgb(249, 250, 251);
+}
+
+.dark .rich-text-content thead {
+    background-color: rgb(55, 65, 81);
+}
+
+.rich-text-content th,
+.rich-text-content td {
+    border: 1px solid rgb(229, 231, 235);
+    padding: 0.75rem 1rem;
+    text-align: left;
+}
+
+.dark .rich-text-content th,
+.dark .rich-text-content td {
+    border-color: rgb(75, 85, 99);
+}
+
+.rich-text-content th {
+    font-weight: 600;
+    color: rgb(17, 24, 39);
+}
+
+.dark .rich-text-content th {
+    color: rgb(243, 244, 246);
+}
+
+.rich-text-content tbody tr:nth-child(even) {
+    background-color: rgb(249, 250, 251);
+}
+
+.dark .rich-text-content tbody tr:nth-child(even) {
+    background-color: rgb(31, 41, 55);
+}
+
+/* Horizontal rules */
+.rich-text-content hr {
+    border: none;
+    border-top: 1px solid rgb(229, 231, 235);
+    margin: 2rem 0;
+}
+
+.dark .rich-text-content hr {
+    border-top-color: rgb(75, 85, 99);
+}
+
+/* Code blocks */
+.rich-text-content code {
+    background-color: rgb(243, 244, 246);
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    color: rgb(220, 38, 38);
+}
+
+.dark .rich-text-content code {
+    background-color: rgb(55, 65, 81);
+    color: rgb(252, 165, 165);
+}
+
+.rich-text-content pre {
+    background-color: rgb(31, 41, 55);
+    color: rgb(243, 244, 246);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+}
+
+.rich-text-content pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+    font-size: 0.875rem;
+}
+
+/* Tips, notes, and warnings */
+.rich-text-content .tip,
+.rich-text-content .note {
+    background-color: rgb(239, 246, 255);
+    border-left: 4px solid rgb(59, 130, 246);
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0;
+    border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.dark .rich-text-content .tip,
+.dark .rich-text-content .note {
+    background-color: rgba(59, 130, 246, 0.1);
+    border-left-color: rgb(96, 165, 250);
+}
+
+.rich-text-content .warning {
+    background-color: rgb(254, 249, 195);
+    border-left: 4px solid rgb(234, 179, 8);
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0;
+    border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.dark .rich-text-content .warning {
+    background-color: rgba(234, 179, 8, 0.1);
+    border-left-color: rgb(250, 204, 21);
+}
+
+.rich-text-content .important {
+    background-color: rgb(254, 226, 226);
+    border-left: 4px solid rgb(220, 38, 38);
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0;
+    border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.dark .rich-text-content .important {
+    background-color: rgba(220, 38, 38, 0.1);
+    border-left-color: rgb(248, 113, 113);
+}
+
+/* Nested lists */
+.rich-text-content ul ul,
+.rich-text-content ol ol,
+.rich-text-content ul ol,
+.rich-text-content ol ul {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* First paragraph should not have top margin */
+.rich-text-content > p:first-child,
+.rich-text-content > h2:first-child,
+.rich-text-content > h3:first-child {
+    margin-top: 0;
+}
+
+/* Definition lists (for steps) */
+.rich-text-content dl {
+    margin: 1rem 0;
+}
+
+.rich-text-content dt {
+    font-weight: 600;
+    margin-top: 1rem;
+}
+
+.rich-text-content dd {
+    margin-left: 1rem;
+    margin-bottom: 0.5rem;
+}

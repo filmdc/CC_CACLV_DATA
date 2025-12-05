@@ -132,9 +132,9 @@
 
                 <!-- Article View -->
                 @elseif($selectedArticle)
-                    <article class="prose dark:prose-invert max-w-none">
+                    <article class="rich-text-content text-gray-800 dark:text-gray-200">
                         <div class="flex items-start justify-between mb-6">
-                            <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-0">{{ $selectedArticle->title }}</h1>
+                            <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-0 mt-0">{{ $selectedArticle->title }}</h1>
                             <button wire:click="toggleBookmark({{ $selectedArticle->id }})"
                                     class="ml-4 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-700 transition"
                                     title="{{ $selectedArticle->isBookmarkedBy() ? 'Remove bookmark' : 'Bookmark this article' }}">

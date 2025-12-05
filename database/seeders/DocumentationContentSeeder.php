@@ -600,11 +600,16 @@ class DocumentationContentSeeder extends Seeder
     {
         return [
             // Getting Started
-            'welcome-to-cap-track' => '<h2>Welcome to CAP TRACK</h2>
-<p>CAP TRACK is a comprehensive data management platform designed specifically for Community Action Partnership agencies. The system streamlines participant and household data management, program services tracking, and CSBG (Community Services Block Grant) reporting requirements.</p>
+            'welcome-to-cap-track' => '<p>CAP TRACK is a comprehensive data management platform designed specifically for Community Action Partnership agencies. The system streamlines participant and household data management, program services tracking, and CSBG (Community Services Block Grant) reporting requirements.</p>
 
-<h3>What is CAP TRACK?</h3>
+<div class="tip">
+<strong>New to CAP TRACK?</strong> Start with the "Your First Steps" guide to learn the basics quickly!
+</div>
+
+<h2>What is CAP TRACK?</h2>
+
 <p>CAP TRACK provides a centralized platform for managing all aspects of your agency\'s operations:</p>
+
 <ul>
 <li><strong>Participant & Household Management</strong> - Track individuals and families you serve with complete demographic and service history</li>
 <li><strong>Program & Service Tracking</strong> - Manage programs, services, work plans, and enrollment data</li>
@@ -614,51 +619,83 @@ class DocumentationContentSeeder extends Seeder
 <li><strong>Financial Integration</strong> - Sync with DonorPerfect and Sage Intacct for seamless accounting</li>
 </ul>
 
-<h3>Key Benefits</h3>
-<ul>
-<li><strong>Centralized Data</strong> - All participant, program, and contract data in one place</li>
-<li><strong>CSBG Compliant</strong> - Built-in support for federal reporting requirements</li>
-<li><strong>Role-Based Access</strong> - Granular permissions ensure data security</li>
-<li><strong>Real-Time Reporting</strong> - Generate reports instantly with current data</li>
-<li><strong>Audit Trails</strong> - Complete tracking of all data changes and user actions</li>
-</ul>
+<hr>
 
-<h3>Getting Help</h3>
+<h2>Key Benefits</h2>
+
+<table>
+<thead>
+<tr><th>Benefit</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Centralized Data</strong></td><td>All participant, program, and contract data in one place</td></tr>
+<tr><td><strong>CSBG Compliant</strong></td><td>Built-in support for federal reporting requirements</td></tr>
+<tr><td><strong>Role-Based Access</strong></td><td>Granular permissions ensure data security</td></tr>
+<tr><td><strong>Real-Time Reporting</strong></td><td>Generate reports instantly with current data</td></tr>
+<tr><td><strong>Audit Trails</strong></td><td>Complete tracking of all data changes and user actions</td></tr>
+</tbody>
+</table>
+
+<hr>
+
+<h2>Getting Help</h2>
+
 <p>Throughout CAP TRACK, you\'ll find contextual help available:</p>
+
 <ul>
-<li><strong>Help Button</strong> - Click the floating help button (?) on any page to see relevant documentation</li>
-<li><strong>Documentation</strong> - Access the full documentation from the sidebar</li>
+<li><strong>Help Button</strong> - Click the floating help button <code>?</code> on any page to see relevant documentation</li>
+<li><strong>Documentation</strong> - Access the full documentation from the sidebar menu</li>
 <li><strong>Feedback</strong> - Use the feedback button to report issues or suggest improvements</li>
-</ul>',
-
-            'navigating-cap-track' => '<h2>Navigating CAP TRACK</h2>
-<p>CAP TRACK uses a clean, intuitive interface designed for efficiency. Here\'s how to get around:</p>
-
-<h3>The Sidebar</h3>
-<p>The left sidebar is your main navigation hub. It\'s organized into logical sections:</p>
-<ul>
-<li><strong>Platform</strong> - Your Dashboard home</li>
-<li><strong>Data Management</strong> - Participants & Households</li>
-<li><strong>Programs</strong> - Programs & Work Plans</li>
-<li><strong>Contracts</strong> - Contract Management & Notifications</li>
-<li><strong>Housing & Projects</strong> - Properties, Contractors, Projects, Communications</li>
-<li><strong>Approvals</strong> - Pending approval items</li>
-<li><strong>Reports</strong> - Reporting Dashboard</li>
-<li><strong>Accounting & Fiscal</strong> - DonorPerfect, Sage Intacct integrations</li>
-<li><strong>Administration</strong> - Admin Panel, User Management, Settings</li>
 </ul>
 
-<h3>What You See Depends on Your Role</h3>
-<p>CAP TRACK uses role-based permissions. You\'ll only see menu items and features you have access to. If you need access to something you can\'t see, contact your administrator.</p>
+<div class="note">
+<strong>Need assistance?</strong> If you can\'t find what you\'re looking for in the documentation, contact your system administrator for help.
+</div>',
 
-<h3>User Menu</h3>
+            'navigating-cap-track' => '<p>CAP TRACK uses a clean, intuitive interface designed for efficiency. Here\'s how to get around:</p>
+
+<h2>The Sidebar</h2>
+
+<p>The left sidebar is your main navigation hub. It\'s organized into logical sections:</p>
+
+<table>
+<thead>
+<tr><th>Section</th><th>What You\'ll Find</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Platform</strong></td><td>Your Dashboard home</td></tr>
+<tr><td><strong>Data Management</strong></td><td>Participants & Households</td></tr>
+<tr><td><strong>Programs</strong></td><td>Programs & Work Plans</td></tr>
+<tr><td><strong>Contracts</strong></td><td>Contract Management & Notifications</td></tr>
+<tr><td><strong>Housing & Projects</strong></td><td>Properties, Contractors, Projects, Communications</td></tr>
+<tr><td><strong>Approvals</strong></td><td>Pending approval items</td></tr>
+<tr><td><strong>Reports</strong></td><td>Reporting Dashboard</td></tr>
+<tr><td><strong>Accounting & Fiscal</strong></td><td>DonorPerfect, Sage Intacct integrations</td></tr>
+<tr><td><strong>Administration</strong></td><td>Admin Panel, User Management, Settings</td></tr>
+</tbody>
+</table>
+
+<div class="note">
+<strong>Role-Based Access:</strong> You\'ll only see menu items and features you have access to. If you need access to something you can\'t see, contact your administrator.
+</div>
+
+<hr>
+
+<h2>User Menu</h2>
+
 <p>Click your name/avatar at the bottom of the sidebar to access:</p>
+
 <ul>
 <li><strong>Settings</strong> - Update your profile, password, and appearance preferences</li>
 <li><strong>Log Out</strong> - Securely end your session</li>
 </ul>
 
-<h3>Common Interface Elements</h3>
+<hr>
+
+<h2>Common Interface Elements</h2>
+
+<p>Throughout CAP TRACK, you\'ll encounter these common elements:</p>
+
 <ul>
 <li><strong>Search Bars</strong> - Type to filter lists in real-time</li>
 <li><strong>Pagination</strong> - Navigate through large data sets</li>
@@ -667,14 +704,28 @@ class DocumentationContentSeeder extends Seeder
 <li><strong>Modals</strong> - Pop-up forms for creating and editing</li>
 </ul>
 
-<h3>Dark Mode</h3>
-<p>CAP TRACK supports light and dark themes. Change your preference in Settings > Appearance.</p>',
+<hr>
 
-            'your-first-steps' => '<h2>Your First Steps in CAP TRACK</h2>
-<p>Welcome! This guide will help you get started with the most common tasks.</p>
+<h2>Dark Mode</h2>
 
-<h3>1. Check Your Dashboard</h3>
-<p>After logging in, you\'ll see your Dashboard. This shows:</p>
+<p>CAP TRACK supports light and dark themes. Change your preference in <strong>Settings &gt; Appearance</strong>.</p>
+
+<div class="tip">
+<strong>Tip:</strong> Dark mode can reduce eye strain when working in low-light environments.
+</div>',
+
+            'your-first-steps' => '<p>Welcome! This quick-start guide will help you get productive in CAP TRACK right away.</p>
+
+<div class="tip">
+<strong>Bookmark this page!</strong> You can save this article for easy reference by clicking the bookmark icon above.
+</div>
+
+<hr>
+
+<h2>Step 1: Check Your Dashboard</h2>
+
+<p>After logging in, you\'ll land on your Dashboard. This is your home base showing:</p>
+
 <ul>
 <li>Key statistics (participants, enrollments, services delivered)</li>
 <li>Your assigned programs</li>
@@ -682,39 +733,66 @@ class DocumentationContentSeeder extends Seeder
 <li>Upcoming deadlines</li>
 </ul>
 
-<h3>2. Review Your Programs</h3>
-<p>Navigate to <strong>Programs & Work Plans</strong> to see which programs you\'re assigned to. You can only manage participants enrolled in your programs (unless you\'re an administrator).</p>
+<hr>
 
-<h3>3. Add a New Participant</h3>
-<p>To add a participant:</p>
+<h2>Step 2: Review Your Programs</h2>
+
+<p>Navigate to <strong>Programs &gt; Programs & Work Plans</strong> to see which programs you\'re assigned to.</p>
+
+<div class="note">
+<strong>Access Note:</strong> You can only manage participants enrolled in your programs (unless you\'re an administrator).
+</div>
+
+<hr>
+
+<h2>Step 3: Add a New Participant</h2>
+
+<p>To add a participant, follow the 6-step intake wizard:</p>
+
 <ol>
-<li>Go to <strong>Participants & Households</strong></li>
+<li>Go to <strong>Data Management &gt; Participants & Households</strong></li>
 <li>Click <strong>Participant Intake</strong></li>
-<li>Follow the 6-step wizard:
+<li>Complete each step:
     <ul>
-    <li>Step 1: Household information</li>
-    <li>Step 2: Head of household details</li>
-    <li>Step 3: Demographics</li>
-    <li>Step 4: Health & employment</li>
-    <li>Step 5: Income & benefits</li>
-    <li>Step 6: Program enrollment</li>
+    <li><strong>Step 1:</strong> Household information</li>
+    <li><strong>Step 2:</strong> Head of household details</li>
+    <li><strong>Step 3:</strong> Demographics</li>
+    <li><strong>Step 4:</strong> Health & employment</li>
+    <li><strong>Step 5:</strong> Income & benefits</li>
+    <li><strong>Step 6:</strong> Program enrollment</li>
     </ul>
 </li>
 </ol>
 
-<h3>4. Enroll in Programs & Services</h3>
+<hr>
+
+<h2>Step 4: Enroll in Programs & Services</h2>
+
 <p>From a participant\'s profile, you can:</p>
+
 <ul>
-<li>Enroll them in programs</li>
+<li>Enroll them in additional programs</li>
 <li>Record service enrollments</li>
 <li>Track hours and sessions</li>
 </ul>
 
-<h3>5. Generate Reports</h3>
+<hr>
+
+<h2>Step 5: Generate Reports</h2>
+
 <p>Go to <strong>Reports</strong> to generate CSBG Module 4 Section C reports. Select your date range and filters to see aggregated data.</p>
 
-<h3>Need Help?</h3>
-<p>Click the <strong>Help</strong> button (?) on any page for contextual documentation, or browse the full documentation from the sidebar.</p>',
+<hr>
+
+<h2>Need Help?</h2>
+
+<p>There are several ways to get help in CAP TRACK:</p>
+
+<ul>
+<li>Click the <strong>Help</strong> button <code>?</code> on any page for contextual documentation</li>
+<li>Browse the full documentation from the sidebar</li>
+<li>Use the search bar above to find specific topics</li>
+</ul>',
 
             // Dashboard
             'dashboard-overview' => '<h2>Dashboard Overview</h2>
@@ -863,38 +941,51 @@ class DocumentationContentSeeder extends Seeder
 </ul>
 <p>You\'ll see a "Limited View" badge when viewing participants outside your program access.</p>',
 
-            'participant-intake' => '<h2>Adding New Participants</h2>
-<p>The Participant Intake wizard guides you through adding a new participant in 6 steps.</p>
+            'participant-intake' => '<p>The Participant Intake wizard guides you through adding a new participant in 6 simple steps.</p>
 
-<h3>Starting an Intake</h3>
+<h2>Starting an Intake</h2>
+
+<p>There are two ways to start a new participant intake:</p>
+
 <ol>
-<li>Go to <strong>Participants & Households > Participant Intake</strong></li>
+<li>Go to <strong>Data Management &gt; Participants & Households &gt; Participant Intake</strong></li>
 <li>Or click <strong>New Participant</strong> from the dashboard</li>
 </ol>
 
-<h3>Step 1: Household Information</h3>
-<p>Choose whether to add to an existing household or create a new one:</p>
-<ul>
-<li><strong>Existing Household</strong> - Search by household code or head of household name</li>
-<li><strong>New Household</strong> - Enter:
-    <ul>
-    <li>Household type (Family, Individual, etc.)</li>
-    <li>Housing status</li>
-    <li>Full address (street, city, state, ZIP, county)</li>
-    </ul>
-</li>
-</ul>
+<hr>
 
-<h3>Step 2: Head of Household</h3>
+<h2>Step 1: Household Information</h2>
+
+<p>Choose whether to add to an existing household or create a new one:</p>
+
+<table>
+<thead>
+<tr><th>Option</th><th>When to Use</th><th>What to Enter</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Existing Household</strong></td><td>Adding a family member</td><td>Search by household code or head of household name</td></tr>
+<tr><td><strong>New Household</strong></td><td>New family or individual</td><td>Household type, housing status, full address</td></tr>
+</tbody>
+</table>
+
+<hr>
+
+<h2>Step 2: Head of Household</h2>
+
 <p>Enter personal information for the head of household:</p>
+
 <ul>
 <li>First name, middle name, last name, suffix</li>
 <li>Date of birth</li>
 <li>Phone and email</li>
 </ul>
 
-<h3>Step 3: Demographics</h3>
+<hr>
+
+<h2>Step 3: Demographics</h2>
+
 <p>Required demographic data for CSBG compliance:</p>
+
 <ul>
 <li>Gender</li>
 <li>Ethnicity</li>
@@ -904,7 +995,14 @@ class DocumentationContentSeeder extends Seeder
 <li>Disability status and types</li>
 </ul>
 
-<h3>Step 4: Health & Employment</h3>
+<div class="important">
+<strong>Required for Reporting:</strong> All demographic fields are required for CSBG Module 4 Section C reporting. Please ensure accurate data entry.
+</div>
+
+<hr>
+
+<h2>Step 4: Health & Employment</h2>
+
 <ul>
 <li>Chronic health conditions</li>
 <li>Work status (employed, unemployed, etc.)</li>
@@ -912,23 +1010,40 @@ class DocumentationContentSeeder extends Seeder
 <li>Employment seeking status</li>
 </ul>
 
-<h3>Step 5: Income & Benefits</h3>
+<hr>
+
+<h2>Step 5: Income & Benefits</h2>
+
 <ul>
-<li>Employment income</li>
-<li>Income sources</li>
+<li>Employment income (monthly amount)</li>
+<li>Income sources (SSI, SSDI, etc.)</li>
 <li>Other income sources</li>
 <li>Non-cash benefits (SNAP, Medicaid, etc.)</li>
 <li>Health insurance status and sources</li>
 </ul>
 
-<h3>Step 6: Program Enrollment</h3>
+<div class="tip">
+<strong>Tip:</strong> Income data is used to automatically calculate HHS Poverty Percentage based on household size.
+</div>
+
+<hr>
+
+<h2>Step 6: Program Enrollment</h2>
+
 <ul>
 <li>Select program(s) to enroll in</li>
 <li>Optional: Select initial service enrollment</li>
 </ul>
 
-<h3>Duplicate Detection</h3>
-<p>Before saving, the system checks for potential duplicates based on name and date of birth. You\'ll be prompted to confirm if a match is found.</p>',
+<hr>
+
+<h2>Duplicate Detection</h2>
+
+<p>Before saving, the system checks for potential duplicates based on name and date of birth.</p>
+
+<div class="warning">
+<strong>Duplicate Found?</strong> If a match is found, you\'ll be prompted to confirm. Review carefully to avoid creating duplicate records.
+</div>',
 
             'managing-participants' => '<h2>Managing Participants</h2>
 <p>The Participant Management screen lets you search, view, and edit participant records.</p>
