@@ -68,18 +68,59 @@
                 <label for="selectedBatch" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Check Scan Batch
                 </label>
-                <select wire:model.live="selectedBatch"
-                        id="selectedBatch"
-                        class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        {{ empty($availableBatches) ? 'disabled' : '' }}>
-                    <option value="">{{ empty($availableBatches) ? 'No batches found' : 'Select a batch...' }}</option>
-                    @foreach($availableBatches as $batch)
-                        <option value="{{ $batch }}">Batch {{ $batch }}</option>
-                    @endforeach
-                </select>
-                @if(count($availableBatches) > 0)
-                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ count($availableBatches) }} batch(es) found for this date</p>
-                @endif
+                <div class="relative">
+                    <!-- Loading state shown while date changes trigger batch lookup -->
+                    <div wire:loading wire:target="selectedDate" class="w-full">
+                        <select disabled class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md opacity-50">
+                            <option value="">Loading batches...</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-8 flex items-center pointer-events-none">
+                            <svg class="animate-spin h-4 w-4 text-indigo-500" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Normal state shown when not loading -->
+                    <div wire:loading.remove wire:target="selectedDate">
+                        <select wire:model.live="selectedBatch"
+                                id="selectedBatch"
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                {{ empty($availableBatches) ? 'disabled' : '' }}>
+                            @if($batchesLoaded && empty($availableBatches))
+                                <option value="">No batches found for this date</option>
+                            @elseif(!$batchesLoaded)
+                                <option value="">Select a date first...</option>
+                            @else
+                                <option value="">Select a batch...</option>
+                                @foreach($availableBatches as $batch)
+                                    <option value="{{ $batch }}">Batch {{ $batch }}</option>
+                                @endforeach
+                            @endif
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Status messages -->
+                <div wire:loading wire:target="selectedDate">
+                    <p class="mt-1 text-xs text-indigo-600 dark:text-indigo-400">
+                        <span class="inline-flex items-center">
+                            <svg class="animate-spin h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Searching for batches...
+                        </span>
+                    </p>
+                </div>
+                <div wire:loading.remove wire:target="selectedDate">
+                    @if($batchesLoaded && count($availableBatches) > 0)
+                        <p class="mt-1 text-xs text-green-600 dark:text-green-400">{{ count($availableBatches) }} batch(es) found for this date</p>
+                    @elseif($batchesLoaded && empty($availableBatches))
+                        <p class="mt-1 text-xs text-amber-600 dark:text-amber-400">No gifts with batch IDs found for this date</p>
+                    @endif
+                </div>
             </div>
 
             <!-- Preview Button -->

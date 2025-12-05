@@ -398,6 +398,12 @@ class DonorPerfectApiService
             $gifts = [];
             $records = $xml->xpath('//record');
 
+            // UDF fields that need case normalization (API returns uppercase, code expects mixed case)
+            $udfFieldMap = [
+                'DP_CHECKSCAN_BATCH' => 'DP_CheckScan_Batch',
+                'IMAGE_CHECK' => 'IMAGE_CHECK', // Keep as-is
+            ];
+
             foreach ($records as $record) {
                 $gift = [];
                 foreach ($record->children() as $fieldElement) {
@@ -407,7 +413,9 @@ class DonorPerfectApiService
                     $fieldValue = (string) ($attributes['value'] ?? '');
 
                     if (!empty($fieldName)) {
-                        $gift[$fieldName] = $fieldValue;
+                        // Normalize UDF field names to expected case
+                        $normalizedName = $udfFieldMap[$fieldName] ?? $fieldName;
+                        $gift[$normalizedName] = $fieldValue;
                     }
                 }
                 $gifts[] = $gift;

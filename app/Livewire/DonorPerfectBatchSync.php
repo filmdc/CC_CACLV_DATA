@@ -18,6 +18,10 @@ class DonorPerfectBatchSync extends Component
 
     public $availableBatches = [];
 
+    public $loadingBatches = false;
+
+    public $batchesLoaded = false;
+
     public $previewGifts = [];
 
     public $showPreview = false;
@@ -46,6 +50,7 @@ class DonorPerfectBatchSync extends Component
         $this->showPreview = false;
         $this->syncCompleted = false;
         $this->downloadUrl = '';
+        $this->batchesLoaded = false;
         $this->loadBatchesForDate();
     }
 
@@ -63,10 +68,13 @@ class DonorPerfectBatchSync extends Component
     public function loadBatchesForDate()
     {
         $this->availableBatches = [];
+        $this->batchesLoaded = false;
 
         if (empty($this->selectedDate)) {
             return;
         }
+
+        $this->loadingBatches = true;
 
         try {
             $giftService = app(DonorPerfectGiftService::class);
@@ -75,6 +83,8 @@ class DonorPerfectBatchSync extends Component
             $result = $giftService->getGiftsWithMetadata($date, $date, '');
 
             if (! $result['success']) {
+                $this->loadingBatches = false;
+                $this->batchesLoaded = true;
                 session()->flash('error', $result['error'] ?? 'Failed to load gifts');
 
                 return;
@@ -99,8 +109,12 @@ class DonorPerfectBatchSync extends Component
                 ->toArray();
 
             $this->availableBatches = $batches;
+            $this->loadingBatches = false;
+            $this->batchesLoaded = true;
 
         } catch (\Exception $e) {
+            $this->loadingBatches = false;
+            $this->batchesLoaded = true;
             Log::error('DonorPerfectBatchSync: Failed to load batches', [
                 'date' => $this->selectedDate,
                 'error' => $e->getMessage(),
