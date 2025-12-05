@@ -36,6 +36,8 @@ class DonorPerfectGiftsFeed extends Component
 
     public $subSolicitCodeFilter = '';
 
+    public $checkScanBatchFilter = '';
+
     public $sortField = 'gift_date';
 
     public $sortDirection = 'desc';
@@ -236,6 +238,11 @@ class DonorPerfectGiftsFeed extends Component
         $this->resetPage();
     }
 
+    public function updatedCheckScanBatchFilter()
+    {
+        $this->resetPage();
+    }
+
     public function clearAllFilters()
     {
         $this->giftTypeFilter = '';
@@ -244,6 +251,7 @@ class DonorPerfectGiftsFeed extends Component
         $this->campaignFilter = '';
         $this->solicitCodeFilter = '';
         $this->subSolicitCodeFilter = '';
+        $this->checkScanBatchFilter = '';
         $this->syncStatusFilter = 'all';
         $this->search = '';
         $this->resetPage();
@@ -1300,6 +1308,7 @@ class DonorPerfectGiftsFeed extends Component
             $uniqueCampaigns = $gifts->pluck('campaign')->filter()->unique()->sort()->values();
             $uniqueSolicitCodes = $gifts->pluck('solicit_code')->filter()->unique()->sort()->values();
             $uniqueSubSolicitCodes = $gifts->pluck('sub_solicit_code')->filter()->unique()->sort()->values();
+            $uniqueCheckScanBatches = $gifts->pluck('DP_CheckScan_Batch')->filter()->unique()->sort()->values();
 
             // Filter by sync status if selected
             if ($this->syncStatusFilter !== 'all') {
@@ -1358,6 +1367,13 @@ class DonorPerfectGiftsFeed extends Component
                 });
             }
 
+            if (! empty($this->checkScanBatchFilter)) {
+                $gifts = $gifts->filter(function ($gift) {
+                    $batchValue = $gift['DP_CheckScan_Batch'] ?? '';
+                    return stripos($batchValue, $this->checkScanBatchFilter) !== false;
+                });
+            }
+
             // Sort by selected field
             $gifts = $gifts->sortBy($this->sortField, SORT_REGULAR, $this->sortDirection === 'desc')
                 ->values(); // Re-index after sorting
@@ -1412,6 +1428,7 @@ class DonorPerfectGiftsFeed extends Component
                 'uniqueCampaigns' => $uniqueCampaigns,
                 'uniqueSolicitCodes' => $uniqueSolicitCodes,
                 'uniqueSubSolicitCodes' => $uniqueSubSolicitCodes,
+                'uniqueCheckScanBatches' => $uniqueCheckScanBatches,
             ])->layout('components.layouts.app');
         } catch (\Exception $e) {
             return view('livewire.donor-perfect-gifts-feed', [

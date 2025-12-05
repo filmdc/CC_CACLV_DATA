@@ -2067,6 +2067,20 @@ LINEITEM;
             $supdocXml = "<supdocid>{$supdocid}</supdocid>";
         }
 
+        // Build custom fields XML
+        $customFieldsXml = '';
+        if (! empty($receiptData['CHECK_SCAN_BATCH_ID'])) {
+            $checkScanBatchId = htmlspecialchars($receiptData['CHECK_SCAN_BATCH_ID'], ENT_XML1, 'UTF-8');
+            $customFieldsXml = <<<CUSTOMFIELDS
+                    <customfields>
+                        <customfield>
+                            <customfieldname>CHECK_SCAN_BATCH_ID</customfieldname>
+                            <customfieldvalue>{$checkScanBatchId}</customfieldvalue>
+                        </customfield>
+                    </customfields>
+CUSTOMFIELDS;
+        }
+
         return <<<XML
             <function controlid="{$controlId}">
                 <record_otherreceipt>
@@ -2078,6 +2092,7 @@ LINEITEM;
                     <refid>{$refId}</refid>
                     <description>{$description}</description>
                     {$supdocXml}
+                    {$customFieldsXml}
                     <receiptitems>
                         {$lineItemsXml}
                     </receiptitems>

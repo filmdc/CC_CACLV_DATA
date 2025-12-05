@@ -317,6 +317,24 @@
                         @endforeach
                     </select>
                 </div>
+
+                <!-- Check Scan Batch Filter -->
+                <div>
+                    <label for="checkScanBatchFilter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Check Scan Batch
+                    </label>
+                    <input type="text"
+                           wire:model.live.debounce.300ms="checkScanBatchFilter"
+                           id="checkScanBatchFilter"
+                           list="batchSuggestions"
+                           placeholder="Search batch..."
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                    <datalist id="batchSuggestions">
+                        @foreach($uniqueCheckScanBatches ?? [] as $batch)
+                            <option value="{{ $batch }}">
+                        @endforeach
+                    </datalist>
+                </div>
             </div>
 
             <!-- Clear Filters Button -->
@@ -329,22 +347,33 @@
 
             <!-- Action Buttons -->
             <div class="flex items-center justify-between mt-4">
-                @if($this->canAny(['donorperfect.sync.refresh', 'donor_gifts.view', 'donor_gifts.configure']))
-                <button wire:click="refreshData"
-                        class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                        wire:loading.attr="disabled">
-                    <span wire:loading.remove wire:target="refreshData">Refresh Data</span>
-                    <span wire:loading wire:target="refreshData" class="flex items-center">
-                        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <div class="flex items-center space-x-2">
+                    @if($this->canAny(['donorperfect.sync.refresh', 'donor_gifts.view', 'donor_gifts.configure']))
+                    <button wire:click="refreshData"
+                            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                            wire:loading.attr="disabled">
+                        <span wire:loading.remove wire:target="refreshData">Refresh Data</span>
+                        <span wire:loading wire:target="refreshData" class="flex items-center">
+                            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Refreshing...
+                        </span>
+                    </button>
+                    @endif
+
+                    <!-- Batch Sync Link -->
+                    @if($intacctConfigured ?? false)
+                    <a href="{{ route('donor-gifts.batch-sync') }}"
+                       class="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 flex items-center">
+                        <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                         </svg>
-                        Refreshing...
-                    </span>
-                </button>
-                @else
-                <div></div>
-                @endif
+                        Batch Sync
+                    </a>
+                    @endif
+                </div>
 
                 <div class="flex items-center space-x-2">
                     <!-- Sage Intacct Sync Button -->
@@ -479,7 +508,7 @@
 
             <div class="overflow-x-auto">
                 <!-- Loading State -->
-                <div wire:loading wire:target="refreshData,startDate,endDate,search,giftTypeFilter,paymentTypeFilter,glCodeFilter,campaignFilter,solicitCodeFilter,subSolicitCodeFilter,syncStatusFilter"
+                <div wire:loading wire:target="refreshData,startDate,endDate,search,giftTypeFilter,paymentTypeFilter,glCodeFilter,campaignFilter,solicitCodeFilter,subSolicitCodeFilter,checkScanBatchFilter,syncStatusFilter"
                      class="flex items-center justify-center py-12">
                     <div class="flex items-center space-x-3">
                         <svg class="animate-spin h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24">
@@ -491,7 +520,7 @@
                 </div>
 
                 <!-- Table -->
-                <div wire:loading.remove wire:target="refreshData,startDate,endDate,search,giftTypeFilter,paymentTypeFilter,glCodeFilter,campaignFilter,solicitCodeFilter,subSolicitCodeFilter,syncStatusFilter">
+                <div wire:loading.remove wire:target="refreshData,startDate,endDate,search,giftTypeFilter,paymentTypeFilter,glCodeFilter,campaignFilter,solicitCodeFilter,subSolicitCodeFilter,checkScanBatchFilter,syncStatusFilter">
                     @if($gifts && count($gifts) > 0)
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700">
                         <thead class="bg-gray-50 dark:bg-zinc-700">
@@ -578,6 +607,7 @@
                                         <span class="ml-1">{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
                                     @endif
                                 </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Check Scan Batch</th>
                                 <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
@@ -777,6 +807,9 @@
                                                 </span>
                                             @endif
                                         </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white cursor-pointer" wire:click="showGiftDetails({{ json_encode($gift) }})">
+                                        {{ $gift['DP_CheckScan_Batch'] ?? '-' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
                                         <div class="flex items-center justify-center space-x-2">

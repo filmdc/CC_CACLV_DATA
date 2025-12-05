@@ -371,7 +371,8 @@ class DonorPerfectGiftService
                     return str_contains(strtolower($gift['donor_name'] ?? ''), $searchLower)
                         || str_contains(strtolower($gift['campaign'] ?? ''), $searchLower)
                         || str_contains(strtolower($gift['amount'] ?? ''), $searchLower)
-                        || str_contains(strtolower($gift['payment_type'] ?? ''), $searchLower);
+                        || str_contains(strtolower($gift['payment_type'] ?? ''), $searchLower)
+                        || str_contains(strtolower($gift['DP_CheckScan_Batch'] ?? ''), $searchLower);
                 });
             }
 
@@ -426,7 +427,8 @@ class DonorPerfectGiftService
                     return str_contains(strtolower($gift['donor_name'] ?? ''), $searchLower)
                         || str_contains(strtolower($gift['campaign'] ?? ''), $searchLower)
                         || str_contains(strtolower($gift['amount'] ?? ''), $searchLower)
-                        || str_contains(strtolower($gift['payment_type'] ?? ''), $searchLower);
+                        || str_contains(strtolower($gift['payment_type'] ?? ''), $searchLower)
+                        || str_contains(strtolower($gift['DP_CheckScan_Batch'] ?? ''), $searchLower);
                 });
             }
 

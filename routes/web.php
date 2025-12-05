@@ -159,6 +159,34 @@ Route::middleware(['auth'])->group(function () {
         ->middleware(['role:Administrator'])
         ->name('donor-gifts.audit-log');
 
+    // Batch Sync Routes
+    Route::get('donor-gifts/batch-sync', App\Livewire\DonorPerfectBatchSync::class)
+        ->middleware(['auth', 'permission:donor_gifts.view'])
+        ->name('donor-gifts.batch-sync');
+
+    Route::get('donor-gifts/batch-sync-download', function () {
+        $exportData = session()->get('batch_sync_export');
+
+        if (! $exportData || ! isset($exportData['filepath'])) {
+            return redirect()->route('donor-gifts.batch-sync')->with('error', 'Export not found or expired.');
+        }
+
+        $filepath = $exportData['filepath'];
+        $filename = $exportData['filename'];
+
+        if (! file_exists($filepath)) {
+            return redirect()->route('donor-gifts.batch-sync')->with('error', 'Export file not found.');
+        }
+
+        // Clear session data
+        session()->forget('batch_sync_export');
+
+        return response()->download($filepath, $filename, [
+            'Content-Type' => 'text/csv',
+        ])->deleteFileAfterSend(true);
+    })->middleware(['auth', 'permission:donor_gifts.view'])
+        ->name('donor-gifts.batch-sync-download');
+
     // Sage Intacct Routes
     Route::get('/accounting/sage-intacct/configuration', \App\Livewire\SageIntacctConfiguration::class)
         ->name('sage-intacct.configuration')

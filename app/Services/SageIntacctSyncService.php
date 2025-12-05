@@ -99,6 +99,7 @@ class SageIntacctSyncService
                 $originalCount = count($gifts);
                 $gifts = array_filter($gifts, function ($gift) use ($syncedGiftIds) {
                     $giftId = $gift['gift_id'] ?? null;
+
                     return $giftId && ! in_array($giftId, $syncedGiftIds);
                 });
                 $gifts = array_values($gifts); // Re-index array
@@ -138,6 +139,7 @@ class SageIntacctSyncService
                 $originalCount = count($gifts);
                 $gifts = array_filter($gifts, function ($gift) use ($syncedGiftIds) {
                     $giftId = $gift['gift_id'] ?? null;
+
                     return $giftId && ! in_array($giftId, $syncedGiftIds);
                 });
                 $gifts = array_values($gifts); // Re-index array
@@ -872,6 +874,11 @@ class SageIntacctSyncService
             'receiptitems' => [$lineItem],
         ], $accountData);
 
+        // Add Check Scan Batch ID custom field if present
+        if (! empty($giftData['DP_CheckScan_Batch'])) {
+            $receiptData['CHECK_SCAN_BATCH_ID'] = $giftData['DP_CheckScan_Batch'];
+        }
+
         // Add SUPDOC if file attachment was prepared
         if ($fileData && isset($fileData['supdocid'])) {
             $receiptData['supdocid'] = $fileData['supdocid'];
@@ -884,6 +891,7 @@ class SageIntacctSyncService
             'dp_payment_type' => $dpPaymentType,
             'gl_account' => $glAccount,
             'amount' => $giftData['amount'] ?? '0.00',
+            'check_scan_batch_id' => $giftData['DP_CheckScan_Batch'] ?? null,
             'has_attachment' => isset($receiptData['supdocid']),
             'supdocid' => $receiptData['supdocid'] ?? null,
         ]);
@@ -1191,6 +1199,7 @@ class SageIntacctSyncService
                             'batch_index' => $index,
                             'available_indexes' => array_keys($giftIdMap),
                         ]);
+
                         continue;
                     }
 
