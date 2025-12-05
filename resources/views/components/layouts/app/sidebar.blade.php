@@ -19,6 +19,9 @@
                 @if(auth()->user()->hasAnyPermission(['participants.create', 'participants.view', 'households.view', 'enrollments.view']))
                 <flux:navlist.group :heading="__('Data Management')" class="grid">
                     <flux:navlist.item icon="users" :href="route('participant.household.hub')" :current="request()->routeIs('participant.household.hub')" wire:navigate>{{ __('Participants & Households') }}</flux:navlist.item>
+                    @if(auth()->user()->hasPermission('enrollments.view'))
+                        <flux:navlist.item icon="clipboard-document-list" :href="route('enrollment.management')" :current="request()->routeIs('enrollment.management')" wire:navigate>{{ __('Enrollments') }}</flux:navlist.item>
+                    @endif
                 </flux:navlist.group>
                 @endif
 
