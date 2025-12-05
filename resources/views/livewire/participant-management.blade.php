@@ -379,10 +379,11 @@
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div>
-                                    <button wire:click="viewParticipant({{ $participant->id }})" 
-                                            class="text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 hover:underline cursor-pointer transition-colors duration-200">
+                                    <a href="{{ route('participant.show', $participant->id) }}"
+                                       wire:navigate
+                                       class="text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 hover:underline cursor-pointer transition-colors duration-200">
                                         <div class="text-sm font-medium">{{ $participant->full_name }}</div>
-                                    </button>
+                                    </a>
                                     @if($participant->email)
                                         <div class="text-sm text-gray-500 dark:text-gray-400">{{ $participant->email }}</div>
                                     @endif

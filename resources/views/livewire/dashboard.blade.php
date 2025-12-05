@@ -689,8 +689,9 @@
                 @if($recentParticipants->count() > 0)
                     <div class="space-y-4">
                         @foreach($recentParticipants as $participant)
-                            <button wire:click="viewParticipant({{ $participant->id }})" 
-                                    class="w-full flex items-center space-x-4 p-3 border border-gray-200 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors">
+                            <a href="{{ route('participant.show', $participant->id) }}"
+                               wire:navigate
+                               class="w-full flex items-center space-x-4 p-3 border border-gray-200 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors">
                                 <div class="flex-shrink-0">
                                     <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
                                         <span class="text-blue-600 dark:text-blue-400 font-semibold text-sm">
@@ -711,7 +712,7 @@
                                         {{ $participant->updated_at->diffForHumans() }}
                                     </p>
                                 </div>
-                            </button>
+                            </a>
                         @endforeach
                     </div>
                 @else
@@ -837,8 +838,9 @@
             {{-- Participants List --}}
             <div class="space-y-4">
                 @foreach($tabData['participants'] as $participant)
-                    <button wire:click="viewParticipant({{ $participant->id }})" 
-                            class="w-full flex items-center justify-between p-4 border border-gray-200 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors">
+                    <a href="{{ route('participant.show', $participant->id) }}"
+                       wire:navigate
+                       class="w-full flex items-center justify-between p-4 border border-gray-200 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors">
                         <div class="flex items-center space-x-4">
                             <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
                                 <span class="text-blue-600 dark:text-blue-400 font-semibold">
@@ -866,7 +868,7 @@
                                 Updated {{ $participant->updated_at->diffForHumans() }}
                             </p>
                         </div>
-                    </button>
+                    </a>
                 @endforeach
             </div>
         </div>

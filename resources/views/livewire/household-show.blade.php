@@ -94,7 +94,8 @@
                         <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Head of Household</label>
                         <p class="text-gray-900 dark:text-white">
                             @if($household->headOfHousehold)
-                                <a href="{{ route('participant.show', $household->headOfHousehold->id) }}" 
+                                <a href="{{ route('participant.show', $household->headOfHousehold->id) }}"
+                                   wire:navigate
                                    class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
                                     {{ $household->headOfHousehold->first_name }} {{ $household->headOfHousehold->last_name }}
                                 </a>
@@ -244,7 +245,8 @@
                                 @foreach($household->participants as $participant)
                                     <tr>
                                         <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                                            <a href="{{ route('participant.show', $participant->id) }}" 
+                                            <a href="{{ route('participant.show', $participant->id) }}"
+                                               wire:navigate
                                                class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
                                                 {{ $participant->first_name }} {{ $participant->last_name }}
                                                 @if($participant->is_head_of_household)

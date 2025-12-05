@@ -40,7 +40,8 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Participant Name</label>
                         <p class="text-gray-900 dark:text-white">
-                            <a href="{{ route('participant.show', $enrollment->participant->id) }}" 
+                            <a href="{{ route('participant.show', $enrollment->participant->id) }}"
+                               wire:navigate
                                class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
                                 {{ $enrollment->participant->full_name }}
                             </a>
