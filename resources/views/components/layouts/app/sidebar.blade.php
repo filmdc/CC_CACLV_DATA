@@ -42,6 +42,7 @@
                 <flux:navlist.group :heading="__('Housing & Projects')" class="grid">
                     @if(auth()->user()->hasPermission('projects.view'))
                         <flux:navlist.item icon="view-columns" :href="route('projects.management')" :current="request()->routeIs(['projects.management', 'project.management', 'housing-job.management', 'project.pipeline'])" wire:navigate>{{ __('Projects') }}</flux:navlist.item>
+                        <flux:navlist.item icon="chart-bar-square" :href="route('project.reporting')" :current="request()->routeIs('project.reporting')" wire:navigate>{{ __('Project Reports') }}</flux:navlist.item>
                     @endif
                     @if(auth()->user()->hasPermission('properties.view'))
                         <flux:navlist.item icon="home-modern" :href="route('property.management')" :current="request()->routeIs('property.management')" wire:navigate>{{ __('Properties') }}</flux:navlist.item>

@@ -565,6 +565,9 @@ Route::middleware(['auth'])->group(function () {
     // Project Management Module Routes (Unified Interface)
     Route::get('projects', App\Livewire\ProjectsManagement::class)->name('projects.management');
     Route::get('project/{id}/manage', App\Livewire\ProjectManagement::class)->name('project.management');
+    Route::get('project-reporting', App\Livewire\ProjectReporting::class)
+        ->middleware(['permission:projects.view'])
+        ->name('project.reporting');
 
     // Approvals Routes
     Route::get('approvals/pending', App\Livewire\PendingApprovalsManagement::class)
