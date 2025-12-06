@@ -98,6 +98,8 @@ class ProjectManagement extends Component
 
     public $budget_amount = '';
 
+    public $budget_contract_id = '';
+
     // Expense Form
     public $showExpenseForm = false;
 
@@ -112,6 +114,8 @@ class ProjectManagement extends Component
     public $expense_description = '';
 
     public $expense_document_id = '';
+
+    public $expense_contract_id = '';
 
     // Template Form
     public $showSaveAsTemplateForm = false;
@@ -849,10 +853,12 @@ class ProjectManagement extends Component
         $validated = $this->validate([
             'budget_category' => 'required|string|max:255',
             'budget_amount' => 'required|numeric|min:0',
+            'budget_contract_id' => 'nullable|exists:contracts,id',
         ]);
 
         ProjectBudget::create([
             'housing_job_id' => $this->jobId,
+            'contract_id' => $this->budget_contract_id !== '' ? $this->budget_contract_id : null,
             'category' => $this->budget_category,
             'budgeted_amount' => $this->budget_amount,
             'created_by' => Auth::id(),
@@ -887,10 +893,12 @@ class ProjectManagement extends Component
             'expense_date' => 'required|date',
             'expense_description' => 'nullable|string',
             'expense_document_id' => 'nullable|exists:milestone_documents,id',
+            'expense_contract_id' => 'nullable|exists:contracts,id',
         ]);
 
         ProjectExpense::create([
             'housing_job_id' => $this->jobId,
+            'contract_id' => $this->expense_contract_id !== '' ? $this->expense_contract_id : null,
             'category' => $this->expense_category,
             'amount' => $this->expense_amount,
             'expense_date' => $this->expense_date,
@@ -1184,6 +1192,7 @@ class ProjectManagement extends Component
         $this->editingBudget = null;
         $this->budget_category = '';
         $this->budget_amount = '';
+        $this->budget_contract_id = '';
     }
 
     protected function resetExpenseForm()
@@ -1195,6 +1204,7 @@ class ProjectManagement extends Component
         $this->expense_date = '';
         $this->expense_description = '';
         $this->expense_document_id = '';
+        $this->expense_contract_id = '';
     }
 
     public function render()
@@ -1228,6 +1238,12 @@ class ProjectManagement extends Component
         // Get contractors for the edit form
         $contractors = \App\Models\Contractor::orderBy('company_name')->get();
 
+        // Get active contracts for budget/expense assignment
+        $contracts = \App\Models\Contract::active()
+            ->with('funder')
+            ->orderBy('title')
+            ->get();
+
         // Get participants (heads of household only) for the searchable select
         $participantsSearchable = \App\Models\Participant::where('is_head_of_household', true)
             ->with('household')
@@ -1258,6 +1274,7 @@ class ProjectManagement extends Component
             'participants' => $participantsSearchable,
             'pdfTemplates' => $pdfTemplates,
             'contractors' => $contractors,
+            'contracts' => $contracts,
         ]);
     }
 }

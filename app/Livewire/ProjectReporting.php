@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Contract;
 use App\Models\Contractor;
 use App\Models\HousingJob;
 use App\Models\MilestoneDocument;
@@ -9,6 +10,7 @@ use App\Models\MilestoneTask;
 use App\Models\Participant;
 use App\Models\Program;
 use App\Models\ProjectBudget;
+use App\Models\ProjectExpense;
 use App\Models\ProjectMilestone;
 use App\Models\Property;
 use App\Models\User;
@@ -392,6 +394,104 @@ class ProjectReporting extends Component
             ->toArray();
     }
 
+    public function getBudgetByContract(): array
+    {
+        $projectIds = $this->getFilteredQuery()->pluck('id');
+
+        // Get budget totals by contract
+        $budgetData = ProjectBudget::whereIn('housing_job_id', $projectIds)
+            ->select(
+                'contract_id',
+                DB::raw('SUM(budgeted_amount) as total_budgeted')
+            )
+            ->groupBy('contract_id')
+            ->get()
+            ->keyBy('contract_id');
+
+        // Get expense totals by contract
+        $expenseData = ProjectExpense::whereIn('housing_job_id', $projectIds)
+            ->select(
+                'contract_id',
+                DB::raw('SUM(amount) as total_spent')
+            )
+            ->groupBy('contract_id')
+            ->get()
+            ->keyBy('contract_id');
+
+        // Merge both datasets and get contract info
+        $contractIds = $budgetData->keys()->merge($expenseData->keys())->unique()->filter();
+
+        $contracts = Contract::whereIn('id', $contractIds)->get()->keyBy('id');
+
+        $results = [];
+
+        // Process contracts with budgets or expenses
+        foreach ($contractIds as $contractId) {
+            if ($contractId === null) {
+                continue;
+            }
+
+            $contract = $contracts->get($contractId);
+            $budget = $budgetData->get($contractId);
+            $expense = $expenseData->get($contractId);
+
+            $totalBudgeted = (float) ($budget->total_budgeted ?? 0);
+            $totalSpent = (float) ($expense->total_spent ?? 0);
+            $remaining = $totalBudgeted - $totalSpent;
+            $utilization = $totalBudgeted > 0 ? round(($totalSpent / $totalBudgeted) * 100, 1) : 0;
+
+            // Get overall contract budget for grant drawdown tracking
+            $contractTotal = (float) ($contract->amount ?? 0);
+            $contractRemaining = $contractTotal - $totalSpent;
+            $grantUtilization = $contractTotal > 0 ? round(($totalSpent / $contractTotal) * 100, 1) : 0;
+
+            $results[] = [
+                'contract_id' => $contractId,
+                'contract_title' => $contract->title ?? 'Unknown Contract',
+                'grant_code' => $contract->grant_code ?? 'N/A',
+                'funder' => $contract->funder?->name ?? 'N/A',
+                'total_budgeted' => $totalBudgeted,
+                'total_spent' => $totalSpent,
+                'remaining' => $remaining,
+                'utilization' => $utilization,
+                'contract_total' => $contractTotal,
+                'contract_remaining' => $contractRemaining,
+                'grant_utilization' => $grantUtilization,
+                'contract_start_date' => $contract->start_date?->format('M d, Y'),
+                'contract_end_date' => $contract->end_date?->format('M d, Y'),
+                'status' => $contract->status ?? 'Unknown',
+            ];
+        }
+
+        // Add unallocated budgets/expenses (no contract assigned)
+        $unallocatedBudget = (float) ($budgetData->get(null)->total_budgeted ?? 0);
+        $unallocatedExpense = (float) ($expenseData->get(null)->total_spent ?? 0);
+
+        if ($unallocatedBudget > 0 || $unallocatedExpense > 0) {
+            $results[] = [
+                'contract_id' => null,
+                'contract_title' => 'Unallocated (No Fund Code)',
+                'grant_code' => 'N/A',
+                'funder' => 'N/A',
+                'total_budgeted' => $unallocatedBudget,
+                'total_spent' => $unallocatedExpense,
+                'remaining' => $unallocatedBudget - $unallocatedExpense,
+                'utilization' => $unallocatedBudget > 0 ? round(($unallocatedExpense / $unallocatedBudget) * 100, 1) : 0,
+                'contract_total' => 0,
+                'contract_remaining' => 0,
+                'grant_utilization' => 0,
+                'contract_start_date' => null,
+                'contract_end_date' => null,
+                'status' => 'N/A',
+            ];
+        }
+
+        // Sort by total spent descending
+        usort($results, fn ($a, $b) => $b['total_spent'] <=> $a['total_spent']);
+
+        return $results;
+    }
+
     public function getGroupedMetrics(): array
     {
         $baseQuery = $this->getFilteredQuery();
@@ -590,6 +690,7 @@ class ProjectReporting extends Component
         $taskMetrics = $this->getTaskMetrics();
         $documentMetrics = $this->getDocumentMetrics();
         $budgetByCategory = $this->getBudgetByCategory();
+        $budgetByContract = $this->getBudgetByContract();
         $groupedMetrics = $this->getGroupedMetrics();
         $contractorPerformance = $this->getContractorPerformance();
         $projectManagerPerformance = $this->getProjectManagerPerformance();
@@ -605,10 +706,12 @@ class ProjectReporting extends Component
             'taskMetrics' => $taskMetrics,
             'documentMetrics' => $documentMetrics,
             'budgetByCategory' => $budgetByCategory,
+            'budgetByContract' => $budgetByContract,
             'groupedMetrics' => $groupedMetrics,
             'contractorPerformance' => $contractorPerformance,
             'projectManagerPerformance' => $projectManagerPerformance,
             'programs' => Program::orderBy('name')->get(),
+            'contracts' => Contract::active()->orderBy('title')->get(),
             'contractors' => Contractor::orderBy('company_name')->get(),
             'properties' => Property::orderBy('address_line_1')->get(),
             'participants' => Participant::where('is_head_of_household', true)

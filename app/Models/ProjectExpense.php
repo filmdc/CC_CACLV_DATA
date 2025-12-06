@@ -9,6 +9,7 @@ class ProjectExpense extends Model
 {
     protected $fillable = [
         'housing_job_id',
+        'contract_id',
         'category',
         'amount',
         'expense_date',
@@ -46,6 +47,11 @@ class ProjectExpense extends Model
     public function housingJob(): BelongsTo
     {
         return $this->belongsTo(HousingJob::class);
+    }
+
+    public function contract(): BelongsTo
+    {
+        return $this->belongsTo(Contract::class);
     }
 
     public function document(): BelongsTo

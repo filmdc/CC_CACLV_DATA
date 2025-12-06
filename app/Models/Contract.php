@@ -120,6 +120,56 @@ class Contract extends Model implements HasMedia
     }
 
     /**
+     * Get the services funded by this contract
+     */
+    public function services(): BelongsToMany
+    {
+        return $this->belongsToMany(Service::class, 'contract_service')
+            ->withPivot(['allocation_percentage', 'allocated_amount', 'notes', 'created_by', 'updated_by'])
+            ->withTimestamps();
+    }
+
+    /**
+     * Get project budgets funded by this contract
+     */
+    public function projectBudgets(): HasMany
+    {
+        return $this->hasMany(ProjectBudget::class);
+    }
+
+    /**
+     * Get project expenses charged to this contract
+     */
+    public function projectExpenses(): HasMany
+    {
+        return $this->hasMany(ProjectExpense::class);
+    }
+
+    /**
+     * Get total budgeted amount across all projects for this contract
+     */
+    public function getTotalBudgetedAttribute(): float
+    {
+        return (float) $this->projectBudgets()->sum('budgeted_amount');
+    }
+
+    /**
+     * Get total spent amount across all projects for this contract
+     */
+    public function getTotalSpentAttribute(): float
+    {
+        return (float) $this->projectExpenses()->sum('amount');
+    }
+
+    /**
+     * Get remaining budget for this contract
+     */
+    public function getRemainingBudgetAttribute(): float
+    {
+        return (float) $this->amount - $this->total_spent;
+    }
+
+    /**
      * Get the report due dates for this contract
      */
     public function reportDueDates(): HasMany

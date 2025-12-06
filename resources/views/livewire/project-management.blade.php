@@ -515,6 +515,7 @@
                                     <thead class="bg-gray-50 dark:bg-zinc-900">
                                         <tr>
                                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Category</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Fund Code</th>
                                             <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Budgeted</th>
                                             <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Spent</th>
                                             <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Remaining</th>
@@ -526,6 +527,15 @@
                                         @foreach($job->budgets as $budget)
                                             <tr>
                                                 <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">{{ $budget->category }}</td>
+                                                <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
+                                                    @if($budget->contract)
+                                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300" title="{{ $budget->contract->title }}">
+                                                            {{ $budget->contract->grant_code ?: Str::limit($budget->contract->title, 15) }}
+                                                        </span>
+                                                    @else
+                                                        <span class="text-gray-400 dark:text-gray-500">-</span>
+                                                    @endif
+                                                </td>
                                                 <td class="px-4 py-3 text-sm text-right text-gray-900 dark:text-white">${{ number_format($budget->budgeted_amount, 2) }}</td>
                                                 <td class="px-4 py-3 text-sm text-right text-gray-900 dark:text-white">${{ number_format($budget->spent_amount, 2) }}</td>
                                                 <td class="px-4 py-3 text-sm text-right {{ $budget->remaining_amount < 0 ? 'text-red-600 dark:text-red-400 font-semibold' : 'text-gray-900 dark:text-white' }}">
@@ -547,6 +557,7 @@
                                         @endforeach
                                         <tr class="bg-gray-100 dark:bg-zinc-900 font-semibold">
                                             <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">TOTAL</td>
+                                            <td class="px-4 py-3"></td>
                                             <td class="px-4 py-3 text-sm text-right text-gray-900 dark:text-white">${{ number_format($job->getTotalBudget(), 2) }}</td>
                                             <td class="px-4 py-3 text-sm text-right text-gray-900 dark:text-white">${{ number_format($job->getTotalSpent(), 2) }}</td>
                                             <td class="px-4 py-3 text-sm text-right text-gray-900 dark:text-white">${{ number_format($job->getTotalBudget() - $job->getTotalSpent(), 2) }}</td>
@@ -584,6 +595,7 @@
                                         <tr>
                                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Date</th>
                                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Category</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Fund Code</th>
                                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Description</th>
                                             <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Amount</th>
                                             <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Actions</th>
@@ -594,6 +606,15 @@
                                             <tr>
                                                 <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">{{ $expense->expense_date->format('M d, Y') }}</td>
                                                 <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">{{ $expense->category }}</td>
+                                                <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
+                                                    @if($expense->contract)
+                                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300" title="{{ $expense->contract->title }}">
+                                                            {{ $expense->contract->grant_code ?: Str::limit($expense->contract->title, 15) }}
+                                                        </span>
+                                                    @else
+                                                        <span class="text-gray-400 dark:text-gray-500">-</span>
+                                                    @endif
+                                                </td>
                                                 <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{{ $expense->description ?: '-' }}</td>
                                                 <td class="px-4 py-3 text-sm text-right {{ $expense->is_credit ? 'text-green-600 dark:text-green-400' : 'text-gray-900 dark:text-white' }}">
                                                     {{ $expense->formatted_amount }}
@@ -818,6 +839,18 @@
                         </div>
                         @error('budget_amount') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
                     </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Funding Source (Contract)</label>
+                        <select wire:model="budget_contract_id"
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                            <option value="">Select a contract (optional)</option>
+                            @foreach($contracts as $contract)
+                                <option value="{{ $contract->id }}">{{ $contract->title }}{{ $contract->grant_code ? ' (' . $contract->grant_code . ')' : '' }}</option>
+                            @endforeach
+                        </select>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Associate this budget with a funding source</p>
+                        @error('budget_contract_id') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+                    </div>
                 </div>
                 <div class="mt-6 flex justify-end space-x-3">
                     <button wire:click="$set('showBudgetForm', false)"
@@ -849,6 +882,18 @@
                             @endforeach
                         </select>
                         @error('expense_category') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Funding Source (Contract)</label>
+                        <select wire:model="expense_contract_id"
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                            <option value="">Select a contract (optional)</option>
+                            @foreach($contracts as $contract)
+                                <option value="{{ $contract->id }}">{{ $contract->title }}{{ $contract->grant_code ? ' (' . $contract->grant_code . ')' : '' }}</option>
+                            @endforeach
+                        </select>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Which funding source covers this expense</p>
+                        @error('expense_contract_id') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Amount *</label>

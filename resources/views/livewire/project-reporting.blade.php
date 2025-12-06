@@ -341,6 +341,95 @@
                 </div>
             </div>
 
+            {{-- Budget by Fund Code --}}
+            <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Budget by Fund Code</h3>
+                @if(count($budgetByContract) > 0)
+                    <div class="space-y-4">
+                        @foreach($budgetByContract as $contract)
+                            <div class="p-4 bg-gray-50 dark:bg-zinc-700 rounded-lg">
+                                <div class="flex items-start justify-between mb-2">
+                                    <div>
+                                        <h4 class="font-medium text-gray-900 dark:text-white">
+                                            {{ $contract['contract_title'] }}
+                                        </h4>
+                                        <div class="flex items-center space-x-2 mt-1">
+                                            @if($contract['grant_code'] !== 'N/A')
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                                    {{ $contract['grant_code'] }}
+                                                </span>
+                                            @endif
+                                            @if($contract['funder'] !== 'N/A')
+                                                <span class="text-xs text-gray-500 dark:text-gray-400">{{ $contract['funder'] }}</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    @if($contract['status'] !== 'N/A')
+                                        <span class="px-2 py-1 rounded text-xs font-medium
+                                            {{ $contract['status'] === 'Active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' :
+                                               ($contract['status'] === 'Expired' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' :
+                                               'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300') }}">
+                                            {{ $contract['status'] }}
+                                        </span>
+                                    @endif
+                                </div>
+
+                                {{-- Project Budget Allocation --}}
+                                <div class="mb-3">
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-gray-600 dark:text-gray-400">Project Allocation</span>
+                                        <span class="font-medium {{ $contract['utilization'] > 100 ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white' }}">
+                                            ${{ number_format($contract['total_spent'], 2) }} / ${{ number_format($contract['total_budgeted'], 2) }}
+                                        </span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 dark:bg-zinc-600 rounded-full h-2">
+                                        <div class="h-2 rounded-full transition-all duration-500
+                                            {{ $contract['utilization'] > 100 ? 'bg-red-500' : ($contract['utilization'] > 90 ? 'bg-yellow-500' : 'bg-blue-500') }}"
+                                             style="width: {{ min($contract['utilization'], 100) }}%">
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        {{ $contract['utilization'] }}% utilized | ${{ number_format($contract['remaining'], 2) }} remaining
+                                    </p>
+                                </div>
+
+                                {{-- Overall Grant Drawdown (if contract has total amount) --}}
+                                @if($contract['contract_total'] > 0)
+                                    <div>
+                                        <div class="flex justify-between text-sm mb-1">
+                                            <span class="text-gray-600 dark:text-gray-400">Grant Drawdown</span>
+                                            <span class="font-medium text-gray-900 dark:text-white">
+                                                ${{ number_format($contract['total_spent'], 2) }} / ${{ number_format($contract['contract_total'], 2) }}
+                                            </span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 dark:bg-zinc-600 rounded-full h-2">
+                                            <div class="h-2 rounded-full transition-all duration-500
+                                                {{ $contract['grant_utilization'] > 100 ? 'bg-red-500' : ($contract['grant_utilization'] > 90 ? 'bg-yellow-500' : 'bg-green-500') }}"
+                                                 style="width: {{ min($contract['grant_utilization'], 100) }}%">
+                                            </div>
+                                        </div>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                            {{ $contract['grant_utilization'] }}% of total grant | ${{ number_format($contract['contract_remaining'], 2) }} remaining
+                                            @if($contract['contract_end_date'])
+                                                | Ends: {{ $contract['contract_end_date'] }}
+                                            @endif
+                                        </p>
+                                    </div>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="text-center py-8">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        </svg>
+                        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">No fund codes assigned to project budgets or expenses</p>
+                        <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Assign contracts to budget categories and expenses to track by fund code</p>
+                    </div>
+                @endif
+            </div>
+
             {{-- Status Distribution --}}
             <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl p-6">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Status Distribution</h3>
