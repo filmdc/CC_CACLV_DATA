@@ -20,6 +20,12 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-4">
+                    @if($this->can('projects.manage'))
+                        <button wire:click="showEditProject"
+                                class="px-3 py-1 text-sm bg-white/20 hover:bg-white/30 text-white rounded-md border border-white/30">
+                            ✏️ Edit Project
+                        </button>
+                    @endif
                     @if($job->milestones()->count() > 0 && $this->can('projects.manage'))
                         <button wire:click="showSaveAsTemplate"
                                 class="px-3 py-1 text-sm bg-white/20 hover:bg-white/30 text-white rounded-md border border-white/30">
@@ -45,6 +51,65 @@
                 <p class="text-sm text-red-700 dark:text-red-300">{{ session('error') }}</p>
             </div>
         @endif
+
+        <!-- Project Info Summary Bar -->
+        <div class="bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-700 px-6 py-3">
+            <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
+                <div class="flex items-center">
+                    <span class="text-gray-500 dark:text-gray-400 mr-2">Status:</span>
+                    <span class="px-2 py-0.5 rounded text-xs font-medium
+                        @if($job->status === 'completed') bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300
+                        @elseif($job->status === 'in_progress') bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300
+                        @elseif($job->status === 'pending') bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300
+                        @elseif($job->status === 'on_hold') bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300
+                        @elseif($job->status === 'cancelled') bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300
+                        @else bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300
+                        @endif">
+                        {{ ucfirst(str_replace('_', ' ', $job->status)) }}
+                    </span>
+                </div>
+                <div class="flex items-center">
+                    <span class="text-gray-500 dark:text-gray-400 mr-2">Priority:</span>
+                    <span class="px-2 py-0.5 rounded text-xs font-medium
+                        @if($job->priority === 'emergency') bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300
+                        @elseif($job->priority === 'high') bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300
+                        @elseif($job->priority === 'medium') bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300
+                        @else bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300
+                        @endif">
+                        {{ ucfirst($job->priority) }}
+                    </span>
+                </div>
+                @if($job->contractor)
+                    <div class="flex items-center">
+                        <span class="text-gray-500 dark:text-gray-400 mr-2">Contractor:</span>
+                        <span class="text-gray-900 dark:text-white">{{ $job->contractor->company_name }}</span>
+                    </div>
+                @endif
+                @if($job->target_completion_date)
+                    <div class="flex items-center">
+                        <span class="text-gray-500 dark:text-gray-400 mr-2">Target:</span>
+                        <span class="{{ $job->isOverdue() ? 'text-red-600 dark:text-red-400 font-medium' : 'text-gray-900 dark:text-white' }}">
+                            {{ $job->target_completion_date->format('M d, Y') }}
+                            @if($job->isOverdue())
+                                <span class="text-xs">({{ $job->days_overdue }} days overdue)</span>
+                            @endif
+                        </span>
+                    </div>
+                @endif
+                @if($job->estimated_cost)
+                    <div class="flex items-center">
+                        <span class="text-gray-500 dark:text-gray-400 mr-2">Est. Cost:</span>
+                        <span class="text-gray-900 dark:text-white">${{ number_format($job->estimated_cost, 2) }}</span>
+                    </div>
+                @endif
+                <div class="flex-1"></div>
+                @if($this->can('projects.manage'))
+                    <button wire:click="showEditProject" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 text-sm font-medium">
+                        Edit Details
+                    </button>
+                @endif
+            </div>
+        </div>
 
         <!-- Tabs -->
         <div class="border-b border-gray-200 dark:border-zinc-700">
@@ -815,6 +880,256 @@
                     <button wire:click="saveExpense"
                             class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
                         Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Edit Project Modal -->
+    @if($showEditProjectForm)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Edit Project Information</h3>
+
+                <!-- Project Summary (Read-Only) -->
+                <div class="mb-6 p-4 bg-gray-50 dark:bg-zinc-700 rounded-lg">
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <span class="font-medium text-gray-700 dark:text-gray-300">Job Number:</span>
+                            <span class="ml-2 text-gray-900 dark:text-white">{{ $job->job_number }}</span>
+                        </div>
+                        <div>
+                            <span class="font-medium text-gray-700 dark:text-gray-300">Program:</span>
+                            <span class="ml-2 text-gray-900 dark:text-white">{{ $job->program?->name ?? 'N/A' }}</span>
+                        </div>
+                        <div>
+                            <span class="font-medium text-gray-700 dark:text-gray-300">Property:</span>
+                            <span class="ml-2 text-gray-900 dark:text-white">{{ $job->property?->address_line_1 ?? 'N/A' }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Row 1: Title -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Project Title *</label>
+                        <input type="text" wire:model="edit_job_title"
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                        @error('edit_job_title') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+                    </div>
+
+                    <!-- Participant Selection -->
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Participant (Head of Household) *
+                            </label>
+                            <button type="button" wire:click="showQuickParticipantModal"
+                                    class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline flex items-center">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                </svg>
+                                New Participant
+                            </button>
+                        </div>
+                        <livewire:searchable-select
+                            :items="$participants"
+                            :selected="$edit_participant_id"
+                            name="edit_participant"
+                            placeholder="Search participants by name..."
+                            display-field="display"
+                            secondary-field="secondary"
+                            :required="true"
+                            empty-message="No heads of household found. Create a new participant above."
+                            :key="'edit-participant-select-' . ($edit_participant_id ?: 'none')"
+                        />
+                        @error('edit_participant_id') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Changing participant will also update the associated household.</p>
+                    </div>
+
+                    <!-- Row 2: Status & Priority -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status *</label>
+                            <select wire:model="edit_status"
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                <option value="pending">Pending</option>
+                                <option value="approved">Approved</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="on_hold">On Hold</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                            @error('edit_status') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Priority *</label>
+                            <select wire:model="edit_priority"
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                                <option value="emergency">Emergency</option>
+                            </select>
+                            @error('edit_priority') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Dates -->
+                    <div class="grid grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Request Date</label>
+                            <input type="date" wire:model="edit_request_date"
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Date</label>
+                            <input type="date" wire:model="edit_start_date"
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Target Completion</label>
+                            <input type="date" wire:model="edit_target_completion_date"
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                        </div>
+                    </div>
+
+                    <!-- Row 4: Contractor & Estimated Cost -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contractor</label>
+                            <select wire:model="edit_contractor_id"
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                <option value="">No Contractor Assigned</option>
+                                @foreach($contractors as $contractor)
+                                    <option value="{{ $contractor->id }}">{{ $contractor->company_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Estimated Cost</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 dark:text-gray-400">$</span>
+                                <input type="number" step="0.01" wire:model="edit_estimated_cost"
+                                       class="w-full pl-7 px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 5: Description -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                        <textarea wire:model="edit_job_description" rows="3"
+                                  class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md"></textarea>
+                    </div>
+
+                    <!-- Row 6: Internal Notes -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Internal Notes</label>
+                        <textarea wire:model="edit_internal_notes" rows="2" placeholder="Notes visible only to staff..."
+                                  class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md"></textarea>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button wire:click="$set('showEditProjectForm', false)"
+                            class="px-4 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
+                        Cancel
+                    </button>
+                    <button wire:click="updateProjectInfo"
+                            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Quick Participant Creation Modal -->
+    @if($showQuickParticipantForm)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[60]">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Create New Participant</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Creates a new participant as head of household. A new household will be automatically created. Full CSBG intake can be completed later.</p>
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">First Name *</label>
+                            <input type="text" wire:model="quick_participant_first_name"
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                            @error('quick_participant_first_name') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Last Name *</label>
+                            <input type="text" wire:model="quick_participant_last_name"
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                            @error('quick_participant_last_name') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
+                        <input type="tel" wire:model="quick_participant_phone"
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                        <input type="email" wire:model="quick_participant_email"
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date of Birth</label>
+                        <input type="date" wire:model="quick_participant_dob"
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                    </div>
+
+                    <!-- Household Address Section -->
+                    <div class="border-t border-gray-200 dark:border-zinc-600 pt-4">
+                        <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Household Address</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Address *</label>
+                                <input type="text" wire:model="quick_participant_address" placeholder="123 Main Street"
+                                       class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                @error('quick_participant_address') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="grid grid-cols-3 gap-3">
+                                <div class="col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">City *</label>
+                                    <input type="text" wire:model="quick_participant_city" placeholder="Las Vegas"
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                    @error('quick_participant_city') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">State *</label>
+                                    <input type="text" wire:model="quick_participant_state" maxlength="2" placeholder="NV"
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md uppercase">
+                                    @error('quick_participant_state') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Zip Code *</label>
+                                <input type="text" wire:model="quick_participant_zip" placeholder="89101"
+                                       class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                @error('quick_participant_zip') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-3">
+                        <p class="text-xs text-yellow-800 dark:text-yellow-300">
+                            This creates a basic participant record with household address. Full CSBG intake should be completed later for reporting compliance.
+                        </p>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button type="button" wire:click="$set('showQuickParticipantForm', false)"
+                            class="px-4 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300">
+                        Cancel
+                    </button>
+                    <button type="button" wire:click="saveQuickParticipant"
+                            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                        Create Participant
                     </button>
                 </div>
             </div>

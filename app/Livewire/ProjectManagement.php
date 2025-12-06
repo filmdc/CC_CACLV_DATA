@@ -3,89 +3,173 @@
 namespace App\Livewire;
 
 use App\Models\HousingJob;
-use App\Models\ProjectMilestone;
-use App\Models\MilestoneTask;
 use App\Models\MilestoneDocument;
+use App\Models\MilestoneTask;
 use App\Models\ProjectBudget;
 use App\Models\ProjectExpense;
-use App\Models\MilestoneCommunication;
+use App\Models\ProjectMilestone;
 use App\Models\User;
 use App\Services\MediaValidationService;
 use App\Traits\WithPermissionChecks;
-use Livewire\Component;
-use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class ProjectManagement extends Component
 {
-    use WithPermissionChecks, WithFileUploads;
+    use WithFileUploads, WithPermissionChecks;
 
     public $jobId;
+
     public $job;
+
     public $activeTab = 'milestones';
+
     public $selectedMilestone = null;
 
     // Milestone Form
     public $showMilestoneForm = false;
+
     public $editingMilestone = null;
+
     public $milestone_name = '';
+
     public $milestone_description = '';
+
     public $milestone_target_date = '';
+
     public $milestone_icon = 'Circle';
+
     public $milestone_color = '#6366f1';
 
     // Task Form
     public $showTaskForm = false;
+
     public $editingTask = null;
+
     public $task_name = '';
+
     public $task_description = '';
+
     public $task_assigned_to = '';
+
     public $task_deadline = '';
+
     public $task_requires_approval = false;
 
     // Document Form
     public $showDocumentForm = false;
-    public $editingDocument = null;
-    public $document_type = '';
-    public $document_description = '';
-    public $document_assigned_to = '';
-    public $document_requires_approval = false;
-    public $document_pdf_template_id = '';
-    public $documentFiles = [];
 
+    public $editingDocument = null;
+
+    public $document_type = '';
+
+    public $document_description = '';
+
+    public $document_assigned_to = '';
+
+    public $document_requires_approval = false;
+
+    public $document_pdf_template_id = '';
+
+    public $documentFiles = [];
 
     // Document Upload Form
     public $showDocumentUploadForm = false;
+
     public $uploadingDocumentId = null;
+
     public $uploadFiles = [];
 
     // Document Viewer/Review Form
     public $showDocumentViewerModal = false;
+
     public $viewingDocumentId = null;
+
     public $rejection_reason = '';
 
     // Budget Form
     public $showBudgetForm = false;
+
     public $editingBudget = null;
+
     public $budget_category = '';
+
     public $budget_amount = '';
 
     // Expense Form
     public $showExpenseForm = false;
+
     public $editingExpense = null;
+
     public $expense_category = '';
+
     public $expense_amount = '';
+
     public $expense_date = '';
+
     public $expense_description = '';
+
     public $expense_document_id = '';
 
     // Template Form
     public $showSaveAsTemplateForm = false;
+
     public $template_name = '';
+
     public $template_description = '';
 
-    protected $listeners = ['milestoneUpdated' => '$refresh'];
+    // Edit Project Form
+    public $showEditProjectForm = false;
+
+    public $edit_job_title = '';
+
+    public $edit_job_description = '';
+
+    public $edit_status = '';
+
+    public $edit_priority = '';
+
+    public $edit_request_date = '';
+
+    public $edit_start_date = '';
+
+    public $edit_target_completion_date = '';
+
+    public $edit_estimated_cost = '';
+
+    public $edit_contractor_id = '';
+
+    public $edit_participant_id = '';
+
+    public $edit_internal_notes = '';
+
+    // Quick Participant Form
+    public $showQuickParticipantForm = false;
+
+    public $quick_participant_first_name = '';
+
+    public $quick_participant_last_name = '';
+
+    public $quick_participant_phone = '';
+
+    public $quick_participant_email = '';
+
+    public $quick_participant_dob = '';
+
+    public $quick_participant_address = '';
+
+    public $quick_participant_city = '';
+
+    public $quick_participant_state = '';
+
+    public $quick_participant_zip = '';
+
+    protected $listeners = [
+        'milestoneUpdated' => '$refresh',
+        'item-selected-edit_participant' => 'onParticipantSelected',
+    ];
 
     public function mount($id)
     {
@@ -94,12 +178,13 @@ class ProjectManagement extends Component
             'program',
             'participant',
             'property',
+            'contractor',
             'milestones.tasks.assignedTo',
             'milestones.documents.media',
             'milestones.documents.assignedTo',
             'milestones.documents.approvedBy',
             'budgets',
-            'expenses'
+            'expenses',
         ])->findOrFail($id);
 
         $this->authorizeAction('projects.view');
@@ -110,7 +195,7 @@ class ProjectManagement extends Component
                 $hasFiles = $document->getMedia('documents')->count() > 0;
 
                 // If status indicates files should exist but they don't, reset to 'not_uploaded'
-                if (!$hasFiles && in_array($document->status, ['pending_review', 'uploaded'])) {
+                if (! $hasFiles && in_array($document->status, ['pending_review', 'uploaded'])) {
                     $document->status = 'not_uploaded';
                     $document->uploaded_date = null;
                     $document->save();
@@ -124,7 +209,7 @@ class ProjectManagement extends Component
         }
 
         // Select first milestone by default
-        if ($this->job->milestones->count() > 0 && !$this->selectedMilestone) {
+        if ($this->job->milestones->count() > 0 && ! $this->selectedMilestone) {
             $this->selectedMilestone = $this->job->milestones->first()->id;
         }
     }
@@ -214,8 +299,9 @@ class ProjectManagement extends Component
     {
         $milestone = ProjectMilestone::findOrFail($id);
 
-        if ($status === 'completed' && !$milestone->canBeCompleted()) {
+        if ($status === 'completed' && ! $milestone->canBeCompleted()) {
             session()->flash('error', 'Cannot complete milestone. All tasks and documents must be completed first.');
+
             return;
         }
 
@@ -233,8 +319,9 @@ class ProjectManagement extends Component
     // Task Methods
     public function showCreateTask()
     {
-        if (!$this->selectedMilestone) {
+        if (! $this->selectedMilestone) {
             session()->flash('error', 'Please select a milestone first');
+
             return;
         }
         $this->resetTaskForm();
@@ -333,8 +420,9 @@ class ProjectManagement extends Component
     // Document Methods
     public function showCreateDocument()
     {
-        if (!$this->selectedMilestone) {
+        if (! $this->selectedMilestone) {
             session()->flash('error', 'Please select a milestone first');
+
             return;
         }
         $this->resetDocumentForm();
@@ -367,7 +455,7 @@ class ProjectManagement extends Component
 
             $uploadSummary = ['uploaded' => 0, 'failed' => []];
 
-            if (!empty($this->documentFiles)) {
+            if (! empty($this->documentFiles)) {
                 $uploadSummary = $this->processDocumentUploads($document, $this->documentFiles);
 
                 if ($uploadSummary['uploaded'] === 0) {
@@ -407,8 +495,8 @@ class ProjectManagement extends Component
 
             $successMessage = 'Document requirement created successfully';
 
-            if (!empty($this->documentFiles)) {
-                $successMessage .= ' – ' . $uploadSummary['uploaded'] . ' file(s) uploaded';
+            if (! empty($this->documentFiles)) {
+                $successMessage .= ' – '.$uploadSummary['uploaded'].' file(s) uploaded';
             }
 
             if ($document->pdf_template_id) {
@@ -417,11 +505,11 @@ class ProjectManagement extends Component
 
             session()->flash('success', $successMessage);
 
-            if (!empty($uploadSummary['failed'])) {
+            if (! empty($uploadSummary['failed'])) {
                 $failedNames = collect($uploadSummary['failed'])->pluck('name')->filter()->implode(', ');
                 session()->flash(
                     'error',
-                    'Some files could not be uploaded: ' . ($failedNames ?: 'please verify the file type and size.')
+                    'Some files could not be uploaded: '.($failedNames ?: 'please verify the file type and size.')
                 );
             }
 
@@ -441,7 +529,7 @@ class ProjectManagement extends Component
                 'error' => $e->getMessage(),
             ]);
 
-            session()->flash('error', 'Document requirement could not be saved: ' . $e->getMessage());
+            session()->flash('error', 'Document requirement could not be saved: '.$e->getMessage());
         }
     }
 
@@ -463,22 +551,22 @@ class ProjectManagement extends Component
         $uploadSummary = $this->processDocumentUploads($document, $this->uploadFiles ?? []);
 
         if ($uploadSummary['uploaded'] > 0) {
-            $message = $uploadSummary['uploaded'] . ' file(s) uploaded successfully';
+            $message = $uploadSummary['uploaded'].' file(s) uploaded successfully';
 
             session()->flash('success', $message);
 
-            if (!empty($uploadSummary['failed'])) {
+            if (! empty($uploadSummary['failed'])) {
                 $failedNames = collect($uploadSummary['failed'])->pluck('name')->filter()->implode(', ');
                 session()->flash(
                     'error',
-                    'Some files could not be uploaded: ' . ($failedNames ?: 'please verify the file type and size.')
+                    'Some files could not be uploaded: '.($failedNames ?: 'please verify the file type and size.')
                 );
             }
         } else {
             $failedNames = collect($uploadSummary['failed'])->pluck('name')->filter()->implode(', ');
             session()->flash(
                 'error',
-                'File upload failed: ' . ($failedNames ?: 'please verify the file type and size.')
+                'File upload failed: '.($failedNames ?: 'please verify the file type and size.')
             );
         }
 
@@ -533,7 +621,7 @@ class ProjectManagement extends Component
             $this->job->load('milestones.tasks');
             session()->flash('success', 'Task approved successfully');
         } catch (\Exception $e) {
-            session()->flash('error', 'Error approving task: ' . $e->getMessage());
+            session()->flash('error', 'Error approving task: '.$e->getMessage());
         }
     }
 
@@ -546,7 +634,7 @@ class ProjectManagement extends Component
         ]);
 
         try {
-            if (!$this->editingTask) {
+            if (! $this->editingTask) {
                 throw new \Exception('No task selected for rejection');
             }
 
@@ -557,7 +645,7 @@ class ProjectManagement extends Component
             $this->resetTaskForm();
             session()->flash('success', 'Task rejected. User will be notified.');
         } catch (\Exception $e) {
-            session()->flash('error', 'Error rejecting task: ' . $e->getMessage());
+            session()->flash('error', 'Error rejecting task: '.$e->getMessage());
         }
     }
 
@@ -567,13 +655,13 @@ class ProjectManagement extends Component
 
         try {
             $document = MilestoneDocument::findOrFail($documentId);
-            $document->requires_approval = !$document->requires_approval;
+            $document->requires_approval = ! $document->requires_approval;
             $document->save();
 
             $this->job->load('milestones.documents');
             session()->flash('success', 'Document approval requirement updated');
         } catch (\Exception $e) {
-            session()->flash('error', 'Error updating document: ' . $e->getMessage());
+            session()->flash('error', 'Error updating document: '.$e->getMessage());
         }
     }
 
@@ -614,7 +702,7 @@ class ProjectManagement extends Component
                     $realPath = method_exists($file, 'getPathname') ? $file->getPathname() : null;
                 }
 
-                if (!$realPath || ! file_exists($realPath)) {
+                if (! $realPath || ! file_exists($realPath)) {
                     throw new \RuntimeException('Uploaded file could not be located on disk.');
                 }
 
@@ -695,8 +783,9 @@ class ProjectManagement extends Component
         try {
             $document = MilestoneDocument::with('pdfTemplate')->findOrFail($documentId);
 
-            if (!$document->hasPdfTemplate()) {
+            if (! $document->hasPdfTemplate()) {
                 session()->flash('error', 'No PDF template assigned to this document');
+
                 return;
             }
 
@@ -723,7 +812,7 @@ class ProjectManagement extends Component
             session()->flash('success', 'PDF regenerated successfully with updated project data!');
             $this->refreshJob();
         } catch (\Exception $e) {
-            session()->flash('error', 'Failed to regenerate PDF: ' . $e->getMessage());
+            session()->flash('error', 'Failed to regenerate PDF: '.$e->getMessage());
             \Log::error('PDF regeneration failed', [
                 'document_id' => $documentId,
                 'error' => $e->getMessage(),
@@ -828,6 +917,7 @@ class ProjectManagement extends Component
     {
         if ($this->job->milestones()->count() == 0) {
             session()->flash('error', 'Cannot save as template. Project must have at least one milestone.');
+
             return;
         }
 
@@ -855,19 +945,158 @@ class ProjectManagement extends Component
             $this->template_name = '';
             $this->template_description = '';
 
-            session()->flash('success', 'Template "' . $template->template_name . '" created successfully with ' . $template->milestones()->count() . ' milestones!');
+            session()->flash('success', 'Template "'.$template->template_name.'" created successfully with '.$template->milestones()->count().' milestones!');
 
             $this->refreshJob();
         } catch (\Illuminate\Validation\ValidationException $e) {
-            session()->flash('error', 'Validation failed: ' . implode(', ', $e->validator->errors()->all()));
+            session()->flash('error', 'Validation failed: '.implode(', ', $e->validator->errors()->all()));
             throw $e;
         } catch (\Exception $e) {
             \Log::error('Failed to create template', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
-            session()->flash('error', 'Failed to create template: ' . $e->getMessage());
+            session()->flash('error', 'Failed to create template: '.$e->getMessage());
         }
+    }
+
+    // Edit Project Methods
+    public function showEditProject()
+    {
+        $this->edit_job_title = $this->job->job_title;
+        $this->edit_job_description = $this->job->job_description ?? '';
+        $this->edit_status = $this->job->status;
+        $this->edit_priority = $this->job->priority;
+        $this->edit_request_date = $this->job->request_date?->format('Y-m-d') ?? '';
+        $this->edit_start_date = $this->job->start_date?->format('Y-m-d') ?? '';
+        $this->edit_target_completion_date = $this->job->target_completion_date?->format('Y-m-d') ?? '';
+        $this->edit_estimated_cost = $this->job->estimated_cost ?? '';
+        $this->edit_contractor_id = $this->job->contractor_id ?? '';
+        $this->edit_participant_id = $this->job->participant_id ?? '';
+        $this->edit_internal_notes = $this->job->internal_notes ?? '';
+        $this->showEditProjectForm = true;
+    }
+
+    public function updateProjectInfo()
+    {
+        $validated = $this->validate([
+            'edit_job_title' => 'required|string|max:255',
+            'edit_job_description' => 'nullable|string',
+            'edit_status' => 'required|in:pending,approved,in_progress,on_hold,completed,cancelled',
+            'edit_priority' => 'required|in:low,medium,high,emergency',
+            'edit_request_date' => 'nullable|date',
+            'edit_start_date' => 'nullable|date',
+            'edit_target_completion_date' => 'nullable|date',
+            'edit_estimated_cost' => 'nullable|numeric|min:0',
+            'edit_contractor_id' => 'nullable|exists:contractors,id',
+            'edit_participant_id' => 'required|exists:participants,id',
+            'edit_internal_notes' => 'nullable|string',
+        ]);
+
+        // Get participant to derive household_id
+        $participant = \App\Models\Participant::findOrFail($this->edit_participant_id);
+
+        // Verify participant is head of household
+        if (! $participant->is_head_of_household) {
+            session()->flash('error', 'Selected participant must be head of household');
+
+            return;
+        }
+
+        $this->job->update([
+            'job_title' => $this->edit_job_title,
+            'job_description' => $this->edit_job_description !== '' ? $this->edit_job_description : null,
+            'status' => $this->edit_status,
+            'priority' => $this->edit_priority,
+            'request_date' => $this->edit_request_date !== '' ? $this->edit_request_date : null,
+            'start_date' => $this->edit_start_date !== '' ? $this->edit_start_date : null,
+            'target_completion_date' => $this->edit_target_completion_date !== '' ? $this->edit_target_completion_date : null,
+            'estimated_cost' => $this->edit_estimated_cost !== '' ? $this->edit_estimated_cost : null,
+            'contractor_id' => $this->edit_contractor_id !== '' ? $this->edit_contractor_id : null,
+            'participant_id' => $this->edit_participant_id,
+            'household_id' => $participant->household_id,
+            'internal_notes' => $this->edit_internal_notes !== '' ? $this->edit_internal_notes : null,
+            'updated_by' => Auth::id(),
+        ]);
+
+        $this->showEditProjectForm = false;
+        session()->flash('success', 'Project information updated successfully');
+        $this->refreshJob();
+    }
+
+    public function onParticipantSelected($participantId)
+    {
+        $this->edit_participant_id = $participantId;
+    }
+
+    public function showQuickParticipantModal()
+    {
+        $this->resetQuickParticipantForm();
+        $this->showQuickParticipantForm = true;
+    }
+
+    public function saveQuickParticipant()
+    {
+        $validated = $this->validate([
+            'quick_participant_first_name' => 'required|string|max:255',
+            'quick_participant_last_name' => 'required|string|max:255',
+            'quick_participant_phone' => 'nullable|string',
+            'quick_participant_email' => 'nullable|email',
+            'quick_participant_dob' => 'nullable|date',
+            'quick_participant_address' => 'required|string|max:255',
+            'quick_participant_city' => 'required|string|max:100',
+            'quick_participant_state' => 'required|string|size:2',
+            'quick_participant_zip' => 'required|string|max:10',
+        ]);
+
+        // Auto-create household first
+        $household = \App\Models\Household::create([
+            'household_type' => 'Single Person',
+            'household_size' => 1,
+            'housing_status' => 'Unknown/not reported',
+        ]);
+
+        // Create household address
+        $household->addresses()->create([
+            'address' => $this->quick_participant_address,
+            'city' => $this->quick_participant_city,
+            'state' => strtoupper($this->quick_participant_state),
+            'zip_code' => $this->quick_participant_zip,
+            'is_current' => true,
+        ]);
+
+        // Create participant as head of household
+        $participant = \App\Models\Participant::create([
+            'household_id' => $household->id,
+            'first_name' => $this->quick_participant_first_name,
+            'last_name' => $this->quick_participant_last_name,
+            'telephone' => $this->quick_participant_phone !== '' ? $this->quick_participant_phone : null,
+            'email' => $this->quick_participant_email !== '' ? $this->quick_participant_email : null,
+            'date_of_birth' => $this->quick_participant_dob !== '' ? $this->quick_participant_dob : null,
+            'relationship_to_head' => 'self',
+            'is_head_of_household' => true,
+            'created_by' => Auth::id(),
+        ]);
+
+        $this->edit_participant_id = $participant->id;
+        $this->showQuickParticipantForm = false;
+
+        session()->flash('success', 'Participant and household created: '.
+                         $participant->first_name.' '.$participant->last_name.
+                         ' (Household: '.$household->household_code.' at '.$this->quick_participant_address.')');
+    }
+
+    protected function resetQuickParticipantForm()
+    {
+        $this->quick_participant_first_name = '';
+        $this->quick_participant_last_name = '';
+        $this->quick_participant_phone = '';
+        $this->quick_participant_email = '';
+        $this->quick_participant_dob = '';
+        $this->quick_participant_address = '';
+        $this->quick_participant_city = '';
+        $this->quick_participant_state = '';
+        $this->quick_participant_zip = '';
     }
 
     // Helper Methods
@@ -877,12 +1106,13 @@ class ProjectManagement extends Component
             'program',
             'participant',
             'property',
+            'contractor',
             'milestones.tasks.assignedTo',
             'milestones.documents.media',
             'milestones.documents.assignedTo',
             'milestones.documents.approvedBy',
             'budgets',
-            'expenses.document'
+            'expenses.document',
         ])->findOrFail($this->jobId);
 
         // Fix any inconsistent document states (e.g., status is 'pending_review' but no files)
@@ -891,7 +1121,7 @@ class ProjectManagement extends Component
                 $hasFiles = $document->getMedia('documents')->count() > 0;
 
                 // If status indicates files should exist but they don't, reset to 'not_uploaded'
-                if (!$hasFiles && in_array($document->status, ['pending_review', 'uploaded'])) {
+                if (! $hasFiles && in_array($document->status, ['pending_review', 'uploaded'])) {
                     $document->status = 'not_uploaded';
                     $document->uploaded_date = null;
                     $document->save();
@@ -973,17 +1203,17 @@ class ProjectManagement extends Component
         $cahProgram = \App\Models\Program::where('name', 'LIKE', '%CAH%')->first();
 
         $users = User::where('active', true)
-            ->where(function($query) use ($cahProgram) {
+            ->where(function ($query) use ($cahProgram) {
                 // Include admins and Contract Managers (have access to all programs)
-                $query->whereHas('roles', function($q) {
+                $query->whereHas('roles', function ($q) {
                     $q->whereIn('name', ['Admin', 'Contract Manager']);
                 })
                 // Or users specifically assigned to the CAH program
-                ->when($cahProgram, function($q) use ($cahProgram) {
-                    $q->orWhereHas('programs', function($pq) use ($cahProgram) {
-                        $pq->where('program_id', $cahProgram->id);
+                    ->when($cahProgram, function ($q) use ($cahProgram) {
+                        $q->orWhereHas('programs', function ($pq) use ($cahProgram) {
+                            $pq->where('program_id', $cahProgram->id);
+                        });
                     });
-                });
             })
             ->orderBy('name')
             ->get();
@@ -995,10 +1225,39 @@ class ProjectManagement extends Component
         // Get active PDF templates
         $pdfTemplates = \App\Models\PdfFormTemplate::active()->orderBy('name')->get();
 
+        // Get contractors for the edit form
+        $contractors = \App\Models\Contractor::orderBy('company_name')->get();
+
+        // Get participants (heads of household only) for the searchable select
+        $participantsSearchable = \App\Models\Participant::where('is_head_of_household', true)
+            ->with('household')
+            ->orderBy('last_name')
+            ->orderBy('first_name')
+            ->get()
+            ->map(function ($p) {
+                $secondaryInfo = [];
+                if ($p->household && $p->household->household_code) {
+                    $secondaryInfo[] = 'HH: '.$p->household->household_code;
+                }
+                if ($p->email) {
+                    $secondaryInfo[] = $p->email;
+                } elseif ($p->telephone) {
+                    $secondaryInfo[] = $p->telephone;
+                }
+
+                return [
+                    'id' => $p->id,
+                    'display' => $p->first_name.' '.$p->last_name,
+                    'secondary' => implode(' - ', $secondaryInfo),
+                ];
+            })->toArray();
+
         return view('livewire.project-management', [
             'users' => $users,
             'currentMilestone' => $currentMilestone,
+            'participants' => $participantsSearchable,
             'pdfTemplates' => $pdfTemplates,
+            'contractors' => $contractors,
         ]);
     }
 }

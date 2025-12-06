@@ -2,11 +2,16 @@
 
 namespace App\Models;
 
+use App\Traits\HasTags;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CommunicationLog extends Model
 {
+    use HasTags;
+
     protected $fillable = [
         'participant_id',
         'household_id',
@@ -31,6 +36,9 @@ class CommunicationLog extends Model
         'follow_up_completed',
         'follow_up_completed_at',
         'follow_up_completed_by',
+        'converted_to_job_id',
+        'converted_at',
+        'converted_by',
         'created_by',
         'updated_by',
     ];
@@ -40,6 +48,7 @@ class CommunicationLog extends Model
         'follow_up_date' => 'date',
         'follow_up_completed' => 'boolean',
         'follow_up_completed_at' => 'datetime',
+        'converted_at' => 'datetime',
     ];
 
     protected $appends = [
@@ -86,6 +95,30 @@ class CommunicationLog extends Model
     public function followUpCompletedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'follow_up_completed_by');
+    }
+
+    // New relationships for services association
+    public function services(): BelongsToMany
+    {
+        return $this->belongsToMany(Service::class, 'communication_log_service')
+            ->withTimestamps();
+    }
+
+    // New relationship for updates/follow-ups
+    public function updates(): HasMany
+    {
+        return $this->hasMany(CommunicationLogUpdate::class)->orderBy('created_at', 'desc');
+    }
+
+    // New relationship for converted project
+    public function convertedToJob(): BelongsTo
+    {
+        return $this->belongsTo(HousingJob::class, 'converted_to_job_id');
+    }
+
+    public function convertedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'converted_by');
     }
 
     // Display Attributes
@@ -172,11 +205,16 @@ class CommunicationLog extends Model
 
     public function getIsFollowUpOverdueAttribute(): bool
     {
-        if (!$this->follow_up_date || $this->follow_up_completed) {
+        if (! $this->follow_up_date || $this->follow_up_completed) {
             return false;
         }
 
         return $this->follow_up_date->isPast();
+    }
+
+    public function getIsConvertedAttribute(): bool
+    {
+        return ! is_null($this->converted_to_job_id);
     }
 
     // Helper Methods
@@ -187,6 +225,30 @@ class CommunicationLog extends Model
         $this->follow_up_completed_at = now();
         $this->follow_up_completed_by = $userId ?? auth()->id();
         $this->save();
+    }
+
+    public function addUpdate(string $content, string $type = 'note', ?int $userId = null): CommunicationLogUpdate
+    {
+        return $this->updates()->create([
+            'update_content' => $content,
+            'update_type' => $type,
+            'created_by' => $userId ?? auth()->id(),
+        ]);
+    }
+
+    public function convertToProject(HousingJob $job, ?int $userId = null): void
+    {
+        $this->converted_to_job_id = $job->id;
+        $this->converted_at = now();
+        $this->converted_by = $userId ?? auth()->id();
+        $this->save();
+
+        // Add an update noting the conversion
+        $this->addUpdate(
+            "Converted to Project: {$job->job_number} - {$job->job_title}",
+            'status_change',
+            $userId
+        );
     }
 
     public function getFormattedCommunicationDateAttribute(): string
@@ -202,17 +264,18 @@ class CommunicationLog extends Model
     public function getRelatedEntityAttribute(): ?string
     {
         if ($this->participant) {
-            return 'Participant: ' . $this->participant->full_name;
+            return 'Participant: '.$this->participant->full_name;
         }
         if ($this->household) {
-            return 'Household: ' . $this->household->household_code;
+            return 'Household: '.$this->household->household_code;
         }
         if ($this->property) {
-            return 'Property: ' . $this->property->address;
+            return 'Property: '.$this->property->address;
         }
         if ($this->contractor) {
-            return 'Contractor: ' . $this->contractor->company_name;
+            return 'Contractor: '.$this->contractor->company_name;
         }
+
         return null;
     }
 
@@ -236,6 +299,13 @@ class CommunicationLog extends Model
     public function scopeForContractor($query, int $contractorId)
     {
         return $query->where('contractor_id', $contractorId);
+    }
+
+    public function scopeForService($query, int $serviceId)
+    {
+        return $query->whereHas('services', function ($q) use ($serviceId) {
+            $q->where('services.id', $serviceId);
+        });
     }
 
     public function scopePendingFollowUp($query)
@@ -274,6 +344,16 @@ class CommunicationLog extends Model
     public function scopeRecent($query, int $days = 30)
     {
         return $query->where('communication_date', '>=', now()->subDays($days));
+    }
+
+    public function scopeConverted($query)
+    {
+        return $query->whereNotNull('converted_to_job_id');
+    }
+
+    public function scopeNotConverted($query)
+    {
+        return $query->whereNull('converted_to_job_id');
     }
 
     public function scopeSearch($query, string $search)

@@ -3,18 +3,24 @@
 namespace App\Livewire;
 
 use App\Models\CommunicationLog;
+use App\Models\CommunicationLogUpdate;
 use App\Models\Contractor;
 use App\Models\Household;
+use App\Models\HousingJob;
 use App\Models\Participant;
 use App\Models\Property;
+use App\Models\Service;
+use App\Models\Tag;
 use App\Traits\WithPermissionChecks;
+use App\Traits\WithProgramAccess;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class CommunicationsLogManagement extends Component
 {
-    use WithPagination, WithPermissionChecks;
+    use WithPagination, WithPermissionChecks, WithProgramAccess;
 
     // Search and Filters
     public $search = '';
@@ -33,10 +39,37 @@ class CommunicationsLogManagement extends Component
 
     public $dateTo = '';
 
+    public $serviceFilter = '';
+
+    public $tagFilter = '';
+
     // Form state
     public $showForm = false;
 
     public $editingId = null;
+
+    // Detail view state
+    public $viewingId = null;
+
+    public $showDetailModal = false;
+
+    // Convert to project state
+    public $showConvertModal = false;
+
+    public $convertingLogId = null;
+
+    public $convertJobTitle = '';
+
+    public $convertJobDescription = '';
+
+    public $convertProgramId = '';
+
+    public $convertServiceId = '';
+
+    // Update/follow-up entry state
+    public $newUpdateContent = '';
+
+    public $newUpdateType = 'note';
 
     // Entity search fields
     public $participantSearch = '';
@@ -88,11 +121,23 @@ class CommunicationsLogManagement extends Component
 
     public $follow_up_action = '';
 
+    // Service multi-select
+    public $selectedServices = [];
+
+    // Tag management
+    public $selectedTagIds = [];
+
+    public $newTagName = '';
+
+    public $tagSearch = '';
+
     protected $queryString = [
         'search' => ['except' => ''],
         'typeFilter' => ['except' => ''],
         'categoryFilter' => ['except' => ''],
         'priorityFilter' => ['except' => ''],
+        'serviceFilter' => ['except' => ''],
+        'tagFilter' => ['except' => ''],
     ];
 
     public function mount()
@@ -120,9 +165,18 @@ class CommunicationsLogManagement extends Component
         $this->resetPage();
     }
 
+    public function updatedServiceFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedTagFilter()
+    {
+        $this->resetPage();
+    }
+
     public function updatedPropertyId($value)
     {
-        // Auto-populate subject from property address when property is selected
         if ($value) {
             $property = Property::find($value);
             if ($property) {
@@ -145,7 +199,7 @@ class CommunicationsLogManagement extends Component
     public function showEditForm($id)
     {
         $this->authorizeAction('communications_log.edit');
-        $log = CommunicationLog::findOrFail($id);
+        $log = CommunicationLog::with(['services', 'tags'])->findOrFail($id);
 
         $this->editingId = $id;
         $this->participant_id = $log->participant_id ?? '';
@@ -168,13 +222,145 @@ class CommunicationsLogManagement extends Component
         $this->priority = $log->priority;
         $this->follow_up_date = $log->follow_up_date?->format('Y-m-d') ?? '';
         $this->follow_up_action = $log->follow_up_action ?? '';
+        $this->selectedServices = $log->services->pluck('id')->toArray();
+        $this->selectedTagIds = $log->tags->pluck('id')->toArray();
 
         $this->showForm = true;
     }
 
+    public function viewDetail($id)
+    {
+        $this->viewingId = $id;
+        $this->showDetailModal = true;
+        $this->newUpdateContent = '';
+        $this->newUpdateType = 'note';
+    }
+
+    public function closeDetailModal()
+    {
+        $this->showDetailModal = false;
+        $this->viewingId = null;
+    }
+
+    public function addUpdate()
+    {
+        $this->validate([
+            'newUpdateContent' => 'required|string|min:1',
+            'newUpdateType' => 'required|in:note,follow_up,status_change,outcome,other',
+        ]);
+
+        $log = CommunicationLog::findOrFail($this->viewingId);
+        $log->addUpdate($this->newUpdateContent, $this->newUpdateType);
+
+        $this->newUpdateContent = '';
+        $this->newUpdateType = 'note';
+
+        session()->flash('success', 'Update added successfully.');
+    }
+
+    public function deleteUpdate($updateId)
+    {
+        $this->authorizeAction('communications_log.edit');
+        CommunicationLogUpdate::findOrFail($updateId)->delete();
+        session()->flash('success', 'Update deleted.');
+    }
+
+    // Tag management methods
+    public function addTag()
+    {
+        if (empty(trim($this->newTagName))) {
+            return;
+        }
+
+        $tag = Tag::findOrCreateByName(trim($this->newTagName));
+
+        if (! in_array($tag->id, $this->selectedTagIds)) {
+            $this->selectedTagIds[] = $tag->id;
+        }
+
+        $this->newTagName = '';
+    }
+
+    public function removeTag($tagId)
+    {
+        $this->selectedTagIds = array_filter($this->selectedTagIds, fn ($id) => $id != $tagId);
+    }
+
+    public function selectTag($tagId)
+    {
+        if (! in_array($tagId, $this->selectedTagIds)) {
+            $this->selectedTagIds[] = $tagId;
+        }
+        $this->tagSearch = '';
+    }
+
+    // Convert to project methods
+    public function openConvertModal($logId)
+    {
+        $this->authorizeAction('projects.create');
+        $log = CommunicationLog::findOrFail($logId);
+
+        $this->convertingLogId = $logId;
+        $this->convertJobTitle = $log->subject;
+        $this->convertJobDescription = $log->summary ?? $log->notes ?? '';
+        $this->convertProgramId = '';
+        $this->convertServiceId = '';
+        $this->showConvertModal = true;
+    }
+
+    public function closeConvertModal()
+    {
+        $this->showConvertModal = false;
+        $this->convertingLogId = null;
+        $this->convertJobTitle = '';
+        $this->convertJobDescription = '';
+        $this->convertProgramId = '';
+        $this->convertServiceId = '';
+    }
+
+    public function convertToProject()
+    {
+        $this->authorizeAction('projects.create');
+
+        $this->validate([
+            'convertJobTitle' => 'required|string|max:255',
+            'convertJobDescription' => 'nullable|string',
+            'convertProgramId' => 'required|exists:programs,id',
+        ]);
+
+        $log = CommunicationLog::findOrFail($this->convertingLogId);
+
+        DB::beginTransaction();
+        try {
+            $job = HousingJob::create([
+                'job_title' => $this->convertJobTitle,
+                'job_description' => $this->convertJobDescription,
+                'program_id' => $this->convertProgramId,
+                'service_id' => $this->convertServiceId ?: null,
+                'participant_id' => $log->participant_id,
+                'household_id' => $log->household_id,
+                'property_id' => $log->property_id,
+                'contractor_id' => $log->contractor_id,
+                'status' => 'pending',
+                'priority' => $log->priority === 'urgent' ? 'emergency' : ($log->priority === 'high' ? 'high' : 'medium'),
+                'request_date' => now(),
+                'created_by' => Auth::id(),
+            ]);
+
+            $log->convertToProject($job, Auth::id());
+
+            DB::commit();
+
+            $this->closeConvertModal();
+            session()->flash('success', "Communication converted to project: {$job->job_number}");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('error', 'Failed to convert to project: '.$e->getMessage());
+        }
+    }
+
     public function save()
     {
-        // Auto-generate subject from property address if not set
         if (empty($this->subject) && $this->property_id) {
             $property = Property::find($this->property_id);
             if ($property) {
@@ -185,7 +371,6 @@ class CommunicationsLogManagement extends Component
             }
         }
 
-        // If still no subject, use a default
         if (empty($this->subject)) {
             $this->subject = 'Communication on '.now()->format('M d, Y');
         }
@@ -211,6 +396,8 @@ class CommunicationsLogManagement extends Component
             'household_id' => 'nullable|exists:households,id',
             'property_id' => 'nullable|exists:properties,id',
             'contractor_id' => 'nullable|exists:contractors,id',
+            'selectedServices' => 'nullable|array',
+            'selectedServices.*' => 'exists:services,id',
         ]);
 
         $data = [
@@ -241,11 +428,25 @@ class CommunicationsLogManagement extends Component
             $log = CommunicationLog::findOrFail($this->editingId);
             $data['updated_by'] = Auth::id();
             $log->update($data);
+
+            // Sync services
+            $log->services()->sync($this->selectedServices);
+
+            // Sync tags
+            $log->syncTags($this->selectedTagIds);
+
             session()->flash('success', 'Communication log updated successfully.');
         } else {
             $this->authorizeAction('communications_log.create');
             $data['created_by'] = Auth::id();
-            CommunicationLog::create($data);
+            $log = CommunicationLog::create($data);
+
+            // Attach services
+            $log->services()->sync($this->selectedServices);
+
+            // Attach tags
+            $log->syncTags($this->selectedTagIds);
+
             session()->flash('success', 'Communication log created successfully.');
         }
 
@@ -295,11 +496,15 @@ class CommunicationsLogManagement extends Component
         $this->priority = 'normal';
         $this->follow_up_date = '';
         $this->follow_up_action = '';
+        $this->selectedServices = [];
+        $this->selectedTagIds = [];
+        $this->newTagName = '';
+        $this->tagSearch = '';
     }
 
     public function render()
     {
-        $query = CommunicationLog::with(['participant', 'household', 'property', 'contractor', 'createdBy'])
+        $query = CommunicationLog::with(['participant', 'household', 'property', 'contractor', 'createdBy', 'services', 'tags', 'convertedToJob'])
             ->orderBy('communication_date', 'desc');
 
         if ($this->search) {
@@ -328,6 +533,14 @@ class CommunicationsLogManagement extends Component
             $query->overdueFollowUp();
         }
 
+        if ($this->serviceFilter) {
+            $query->forService($this->serviceFilter);
+        }
+
+        if ($this->tagFilter) {
+            $query->whereHas('tags', fn ($q) => $q->where('tags.id', $this->tagFilter));
+        }
+
         if ($this->dateFrom) {
             $query->where('communication_date', '>=', $this->dateFrom);
         }
@@ -354,7 +567,6 @@ class CommunicationsLogManagement extends Component
                 });
             })
             ->when($this->participant_id, function ($query) {
-                // Always include the currently selected participant
                 $query->orWhere('id', $this->participant_id);
             })
             ->orderBy('last_name')
@@ -366,7 +578,6 @@ class CommunicationsLogManagement extends Component
                 $query->where('household_code', 'like', '%'.$this->householdSearch.'%');
             })
             ->when($this->household_id, function ($query) {
-                // Always include the currently selected household
                 $query->orWhere('id', $this->household_id);
             })
             ->orderBy('household_code')
@@ -382,7 +593,6 @@ class CommunicationsLogManagement extends Component
                 });
             })
             ->when($this->property_id, function ($query) {
-                // Always include the currently selected property
                 $query->orWhere('id', $this->property_id);
             })
             ->orderBy('address_line_1')
@@ -399,12 +609,51 @@ class CommunicationsLogManagement extends Component
                 });
             })
             ->when($this->contractor_id, function ($query) {
-                // Always include the currently selected contractor
                 $query->orWhere('id', $this->contractor_id);
             })
             ->orderBy('company_name')
             ->limit(50)
             ->get();
+
+        // Get programs the user has access to for service selection
+        $accessiblePrograms = $this->getAccessiblePrograms()
+            ->where('active', true)
+            ->with(['services' => fn ($q) => $q->where('active', true)->orderBy('name')])
+            ->orderBy('name')
+            ->get();
+
+
+        // Get all active services from accessible programs for filtering
+        $accessibleProgramIds = $accessiblePrograms->pluck('id')->toArray();
+        $allServices = Service::where('active', true)
+            ->whereIn('program_id', $accessibleProgramIds)
+            ->orderBy('name')
+            ->get();
+
+        // Get all tags for filtering and selection
+        $allTags = Tag::orderBy('name')->get();
+
+        // Get tags matching search for typeahead
+        $searchedTags = $this->tagSearch
+            ? Tag::search($this->tagSearch)->limit(10)->get()
+            : collect();
+
+        // Get viewing log details
+        $viewingLog = $this->viewingId
+            ? CommunicationLog::with([
+                'participant',
+                'household',
+                'property',
+                'contractor',
+                'createdBy',
+                'updatedBy',
+                'services',
+                'tags',
+                'updates.createdBy',
+                'convertedToJob',
+                'convertedBy',
+            ])->find($this->viewingId)
+            : null;
 
         return view('livewire.communications-log-management', [
             'logs' => $logs,
@@ -415,6 +664,11 @@ class CommunicationsLogManagement extends Component
             'households' => $households,
             'properties' => $properties,
             'contractors' => $contractors,
+            'accessiblePrograms' => $accessiblePrograms,
+            'allServices' => $allServices,
+            'allTags' => $allTags,
+            'searchedTags' => $searchedTags,
+            'viewingLog' => $viewingLog,
         ]);
     }
 }

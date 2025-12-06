@@ -22,6 +22,21 @@
             </div>
         @endif
 
+        @if (session()->has('error'))
+            <div class="mb-4 rounded-md bg-red-50 dark:bg-red-900/50 p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-red-800 dark:text-red-200">{{ session('error') }}</p>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div class="bg-white dark:bg-zinc-800 rounded-lg shadow p-4">
@@ -84,9 +99,9 @@
 
             <!-- Filters -->
             <div class="p-4 border-b border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-900/50">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-3">
                     <!-- Search -->
-                    <div class="relative">
+                    <div class="relative xl:col-span-2">
                         <input type="text" wire:model.live.debounce.300ms="search"
                                placeholder="Search..."
                                class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md text-sm">
@@ -152,13 +167,35 @@
                         <option value="pending">Pending</option>
                         <option value="overdue">Overdue</option>
                     </select>
+
+                    <!-- Service Filter -->
+                    <select wire:model.live="serviceFilter"
+                            class="px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md text-sm">
+                        <option value="">All Services</option>
+                        @foreach($allServices as $service)
+                            <option value="{{ $service->id }}">{{ $service->name }}</option>
+                        @endforeach
+                    </select>
                 </div>
+
+                <!-- Second row for tag filter -->
+                @if($allTags->isNotEmpty())
+                <div class="mt-3">
+                    <select wire:model.live="tagFilter"
+                            class="px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md text-sm">
+                        <option value="">All Tags</option>
+                        @foreach($allTags as $tag)
+                            <option value="{{ $tag->id }}">{{ $tag->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                @endif
             </div>
 
             <!-- Communications List -->
             <div class="divide-y divide-gray-200 dark:divide-zinc-700">
                 @forelse($logs as $log)
-                    <div class="p-4 hover:bg-gray-50 dark:hover:bg-zinc-700/50">
+                    <div class="p-4 hover:bg-gray-50 dark:hover:bg-zinc-700/50 cursor-pointer" wire:click="viewDetail({{ $log->id }})">
                         <div class="flex items-start justify-between">
                             <div class="flex-1">
                                 <div class="flex items-center gap-3 mb-2">
@@ -228,10 +265,37 @@
                                             {{ $log->related_entity }}
                                         </span>
                                     @endif
+                                    @if($log->converted_to_job_id)
+                                        <span class="px-2 py-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300">
+                                            Converted to Project
+                                        </span>
+                                    @endif
                                     <span class="text-gray-500 dark:text-gray-400">
                                         {{ $log->communication_date->format('M d, Y g:i A') }}
                                     </span>
                                 </div>
+
+                                <!-- Services -->
+                                @if($log->services->isNotEmpty())
+                                    <div class="flex flex-wrap gap-1 mb-2">
+                                        @foreach($log->services as $service)
+                                            <span class="px-2 py-0.5 text-xs rounded bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-300">
+                                                {{ $service->name }}
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                @endif
+
+                                <!-- Custom Tags -->
+                                @if($log->tags->isNotEmpty())
+                                    <div class="flex flex-wrap gap-1 mb-2">
+                                        @foreach($log->tags as $tag)
+                                            <span class="px-2 py-0.5 text-xs rounded" style="background-color: {{ $tag->color }}20; color: {{ $tag->color }};">
+                                                {{ $tag->name }}
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                @endif
 
                                 @if($log->summary)
                                     <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">{{ Str::limit($log->summary, 200) }}</p>
@@ -272,10 +336,13 @@
 
                                 <div class="mt-2 text-xs text-gray-400 dark:text-gray-500">
                                     Created by {{ $log->createdBy?->name ?? 'Unknown' }} on {{ $log->created_at->format('M d, Y') }}
+                                    @if($log->updates_count ?? $log->updates->count() > 0)
+                                        <span class="ml-2 text-indigo-500">{{ $log->updates_count ?? $log->updates->count() }} update(s)</span>
+                                    @endif
                                 </div>
                             </div>
 
-                            <div class="flex items-start space-x-2 ml-4">
+                            <div class="flex items-start space-x-2 ml-4" wire:click.stop>
                                 @if($log->follow_up_date && !$log->follow_up_completed)
                                     @can('communications_log.edit')
                                     <button wire:click="markFollowUpComplete({{ $log->id }})"
@@ -331,10 +398,345 @@
         </div>
     </div>
 
+    <!-- Detail View Modal -->
+    @if($showDetailModal && $viewingLog)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="closeDetailModal">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{{ $viewingLog->subject }}</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $viewingLog->communication_date->format('F d, Y g:i A') }}</p>
+                    </div>
+                    <button wire:click="closeDetailModal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Status Tags -->
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="px-3 py-1 rounded-full text-sm {{ $viewingLog->direction === 'outgoing' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' }}">
+                        {{ $viewingLog->direction_display }}
+                    </span>
+                    <span class="px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-800 dark:bg-zinc-600 dark:text-gray-300">
+                        {{ $viewingLog->communication_type_display }}
+                    </span>
+                    <span class="px-3 py-1 rounded-full text-sm bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300">
+                        {{ $viewingLog->category_display }}
+                    </span>
+                    <span class="px-3 py-1 rounded-full text-sm
+                        @if($viewingLog->priority === 'urgent') bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300
+                        @elseif($viewingLog->priority === 'high') bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300
+                        @elseif($viewingLog->priority === 'low') bg-gray-100 text-gray-600 dark:bg-zinc-600 dark:text-gray-400
+                        @else bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300
+                        @endif">
+                        {{ $viewingLog->priority_display }} Priority
+                    </span>
+                    @if($viewingLog->converted_to_job_id)
+                        <span class="px-3 py-1 rounded-full text-sm bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300">
+                            Converted to Project: {{ $viewingLog->convertedToJob->job_number ?? 'N/A' }}
+                        </span>
+                    @endif
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <!-- Contact Information -->
+                    <div class="bg-gray-50 dark:bg-zinc-700/50 rounded-lg p-4">
+                        <h4 class="font-medium text-gray-900 dark:text-white mb-3">Contact Information</h4>
+                        <dl class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <dt class="text-gray-500 dark:text-gray-400">Name:</dt>
+                                <dd class="text-gray-900 dark:text-white font-medium">{{ $viewingLog->contact_name }}</dd>
+                            </div>
+                            @if($viewingLog->contact_role)
+                            <div class="flex justify-between">
+                                <dt class="text-gray-500 dark:text-gray-400">Role:</dt>
+                                <dd class="text-gray-900 dark:text-white">{{ $viewingLog->contact_role_display }}</dd>
+                            </div>
+                            @endif
+                            @if($viewingLog->contact_organization)
+                            <div class="flex justify-between">
+                                <dt class="text-gray-500 dark:text-gray-400">Organization:</dt>
+                                <dd class="text-gray-900 dark:text-white">{{ $viewingLog->contact_organization }}</dd>
+                            </div>
+                            @endif
+                            @if($viewingLog->contact_phone)
+                            <div class="flex justify-between">
+                                <dt class="text-gray-500 dark:text-gray-400">Phone:</dt>
+                                <dd class="text-gray-900 dark:text-white">{{ $viewingLog->contact_phone }}</dd>
+                            </div>
+                            @endif
+                            @if($viewingLog->contact_email)
+                            <div class="flex justify-between">
+                                <dt class="text-gray-500 dark:text-gray-400">Email:</dt>
+                                <dd class="text-gray-900 dark:text-white">{{ $viewingLog->contact_email }}</dd>
+                            </div>
+                            @endif
+                        </dl>
+                    </div>
+
+                    <!-- Linked Records -->
+                    <div class="bg-gray-50 dark:bg-zinc-700/50 rounded-lg p-4">
+                        <h4 class="font-medium text-gray-900 dark:text-white mb-3">Linked Records</h4>
+                        <dl class="space-y-2 text-sm">
+                            @if($viewingLog->participant)
+                            <div class="flex justify-between">
+                                <dt class="text-gray-500 dark:text-gray-400">Participant:</dt>
+                                <dd class="text-gray-900 dark:text-white">{{ $viewingLog->participant->full_name }}</dd>
+                            </div>
+                            @endif
+                            @if($viewingLog->household)
+                            <div class="flex justify-between">
+                                <dt class="text-gray-500 dark:text-gray-400">Household:</dt>
+                                <dd class="text-gray-900 dark:text-white">{{ $viewingLog->household->household_code }}</dd>
+                            </div>
+                            @endif
+                            @if($viewingLog->property)
+                            <div class="flex justify-between">
+                                <dt class="text-gray-500 dark:text-gray-400">Property:</dt>
+                                <dd class="text-gray-900 dark:text-white">{{ $viewingLog->property->address_line_1 }}</dd>
+                            </div>
+                            @endif
+                            @if($viewingLog->contractor)
+                            <div class="flex justify-between">
+                                <dt class="text-gray-500 dark:text-gray-400">Contractor:</dt>
+                                <dd class="text-gray-900 dark:text-white">{{ $viewingLog->contractor->company_name }}</dd>
+                            </div>
+                            @endif
+                            @if(!$viewingLog->participant && !$viewingLog->household && !$viewingLog->property && !$viewingLog->contractor)
+                            <p class="text-gray-500 dark:text-gray-400 italic">No linked records</p>
+                            @endif
+                        </dl>
+                    </div>
+                </div>
+
+                <!-- Services -->
+                @if($viewingLog->services->isNotEmpty())
+                <div class="mb-6">
+                    <h4 class="font-medium text-gray-900 dark:text-white mb-2">Associated Services</h4>
+                    <div class="flex flex-wrap gap-2">
+                        @foreach($viewingLog->services as $service)
+                            <span class="px-3 py-1 text-sm rounded-full bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-300">
+                                {{ $service->name }}
+                            </span>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
+                <!-- Tags -->
+                @if($viewingLog->tags->isNotEmpty())
+                <div class="mb-6">
+                    <h4 class="font-medium text-gray-900 dark:text-white mb-2">Tags</h4>
+                    <div class="flex flex-wrap gap-2">
+                        @foreach($viewingLog->tags as $tag)
+                            <span class="px-3 py-1 text-sm rounded-full" style="background-color: {{ $tag->color }}20; color: {{ $tag->color }};">
+                                {{ $tag->name }}
+                            </span>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
+                <!-- Summary & Notes -->
+                @if($viewingLog->summary)
+                <div class="mb-4">
+                    <h4 class="font-medium text-gray-900 dark:text-white mb-2">Summary</h4>
+                    <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $viewingLog->summary }}</p>
+                </div>
+                @endif
+
+                @if($viewingLog->notes)
+                <div class="mb-4">
+                    <h4 class="font-medium text-gray-900 dark:text-white mb-2">Notes</h4>
+                    <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $viewingLog->notes }}</p>
+                </div>
+                @endif
+
+                @if($viewingLog->outcome)
+                <div class="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                    <h4 class="font-medium text-blue-800 dark:text-blue-300 mb-1">Outcome</h4>
+                    <p class="text-blue-700 dark:text-blue-400">{{ $viewingLog->outcome }}</p>
+                </div>
+                @endif
+
+                <!-- Follow-up -->
+                @if($viewingLog->follow_up_date)
+                <div class="mb-6 p-3 {{ $viewingLog->follow_up_completed ? 'bg-green-50 dark:bg-green-900/20' : ($viewingLog->is_follow_up_overdue ? 'bg-red-50 dark:bg-red-900/20' : 'bg-amber-50 dark:bg-amber-900/20') }} rounded-lg">
+                    <h4 class="font-medium {{ $viewingLog->follow_up_completed ? 'text-green-800 dark:text-green-300' : ($viewingLog->is_follow_up_overdue ? 'text-red-800 dark:text-red-300' : 'text-amber-800 dark:text-amber-300') }} mb-1">
+                        Follow-up {{ $viewingLog->follow_up_completed ? 'Completed' : ($viewingLog->is_follow_up_overdue ? '(OVERDUE)' : 'Scheduled') }}
+                    </h4>
+                    <p class="{{ $viewingLog->follow_up_completed ? 'text-green-700 dark:text-green-400' : ($viewingLog->is_follow_up_overdue ? 'text-red-700 dark:text-red-400' : 'text-amber-700 dark:text-amber-400') }}">
+                        {{ $viewingLog->follow_up_date->format('F d, Y') }}
+                        @if($viewingLog->follow_up_action)
+                            - {{ $viewingLog->follow_up_action }}
+                        @endif
+                    </p>
+                </div>
+                @endif
+
+                <!-- Updates/Activity Log -->
+                <div class="border-t border-gray-200 dark:border-zinc-600 pt-4 mb-4">
+                    <h4 class="font-medium text-gray-900 dark:text-white mb-3">Activity Updates</h4>
+
+                    <!-- Add Update Form -->
+                    @can('communications_log.edit')
+                    <div class="mb-4 p-3 bg-gray-50 dark:bg-zinc-700/50 rounded-lg">
+                        <div class="flex gap-3">
+                            <select wire:model="newUpdateType" class="px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md text-sm">
+                                <option value="note">Note</option>
+                                <option value="follow_up">Follow-up</option>
+                                <option value="status_change">Status Change</option>
+                                <option value="outcome">Outcome</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <input type="text" wire:model="newUpdateContent"
+                                   placeholder="Add an update or note..."
+                                   wire:keydown.enter="addUpdate"
+                                   class="flex-1 px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md text-sm">
+                            <button wire:click="addUpdate"
+                                    class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm">
+                                Add
+                            </button>
+                        </div>
+                        @error('newUpdateContent') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                    </div>
+                    @endcan
+
+                    <!-- Updates List -->
+                    <div class="space-y-3 max-h-60 overflow-y-auto">
+                        @forelse($viewingLog->updates as $update)
+                            <div class="flex items-start gap-3 p-2 bg-gray-50 dark:bg-zinc-700/30 rounded">
+                                <span class="px-2 py-0.5 text-xs rounded
+                                    @if($update->update_type === 'follow_up') bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300
+                                    @elseif($update->update_type === 'status_change') bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300
+                                    @elseif($update->update_type === 'outcome') bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300
+                                    @else bg-gray-100 text-gray-800 dark:bg-zinc-600 dark:text-gray-300
+                                    @endif">
+                                    {{ $update->update_type_display }}
+                                </span>
+                                <div class="flex-1">
+                                    <p class="text-sm text-gray-700 dark:text-gray-300">{{ $update->update_content }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        {{ $update->createdBy?->name ?? 'Unknown' }} - {{ $update->created_at->format('M d, Y g:i A') }}
+                                    </p>
+                                </div>
+                                @can('communications_log.edit')
+                                <button wire:click="deleteUpdate({{ $update->id }})"
+                                        wire:confirm="Delete this update?"
+                                        class="text-red-500 hover:text-red-700 text-xs">
+                                    Delete
+                                </button>
+                                @endcan
+                            </div>
+                        @empty
+                            <p class="text-gray-500 dark:text-gray-400 text-sm italic">No updates yet</p>
+                        @endforelse
+                    </div>
+                </div>
+
+                <!-- Meta Information -->
+                <div class="text-xs text-gray-400 dark:text-gray-500 border-t border-gray-200 dark:border-zinc-600 pt-3">
+                    <p>Created by {{ $viewingLog->createdBy?->name ?? 'Unknown' }} on {{ $viewingLog->created_at->format('M d, Y g:i A') }}</p>
+                    @if($viewingLog->updatedBy)
+                        <p>Last updated by {{ $viewingLog->updatedBy->name }} on {{ $viewingLog->updated_at->format('M d, Y g:i A') }}</p>
+                    @endif
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-between items-center mt-6 pt-4 border-t border-gray-200 dark:border-zinc-600">
+                    <div class="flex gap-2">
+                        @if(!$viewingLog->converted_to_job_id)
+                            @can('projects.create')
+                            <button wire:click="openConvertModal({{ $viewingLog->id }})"
+                                    class="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 text-sm">
+                                Convert to Project
+                            </button>
+                            @endcan
+                        @endif
+                        @can('communications_log.edit')
+                        <button wire:click="showEditForm({{ $viewingLog->id }})"
+                                class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm">
+                            Edit
+                        </button>
+                        @endcan
+                    </div>
+                    <button wire:click="closeDetailModal"
+                            class="px-4 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500 text-sm">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Convert to Project Modal -->
+    @if($showConvertModal)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-lg w-full mx-4">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Convert to Project</h3>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Project Title *</label>
+                        <input type="text" wire:model="convertJobTitle"
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                        @error('convertJobTitle') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                        <textarea wire:model="convertJobDescription" rows="3"
+                                  class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Program *</label>
+                        <select wire:model.live="convertProgramId"
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                            <option value="">Select a program...</option>
+                            @foreach($accessiblePrograms as $program)
+                                <option value="{{ $program->id }}">{{ $program->name }}</option>
+                            @endforeach
+                        </select>
+                        @error('convertProgramId') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+                    </div>
+
+                    @if($convertProgramId)
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Service (Optional)</label>
+                        <select wire:model="convertServiceId"
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                            <option value="">Select a service...</option>
+                            @foreach($accessiblePrograms->firstWhere('id', $convertProgramId)?->services ?? [] as $service)
+                                <option value="{{ $service->id }}">{{ $service->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @endif
+                </div>
+
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button wire:click="closeConvertModal"
+                            class="px-4 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
+                        Cancel
+                    </button>
+                    <button wire:click="convertToProject"
+                            wire:loading.attr="disabled"
+                            class="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700">
+                        <span wire:loading.remove wire:target="convertToProject">Create Project</span>
+                        <span wire:loading wire:target="convertToProject">Creating...</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <!-- Form Modal -->
     @if($showForm)
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
-            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                     {{ $editingId ? 'Edit Communication' : 'New Communication Entry' }}
                 </h3>
@@ -529,6 +931,80 @@
                                 @if($contractorSearch && $contractors->count() === 50)
                                     <p class="text-xs text-amber-600 dark:text-amber-400 mt-1">Showing first 50 results. Refine your search for more specific results.</p>
                                 @endif
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Service Association Section -->
+                    @if($accessiblePrograms->isNotEmpty())
+                    <div class="md:col-span-2 border-t border-gray-200 dark:border-zinc-600 pt-4 mt-2">
+                        <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Associate with Program Services (Optional)</h4>
+                        <div class="space-y-3">
+                            @foreach($accessiblePrograms as $program)
+                                @if($program->services->isNotEmpty())
+                                <div>
+                                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">{{ $program->name }}</p>
+                                    <div class="flex flex-wrap gap-2">
+                                        @foreach($program->services as $service)
+                                            <label class="inline-flex items-center">
+                                                <input type="checkbox" wire:model="selectedServices" value="{{ $service->id }}"
+                                                       class="rounded border-gray-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500">
+                                                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{{ $service->name }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+                                @endif
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+
+                    <!-- Tags Section -->
+                    <div class="md:col-span-2 border-t border-gray-200 dark:border-zinc-600 pt-4 mt-2">
+                        <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Tags (Optional)</h4>
+
+                        <!-- Selected Tags -->
+                        @if(count($selectedTagIds) > 0)
+                        <div class="flex flex-wrap gap-2 mb-3">
+                            @foreach($allTags->whereIn('id', $selectedTagIds) as $tag)
+                                <span class="inline-flex items-center px-2 py-1 text-sm rounded" style="background-color: {{ $tag->color }}20; color: {{ $tag->color }};">
+                                    {{ $tag->name }}
+                                    <button type="button" wire:click="removeTag({{ $tag->id }})" class="ml-1 hover:opacity-75">&times;</button>
+                                </span>
+                            @endforeach
+                        </div>
+                        @endif
+
+                        <!-- Tag Input -->
+                        <div class="flex gap-2">
+                            <div class="flex-1 relative">
+                                <input type="text" wire:model.live.debounce.300ms="tagSearch"
+                                       placeholder="Search existing tags..."
+                                       class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md text-sm">
+                                @if($searchedTags->isNotEmpty())
+                                    <div class="absolute z-10 w-full mt-1 bg-white dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md shadow-lg max-h-40 overflow-y-auto">
+                                        @foreach($searchedTags as $tag)
+                                            @if(!in_array($tag->id, $selectedTagIds))
+                                                <button type="button" wire:click="selectTag({{ $tag->id }})"
+                                                        class="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-zinc-600 flex items-center gap-2">
+                                                    <span class="w-3 h-3 rounded-full" style="background-color: {{ $tag->color }};"></span>
+                                                    {{ $tag->name }}
+                                                </button>
+                                            @endif
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="flex gap-2">
+                                <input type="text" wire:model="newTagName"
+                                       placeholder="Or create new tag..."
+                                       wire:keydown.enter="addTag"
+                                       class="px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md text-sm">
+                                <button type="button" wire:click="addTag"
+                                        class="px-3 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500 text-sm">
+                                    Add
+                                </button>
                             </div>
                         </div>
                     </div>
