@@ -362,6 +362,14 @@ class DocumentationContentSeeder extends Seeder
                 'routes' => ['funder.management' => 'Funder Management'],
                 'content' => $this->getArticleContent('funder-management'),
             ],
+            [
+                'slug' => 'contract-utilization-dashboard',
+                'title' => 'Contract Utilization Dashboard',
+                'summary' => 'Monitor contract budget utilization and receive threshold alerts',
+                'sort_order' => 6,
+                'routes' => ['contract-utilization.dashboard' => 'Contract Utilization'],
+                'content' => $this->getArticleContent('contract-utilization-dashboard'),
+            ],
         ];
     }
 
@@ -414,6 +422,21 @@ class DocumentationContentSeeder extends Seeder
                 'sort_order' => 6,
                 'routes' => ['communications-log.management' => 'Communications Log'],
                 'content' => $this->getArticleContent('communications-log'),
+            ],
+            [
+                'slug' => 'project-budgets-expenses',
+                'title' => 'Project Budgets & Expenses',
+                'summary' => 'Managing project budgets with contract fund code tracking',
+                'sort_order' => 7,
+                'content' => $this->getArticleContent('project-budgets-expenses'),
+            ],
+            [
+                'slug' => 'project-reporting',
+                'title' => 'Project Reporting',
+                'summary' => 'Comprehensive project reporting and analytics dashboard',
+                'sort_order' => 8,
+                'routes' => ['project-reporting' => 'Project Reporting'],
+                'content' => $this->getArticleContent('project-reporting'),
             ],
         ];
     }
@@ -1356,6 +1379,11 @@ Program
             'service-management' => '<h2>Service Management</h2>
 <p>Services are specific offerings within a program that participants can enroll in.</p>
 
+<div class="screenshot-placeholder">
+<img src="/images/documentation/service-management-list.png" alt="Service Management List View" style="max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 10px 0;">
+<p><em>Service Management showing the list of services with contract badges</em></p>
+</div>
+
 <h3>Creating a Service</h3>
 <ol>
 <li>Go to <strong>Service Management</strong></li>
@@ -1372,6 +1400,32 @@ Program
 <li>Click <strong>Save</strong></li>
 </ol>
 
+<h3>Contract Associations</h3>
+<p>Services can be linked to one or more funding contracts for budget tracking and grant management.</p>
+
+<div class="screenshot-placeholder">
+<img src="/images/documentation/service-contract-association.png" alt="Service Contract Association" style="max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 10px 0;">
+<p><em>Associating contracts with a service in the create/edit form</em></p>
+</div>
+
+<h4>Linking Contracts to Services</h4>
+<ol>
+<li>When creating or editing a service, scroll to <strong>Funding Contracts</strong></li>
+<li>Check the contracts that fund this service</li>
+<li>For each selected contract, optionally specify:
+    <ul>
+    <li><strong>Allocation Percentage</strong> - What percentage of the contract funds this service</li>
+    <li><strong>Allocated Amount</strong> - Fixed dollar amount allocated</li>
+    <li><strong>Notes</strong> - Additional details about the allocation</li>
+    </ul>
+</li>
+<li>Contract badges appear on the service list showing associated funding sources</li>
+</ol>
+
+<div class="tip">
+<strong>Tip:</strong> Linking services to contracts helps track how funding is distributed across your programs and enables budget utilization reporting.
+</div>
+
 <h3>Filtering by Program</h3>
 <p>Use the program filter dropdown or add <code>?program={id}</code> to the URL to see services for a specific program only.</p>
 
@@ -1381,6 +1435,7 @@ Program
 <li>Number of enrolled participants</li>
 <li>Number of completed enrollments</li>
 <li>Associated work plan goals</li>
+<li>Linked contracts (displayed as badges)</li>
 </ul>
 
 <h3>Viewing Service Details</h3>
@@ -1390,6 +1445,7 @@ Program
 <li>Parent program details</li>
 <li>Enrollment statistics</li>
 <li>Recent enrollments (last 10)</li>
+<li>Associated contracts and funding allocations</li>
 </ul>
 
 <h3>Service Enrollment Tracking</h3>
@@ -1539,7 +1595,12 @@ Enrolled → In Progress → Completed
 
             // Contracts & Funders
             'contract-management-overview' => '<h2>Contract Management Overview</h2>
-<p>The Contract Management module helps you track grants, contracts, and reporting requirements.</p>
+<p>The Contract Management module helps you track grants, contracts, and reporting requirements with comprehensive budget monitoring.</p>
+
+<div class="screenshot-placeholder">
+<img src="/images/documentation/contract-management-list.png" alt="Contract Management List View" style="max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 10px 0;">
+<p><em>Contract Management showing the list of contracts with status indicators</em></p>
+</div>
 
 <h3>Accessing Contract Management</h3>
 <p>Navigate to <strong>Contracts > Contract Management</strong> in the sidebar.</p>
@@ -1551,6 +1612,8 @@ Enrolled → In Progress → Completed
 <li><strong>Automated Reminders</strong> - Email notifications before due dates</li>
 <li><strong>Report Submission</strong> - Submit and track reports</li>
 <li><strong>Document Storage</strong> - Attach contract documents</li>
+<li><strong>Service Associations</strong> - Link contracts to services for fund tracking</li>
+<li><strong>Utilization Dashboard</strong> - Monitor budget spending and receive threshold alerts</li>
 </ul>
 
 <h3>Contract List</h3>
@@ -1560,7 +1623,7 @@ Enrolled → In Progress → Completed
 <li>Associated program</li>
 <li>Funder name</li>
 <li>Status (Active, Expired, Upcoming, Archived)</li>
-<li>Amount</li>
+<li>Amount and utilization percentage</li>
 <li>Date range</li>
 </ul>
 
@@ -1579,7 +1642,14 @@ Enrolled → In Progress → Completed
 <ul>
 <li><strong>Contracts Tab</strong> - Main contract list and management</li>
 <li><strong>Upcoming Deadlines Tab</strong> - Due dates across all contracts</li>
-</ul>',
+</ul>
+
+<h3>Contract Utilization Dashboard</h3>
+<p>Monitor spending across all contracts from the dedicated <strong>Contract Utilization</strong> page. See the <a href="contract-utilization-dashboard">Contract Utilization Dashboard</a> article for details.</p>
+
+<div class="tip">
+<strong>Tip:</strong> Keep track of contract budget utilization to avoid overspending and ensure funds are used before contract end dates.
+</div>',
 
             'creating-contracts' => '<h2>Creating and Editing Contracts</h2>
 
@@ -1944,7 +2014,12 @@ Enrolled → In Progress → Completed
 </ul>',
 
             'housing-jobs-projects' => '<h2>Housing Jobs & Projects</h2>
-<p>Housing jobs (projects) track the full lifecycle of housing rehabilitation work.</p>
+<p>Housing jobs (projects) track the full lifecycle of housing rehabilitation work with comprehensive budget and expense tracking.</p>
+
+<div class="screenshot-placeholder">
+<img src="/images/documentation/project-management-list.png" alt="Project Management List View" style="max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 10px 0;">
+<p><em>Project Management showing the list of housing projects with status and budget information</em></p>
+</div>
 
 <h3>Job Number Format</h3>
 <p>Jobs are assigned auto-generated numbers: <code>JOB-YYYY-NNNNN</code></p>
@@ -1998,10 +2073,23 @@ Pending → Approved → In Progress → Completed
 <ul>
 <li><strong>Quick Participant</strong> - Create participant + household from project form</li>
 <li><strong>Quick Property</strong> - Create property from household address</li>
+<li><strong>Quick Contractor</strong> - Create new contractor directly from the project form</li>
 </ul>
 
 <h3>Project Templates</h3>
-<p>Save completed projects as templates to quickly create similar projects with predefined milestones and documents.</p>',
+<p>Save completed projects as templates to quickly create similar projects with predefined milestones and documents.</p>
+
+<h3>Budget & Expense Tracking with Fund Codes</h3>
+<p>Projects now support detailed budget and expense tracking with contract fund code associations. See <a href="project-budgets-expenses">Project Budgets & Expenses</a> for detailed information.</p>
+
+<div class="screenshot-placeholder">
+<img src="/images/documentation/project-budget-section.png" alt="Project Budget Section" style="max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 10px 0;">
+<p><em>Budget section showing fund code selection dropdown</em></p>
+</div>
+
+<div class="tip">
+<strong>Tip:</strong> Link budget items and expenses to contracts to track fund utilization and generate accurate financial reports.
+</div>',
 
             'project-milestones-tasks' => '<h2>Milestones, Tasks & Documents</h2>
 <p>Break projects into manageable phases with tasks and document requirements.</p>
@@ -2075,7 +2163,12 @@ Pending → Approved → In Progress → Completed
 </ul>',
 
             'communications-log' => '<h2>Communications Log</h2>
-<p>Document all communications with participants, contractors, and other parties.</p>
+<p>Document all communications with participants, contractors, and other parties. The enhanced Communications Log includes quick create features and the ability to convert communications into projects.</p>
+
+<div class="screenshot-placeholder">
+<img src="/images/documentation/communications-log-list.png" alt="Communications Log List View" style="max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 10px 0;">
+<p><em>Communications Log showing the list of communications with follow-up indicators</em></p>
+</div>
 
 <h3>Accessing Communications Log</h3>
 <p>Navigate to <strong>Housing & Projects > Communications Log</strong> in the sidebar.</p>
@@ -2116,6 +2209,56 @@ Pending → Approved → In Progress → Completed
 </li>
 </ol>
 
+<h3>Quick Create Features</h3>
+<p>Create new records directly from the communications log form without navigating away:</p>
+
+<div class="screenshot-placeholder">
+<img src="/images/documentation/communications-quick-create.png" alt="Communications Quick Create" style="max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 10px 0;">
+<p><em>Quick create options for participant, property, and contractor</em></p>
+</div>
+
+<h4>Quick Create Participant</h4>
+<ol>
+<li>Click <strong>+ Create Participant</strong> next to the participant field</li>
+<li>Enter first name, last name, and optional date of birth</li>
+<li>A new participant and household are created automatically</li>
+<li>The participant is linked to the communication</li>
+<li>You\'ll be prompted to create a property with the same address</li>
+</ol>
+
+<h4>Quick Create Property</h4>
+<ol>
+<li>Click <strong>+ Create Property</strong> next to the property field</li>
+<li>Enter address information</li>
+<li>Property is automatically linked to the selected household</li>
+</ol>
+
+<h4>Quick Create Contractor</h4>
+<ol>
+<li>Click <strong>+ Create Contractor</strong> next to the contractor field</li>
+<li>Enter company name and contact information</li>
+<li>Contractor is created and linked to the communication</li>
+</ol>
+
+<div class="tip">
+<strong>Tip:</strong> Quick create streamlines intake workflows - create a participant, their property, and log the communication all in one place!
+</div>
+
+<h3>Convert to Project</h3>
+<p>Communications can be converted to housing projects when action is needed:</p>
+
+<ol>
+<li>Open an existing communication</li>
+<li>Click <strong>Convert to Project</strong></li>
+<li>Review pre-filled project details (participant, property, etc.)</li>
+<li>Add additional project information</li>
+<li>The communication is linked to the new project</li>
+</ol>
+
+<div class="note">
+<strong>Note:</strong> Converting a communication to a project maintains the link between them, allowing you to track the full history from initial contact to project completion.
+</div>
+
 <h3>Follow-Up Tracking</h3>
 <p>Set follow-up reminders:</p>
 <ul>
@@ -2124,12 +2267,22 @@ Pending → Approved → In Progress → Completed
 <li><strong>Mark Complete</strong> - When done</li>
 </ul>
 
+<h3>Communication Updates</h3>
+<p>Add follow-up notes and updates to existing communications:</p>
+<ol>
+<li>Open a communication</li>
+<li>Click <strong>Add Update</strong></li>
+<li>Enter the update details and outcome</li>
+<li>Updates are timestamped and tracked</li>
+</ol>
+
 <h3>Dashboard Statistics</h3>
 <p>The communications log shows:</p>
 <ul>
 <li>Pending follow-ups count</li>
 <li>Overdue follow-ups count</li>
 <li>Today\'s communications count</li>
+<li>Converted to project count</li>
 </ul>
 
 <h3>Filtering Communications</h3>
@@ -2138,7 +2291,12 @@ Pending → Approved → In Progress → Completed
 <li>By direction</li>
 <li>By date range</li>
 <li>By linked entity</li>
-</ul>',
+<li>By follow-up status</li>
+<li>By conversion status (converted to project)</li>
+</ul>
+
+<h3>Tags</h3>
+<p>Add tags to communications for additional organization and filtering. Tags can be searched and filtered to find related communications quickly.</p>',
 
             // Approvals
             'approvals-overview' => '<h2>Approvals Overview</h2>
@@ -3034,6 +3192,337 @@ Pending → Approved → In Progress → Completed
 <li>Browse full documentation</li>
 <li>Submit feedback for questions</li>
 <li>Contact your administrator for access issues</li>
+</ul>',
+
+            // New Articles - Contract Utilization & Project Features
+            'contract-utilization-dashboard' => '<h2>Contract Utilization Dashboard</h2>
+<p>The Contract Utilization Dashboard provides a comprehensive view of budget spending across all contracts, with threshold-based alerts to help prevent overspending or underutilization.</p>
+
+<div class="screenshot-placeholder">
+<img src="/images/documentation/contract-utilization-dashboard.png" alt="Contract Utilization Dashboard" style="max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 10px 0;">
+<p><em>Contract Utilization Dashboard showing all contracts with color-coded utilization indicators</em></p>
+</div>
+
+<h3>Accessing the Dashboard</h3>
+<p>Navigate to <strong>Contracts > Contract Utilization</strong> in the sidebar.</p>
+
+<h3>Dashboard Views</h3>
+<p>Toggle between two views using the buttons at the top:</p>
+<ul>
+<li><strong>Card View</strong> - Visual cards for each contract with progress bars</li>
+<li><strong>Table View</strong> - Detailed tabular data for comparison</li>
+</ul>
+
+<h3>Understanding Utilization Status</h3>
+<p>Contracts are color-coded based on remaining budget:</p>
+
+<table>
+<thead>
+<tr><th>Status</th><th>Remaining Budget</th><th>Color</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Healthy</strong></td><td>More than 50%</td><td style="background: #22c55e; color: white; padding: 2px 6px;">Green</td></tr>
+<tr><td><strong>Caution</strong></td><td>25% - 50%</td><td style="background: #eab308; color: white; padding: 2px 6px;">Yellow</td></tr>
+<tr><td><strong>Warning</strong></td><td>10% - 25%</td><td style="background: #f97316; color: white; padding: 2px 6px;">Orange</td></tr>
+<tr><td><strong>High Risk</strong></td><td>5% - 10%</td><td style="background: #ef4444; color: white; padding: 2px 6px;">Orange-Red</td></tr>
+<tr><td><strong>Critical</strong></td><td>0% - 5%</td><td style="background: #dc2626; color: white; padding: 2px 6px;">Red</td></tr>
+<tr><td><strong>Depleted</strong></td><td>0% or less</td><td style="background: #7f1d1d; color: white; padding: 2px 6px;">Dark Red</td></tr>
+</tbody>
+</table>
+
+<h3>Contract Information Displayed</h3>
+<p>Each contract shows:</p>
+<ul>
+<li><strong>Title and Grant Code</strong></li>
+<li><strong>Program and Funder</strong></li>
+<li><strong>Contract Amount</strong> - Total budget</li>
+<li><strong>Amount Spent</strong> - Expenses to date</li>
+<li><strong>Remaining Budget</strong> - Available funds</li>
+<li><strong>Utilization Percentage</strong> - Percent of budget used</li>
+<li><strong>Contract Dates</strong> - Start and end dates</li>
+<li><strong>Days Remaining</strong> - Until contract expiration</li>
+</ul>
+
+<h3>Filtering Options</h3>
+<p>Filter contracts by:</p>
+<ul>
+<li><strong>Program</strong> - Select specific program</li>
+<li><strong>Funder</strong> - Filter by funding organization</li>
+<li><strong>Status</strong> - Active, Expired, Upcoming</li>
+<li><strong>Utilization Level</strong> - Filter by utilization status (Healthy, Caution, etc.)</li>
+</ul>
+
+<h3>Sorting Options</h3>
+<p>Sort by:</p>
+<ul>
+<li><strong>Utilization (High to Low)</strong> - Most utilized first</li>
+<li><strong>Utilization (Low to High)</strong> - Least utilized first</li>
+<li><strong>Contract Amount</strong> - Largest contracts first</li>
+<li><strong>Remaining Budget</strong> - Most available funds first</li>
+<li><strong>Title</strong> - Alphabetically by name</li>
+</ul>
+
+<div class="screenshot-placeholder">
+<img src="/images/documentation/contract-utilization-filters.png" alt="Contract Utilization Filters" style="max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 10px 0;">
+<p><em>Filtering and sorting options on the Contract Utilization Dashboard</em></p>
+</div>
+
+<h3>Threshold Alerts</h3>
+<p>The system sends automatic notifications when contracts reach certain thresholds:</p>
+<ul>
+<li>75% utilized (25% remaining)</li>
+<li>50% utilized (50% remaining)</li>
+<li>25% remaining</li>
+<li>10% remaining</li>
+<li>5% remaining</li>
+<li>0% remaining (Depleted)</li>
+</ul>
+
+<h3>Contract Managers</h3>
+<p>Assign contract managers to receive utilization alerts:</p>
+<ol>
+<li>Go to the contract details</li>
+<li>Add users as contract managers</li>
+<li>Select notification preferences</li>
+<li>Managers receive emails when thresholds are reached</li>
+</ol>
+
+<h3>Admin Override</h3>
+<p>Administrators can mark contracts as "Admin Override" to allow continued use even when fully utilized. This is useful for contracts with pending amendments or adjustments.</p>
+
+<h3>Required Permissions</h3>
+<ul>
+<li><code>contracts.view</code> - View utilization dashboard</li>
+<li><code>contracts.edit</code> - Manage contract managers</li>
+<li><code>contracts.manage_notifications</code> - Configure notification settings</li>
+</ul>
+
+<div class="tip">
+<strong>Tip:</strong> Check the utilization dashboard weekly to stay on top of budget spending and avoid surprises at contract end dates.
+</div>',
+
+            'project-budgets-expenses' => '<h2>Project Budgets & Expenses</h2>
+<p>Track project budgets and expenses with direct links to contract fund codes for accurate financial reporting and grant management.</p>
+
+<div class="screenshot-placeholder">
+<img src="/images/documentation/project-budget-management.png" alt="Project Budget Management" style="max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 10px 0;">
+<p><em>Budget management section within a project showing fund code associations</em></p>
+</div>
+
+<h3>Budget Overview</h3>
+<p>Each project displays budget summary information:</p>
+<ul>
+<li><strong>Estimated Cost</strong> - Initial cost estimate</li>
+<li><strong>Approved Amount</strong> - Approved project budget</li>
+<li><strong>Total Budgeted</strong> - Sum of all budget line items</li>
+<li><strong>Total Expenses</strong> - Sum of all expense entries</li>
+<li><strong>Remaining Budget</strong> - Available funds</li>
+<li><strong>Budget Utilization</strong> - Percentage of budget used</li>
+</ul>
+
+<h3>Adding Budget Line Items</h3>
+<ol>
+<li>Open a project</li>
+<li>Go to the <strong>Budget</strong> tab</li>
+<li>Click <strong>Add Budget Item</strong></li>
+<li>Fill in:
+    <ul>
+    <li><strong>Category</strong> - Labor, Materials, Equipment, etc.</li>
+    <li><strong>Description</strong> - What the budget is for</li>
+    <li><strong>Amount</strong> - Budgeted dollar amount</li>
+    <li><strong>Fund Code / Contract</strong> - Select the funding contract</li>
+    </ul>
+</li>
+<li>Click <strong>Save</strong></li>
+</ol>
+
+<div class="screenshot-placeholder">
+<img src="/images/documentation/project-budget-form.png" alt="Project Budget Form" style="max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 10px 0;">
+<p><em>Budget form showing the searchable fund code dropdown</em></p>
+</div>
+
+<h3>Searchable Fund Code Dropdown</h3>
+<p>The fund code selection uses a searchable dropdown that shows:</p>
+<ul>
+<li><strong>Grant Code</strong> - The contract\'s grant code</li>
+<li><strong>Contract Title</strong></li>
+<li><strong>Funder Name</strong></li>
+</ul>
+<p>Type to search by any of these fields to quickly find the correct funding source.</p>
+
+<div class="tip">
+<strong>Tip:</strong> The fund code dropdown filters contracts to show only those associated with the project\'s program for easier selection.
+</div>
+
+<h3>Recording Expenses</h3>
+<ol>
+<li>Go to the <strong>Expenses</strong> tab</li>
+<li>Click <strong>Add Expense</strong></li>
+<li>Fill in:
+    <ul>
+    <li><strong>Date</strong> - When the expense occurred</li>
+    <li><strong>Category</strong> - Expense category</li>
+    <li><strong>Description</strong> - What was purchased/paid</li>
+    <li><strong>Amount</strong> - Dollar amount</li>
+    <li><strong>Fund Code / Contract</strong> - Select the funding contract</li>
+    <li><strong>Vendor</strong> (optional) - Who was paid</li>
+    <li><strong>Invoice Number</strong> (optional) - Reference number</li>
+    </ul>
+</li>
+<li>Attach receipt or invoice documents if needed</li>
+<li>Click <strong>Save</strong></li>
+</ol>
+
+<h3>Budget Categories</h3>
+<p>Standard budget and expense categories include:</p>
+<ul>
+<li>Labor / Personnel</li>
+<li>Materials / Supplies</li>
+<li>Equipment</li>
+<li>Subcontractors</li>
+<li>Permits / Fees</li>
+<li>Inspections</li>
+<li>Other</li>
+</ul>
+
+<h3>Contract Utilization Tracking</h3>
+<p>When budgets and expenses are linked to contracts:</p>
+<ul>
+<li>Expenses update the contract\'s utilization percentage</li>
+<li>Threshold alerts are triggered when appropriate</li>
+<li>Reports show spending by contract</li>
+<li>Financial reports are accurate across programs</li>
+</ul>
+
+<h3>Budget vs Actual Reports</h3>
+<p>View budget vs actual comparisons:</p>
+<ul>
+<li>By category breakdown</li>
+<li>By contract/fund code</li>
+<li>Over/under budget indicators</li>
+<li>Variance percentages</li>
+</ul>
+
+<h3>Required Permissions</h3>
+<ul>
+<li><code>projects.view</code> - View project budgets</li>
+<li><code>projects.edit</code> - Add/edit budget items</li>
+<li><code>projects.manage_budget</code> - Full budget management</li>
+</ul>',
+
+            'project-reporting' => '<h2>Project Reporting</h2>
+<p>The Project Reporting dashboard provides comprehensive analytics and metrics across all housing projects.</p>
+
+<div class="screenshot-placeholder">
+<img src="/images/documentation/project-reporting-dashboard.png" alt="Project Reporting Dashboard" style="max-width: 100%; border: 1px solid #ddd; border-radius: 4px; margin: 10px 0;">
+<p><em>Project Reporting Dashboard showing summary metrics and filters</em></p>
+</div>
+
+<h3>Accessing Project Reporting</h3>
+<p>Navigate to <strong>Housing & Projects > Project Reporting</strong> in the sidebar.</p>
+
+<h3>Summary Metrics</h3>
+<p>At-a-glance statistics:</p>
+<ul>
+<li><strong>Total Projects</strong> - Count of all projects matching filters</li>
+<li><strong>Overdue Projects</strong> - Projects past their target completion date</li>
+<li><strong>At-Risk Projects</strong> - Projects with issues or concerns</li>
+<li><strong>Completed This Month</strong> - Recently finished projects</li>
+</ul>
+
+<h3>Budget Overview</h3>
+<p>Financial summary metrics:</p>
+<ul>
+<li><strong>Total Budget</strong> - Sum of all project budgets</li>
+<li><strong>Total Expenses</strong> - Sum of all project expenses</li>
+<li><strong>Budget Utilization</strong> - Overall percentage used</li>
+<li><strong>Budget by Category</strong> - Breakdown by expense type</li>
+</ul>
+
+<h3>Status Distribution</h3>
+<p>Visual breakdown of projects by status:</p>
+<ul>
+<li>Pending</li>
+<li>Approved</li>
+<li>In Progress</li>
+<li>On Hold</li>
+<li>Completed</li>
+<li>Cancelled</li>
+</ul>
+
+<h3>Progress Tracking</h3>
+<p>Milestone, task, and document progress:</p>
+<ul>
+<li><strong>Milestone Completion Rate</strong> - Percentage of milestones completed</li>
+<li><strong>Task Completion Rate</strong> - Percentage of tasks done</li>
+<li><strong>Document Completion Rate</strong> - Required documents uploaded</li>
+<li><strong>Overdue Tasks Count</strong></li>
+<li><strong>Pending Documents Count</strong></li>
+</ul>
+
+<h3>Performance Metrics</h3>
+
+<h4>Contractor Performance</h4>
+<ul>
+<li>Projects per contractor</li>
+<li>Completion rate by contractor</li>
+<li>Average days to completion</li>
+</ul>
+
+<h4>Project Manager Performance</h4>
+<ul>
+<li>Projects per manager</li>
+<li>On-time completion rate</li>
+<li>Average project duration</li>
+</ul>
+
+<h3>Filtering Options</h3>
+<p>Filter reports by:</p>
+<ul>
+<li><strong>Program</strong> - Specific program</li>
+<li><strong>Status</strong> - Project status</li>
+<li><strong>Priority</strong> - Low, Medium, High, Emergency</li>
+<li><strong>Contractor</strong> - Specific contractor</li>
+<li><strong>Property</strong> - Specific property</li>
+<li><strong>Participant</strong> - Specific participant</li>
+<li><strong>Project Manager</strong> - Assigned manager</li>
+<li><strong>Budget Status</strong> - Over/under budget</li>
+<li><strong>Date Range</strong> - By request, start, or completion date</li>
+</ul>
+
+<h3>Grouping Options</h3>
+<p>Group metrics by:</p>
+<ul>
+<li>Status</li>
+<li>Program</li>
+<li>Contractor</li>
+<li>Priority</li>
+<li>Project Manager</li>
+</ul>
+
+<h3>View Modes</h3>
+<ul>
+<li><strong>Summary View</strong> - High-level metrics only</li>
+<li><strong>Detailed View</strong> - Full metrics with breakdowns</li>
+<li><strong>Chart View</strong> - Visual charts and graphs</li>
+</ul>
+
+<h3>Export Options</h3>
+<p>Export report data to CSV for further analysis:</p>
+<ol>
+<li>Apply desired filters</li>
+<li>Click <strong>Export CSV</strong></li>
+<li>Download includes all visible metrics</li>
+</ol>
+
+<div class="tip">
+<strong>Tip:</strong> Use the Project Reporting dashboard for monthly program reviews and to identify bottlenecks in project completion.
+</div>
+
+<h3>Required Permissions</h3>
+<ul>
+<li><code>projects.view</code> - View project reports</li>
+<li><code>reports.export</code> - Export report data</li>
 </ul>',
         ];
     }
