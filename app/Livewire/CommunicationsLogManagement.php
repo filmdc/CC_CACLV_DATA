@@ -131,6 +131,46 @@ class CommunicationsLogManagement extends Component
 
     public $tagSearch = '';
 
+    // Quick create states
+    public $showQuickCreateParticipant = false;
+
+    public $showQuickCreateProperty = false;
+
+    public $showQuickCreateContractor = false;
+
+    public $showPropertyAddressPrompt = false;
+
+    public $newlyCreatedParticipantName = '';
+
+    // Quick create participant fields
+    public $newParticipantFirstName = '';
+
+    public $newParticipantLastName = '';
+
+    public $newParticipantPhone = '';
+
+    public $newParticipantEmail = '';
+
+    // Quick create property fields
+    public $newPropertyAddress = '';
+
+    public $newPropertyCity = '';
+
+    public $newPropertyState = 'NV';
+
+    public $newPropertyZip = '';
+
+    // Quick create contractor fields
+    public $newContractorCompanyName = '';
+
+    public $newContractorContactFirstName = '';
+
+    public $newContractorContactLastName = '';
+
+    public $newContractorPhone = '';
+
+    public $newContractorEmail = '';
+
     protected $queryString = [
         'search' => ['except' => ''],
         'typeFilter' => ['except' => ''],
@@ -186,6 +226,222 @@ class CommunicationsLogManagement extends Component
                 }
             }
         }
+    }
+
+    public function updatedParticipantId($value)
+    {
+        if ($value) {
+            $participant = Participant::find($value);
+            if ($participant && $participant->household_id) {
+                $this->household_id = $participant->household_id;
+            }
+        } else {
+            $this->household_id = '';
+        }
+    }
+
+    // Quick create methods
+    public function toggleQuickCreateParticipant()
+    {
+        $this->showQuickCreateParticipant = ! $this->showQuickCreateParticipant;
+        $this->resetQuickCreateParticipantFields();
+    }
+
+    public function toggleQuickCreateProperty()
+    {
+        $this->showQuickCreateProperty = ! $this->showQuickCreateProperty;
+        $this->resetQuickCreatePropertyFields();
+    }
+
+    public function toggleQuickCreateContractor()
+    {
+        $this->showQuickCreateContractor = ! $this->showQuickCreateContractor;
+        $this->resetQuickCreateContractorFields();
+    }
+
+    public function createQuickParticipant()
+    {
+        $this->validate([
+            'newParticipantFirstName' => 'required|string|max:255',
+            'newParticipantLastName' => 'required|string|max:255',
+            'newParticipantPhone' => 'nullable|string|max:50',
+            'newParticipantEmail' => 'nullable|email|max:255',
+        ]);
+
+        // Create a new household for the participant (matching ProjectsManagement approach)
+        $household = Household::create([
+            'household_type' => 'Single Person',
+            'household_size' => 1,
+            'housing_status' => 'Unknown/not reported',
+        ]);
+
+        // Create participant as head of household
+        $participant = Participant::create([
+            'household_id' => $household->id,
+            'first_name' => $this->newParticipantFirstName,
+            'last_name' => $this->newParticipantLastName,
+            'telephone' => $this->newParticipantPhone ?: null,
+            'email' => $this->newParticipantEmail ?: null,
+            'relationship_to_head' => 'self',
+            'is_head_of_household' => true,
+        ]);
+
+        $this->participant_id = $participant->id;
+        $this->household_id = $household->id;
+        $this->contact_name = $participant->full_name;
+        if ($this->newParticipantPhone) {
+            $this->contact_phone = $this->newParticipantPhone;
+        }
+        if ($this->newParticipantEmail) {
+            $this->contact_email = $this->newParticipantEmail;
+        }
+
+        $this->showQuickCreateParticipant = false;
+        $this->resetQuickCreateParticipantFields();
+
+        // Show property address prompt for the newly created participant
+        $this->newlyCreatedParticipantName = $participant->first_name.' '.$participant->last_name;
+        $this->showPropertyAddressPrompt = true;
+        $this->resetQuickCreatePropertyFields();
+
+        session()->flash('success', 'Participant created: '.$participant->first_name.' '.$participant->last_name.' (Household: '.$household->household_code.')');
+    }
+
+    public function savePropertyFromPrompt()
+    {
+        $this->validate([
+            'newPropertyAddress' => 'required|string|max:255',
+            'newPropertyCity' => 'required|string|max:100',
+            'newPropertyState' => 'required|string|max:2',
+            'newPropertyZip' => 'required|string|max:10',
+        ]);
+
+        $property = Property::create([
+            'address_line_1' => $this->newPropertyAddress,
+            'city' => $this->newPropertyCity,
+            'state' => strtoupper($this->newPropertyState),
+            'zip_code' => $this->newPropertyZip,
+            'participant_id' => $this->participant_id,
+            'household_id' => $this->household_id,
+            'status' => 'active',
+            'created_by' => Auth::id(),
+        ]);
+
+        // Also create household address record
+        $household = Household::find($this->household_id);
+        if ($household) {
+            $household->addresses()->create([
+                'address' => $this->newPropertyAddress,
+                'city' => $this->newPropertyCity,
+                'state' => strtoupper($this->newPropertyState),
+                'zip_code' => $this->newPropertyZip,
+                'is_current' => true,
+            ]);
+        }
+
+        $this->property_id = $property->id;
+        $this->subject = $property->address_line_1.', '.$property->city;
+
+        $this->showPropertyAddressPrompt = false;
+        $this->resetQuickCreatePropertyFields();
+
+        session()->flash('success', 'Property created: '.$property->address_line_1.', '.$property->city);
+    }
+
+    public function skipPropertyPrompt()
+    {
+        $this->showPropertyAddressPrompt = false;
+        $this->resetQuickCreatePropertyFields();
+    }
+
+    public function createQuickProperty()
+    {
+        $this->validate([
+            'newPropertyAddress' => 'required|string|max:255',
+            'newPropertyCity' => 'required|string|max:100',
+            'newPropertyState' => 'required|string|max:2',
+            'newPropertyZip' => 'required|string|max:10',
+        ]);
+
+        $property = Property::create([
+            'address_line_1' => $this->newPropertyAddress,
+            'city' => $this->newPropertyCity,
+            'state' => $this->newPropertyState,
+            'zip_code' => $this->newPropertyZip,
+            'participant_id' => $this->participant_id ?: null,
+            'household_id' => $this->household_id ?: null,
+            'status' => 'active',
+            'created_by' => Auth::id(),
+        ]);
+
+        $this->property_id = $property->id;
+        $this->subject = $property->address_line_1.', '.$property->city;
+
+        $this->showQuickCreateProperty = false;
+        $this->resetQuickCreatePropertyFields();
+
+        session()->flash('success', 'Property created successfully.');
+    }
+
+    public function createQuickContractor()
+    {
+        $this->validate([
+            'newContractorCompanyName' => 'required|string|max:255',
+            'newContractorContactFirstName' => 'nullable|string|max:255',
+            'newContractorContactLastName' => 'nullable|string|max:255',
+            'newContractorPhone' => 'nullable|string|max:50',
+            'newContractorEmail' => 'nullable|email|max:255',
+        ]);
+
+        $contractor = Contractor::create([
+            'company_name' => $this->newContractorCompanyName,
+            'contact_first_name' => $this->newContractorContactFirstName ?: null,
+            'contact_last_name' => $this->newContractorContactLastName ?: null,
+            'phone' => $this->newContractorPhone ?: null,
+            'email' => $this->newContractorEmail ?: null,
+            'status' => 'active',
+            'created_by' => Auth::id(),
+        ]);
+
+        $this->contractor_id = $contractor->id;
+        $this->contact_name = $contractor->company_name;
+        $this->contact_organization = $contractor->company_name;
+        if ($this->newContractorPhone) {
+            $this->contact_phone = $this->newContractorPhone;
+        }
+        if ($this->newContractorEmail) {
+            $this->contact_email = $this->newContractorEmail;
+        }
+
+        $this->showQuickCreateContractor = false;
+        $this->resetQuickCreateContractorFields();
+
+        session()->flash('success', 'Contractor created successfully.');
+    }
+
+    protected function resetQuickCreateParticipantFields()
+    {
+        $this->newParticipantFirstName = '';
+        $this->newParticipantLastName = '';
+        $this->newParticipantPhone = '';
+        $this->newParticipantEmail = '';
+    }
+
+    protected function resetQuickCreatePropertyFields()
+    {
+        $this->newPropertyAddress = '';
+        $this->newPropertyCity = '';
+        $this->newPropertyState = 'NV';
+        $this->newPropertyZip = '';
+    }
+
+    protected function resetQuickCreateContractorFields()
+    {
+        $this->newContractorCompanyName = '';
+        $this->newContractorContactFirstName = '';
+        $this->newContractorContactLastName = '';
+        $this->newContractorPhone = '';
+        $this->newContractorEmail = '';
     }
 
     public function showCreateForm()
@@ -500,6 +756,16 @@ class CommunicationsLogManagement extends Component
         $this->selectedTagIds = [];
         $this->newTagName = '';
         $this->tagSearch = '';
+
+        // Reset quick create states
+        $this->showQuickCreateParticipant = false;
+        $this->showQuickCreateProperty = false;
+        $this->showQuickCreateContractor = false;
+        $this->showPropertyAddressPrompt = false;
+        $this->newlyCreatedParticipantName = '';
+        $this->resetQuickCreateParticipantFields();
+        $this->resetQuickCreatePropertyFields();
+        $this->resetQuickCreateContractorFields();
     }
 
     public function render()
@@ -621,7 +887,6 @@ class CommunicationsLogManagement extends Component
             ->with(['services' => fn ($q) => $q->where('active', true)->orderBy('name')])
             ->orderBy('name')
             ->get();
-
 
         // Get all active services from accessible programs for filtering
         $accessibleProgramIds = $accessiblePrograms->pluck('id')->toArray();
