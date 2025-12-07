@@ -2,6 +2,8 @@
 
 namespace App\Livewire;
 
+use App\Exceptions\ContractFullyUtilizedException;
+use App\Models\Contract;
 use App\Models\HousingJob;
 use App\Models\MilestoneDocument;
 use App\Models\MilestoneTask;
@@ -169,6 +171,19 @@ class ProjectManagement extends Component
     public $quick_participant_state = '';
 
     public $quick_participant_zip = '';
+
+    // Contract Override Form (for fully utilized contracts)
+    public $showOverrideWarning = false;
+
+    public $pendingOverrideType = null; // 'budget' or 'expense'
+
+    public $overrideReason = '';
+
+    public $overrideContractId = null;
+
+    public $overrideContractTitle = '';
+
+    public $overrideRemainingAmount = 0;
 
     protected $listeners = [
         'milestoneUpdated' => '$refresh',
@@ -856,18 +871,31 @@ class ProjectManagement extends Component
             'budget_contract_id' => 'nullable|exists:contracts,id',
         ]);
 
-        ProjectBudget::create([
-            'housing_job_id' => $this->jobId,
-            'contract_id' => $this->budget_contract_id !== '' ? $this->budget_contract_id : null,
-            'category' => $this->budget_category,
-            'budgeted_amount' => $this->budget_amount,
-            'created_by' => Auth::id(),
-        ]);
+        try {
+            ProjectBudget::create([
+                'housing_job_id' => $this->jobId,
+                'contract_id' => $this->budget_contract_id !== '' ? $this->budget_contract_id : null,
+                'category' => $this->budget_category,
+                'budgeted_amount' => $this->budget_amount,
+                'created_by' => Auth::id(),
+            ]);
 
-        session()->flash('success', 'Budget category created successfully');
-        $this->showBudgetForm = false;
-        $this->resetBudgetForm();
-        $this->refreshJob();
+            session()->flash('success', 'Budget category created successfully');
+            $this->showBudgetForm = false;
+            $this->resetBudgetForm();
+            $this->refreshJob();
+        } catch (ContractFullyUtilizedException $e) {
+            if ($this->isAdmin()) {
+                $this->pendingOverrideType = 'budget';
+                $this->overrideContractId = $e->getContract()->id;
+                $this->overrideContractTitle = $e->getContract()->title;
+                $this->overrideRemainingAmount = $e->getRemainingFunds();
+                $this->showOverrideWarning = true;
+                session()->flash('warning', $e->getUserMessage().' As an admin, you can override this restriction.');
+            } else {
+                session()->flash('error', $e->getUserMessage());
+            }
+        }
     }
 
     public function deleteBudget($id)
@@ -896,21 +924,34 @@ class ProjectManagement extends Component
             'expense_contract_id' => 'nullable|exists:contracts,id',
         ]);
 
-        ProjectExpense::create([
-            'housing_job_id' => $this->jobId,
-            'contract_id' => $this->expense_contract_id !== '' ? $this->expense_contract_id : null,
-            'category' => $this->expense_category,
-            'amount' => $this->expense_amount,
-            'expense_date' => $this->expense_date,
-            'description' => $this->expense_description !== '' ? $this->expense_description : null,
-            'document_id' => $this->expense_document_id !== '' ? $this->expense_document_id : null,
-            'created_by' => Auth::id(),
-        ]);
+        try {
+            ProjectExpense::create([
+                'housing_job_id' => $this->jobId,
+                'contract_id' => $this->expense_contract_id !== '' ? $this->expense_contract_id : null,
+                'category' => $this->expense_category,
+                'amount' => $this->expense_amount,
+                'expense_date' => $this->expense_date,
+                'description' => $this->expense_description !== '' ? $this->expense_description : null,
+                'document_id' => $this->expense_document_id !== '' ? $this->expense_document_id : null,
+                'created_by' => Auth::id(),
+            ]);
 
-        session()->flash('success', 'Expense recorded successfully');
-        $this->showExpenseForm = false;
-        $this->resetExpenseForm();
-        $this->refreshJob();
+            session()->flash('success', 'Expense recorded successfully');
+            $this->showExpenseForm = false;
+            $this->resetExpenseForm();
+            $this->refreshJob();
+        } catch (ContractFullyUtilizedException $e) {
+            if ($this->isAdmin()) {
+                $this->pendingOverrideType = 'expense';
+                $this->overrideContractId = $e->getContract()->id;
+                $this->overrideContractTitle = $e->getContract()->title;
+                $this->overrideRemainingAmount = $e->getRemainingFunds();
+                $this->showOverrideWarning = true;
+                session()->flash('warning', $e->getUserMessage().' As an admin, you can override this restriction.');
+            } else {
+                session()->flash('error', $e->getUserMessage());
+            }
+        }
     }
 
     public function deleteExpense($id)
@@ -1205,6 +1246,49 @@ class ProjectManagement extends Component
         $this->expense_description = '';
         $this->expense_document_id = '';
         $this->expense_contract_id = '';
+    }
+
+    // Contract Override Methods
+    public function confirmOverride()
+    {
+        $this->validate([
+            'overrideReason' => 'required|string|min:10',
+        ], [
+            'overrideReason.required' => 'Please provide a reason for overriding the contract restriction.',
+            'overrideReason.min' => 'The override reason must be at least 10 characters.',
+        ]);
+
+        // Set session flags for the observer to detect override
+        session()->put('contract_override_'.$this->overrideContractId, true);
+        session()->put('contract_override_reason_'.$this->overrideContractId, $this->overrideReason);
+
+        // Retry the original operation
+        if ($this->pendingOverrideType === 'budget') {
+            $this->showOverrideWarning = false;
+            $this->saveBudget();
+        } elseif ($this->pendingOverrideType === 'expense') {
+            $this->showOverrideWarning = false;
+            $this->saveExpense();
+        }
+
+        // Reset override state
+        $this->resetOverrideForm();
+    }
+
+    public function cancelOverride()
+    {
+        $this->resetOverrideForm();
+        session()->flash('info', 'Operation cancelled. The contract restriction remains in effect.');
+    }
+
+    protected function resetOverrideForm()
+    {
+        $this->showOverrideWarning = false;
+        $this->pendingOverrideType = null;
+        $this->overrideReason = '';
+        $this->overrideContractId = null;
+        $this->overrideContractTitle = '';
+        $this->overrideRemainingAmount = 0;
     }
 
     public function render()

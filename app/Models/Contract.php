@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Collection;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -377,18 +378,253 @@ class Contract extends Model implements HasMedia
     public function getDisplayProgramNamesWithCount(): string
     {
         $allPrograms = $this->getAllPrograms();
-        
+
         if ($allPrograms->isEmpty()) {
             return 'N/A';
         }
-        
+
         if ($allPrograms->count() === 1) {
             return $allPrograms->first()->name;
         }
-        
+
         $count = $allPrograms->count();
         $firstProgram = $allPrograms->first()->name;
         return "{$firstProgram} (+{$count} programs)";
+    }
+
+    // ===== Contract Utilization Management =====
+
+    /**
+     * Get managers assigned to this contract
+     */
+    public function managers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'contract_managers')
+            ->withPivot(['receive_notifications', 'created_by'])
+            ->withTimestamps();
+    }
+
+    /**
+     * Get utilization notifications for this contract
+     */
+    public function utilizationNotifications(): HasMany
+    {
+        return $this->hasMany(ContractUtilizationNotification::class);
+    }
+
+    /**
+     * Get utilization activity logs for this contract
+     */
+    public function utilizationLogs(): HasMany
+    {
+        return $this->hasMany(ContractUtilizationLog::class);
+    }
+
+    /**
+     * Get utilization percentage (amount spent as percentage of total)
+     */
+    public function getUtilizationPercentageAttribute(): float
+    {
+        if ($this->amount <= 0) {
+            return 0;
+        }
+
+        return round(($this->total_spent / $this->amount) * 100, 2);
+    }
+
+    /**
+     * Get remaining percentage (amount remaining as percentage of total)
+     */
+    public function getRemainingPercentageAttribute(): float
+    {
+        if ($this->amount <= 0) {
+            return 0;
+        }
+
+        return round(100 - $this->utilization_percentage, 2);
+    }
+
+    /**
+     * Check if contract is fully utilized (spent >= amount)
+     */
+    public function isFullyUtilized(): bool
+    {
+        return $this->total_spent >= $this->amount;
+    }
+
+    /**
+     * Check if contract can accept new expenses
+     */
+    public function canAcceptNewExpenses(): bool
+    {
+        return ! $this->isFullyUtilized() && ! $this->archived;
+    }
+
+    /**
+     * Get remaining funds (capped at 0)
+     */
+    public function getRemainingFunds(): float
+    {
+        return max(0, $this->amount - $this->total_spent);
+    }
+
+    /**
+     * Check if a specific threshold has been notified
+     */
+    public function hasNotifiedThreshold(int $threshold): bool
+    {
+        return ContractUtilizationNotification::hasBeenNotified($this->id, $threshold);
+    }
+
+    /**
+     * Mark a threshold as notified
+     */
+    public function markThresholdNotified(int $threshold, array $recentExpenseIds = [], string $type = 'scheduled'): ContractUtilizationNotification
+    {
+        return ContractUtilizationNotification::create([
+            'contract_id' => $this->id,
+            'threshold_percentage' => $threshold,
+            'utilization_at_notification' => $this->utilization_percentage,
+            'remaining_amount' => $this->remaining_budget,
+            'recent_expenses' => $recentExpenseIds,
+            'notified_at' => now(),
+            'notification_type' => $type,
+        ]);
+    }
+
+    /**
+     * Clear threshold notifications (when utilization drops)
+     */
+    public function clearThresholdNotifications(): int
+    {
+        return $this->utilizationNotifications()->delete();
+    }
+
+    /**
+     * Reset thresholds that are no longer crossed (utilization dropped)
+     */
+    public function resetThresholdsIfNeeded(): int
+    {
+        return ContractUtilizationNotification::clearThresholdsAbove(
+            $this->id,
+            $this->remaining_percentage
+        );
+    }
+
+    /**
+     * Get recent expenses for this contract
+     */
+    public function getRecentExpenses(int $limit = 5): Collection
+    {
+        return $this->projectExpenses()
+            ->orderBy('created_at', 'desc')
+            ->limit($limit)
+            ->get();
+    }
+
+    /**
+     * Get all notification recipients (managers + due date recipients)
+     */
+    public function getUtilizationNotificationRecipients(): Collection
+    {
+        $recipients = collect();
+
+        // Get contract managers who have notifications enabled
+        if (SiteSetting::get('utilization_notify_contract_managers', '1') === '1') {
+            $managers = $this->managers()
+                ->wherePivot('receive_notifications', true)
+                ->get();
+            $recipients = $recipients->merge($managers);
+        }
+
+        // Get due date email recipients
+        if (SiteSetting::get('utilization_notify_due_date_emails', '1') === '1') {
+            $dueDateRecipients = $this->reportDueDates()
+                ->with('emails.user')
+                ->get()
+                ->flatMap(function ($dueDate) {
+                    return $dueDate->emails
+                        ->where('active', true)
+                        ->pluck('user')
+                        ->filter();
+                });
+            $recipients = $recipients->merge($dueDateRecipients);
+        }
+
+        // Return unique users only (filter out nulls and duplicates)
+        return $recipients->filter()->unique('id');
+    }
+
+    /**
+     * Get utilization status label
+     */
+    public function getUtilizationStatusAttribute(): string
+    {
+        $remaining = $this->remaining_percentage;
+
+        if ($this->amount <= 0) {
+            return 'No Budget';
+        }
+
+        if ($remaining <= 0) {
+            return 'Depleted';
+        }
+
+        if ($remaining <= 5) {
+            return 'Critical';
+        }
+
+        if ($remaining <= 10) {
+            return 'High Risk';
+        }
+
+        if ($remaining <= 25) {
+            return 'Warning';
+        }
+
+        if ($remaining <= 50) {
+            return 'Caution';
+        }
+
+        return 'Healthy';
+    }
+
+    /**
+     * Get utilization status color class
+     */
+    public function getUtilizationColorClassAttribute(): string
+    {
+        $remaining = $this->remaining_percentage;
+
+        if ($this->amount <= 0) {
+            return 'bg-gray-500';
+        }
+
+        if ($remaining <= 0) {
+            return 'bg-red-600';
+        }
+
+        if ($remaining <= 5) {
+            return 'bg-red-500';
+        }
+
+        if ($remaining <= 10) {
+            return 'bg-orange-500';
+        }
+
+        if ($remaining <= 25) {
+            return 'bg-yellow-500';
+        }
+
+        if ($remaining <= 50) {
+            return 'bg-yellow-400';
+        }
+
+        if ($remaining <= 75) {
+            return 'bg-green-400';
+        }
+
+        return 'bg-green-500';
     }
 
 }

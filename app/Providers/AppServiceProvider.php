@@ -11,9 +11,12 @@ use App\Models\JobDocumentChecklist;
 use App\Models\MilestoneDocument;
 use App\Models\PendingApproval;
 use App\Models\ProgramEnrollment;
+use App\Models\ProjectBudget;
+use App\Models\ProjectExpense;
 use App\Models\PropertyDocument;
 use App\Models\ServiceEnrollment;
 use App\Models\User;
+use App\Observers\ContractUtilizationObserver;
 use App\Observers\DocumentObserver;
 use App\Observers\PendingApprovalObserver;
 use App\Observers\ProgramEnrollmentObserver;
@@ -63,5 +66,9 @@ class AppServiceProvider extends ServiceProvider
         ContractorDocument::observe(DocumentObserver::class);
         JobDocumentChecklist::observe(DocumentObserver::class);
         MilestoneDocument::observe(DocumentObserver::class);
+
+        // Register Contract Utilization Observer for budget/expense tracking
+        ProjectBudget::observe(ContractUtilizationObserver::class);
+        ProjectExpense::observe(ContractUtilizationObserver::class);
     }
 }

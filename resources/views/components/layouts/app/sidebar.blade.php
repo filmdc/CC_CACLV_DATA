@@ -34,6 +34,7 @@
                 @if(auth()->user()->hasAnyPermission(['contracts.view', 'funders.view', 'due_dates.view']) || auth()->user()->isAdmin())
                 <flux:navlist.group :heading="__('Contracts')" class="grid">
                     <flux:navlist.item icon="document-text" :href="route('contract.management')" :current="request()->routeIs('contract.management')" wire:navigate>{{ __('Contract Management') }}</flux:navlist.item>
+                    <flux:navlist.item icon="chart-pie" :href="route('contract.utilization')" :current="request()->routeIs('contract.utilization')" wire:navigate>{{ __('Utilization Dashboard') }}</flux:navlist.item>
                     <flux:navlist.item icon="bell" :href="route('notification-recipients.management')" :current="request()->routeIs('notification-recipients.management')" wire:navigate>{{ __('Notification Recipients') }}</flux:navlist.item>
                 </flux:navlist.group>
                 @endif

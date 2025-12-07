@@ -74,6 +74,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('funder-management', App\Livewire\FunderManagement::class)->name('funder.management');
     Route::get('funder/{id}', App\Livewire\FunderShow::class)->name('funder.show');
     Route::get('contract-report-due-dates', App\Livewire\ContractReportDueDateManagement::class)->name('contract-report-due-dates.management');
+    Route::get('contract-utilization', App\Livewire\ContractUtilizationDashboard::class)->name('contract.utilization')->middleware(['permission:contracts.view']);
     Route::get('work-plan-management', App\Livewire\WorkPlanManagement::class)->name('work-plan.management');
     Route::get('work-plan/{id}', App\Livewire\WorkPlanShow::class)->name('work-plan.show');
     Route::get('work-plan-goal-management', App\Livewire\WorkPlanGoalManagement::class)->name('work-plan-goal.management');

@@ -25,6 +25,12 @@ return Application::configure(basePath: dirname(__DIR__))
             ->emailOutputOnFailure('admin@example.com')
             ->description('Send contract report reminder emails');
 
+        // Check contract budget utilization daily at 9:00 AM
+        $schedule->command('contract:check-utilization')
+            ->dailyAt('09:00')
+            ->timezone('America/New_York')
+            ->description('Check contract budget utilization and send threshold notifications');
+
         // Process scheduled test reminders every minute
         $schedule->command('contract:process-scheduled-tests')
             ->everyMinute()
