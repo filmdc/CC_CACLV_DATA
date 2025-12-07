@@ -839,15 +839,76 @@
                         </div>
                         @error('budget_amount') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
                     </div>
-                    <div>
+                    <div x-data="{
+                        open: false,
+                        search: '',
+                        selectedId: @entangle('budget_contract_id'),
+                        contracts: {{ Js::from($contracts->map(fn($c) => ['id' => $c->id, 'title' => $c->title, 'grant_code' => $c->grant_code, 'funder' => $c->funder?->name])) }},
+                        get filteredContracts() {
+                            if (!this.search) return this.contracts;
+                            const s = this.search.toLowerCase();
+                            return this.contracts.filter(c =>
+                                c.title.toLowerCase().includes(s) ||
+                                (c.grant_code && c.grant_code.toLowerCase().includes(s)) ||
+                                (c.funder && c.funder.toLowerCase().includes(s))
+                            );
+                        },
+                        get selectedContract() {
+                            return this.contracts.find(c => c.id == this.selectedId);
+                        },
+                        selectContract(contract) {
+                            this.selectedId = contract ? contract.id : '';
+                            this.open = false;
+                            this.search = '';
+                        },
+                        clear() {
+                            this.selectedId = '';
+                            this.search = '';
+                        }
+                    }" class="relative">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Funding Source (Contract)</label>
-                        <select wire:model="budget_contract_id"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                            <option value="">Select a contract (optional)</option>
-                            @foreach($contracts as $contract)
-                                <option value="{{ $contract->id }}">{{ $contract->title }}{{ $contract->grant_code ? ' (' . $contract->grant_code . ')' : '' }}</option>
-                            @endforeach
-                        </select>
+                        <div class="relative">
+                            <button type="button" @click="open = !open"
+                                    class="w-full px-3 py-2 text-left border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md flex items-center justify-between">
+                                <span x-show="!selectedContract" class="text-gray-400">Select a contract (optional)</span>
+                                <span x-show="selectedContract" class="truncate" x-text="selectedContract ? (selectedContract.title + (selectedContract.grant_code ? ' (' + selectedContract.grant_code + ')' : '')) : ''"></span>
+                                <div class="flex items-center space-x-1">
+                                    <button type="button" x-show="selectedContract" @click.stop="clear()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    </button>
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                </div>
+                            </button>
+                            <div x-show="open" @click.away="open = false" x-transition
+                                 class="absolute z-50 mt-1 w-full bg-white dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md shadow-lg">
+                                <div class="p-2 border-b border-gray-200 dark:border-zinc-600">
+                                    <input type="text" x-model="search" placeholder="Search contracts..."
+                                           class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                                           @click.stop>
+                                </div>
+                                <ul class="max-h-48 overflow-y-auto">
+                                    <li @click="selectContract(null)"
+                                        class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-600 cursor-pointer">
+                                        No contract (clear selection)
+                                    </li>
+                                    <template x-for="contract in filteredContracts" :key="contract.id">
+                                        <li @click="selectContract(contract)"
+                                            :class="{'bg-indigo-50 dark:bg-indigo-900/30': contract.id == selectedId}"
+                                            class="px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-600 cursor-pointer">
+                                            <div class="text-sm font-medium text-gray-900 dark:text-white truncate" x-text="contract.title"></div>
+                                            <div class="text-xs text-gray-500 dark:text-gray-400">
+                                                <span x-show="contract.grant_code" x-text="contract.grant_code" class="font-medium text-blue-600 dark:text-blue-400"></span>
+                                                <span x-show="contract.grant_code && contract.funder"> · </span>
+                                                <span x-show="contract.funder" x-text="contract.funder"></span>
+                                            </div>
+                                        </li>
+                                    </template>
+                                    <li x-show="filteredContracts.length === 0" class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 text-center">
+                                        No contracts found
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Associate this budget with a funding source</p>
                         @error('budget_contract_id') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
                     </div>
@@ -883,15 +944,76 @@
                         </select>
                         @error('expense_category') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
                     </div>
-                    <div>
+                    <div x-data="{
+                        open: false,
+                        search: '',
+                        selectedId: @entangle('expense_contract_id'),
+                        contracts: {{ Js::from($contracts->map(fn($c) => ['id' => $c->id, 'title' => $c->title, 'grant_code' => $c->grant_code, 'funder' => $c->funder?->name])) }},
+                        get filteredContracts() {
+                            if (!this.search) return this.contracts;
+                            const s = this.search.toLowerCase();
+                            return this.contracts.filter(c =>
+                                c.title.toLowerCase().includes(s) ||
+                                (c.grant_code && c.grant_code.toLowerCase().includes(s)) ||
+                                (c.funder && c.funder.toLowerCase().includes(s))
+                            );
+                        },
+                        get selectedContract() {
+                            return this.contracts.find(c => c.id == this.selectedId);
+                        },
+                        selectContract(contract) {
+                            this.selectedId = contract ? contract.id : '';
+                            this.open = false;
+                            this.search = '';
+                        },
+                        clear() {
+                            this.selectedId = '';
+                            this.search = '';
+                        }
+                    }" class="relative">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Funding Source (Contract)</label>
-                        <select wire:model="expense_contract_id"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                            <option value="">Select a contract (optional)</option>
-                            @foreach($contracts as $contract)
-                                <option value="{{ $contract->id }}">{{ $contract->title }}{{ $contract->grant_code ? ' (' . $contract->grant_code . ')' : '' }}</option>
-                            @endforeach
-                        </select>
+                        <div class="relative">
+                            <button type="button" @click="open = !open"
+                                    class="w-full px-3 py-2 text-left border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md flex items-center justify-between">
+                                <span x-show="!selectedContract" class="text-gray-400">Select a contract (optional)</span>
+                                <span x-show="selectedContract" class="truncate" x-text="selectedContract ? (selectedContract.title + (selectedContract.grant_code ? ' (' + selectedContract.grant_code + ')' : '')) : ''"></span>
+                                <div class="flex items-center space-x-1">
+                                    <button type="button" x-show="selectedContract" @click.stop="clear()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    </button>
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                </div>
+                            </button>
+                            <div x-show="open" @click.away="open = false" x-transition
+                                 class="absolute z-50 mt-1 w-full bg-white dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md shadow-lg">
+                                <div class="p-2 border-b border-gray-200 dark:border-zinc-600">
+                                    <input type="text" x-model="search" placeholder="Search contracts..."
+                                           class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                                           @click.stop>
+                                </div>
+                                <ul class="max-h-48 overflow-y-auto">
+                                    <li @click="selectContract(null)"
+                                        class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-600 cursor-pointer">
+                                        No contract (clear selection)
+                                    </li>
+                                    <template x-for="contract in filteredContracts" :key="contract.id">
+                                        <li @click="selectContract(contract)"
+                                            :class="{'bg-indigo-50 dark:bg-indigo-900/30': contract.id == selectedId}"
+                                            class="px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-600 cursor-pointer">
+                                            <div class="text-sm font-medium text-gray-900 dark:text-white truncate" x-text="contract.title"></div>
+                                            <div class="text-xs text-gray-500 dark:text-gray-400">
+                                                <span x-show="contract.grant_code" x-text="contract.grant_code" class="font-medium text-blue-600 dark:text-blue-400"></span>
+                                                <span x-show="contract.grant_code && contract.funder"> · </span>
+                                                <span x-show="contract.funder" x-text="contract.funder"></span>
+                                            </div>
+                                        </li>
+                                    </template>
+                                    <li x-show="filteredContracts.length === 0" class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 text-center">
+                                        No contracts found
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Which funding source covers this expense</p>
                         @error('expense_contract_id') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
                     </div>
