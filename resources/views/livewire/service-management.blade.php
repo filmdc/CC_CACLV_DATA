@@ -120,26 +120,52 @@
 
                         <div class="md:col-span-2 flex items-center">
                             <input type="checkbox" wire:model="active" id="active" class="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded">
-                            <label for="active" class="ml-2 block text-sm text-gray-900">Active Service</label>
+                            <label for="active" class="ml-2 block text-sm text-gray-900 dark:text-gray-300">Active Service</label>
+                        </div>
+
+                        <!-- Contract Selection -->
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Funding Contracts
+                            </label>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Select the contracts that fund this service (optional)</p>
+                            <div class="border border-gray-300 dark:border-zinc-600 rounded-md max-h-48 overflow-y-auto bg-white dark:bg-zinc-700">
+                                @forelse($contracts as $contract)
+                                    <label class="flex items-center px-3 py-2 hover:bg-gray-50 dark:hover:bg-zinc-600 cursor-pointer border-b border-gray-100 dark:border-zinc-600 last:border-b-0">
+                                        <input type="checkbox"
+                                               wire:model="selectedContracts"
+                                               value="{{ $contract->id }}"
+                                               class="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 dark:border-zinc-500 rounded">
+                                        <span class="ml-3 text-sm text-gray-900 dark:text-white">
+                                            {{ $contract->title }}
+                                            @if($contract->contract_number)
+                                                <span class="text-gray-500 dark:text-gray-400">({{ $contract->contract_number }})</span>
+                                            @endif
+                                        </span>
+                                    </label>
+                                @empty
+                                    <p class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">No active contracts available</p>
+                                @endforelse
+                            </div>
                         </div>
                     </div>
 
                     <div>
-                        <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
                         <x-wysiwyg-editor model="description" :rows="3" placeholder="Describe this service and its objectives..." id="service_description" />
                     </div>
 
                     <div>
-                        <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                        <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
                         <x-wysiwyg-editor model="notes" :rows="2" placeholder="Additional notes about this service..." id="service_notes" />
                     </div>
 
                     <div class="flex justify-end space-x-3">
-                        <button type="button" wire:click="$set('showCreateForm', false)" 
+                        <button type="button" wire:click="$set('showCreateForm', false)"
                                 class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 border border-gray-300 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500">
                             Cancel
                         </button>
-                        <button type="submit" 
+                        <button type="submit"
                                 class="px-4 py-2 text-sm font-medium text-white bg-teal-600 border border-transparent rounded-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500">
                             Create Service
                         </button>
@@ -203,26 +229,52 @@
 
                         <div class="md:col-span-2 flex items-center">
                             <input type="checkbox" wire:model="active" id="edit_active" class="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded">
-                            <label for="edit_active" class="ml-2 block text-sm text-gray-900">Active Service</label>
+                            <label for="edit_active" class="ml-2 block text-sm text-gray-900 dark:text-gray-300">Active Service</label>
+                        </div>
+
+                        <!-- Contract Selection -->
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Funding Contracts
+                            </label>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Select the contracts that fund this service (optional)</p>
+                            <div class="border border-gray-300 dark:border-zinc-600 rounded-md max-h-48 overflow-y-auto bg-white dark:bg-zinc-700">
+                                @forelse($contracts as $contract)
+                                    <label class="flex items-center px-3 py-2 hover:bg-gray-50 dark:hover:bg-zinc-600 cursor-pointer border-b border-gray-100 dark:border-zinc-600 last:border-b-0">
+                                        <input type="checkbox"
+                                               wire:model="selectedContracts"
+                                               value="{{ $contract->id }}"
+                                               class="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 dark:border-zinc-500 rounded">
+                                        <span class="ml-3 text-sm text-gray-900 dark:text-white">
+                                            {{ $contract->title }}
+                                            @if($contract->contract_number)
+                                                <span class="text-gray-500 dark:text-gray-400">({{ $contract->contract_number }})</span>
+                                            @endif
+                                        </span>
+                                    </label>
+                                @empty
+                                    <p class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">No active contracts available</p>
+                                @endforelse
+                            </div>
                         </div>
                     </div>
 
                     <div>
-                        <label for="edit_description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <label for="edit_description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
                         <x-wysiwyg-editor model="description" :rows="3" placeholder="Describe this service and its objectives..." id="edit_service_description" />
                     </div>
 
                     <div>
-                        <label for="edit_notes" class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                        <label for="edit_notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
                         <x-wysiwyg-editor model="notes" :rows="2" placeholder="Additional notes about this service..." id="edit_service_notes" />
                     </div>
 
                     <div class="flex justify-end space-x-3">
-                        <button type="button" wire:click="$set('showEditForm', false)" 
+                        <button type="button" wire:click="$set('showEditForm', false)"
                                 class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 border border-gray-300 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500">
                             Cancel
                         </button>
-                        <button type="submit" 
+                        <button type="submit"
                                 class="px-4 py-2 text-sm font-medium text-white bg-yellow-600 border border-transparent rounded-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500">
                             Update Service
                         </button>
@@ -251,7 +303,7 @@
                                         </span>
                                     </div>
                                     <p class="text-sm text-gray-600 mt-1">{{ $service->description }}</p>
-                                    <div class="mt-2 flex items-center text-sm text-gray-500 space-x-4">
+                                    <div class="mt-2 flex flex-wrap items-center text-sm text-gray-500 gap-x-4 gap-y-1">
                                         <span>Program: {{ $service->program->name }}</span>
                                         <span>Start: {{ $service->start_date ? $service->start_date->format('M j, Y') : 'Not set' }}</span>
                                         @if($service->end_date)
@@ -265,6 +317,15 @@
                                             Completed: {{ $service->getCompletedEnrollmentsCount() }}
                                         </span>
                                     </div>
+                                    @if($service->contracts->count() > 0)
+                                        <div class="mt-2 flex flex-wrap gap-1">
+                                            @foreach($service->contracts as $contract)
+                                                <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
+                                                    {{ $contract->title }}
+                                                </span>
+                                            @endforeach
+                                        </div>
+                                    @endif
                                 </div>
                                 <div class="flex items-center space-x-2">
                                     @if($this->can('services.edit') && in_array($service->program_id, $editableProgramIds))

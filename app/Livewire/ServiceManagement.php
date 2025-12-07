@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Contract;
 use App\Models\Program;
 use App\Models\Service;
 use App\Traits\WithPermissionChecks;
@@ -43,6 +44,8 @@ class ServiceManagement extends Component
     public $active = true;
 
     public $notes = '';
+
+    public $selectedContracts = [];
 
     public function mount()
     {
@@ -141,6 +144,7 @@ class ServiceManagement extends Component
         $this->end_date = '';
         $this->active = true;
         $this->notes = '';
+        $this->selectedContracts = [];
         $this->showViewModal = false;
         $this->selectedViewService = null;
         $this->selectedServiceId = null;
@@ -158,6 +162,7 @@ class ServiceManagement extends Component
             $this->end_date = $service->end_date ? $service->end_date->format('Y-m-d') : '';
             $this->active = $service->active;
             $this->notes = $service->notes;
+            $this->selectedContracts = $service->contracts()->pluck('contracts.id')->toArray();
         }
     }
 
@@ -185,7 +190,7 @@ class ServiceManagement extends Component
         }
 
         try {
-            Service::create([
+            $service = Service::create([
                 'name' => $this->name,
                 'description' => $this->description,
                 'program_id' => $this->program_id,
@@ -194,6 +199,11 @@ class ServiceManagement extends Component
                 'active' => $this->active,
                 'notes' => $this->notes,
             ]);
+
+            // Sync contracts
+            if (! empty($this->selectedContracts)) {
+                $service->contracts()->sync($this->selectedContracts);
+            }
 
             session()->flash('success', 'Service created successfully.');
             $this->showCreateForm = false;
@@ -248,6 +258,9 @@ class ServiceManagement extends Component
                 'notes' => $this->notes,
             ]);
 
+            // Sync contracts
+            $service->contracts()->sync($this->selectedContracts);
+
             session()->flash('success', 'Service updated successfully.');
             $this->showEditForm = false;
             $this->selectedServiceId = null;
@@ -296,7 +309,7 @@ class ServiceManagement extends Component
 
     public function render()
     {
-        $services = Service::with(['program', 'workPlanGoals', 'serviceEnrollments'])
+        $services = Service::with(['program', 'workPlanGoals', 'serviceEnrollments', 'contracts'])
             ->when($this->filterProgramId, function ($query) {
                 $query->where('program_id', $this->filterProgramId);
             })
@@ -332,6 +345,11 @@ class ServiceManagement extends Component
             $filteredProgram = Program::find($this->filterProgramId);
         }
 
+        // Get active contracts for selection
+        $contracts = Contract::active()
+            ->orderBy('title')
+            ->get();
+
         return view('livewire.service-management', [
             'services' => $services,
             'programs' => $programs,
@@ -339,6 +357,7 @@ class ServiceManagement extends Component
             'editableProgramIds' => $editableProgramIds,
             'filteredProgram' => $filteredProgram,
             'selectedService' => $this->selectedService,
+            'contracts' => $contracts,
         ])->layout('components.layouts.app');
     }
 }
