@@ -1,5 +1,5 @@
 <div class="max-w-4xl mx-auto p-6">
-    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+    <div class="bg-white dark:bg-zinc-800 shadow-lg rounded-lg overflow-hidden">
         <!-- Header -->
         <div class="bg-blue-600 text-white p-6">
             <h1 class="text-2xl font-bold">Participant Intake & Registration</h1>
@@ -7,13 +7,13 @@
         </div>
 
         <!-- Progress Bar -->
-        <div class="p-4 bg-gray-50 border-b">
+        <div class="p-4 bg-gray-50 dark:bg-zinc-700 border-b dark:border-zinc-600">
             <div class="flex items-center justify-between mb-2">
-                <span class="text-sm font-medium text-gray-700">Step {{ $step }} of {{ $totalSteps }}</span>
-                <span class="text-sm text-gray-500">{{ round(($step / $totalSteps) * 100) }}% Complete</span>
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Step {{ $step }} of {{ $totalSteps }}</span>
+                <span class="text-sm text-gray-500 dark:text-gray-400">{{ round(($step / $totalSteps) * 100) }}% Complete</span>
             </div>
-            <div class="w-full bg-gray-200 rounded-full h-2">
-                <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+            <div class="w-full bg-gray-200 dark:bg-zinc-600 rounded-full h-2">
+                <div class="bg-blue-600 h-2 rounded-full transition-all duration-300"
                      style="width: {{ ($step / $totalSteps) * 100 }}%"></div>
             </div>
         </div>
@@ -43,7 +43,7 @@
             <!-- Step 1: Head of Household Personal Information -->
             @if ($step === 1)
                 <div class="space-y-6">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Head of Household Information</h2>
+                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Head of Household Information</h2>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
@@ -121,7 +121,7 @@
             <!-- Step 2: Household Information -->
             @if ($step === 2)
                 <div class="space-y-6">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Household Information</h2>
+                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Household Information</h2>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
@@ -171,7 +171,7 @@
                     </div>
 
                     <div class="space-y-4">
-                        <h3 class="text-lg font-medium text-gray-900">Address Information</h3>
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Address Information</h3>
                         
                         <div>
                             <label for="street_address" class="block text-sm font-medium text-gray-700 mb-2">
@@ -224,8 +224,8 @@
             @if ($step === 3)
                 <div class="space-y-6">
                     <div class="flex items-center justify-between">
-                        <h2 class="text-xl font-semibold text-gray-900 mb-4">Household Members</h2>
-                        <p class="text-sm text-gray-600">Optional: Add additional household members during intake</p>
+                        <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Household Members</h2>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Optional: Add additional household members during intake</p>
                     </div>
                     
                     <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -244,20 +244,20 @@
 
                     <!-- Current Household Members List -->
                     @if(count($householdMembers) > 0)
-                        <div class="bg-white border border-gray-200 rounded-lg">
-                            <div class="px-4 py-3 border-b border-gray-200">
-                                <h3 class="text-sm font-medium text-gray-900">Added Household Members</h3>
+                        <div class="bg-white dark:bg-zinc-700 border border-gray-200 dark:border-zinc-600 rounded-lg">
+                            <div class="px-4 py-3 border-b border-gray-200 dark:border-zinc-600">
+                                <h3 class="text-sm font-medium text-gray-900 dark:text-white">Added Household Members</h3>
                             </div>
-                            <ul class="divide-y divide-gray-200">
+                            <ul class="divide-y divide-gray-200 dark:divide-zinc-600">
                                 @foreach($householdMembers as $index => $member)
                                     <li class="px-4 py-3">
                                         <div class="flex items-center justify-between">
                                             <div>
-                                                <p class="text-sm font-medium text-gray-900">
+                                                <p class="text-sm font-medium text-gray-900 dark:text-white">
                                                     {{ $member['first_name'] }} {{ $member['middle_name'] }} {{ $member['last_name'] }}
                                                     @if($member['suffix']) {{ $member['suffix'] }} @endif
                                                 </p>
-                                                <p class="text-xs text-gray-500">
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">
                                                     {{ $member['relationship_to_head'] ? ucfirst($member['relationship_to_head']) : 'Not specified' }} • 
                                                     {{ $member['gender'] ? ucfirst($member['gender']) : 'Not specified' }} • 
                                                     DOB: {{ \Carbon\Carbon::parse($member['date_of_birth'])->format('M j, Y') }}
@@ -289,11 +289,11 @@
 
                     <!-- Add Member Form -->
                     @if($showMemberForm)
-                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-6">
+                        <div class="bg-gray-50 dark:bg-zinc-700 border border-gray-200 dark:border-zinc-600 rounded-lg p-6">
                             <div class="flex items-center justify-between mb-4">
-                                <h3 class="text-lg font-medium text-gray-900">Add Household Member</h3>
-                                <button type="button" wire:click="hideAddMemberForm" 
-                                        class="text-gray-400 hover:text-gray-600">
+                                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Add Household Member</h3>
+                                <button type="button" wire:click="hideAddMemberForm"
+                                        class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                     </svg>
@@ -395,7 +395,7 @@
             <!-- Step 4: Demographics -->
             @if ($step === 4)
                 <div class="space-y-6">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Demographics (CSBG Module 4 Section C)</h2>
+                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Demographics (CSBG Module 4 Section C)</h2>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
@@ -570,7 +570,7 @@
 
                     <!-- Employment & Military Information -->
                     <div class="mt-8">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Employment & Military Information</h3>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Employment & Military Information</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label for="military_status" class="block text-sm font-medium text-gray-700 mb-2">Military Status</label>
@@ -642,7 +642,7 @@
             <!-- Step 5: Financial Information -->
             @if ($step === 5)
                 <div class="space-y-6">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Financial Information</h2>
+                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Financial Information</h2>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
@@ -687,8 +687,8 @@
                         </div>
                     </div>
 
-                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Program Enrollment</h2>
-                    <p class="text-gray-600 mb-6">Enroll the participant in a program to begin service delivery.</p>
+                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Program Enrollment</h2>
+                    <p class="text-gray-600 dark:text-gray-400 mb-6">Enroll the participant in a program to begin service delivery.</p>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Program Selection -->
@@ -736,7 +736,7 @@
                         </div>
 
                         @if($enroll_in_service)
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 p-4 rounded-lg">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg">
                                 <!-- Service Selection -->
                                 <div>
                                     <label for="service_id" class="block text-sm font-medium text-gray-700 mb-2">
@@ -751,7 +751,7 @@
                                     </select>
                                     @error('service_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                     @if($program_id && $services->isEmpty())
-                                        <p class="text-sm text-gray-500 mt-1">No services available for this program.</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">No services available for this program.</p>
                                     @endif
                                 </div>
 
@@ -840,10 +840,10 @@
     <!-- Head of Household Duplicate Check Modal -->
     @if($showHeadOfHouseholdDuplicateModal)
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
-            <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-                <div class="px-6 py-4 border-b border-gray-200">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-700">
                     <div class="flex items-center justify-between">
-                        <h3 class="text-lg font-medium text-gray-900">Potential Head of Household Match Found</h3>
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Potential Head of Household Match Found</h3>
                         <button wire:click="cancelHeadOfHouseholdDuplicateCreation" class="text-gray-400 hover:text-gray-600">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -871,20 +871,20 @@
                     </div>
 
                     <div class="mb-6">
-                        <h4 class="text-sm font-medium text-gray-900 mb-3">Your Input:</h4>
-                        <div class="bg-gray-50 rounded-lg p-4">
+                        <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Your Input:</h4>
+                        <div class="bg-gray-50 dark:bg-zinc-700 rounded-lg p-4">
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                                 <div>
-                                    <span class="font-medium text-gray-700">Name:</span>
-                                    <p class="text-gray-900">{{ $first_name }} {{ $last_name }}</p>
+                                    <span class="font-medium text-gray-700 dark:text-gray-300">Name:</span>
+                                    <p class="text-gray-900 dark:text-white">{{ $first_name }} {{ $last_name }}</p>
                                 </div>
                                 <div>
-                                    <span class="font-medium text-gray-700">Date of Birth:</span>
-                                    <p class="text-gray-900">{{ $date_of_birth ? \Carbon\Carbon::parse($date_of_birth)->format('M j, Y') : 'Not provided' }}</p>
+                                    <span class="font-medium text-gray-700 dark:text-gray-300">Date of Birth:</span>
+                                    <p class="text-gray-900 dark:text-white">{{ $date_of_birth ? \Carbon\Carbon::parse($date_of_birth)->format('M j, Y') : 'Not provided' }}</p>
                                 </div>
                                 <div>
-                                    <span class="font-medium text-gray-700">Gender:</span>
-                                    <p class="text-gray-900">{{ $gender ?: 'Not provided' }}</p>
+                                    <span class="font-medium text-gray-700 dark:text-gray-300">Gender:</span>
+                                    <p class="text-gray-900 dark:text-white">{{ $gender ?: 'Not provided' }}</p>
                                 </div>
                             </div>
                         </div>
@@ -892,44 +892,44 @@
 
                     @if(!empty($potentialHeadOfHouseholdDuplicates))
                         <div class="space-y-4">
-                            <h4 class="text-sm font-medium text-gray-900">Potential Matches:</h4>
+                            <h4 class="text-sm font-medium text-gray-900 dark:text-white">Potential Matches:</h4>
                             @foreach($potentialHeadOfHouseholdDuplicates as $duplicate)
-                                <div class="border border-gray-200 rounded-lg p-4">
+                                <div class="border border-gray-200 dark:border-zinc-600 rounded-lg p-4">
                                     <div class="flex justify-between items-start mb-3">
                                         <div>
                                             <div class="flex items-center space-x-2">
-                                                <h5 class="font-medium text-gray-900">{{ $duplicate['participant']['first_name'] }} {{ $duplicate['participant']['last_name'] }}</h5>
+                                                <h5 class="font-medium text-gray-900 dark:text-white">{{ $duplicate['participant']['first_name'] }} {{ $duplicate['participant']['last_name'] }}</h5>
                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                                                     {{ round($duplicate['confidence_score']) }}% match
                                                 </span>
                                             </div>
-                                            <p class="text-sm text-gray-500">Household: {{ $duplicate['participant']['household']['household_code'] ?? 'N/A' }}</p>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">Household: {{ $duplicate['participant']['household']['household_code'] ?? 'N/A' }}</p>
                                         </div>
-                                        <button wire:click="viewExistingParticipant({{ $duplicate['participant']['id'] }})" 
-                                                class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                        <button wire:click="viewExistingParticipant({{ $duplicate['participant']['id'] }})"
+                                                class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium">
                                             View Details
                                         </button>
                                     </div>
 
                                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mb-3">
                                         <div>
-                                            <span class="font-medium text-gray-700">Date of Birth:</span>
-                                            <p class="text-gray-900">{{ $duplicate['participant']['date_of_birth'] ? \Carbon\Carbon::parse($duplicate['participant']['date_of_birth'])->format('M j, Y') : 'Not provided' }}</p>
+                                            <span class="font-medium text-gray-700 dark:text-gray-300">Date of Birth:</span>
+                                            <p class="text-gray-900 dark:text-white">{{ $duplicate['participant']['date_of_birth'] ? \Carbon\Carbon::parse($duplicate['participant']['date_of_birth'])->format('M j, Y') : 'Not provided' }}</p>
                                         </div>
                                         <div>
-                                            <span class="font-medium text-gray-700">Gender:</span>
-                                            <p class="text-gray-900">{{ $duplicate['participant']['gender'] ?? 'Not provided' }}</p>
+                                            <span class="font-medium text-gray-700 dark:text-gray-300">Gender:</span>
+                                            <p class="text-gray-900 dark:text-white">{{ $duplicate['participant']['gender'] ?? 'Not provided' }}</p>
                                         </div>
                                         <div>
-                                            <span class="font-medium text-gray-700">Phone:</span>
-                                            <p class="text-gray-900">{{ $duplicate['participant']['telephone'] ?? 'Not provided' }}</p>
+                                            <span class="font-medium text-gray-700 dark:text-gray-300">Phone:</span>
+                                            <p class="text-gray-900 dark:text-white">{{ $duplicate['participant']['telephone'] ?? 'Not provided' }}</p>
                                         </div>
                                     </div>
 
                                     @if(!empty($duplicate['matching_criteria']))
                                         <div class="mt-3">
-                                            <span class="text-sm font-medium text-gray-700">Matching criteria:</span>
-                                            <ul class="mt-1 text-sm text-gray-600">
+                                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Matching criteria:</span>
+                                            <ul class="mt-1 text-sm text-gray-600 dark:text-gray-400">
                                                 @foreach($duplicate['matching_criteria'] as $criterion)
                                                     <li class="flex items-center">
                                                         <svg class="w-4 h-4 text-green-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -947,9 +947,9 @@
                     @endif
                 </div>
                 
-                <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end space-x-3">
-                    <button wire:click="cancelHeadOfHouseholdDuplicateCreation" 
-                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                <div class="px-6 py-4 border-t border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-700 flex justify-end space-x-3">
+                    <button wire:click="cancelHeadOfHouseholdDuplicateCreation"
+                            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-zinc-600 border border-gray-300 dark:border-zinc-500 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-500">
                         Review & Revise
                     </button>
                     <button wire:click="proceedWithHeadOfHouseholdDuplicate" 

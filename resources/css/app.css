@@ -45,6 +45,93 @@
     ::file-selector-button {
         border-color: var(--color-gray-200, currentColor);
     }
+
+    /* Dark mode form input styling */
+    .dark input[type="text"],
+    .dark input[type="email"],
+    .dark input[type="password"],
+    .dark input[type="number"],
+    .dark input[type="tel"],
+    .dark input[type="url"],
+    .dark input[type="date"],
+    .dark input[type="time"],
+    .dark input[type="datetime-local"],
+    .dark input[type="month"],
+    .dark input[type="week"],
+    .dark input[type="search"],
+    .dark select,
+    .dark textarea {
+        background-color: rgb(63, 63, 70); /* zinc-700 */
+        border-color: rgb(82, 82, 91); /* zinc-600 */
+        color: rgb(255, 255, 255); /* white */
+    }
+
+    .dark input[type="text"]::placeholder,
+    .dark input[type="email"]::placeholder,
+    .dark input[type="password"]::placeholder,
+    .dark input[type="number"]::placeholder,
+    .dark input[type="tel"]::placeholder,
+    .dark input[type="url"]::placeholder,
+    .dark input[type="search"]::placeholder,
+    .dark textarea::placeholder {
+        color: rgb(161, 161, 170); /* zinc-400 */
+    }
+
+    .dark input[type="text"]:focus,
+    .dark input[type="email"]:focus,
+    .dark input[type="password"]:focus,
+    .dark input[type="number"]:focus,
+    .dark input[type="tel"]:focus,
+    .dark input[type="url"]:focus,
+    .dark input[type="date"]:focus,
+    .dark input[type="time"]:focus,
+    .dark input[type="datetime-local"]:focus,
+    .dark input[type="month"]:focus,
+    .dark input[type="week"]:focus,
+    .dark input[type="search"]:focus,
+    .dark select:focus,
+    .dark textarea:focus {
+        border-color: rgb(99, 102, 241); /* indigo-500 */
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+    }
+
+    /* Style select dropdown options in dark mode */
+    .dark select option {
+        background-color: rgb(63, 63, 70); /* zinc-700 */
+        color: rgb(255, 255, 255); /* white */
+    }
+
+    /* Dark mode label styling - use !important to override Tailwind text-gray-700 */
+    .dark label {
+        color: rgb(244, 244, 245) !important; /* zinc-100 - bright for better readability */
+    }
+
+    /* Dark mode for common text classes used on labels */
+    .dark .text-gray-700 {
+        color: rgb(228, 228, 231) !important; /* zinc-200 */
+    }
+
+    .dark .text-gray-600 {
+        color: rgb(212, 212, 216) !important; /* zinc-300 */
+    }
+
+    .dark .text-gray-500 {
+        color: rgb(161, 161, 170) !important; /* zinc-400 */
+    }
+
+    /* Radio and checkbox inputs in dark mode */
+    .dark input[type="radio"],
+    .dark input[type="checkbox"] {
+        background-color: rgb(63, 63, 70); /* zinc-700 */
+        border-color: rgb(82, 82, 91); /* zinc-600 */
+    }
+
+    .dark input[type="radio"]:checked,
+    .dark input[type="checkbox"]:checked {
+        background-color: rgb(99, 102, 241); /* indigo-500 */
+        border-color: rgb(99, 102, 241); /* indigo-500 */
+    }
 }
 
 [data-flux-field]:not(ui-radio, ui-checkbox) {
