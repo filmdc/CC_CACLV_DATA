@@ -21,12 +21,14 @@ use App\Observers\DocumentObserver;
 use App\Observers\PendingApprovalObserver;
 use App\Observers\ProgramEnrollmentObserver;
 use App\Observers\ServiceEnrollmentObserver;
+use App\Services\VersionService;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -36,7 +38,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(VersionService::class, function () {
+            return new VersionService();
+        });
     }
 
     /**
@@ -70,5 +74,10 @@ class AppServiceProvider extends ServiceProvider
         // Register Contract Utilization Observer for budget/expense tracking
         ProjectBudget::observe(ContractUtilizationObserver::class);
         ProjectExpense::observe(ContractUtilizationObserver::class);
+
+        // Share version info with all views
+        View::composer('*', function ($view) {
+            $view->with('appVersion', app(VersionService::class));
+        });
     }
 }

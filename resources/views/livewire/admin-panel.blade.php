@@ -165,6 +165,27 @@
                             <p class="text-2xl font-bold text-gray-900">{{ number_format($systemStats['total_work_plans']) }}</p>
                         </div>
                     </div>
+
+                    <!-- System Version Info -->
+                    @if(isset($appVersion))
+                    <div class="mt-6 bg-indigo-50 rounded-lg p-4 border border-indigo-100">
+                        <h3 class="text-sm font-medium text-indigo-900 mb-2">System Version</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                            <div>
+                                <span class="text-indigo-600 font-medium">Version:</span>
+                                <span class="text-indigo-900 ml-1">{{ $appVersion->getFullVersion() }}</span>
+                            </div>
+                            <div>
+                                <span class="text-indigo-600 font-medium">Commit:</span>
+                                <span class="text-indigo-900 ml-1 font-mono">{{ $appVersion->getShortCommit() }}</span>
+                            </div>
+                            <div>
+                                <span class="text-indigo-600 font-medium">Updated:</span>
+                                <span class="text-indigo-900 ml-1">{{ $appVersion->getUpdatedAt() }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
                 </div>
 
             @elseif ($activeTab === 'programs')

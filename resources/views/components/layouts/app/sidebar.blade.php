@@ -139,6 +139,13 @@
                 </flux:navlist.item>
             </flux:navlist>
 
+            <!-- Version Display -->
+            @if(isset($appVersion))
+            <div class="px-3 py-2 text-center">
+                <span class="text-xs text-zinc-400 dark:text-zinc-500">{{ $appVersion->getShortVersion() }}</span>
+            </div>
+            @endif
+
             <!-- Desktop User Menu -->
             <flux:dropdown position="bottom" align="start">
                 <flux:profile

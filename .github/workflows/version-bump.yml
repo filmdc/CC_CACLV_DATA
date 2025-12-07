@@ -1,0 +1,143 @@
+name: Version Bump
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'config/version.php'
+
+permissions:
+  contents: write
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get commit message
+        id: commit
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          echo "message<<EOF" >> $GITHUB_OUTPUT
+          echo "$COMMIT_MSG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          COMMIT_HASH=$(git rev-parse --short HEAD)
+          echo "hash=$COMMIT_HASH" >> $GITHUB_OUTPUT
+
+      - name: Determine version bump type
+        id: bump_type
+        run: |
+          COMMIT_MSG="${{ steps.commit.outputs.message }}"
+
+          # Check for breaking changes (MAJOR bump)
+          if echo "$COMMIT_MSG" | grep -qiE "(BREAKING|breaking change)"; then
+            echo "type=major" >> $GITHUB_OUTPUT
+            echo "Detected: MAJOR version bump (breaking change)"
+          # Check for new features (MINOR bump)
+          elif echo "$COMMIT_MSG" | grep -qiE "^(feat:|Add |add )"; then
+            echo "type=minor" >> $GITHUB_OUTPUT
+            echo "Detected: MINOR version bump (new feature)"
+          # Default to patch for all other changes
+          else
+            echo "type=patch" >> $GITHUB_OUTPUT
+            echo "Detected: PATCH version bump"
+          fi
+
+      - name: Read current version
+        id: current_version
+        run: |
+          MAJOR=$(grep "'major'" config/version.php | grep -oE "[0-9]+")
+          MINOR=$(grep "'minor'" config/version.php | grep -oE "[0-9]+")
+          PATCH=$(grep "'patch'" config/version.php | grep -oE "[0-9]+")
+          echo "major=$MAJOR" >> $GITHUB_OUTPUT
+          echo "minor=$MINOR" >> $GITHUB_OUTPUT
+          echo "patch=$PATCH" >> $GITHUB_OUTPUT
+          echo "Current version: $MAJOR.$MINOR.$PATCH"
+
+      - name: Calculate new version
+        id: new_version
+        run: |
+          MAJOR=${{ steps.current_version.outputs.major }}
+          MINOR=${{ steps.current_version.outputs.minor }}
+          PATCH=${{ steps.current_version.outputs.patch }}
+          BUMP_TYPE=${{ steps.bump_type.outputs.type }}
+
+          if [ "$BUMP_TYPE" = "major" ]; then
+            MAJOR=$((MAJOR + 1))
+            MINOR=0
+            PATCH=0
+          elif [ "$BUMP_TYPE" = "minor" ]; then
+            MINOR=$((MINOR + 1))
+            PATCH=0
+          else
+            PATCH=$((PATCH + 1))
+          fi
+
+          echo "major=$MAJOR" >> $GITHUB_OUTPUT
+          echo "minor=$MINOR" >> $GITHUB_OUTPUT
+          echo "patch=$PATCH" >> $GITHUB_OUTPUT
+          echo "New version: $MAJOR.$MINOR.$PATCH"
+
+      - name: Update version file
+        run: |
+          TODAY=$(date +%Y-%m-%d)
+          cat > config/version.php << 'ENDOFFILE'
+          <?php
+
+          return [
+              /*
+              |--------------------------------------------------------------------------
+              | Application Version
+              |--------------------------------------------------------------------------
+              |
+              | This file stores the semantic version of the application.
+              | The version is automatically updated by GitHub Actions on each push to main.
+              |
+              | Version Convention:
+              | - MAJOR: Breaking changes (commits containing 'BREAKING' or 'breaking change')
+              | - MINOR: New features (commits starting with 'feat:', 'Add', or 'add')
+              | - PATCH: Bug fixes and other changes
+              |
+              */
+
+              'major' => ${{ steps.new_version.outputs.major }},
+              'minor' => ${{ steps.new_version.outputs.minor }},
+              'patch' => ${{ steps.new_version.outputs.patch }},
+
+              /*
+              |--------------------------------------------------------------------------
+              | Last Commit Hash
+              |--------------------------------------------------------------------------
+              |
+              | The short hash of the last commit that triggered a version update.
+              |
+              */
+
+              'commit' => '${{ steps.commit.outputs.hash }}',
+
+              /*
+              |--------------------------------------------------------------------------
+              | Last Updated
+              |--------------------------------------------------------------------------
+              |
+              | Timestamp of the last version update.
+              |
+              */
+
+              'updated_at' => '${TODAY}',
+          ];
+          ENDOFFILE
+
+      - name: Commit version bump
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          NEW_VERSION="v${{ steps.new_version.outputs.major }}.${{ steps.new_version.outputs.minor }}.${{ steps.new_version.outputs.patch }}"
+          git add config/version.php
+          git diff --staged --quiet || git commit -m "chore: bump version to ${NEW_VERSION} [skip ci]"
+          git push

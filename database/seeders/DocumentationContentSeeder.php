@@ -562,6 +562,13 @@ class DocumentationContentSeeder extends Seeder
                 'sort_order' => 6,
                 'content' => $this->getArticleContent('poverty-guidelines'),
             ],
+            [
+                'slug' => 'system-versioning',
+                'title' => 'System Versioning',
+                'summary' => 'Understanding CAP TRACK version numbering and automatic updates',
+                'sort_order' => 7,
+                'content' => $this->getArticleContent('system-versioning'),
+            ],
         ];
     }
 
@@ -2991,6 +2998,57 @@ Pending → Approved → In Progress → Completed
 <li><code>poverty_guidelines.create</code> - Create guidelines</li>
 <li><code>poverty_guidelines.edit</code> - Edit guidelines</li>
 </ul>',
+
+            'system-versioning' => '<h2>System Versioning</h2>
+<p>CAP TRACK uses semantic versioning to track application updates. Version numbers help you identify which release you\'re running and track changes over time.</p>
+
+<h3>Version Format</h3>
+<p>Versions follow the <strong>semantic versioning</strong> pattern: <code>MAJOR.MINOR.PATCH</code></p>
+
+<table>
+<thead>
+<tr><th>Component</th><th>When It Changes</th><th>Example</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>MAJOR</strong></td><td>Breaking changes that may require updates to workflows</td><td>1.0.0 → 2.0.0</td></tr>
+<tr><td><strong>MINOR</strong></td><td>New features added (backwards compatible)</td><td>1.0.0 → 1.1.0</td></tr>
+<tr><td><strong>PATCH</strong></td><td>Bug fixes and small improvements</td><td>1.0.0 → 1.0.1</td></tr>
+</tbody>
+</table>
+
+<h3>Where to Find the Version</h3>
+<p>The current version is displayed in several locations:</p>
+<ul>
+<li><strong>Sidebar Footer</strong> - Look for the version number (e.g., <code>v1.0.0</code>) at the bottom of the navigation sidebar</li>
+<li><strong>Admin Panel</strong> - The System Overview tab shows detailed version information including commit hash and last update date</li>
+<li><strong>This Documentation</strong> - Always check your version to ensure you\'re reading relevant documentation</li>
+</ul>
+
+<h3>Automatic Version Updates</h3>
+<p>CAP TRACK automatically updates its version number based on commit messages when code is merged to the main branch:</p>
+
+<table>
+<thead>
+<tr><th>Commit Pattern</th><th>Version Bump</th></tr>
+</thead>
+<tbody>
+<tr><td>Commits containing <code>BREAKING</code> or <code>breaking change</code></td><td>MAJOR</td></tr>
+<tr><td>Commits starting with <code>feat:</code>, <code>Add</code>, or <code>add</code></td><td>MINOR</td></tr>
+<tr><td>All other commits (including <code>fix:</code>)</td><td>PATCH</td></tr>
+</tbody>
+</table>
+
+<h3>Version Information Details</h3>
+<p>In the Admin Panel, you can see:</p>
+<ul>
+<li><strong>Version</strong> - The full version number with commit hash (e.g., <code>v1.0.0 (abc1234)</code>)</li>
+<li><strong>Commit</strong> - The short hash of the last commit</li>
+<li><strong>Updated</strong> - The date of the last version update</li>
+</ul>
+
+<div class="note">
+<strong>Note:</strong> Version updates are automatic and managed through our CI/CD pipeline. No manual intervention is required.
+</div>',
 
             // User Guide
             'profile-settings' => '<h2>Profile Settings</h2>
