@@ -16,7 +16,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class ContractReportDueDate extends Model implements HasMedia
 {
-    use SoftDeletes, InteractsWithMedia, Auditable, HasLegacySyncScopes;
+    use Auditable, HasLegacySyncScopes, InteractsWithMedia, SoftDeletes;
 
     public const STATUS_OPTIONS = [
         'pending' => 'Pending',
@@ -104,7 +104,7 @@ class ContractReportDueDate extends Model implements HasMedia
                 'image/jpeg',
                 'image/png',
                 'image/gif',
-                'image/jpg'
+                'image/jpg',
             ])
             ->useDisk('public');
     }
@@ -112,7 +112,7 @@ class ContractReportDueDate extends Model implements HasMedia
     /**
      * Register media conversions
      */
-    public function registerMediaConversions(Media $media = null): void
+    public function registerMediaConversions(?Media $media = null): void
     {
         $this->addMediaConversion('thumb')->fit('crop', 150, 150);
         $this->addMediaConversion('preview')->fit('crop', 300, 300);
@@ -132,8 +132,9 @@ class ContractReportDueDate extends Model implements HasMedia
     public function emails(): BelongsToMany
     {
         return $this->belongsToMany(DueDateEmail::class, 'contract_report_due_date_emails')
-                    ->withPivot(['reminder_intervals', 'active'])
-                    ->withTimestamps();
+            ->using(ContractReportDueDateEmail::class)
+            ->withPivot(['reminder_intervals', 'active'])
+            ->withTimestamps();
     }
 
     /**
@@ -173,6 +174,7 @@ class ContractReportDueDate extends Model implements HasMedia
 
     /**
      * Get documents attached to this due date (legacy accessor)
+     *
      * @deprecated Use getTemplatesAttribute() instead
      */
     public function getDocumentsAttribute()
@@ -210,7 +212,7 @@ class ContractReportDueDate extends Model implements HasMedia
     public function scopeOverdue($query)
     {
         return $query->where('due_date', '<', Carbon::today())
-                    ->where('status', '!=', 'completed');
+            ->where('status', '!=', 'completed');
     }
 
     /**
@@ -219,8 +221,8 @@ class ContractReportDueDate extends Model implements HasMedia
     public function scopeUpcoming($query, int $days = 30)
     {
         return $query->where('due_date', '>=', Carbon::today())
-                    ->where('due_date', '<=', Carbon::today()->addDays($days))
-                    ->where('status', '!=', 'completed');
+            ->where('due_date', '<=', Carbon::today()->addDays($days))
+            ->where('status', '!=', 'completed');
     }
 
     /**
@@ -229,6 +231,7 @@ class ContractReportDueDate extends Model implements HasMedia
     public function shouldSendReminder(int $daysUntilDue): bool
     {
         $intervals = $this->reminder_intervals ?? [30, 15, 7, 3, 1];
+
         return in_array($daysUntilDue, $intervals) && $this->status !== 'completed' && $this->active;
     }
 
@@ -254,13 +257,19 @@ class ContractReportDueDate extends Model implements HasMedia
     /**
      * Convert legacy individual reminder fields to current reminder_intervals array
      */
-    public function setLegacyReminders(int $first = null, int $second = null, int $final = null): void
+    public function setLegacyReminders(?int $first = null, ?int $second = null, ?int $final = null): void
     {
         $intervals = [];
-        if ($first) $intervals[] = $first;
-        if ($second) $intervals[] = $second;
-        if ($final) $intervals[] = $final;
-        
+        if ($first) {
+            $intervals[] = $first;
+        }
+        if ($second) {
+            $intervals[] = $second;
+        }
+        if ($final) {
+            $intervals[] = $final;
+        }
+
         $this->reminder_intervals = $intervals;
         $this->first_reminder = $first;
         $this->second_reminder = $second;
@@ -273,6 +282,7 @@ class ContractReportDueDate extends Model implements HasMedia
     public function getLegacyReminderFields(): array
     {
         $intervals = $this->reminder_intervals ?? [];
+
         return [
             'first_reminder' => $intervals[0] ?? null,
             'second_reminder' => $intervals[1] ?? null,
@@ -283,7 +293,7 @@ class ContractReportDueDate extends Model implements HasMedia
     /**
      * Create due date with time from legacy date and time fields
      */
-    public function setLegacyDateTime(string $date, string $time = null): void
+    public function setLegacyDateTime(string $date, ?string $time = null): void
     {
         $this->due_date = $date;
         $this->due_time = $time;
@@ -296,8 +306,9 @@ class ContractReportDueDate extends Model implements HasMedia
     {
         $dateTime = $this->due_date->format('Y-m-d');
         if ($this->due_time) {
-            $dateTime .= ' ' . $this->due_time;
+            $dateTime .= ' '.$this->due_time;
         }
+
         return $dateTime;
     }
 
@@ -306,6 +317,6 @@ class ContractReportDueDate extends Model implements HasMedia
      */
     public function hasCalendarIntegration(): bool
     {
-        return !empty($this->microsoft_event_id);
+        return ! empty($this->microsoft_event_id);
     }
 }

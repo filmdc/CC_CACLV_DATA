@@ -52,6 +52,8 @@ class LegacyContractImport extends Component
 
     public $lastImportWarnings = [];
 
+    public $showSuccessSummary = false;
+
     protected $queryString = [
         'legacyIdFilter' => ['except' => ''],
         'startDateFilter' => ['except' => ''],
@@ -139,6 +141,19 @@ class LegacyContractImport extends Component
         $this->previewContracts = [];
         $this->selectedContracts = [];
         $this->selectAll = false;
+        $this->dismissSuccessSummary();
+    }
+
+    /**
+     * Dismiss the success summary
+     */
+    public function dismissSuccessSummary()
+    {
+        $this->showSuccessSummary = false;
+        $this->importResults = null;
+        $this->lastImportStats = [];
+        $this->lastImportErrors = [];
+        $this->lastImportWarnings = [];
     }
 
     /**
@@ -203,13 +218,7 @@ class LegacyContractImport extends Component
             $this->lastImportWarnings = $result['warnings'] ?? [];
 
             if ($result['success']) {
-                $message = sprintf(
-                    'Import completed! Created: %d, Updated: %d, Skipped: %d',
-                    $this->lastImportStats['created'] ?? 0,
-                    $this->lastImportStats['updated'] ?? 0,
-                    $this->lastImportStats['skipped'] ?? 0
-                );
-                session()->flash('success', $message);
+                $this->showSuccessSummary = true;
 
                 // Refresh preview to show updated sync status
                 $this->loadPreview();

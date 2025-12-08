@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class ContractReportDueDateEmail extends Model
+class ContractReportDueDateEmail extends Pivot
 {
     protected $table = 'contract_report_due_date_emails';
-    
+
     protected $fillable = [
         'contract_report_due_date_id',
         'due_date_email_id',
@@ -17,14 +17,14 @@ class ContractReportDueDateEmail extends Model
         'reminders_sent',
         'last_reminder_sent',
     ];
-    
+
     protected $casts = [
         'reminder_intervals' => 'array',
         'active' => 'boolean',
         'reminders_sent' => 'array',
         'last_reminder_sent' => 'datetime',
     ];
-    
+
     /**
      * Get the contract report due date
      */
@@ -32,7 +32,7 @@ class ContractReportDueDateEmail extends Model
     {
         return $this->belongsTo(ContractReportDueDate::class);
     }
-    
+
     /**
      * Get the due date email
      */
@@ -40,7 +40,7 @@ class ContractReportDueDateEmail extends Model
     {
         return $this->belongsTo(DueDateEmail::class);
     }
-    
+
     /**
      * Get the user associated with this email
      */

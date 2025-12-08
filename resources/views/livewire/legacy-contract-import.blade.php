@@ -33,6 +33,73 @@
             </div>
         @endif
 
+        <!-- Success Summary -->
+        @if($showSuccessSummary)
+            <div class="m-6 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-200 dark:border-green-700 shadow-lg">
+                <div class="p-6">
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-start space-x-4">
+                            <div class="flex-shrink-0">
+                                <div class="rounded-full bg-green-500 p-3">
+                                    <svg class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-xl font-bold text-green-900 dark:text-green-100 mb-2">
+                                    Import Completed Successfully!
+                                </h3>
+                                <p class="text-sm text-green-700 dark:text-green-300 mb-4">
+                                    Your contracts have been imported from the legacy database.
+                                </p>
+
+                                <!-- Stats Grid -->
+                                <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mt-4">
+                                    <div class="bg-white dark:bg-zinc-800 rounded-lg p-4 border border-green-200 dark:border-green-700">
+                                        <div class="text-3xl font-bold text-green-600 dark:text-green-400">
+                                            {{ $lastImportStats['created'] ?? 0 }}
+                                        </div>
+                                        <div class="text-xs text-gray-600 dark:text-gray-400 mt-1">Created</div>
+                                    </div>
+                                    <div class="bg-white dark:bg-zinc-800 rounded-lg p-4 border border-blue-200 dark:border-blue-700">
+                                        <div class="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                                            {{ $lastImportStats['updated'] ?? 0 }}
+                                        </div>
+                                        <div class="text-xs text-gray-600 dark:text-gray-400 mt-1">Updated</div>
+                                    </div>
+                                    <div class="bg-white dark:bg-zinc-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                                        <div class="text-3xl font-bold text-gray-600 dark:text-gray-400">
+                                            {{ $lastImportStats['skipped'] ?? 0 }}
+                                        </div>
+                                        <div class="text-xs text-gray-600 dark:text-gray-400 mt-1">Skipped</div>
+                                    </div>
+                                    <div class="bg-white dark:bg-zinc-800 rounded-lg p-4 border border-purple-200 dark:border-purple-700">
+                                        <div class="text-3xl font-bold text-purple-600 dark:text-purple-400">
+                                            {{ $lastImportStats['funders_created'] ?? 0 }}
+                                        </div>
+                                        <div class="text-xs text-gray-600 dark:text-gray-400 mt-1">Funders Created</div>
+                                    </div>
+                                    <div class="bg-white dark:bg-zinc-800 rounded-lg p-4 border border-indigo-200 dark:border-indigo-700">
+                                        <div class="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
+                                            {{ $lastImportStats['media_synced'] ?? 0 }}
+                                        </div>
+                                        <div class="text-xs text-gray-600 dark:text-gray-400 mt-1">Files Synced</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button wire:click="dismissSuccessSummary"
+                                class="flex-shrink-0 text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <div class="p-6">
             <!-- Connection Test Section -->
             <div class="mb-6 p-4 bg-gray-50 dark:bg-zinc-900 rounded-lg border border-gray-200 dark:border-zinc-700">

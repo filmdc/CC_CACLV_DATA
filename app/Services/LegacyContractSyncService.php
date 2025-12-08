@@ -226,9 +226,10 @@ class LegacyContractSyncService
             'start_date' => $legacyContract->start_date,
             'end_date' => $legacyContract->end_date,
             'grant_code' => $legacyContract->grant_code,
+            'archived' => false, // Ensure imported contracts are active
             'last_synced_at' => now(),
-            'created_by' => 1, // System user
-            'updated_by' => 1,
+            'created_by' => auth()->id(),
+            'updated_by' => auth()->id(),
         ];
 
         // Create or update contract
@@ -287,8 +288,8 @@ class LegacyContractSyncService
                 'active' => true,
                 'status' => $legacyDueDate->status ?? 'pending',
                 'last_synced_at' => now(),
-                'created_by' => 1,
-                'updated_by' => 1,
+                'created_by' => auth()->id(),
+                'updated_by' => auth()->id(),
             ];
 
             if ($existing) {
@@ -339,7 +340,7 @@ class LegacyContractSyncService
                 ], [
                     'name' => $legacyEmail->name,
                     'active' => $legacyEmail->active ?? true,
-                    'created_by' => 1,
+                    'created_by' => auth()->id(),
                 ]);
             } else {
                 // Create DueDateEmail with user
@@ -349,14 +350,16 @@ class LegacyContractSyncService
                 ], [
                     'name' => $legacyEmail->name ?? $user->name,
                     'active' => $legacyEmail->active ?? true,
-                    'created_by' => 1,
+                    'created_by' => auth()->id(),
                 ]);
             }
 
             // Attach to due date if not already attached
             if (! $dueDate->emails()->where('due_date_email_id', $dueDateEmail->id)->exists()) {
+                $reminderIntervals = json_decode($assignment->reminder_intervals ?? '[]', true) ?: [30, 15, 7, 3, 1];
+
                 $dueDate->emails()->attach($dueDateEmail->id, [
-                    'reminder_intervals' => json_decode($assignment->reminder_intervals ?? '[]', true) ?: [30, 15, 7, 3, 1],
+                    'reminder_intervals' => $reminderIntervals,
                     'active' => $assignment->active ?? true,
                     'created_at' => now(),
                     'updated_at' => now(),
@@ -529,8 +532,8 @@ class LegacyContractSyncService
             'legacy_id' => $legacyFunderId,
             'name' => $legacyFunder->funder_name,
             'active' => true,
-            'created_by' => 1,
-            'updated_by' => 1,
+            'created_by' => auth()->id(),
+            'updated_by' => auth()->id(),
             'created_at' => $legacyFunder->created_at,
             'updated_at' => $legacyFunder->updated_at,
         ]);

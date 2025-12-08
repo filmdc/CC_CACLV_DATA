@@ -1051,14 +1051,33 @@ class ContractManagement extends Component
                 ->when($this->statusFilter !== 'all', function ($query) {
                     switch ($this->statusFilter) {
                         case 'active':
-                            $query->where('start_date', '<=', now())
-                                ->where('end_date', '>=', now());
+                            $query->where(function ($q) {
+                                $q->where(function ($subQ) {
+                                    // Has start date <= now and (no end date OR end date >= now)
+                                    $subQ->where('start_date', '<=', now())
+                                        ->where(function ($endQ) {
+                                            $endQ->whereNull('end_date')
+                                                ->orWhere('end_date', '>=', now());
+                                        });
+                                })
+                                    ->orWhere(function ($subQ) {
+                                        // No start date but has end date >= now
+                                        $subQ->whereNull('start_date')
+                                            ->where('end_date', '>=', now());
+                                    })
+                                    ->orWhere(function ($subQ) {
+                                        // No start date and no end date
+                                        $subQ->whereNull('start_date')
+                                            ->whereNull('end_date');
+                                    });
+                            });
                             break;
                         case 'upcoming':
                             $query->where('start_date', '>', now());
                             break;
                         case 'expired':
-                            $query->where('end_date', '<', now());
+                            $query->whereNotNull('end_date')
+                                ->where('end_date', '<', now());
                             break;
                     }
                 });
