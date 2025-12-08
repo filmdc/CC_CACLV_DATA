@@ -238,7 +238,7 @@
 
     <!-- Add/Edit Distribution List Modal -->
     @if($showDistributionListForm)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="closeDistributionListForm">
             <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
                     {{ $editingDistributionListId ? 'Edit Distribution List' : 'Add Distribution List' }}

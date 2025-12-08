@@ -353,7 +353,7 @@
 
     <!-- Item Details Modal -->
     @if($showModal && $selectedItem)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 p-4" wire:click.self="closeModal">
             <div class="bg-white dark:bg-zinc-800 rounded-lg max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col">
                 <!-- Modal Header -->
                 <div class="bg-indigo-600 text-white p-4 rounded-t-lg flex justify-between items-center">
@@ -480,7 +480,7 @@
             }
         @endphp
 
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="cancelReset">
             <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-lg w-full mx-4">
                 <!-- Modal Header -->
                 <div class="bg-orange-600 text-white p-6 rounded-t-lg">

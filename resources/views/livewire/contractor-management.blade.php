@@ -218,7 +218,7 @@
 
     <!-- Create/Edit Form Modal -->
     @if($showCreateForm || $showEditForm)
-        <div class="fixed inset-0 bg-gray-500 dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-75 flex items-center justify-center p-4 z-50">
+        <div class="fixed inset-0 bg-gray-500 dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-75 flex items-center justify-center p-4 z-50" wire:click.self="resetForm">
             <div class="bg-white dark:bg-zinc-800 rounded-lg max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
                 <div class="sticky top-0 bg-white dark:bg-zinc-800 border-b border-gray-200 dark:border-zinc-700 px-6 py-4 rounded-t-lg">
                     <div class="flex items-center justify-between">
@@ -586,7 +586,7 @@
 
     <!-- Contractor Details Modal -->
     @if($showDetails && $selectedContractor)
-        <div class="fixed inset-0 bg-gray-500 dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-75 flex items-center justify-center p-4 z-50">
+        <div class="fixed inset-0 bg-gray-500 dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-75 flex items-center justify-center p-4 z-50" wire:click.self="$set('showDetails', false)">
             <div class="bg-white dark:bg-zinc-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
                 <div class="p-6">
                     <div class="flex justify-between items-start mb-4">
@@ -939,7 +939,7 @@
 
     <!-- Rejection Modal -->
     @if($showApprovalModal)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="resetApprovalModal">
             <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                     Reject Document

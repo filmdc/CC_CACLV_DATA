@@ -311,7 +311,7 @@
 
     <!-- Edit Household Modal -->
     @if($showEditHouseholdModal)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="cancelHouseholdEdit">
             <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
                 <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-600">
                     <div class="flex items-center justify-between">
@@ -443,7 +443,7 @@
 
     <!-- Add Member Modal -->
     @if($showAddMemberModal)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="cancelMemberEdit">
             <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
                 <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-600">
                     <div class="flex items-center justify-between">
@@ -565,7 +565,7 @@
 
     <!-- Edit Member Modal -->
     @if($showEditMemberModal)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="cancelMemberEdit">
             <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
                 <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-600">
                     <div class="flex items-center justify-between">

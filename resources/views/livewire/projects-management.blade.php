@@ -525,7 +525,7 @@
 
     <!-- Template Library Modal -->
     @if($showTemplateModal)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="$set('showTemplateModal', false)">
             <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-3xl w-full mx-4 max-h-[80vh] overflow-y-auto">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Project Templates</h3>
@@ -586,7 +586,7 @@
 
     <!-- Quick Participant Creation Modal -->
     @if($showQuickParticipantForm)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="$set('showQuickParticipantForm', false)">
             <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-md w-full mx-4">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Create New Participant</h3>
                 <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Creates a new participant as head of household. A new household will be automatically created. Full CSBG intake can be completed later.</p>
@@ -676,7 +676,7 @@
 
     <!-- Quick Property Creation Modal -->
     @if($showQuickPropertyForm)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="$set('showQuickPropertyForm', false)">
             <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-md w-full mx-4">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Create New Property</h3>
                 <div class="space-y-4">

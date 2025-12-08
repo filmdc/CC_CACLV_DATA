@@ -229,7 +229,7 @@
 
         <!-- View User Modal -->
         @if($showViewModal && $selectedUser)
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="closeViewModal">
                 <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
                     <!-- Modal Header -->
                     <div class="bg-purple-600 text-white p-6 rounded-t-lg">
@@ -488,7 +488,7 @@
 
     <!-- Bulk Assignment Modal -->
     @if($showBulkAssignModal)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="resetBulkAssignment">
             <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
                 <!-- Modal Header -->
                 <div class="bg-purple-600 text-white p-6 rounded-t-lg">
@@ -589,7 +589,7 @@
 
     <!-- Bulk Delete Confirmation Modal -->
     @if($showBulkDeleteModal)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="resetBulkDelete">
             <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-md w-full mx-4">
                 <!-- Modal Header -->
                 <div class="bg-red-600 text-white p-6 rounded-t-lg">

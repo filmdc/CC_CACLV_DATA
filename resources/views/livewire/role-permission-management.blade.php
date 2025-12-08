@@ -351,7 +351,7 @@
 
         <!-- View Role Modal -->
         @if($showViewRoleModal && $viewRole)
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="$set('showViewRoleModal', false)">
                 <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-4xl w-full m-4 max-h-[90vh] overflow-y-auto">
                     <!-- Modal Header -->
                     <div class="bg-purple-600 text-white p-6 rounded-t-lg">
@@ -478,7 +478,7 @@
 
         <!-- View Permission Modal -->
         @if($showViewPermissionModal && $viewPermission)
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="$set('showViewPermissionModal', false)">
                 <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-3xl w-full m-4 max-h-[90vh] overflow-y-auto">
                     <!-- Modal Header -->
                     <div class="bg-purple-600 text-white p-6 rounded-t-lg">

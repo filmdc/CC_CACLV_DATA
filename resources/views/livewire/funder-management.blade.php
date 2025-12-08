@@ -242,7 +242,7 @@
 
         <!-- View Modal -->
         @if($showViewModal && $selectedFunder)
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="$set('showViewModal', false)">
                 <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
                     <!-- Modal Header -->
                     <div class="bg-purple-600 text-white p-6 rounded-t-lg">

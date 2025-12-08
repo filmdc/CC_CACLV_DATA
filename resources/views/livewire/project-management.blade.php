@@ -648,7 +648,7 @@
 
     <!-- Milestone Form Modal -->
     @if($showMilestoneForm)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="$set('showMilestoneForm', false)">
             <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-md w-full mx-4">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                     {{ $editingMilestone ? 'Edit Milestone' : 'Create Milestone' }}
@@ -692,7 +692,7 @@
 
     <!-- Task Form Modal -->
     @if($showTaskForm)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="$set('showTaskForm', false)">
             <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-md w-full mx-4">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                     {{ $editingTask ? 'Edit Task' : 'Create Task' }}
@@ -748,7 +748,7 @@
 
     <!-- Document Form Modal -->
     @if($showDocumentForm)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="$set('showDocumentForm', false)">
             <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-md w-full mx-4">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Add Required Document</h3>
                 <div class="space-y-4">
@@ -820,7 +820,7 @@
 
     <!-- Budget Form Modal -->
     @if($showBudgetForm)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="$set('showBudgetForm', false)">
             <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-md w-full mx-4">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Add Budget Category</h3>
                 <div class="space-y-4">
@@ -929,7 +929,7 @@
 
     <!-- Expense Form Modal -->
     @if($showExpenseForm)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="$set('showExpenseForm', false)">
             <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-md w-full mx-4">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Record Expense</h3>
                 <div class="space-y-4">
@@ -1055,7 +1055,7 @@
 
     <!-- Edit Project Modal -->
     @if($showEditProjectForm)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="$set('showEditProjectForm', false)">
             <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Edit Project Information</h3>
 
@@ -1305,7 +1305,7 @@
 
     <!-- Save as Template Modal -->
     @if($showSaveAsTemplateForm)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="$set('showSaveAsTemplateForm', false)">
             <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-md w-full mx-4">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Save as Template</h3>
                 <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
@@ -1351,7 +1351,7 @@
 
     <!-- Document Upload Modal -->
     @if($showDocumentUploadForm)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="$set('showDocumentUploadForm', false)">
             <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-lg w-full mx-4">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Upload Document Files</h3>
@@ -1416,7 +1416,7 @@
             $viewingDocument = $job->milestones->flatMap->documents->firstWhere('id', $viewingDocumentId);
         @endphp
         @if($viewingDocument)
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="$set('showDocumentViewerModal', false)">
                 <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
                     <!-- Header -->
                     <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-900">

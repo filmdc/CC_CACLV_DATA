@@ -142,7 +142,7 @@
 
     <!-- Edit Field Mapping Modal -->
     @if($showEditModal)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="$set('showEditModal', false)">
             <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
                 @php
                     $editingField = $template->fieldMappings->firstWhere('id', $editingFieldId);

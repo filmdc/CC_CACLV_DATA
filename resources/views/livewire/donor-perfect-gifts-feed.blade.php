@@ -1251,7 +1251,7 @@
 
     <!-- Download Modal -->
     @if($showDownloadModal)
-    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="closeDownloadModal">
         <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-lg w-full mx-4">
             <!-- Modal Header -->
             <div class="bg-green-600 text-white p-6 rounded-t-lg flex justify-between items-center">

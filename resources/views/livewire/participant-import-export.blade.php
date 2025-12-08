@@ -791,7 +791,7 @@
     
     <!-- Transformation Preview Modal -->
     @if($showTransformationPreview ?? false)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="$set('showTransformationPreview', false)">
             <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[80vh] overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-700">
                     <div class="flex items-center justify-between">

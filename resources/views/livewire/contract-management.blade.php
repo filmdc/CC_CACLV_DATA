@@ -257,7 +257,7 @@
 
         <!-- View Contract Modal -->
         @if($showViewModal && $selectedContract)
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="closeViewModal">
                 <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
                     <!-- Modal Header -->
                     <div class="bg-green-600 text-white p-6 rounded-t-lg">
@@ -661,7 +661,7 @@
 
         <!-- Due Date Form Modal -->
         @if($showDueDateForm)
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="closeDueDateForm">
                 <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="text-lg font-medium text-gray-900 dark:text-white">
@@ -750,7 +750,7 @@
 
         <!-- Report Form Modal -->
         @if($showReportForm)
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="closeReportForm">
                 <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="text-lg font-medium text-gray-900 dark:text-white">
@@ -827,7 +827,7 @@
 
         <!-- Report View Modal -->
         @if($showReportView && $selectedReport)
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="closeReportView">
                 <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="text-lg font-medium text-gray-900 dark:text-white">{{ $selectedReport->title }}</h3>
@@ -1247,7 +1247,7 @@
     
     <!-- Due Date Reports Modal -->
     @if($showDueDateReportsModal && $selectedDueDate)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="closeDueDateReportsModal">
             <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
                 <div class="flex justify-between items-start mb-4">
                     <div>
@@ -1345,7 +1345,7 @@
     
     <!-- Assigned Users Modal -->
     @if($showAssignedUsersModal && $selectedDueDateForUsers)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="closeAssignedUsersModal">
             <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">

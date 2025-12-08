@@ -468,7 +468,7 @@
 
     <!-- Drill-Down Modal -->
     @if($showDrillDown)
-    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="closeDrillDown">
         <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-6xl w-full mx-4 max-h-screen overflow-hidden">
             <!-- Modal Header -->
             <div class="bg-blue-600 text-white px-6 py-4 flex justify-between items-center">
