@@ -118,7 +118,7 @@
 
                 <!-- Action Buttons -->
                 <div class="mt-4 flex space-x-3">
-                    <button wire:click="previewContracts"
+                    <button wire:click="loadPreview"
                             class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md font-medium transition-colors">
                         Preview Contracts
                     </button>

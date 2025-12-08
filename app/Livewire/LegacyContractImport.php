@@ -92,7 +92,7 @@ class LegacyContractImport extends Component
     /**
      * Preview contracts based on filters
      */
-    public function previewContracts()
+    public function loadPreview()
     {
         $this->validate([
             'legacyIdFilter' => 'nullable|string|max:255',
@@ -212,7 +212,7 @@ class LegacyContractImport extends Component
                 session()->flash('success', $message);
 
                 // Refresh preview to show updated sync status
-                $this->previewContracts();
+                $this->loadPreview();
                 $this->selectedContracts = [];
                 $this->selectAll = false;
             } else {
