@@ -39,7 +39,7 @@ class ContractManagement extends Component
     public $filterEndDate = '';
 
     // Sorting
-    public $sortBy = 'id';
+    public $sortBy = 'legacy_id';
 
     public $sortDirection = 'desc';
 
@@ -1013,7 +1013,7 @@ class ContractManagement extends Component
                 })
                 ->when($this->search, function ($query) {
                     $query->where(function ($q) {
-                        $q->where('id', 'like', '%'.$this->search.'%')
+                        $q->where('legacy_id', 'like', '%'.$this->search.'%')
                             ->orWhere('title', 'like', '%'.$this->search.'%')
                             ->orWhere('contract_number', 'like', '%'.$this->search.'%')
                             ->orWhere('cfda_number', 'like', '%'.$this->search.'%')
@@ -1028,7 +1028,7 @@ class ContractManagement extends Component
                 })
                 // Individual column filters
                 ->when($this->filterId, function ($query) {
-                    $query->where('id', 'like', '%'.$this->filterId.'%');
+                    $query->where('legacy_id', 'like', '%'.$this->filterId.'%');
                 })
                 ->when($this->filterGrantCode, function ($query) {
                     $query->where('grant_code', 'like', '%'.$this->filterGrantCode.'%');
