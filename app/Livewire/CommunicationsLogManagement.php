@@ -256,6 +256,11 @@ class CommunicationsLogManagement extends Component
     }
 
     // Quick create methods
+    /**
+     * Toggle the address entry section visibility
+     *
+     * @return void
+     */
     public function toggleAddressEntry()
     {
         $this->showAddressEntry = ! $this->showAddressEntry;
@@ -467,6 +472,11 @@ class CommunicationsLogManagement extends Component
         $this->newContractorEmail = '';
     }
 
+    /**
+     * Reset all address entry form fields to default values
+     *
+     * @return void
+     */
     protected function resetAddressEntryFields()
     {
         $this->addressLine = '';
@@ -650,6 +660,14 @@ class CommunicationsLogManagement extends Component
 
     /**
      * Process address entry - creates property and/or household address if needed
+     *
+     * This method handles three scenarios:
+     * 1. Create Property record for project tracking
+     * 2. Link address to participant's household
+     * 3. Use address as communication subject only
+     *
+     *
+     * @throws \Exception if address creation fails
      */
     protected function processAddressEntry(): void
     {
@@ -661,7 +679,7 @@ class CommunicationsLogManagement extends Component
         $this->validate([
             'addressLine' => 'required|string|max:255',
             'addressCity' => 'required|string|max:100',
-            'addressState' => 'required|string|max:2',
+            'addressState' => 'required|string|size:2|regex:/^[A-Z]{2}$/',
             'addressZip' => 'required|string|max:10',
         ]);
 
@@ -673,53 +691,99 @@ class CommunicationsLogManagement extends Component
             return;
         }
 
-        // Create property if toggled
-        if ($this->createAsProperty) {
-            $property = Property::create([
-                'address_line_1' => $this->addressLine,
-                'city' => $this->addressCity,
-                'state' => strtoupper($this->addressState),
-                'zip_code' => $this->addressZip,
-                'participant_id' => $this->participant_id ?: null,
-                'household_id' => $this->household_id ?: null,
-                'status' => 'active',
-                'created_by' => Auth::id(),
-            ]);
+        try {
+            $createdResources = []; // Track what was created for success message
 
-            $this->property_id = $property->id;
-
-            // Set subject from property address if not already set
-            if (empty($this->subject)) {
-                $this->subject = $property->address_line_1.', '.$property->city;
-            }
-        }
-
-        // Create household address if linked to participant with household
-        if ($this->linkAddressToParticipant && $this->household_id) {
-            $household = Household::find($this->household_id);
-            if ($household) {
-                // Check if this address already exists for the household
-                $existingAddress = $household->addresses()
-                    ->where('address', $this->addressLine)
+            // Create property if toggled
+            if ($this->createAsProperty) {
+                // Check for duplicate property first
+                $existingProperty = Property::where('address_line_1', $this->addressLine)
                     ->where('city', $this->addressCity)
                     ->where('zip_code', $this->addressZip)
                     ->first();
 
-                if (! $existingAddress) {
-                    $household->addresses()->create([
-                        'address' => $this->addressLine,
+                if ($existingProperty) {
+                    // Use existing property instead of creating duplicate
+                    $this->property_id = $existingProperty->id;
+
+                    // Set subject from property address if not already set
+                    if (empty($this->subject)) {
+                        $this->subject = $existingProperty->address_line_1.', '.$existingProperty->city;
+                    }
+
+                    $createdResources[] = 'linked to existing property';
+                } else {
+                    // Create new property
+                    $property = Property::create([
+                        'address_line_1' => $this->addressLine,
                         'city' => $this->addressCity,
                         'state' => strtoupper($this->addressState),
                         'zip_code' => $this->addressZip,
-                        'is_current' => true,
+                        'participant_id' => $this->participant_id ?: null,
+                        'household_id' => $this->household_id ?: null,
+                        'status' => 'active',
+                        'created_by' => Auth::id(),
                     ]);
+
+                    $this->property_id = $property->id;
+
+                    // Set subject from property address if not already set
+                    if (empty($this->subject)) {
+                        $this->subject = $property->address_line_1.', '.$property->city;
+                    }
+
+                    $createdResources[] = 'property created';
                 }
             }
-        }
 
-        // Set subject from address if not already set and not a property
-        if (empty($this->subject) && ! $this->createAsProperty) {
-            $this->subject = $this->addressLine.', '.$this->addressCity;
+            // Create household address if linked to participant with household
+            if ($this->linkAddressToParticipant && $this->household_id) {
+                $household = Household::find($this->household_id);
+                if ($household) {
+                    // Check if this address already exists for the household
+                    $existingAddress = $household->addresses()
+                        ->where('address', $this->addressLine)
+                        ->where('city', $this->addressCity)
+                        ->where('zip_code', $this->addressZip)
+                        ->first();
+
+                    if (! $existingAddress) {
+                        $household->addresses()->create([
+                            'address' => $this->addressLine,
+                            'city' => $this->addressCity,
+                            'state' => strtoupper($this->addressState),
+                            'zip_code' => $this->addressZip,
+                            'is_current' => true,
+                        ]);
+
+                        $createdResources[] = 'household address linked';
+                    } else {
+                        $createdResources[] = 'address already linked to household';
+                    }
+                }
+            }
+
+            // Set subject from address if not already set and not a property
+            if (empty($this->subject) && ! $this->createAsProperty) {
+                $this->subject = $this->addressLine.', '.$this->addressCity;
+            }
+
+            // Show success message if any resources were created/linked
+            if (! empty($createdResources)) {
+                $message = 'Address processed: '.implode(', ', $createdResources);
+                session()->flash('address_success', $message);
+            }
+        } catch (\Exception $e) {
+            // Log the error and show user-friendly message
+            \Log::error('Failed to process address entry', [
+                'address' => $this->addressLine,
+                'city' => $this->addressCity,
+                'error' => $e->getMessage(),
+            ]);
+
+            $this->addError('addressLine', 'Failed to save address. Please try again or contact support.');
+
+            throw $e;
         }
     }
 
