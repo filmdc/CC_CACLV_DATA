@@ -271,7 +271,7 @@
                                         </span>
                                     @endif
                                     <span class="text-gray-500 dark:text-gray-400">
-                                        {{ $log->communication_date->format('M d, Y g:i A') }}
+                                        {{ $log->communication_date->format('M d, Y') }}
                                     </span>
                                 </div>
 
@@ -405,7 +405,7 @@
                 <div class="flex justify-between items-start mb-4">
                     <div>
                         <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{{ $viewingLog->subject }}</h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $viewingLog->communication_date->format('F d, Y g:i A') }}</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $viewingLog->communication_date->format('F d, Y') }}</p>
                     </div>
                     <button wire:click="closeDetailModal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -754,10 +754,10 @@
                 @endif
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Date/Time -->
+                    <!-- Date -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date & Time *</label>
-                        <input type="datetime-local" wire:model="communication_date"
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date *</label>
+                        <input type="date" wire:model="communication_date"
                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
                         @error('communication_date') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
                     </div>

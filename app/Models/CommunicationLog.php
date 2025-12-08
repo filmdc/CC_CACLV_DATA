@@ -44,7 +44,7 @@ class CommunicationLog extends Model
     ];
 
     protected $casts = [
-        'communication_date' => 'datetime',
+        'communication_date' => 'date',
         'follow_up_date' => 'date',
         'follow_up_completed' => 'boolean',
         'follow_up_completed_at' => 'datetime',
@@ -253,7 +253,7 @@ class CommunicationLog extends Model
 
     public function getFormattedCommunicationDateAttribute(): string
     {
-        return $this->communication_date?->format('M d, Y g:i A') ?? '';
+        return $this->communication_date?->format('M d, Y') ?? '';
     }
 
     public function getFormattedFollowUpDateAttribute(): string

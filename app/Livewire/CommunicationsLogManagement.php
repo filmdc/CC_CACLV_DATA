@@ -448,7 +448,7 @@ class CommunicationsLogManagement extends Component
     {
         $this->authorizeAction('communications_log.create');
         $this->resetForm();
-        $this->communication_date = now()->format('Y-m-d\TH:i');
+        $this->communication_date = now()->format('Y-m-d');
         $this->showForm = true;
     }
 
@@ -462,7 +462,7 @@ class CommunicationsLogManagement extends Component
         $this->household_id = $log->household_id ?? '';
         $this->property_id = $log->property_id ?? '';
         $this->contractor_id = $log->contractor_id ?? '';
-        $this->communication_date = $log->communication_date?->format('Y-m-d\TH:i');
+        $this->communication_date = $log->communication_date?->format('Y-m-d');
         $this->communication_type = $log->communication_type;
         $this->direction = $log->direction;
         $this->contact_name = $log->contact_name;
