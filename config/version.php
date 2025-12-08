@@ -40,5 +40,5 @@ return [
     |
     */
 
-    'updated_at' => '${TODAY}',
+    'updated_at' => '2025-12-08',
 ];

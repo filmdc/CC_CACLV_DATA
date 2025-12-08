@@ -103,7 +103,7 @@ jobs:
         if: steps.skip_check.outputs.skip != 'true'
         run: |
           TODAY=$(date +%Y-%m-%d)
-          cat > config/version.php << 'ENDOFFILE'
+          cat > config/version.php << ENDOFFILE
           <?php
 
           return [
