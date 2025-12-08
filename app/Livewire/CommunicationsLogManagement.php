@@ -171,6 +171,21 @@ class CommunicationsLogManagement extends Component
 
     public $newContractorEmail = '';
 
+    // Address entry fields
+    public $showAddressEntry = false;
+
+    public $addressLine = '';
+
+    public $addressCity = '';
+
+    public $addressState = 'NV';
+
+    public $addressZip = '';
+
+    public $createAsProperty = false;
+
+    public $linkAddressToParticipant = false;
+
     protected $queryString = [
         'search' => ['except' => ''],
         'typeFilter' => ['except' => ''],
@@ -241,6 +256,14 @@ class CommunicationsLogManagement extends Component
     }
 
     // Quick create methods
+    public function toggleAddressEntry()
+    {
+        $this->showAddressEntry = ! $this->showAddressEntry;
+        if (! $this->showAddressEntry) {
+            $this->resetAddressEntryFields();
+        }
+    }
+
     public function toggleQuickCreateParticipant()
     {
         $this->showQuickCreateParticipant = ! $this->showQuickCreateParticipant;
@@ -444,6 +467,16 @@ class CommunicationsLogManagement extends Component
         $this->newContractorEmail = '';
     }
 
+    protected function resetAddressEntryFields()
+    {
+        $this->addressLine = '';
+        $this->addressCity = '';
+        $this->addressState = 'NV';
+        $this->addressZip = '';
+        $this->createAsProperty = false;
+        $this->linkAddressToParticipant = false;
+    }
+
     public function showCreateForm()
     {
         $this->authorizeAction('communications_log.create');
@@ -615,8 +648,91 @@ class CommunicationsLogManagement extends Component
         }
     }
 
+    /**
+     * Process address entry - creates property and/or household address if needed
+     */
+    protected function processAddressEntry(): void
+    {
+        if (! $this->showAddressEntry || empty($this->addressLine)) {
+            return;
+        }
+
+        // Validate address fields
+        $this->validate([
+            'addressLine' => 'required|string|max:255',
+            'addressCity' => 'required|string|max:100',
+            'addressState' => 'required|string|max:2',
+            'addressZip' => 'required|string|max:10',
+        ]);
+
+        // If linking to participant, ensure participant is selected or create new one
+        if ($this->linkAddressToParticipant && ! $this->participant_id) {
+            // If no participant selected but we want to link, they need to select or create one
+            $this->addError('participant_id', 'Please select or create a participant to link this address.');
+
+            return;
+        }
+
+        // Create property if toggled
+        if ($this->createAsProperty) {
+            $property = Property::create([
+                'address_line_1' => $this->addressLine,
+                'city' => $this->addressCity,
+                'state' => strtoupper($this->addressState),
+                'zip_code' => $this->addressZip,
+                'participant_id' => $this->participant_id ?: null,
+                'household_id' => $this->household_id ?: null,
+                'status' => 'active',
+                'created_by' => Auth::id(),
+            ]);
+
+            $this->property_id = $property->id;
+
+            // Set subject from property address if not already set
+            if (empty($this->subject)) {
+                $this->subject = $property->address_line_1.', '.$property->city;
+            }
+        }
+
+        // Create household address if linked to participant with household
+        if ($this->linkAddressToParticipant && $this->household_id) {
+            $household = Household::find($this->household_id);
+            if ($household) {
+                // Check if this address already exists for the household
+                $existingAddress = $household->addresses()
+                    ->where('address', $this->addressLine)
+                    ->where('city', $this->addressCity)
+                    ->where('zip_code', $this->addressZip)
+                    ->first();
+
+                if (! $existingAddress) {
+                    $household->addresses()->create([
+                        'address' => $this->addressLine,
+                        'city' => $this->addressCity,
+                        'state' => strtoupper($this->addressState),
+                        'zip_code' => $this->addressZip,
+                        'is_current' => true,
+                    ]);
+                }
+            }
+        }
+
+        // Set subject from address if not already set and not a property
+        if (empty($this->subject) && ! $this->createAsProperty) {
+            $this->subject = $this->addressLine.', '.$this->addressCity;
+        }
+    }
+
     public function save()
     {
+        // Process address entry first
+        $this->processAddressEntry();
+
+        // Check for validation errors from address processing
+        if ($this->getErrorBag()->isNotEmpty()) {
+            return;
+        }
+
         if (empty($this->subject) && $this->property_id) {
             $property = Property::find($this->property_id);
             if ($property) {
@@ -766,6 +882,10 @@ class CommunicationsLogManagement extends Component
         $this->resetQuickCreateParticipantFields();
         $this->resetQuickCreatePropertyFields();
         $this->resetQuickCreateContractorFields();
+
+        // Reset address entry
+        $this->showAddressEntry = false;
+        $this->resetAddressEntryFields();
     }
 
     public function render()

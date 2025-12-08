@@ -855,6 +855,81 @@
                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
                     </div>
 
+                    <!-- Address Entry Section -->
+                    <div class="md:col-span-2 border-t border-gray-200 dark:border-zinc-600 pt-4 mt-2">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Address (Optional)</h4>
+                            <button type="button" wire:click="toggleAddressEntry"
+                                    class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">
+                                {{ $showAddressEntry ? 'Hide Address' : '+ Add Address' }}
+                            </button>
+                        </div>
+
+                        @if($showAddressEntry)
+                        <div class="p-4 bg-gray-50 dark:bg-zinc-700/50 rounded-lg space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Street Address *</label>
+                                    <input type="text" wire:model="addressLine" placeholder="123 Main Street"
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                    @error('addressLine') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">City *</label>
+                                    <input type="text" wire:model="addressCity" placeholder="Las Vegas"
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                    @error('addressCity') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                </div>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">State *</label>
+                                        <input type="text" wire:model="addressState" placeholder="NV" maxlength="2"
+                                               class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md uppercase">
+                                        @error('addressState') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ZIP *</label>
+                                        <input type="text" wire:model="addressZip" placeholder="89101"
+                                               class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                        @error('addressZip') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Address Options -->
+                            <div class="border-t border-gray-200 dark:border-zinc-600 pt-4 space-y-3">
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="checkbox" wire:model.live="createAsProperty"
+                                           class="rounded border-gray-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500">
+                                    <div>
+                                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Create as Property</span>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Add this address to the properties database for project tracking</p>
+                                    </div>
+                                </label>
+
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="checkbox" wire:model.live="linkAddressToParticipant"
+                                           class="rounded border-gray-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500">
+                                    <div>
+                                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Link to Participant</span>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Save this address to the participant's household record</p>
+                                    </div>
+                                </label>
+
+                                @if($linkAddressToParticipant && !$participant_id)
+                                    <p class="text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 p-2 rounded">
+                                        Select or create a participant below to link this address
+                                    </p>
+                                @endif
+                            </div>
+
+                            <p class="text-xs text-gray-500 dark:text-gray-400 italic">
+                                If no options are selected, the address will only be used as the communication subject.
+                            </p>
+                        </div>
+                        @endif
+                    </div>
+
                     <!-- Link to entities section -->
                     <div class="md:col-span-2 border-t border-gray-200 dark:border-zinc-600 pt-4 mt-2">
                         <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Link to Record (Optional)</h4>
