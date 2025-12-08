@@ -29,8 +29,22 @@ jobs:
           COMMIT_HASH=$(git rev-parse --short HEAD)
           echo "hash=$COMMIT_HASH" >> $GITHUB_OUTPUT
 
+      - name: Check if should skip version bump
+        id: skip_check
+        run: |
+          COMMIT_MSG="${{ steps.commit.outputs.message }}"
+
+          # Skip version bump for merge commits and PR merges
+          if echo "$COMMIT_MSG" | grep -qiE "^(Merge |Merge pull request|Merge branch)"; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "Skipping: Merge commit detected"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Determine version bump type
         id: bump_type
+        if: steps.skip_check.outputs.skip != 'true'
         run: |
           COMMIT_MSG="${{ steps.commit.outputs.message }}"
 
@@ -50,6 +64,7 @@ jobs:
 
       - name: Read current version
         id: current_version
+        if: steps.skip_check.outputs.skip != 'true'
         run: |
           MAJOR=$(grep "'major'" config/version.php | grep -oE "[0-9]+")
           MINOR=$(grep "'minor'" config/version.php | grep -oE "[0-9]+")
@@ -61,6 +76,7 @@ jobs:
 
       - name: Calculate new version
         id: new_version
+        if: steps.skip_check.outputs.skip != 'true'
         run: |
           MAJOR=${{ steps.current_version.outputs.major }}
           MINOR=${{ steps.current_version.outputs.minor }}
@@ -84,6 +100,7 @@ jobs:
           echo "New version: $MAJOR.$MINOR.$PATCH"
 
       - name: Update version file
+        if: steps.skip_check.outputs.skip != 'true'
         run: |
           TODAY=$(date +%Y-%m-%d)
           cat > config/version.php << 'ENDOFFILE'
@@ -134,6 +151,7 @@ jobs:
           ENDOFFILE
 
       - name: Commit version bump
+        if: steps.skip_check.outputs.skip != 'true'
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
