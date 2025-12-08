@@ -4,7 +4,6 @@ namespace App\Livewire;
 
 use App\Services\LegacyContractSyncService;
 use App\Traits\WithPermissionChecks;
-use Illuminate\Support\Collection;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -22,7 +21,7 @@ class LegacyContractImport extends Component
     public $previewLimit = 100;
 
     // Preview and selection
-    public Collection $previewContracts;
+    public $previewContracts = [];
 
     public $selectedContracts = [];
 
@@ -62,7 +61,7 @@ class LegacyContractImport extends Component
     public function mount()
     {
         $this->authorizeAction('contracts.import_legacy');
-        $this->previewContracts = collect();
+        $this->previewContracts = [];
     }
 
     /**
@@ -105,18 +104,19 @@ class LegacyContractImport extends Component
         try {
             $service = app(LegacyContractSyncService::class);
 
-            $this->previewContracts = $service->previewContracts(
+            $contracts = $service->previewContracts(
                 $this->legacyIdFilter,
                 $this->startDateFilter,
                 $this->endDateFilter,
                 $this->previewLimit
             );
 
+            $this->previewContracts = $contracts->toArray();
             $this->showPreview = true;
             $this->selectedContracts = [];
             $this->selectAll = false;
 
-            session()->flash('success', 'Found '.$this->previewContracts->count().' contracts matching your filters.');
+            session()->flash('success', 'Found '.count($this->previewContracts).' contracts matching your filters.');
         } catch (\Exception $e) {
             session()->flash('error', 'Preview failed: '.$e->getMessage());
             \Log::error('Legacy contract preview failed', [
@@ -136,7 +136,7 @@ class LegacyContractImport extends Component
     public function clearPreview()
     {
         $this->showPreview = false;
-        $this->previewContracts = collect();
+        $this->previewContracts = [];
         $this->selectedContracts = [];
         $this->selectAll = false;
     }
@@ -147,7 +147,7 @@ class LegacyContractImport extends Component
     public function toggleSelectAll()
     {
         if ($this->selectAll) {
-            $this->selectedContracts = $this->previewContracts->pluck('legacy_id')->toArray();
+            $this->selectedContracts = array_column($this->previewContracts, 'legacy_id');
         } else {
             $this->selectedContracts = [];
         }
