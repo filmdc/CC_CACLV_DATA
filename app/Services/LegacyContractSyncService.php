@@ -270,14 +270,21 @@ class LegacyContractSyncService
             // Check if already synced
             $existing = ContractReportDueDate::where('legacy_id', $legacyDueDate->id)->first();
 
+            // Generate report name from description or use default
+            $reportName = $legacyDueDate->description
+                ? (strlen($legacyDueDate->description) > 100
+                    ? substr($legacyDueDate->description, 0, 100).'...'
+                    : $legacyDueDate->description)
+                : 'Report Due '.date('m/d/Y', strtotime($legacyDueDate->due_date));
+
             $dueDateData = [
                 'legacy_id' => $legacyDueDate->id,
                 'contract_id' => $contractId,
-                'report_name' => $legacyDueDate->report_name,
+                'report_name' => $reportName,
                 'due_date' => $legacyDueDate->due_date,
                 'description' => $legacyDueDate->description,
-                'reminder_intervals' => json_decode($legacyDueDate->reminder_intervals, true) ?? [30, 15, 7, 3, 1],
-                'active' => $legacyDueDate->active ?? true,
+                'reminder_intervals' => [30, 15, 7, 3, 1], // Use default intervals
+                'active' => true,
                 'status' => $legacyDueDate->status ?? 'pending',
                 'last_synced_at' => now(),
                 'created_by' => 1,
