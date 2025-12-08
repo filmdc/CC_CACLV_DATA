@@ -952,10 +952,10 @@
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-600">
                 <thead class="bg-gray-50 dark:bg-zinc-700">
                     <tr>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-600" wire:click="sortByColumn('id')">
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-600" wire:click="sortByColumn('legacy_id')">
                             <div class="flex items-center">
-                                ID
-                                @if($sortBy === 'id')
+                                Legacy ID
+                                @if($sortBy === 'legacy_id')
                                     <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
                                         @if($sortDirection === 'asc')
                                             <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
@@ -1026,10 +1026,10 @@
                 <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-zinc-600">
                     @forelse($contracts as $contract)
                         <tr class="{{ $contract->archived ? 'bg-gray-100 dark:bg-zinc-900' : '' }}">
-                            <!-- ID -->
+                            <!-- Legacy ID -->
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <div class="text-sm text-gray-900 dark:text-white font-medium">
-                                    {{ $contract->id }}
+                                    {{ $contract->legacy_id ?? '-' }}
                                 </div>
                             </td>
                             <!-- Grant Code -->
