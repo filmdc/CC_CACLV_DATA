@@ -112,7 +112,7 @@ class LegacyContractSyncService
                 $programNames = DB::connection($this->connection)
                     ->table('programs')
                     ->whereIn('id', $programIds)
-                    ->pluck('name');
+                    ->pluck('program_name');
                 $contract->program_name = $programNames->implode(', ');
                 $contract->program_ids = $programIds->toArray();
             } else {
@@ -123,7 +123,7 @@ class LegacyContractSyncService
             $contract->funder_name = DB::connection($this->connection)
                 ->table('funders')
                 ->where('id', $contract->funder_id)
-                ->value('name') ?? '-';
+                ->value('funder_name') ?? '-';
 
             // Format amount
             $contract->amount_formatted = number_format($contract->amount, 2);
@@ -464,7 +464,7 @@ class LegacyContractSyncService
         }
 
         // Try to find by name match
-        $program = Program::where('name', $legacyProgram->name)->first();
+        $program = Program::where('name', $legacyProgram->program_name)->first();
 
         if ($program) {
             return $program->id;
@@ -472,8 +472,8 @@ class LegacyContractSyncService
 
         // Use mapping from config
         $mapping = config('legacy-import.program_mapping', []);
-        if (isset($mapping[$legacyProgram->name])) {
-            return $mapping[$legacyProgram->name];
+        if (isset($mapping[$legacyProgram->program_name])) {
+            return $mapping[$legacyProgram->program_name];
         }
 
         return config('legacy-import.default_program_id', 5);
@@ -506,7 +506,7 @@ class LegacyContractSyncService
         }
 
         // Try to find by name match
-        $funder = Funder::where('name', $legacyFunder->name)->first();
+        $funder = Funder::where('name', $legacyFunder->funder_name)->first();
 
         if ($funder) {
             // Update with legacy_id
@@ -518,8 +518,7 @@ class LegacyContractSyncService
         // Create new funder
         $funder = Funder::create([
             'legacy_id' => $legacyFunderId,
-            'name' => $legacyFunder->name,
-            'notes' => $legacyFunder->notes ?? null,
+            'name' => $legacyFunder->funder_name,
             'active' => true,
             'created_by' => 1,
             'updated_by' => 1,
