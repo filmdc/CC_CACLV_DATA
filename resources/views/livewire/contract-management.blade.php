@@ -952,6 +952,20 @@
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-600">
                 <thead class="bg-gray-50 dark:bg-zinc-700">
                     <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-600" wire:click="sortByColumn('id')">
+                            <div class="flex items-center">
+                                ID
+                                @if($sortBy === 'id')
+                                    <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                                        @if($sortDirection === 'asc')
+                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                        @else
+                                            <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd"/>
+                                        @endif
+                                    </svg>
+                                @endif
+                            </div>
+                        </th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Fund Code</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Title</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Program</th>
@@ -963,6 +977,10 @@
                     </tr>
                     <!-- Filter Row -->
                     <tr class="bg-gray-100 dark:bg-zinc-800">
+                        <th class="px-2 py-2">
+                            <input type="text" wire:model.live.debounce.300ms="filterId" placeholder="Filter..."
+                                   class="w-full px-2 py-1 text-xs border border-gray-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-green-500">
+                        </th>
                         <th class="px-2 py-2">
                             <input type="text" wire:model.live.debounce.300ms="filterGrantCode" placeholder="Filter..."
                                    class="w-full px-2 py-1 text-xs border border-gray-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-green-500">
@@ -1008,6 +1026,12 @@
                 <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-zinc-600">
                     @forelse($contracts as $contract)
                         <tr class="{{ $contract->archived ? 'bg-gray-100 dark:bg-zinc-900' : '' }}">
+                            <!-- ID -->
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <div class="text-sm text-gray-900 dark:text-white font-medium">
+                                    {{ $contract->id }}
+                                </div>
+                            </td>
                             <!-- Grant Code -->
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <div class="text-sm text-gray-900 dark:text-white font-medium">

@@ -24,6 +24,8 @@ class ContractManagement extends Component
     public $statusFilter = 'active';
 
     // Individual column filters
+    public $filterId = '';
+
     public $filterGrantCode = '';
 
     public $filterTitle = '';
@@ -35,6 +37,11 @@ class ContractManagement extends Component
     public $filterStartDate = '';
 
     public $filterEndDate = '';
+
+    // Sorting
+    public $sortBy = 'id';
+
+    public $sortDirection = 'desc';
 
     public $selectedContract = null;
 
@@ -423,6 +430,11 @@ class ContractManagement extends Component
         $this->resetPage();
     }
 
+    public function updatedFilterId()
+    {
+        $this->resetPage();
+    }
+
     public function updatedFilterGrantCode()
     {
         $this->resetPage();
@@ -456,6 +468,17 @@ class ContractManagement extends Component
     public function toggleArchivedView()
     {
         $this->showArchivedContracts = ! $this->showArchivedContracts;
+        $this->resetPage();
+    }
+
+    public function sortByColumn($column)
+    {
+        if ($this->sortBy === $column) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortBy = $column;
+            $this->sortDirection = 'asc';
+        }
         $this->resetPage();
     }
 
@@ -990,7 +1013,8 @@ class ContractManagement extends Component
                 })
                 ->when($this->search, function ($query) {
                     $query->where(function ($q) {
-                        $q->where('title', 'like', '%'.$this->search.'%')
+                        $q->where('id', 'like', '%'.$this->search.'%')
+                            ->orWhere('title', 'like', '%'.$this->search.'%')
                             ->orWhere('contract_number', 'like', '%'.$this->search.'%')
                             ->orWhere('cfda_number', 'like', '%'.$this->search.'%')
                             ->orWhere('grant_code', 'like', '%'.$this->search.'%')
@@ -1003,6 +1027,9 @@ class ContractManagement extends Component
                     });
                 })
                 // Individual column filters
+                ->when($this->filterId, function ($query) {
+                    $query->where('id', 'like', '%'.$this->filterId.'%');
+                })
                 ->when($this->filterGrantCode, function ($query) {
                     $query->where('grant_code', 'like', '%'.$this->filterGrantCode.'%');
                 })
@@ -1036,7 +1063,7 @@ class ContractManagement extends Component
                     }
                 });
 
-            $contracts = $query->orderBy('created_at', 'desc')->paginate(10);
+            $contracts = $query->orderBy($this->sortBy, $this->sortDirection)->paginate(10);
         }
 
         // Get upcoming deadlines if on upcoming-deadlines tab
