@@ -69,7 +69,6 @@ class LegacyContractSyncService
                 'grant_code',
                 'purpose',
                 'notes',
-                'program_id',
                 'funder_id',
                 'start_date',
                 'end_date',
@@ -93,7 +92,7 @@ class LegacyContractSyncService
 
             // Get related counts from legacy database
             $contract->due_dates_count = DB::connection($this->connection)
-                ->table('contract_report_due_dates')
+                ->table('report_due_dates')
                 ->where('contract_id', $contract->legacy_id)
                 ->count();
 
@@ -103,16 +102,28 @@ class LegacyContractSyncService
                 ->where('model_id', $contract->legacy_id)
                 ->count();
 
-            // Get program and funder names
-            $contract->program_name = DB::connection($this->connection)
-                ->table('programs')
-                ->where('id', $contract->program_id)
-                ->value('name');
+            // Get program names from pivot table (contracts can have multiple programs)
+            $programIds = DB::connection($this->connection)
+                ->table('contract_program')
+                ->where('contract_id', $contract->legacy_id)
+                ->pluck('program_id');
+
+            if ($programIds->isNotEmpty()) {
+                $programNames = DB::connection($this->connection)
+                    ->table('programs')
+                    ->whereIn('id', $programIds)
+                    ->pluck('name');
+                $contract->program_name = $programNames->implode(', ');
+                $contract->program_ids = $programIds->toArray();
+            } else {
+                $contract->program_name = '-';
+                $contract->program_ids = [];
+            }
 
             $contract->funder_name = DB::connection($this->connection)
                 ->table('funders')
                 ->where('id', $contract->funder_id)
-                ->value('name');
+                ->value('name') ?? '-';
 
             // Format amount
             $contract->amount_formatted = number_format($contract->amount, 2);
@@ -189,8 +200,15 @@ class LegacyContractSyncService
             return;
         }
 
-        // Map program and funder
-        $programId = $this->mapProgram($legacyContract->program_id);
+        // Get program IDs from pivot table
+        $legacyProgramIds = DB::connection($this->connection)
+            ->table('contract_program')
+            ->where('contract_id', $legacyId)
+            ->pluck('program_id')
+            ->toArray();
+
+        // Map the first program (or use default if none)
+        $programId = $this->mapProgramFromLegacyIds($legacyProgramIds);
         $funderId = $this->mapFunder($legacyContract->funder_id);
 
         // Prepare contract data - preserve HTML formatting in purpose and notes
@@ -244,7 +262,7 @@ class LegacyContractSyncService
     protected function syncContractDueDates(int $legacyContractId, int $contractId): void
     {
         $legacyDueDates = DB::connection($this->connection)
-            ->table('contract_report_due_dates')
+            ->table('report_due_dates')
             ->where('contract_id', $legacyContractId)
             ->get();
 
@@ -287,8 +305,8 @@ class LegacyContractSyncService
     {
         // Get assignments from pivot table
         $assignments = DB::connection($this->connection)
-            ->table('contract_report_due_date_emails')
-            ->where('contract_report_due_date_id', $legacyDueDateId)
+            ->table('due_date_email_report_due_date')
+            ->where('report_due_date_id', $legacyDueDateId)
             ->get();
 
         $dueDate = ContractReportDueDate::find($dueDateId);
@@ -396,6 +414,27 @@ class LegacyContractSyncService
                 ]);
             }
         }
+    }
+
+    /**
+     * Map multiple legacy program IDs to a single new program ID
+     */
+    protected function mapProgramFromLegacyIds(array $legacyProgramIds): int
+    {
+        if (empty($legacyProgramIds)) {
+            return config('legacy-import.default_program_id', 5);
+        }
+
+        // Try to map the first program
+        foreach ($legacyProgramIds as $legacyProgramId) {
+            $mappedId = $this->mapProgram($legacyProgramId);
+            if ($mappedId !== config('legacy-import.default_program_id', 5)) {
+                return $mappedId;
+            }
+        }
+
+        // If none mapped successfully, return default
+        return config('legacy-import.default_program_id', 5);
     }
 
     /**
