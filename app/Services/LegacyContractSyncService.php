@@ -384,7 +384,9 @@ class LegacyContractSyncService
                 }
 
                 // Download file from legacy server
-                $fileUrl = config('legacy-import.media_migration.remote_server.base_url').'/'.$mediaRecord->id.'/'.$mediaRecord->file_name;
+                $baseUrl = config('legacy-import.media_migration.remote_server.base_url');
+                $storagePath = config('legacy-import.media_migration.remote_server.storage_path', '/storage');
+                $fileUrl = $baseUrl.$storagePath.'/'.$mediaRecord->id.'/'.$mediaRecord->file_name;
 
                 $response = Http::timeout(60)
                     ->withOptions(['verify' => false]) // Skip SSL verification for internal server

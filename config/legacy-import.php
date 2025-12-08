@@ -209,10 +209,10 @@ return [
         'source_storage_path' => '/var/www/Contracts_Database_Laravel_Gen/storage/app', // Path to old system's storage (will check both public and private)
         'remote_server' => [
             'enabled' => true, // Set to true to fetch files from remote server instead of local paths
-            'base_url' => 'http://10.55.0.10', // Base URL of the remote server
+            'base_url' => 'https://contracts.caclv.org', // Base URL of the remote server
             'storage_path' => '/storage', // Path on remote server where files are stored
             'timeout' => 30, // HTTP timeout in seconds
-            'verify_ssl' => false, // Whether to verify SSL certificates
+            'verify_ssl' => false, // Whether to verify SSL certificates (false for self-signed certs)
             'auth' => [
                 'type' => 'none', // 'none', 'basic', 'bearer', 'query'
                 'username' => null,
