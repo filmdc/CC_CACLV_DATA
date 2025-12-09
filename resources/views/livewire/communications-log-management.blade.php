@@ -232,7 +232,7 @@
                                     <div>
                                         <h4 class="font-medium text-gray-900 dark:text-white">{{ $log->subject }}</h4>
                                         <p class="text-sm text-gray-600 dark:text-gray-400">
-                                            {{ $log->contact_name }}
+                                            {{ $log->contact_full_name }}
                                             @if($log->contact_organization)
                                                 <span class="text-gray-400 dark:text-gray-500">| {{ $log->contact_organization }}</span>
                                             @endif
@@ -447,7 +447,7 @@
                         <dl class="space-y-2 text-sm">
                             <div class="flex justify-between">
                                 <dt class="text-gray-500 dark:text-gray-400">Name:</dt>
-                                <dd class="text-gray-900 dark:text-white font-medium">{{ $viewingLog->contact_name }}</dd>
+                                <dd class="text-gray-900 dark:text-white font-medium">{{ $viewingLog->contact_full_name }}</dd>
                             </div>
                             @if($viewingLog->contact_role)
                             <div class="flex justify-between">
@@ -459,6 +459,12 @@
                             <div class="flex justify-between">
                                 <dt class="text-gray-500 dark:text-gray-400">Organization:</dt>
                                 <dd class="text-gray-900 dark:text-white">{{ $viewingLog->contact_organization }}</dd>
+                            </div>
+                            @endif
+                            @if($viewingLog->contact_full_address)
+                            <div class="flex justify-between">
+                                <dt class="text-gray-500 dark:text-gray-400">Address:</dt>
+                                <dd class="text-gray-900 dark:text-white">{{ $viewingLog->contact_full_address }}</dd>
                             </div>
                             @endif
                             @if($viewingLog->contact_phone)
@@ -808,12 +814,20 @@
                         </select>
                     </div>
 
-                    <!-- Contact Name -->
+                    <!-- Contact First Name -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contact Name *</label>
-                        <input type="text" wire:model="contact_name" placeholder="e.g., John Smith"
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">First Name *</label>
+                        <input type="text" wire:model="contact_first_name" placeholder="e.g., John"
                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                        @error('contact_name') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+                        @error('contact_first_name') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+                    </div>
+
+                    <!-- Contact Last Name -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Last Name</label>
+                        <input type="text" wire:model="contact_last_name" placeholder="e.g., Smith"
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                        @error('contact_last_name') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
                     </div>
 
                     <!-- Contact Role -->
@@ -853,6 +867,96 @@
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Organization</label>
                         <input type="text" wire:model="contact_organization" placeholder="e.g., ABC Company"
                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                    </div>
+
+                    <!-- Contact Address Section -->
+                    <div class="md:col-span-2 border-t border-gray-200 dark:border-zinc-600 pt-4 mt-2">
+                        <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Contact Address (Optional)</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Address -->
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Street Address</label>
+                                <input type="text" wire:model="contact_address" placeholder="123 Main Street"
+                                       class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                @error('contact_address') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
+
+                            <!-- City -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">City</label>
+                                <input type="text" wire:model="contact_city" placeholder="Las Vegas"
+                                       class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                @error('contact_city') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
+
+                            <!-- State & ZIP -->
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">State</label>
+                                    <select wire:model="contact_state"
+                                            class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                        <option value="">Select...</option>
+                                        <option value="AL">AL</option>
+                                        <option value="AK">AK</option>
+                                        <option value="AZ">AZ</option>
+                                        <option value="AR">AR</option>
+                                        <option value="CA">CA</option>
+                                        <option value="CO">CO</option>
+                                        <option value="CT">CT</option>
+                                        <option value="DE">DE</option>
+                                        <option value="FL">FL</option>
+                                        <option value="GA">GA</option>
+                                        <option value="HI">HI</option>
+                                        <option value="ID">ID</option>
+                                        <option value="IL">IL</option>
+                                        <option value="IN">IN</option>
+                                        <option value="IA">IA</option>
+                                        <option value="KS">KS</option>
+                                        <option value="KY">KY</option>
+                                        <option value="LA">LA</option>
+                                        <option value="ME">ME</option>
+                                        <option value="MD">MD</option>
+                                        <option value="MA">MA</option>
+                                        <option value="MI">MI</option>
+                                        <option value="MN">MN</option>
+                                        <option value="MS">MS</option>
+                                        <option value="MO">MO</option>
+                                        <option value="MT">MT</option>
+                                        <option value="NE">NE</option>
+                                        <option value="NV" selected>NV</option>
+                                        <option value="NH">NH</option>
+                                        <option value="NJ">NJ</option>
+                                        <option value="NM">NM</option>
+                                        <option value="NY">NY</option>
+                                        <option value="NC">NC</option>
+                                        <option value="ND">ND</option>
+                                        <option value="OH">OH</option>
+                                        <option value="OK">OK</option>
+                                        <option value="OR">OR</option>
+                                        <option value="PA">PA</option>
+                                        <option value="RI">RI</option>
+                                        <option value="SC">SC</option>
+                                        <option value="SD">SD</option>
+                                        <option value="TN">TN</option>
+                                        <option value="TX">TX</option>
+                                        <option value="UT">UT</option>
+                                        <option value="VT">VT</option>
+                                        <option value="VA">VA</option>
+                                        <option value="WA">WA</option>
+                                        <option value="WV">WV</option>
+                                        <option value="WI">WI</option>
+                                        <option value="WY">WY</option>
+                                    </select>
+                                    @error('contact_state') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ZIP</label>
+                                    <input type="text" wire:model="contact_zip" placeholder="89101"
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                    @error('contact_zip') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Address Entry Section -->

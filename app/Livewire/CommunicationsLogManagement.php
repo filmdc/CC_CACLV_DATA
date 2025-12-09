@@ -95,11 +95,21 @@ class CommunicationsLogManagement extends Component
 
     public $direction = 'outgoing';
 
-    public $contact_name = '';
+    public $contact_first_name = '';
+
+    public $contact_last_name = '';
 
     public $contact_phone = '';
 
     public $contact_email = '';
+
+    public $contact_address = '';
+
+    public $contact_city = '';
+
+    public $contact_state = 'NV';
+
+    public $contact_zip = '';
 
     public $contact_organization = '';
 
@@ -316,7 +326,8 @@ class CommunicationsLogManagement extends Component
 
         $this->participant_id = $participant->id;
         $this->household_id = $household->id;
-        $this->contact_name = $participant->full_name;
+        $this->contact_first_name = $participant->first_name;
+        $this->contact_last_name = $participant->last_name;
         if ($this->newParticipantPhone) {
             $this->contact_phone = $this->newParticipantPhone;
         }
@@ -432,7 +443,8 @@ class CommunicationsLogManagement extends Component
         ]);
 
         $this->contractor_id = $contractor->id;
-        $this->contact_name = $contractor->company_name;
+        $this->contact_first_name = $contractor->contact_first_name ?? '';
+        $this->contact_last_name = $contractor->contact_last_name ?? '';
         $this->contact_organization = $contractor->company_name;
         if ($this->newContractorPhone) {
             $this->contact_phone = $this->newContractorPhone;
@@ -508,9 +520,14 @@ class CommunicationsLogManagement extends Component
         $this->communication_date = $log->communication_date?->format('Y-m-d');
         $this->communication_type = $log->communication_type;
         $this->direction = $log->direction;
-        $this->contact_name = $log->contact_name;
+        $this->contact_first_name = $log->contact_first_name ?? '';
+        $this->contact_last_name = $log->contact_last_name ?? '';
         $this->contact_phone = $log->contact_phone ?? '';
         $this->contact_email = $log->contact_email ?? '';
+        $this->contact_address = $log->contact_address ?? '';
+        $this->contact_city = $log->contact_city ?? '';
+        $this->contact_state = $log->contact_state ?? 'NV';
+        $this->contact_zip = $log->contact_zip ?? '';
         $this->contact_organization = $log->contact_organization ?? '';
         $this->contact_role = $log->contact_role ?? '';
         $this->subject = $log->subject;
@@ -815,9 +832,14 @@ class CommunicationsLogManagement extends Component
             'communication_date' => 'required|date',
             'communication_type' => 'required|in:phone_call,email,in_person,site_visit,video_call,text,mail,voicemail,fax,other',
             'direction' => 'required|in:incoming,outgoing',
-            'contact_name' => 'required|string|max:255',
+            'contact_first_name' => 'required|string|max:255',
+            'contact_last_name' => 'nullable|string|max:255',
             'contact_phone' => 'nullable|string|max:50',
             'contact_email' => 'nullable|email|max:255',
+            'contact_address' => 'nullable|string|max:255',
+            'contact_city' => 'nullable|string|max:100',
+            'contact_state' => 'nullable|string|size:2',
+            'contact_zip' => 'nullable|string|max:10',
             'contact_organization' => 'nullable|string|max:255',
             'contact_role' => 'nullable|in:homeowner,contractor,inspector,vendor,agency,applicant,family_member,other',
             'subject' => 'required|string|max:255',
@@ -844,9 +866,14 @@ class CommunicationsLogManagement extends Component
             'communication_date' => $this->communication_date,
             'communication_type' => $this->communication_type,
             'direction' => $this->direction,
-            'contact_name' => $this->contact_name,
+            'contact_first_name' => $this->contact_first_name,
+            'contact_last_name' => $this->contact_last_name !== '' ? $this->contact_last_name : null,
             'contact_phone' => $this->contact_phone !== '' ? $this->contact_phone : null,
             'contact_email' => $this->contact_email !== '' ? $this->contact_email : null,
+            'contact_address' => $this->contact_address !== '' ? $this->contact_address : null,
+            'contact_city' => $this->contact_city !== '' ? $this->contact_city : null,
+            'contact_state' => $this->contact_state !== '' ? $this->contact_state : null,
+            'contact_zip' => $this->contact_zip !== '' ? $this->contact_zip : null,
             'contact_organization' => $this->contact_organization !== '' ? $this->contact_organization : null,
             'contact_role' => $this->contact_role !== '' ? $this->contact_role : null,
             'subject' => $this->subject,
@@ -919,9 +946,14 @@ class CommunicationsLogManagement extends Component
         $this->communication_date = '';
         $this->communication_type = 'phone_call';
         $this->direction = 'outgoing';
-        $this->contact_name = '';
+        $this->contact_first_name = '';
+        $this->contact_last_name = '';
         $this->contact_phone = '';
         $this->contact_email = '';
+        $this->contact_address = '';
+        $this->contact_city = '';
+        $this->contact_state = 'NV';
+        $this->contact_zip = '';
         $this->contact_organization = '';
         $this->contact_role = '';
         $this->subject = '';

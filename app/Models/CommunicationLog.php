@@ -20,9 +20,14 @@ class CommunicationLog extends Model
         'communication_date',
         'communication_type',
         'direction',
-        'contact_name',
+        'contact_first_name',
+        'contact_last_name',
         'contact_phone',
         'contact_email',
+        'contact_address',
+        'contact_city',
+        'contact_state',
+        'contact_zip',
         'contact_organization',
         'contact_role',
         'subject',
@@ -58,6 +63,7 @@ class CommunicationLog extends Model
         'category_display',
         'priority_display',
         'is_follow_up_overdue',
+        'contact_full_name',
     ];
 
     // Relationships
@@ -217,6 +223,23 @@ class CommunicationLog extends Model
         return ! is_null($this->converted_to_job_id);
     }
 
+    public function getContactFullNameAttribute(): string
+    {
+        return trim(($this->contact_first_name ?? '').' '.($this->contact_last_name ?? ''));
+    }
+
+    public function getContactFullAddressAttribute(): string
+    {
+        $parts = array_filter([
+            $this->contact_address,
+            $this->contact_city,
+            $this->contact_state ? $this->contact_state : null,
+            $this->contact_zip,
+        ]);
+
+        return implode(', ', $parts);
+    }
+
     // Helper Methods
 
     public function markFollowUpCompleted(?int $userId = null): void
@@ -359,13 +382,17 @@ class CommunicationLog extends Model
     public function scopeSearch($query, string $search)
     {
         return $query->where(function ($q) use ($search) {
-            $q->where('contact_name', 'like', "%{$search}%")
+            $q->where('contact_first_name', 'like', "%{$search}%")
+                ->orWhere('contact_last_name', 'like', "%{$search}%")
+                ->orWhereRaw("CONCAT(contact_first_name, ' ', contact_last_name) LIKE ?", ["%{$search}%"])
                 ->orWhere('subject', 'like', "%{$search}%")
                 ->orWhere('summary', 'like', "%{$search}%")
                 ->orWhere('notes', 'like', "%{$search}%")
                 ->orWhere('contact_organization', 'like', "%{$search}%")
                 ->orWhere('contact_email', 'like', "%{$search}%")
-                ->orWhere('contact_phone', 'like', "%{$search}%");
+                ->orWhere('contact_phone', 'like', "%{$search}%")
+                ->orWhere('contact_address', 'like', "%{$search}%")
+                ->orWhere('contact_city', 'like', "%{$search}%");
         });
     }
 }
