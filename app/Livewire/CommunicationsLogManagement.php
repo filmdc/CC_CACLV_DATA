@@ -81,6 +81,8 @@ class CommunicationsLogManagement extends Component
     public $contractorSearch = '';
 
     // Form fields
+    public $housing_job_id = '';
+
     public $participant_id = '';
 
     public $household_id = '';
@@ -94,6 +96,8 @@ class CommunicationsLogManagement extends Component
     public $communication_type = 'phone_call';
 
     public $direction = 'outgoing';
+
+    public $create_project_enrollment = false;
 
     public $contact_first_name = '';
 
@@ -262,6 +266,23 @@ class CommunicationsLogManagement extends Component
             }
         } else {
             $this->household_id = '';
+        }
+    }
+
+    public function updatedContactAddress()
+    {
+        $this->updateSubjectFromAddress();
+    }
+
+    public function updatedContactCity()
+    {
+        $this->updateSubjectFromAddress();
+    }
+
+    protected function updateSubjectFromAddress()
+    {
+        if ($this->contact_address && $this->contact_city) {
+            $this->subject = trim($this->contact_address).', '.trim($this->contact_city);
         }
     }
 
@@ -513,6 +534,7 @@ class CommunicationsLogManagement extends Component
         $log = CommunicationLog::with(['services', 'tags'])->findOrFail($id);
 
         $this->editingId = $id;
+        $this->housing_job_id = $log->housing_job_id ?? '';
         $this->participant_id = $log->participant_id ?? '';
         $this->household_id = $log->household_id ?? '';
         $this->property_id = $log->property_id ?? '';
@@ -540,6 +562,7 @@ class CommunicationsLogManagement extends Component
         $this->follow_up_action = $log->follow_up_action ?? '';
         $this->selectedServices = $log->services->pluck('id')->toArray();
         $this->selectedTagIds = $log->tags->pluck('id')->toArray();
+        $this->create_project_enrollment = false; // Always false when editing
 
         $this->showForm = true;
     }
@@ -804,8 +827,136 @@ class CommunicationsLogManagement extends Component
         }
     }
 
+    protected function processProjectEnrollment(): void
+    {
+        if (! $this->create_project_enrollment) {
+            return;
+        }
+
+        // Validate required fields for project enrollment
+        $this->validate([
+            'contact_address' => 'required|string|max:255',
+            'contact_city' => 'required|string|max:100',
+            'contact_state' => 'required|string|size:2',
+            'contact_zip' => 'required|string|max:10',
+            'contact_first_name' => 'required|string|max:255',
+            'contact_last_name' => 'required|string|max:255',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            // Step 1: Check for duplicate property
+            $existingProperty = Property::where('address_line_1', $this->contact_address)
+                ->where('city', $this->contact_city)
+                ->where('zip_code', $this->contact_zip)
+                ->first();
+
+            if ($existingProperty) {
+                // Use existing property
+                $property = $existingProperty;
+                session()->flash('info', 'Using existing property: '.$property->address_line_1.', '.$property->city);
+            } else {
+                // Create new property
+                $property = Property::create([
+                    'address_line_1' => $this->contact_address,
+                    'city' => $this->contact_city,
+                    'state' => strtoupper($this->contact_state),
+                    'zip_code' => $this->contact_zip,
+                    'status' => 'active',
+                    'created_by' => Auth::id(),
+                ]);
+            }
+
+            // Step 2: Check for duplicate participant
+            $existingParticipant = Participant::where('first_name', $this->contact_first_name)
+                ->where('last_name', $this->contact_last_name)
+                ->first();
+
+            if ($existingParticipant) {
+                // Use existing participant
+                $participant = $existingParticipant;
+                $household = $participant->household;
+                session()->flash('info', 'Using existing participant: '.$participant->full_name);
+            } else {
+                // Step 3: Create household with the address
+                $household = Household::create([
+                    'household_type' => 'Single Person',
+                    'household_size' => 1,
+                    'housing_status' => 'Unknown/not reported',
+                ]);
+
+                // Create household address
+                $household->addresses()->create([
+                    'address' => $this->contact_address,
+                    'city' => $this->contact_city,
+                    'state' => strtoupper($this->contact_state),
+                    'zip_code' => $this->contact_zip,
+                    'is_current' => true,
+                ]);
+
+                // Step 4: Create participant as head of household
+                $participant = Participant::create([
+                    'household_id' => $household->id,
+                    'first_name' => $this->contact_first_name,
+                    'last_name' => $this->contact_last_name,
+                    'telephone' => $this->contact_phone ?: null,
+                    'email' => $this->contact_email ?: null,
+                    'relationship_to_head' => 'self',
+                    'is_head_of_household' => true,
+                ]);
+            }
+
+            // Update property with participant and household
+            $property->update([
+                'participant_id' => $participant->id,
+                'household_id' => $household->id,
+            ]);
+
+            // Step 5: Create housing job
+            $housingJob = HousingJob::create([
+                'job_title' => $this->subject ?: ($this->contact_address.', '.$this->contact_city),
+                'job_description' => $this->summary ?? 'Created from communication log',
+                'participant_id' => $participant->id,
+                'household_id' => $household->id,
+                'property_id' => $property->id,
+                'status' => 'pending',
+                'priority' => $this->priority === 'urgent' ? 'emergency' : ($this->priority === 'high' ? 'high' : 'medium'),
+                'request_date' => now(),
+                'created_by' => Auth::id(),
+            ]);
+
+            // Set the relationships for the communication log
+            $this->participant_id = $participant->id;
+            $this->household_id = $household->id;
+            $this->property_id = $property->id;
+            $this->housing_job_id = $housingJob->id;
+
+            DB::commit();
+
+            session()->flash('success', 'Project and enrollment created successfully! Job #'.$housingJob->job_number);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Failed to create project enrollment', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            $this->addError('create_project_enrollment', 'Failed to create project and enrollment: '.$e->getMessage());
+            throw $e;
+        }
+    }
+
     public function save()
     {
+        // Process project enrollment if checkbox is checked
+        if ($this->create_project_enrollment) {
+            $this->processProjectEnrollment();
+
+            // Check for errors from project enrollment
+            if ($this->getErrorBag()->isNotEmpty()) {
+                return;
+            }
+        }
+
         // Process address entry first
         $this->processAddressEntry();
 
@@ -859,6 +1010,7 @@ class CommunicationsLogManagement extends Component
         ]);
 
         $data = [
+            'housing_job_id' => $this->housing_job_id !== '' ? $this->housing_job_id : null,
             'participant_id' => $this->participant_id !== '' ? $this->participant_id : null,
             'household_id' => $this->household_id !== '' ? $this->household_id : null,
             'property_id' => $this->property_id !== '' ? $this->property_id : null,
@@ -935,6 +1087,7 @@ class CommunicationsLogManagement extends Component
     protected function resetForm()
     {
         $this->editingId = null;
+        $this->housing_job_id = '';
         $this->participant_id = '';
         $this->household_id = '';
         $this->property_id = '';
@@ -946,6 +1099,7 @@ class CommunicationsLogManagement extends Component
         $this->communication_date = '';
         $this->communication_type = 'phone_call';
         $this->direction = 'outgoing';
+        $this->create_project_enrollment = false;
         $this->contact_first_name = '';
         $this->contact_last_name = '';
         $this->contact_phone = '';
@@ -1133,8 +1287,19 @@ class CommunicationsLogManagement extends Component
                 'updates.createdBy',
                 'convertedToJob',
                 'convertedBy',
+                'housingJob',
             ])->find($this->viewingId)
             : null;
+
+        // Get housing jobs for project selection dropdown
+        $housingJobs = HousingJob::select('id', 'job_number', 'job_title', 'status')
+            ->when($this->housing_job_id, function ($query) {
+                $query->orWhere('id', $this->housing_job_id);
+            })
+            ->whereIn('status', ['pending', 'in_progress', 'on_hold'])
+            ->orderBy('created_at', 'desc')
+            ->limit(50)
+            ->get();
 
         return view('livewire.communications-log-management', [
             'logs' => $logs,
@@ -1150,6 +1315,7 @@ class CommunicationsLogManagement extends Component
             'allTags' => $allTags,
             'searchedTags' => $searchedTags,
             'viewingLog' => $viewingLog,
+            'housingJobs' => $housingJobs,
         ]);
     }
 }

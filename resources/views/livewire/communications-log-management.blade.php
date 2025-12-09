@@ -869,9 +869,33 @@
                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
                     </div>
 
+                    <!-- Create Project and Enrollment Checkbox -->
+                    <div class="md:col-span-2 border-t border-gray-200 dark:border-zinc-600 pt-4 mt-2">
+                        @if(!$editingId)
+                        <label class="flex items-center gap-3 cursor-pointer p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors">
+                            <input type="checkbox" wire:model.live="create_project_enrollment"
+                                   class="rounded border-gray-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500 w-5 h-5">
+                            <div>
+                                <span class="text-sm font-semibold text-indigo-700 dark:text-indigo-300">Create Project and Enrollment</span>
+                                <p class="text-xs text-indigo-600 dark:text-indigo-400 mt-0.5">
+                                    Automatically create property (with duplicate check), participant + household with address, and housing job from this communication log
+                                </p>
+                            </div>
+                        </label>
+                        @error('create_project_enrollment') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+                        @endif
+                    </div>
+
                     <!-- Contact Address Section -->
                     <div class="md:col-span-2 border-t border-gray-200 dark:border-zinc-600 pt-4 mt-2">
-                        <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Contact Address (Optional)</h4>
+                        <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                            Contact Address
+                            @if($create_project_enrollment)
+                                <span class="text-indigo-600 dark:text-indigo-400 text-xs font-normal">(Required for Project Enrollment)</span>
+                            @else
+                                <span class="text-gray-500 dark:text-gray-400 text-xs font-normal">(Optional - Auto-populates Subject)</span>
+                            @endif
+                        </h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <!-- Address -->
                             <div class="md:col-span-2">
@@ -959,152 +983,10 @@
                         </div>
                     </div>
 
-                    <!-- Address Entry Section -->
-                    <div class="md:col-span-2 border-t border-gray-200 dark:border-zinc-600 pt-4 mt-2">
-                        <div class="flex items-center justify-between mb-3">
-                            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Address (Optional)</h4>
-                            <button type="button" wire:click="toggleAddressEntry"
-                                    class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">
-                                {{ $showAddressEntry ? 'Hide Address' : '+ Add Address' }}
-                            </button>
-                        </div>
-
-                        @if($showAddressEntry)
-                        <div class="p-4 bg-gray-50 dark:bg-zinc-700/50 rounded-lg space-y-4">
-                            <!-- Success Message -->
-                            @if (session()->has('address_success'))
-                                <div class="rounded-md bg-green-50 dark:bg-green-900/20 p-3">
-                                    <div class="flex">
-                                        <div class="flex-shrink-0">
-                                            <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                            </svg>
-                                        </div>
-                                        <div class="ml-3">
-                                            <p class="text-sm font-medium text-green-800 dark:text-green-200">{{ session('address_success') }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endif
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="md:col-span-2">
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Street Address *</label>
-                                    <input type="text" wire:model.blur="addressLine" placeholder="123 Main Street"
-                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                                    @error('addressLine') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">City *</label>
-                                    <input type="text" wire:model.blur="addressCity" placeholder="Las Vegas"
-                                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                                    @error('addressCity') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                                </div>
-                                <div class="grid grid-cols-2 gap-3">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">State *</label>
-                                        <select wire:model="addressState"
-                                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                                            <option value="AL">Alabama</option>
-                                            <option value="AK">Alaska</option>
-                                            <option value="AZ">Arizona</option>
-                                            <option value="AR">Arkansas</option>
-                                            <option value="CA">California</option>
-                                            <option value="CO">Colorado</option>
-                                            <option value="CT">Connecticut</option>
-                                            <option value="DE">Delaware</option>
-                                            <option value="FL">Florida</option>
-                                            <option value="GA">Georgia</option>
-                                            <option value="HI">Hawaii</option>
-                                            <option value="ID">Idaho</option>
-                                            <option value="IL">Illinois</option>
-                                            <option value="IN">Indiana</option>
-                                            <option value="IA">Iowa</option>
-                                            <option value="KS">Kansas</option>
-                                            <option value="KY">Kentucky</option>
-                                            <option value="LA">Louisiana</option>
-                                            <option value="ME">Maine</option>
-                                            <option value="MD">Maryland</option>
-                                            <option value="MA">Massachusetts</option>
-                                            <option value="MI">Michigan</option>
-                                            <option value="MN">Minnesota</option>
-                                            <option value="MS">Mississippi</option>
-                                            <option value="MO">Missouri</option>
-                                            <option value="MT">Montana</option>
-                                            <option value="NE">Nebraska</option>
-                                            <option value="NV" selected>Nevada</option>
-                                            <option value="NH">New Hampshire</option>
-                                            <option value="NJ">New Jersey</option>
-                                            <option value="NM">New Mexico</option>
-                                            <option value="NY">New York</option>
-                                            <option value="NC">North Carolina</option>
-                                            <option value="ND">North Dakota</option>
-                                            <option value="OH">Ohio</option>
-                                            <option value="OK">Oklahoma</option>
-                                            <option value="OR">Oregon</option>
-                                            <option value="PA">Pennsylvania</option>
-                                            <option value="RI">Rhode Island</option>
-                                            <option value="SC">South Carolina</option>
-                                            <option value="SD">South Dakota</option>
-                                            <option value="TN">Tennessee</option>
-                                            <option value="TX">Texas</option>
-                                            <option value="UT">Utah</option>
-                                            <option value="VT">Vermont</option>
-                                            <option value="VA">Virginia</option>
-                                            <option value="WA">Washington</option>
-                                            <option value="WV">West Virginia</option>
-                                            <option value="WI">Wisconsin</option>
-                                            <option value="WY">Wyoming</option>
-                                        </select>
-                                        @error('addressState') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ZIP *</label>
-                                        <input type="text" wire:model.blur="addressZip" placeholder="89101"
-                                               class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                                        @error('addressZip') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Address Options -->
-                            <div class="border-t border-gray-200 dark:border-zinc-600 pt-4 space-y-3">
-                                <label class="flex items-center gap-3 cursor-pointer">
-                                    <input type="checkbox" wire:model.live="createAsProperty"
-                                           class="rounded border-gray-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500">
-                                    <div>
-                                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Create as Property</span>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400">Add this address to the properties database for project tracking</p>
-                                    </div>
-                                </label>
-
-                                <label class="flex items-center gap-3 cursor-pointer">
-                                    <input type="checkbox" wire:model.live="linkAddressToParticipant"
-                                           class="rounded border-gray-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500">
-                                    <div>
-                                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Link to Participant</span>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400">Save this address to the participant's household record</p>
-                                    </div>
-                                </label>
-
-                                @if($linkAddressToParticipant && !$participant_id)
-                                    <p class="text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 p-2 rounded">
-                                        Select or create a participant below to link this address
-                                    </p>
-                                @endif
-                            </div>
-
-                            <p class="text-xs text-gray-500 dark:text-gray-400 italic">
-                                If no options are selected, the address will only be used as the communication subject.
-                            </p>
-                        </div>
-                        @endif
-                    </div>
-
                     <!-- Link to entities section -->
                     <div class="md:col-span-2 border-t border-gray-200 dark:border-zinc-600 pt-4 mt-2">
                         <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Link to Record (Optional)</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <!-- Participant -->
                             <div>
                                 <div class="flex items-center justify-between mb-1">
@@ -1290,6 +1172,28 @@
                                         <p class="text-xs text-amber-600 dark:text-amber-400 mt-1">Showing first 50 results.</p>
                                     @endif
                                 @endif
+                            </div>
+
+                            <!-- Housing Job (Project) -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Housing Project</label>
+                                <select wire:model="housing_job_id"
+                                        class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                    <option value="">None</option>
+                                    @foreach($housingJobs as $job)
+                                        <option value="{{ $job->id }}">
+                                            {{ $job->job_number }} - {{ Str::limit($job->job_title, 30) }}
+                                            @if($job->status === 'pending')
+                                                (Pending)
+                                            @elseif($job->status === 'in_progress')
+                                                (In Progress)
+                                            @elseif($job->status === 'on_hold')
+                                                (On Hold)
+                                            @endif
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Link to existing housing project</p>
                             </div>
                         </div>
                     </div>

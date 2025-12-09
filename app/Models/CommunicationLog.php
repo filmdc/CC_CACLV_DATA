@@ -13,6 +13,7 @@ class CommunicationLog extends Model
     use HasTags;
 
     protected $fillable = [
+        'housing_job_id',
         'participant_id',
         'household_id',
         'property_id',
@@ -86,6 +87,11 @@ class CommunicationLog extends Model
     public function contractor(): BelongsTo
     {
         return $this->belongsTo(Contractor::class);
+    }
+
+    public function housingJob(): BelongsTo
+    {
+        return $this->belongsTo(HousingJob::class);
     }
 
     public function createdBy(): BelongsTo
@@ -322,6 +328,11 @@ class CommunicationLog extends Model
     public function scopeForContractor($query, int $contractorId)
     {
         return $query->where('contractor_id', $contractorId);
+    }
+
+    public function scopeForHousingJob($query, int $housingJobId)
+    {
+        return $query->where('housing_job_id', $housingJobId);
     }
 
     public function scopeForService($query, int $serviceId)
