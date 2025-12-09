@@ -814,6 +814,27 @@
                         </select>
                     </div>
 
+                    <!-- Related to a Project? -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Related to a Project?</label>
+                        <select wire:model="housing_job_id"
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                            <option value="">None</option>
+                            @foreach($housingJobs as $job)
+                                <option value="{{ $job->id }}">
+                                    {{ $job->job_number }} - {{ Str::limit($job->job_title, 30) }}
+                                    @if($job->status === 'pending')
+                                        (Pending)
+                                    @elseif($job->status === 'in_progress')
+                                        (In Progress)
+                                    @elseif($job->status === 'on_hold')
+                                        (On Hold)
+                                    @endif
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
                     <!-- Contact First Name -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">First Name *</label>
@@ -985,144 +1006,10 @@
 
                     <!-- Link to entities section -->
                     <div class="md:col-span-2 border-t border-gray-200 dark:border-zinc-600 pt-4 mt-2">
-                        <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Link to Record (Optional)</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <!-- Participant -->
-                            <div>
-                                <div class="flex items-center justify-between mb-1">
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Participant</label>
-                                    <button type="button" wire:click="toggleQuickCreateParticipant"
-                                            class="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">
-                                        {{ $showQuickCreateParticipant ? 'Cancel' : '+ New' }}
-                                    </button>
-                                </div>
-                                @if($showQuickCreateParticipant)
-                                    <div class="p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-md space-y-2">
-                                        <input type="text" wire:model="newParticipantFirstName" placeholder="First Name *"
-                                               class="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                                        @error('newParticipantFirstName') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                                        <input type="text" wire:model="newParticipantLastName" placeholder="Last Name *"
-                                               class="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                                        @error('newParticipantLastName') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                                        <input type="text" wire:model="newParticipantPhone" placeholder="Phone"
-                                               class="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                                        <input type="email" wire:model="newParticipantEmail" placeholder="Email"
-                                               class="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                                        @error('newParticipantEmail') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                                        <button type="button" wire:click="createQuickParticipant"
-                                                class="w-full px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700">
-                                            Create Participant
-                                        </button>
-                                    </div>
-                                @else
-                                    <input type="text"
-                                           wire:model.live.debounce.300ms="participantSearch"
-                                           placeholder="Search participants..."
-                                           class="w-full px-3 py-1.5 mb-1 text-sm border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                                    <select wire:model.live="participant_id"
-                                            class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                                        <option value="">None</option>
-                                        @foreach($participants as $participant)
-                                            <option value="{{ $participant->id }}">{{ $participant->last_name }}, {{ $participant->first_name }}</option>
-                                        @endforeach
-                                    </select>
-                                    @if($participantSearch && $participants->count() === 50)
-                                        <p class="text-xs text-amber-600 dark:text-amber-400 mt-1">Showing first 50 results.</p>
-                                    @endif
-                                    @if($participant_id && $household_id)
-                                        <p class="text-xs text-green-600 dark:text-green-400 mt-1">Household auto-linked</p>
-                                    @endif
-                                @endif
-                            </div>
-
-                            <!-- Property -->
-                            <div class="{{ $showPropertyAddressPrompt ? 'ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-zinc-800 rounded-md' : '' }}">
-                                @if($showPropertyAddressPrompt)
-                                    <!-- Property Address Prompt after participant creation -->
-                                    <div class="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-md">
-                                        <div class="flex items-center justify-between mb-2">
-                                            <label class="block text-sm font-medium text-indigo-700 dark:text-indigo-300">
-                                                Add Property for {{ $newlyCreatedParticipantName }}
-                                            </label>
-                                        </div>
-                                        <p class="text-xs text-indigo-600 dark:text-indigo-400 mb-2">Enter the property address for this participant's household:</p>
-                                        <div class="space-y-2">
-                                            <input type="text" wire:model="newPropertyAddress" placeholder="Address *"
-                                                   class="w-full px-2 py-1.5 text-sm border border-indigo-300 dark:border-indigo-600 dark:bg-zinc-700 dark:text-white rounded-md focus:ring-indigo-500 focus:border-indigo-500">
-                                            @error('newPropertyAddress') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                                            <input type="text" wire:model="newPropertyCity" placeholder="City *"
-                                                   class="w-full px-2 py-1.5 text-sm border border-indigo-300 dark:border-indigo-600 dark:bg-zinc-700 dark:text-white rounded-md focus:ring-indigo-500 focus:border-indigo-500">
-                                            @error('newPropertyCity') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                                            <div class="grid grid-cols-2 gap-2">
-                                                <input type="text" wire:model="newPropertyState" placeholder="State *" maxlength="2"
-                                                       class="px-2 py-1.5 text-sm border border-indigo-300 dark:border-indigo-600 dark:bg-zinc-700 dark:text-white rounded-md focus:ring-indigo-500 focus:border-indigo-500">
-                                                <input type="text" wire:model="newPropertyZip" placeholder="ZIP *"
-                                                       class="px-2 py-1.5 text-sm border border-indigo-300 dark:border-indigo-600 dark:bg-zinc-700 dark:text-white rounded-md focus:ring-indigo-500 focus:border-indigo-500">
-                                            </div>
-                                            @error('newPropertyState') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                                            @error('newPropertyZip') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                                            <div class="flex gap-2">
-                                                <button type="button" wire:click="savePropertyFromPrompt"
-                                                        class="flex-1 px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700">
-                                                    Save Property
-                                                </button>
-                                                <button type="button" wire:click="skipPropertyPrompt"
-                                                        class="px-3 py-1.5 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 text-sm rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
-                                                    Skip
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @else
-                                <div class="flex items-center justify-between mb-1">
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Property</label>
-                                    <button type="button" wire:click="toggleQuickCreateProperty"
-                                            class="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">
-                                        {{ $showQuickCreateProperty ? 'Cancel' : '+ New' }}
-                                    </button>
-                                </div>
-                                @if($showQuickCreateProperty)
-                                    <div class="p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-md space-y-2">
-                                        <input type="text" wire:model="newPropertyAddress" placeholder="Address *"
-                                               class="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                                        @error('newPropertyAddress') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                                        <input type="text" wire:model="newPropertyCity" placeholder="City *"
-                                               class="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                                        @error('newPropertyCity') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                                        <div class="grid grid-cols-2 gap-2">
-                                            <input type="text" wire:model="newPropertyState" placeholder="State *" maxlength="2"
-                                                   class="px-2 py-1.5 text-sm border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                                            <input type="text" wire:model="newPropertyZip" placeholder="ZIP *"
-                                                   class="px-2 py-1.5 text-sm border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                                        </div>
-                                        @error('newPropertyState') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                                        @error('newPropertyZip') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                                        <button type="button" wire:click="createQuickProperty"
-                                                class="w-full px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700">
-                                            Create Property
-                                        </button>
-                                    </div>
-                                @else
-                                    <input type="text"
-                                           wire:model.live.debounce.300ms="propertySearch"
-                                           placeholder="Search address..."
-                                           class="w-full px-3 py-1.5 mb-1 text-sm border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                                    <select wire:model.live="property_id"
-                                            class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                                        <option value="">None</option>
-                                        @foreach($properties as $property)
-                                            <option value="{{ $property->id }}">{{ $property->address_line_1 }}, {{ $property->city }}</option>
-                                        @endforeach
-                                    </select>
-                                    @if($propertySearch && $properties->count() === 50)
-                                        <p class="text-xs text-amber-600 dark:text-amber-400 mt-1">Showing first 50 results.</p>
-                                    @endif
-                                @endif
-                                @endif
-                            </div>
-
+                        <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Link to Contractor (Optional)</h4>
+                        <div>
                             <!-- Contractor -->
-                            <div>
+                            <div class="max-w-md">
                                 <div class="flex items-center justify-between mb-1">
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Contractor</label>
                                     <button type="button" wire:click="toggleQuickCreateContractor"
@@ -1172,28 +1059,6 @@
                                         <p class="text-xs text-amber-600 dark:text-amber-400 mt-1">Showing first 50 results.</p>
                                     @endif
                                 @endif
-                            </div>
-
-                            <!-- Housing Job (Project) -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Housing Project</label>
-                                <select wire:model="housing_job_id"
-                                        class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                                    <option value="">None</option>
-                                    @foreach($housingJobs as $job)
-                                        <option value="{{ $job->id }}">
-                                            {{ $job->job_number }} - {{ Str::limit($job->job_title, 30) }}
-                                            @if($job->status === 'pending')
-                                                (Pending)
-                                            @elseif($job->status === 'in_progress')
-                                                (In Progress)
-                                            @elseif($job->status === 'on_hold')
-                                                (On Hold)
-                                            @endif
-                                        </option>
-                                    @endforeach
-                                </select>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Link to existing housing project</p>
                             </div>
                         </div>
                     </div>
