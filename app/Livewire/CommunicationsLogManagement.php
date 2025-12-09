@@ -279,10 +279,30 @@ class CommunicationsLogManagement extends Component
         $this->updateSubjectFromAddress();
     }
 
+    public function updatedContactState()
+    {
+        $this->updateSubjectFromAddress();
+    }
+
+    public function updatedContactZip()
+    {
+        $this->updateSubjectFromAddress();
+    }
+
     protected function updateSubjectFromAddress()
     {
         if ($this->contact_address && $this->contact_city) {
-            $this->subject = trim($this->contact_address).', '.trim($this->contact_city);
+            $parts = [trim($this->contact_address), trim($this->contact_city)];
+
+            if ($this->contact_state) {
+                $parts[] = $this->contact_state;
+            }
+
+            if ($this->contact_zip) {
+                $parts[] = $this->contact_zip;
+            }
+
+            $this->subject = implode(', ', $parts);
         }
     }
 
@@ -913,8 +933,16 @@ class CommunicationsLogManagement extends Component
             ]);
 
             // Step 5: Create housing job
+            $fallbackTitle = $this->contact_address.', '.$this->contact_city;
+            if ($this->contact_state) {
+                $fallbackTitle .= ', '.$this->contact_state;
+            }
+            if ($this->contact_zip) {
+                $fallbackTitle .= ', '.$this->contact_zip;
+            }
+
             $housingJob = HousingJob::create([
-                'job_title' => $this->subject ?: ($this->contact_address.', '.$this->contact_city),
+                'job_title' => $this->subject ?: $fallbackTitle,
                 'job_description' => $this->summary ?? 'Created from communication log',
                 'participant_id' => $participant->id,
                 'household_id' => $household->id,
