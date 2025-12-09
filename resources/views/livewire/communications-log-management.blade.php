@@ -890,6 +890,13 @@
                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
                     </div>
 
+                    <!-- Summary -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Summary</label>
+                        <textarea wire:model="summary" rows="2" placeholder="Brief summary of the communication..."
+                                  class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md"></textarea>
+                    </div>
+
                     <!-- Create Project and Enrollment Checkbox -->
                     <div class="md:col-span-2 border-t border-gray-200 dark:border-zinc-600 pt-4 mt-2">
                         @if(!$editingId)
@@ -1139,13 +1146,6 @@
 
                     <!-- Subject (hidden - auto-generated from property address) -->
                     <input type="hidden" wire:model="subject">
-
-                    <!-- Summary -->
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Summary</label>
-                        <textarea wire:model="summary" rows="2" placeholder="Brief summary of the communication..."
-                                  class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md"></textarea>
-                    </div>
 
                     <!-- Follow-up Section -->
                     <div class="md:col-span-2 border-t border-gray-200 dark:border-zinc-600 pt-4 mt-2">
