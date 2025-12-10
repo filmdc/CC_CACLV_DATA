@@ -689,8 +689,31 @@ class CommunicationsLogManagement extends Component
 
         $log = CommunicationLog::findOrFail($this->convertingLogId);
 
+        // Validate that participant and property are set
+        if (! $log->participant_id) {
+            session()->flash('error', 'Cannot convert to project: No participant is linked to this communication log. Please edit the communication log and select a participant before converting to a project.');
+            $this->closeConvertModal();
+
+            return;
+        }
+
+        if (! $log->property_id) {
+            session()->flash('warning', 'Warning: No property is linked to this communication log. The project will be created without a property. You can add a property by editing the project after creation.');
+        }
+
         DB::beginTransaction();
         try {
+            // Check for duplicate property assignment if property exists
+            if ($log->property_id) {
+                $existingJob = HousingJob::where('property_id', $log->property_id)
+                    ->whereIn('status', ['pending', 'approved', 'in_progress', 'on_hold'])
+                    ->first();
+
+                if ($existingJob) {
+                    session()->flash('warning', "Note: An active project already exists for this property (Job #{$existingJob->job_number}). Creating a new project anyway.");
+                }
+            }
+
             $job = HousingJob::create([
                 'job_title' => $this->convertJobTitle,
                 'job_description' => $this->convertJobDescription,
@@ -711,7 +734,12 @@ class CommunicationsLogManagement extends Component
             DB::commit();
 
             $this->closeConvertModal();
-            session()->flash('success', "Communication converted to project: {$job->job_number}");
+
+            $message = "Communication converted to project: {$job->job_number}";
+            if (! $log->property_id) {
+                $message .= ' (Note: No property assigned - you can add one by editing the project)';
+            }
+            session()->flash('success', $message);
         } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('error', 'Failed to convert to project: '.$e->getMessage());
@@ -1110,6 +1138,30 @@ class CommunicationsLogManagement extends Component
         $log = CommunicationLog::findOrFail($id);
         $log->markFollowUpCompleted(Auth::id());
         session()->flash('success', 'Follow-up marked as complete.');
+    }
+
+    public function resetConversion($id)
+    {
+        // Only admins can reset conversions
+        if (! Auth::user()->isAdmin()) {
+            session()->flash('error', 'Only administrators can reset project conversions.');
+
+            return;
+        }
+
+        $log = CommunicationLog::with('convertedToJob')->findOrFail($id);
+
+        if (! $log->converted_to_job_id) {
+            session()->flash('error', 'This communication log has not been converted to a project.');
+
+            return;
+        }
+
+        $oldJobNumber = $log->convertedToJob?->job_number ?? 'Unknown';
+
+        $log->resetConversion(Auth::id());
+
+        session()->flash('success', "Conversion reset for {$oldJobNumber}. You can now re-convert this communication log with updated validation and automation.");
     }
 
     protected function resetForm()

@@ -280,6 +280,27 @@ class CommunicationLog extends Model
         );
     }
 
+    /**
+     * Reset the conversion status to allow re-conversion
+     * Admin override to fix logs that were converted before validation was added
+     */
+    public function resetConversion(?int $userId = null): void
+    {
+        $oldJobNumber = $this->convertedToJob?->job_number ?? 'Unknown';
+
+        $this->converted_to_job_id = null;
+        $this->converted_at = null;
+        $this->converted_by = null;
+        $this->save();
+
+        // Add an update noting the reset
+        $this->addUpdate(
+            "Conversion reset by admin (was: {$oldJobNumber}). Can now be re-converted with updated validation.",
+            'status_change',
+            $userId
+        );
+    }
+
     public function getFormattedCommunicationDateAttribute(): string
     {
         return $this->communication_date?->format('M d, Y') ?? '';

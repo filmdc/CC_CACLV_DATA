@@ -434,8 +434,16 @@
                         {{ $viewingLog->priority_display }} Priority
                     </span>
                     @if($viewingLog->converted_to_job_id)
-                        <span class="px-3 py-1 rounded-full text-sm bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300">
-                            Converted to Project: {{ $viewingLog->convertedToJob->job_number ?? 'N/A' }}
+                        <span class="px-3 py-1 rounded-full text-sm bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300 flex items-center gap-2">
+                            <span>Converted to Project: {{ $viewingLog->convertedToJob->job_number ?? 'N/A' }}</span>
+                            @if(auth()->user()->isAdmin())
+                                <button wire:click="resetConversion({{ $viewingLog->id }})"
+                                        wire:confirm="Are you sure you want to reset this conversion? This will allow you to re-convert this communication log with the updated validation and automation. The original project ({{ $viewingLog->convertedToJob->job_number ?? 'N/A' }}) will not be deleted."
+                                        class="ml-1 text-xs text-emerald-700 dark:text-emerald-400 hover:text-emerald-900 dark:hover:text-emerald-200 underline"
+                                        title="Admin: Reset conversion to re-run with new validation">
+                                    Reset
+                                </button>
+                            @endif
                         </span>
                     @endif
                 </div>
@@ -660,6 +668,17 @@
                                 Convert to Project
                             </button>
                             @endcan
+                        @else
+                            @if(auth()->user()->isAdmin())
+                                <button wire:click="resetConversion({{ $viewingLog->id }})"
+                                        wire:confirm="Are you sure you want to reset this conversion?\n\nThis will:\n• Clear the conversion status from this communication log\n• Allow you to re-convert with the updated validation and automation\n• NOT delete the original project ({{ $viewingLog->convertedToJob->job_number ?? 'N/A' }})\n\nYou can then re-convert to create a new project with proper participant and property validation."
+                                        class="px-4 py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700 text-sm flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                    </svg>
+                                    Admin: Reset Conversion
+                                </button>
+                            @endif
                         @endif
                         @can('communications_log.edit')
                         <button wire:click="showEditForm({{ $viewingLog->id }})"

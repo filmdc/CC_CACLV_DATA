@@ -1070,10 +1070,6 @@
                             <span class="font-medium text-gray-700 dark:text-gray-300">Program:</span>
                             <span class="ml-2 text-gray-900 dark:text-white">{{ $job->program?->name ?? 'N/A' }}</span>
                         </div>
-                        <div>
-                            <span class="font-medium text-gray-700 dark:text-gray-300">Property:</span>
-                            <span class="ml-2 text-gray-900 dark:text-white">{{ $job->property?->address_line_1 ?? 'N/A' }}</span>
-                        </div>
                     </div>
                 </div>
 
@@ -1162,7 +1158,29 @@
                         </div>
                     </div>
 
-                    <!-- Row 4: Contractor & Estimated Cost -->
+                    <!-- Row 4: Property -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Property Address</label>
+                        <select wire:model="edit_property_id"
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                            <option value="">No Property Assigned</option>
+                            @foreach($properties as $property)
+                                <option value="{{ $property->id }}">
+                                    {{ $property->address_line_1 }}
+                                    @if($property->city), {{ $property->city }}@endif
+                                    @if($property->state), {{ $property->state }}@endif
+                                    @if($property->zip_code) {{ $property->zip_code }}@endif
+                                    @if($property->participant)
+                                        - ({{ $property->participant->first_name }} {{ $property->participant->last_name }})
+                                    @endif
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('edit_property_id') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Select the property where work will be performed.</p>
+                    </div>
+
+                    <!-- Row 5: Contractor & Estimated Cost -->
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contractor</label>
@@ -1184,14 +1202,14 @@
                         </div>
                     </div>
 
-                    <!-- Row 5: Description -->
+                    <!-- Row 6: Description -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
                         <textarea wire:model="edit_job_description" rows="3"
                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md"></textarea>
                     </div>
 
-                    <!-- Row 6: Internal Notes -->
+                    <!-- Row 7: Internal Notes -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Internal Notes</label>
                         <textarea wire:model="edit_internal_notes" rows="2" placeholder="Notes visible only to staff..."

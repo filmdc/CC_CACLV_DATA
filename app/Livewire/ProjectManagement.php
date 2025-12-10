@@ -149,6 +149,8 @@ class ProjectManagement extends Component
 
     public $edit_participant_id = '';
 
+    public $edit_property_id = '';
+
     public $edit_internal_notes = '';
 
     // Quick Participant Form
@@ -1022,6 +1024,7 @@ class ProjectManagement extends Component
         $this->edit_estimated_cost = $this->job->estimated_cost ?? '';
         $this->edit_contractor_id = $this->job->contractor_id ?? '';
         $this->edit_participant_id = $this->job->participant_id ?? '';
+        $this->edit_property_id = $this->job->property_id ?? '';
         $this->edit_internal_notes = $this->job->internal_notes ?? '';
         $this->showEditProjectForm = true;
     }
@@ -1039,6 +1042,7 @@ class ProjectManagement extends Component
             'edit_estimated_cost' => 'nullable|numeric|min:0',
             'edit_contractor_id' => 'nullable|exists:contractors,id',
             'edit_participant_id' => 'required|exists:participants,id',
+            'edit_property_id' => 'nullable|exists:properties,id',
             'edit_internal_notes' => 'nullable|string',
         ]);
 
@@ -1064,6 +1068,7 @@ class ProjectManagement extends Component
             'contractor_id' => $this->edit_contractor_id !== '' ? $this->edit_contractor_id : null,
             'participant_id' => $this->edit_participant_id,
             'household_id' => $participant->household_id,
+            'property_id' => $this->edit_property_id !== '' ? $this->edit_property_id : null,
             'internal_notes' => $this->edit_internal_notes !== '' ? $this->edit_internal_notes : null,
             'updated_by' => Auth::id(),
         ]);
@@ -1322,6 +1327,11 @@ class ProjectManagement extends Component
         // Get contractors for the edit form
         $contractors = \App\Models\Contractor::orderBy('company_name')->get();
 
+        // Get properties for the edit form
+        $properties = \App\Models\Property::with('participant')
+            ->orderBy('address_line_1')
+            ->get();
+
         // Get active contracts for budget/expense assignment
         $contracts = \App\Models\Contract::active()
             ->with('funder')
@@ -1358,6 +1368,7 @@ class ProjectManagement extends Component
             'participants' => $participantsSearchable,
             'pdfTemplates' => $pdfTemplates,
             'contractors' => $contractors,
+            'properties' => $properties,
             'contracts' => $contracts,
         ]);
     }
