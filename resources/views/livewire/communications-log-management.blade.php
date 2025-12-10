@@ -698,7 +698,7 @@
 
     <!-- Convert to Project Modal -->
     @if($showConvertModal)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="closeConvertModal">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[60]" wire:click.self="closeConvertModal">
             <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-lg w-full mx-4">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Convert to Project</h3>
 
