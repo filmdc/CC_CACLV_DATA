@@ -1513,6 +1513,132 @@ class CommunicationsLogManagement extends Component
         session()->flash('success', "Conversion reset for {$oldJobNumber}. You can now re-convert this communication log with updated validation and automation.");
     }
 
+    /**
+     * Unlink a participant from a communication log
+     */
+    public function unlinkParticipant($logId)
+    {
+        // Only admins can unlink entities
+        if (! Auth::user()->isAdmin()) {
+            session()->flash('error', 'Only administrators can unlink records.');
+
+            return;
+        }
+
+        $log = CommunicationLog::findOrFail($logId);
+        $participantName = $log->participant?->full_name ?? 'Unknown';
+
+        $log->update([
+            'participant_id' => null,
+            'household_id' => null, // Also clear household since it's linked through participant
+            'updated_by' => Auth::id(),
+        ]);
+
+        // Add an update note about the unlink
+        $log->addUpdate("Participant unlinked by admin: {$participantName}", 'status_change', Auth::id());
+
+        // Also clear form state if editing this log
+        if ($this->editingId == $logId) {
+            $this->participant_id = '';
+            $this->household_id = '';
+        }
+
+        session()->flash('success', "Participant '{$participantName}' has been unlinked from this communication log.");
+    }
+
+    /**
+     * Unlink a property from a communication log
+     */
+    public function unlinkProperty($logId)
+    {
+        // Only admins can unlink entities
+        if (! Auth::user()->isAdmin()) {
+            session()->flash('error', 'Only administrators can unlink records.');
+
+            return;
+        }
+
+        $log = CommunicationLog::findOrFail($logId);
+        $propertyAddress = $log->property?->address_line_1 ?? 'Unknown';
+
+        $log->update([
+            'property_id' => null,
+            'updated_by' => Auth::id(),
+        ]);
+
+        // Add an update note about the unlink
+        $log->addUpdate("Property unlinked by admin: {$propertyAddress}", 'status_change', Auth::id());
+
+        // Also clear form state if editing this log
+        if ($this->editingId == $logId) {
+            $this->property_id = '';
+        }
+
+        session()->flash('success', "Property '{$propertyAddress}' has been unlinked from this communication log.");
+    }
+
+    /**
+     * Unlink a contractor from a communication log
+     */
+    public function unlinkContractor($logId)
+    {
+        // Only admins can unlink entities
+        if (! Auth::user()->isAdmin()) {
+            session()->flash('error', 'Only administrators can unlink records.');
+
+            return;
+        }
+
+        $log = CommunicationLog::findOrFail($logId);
+        $contractorName = $log->contractor?->company_name ?? 'Unknown';
+
+        $log->update([
+            'contractor_id' => null,
+            'updated_by' => Auth::id(),
+        ]);
+
+        // Add an update note about the unlink
+        $log->addUpdate("Contractor unlinked by admin: {$contractorName}", 'status_change', Auth::id());
+
+        // Also clear form state if editing this log
+        if ($this->editingId == $logId) {
+            $this->contractor_id = '';
+        }
+
+        session()->flash('success', "Contractor '{$contractorName}' has been unlinked from this communication log.");
+    }
+
+    /**
+     * Unlink a housing job from a communication log
+     */
+    public function unlinkHousingJob($logId)
+    {
+        // Only admins can unlink entities
+        if (! Auth::user()->isAdmin()) {
+            session()->flash('error', 'Only administrators can unlink records.');
+
+            return;
+        }
+
+        $log = CommunicationLog::findOrFail($logId);
+        $jobNumber = $log->housingJob?->job_number ?? 'Unknown';
+
+        $log->update([
+            'housing_job_id' => null,
+            'updated_by' => Auth::id(),
+        ]);
+
+        // Add an update note about the unlink
+        $log->addUpdate("Project unlinked by admin: {$jobNumber}", 'status_change', Auth::id());
+
+        // Also clear form state if editing this log
+        if ($this->editingId == $logId) {
+            $this->housing_job_id = '';
+        }
+
+        session()->flash('success', "Project '{$jobNumber}' has been unlinked from this communication log.");
+    }
+
     protected function resetForm()
     {
         $this->editingId = null;

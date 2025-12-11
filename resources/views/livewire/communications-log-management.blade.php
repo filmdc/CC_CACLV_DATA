@@ -495,33 +495,89 @@
                         <h4 class="font-medium text-gray-900 dark:text-white mb-3">Linked Records</h4>
                         <dl class="space-y-2 text-sm">
                             @if($viewingLog->participant)
-                            <div class="flex justify-between">
+                            <div class="flex justify-between items-center">
                                 <dt class="text-gray-500 dark:text-gray-400">Participant:</dt>
-                                <dd class="text-gray-900 dark:text-white">{{ $viewingLog->participant->full_name }}</dd>
-                            </div>
-                            @endif
-                            @if($viewingLog->household)
-                            <div class="flex justify-between">
-                                <dt class="text-gray-500 dark:text-gray-400">Household:</dt>
-                                <dd class="text-gray-900 dark:text-white">{{ $viewingLog->household->household_code }}</dd>
+                                <dd class="flex items-center gap-2">
+                                    <span class="text-gray-900 dark:text-white">{{ $viewingLog->participant->full_name }}</span>
+                                    @if($viewingLog->household)
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">({{ $viewingLog->household->household_code }})</span>
+                                    @endif
+                                    @if(auth()->user()->isAdmin())
+                                    <button wire:click="unlinkParticipant({{ $viewingLog->id }})"
+                                            wire:confirm="Are you sure you want to unlink this participant? This will also unlink the household."
+                                            class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-xs"
+                                            title="Unlink participant">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </button>
+                                    @endif
+                                </dd>
                             </div>
                             @endif
                             @if($viewingLog->property)
-                            <div class="flex justify-between">
+                            <div class="flex justify-between items-center">
                                 <dt class="text-gray-500 dark:text-gray-400">Property:</dt>
-                                <dd class="text-gray-900 dark:text-white">{{ $viewingLog->property->address_line_1 }}</dd>
+                                <dd class="flex items-center gap-2">
+                                    <span class="text-gray-900 dark:text-white">{{ $viewingLog->property->address_line_1 }}, {{ $viewingLog->property->city }}</span>
+                                    @if(auth()->user()->isAdmin())
+                                    <button wire:click="unlinkProperty({{ $viewingLog->id }})"
+                                            wire:confirm="Are you sure you want to unlink this property?"
+                                            class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-xs"
+                                            title="Unlink property">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </button>
+                                    @endif
+                                </dd>
                             </div>
                             @endif
                             @if($viewingLog->contractor)
-                            <div class="flex justify-between">
+                            <div class="flex justify-between items-center">
                                 <dt class="text-gray-500 dark:text-gray-400">Contractor:</dt>
-                                <dd class="text-gray-900 dark:text-white">{{ $viewingLog->contractor->company_name }}</dd>
+                                <dd class="flex items-center gap-2">
+                                    <span class="text-gray-900 dark:text-white">{{ $viewingLog->contractor->company_name }}</span>
+                                    @if(auth()->user()->isAdmin())
+                                    <button wire:click="unlinkContractor({{ $viewingLog->id }})"
+                                            wire:confirm="Are you sure you want to unlink this contractor?"
+                                            class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-xs"
+                                            title="Unlink contractor">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </button>
+                                    @endif
+                                </dd>
                             </div>
                             @endif
-                            @if(!$viewingLog->participant && !$viewingLog->household && !$viewingLog->property && !$viewingLog->contractor)
+                            @if($viewingLog->housingJob)
+                            <div class="flex justify-between items-center">
+                                <dt class="text-gray-500 dark:text-gray-400">Project:</dt>
+                                <dd class="flex items-center gap-2">
+                                    <span class="text-gray-900 dark:text-white">{{ $viewingLog->housingJob->job_number }} - {{ Str::limit($viewingLog->housingJob->job_title, 30) }}</span>
+                                    @if(auth()->user()->isAdmin())
+                                    <button wire:click="unlinkHousingJob({{ $viewingLog->id }})"
+                                            wire:confirm="Are you sure you want to unlink this project?"
+                                            class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-xs"
+                                            title="Unlink project">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </button>
+                                    @endif
+                                </dd>
+                            </div>
+                            @endif
+                            @if(!$viewingLog->participant && !$viewingLog->property && !$viewingLog->contractor && !$viewingLog->housingJob)
                             <p class="text-gray-500 dark:text-gray-400 italic">No linked records</p>
                             @endif
                         </dl>
+                        @if(auth()->user()->isAdmin() && ($viewingLog->participant || $viewingLog->property || $viewingLog->contractor || $viewingLog->housingJob))
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-3 pt-2 border-t border-gray-200 dark:border-zinc-600">
+                            <span class="text-red-600 dark:text-red-400">Admin:</span> Click <svg class="w-3 h-3 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg> to unlink a record
+                        </p>
+                        @endif
                     </div>
                 </div>
 
@@ -961,6 +1017,112 @@
                             @endforeach
                         </ul>
                     </div>
+                @endif
+
+                <!-- Linked Entities Section (only shown when editing and has links) -->
+                @if($editingId && ($participant_id || $property_id || $contractor_id || $housing_job_id))
+                <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+                    <h4 class="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-3 flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                        </svg>
+                        Currently Linked Records
+                    </h4>
+                    <div class="flex flex-wrap gap-3">
+                        @if($participant_id)
+                            @php $linkedParticipant = \App\Models\Participant::with('household')->find($participant_id); @endphp
+                            @if($linkedParticipant)
+                            <div class="flex items-center gap-2 px-3 py-2 bg-white dark:bg-zinc-700 rounded-md border border-blue-200 dark:border-blue-600">
+                                <div>
+                                    <span class="text-xs text-blue-600 dark:text-blue-400 font-medium block">Participant</span>
+                                    <span class="text-sm text-gray-900 dark:text-white">{{ $linkedParticipant->full_name }}</span>
+                                    @if($linkedParticipant->household)
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">({{ $linkedParticipant->household->household_code }})</span>
+                                    @endif
+                                </div>
+                                @if(auth()->user()->isAdmin())
+                                <button type="button" wire:click="unlinkParticipant({{ $editingId }})"
+                                        wire:confirm="Are you sure you want to unlink this participant? This will also unlink the household."
+                                        class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 ml-2"
+                                        title="Unlink participant">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                                @endif
+                            </div>
+                            @endif
+                        @endif
+                        @if($property_id)
+                            @php $linkedProperty = \App\Models\Property::find($property_id); @endphp
+                            @if($linkedProperty)
+                            <div class="flex items-center gap-2 px-3 py-2 bg-white dark:bg-zinc-700 rounded-md border border-blue-200 dark:border-blue-600">
+                                <div>
+                                    <span class="text-xs text-blue-600 dark:text-blue-400 font-medium block">Property</span>
+                                    <span class="text-sm text-gray-900 dark:text-white">{{ $linkedProperty->address_line_1 }}, {{ $linkedProperty->city }}</span>
+                                </div>
+                                @if(auth()->user()->isAdmin())
+                                <button type="button" wire:click="unlinkProperty({{ $editingId }})"
+                                        wire:confirm="Are you sure you want to unlink this property?"
+                                        class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 ml-2"
+                                        title="Unlink property">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                                @endif
+                            </div>
+                            @endif
+                        @endif
+                        @if($contractor_id)
+                            @php $linkedContractor = \App\Models\Contractor::find($contractor_id); @endphp
+                            @if($linkedContractor)
+                            <div class="flex items-center gap-2 px-3 py-2 bg-white dark:bg-zinc-700 rounded-md border border-blue-200 dark:border-blue-600">
+                                <div>
+                                    <span class="text-xs text-blue-600 dark:text-blue-400 font-medium block">Contractor</span>
+                                    <span class="text-sm text-gray-900 dark:text-white">{{ $linkedContractor->company_name }}</span>
+                                </div>
+                                @if(auth()->user()->isAdmin())
+                                <button type="button" wire:click="unlinkContractor({{ $editingId }})"
+                                        wire:confirm="Are you sure you want to unlink this contractor?"
+                                        class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 ml-2"
+                                        title="Unlink contractor">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                                @endif
+                            </div>
+                            @endif
+                        @endif
+                        @if($housing_job_id)
+                            @php $linkedJob = \App\Models\HousingJob::find($housing_job_id); @endphp
+                            @if($linkedJob)
+                            <div class="flex items-center gap-2 px-3 py-2 bg-white dark:bg-zinc-700 rounded-md border border-blue-200 dark:border-blue-600">
+                                <div>
+                                    <span class="text-xs text-blue-600 dark:text-blue-400 font-medium block">Project</span>
+                                    <span class="text-sm text-gray-900 dark:text-white">{{ $linkedJob->job_number }} - {{ Str::limit($linkedJob->job_title, 25) }}</span>
+                                </div>
+                                @if(auth()->user()->isAdmin())
+                                <button type="button" wire:click="unlinkHousingJob({{ $editingId }})"
+                                        wire:confirm="Are you sure you want to unlink this project?"
+                                        class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 ml-2"
+                                        title="Unlink project">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                                @endif
+                            </div>
+                            @endif
+                        @endif
+                    </div>
+                    @if(auth()->user()->isAdmin())
+                    <p class="text-xs text-blue-600 dark:text-blue-400 mt-3">
+                        <span class="font-medium">Admin:</span> Click <svg class="w-3 h-3 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg> to unlink a record. You can also change links using the dropdowns below.
+                    </p>
+                    @endif
+                </div>
                 @endif
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
