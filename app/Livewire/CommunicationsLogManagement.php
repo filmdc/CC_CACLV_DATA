@@ -656,6 +656,8 @@ class CommunicationsLogManagement extends Component
     // Convert to project methods
     public function openConvertModal($logId)
     {
+        \Log::info('openConvertModal called', ['logId' => $logId, 'showConvertModal_before' => $this->showConvertModal]);
+
         $this->authorizeAction('projects.create');
         $log = CommunicationLog::findOrFail($logId);
 
@@ -665,10 +667,14 @@ class CommunicationsLogManagement extends Component
         $this->convertProgramId = '';
         $this->convertServiceId = '';
         $this->showConvertModal = true;
+
+        \Log::info('openConvertModal completed', ['showConvertModal_after' => $this->showConvertModal, 'convertingLogId' => $this->convertingLogId]);
     }
 
     public function closeConvertModal()
     {
+        \Log::info('closeConvertModal called', ['caller' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'] ?? 'unknown']);
+
         $this->showConvertModal = false;
         $this->convertingLogId = null;
         $this->convertJobTitle = '';
