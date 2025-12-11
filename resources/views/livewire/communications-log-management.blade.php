@@ -699,10 +699,54 @@
     <!-- Convert to Project Modal -->
     @if($showConvertModal)
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[60]" wire:click.self="closeConvertModal">
-            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-lg w-full mx-4">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Convert to Project</h3>
+            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                <!-- Step Indicator -->
+                <div class="flex items-center justify-center mb-6">
+                    <div class="flex items-center">
+                        <div class="flex items-center justify-center w-8 h-8 rounded-full {{ $convertStep >= 1 ? 'bg-indigo-600 text-white' : 'bg-gray-300 text-gray-600' }}">1</div>
+                        <div class="w-16 h-1 {{ $convertStep >= 2 ? 'bg-indigo-600' : 'bg-gray-300' }}"></div>
+                        <div class="flex items-center justify-center w-8 h-8 rounded-full {{ $convertStep >= 2 ? 'bg-indigo-600 text-white' : 'bg-gray-300 text-gray-600' }}">2</div>
+                    </div>
+                </div>
 
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    @if($convertStep === 1)
+                        Convert to Project
+                    @else
+                        Review Potential Matches
+                    @endif
+                </h3>
+
+                <!-- Step 1: Basic Info -->
+                @if($convertStep === 1)
                 <div class="space-y-4">
+                    <!-- Contact Info Summary -->
+                    @if($convertingLog)
+                    <div class="p-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-md text-sm">
+                        <p class="font-medium text-blue-800 dark:text-blue-200 mb-1">Contact Information from Log:</p>
+                        <div class="text-blue-700 dark:text-blue-300 space-y-1">
+                            @if($convertingLog->contact_first_name || $convertingLog->contact_last_name)
+                                <p><span class="font-medium">Name:</span> {{ $convertingLog->contact_first_name }} {{ $convertingLog->contact_last_name }}</p>
+                            @endif
+                            @if($convertingLog->contact_phone)
+                                <p><span class="font-medium">Phone:</span> {{ $convertingLog->contact_phone }}</p>
+                            @endif
+                            @if($convertingLog->contact_email)
+                                <p><span class="font-medium">Email:</span> {{ $convertingLog->contact_email }}</p>
+                            @endif
+                            @if($convertingLog->contact_address)
+                                <p><span class="font-medium">Address:</span> {{ $convertingLog->contact_address }}, {{ $convertingLog->contact_city }}, {{ $convertingLog->contact_state }} {{ $convertingLog->contact_zip }}</p>
+                            @endif
+                            @if($convertingLog->participant_id)
+                                <p class="text-green-700 dark:text-green-400"><span class="font-medium">Participant:</span> Already linked ({{ $convertingLog->participant?->full_name }})</p>
+                            @endif
+                            @if($convertingLog->property_id)
+                                <p class="text-green-700 dark:text-green-400"><span class="font-medium">Property:</span> Already linked ({{ $convertingLog->property?->address_line_1 }})</p>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
+
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Project Title *</label>
                         <input type="text" wire:model="convertJobTitle"
@@ -747,13 +791,154 @@
                             class="px-4 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
                         Cancel
                     </button>
-                    <button wire:click="convertToProject"
+                    <button wire:click="checkForDuplicates"
                             wire:loading.attr="disabled"
-                            class="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700">
-                        <span wire:loading.remove wire:target="convertToProject">Create Project</span>
-                        <span wire:loading wire:target="convertToProject">Creating...</span>
+                            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                        <span wire:loading.remove wire:target="checkForDuplicates">Continue</span>
+                        <span wire:loading wire:target="checkForDuplicates">Checking...</span>
                     </button>
                 </div>
+
+                <!-- Step 2: Review Duplicates -->
+                @else
+                <div class="space-y-6">
+                    <!-- Participant Matches -->
+                    @if(count($potentialParticipantMatches) > 0)
+                    <div class="border border-amber-300 dark:border-amber-600 rounded-lg p-4 bg-amber-50 dark:bg-amber-900/30">
+                        <h4 class="font-medium text-amber-800 dark:text-amber-200 mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            Potential Participant Matches Found
+                        </h4>
+                        <p class="text-sm text-amber-700 dark:text-amber-300 mb-3">
+                            We found existing participants that might match "<strong>{{ $convertingLog?->contact_first_name }} {{ $convertingLog?->contact_last_name }}</strong>".
+                            Please select one to link, or choose to create a new participant.
+                        </p>
+
+                        <div class="space-y-2">
+                            @foreach($potentialParticipantMatches as $match)
+                            <label class="flex items-start p-3 border rounded-md cursor-pointer transition-colors
+                                {{ $selectedParticipantAction == $match['id'] ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30' : 'border-gray-300 dark:border-zinc-600 hover:bg-gray-50 dark:hover:bg-zinc-700' }}">
+                                <input type="radio" name="participant_match" value="{{ $match['id'] }}"
+                                       wire:click="selectExistingParticipant({{ $match['id'] }})"
+                                       {{ $selectedParticipantAction == $match['id'] ? 'checked' : '' }}
+                                       class="mt-1 mr-3 text-indigo-600">
+                                <div class="flex-1">
+                                    <p class="font-medium text-gray-900 dark:text-white">{{ $match['name'] }}</p>
+                                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                                        @if($match['phone'])<span class="mr-3">Phone: {{ $match['phone'] }}</span>@endif
+                                        @if($match['email'])<span class="mr-3">Email: {{ $match['email'] }}</span>@endif
+                                        @if($match['household_code'])<span>Household: {{ $match['household_code'] }}</span>@endif
+                                    </div>
+                                </div>
+                            </label>
+                            @endforeach
+
+                            <label class="flex items-start p-3 border rounded-md cursor-pointer transition-colors
+                                {{ $selectedParticipantAction === 'create_new' ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30' : 'border-gray-300 dark:border-zinc-600 hover:bg-gray-50 dark:hover:bg-zinc-700' }}">
+                                <input type="radio" name="participant_match" value="create_new"
+                                       wire:click="selectCreateNewParticipant"
+                                       {{ $selectedParticipantAction === 'create_new' ? 'checked' : '' }}
+                                       class="mt-1 mr-3 text-emerald-600">
+                                <div class="flex-1">
+                                    <p class="font-medium text-emerald-700 dark:text-emerald-400">Create New Participant</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                                        This is a different person - create a new participant record for "{{ $convertingLog?->contact_first_name }} {{ $convertingLog?->contact_last_name }}"
+                                    </p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    @endif
+
+                    <!-- Property Matches -->
+                    @if(count($potentialPropertyMatches) > 0)
+                    <div class="border border-amber-300 dark:border-amber-600 rounded-lg p-4 bg-amber-50 dark:bg-amber-900/30">
+                        <h4 class="font-medium text-amber-800 dark:text-amber-200 mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            Potential Property Matches Found
+                        </h4>
+                        <p class="text-sm text-amber-700 dark:text-amber-300 mb-3">
+                            We found existing properties that might match "<strong>{{ $convertingLog?->contact_address }}, {{ $convertingLog?->contact_city }}</strong>".
+                            Please select one to link, or choose to create a new property.
+                        </p>
+
+                        <div class="space-y-2">
+                            @foreach($potentialPropertyMatches as $match)
+                            <label class="flex items-start p-3 border rounded-md cursor-pointer transition-colors
+                                {{ $selectedPropertyAction == $match['id'] ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30' : 'border-gray-300 dark:border-zinc-600 hover:bg-gray-50 dark:hover:bg-zinc-700' }}">
+                                <input type="radio" name="property_match" value="{{ $match['id'] }}"
+                                       wire:click="selectExistingProperty({{ $match['id'] }})"
+                                       {{ $selectedPropertyAction == $match['id'] ? 'checked' : '' }}
+                                       class="mt-1 mr-3 text-indigo-600">
+                                <div class="flex-1">
+                                    <p class="font-medium text-gray-900 dark:text-white">{{ $match['address'] }}</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ $match['city'] }}, {{ $match['state'] }} {{ $match['zip'] }}</p>
+                                </div>
+                            </label>
+                            @endforeach
+
+                            <label class="flex items-start p-3 border rounded-md cursor-pointer transition-colors
+                                {{ $selectedPropertyAction === 'create_new' ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30' : 'border-gray-300 dark:border-zinc-600 hover:bg-gray-50 dark:hover:bg-zinc-700' }}">
+                                <input type="radio" name="property_match" value="create_new"
+                                       wire:click="selectCreateNewProperty"
+                                       {{ $selectedPropertyAction === 'create_new' ? 'checked' : '' }}
+                                       class="mt-1 mr-3 text-emerald-600">
+                                <div class="flex-1">
+                                    <p class="font-medium text-emerald-700 dark:text-emerald-400">Create New Property</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                                        This is a different property - create a new property record for "{{ $convertingLog?->contact_address }}"
+                                    </p>
+                                </div>
+                            </label>
+
+                            <label class="flex items-start p-3 border rounded-md cursor-pointer transition-colors
+                                {{ $selectedPropertyAction === 'skip' ? 'border-gray-500 bg-gray-100 dark:bg-zinc-700' : 'border-gray-300 dark:border-zinc-600 hover:bg-gray-50 dark:hover:bg-zinc-700' }}">
+                                <input type="radio" name="property_match" value="skip"
+                                       wire:click="selectSkipProperty"
+                                       {{ $selectedPropertyAction === 'skip' ? 'checked' : '' }}
+                                       class="mt-1 mr-3 text-gray-600">
+                                <div class="flex-1">
+                                    <p class="font-medium text-gray-700 dark:text-gray-300">Skip Property</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                                        Don't link or create a property for this project
+                                    </p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    @endif
+
+                    <!-- No duplicates message (shouldn't normally show since we skip step 2 if no duplicates) -->
+                    @if(count($potentialParticipantMatches) === 0 && count($potentialPropertyMatches) === 0)
+                    <div class="p-4 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 rounded-md">
+                        <p class="text-green-700 dark:text-green-300">No potential duplicates found. Ready to create the project.</p>
+                    </div>
+                    @endif
+                </div>
+
+                <div class="mt-6 flex justify-between">
+                    <button wire:click="backToStep1"
+                            class="px-4 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
+                        Back
+                    </button>
+                    <div class="space-x-3">
+                        <button wire:click="closeConvertModal"
+                                class="px-4 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
+                            Cancel
+                        </button>
+                        <button wire:click="convertToProject"
+                                wire:loading.attr="disabled"
+                                class="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700">
+                            <span wire:loading.remove wire:target="convertToProject">Create Project</span>
+                            <span wire:loading wire:target="convertToProject">Creating...</span>
+                        </button>
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
     @endif

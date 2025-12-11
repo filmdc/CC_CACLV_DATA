@@ -66,6 +66,19 @@ class CommunicationsLogManagement extends Component
 
     public $convertServiceId = '';
 
+    // Duplicate detection state for conversion
+    public $convertStep = 1; // 1 = basic info, 2 = review duplicates, 3 = confirm
+
+    public $potentialParticipantMatches = [];
+
+    public $potentialPropertyMatches = [];
+
+    public $selectedParticipantAction = 'create_new'; // 'create_new', 'use_existing', or participant ID
+
+    public $selectedPropertyAction = 'create_new'; // 'create_new', 'use_existing', 'skip', or property ID
+
+    public $convertingLog = null; // Holds the log being converted for display
+
     // Update/follow-up entry state
     public $newUpdateContent = '';
 
@@ -659,16 +672,188 @@ class CommunicationsLogManagement extends Component
         \Log::info('openConvertModal called', ['logId' => $logId, 'showConvertModal_before' => $this->showConvertModal]);
 
         $this->authorizeAction('projects.create');
-        $log = CommunicationLog::findOrFail($logId);
+        $log = CommunicationLog::with(['participant', 'property'])->findOrFail($logId);
 
         $this->convertingLogId = $logId;
+        $this->convertingLog = $log;
         $this->convertJobTitle = $log->subject;
         $this->convertJobDescription = $log->summary ?? $log->notes ?? '';
         $this->convertProgramId = '';
         $this->convertServiceId = '';
+        $this->convertStep = 1;
+        $this->potentialParticipantMatches = [];
+        $this->potentialPropertyMatches = [];
+        $this->selectedParticipantAction = 'create_new';
+        $this->selectedPropertyAction = 'create_new';
         $this->showConvertModal = true;
 
         \Log::info('openConvertModal completed', ['showConvertModal_after' => $this->showConvertModal, 'convertingLogId' => $this->convertingLogId]);
+    }
+
+    /**
+     * Move to step 2: Check for duplicates and show review screen
+     */
+    public function checkForDuplicates()
+    {
+        $this->validate([
+            'convertJobTitle' => 'required|string|max:255',
+            'convertJobDescription' => 'nullable|string',
+            'convertProgramId' => 'required|exists:programs,id',
+        ]);
+
+        $log = CommunicationLog::findOrFail($this->convertingLogId);
+        $this->convertingLog = $log;
+
+        // Reset matches
+        $this->potentialParticipantMatches = [];
+        $this->potentialPropertyMatches = [];
+
+        $needsReview = false;
+
+        // Check for participant duplicates if no participant is linked
+        if (! $log->participant_id && $log->contact_first_name && $log->contact_last_name) {
+            // Search for similar participants (case-insensitive, partial match)
+            $matches = Participant::with('household')
+                ->where(function ($query) use ($log) {
+                    // Exact name match (case-insensitive)
+                    $query->whereRaw('LOWER(first_name) = ?', [strtolower($log->contact_first_name)])
+                        ->whereRaw('LOWER(last_name) = ?', [strtolower($log->contact_last_name)]);
+                })
+                ->orWhere(function ($query) use ($log) {
+                    // Partial match - same last name and similar first name
+                    $query->whereRaw('LOWER(last_name) = ?', [strtolower($log->contact_last_name)])
+                        ->where(function ($q) use ($log) {
+                            $q->whereRaw('LOWER(first_name) LIKE ?', [strtolower($log->contact_first_name).'%'])
+                                ->orWhereRaw('? LIKE CONCAT(LOWER(first_name), "%")', [strtolower($log->contact_first_name)]);
+                        });
+                })
+                ->limit(10)
+                ->get();
+
+            // Also check by phone or email if available
+            if ($log->contact_phone || $log->contact_email) {
+                $contactMatches = Participant::with('household')
+                    ->where(function ($query) use ($log) {
+                        if ($log->contact_phone) {
+                            $query->orWhere('telephone', 'LIKE', '%'.preg_replace('/[^0-9]/', '', $log->contact_phone).'%');
+                        }
+                        if ($log->contact_email) {
+                            $query->orWhereRaw('LOWER(email) = ?', [strtolower($log->contact_email)]);
+                        }
+                    })
+                    ->limit(5)
+                    ->get();
+
+                $matches = $matches->merge($contactMatches)->unique('id');
+            }
+
+            if ($matches->isNotEmpty()) {
+                $this->potentialParticipantMatches = $matches->map(function ($p) {
+                    return [
+                        'id' => $p->id,
+                        'name' => $p->full_name,
+                        'phone' => $p->telephone,
+                        'email' => $p->email,
+                        'household_code' => $p->household?->household_code,
+                        'household_id' => $p->household_id,
+                    ];
+                })->toArray();
+                $needsReview = true;
+            }
+        }
+
+        // Check for property duplicates if no property is linked but address is provided
+        if (! $log->property_id && $log->contact_address && $log->contact_city) {
+            // Search for similar properties
+            $matches = Property::where(function ($query) use ($log) {
+                // Exact match
+                $query->whereRaw('LOWER(address_line_1) = ?', [strtolower($log->contact_address)])
+                    ->whereRaw('LOWER(city) = ?', [strtolower($log->contact_city)]);
+            })
+                ->orWhere(function ($query) use ($log) {
+                    // Partial address match in same city
+                    $query->whereRaw('LOWER(city) = ?', [strtolower($log->contact_city)])
+                        ->where(function ($q) use ($log) {
+                            // Extract street number if present
+                            if (preg_match('/^(\d+)/', $log->contact_address, $m)) {
+                                $q->where('address_line_1', 'LIKE', $m[1].'%');
+                            } else {
+                                $q->whereRaw('LOWER(address_line_1) LIKE ?', ['%'.strtolower(substr($log->contact_address, 0, 10)).'%']);
+                            }
+                        });
+                })
+                ->limit(10)
+                ->get();
+
+            if ($matches->isNotEmpty()) {
+                $this->potentialPropertyMatches = $matches->map(function ($p) {
+                    return [
+                        'id' => $p->id,
+                        'address' => $p->address_line_1,
+                        'city' => $p->city,
+                        'state' => $p->state,
+                        'zip' => $p->zip_code,
+                        'full_address' => $p->address_line_1.', '.$p->city.', '.$p->state.' '.$p->zip_code,
+                    ];
+                })->toArray();
+                $needsReview = true;
+            }
+        }
+
+        if ($needsReview) {
+            $this->convertStep = 2;
+        } else {
+            // No duplicates found, go straight to conversion
+            $this->convertToProject();
+        }
+    }
+
+    /**
+     * Select an existing participant from the duplicate list
+     */
+    public function selectExistingParticipant($participantId)
+    {
+        $this->selectedParticipantAction = $participantId;
+    }
+
+    /**
+     * Select to create a new participant
+     */
+    public function selectCreateNewParticipant()
+    {
+        $this->selectedParticipantAction = 'create_new';
+    }
+
+    /**
+     * Select an existing property from the duplicate list
+     */
+    public function selectExistingProperty($propertyId)
+    {
+        $this->selectedPropertyAction = $propertyId;
+    }
+
+    /**
+     * Select to create a new property
+     */
+    public function selectCreateNewProperty()
+    {
+        $this->selectedPropertyAction = 'create_new';
+    }
+
+    /**
+     * Skip property creation (proceed without property)
+     */
+    public function selectSkipProperty()
+    {
+        $this->selectedPropertyAction = 'skip';
+    }
+
+    /**
+     * Go back to step 1
+     */
+    public function backToStep1()
+    {
+        $this->convertStep = 1;
     }
 
     public function closeConvertModal()
@@ -677,10 +862,16 @@ class CommunicationsLogManagement extends Component
 
         $this->showConvertModal = false;
         $this->convertingLogId = null;
+        $this->convertingLog = null;
         $this->convertJobTitle = '';
         $this->convertJobDescription = '';
         $this->convertProgramId = '';
         $this->convertServiceId = '';
+        $this->convertStep = 1;
+        $this->potentialParticipantMatches = [];
+        $this->potentialPropertyMatches = [];
+        $this->selectedParticipantAction = 'create_new';
+        $this->selectedPropertyAction = 'create_new';
     }
 
     public function convertToProject()
@@ -727,53 +918,64 @@ class CommunicationsLogManagement extends Component
             $property = null;
             $createdResources = [];
 
-            // If no participant linked, try to create from contact info
-            if (! $log->participant_id) {
-                \Log::info('convertToProject: No participant linked, checking contact info');
-                // Check if we have enough contact info to create participant
+            \Log::info('convertToProject: User selections', [
+                'selectedParticipantAction' => $this->selectedParticipantAction,
+                'selectedPropertyAction' => $this->selectedPropertyAction,
+            ]);
+
+            // Handle participant based on user selection or existing link
+            if ($log->participant_id) {
+                // Already has a participant linked
+                \Log::info('convertToProject: Using already-linked participant', ['participant_id' => $log->participant_id]);
+                $participant = Participant::find($log->participant_id);
+                $household = $participant?->household;
+            } elseif (is_numeric($this->selectedParticipantAction)) {
+                // User selected an existing participant from duplicates
+                \Log::info('convertToProject: User selected existing participant', ['participant_id' => $this->selectedParticipantAction]);
+                $participant = Participant::find($this->selectedParticipantAction);
+                $household = $participant?->household;
+                $createdResources[] = "linked to existing participant: {$participant->full_name}";
+
+                // Update the communication log with the participant
+                $log->update([
+                    'participant_id' => $participant->id,
+                    'household_id' => $household?->id,
+                ]);
+            } elseif ($this->selectedParticipantAction === 'create_new') {
+                // User chose to create a new participant
                 if ($log->contact_first_name && $log->contact_last_name) {
-                    \Log::info('convertToProject: Contact name available, checking for existing participant');
-                    // Check for existing participant with same name
-                    $existingParticipant = Participant::where('first_name', $log->contact_first_name)
-                        ->where('last_name', $log->contact_last_name)
-                        ->first();
+                    \Log::info('convertToProject: Creating new participant per user selection');
 
-                    if ($existingParticipant) {
-                        $participant = $existingParticipant;
-                        $household = $participant->household;
-                        $createdResources[] = "linked to existing participant: {$participant->full_name}";
-                    } else {
-                        // Create new household
-                        $household = Household::create([
-                            'household_type' => 'Single Person',
-                            'household_size' => 1,
-                            'housing_status' => 'Unknown/not reported',
+                    // Create new household
+                    $household = Household::create([
+                        'household_type' => 'Single Person',
+                        'household_size' => 1,
+                        'housing_status' => 'Unknown/not reported',
+                    ]);
+
+                    // Add household address if available
+                    if ($log->contact_address && $log->contact_city) {
+                        $household->addresses()->create([
+                            'address' => $log->contact_address,
+                            'city' => $log->contact_city,
+                            'state' => strtoupper($log->contact_state ?? 'NV'),
+                            'zip_code' => $log->contact_zip ?? '',
+                            'is_current' => true,
                         ]);
-
-                        // Add household address if available
-                        if ($log->contact_address && $log->contact_city) {
-                            $household->addresses()->create([
-                                'address' => $log->contact_address,
-                                'city' => $log->contact_city,
-                                'state' => strtoupper($log->contact_state ?? 'NV'),
-                                'zip_code' => $log->contact_zip ?? '',
-                                'is_current' => true,
-                            ]);
-                        }
-
-                        // Create new participant
-                        $participant = Participant::create([
-                            'household_id' => $household->id,
-                            'first_name' => $log->contact_first_name,
-                            'last_name' => $log->contact_last_name,
-                            'telephone' => $log->contact_phone ?: null,
-                            'email' => $log->contact_email ?: null,
-                            'relationship_to_head' => 'self',
-                            'is_head_of_household' => true,
-                        ]);
-
-                        $createdResources[] = "created participant: {$participant->full_name}";
                     }
+
+                    // Create new participant
+                    $participant = Participant::create([
+                        'household_id' => $household->id,
+                        'first_name' => $log->contact_first_name,
+                        'last_name' => $log->contact_last_name,
+                        'telephone' => $log->contact_phone ?: null,
+                        'email' => $log->contact_email ?: null,
+                        'relationship_to_head' => 'self',
+                        'is_head_of_household' => true,
+                    ]);
+
+                    $createdResources[] = "created participant: {$participant->full_name}";
 
                     // Update the communication log with the participant
                     $log->update([
@@ -788,50 +990,50 @@ class CommunicationsLogManagement extends Component
 
                     return;
                 }
-            } else {
-                \Log::info('convertToProject: Using existing participant', ['participant_id' => $log->participant_id]);
-                $participant = Participant::find($log->participant_id);
-                $household = $participant?->household;
             }
 
-            // If no property linked, try to create from contact address
-            if (! $log->property_id && $log->contact_address && $log->contact_city) {
-                \Log::info('convertToProject: No property linked, checking contact address');
-                // Check for existing property at same address
-                $existingProperty = Property::where('address_line_1', $log->contact_address)
-                    ->where('city', $log->contact_city)
-                    ->where('zip_code', $log->contact_zip ?? '')
-                    ->first();
-
-                if ($existingProperty) {
-                    $property = $existingProperty;
-                    $createdResources[] = "linked to existing property: {$property->address_line_1}";
-                } else {
-                    // Create new property
-                    $property = Property::create([
-                        'address_line_1' => $log->contact_address,
-                        'city' => $log->contact_city,
-                        'state' => strtoupper($log->contact_state ?? 'NV'),
-                        'zip_code' => $log->contact_zip ?? '',
-                        'participant_id' => $participant?->id,
-                        'household_id' => $household?->id,
-                        'status' => 'active',
-                        'created_by' => Auth::id(),
-                    ]);
-
-                    $createdResources[] = "created property: {$property->address_line_1}";
-                }
+            // Handle property based on user selection or existing link
+            if ($log->property_id) {
+                // Already has a property linked
+                \Log::info('convertToProject: Using already-linked property', ['property_id' => $log->property_id]);
+                $property = Property::find($log->property_id);
+            } elseif (is_numeric($this->selectedPropertyAction)) {
+                // User selected an existing property from duplicates
+                \Log::info('convertToProject: User selected existing property', ['property_id' => $this->selectedPropertyAction]);
+                $property = Property::find($this->selectedPropertyAction);
+                $createdResources[] = "linked to existing property: {$property->address_line_1}";
 
                 // Update the communication log with the property
                 $log->update(['property_id' => $property->id]);
+            } elseif ($this->selectedPropertyAction === 'create_new' && $log->contact_address && $log->contact_city) {
+                // User chose to create a new property
+                \Log::info('convertToProject: Creating new property per user selection');
+                $property = Property::create([
+                    'address_line_1' => $log->contact_address,
+                    'city' => $log->contact_city,
+                    'state' => strtoupper($log->contact_state ?? 'NV'),
+                    'zip_code' => $log->contact_zip ?? '',
+                    'participant_id' => $participant?->id,
+                    'household_id' => $household?->id,
+                    'status' => 'active',
+                    'created_by' => Auth::id(),
+                ]);
+
+                $createdResources[] = "created property: {$property->address_line_1}";
+
+                // Update the communication log with the property
+                $log->update(['property_id' => $property->id]);
+            } elseif ($this->selectedPropertyAction === 'skip') {
+                // User chose to skip property creation
+                \Log::info('convertToProject: User chose to skip property creation');
+                $property = null;
             } else {
-                $property = $log->property_id ? Property::find($log->property_id) : null;
-                \Log::info('convertToProject: Property state', [
-                    'property_id_from_log' => $log->property_id,
+                // No property linked and no address to create from
+                \Log::info('convertToProject: No property available', [
                     'has_contact_address' => (bool) $log->contact_address,
                     'has_contact_city' => (bool) $log->contact_city,
-                    'property_loaded' => $property ? 'yes' : 'no',
                 ]);
+                $property = null;
             }
 
             // Check for duplicate property assignment if property exists
