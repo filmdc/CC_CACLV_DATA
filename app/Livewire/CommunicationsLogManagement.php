@@ -685,6 +685,8 @@ class CommunicationsLogManagement extends Component
 
     public function convertToProject()
     {
+        \Log::info('convertToProject started', ['convertingLogId' => $this->convertingLogId]);
+
         $this->authorizeAction('projects.create');
 
         $this->validate([
@@ -695,6 +697,29 @@ class CommunicationsLogManagement extends Component
 
         $log = CommunicationLog::findOrFail($this->convertingLogId);
 
+        \Log::info('convertToProject log loaded', [
+            'log_id' => $log->id,
+            'already_converted' => $log->converted_to_job_id ? 'yes' : 'no',
+            'converted_to_job_id' => $log->converted_to_job_id,
+            'participant_id' => $log->participant_id,
+            'property_id' => $log->property_id,
+            'contact_first_name' => $log->contact_first_name,
+            'contact_last_name' => $log->contact_last_name,
+            'contact_address' => $log->contact_address,
+            'contact_city' => $log->contact_city,
+        ]);
+
+        // Check if already converted and block (user must use resetConversion first)
+        if ($log->converted_to_job_id) {
+            $existingJob = HousingJob::find($log->converted_to_job_id);
+            $jobNumber = $existingJob?->job_number ?? "ID: {$log->converted_to_job_id}";
+            session()->flash('error', "This communication log has already been converted to project {$jobNumber}. Use 'Reset Conversion' option first if you need to re-convert.");
+            $this->closeConvertModal();
+            \Log::info('convertToProject blocked - already converted', ['job_number' => $jobNumber]);
+
+            return;
+        }
+
         DB::beginTransaction();
         try {
             $participant = null;
@@ -704,8 +729,10 @@ class CommunicationsLogManagement extends Component
 
             // If no participant linked, try to create from contact info
             if (! $log->participant_id) {
+                \Log::info('convertToProject: No participant linked, checking contact info');
                 // Check if we have enough contact info to create participant
                 if ($log->contact_first_name && $log->contact_last_name) {
+                    \Log::info('convertToProject: Contact name available, checking for existing participant');
                     // Check for existing participant with same name
                     $existingParticipant = Participant::where('first_name', $log->contact_first_name)
                         ->where('last_name', $log->contact_last_name)
@@ -754,6 +781,7 @@ class CommunicationsLogManagement extends Component
                         'household_id' => $household->id,
                     ]);
                 } else {
+                    \Log::info('convertToProject: No contact name, cannot create participant');
                     DB::rollBack();
                     session()->flash('error', 'Cannot convert to project: No participant is linked and contact name is incomplete. Please edit the communication log and add contact first/last name or select a participant.');
                     $this->closeConvertModal();
@@ -761,12 +789,14 @@ class CommunicationsLogManagement extends Component
                     return;
                 }
             } else {
+                \Log::info('convertToProject: Using existing participant', ['participant_id' => $log->participant_id]);
                 $participant = Participant::find($log->participant_id);
                 $household = $participant?->household;
             }
 
             // If no property linked, try to create from contact address
             if (! $log->property_id && $log->contact_address && $log->contact_city) {
+                \Log::info('convertToProject: No property linked, checking contact address');
                 // Check for existing property at same address
                 $existingProperty = Property::where('address_line_1', $log->contact_address)
                     ->where('city', $log->contact_city)
@@ -796,6 +826,12 @@ class CommunicationsLogManagement extends Component
                 $log->update(['property_id' => $property->id]);
             } else {
                 $property = $log->property_id ? Property::find($log->property_id) : null;
+                \Log::info('convertToProject: Property state', [
+                    'property_id_from_log' => $log->property_id,
+                    'has_contact_address' => (bool) $log->contact_address,
+                    'has_contact_city' => (bool) $log->contact_city,
+                    'property_loaded' => $property ? 'yes' : 'no',
+                ]);
             }
 
             // Check for duplicate property assignment if property exists
@@ -808,6 +844,14 @@ class CommunicationsLogManagement extends Component
                     $createdResources[] = "Note: Active project already exists for this property (Job #{$existingJob->job_number})";
                 }
             }
+
+            \Log::info('convertToProject: Creating HousingJob', [
+                'job_title' => $this->convertJobTitle,
+                'program_id' => $this->convertProgramId,
+                'participant_id' => $participant?->id,
+                'household_id' => $household?->id,
+                'property_id' => $property?->id,
+            ]);
 
             $job = HousingJob::create([
                 'job_title' => $this->convertJobTitle,
@@ -824,9 +868,13 @@ class CommunicationsLogManagement extends Component
                 'created_by' => Auth::id(),
             ]);
 
+            \Log::info('convertToProject: HousingJob created', ['job_id' => $job->id, 'job_number' => $job->job_number]);
+
             $log->convertToProject($job, Auth::id());
 
             DB::commit();
+
+            \Log::info('convertToProject: Transaction committed successfully');
 
             $this->closeConvertModal();
 
