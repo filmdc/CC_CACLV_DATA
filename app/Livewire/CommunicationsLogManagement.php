@@ -695,28 +695,117 @@ class CommunicationsLogManagement extends Component
 
         $log = CommunicationLog::findOrFail($this->convertingLogId);
 
-        // Validate that participant and property are set
-        if (! $log->participant_id) {
-            session()->flash('error', 'Cannot convert to project: No participant is linked to this communication log. Please edit the communication log and select a participant before converting to a project.');
-            $this->closeConvertModal();
-
-            return;
-        }
-
-        if (! $log->property_id) {
-            session()->flash('warning', 'Warning: No property is linked to this communication log. The project will be created without a property. You can add a property by editing the project after creation.');
-        }
-
         DB::beginTransaction();
         try {
+            $participant = null;
+            $household = null;
+            $property = null;
+            $createdResources = [];
+
+            // If no participant linked, try to create from contact info
+            if (! $log->participant_id) {
+                // Check if we have enough contact info to create participant
+                if ($log->contact_first_name && $log->contact_last_name) {
+                    // Check for existing participant with same name
+                    $existingParticipant = Participant::where('first_name', $log->contact_first_name)
+                        ->where('last_name', $log->contact_last_name)
+                        ->first();
+
+                    if ($existingParticipant) {
+                        $participant = $existingParticipant;
+                        $household = $participant->household;
+                        $createdResources[] = "linked to existing participant: {$participant->full_name}";
+                    } else {
+                        // Create new household
+                        $household = Household::create([
+                            'household_type' => 'Single Person',
+                            'household_size' => 1,
+                            'housing_status' => 'Unknown/not reported',
+                        ]);
+
+                        // Add household address if available
+                        if ($log->contact_address && $log->contact_city) {
+                            $household->addresses()->create([
+                                'address' => $log->contact_address,
+                                'city' => $log->contact_city,
+                                'state' => strtoupper($log->contact_state ?? 'NV'),
+                                'zip_code' => $log->contact_zip ?? '',
+                                'is_current' => true,
+                            ]);
+                        }
+
+                        // Create new participant
+                        $participant = Participant::create([
+                            'household_id' => $household->id,
+                            'first_name' => $log->contact_first_name,
+                            'last_name' => $log->contact_last_name,
+                            'telephone' => $log->contact_phone ?: null,
+                            'email' => $log->contact_email ?: null,
+                            'relationship_to_head' => 'self',
+                            'is_head_of_household' => true,
+                        ]);
+
+                        $createdResources[] = "created participant: {$participant->full_name}";
+                    }
+
+                    // Update the communication log with the participant
+                    $log->update([
+                        'participant_id' => $participant->id,
+                        'household_id' => $household->id,
+                    ]);
+                } else {
+                    DB::rollBack();
+                    session()->flash('error', 'Cannot convert to project: No participant is linked and contact name is incomplete. Please edit the communication log and add contact first/last name or select a participant.');
+                    $this->closeConvertModal();
+
+                    return;
+                }
+            } else {
+                $participant = Participant::find($log->participant_id);
+                $household = $participant?->household;
+            }
+
+            // If no property linked, try to create from contact address
+            if (! $log->property_id && $log->contact_address && $log->contact_city) {
+                // Check for existing property at same address
+                $existingProperty = Property::where('address_line_1', $log->contact_address)
+                    ->where('city', $log->contact_city)
+                    ->where('zip_code', $log->contact_zip ?? '')
+                    ->first();
+
+                if ($existingProperty) {
+                    $property = $existingProperty;
+                    $createdResources[] = "linked to existing property: {$property->address_line_1}";
+                } else {
+                    // Create new property
+                    $property = Property::create([
+                        'address_line_1' => $log->contact_address,
+                        'city' => $log->contact_city,
+                        'state' => strtoupper($log->contact_state ?? 'NV'),
+                        'zip_code' => $log->contact_zip ?? '',
+                        'participant_id' => $participant?->id,
+                        'household_id' => $household?->id,
+                        'status' => 'active',
+                        'created_by' => Auth::id(),
+                    ]);
+
+                    $createdResources[] = "created property: {$property->address_line_1}";
+                }
+
+                // Update the communication log with the property
+                $log->update(['property_id' => $property->id]);
+            } else {
+                $property = $log->property_id ? Property::find($log->property_id) : null;
+            }
+
             // Check for duplicate property assignment if property exists
-            if ($log->property_id) {
-                $existingJob = HousingJob::where('property_id', $log->property_id)
+            if ($property) {
+                $existingJob = HousingJob::where('property_id', $property->id)
                     ->whereIn('status', ['pending', 'approved', 'in_progress', 'on_hold'])
                     ->first();
 
                 if ($existingJob) {
-                    session()->flash('warning', "Note: An active project already exists for this property (Job #{$existingJob->job_number}). Creating a new project anyway.");
+                    $createdResources[] = "Note: Active project already exists for this property (Job #{$existingJob->job_number})";
                 }
             }
 
@@ -725,9 +814,9 @@ class CommunicationsLogManagement extends Component
                 'job_description' => $this->convertJobDescription,
                 'program_id' => $this->convertProgramId,
                 'service_id' => $this->convertServiceId ?: null,
-                'participant_id' => $log->participant_id,
-                'household_id' => $log->household_id,
-                'property_id' => $log->property_id,
+                'participant_id' => $participant?->id,
+                'household_id' => $household?->id,
+                'property_id' => $property?->id,
                 'contractor_id' => $log->contractor_id,
                 'status' => 'pending',
                 'priority' => $log->priority === 'urgent' ? 'emergency' : ($log->priority === 'high' ? 'high' : 'medium'),
@@ -742,12 +831,16 @@ class CommunicationsLogManagement extends Component
             $this->closeConvertModal();
 
             $message = "Communication converted to project: {$job->job_number}";
-            if (! $log->property_id) {
+            if (! empty($createdResources)) {
+                $message .= ' ('.implode(', ', $createdResources).')';
+            }
+            if (! $property) {
                 $message .= ' (Note: No property assigned - you can add one by editing the project)';
             }
             session()->flash('success', $message);
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error('Convert to project failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             session()->flash('error', 'Failed to convert to project: '.$e->getMessage());
         }
     }
