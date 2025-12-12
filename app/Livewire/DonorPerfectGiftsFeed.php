@@ -1370,6 +1370,7 @@ class DonorPerfectGiftsFeed extends Component
             if (! empty($this->checkScanBatchFilter)) {
                 $gifts = $gifts->filter(function ($gift) {
                     $batchValue = $gift['DP_CheckScan_Batch'] ?? '';
+
                     return stripos($batchValue, $this->checkScanBatchFilter) !== false;
                 });
             }
@@ -1453,7 +1454,7 @@ class DonorPerfectGiftsFeed extends Component
         $dpCode = $gift[$fieldType] ?? '';
 
         if (empty($dpCode)) {
-            return ['code' => '', 'source' => null];
+            return ['code' => '', 'source' => null, 'blocked' => false, 'reason' => null];
         }
 
         // For solicit_code and sub_solicit_code, check conditional mappings first
@@ -1468,21 +1469,40 @@ class DonorPerfectGiftsFeed extends Component
 
             // If we have a location, check for conditional mapping
             if ($intacctLocation) {
-                $conditionalCode = \App\Models\ConditionalCodeMapping::getMapping(
+                // Check if conditional rules exist for this location + field type
+                $hasConditionalRules = \App\Models\ConditionalCodeMapping::hasRulesForLocation(
                     $intacctLocation,
-                    $fieldType,
-                    $dpCode
+                    $fieldType
                 );
 
-                if ($conditionalCode) {
-                    return ['code' => $conditionalCode, 'source' => 'conditional'];
+                if ($hasConditionalRules) {
+                    // Conditional rules exist - try to get the mapping
+                    $conditionalCode = \App\Models\ConditionalCodeMapping::getMapping(
+                        $intacctLocation,
+                        $fieldType,
+                        $dpCode
+                    );
+
+                    if ($conditionalCode) {
+                        return ['code' => $conditionalCode, 'source' => 'conditional', 'blocked' => false, 'reason' => null];
+                    } else {
+                        // Rules exist but this code is NOT in the allowlist - will be BLOCKED during sync
+                        $standardCode = \App\Models\DonorPerfectCodeMapping::getMappingFor($fieldType, $dpCode);
+
+                        return [
+                            'code' => $standardCode ?: $dpCode,
+                            'source' => 'standard',
+                            'blocked' => true,
+                            'reason' => "Not allowed for location {$intacctLocation}",
+                        ];
+                    }
                 }
             }
         }
 
-        // Fall back to standard mapping
+        // Fall back to standard mapping (no conditional blocking)
         $standardCode = \App\Models\DonorPerfectCodeMapping::getMappingFor($fieldType, $dpCode);
 
-        return ['code' => $standardCode ?: $dpCode, 'source' => 'standard'];
+        return ['code' => $standardCode ?: $dpCode, 'source' => 'standard', 'blocked' => false, 'reason' => null];
     }
 }

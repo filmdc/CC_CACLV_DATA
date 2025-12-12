@@ -221,6 +221,8 @@ class SageIntacctSyncService
             // Process CREATE operations in batches
             $totalSynced = 0;
             $totalFailed = 0;
+            $totalSkipped = 0;
+            $totalFiltered = 0;
             $failedRecords = [];
 
             if (! empty($categorized['create'])) {
@@ -238,6 +240,8 @@ class SageIntacctSyncService
 
                     $totalSynced += $batchResult['synced'];
                     $totalFailed += $batchResult['failed'];
+                    $totalSkipped += $batchResult['skipped'] ?? 0;
+                    $totalFiltered += $batchResult['filtered'] ?? 0;
                     $failedRecords = array_merge($failedRecords, $batchResult['failed_count']);
 
                     // Update sync history progress
@@ -246,6 +250,7 @@ class SageIntacctSyncService
                         ->update([
                             'successful_count' => $totalSynced,
                             'failed_count' => $totalFailed,
+                            'skipped_count' => $totalSkipped + $totalFiltered,
                         ]);
                 }
             }
@@ -299,6 +304,9 @@ class SageIntacctSyncService
                 }
             }
 
+            // Calculate total skipped (includes both skipped during sync and filtered by rules)
+            $allSkipped = $toSkip + $totalSkipped + $totalFiltered;
+
             // Update sync history status
             $finalStatus = $totalFailed > 0 ? 'partial' : 'success';
             $errorMessage = $totalFailed > 0 ? "Failed to sync {$totalFailed} records" : null;
@@ -306,9 +314,11 @@ class SageIntacctSyncService
 
             Log::info('Sage Intacct: Gift sync completed', [
                 'total' => $totalRecords,
-                'created' => $toCreate - $totalFailed, // Subtract failures
+                'created' => $totalSynced,
                 'updated' => $toUpdate,
-                'skipped' => $toSkip,
+                'skipped' => $allSkipped,
+                'skipped_during_transform' => $totalSkipped,
+                'filtered_by_rules' => $totalFiltered,
                 'failed' => $totalFailed,
             ]);
 
@@ -317,8 +327,8 @@ class SageIntacctSyncService
                 'total' => $totalRecords,
                 'synced' => $totalSynced,
                 'failed' => $totalFailed,
-                'skipped' => $toSkip,
-                'created' => $toCreate,
+                'skipped' => $allSkipped,
+                'created' => $totalSynced,
                 'updated' => $toUpdate,
                 'failed_count' => $failedRecords,
                 'sync_history_id' => $syncHistory->id,
@@ -1290,6 +1300,8 @@ class SageIntacctSyncService
             return [
                 'synced' => $synced,
                 'failed' => $failed,
+                'skipped' => $skippedCount,
+                'filtered' => $filteredCount,
                 'failed_count' => $failedRecords,
             ];
 
@@ -1318,6 +1330,8 @@ class SageIntacctSyncService
             return [
                 'synced' => 0,
                 'failed' => count($batch),
+                'skipped' => 0,
+                'filtered' => 0,
                 'failed_count' => array_map(function ($gift) use ($e) {
                     return [
                         'gift_id' => $gift['gift_id'] ?? 'unknown',
@@ -1841,9 +1855,11 @@ class SageIntacctSyncService
     {
         $changes = [];
 
-        // Compare amount
-        $localAmount = number_format((float) ($localGift['amount'] ?? 0), 2, '.', '');
-        $intacctAmount = number_format((float) ($intacctRecord['amount'] ?? 0), 2, '.', '');
+        // Compare amount - strip commas to handle formatted numbers like "1,000.00"
+        $localAmountRaw = str_replace(',', '', $localGift['amount'] ?? 0);
+        $intacctAmountRaw = str_replace(',', '', $intacctRecord['amount'] ?? 0);
+        $localAmount = number_format((float) $localAmountRaw, 2, '.', '');
+        $intacctAmount = number_format((float) $intacctAmountRaw, 2, '.', '');
         if ($localAmount != $intacctAmount) {
             $changes[] = 'amount';
         }

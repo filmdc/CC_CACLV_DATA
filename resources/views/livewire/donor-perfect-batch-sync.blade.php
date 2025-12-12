@@ -47,6 +47,21 @@
         </div>
     @endif
 
+    @if (session()->has('info'))
+        <div class="rounded-md bg-amber-50 dark:bg-amber-900/30 p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-amber-800 dark:text-amber-200">{{ session('info') }}</p>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <!-- Selection Card -->
     <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl p-6 mb-6">
         <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Select Date and Batch</h2>
@@ -191,14 +206,23 @@
                         @endif
 
                         @if(!$syncCompleted && $this->intacctConfigured && $this->canAny(['sage.sync.perform', 'intacct.sync']))
-                            <button wire:click="confirmSync"
-                                    wire:loading.attr="disabled"
-                                    class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50">
-                                <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
-                                </svg>
-                                Sync to Sage
-                            </button>
+                            @if(count($previewGifts) > 0)
+                                <button wire:click="confirmSync"
+                                        wire:loading.attr="disabled"
+                                        class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50">
+                                    <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                    </svg>
+                                    Sync {{ count($previewGifts) }} to Sage
+                                </button>
+                            @else
+                                <span class="inline-flex items-center px-4 py-2 bg-gray-100 dark:bg-zinc-700 text-gray-500 dark:text-gray-400 rounded-md cursor-not-allowed">
+                                    <svg class="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    All gifts filtered
+                                </span>
+                            @endif
                         @elseif($syncCompleted)
                             <span class="inline-flex items-center px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 rounded-md">
                                 <svg class="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -267,7 +291,7 @@
                                         {{ $gift['DP_CheckScan_Batch'] ?? '-' }}
                                     </td>
                                     <td class="px-4 py-3 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-white">
-                                        ${{ number_format(floatval($gift['amount'] ?? 0), 2) }}
+                                        ${{ number_format(floatval(str_replace(',', '', $gift['amount'] ?? 0)), 2) }}
                                     </td>
                                     <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                                         {{ trim(($gift['first_name'] ?? '') . ' ' . ($gift['last_name'] ?? '')) ?: 'Anonymous' }}
@@ -287,13 +311,23 @@
                                     <td class="px-4 py-3 whitespace-nowrap text-sm font-mono">
                                         <span class="text-gray-600 dark:text-gray-300">{{ $gift['solicit_code'] ?? '-' }}</span>
                                         @if($solicitMapping['code'])
-                                            <span class="{{ $solicitMapping['source'] === 'conditional' ? 'text-orange-600 dark:text-orange-400' : 'text-purple-600 dark:text-purple-400' }} ml-1">→ {{ $solicitMapping['code'] }}</span>
+                                            @if($solicitMapping['blocked'] ?? false)
+                                                <span class="text-red-600 dark:text-red-400 ml-1" title="{{ $solicitMapping['reason'] ?? '' }}">→ {{ $solicitMapping['code'] }}</span>
+                                                <span class="inline-flex items-center px-1 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 ml-1" title="{{ $solicitMapping['reason'] ?? '' }}">!</span>
+                                            @else
+                                                <span class="{{ $solicitMapping['source'] === 'conditional' ? 'text-orange-600 dark:text-orange-400' : 'text-purple-600 dark:text-purple-400' }} ml-1">→ {{ $solicitMapping['code'] }}</span>
+                                            @endif
                                         @endif
                                     </td>
                                     <td class="px-4 py-3 whitespace-nowrap text-sm font-mono">
                                         <span class="text-gray-600 dark:text-gray-300">{{ $gift['sub_solicit_code'] ?? '-' }}</span>
                                         @if($subSolicitMapping['code'])
-                                            <span class="{{ $subSolicitMapping['source'] === 'conditional' ? 'text-orange-600 dark:text-orange-400' : 'text-purple-600 dark:text-purple-400' }} ml-1">→ {{ $subSolicitMapping['code'] }}</span>
+                                            @if($subSolicitMapping['blocked'] ?? false)
+                                                <span class="text-red-600 dark:text-red-400 ml-1" title="{{ $subSolicitMapping['reason'] ?? '' }}">→ {{ $subSolicitMapping['code'] }}</span>
+                                                <span class="inline-flex items-center px-1 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 ml-1" title="{{ $subSolicitMapping['reason'] ?? '' }}">!</span>
+                                            @else
+                                                <span class="{{ $subSolicitMapping['source'] === 'conditional' ? 'text-orange-600 dark:text-orange-400' : 'text-purple-600 dark:text-purple-400' }} ml-1">→ {{ $subSolicitMapping['code'] }}</span>
+                                            @endif
                                         @endif
                                     </td>
                                     <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
@@ -327,6 +361,53 @@
                         </tfoot>
                     </table>
                 </div>
+
+                <!-- Filtered Out Gifts Section -->
+                @if(count($filteredOutGifts) > 0)
+                    <div class="mt-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-sm font-semibold text-amber-600 dark:text-amber-400 flex items-center">
+                                <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd"></path>
+                                </svg>
+                                Filtered Out ({{ count($filteredOutGifts) }} gifts)
+                            </h3>
+                            <span class="text-xs text-gray-500 dark:text-gray-400">These gifts will be excluded from the sync</span>
+                        </div>
+                        <div class="overflow-x-auto border border-amber-200 dark:border-amber-800 rounded-lg">
+                            <table class="min-w-full divide-y divide-amber-200 dark:divide-amber-800">
+                                <thead class="bg-amber-50 dark:bg-amber-900/30">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-amber-700 dark:text-amber-300 uppercase">Gift ID</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-amber-700 dark:text-amber-300 uppercase">Amount</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-amber-700 dark:text-amber-300 uppercase">Gift Type</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-amber-700 dark:text-amber-300 uppercase">Donor</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-amber-700 dark:text-amber-300 uppercase">Filter Reason</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white dark:bg-zinc-900 divide-y divide-amber-100 dark:divide-amber-900">
+                                    @foreach($filteredOutGifts as $gift)
+                                        <tr class="opacity-60">
+                                            <td class="px-4 py-2 text-sm font-mono text-gray-600 dark:text-gray-400">{{ $gift['gift_id'] ?? '-' }}</td>
+                                            <td class="px-4 py-2 text-sm text-gray-600 dark:text-gray-400">${{ number_format(floatval(str_replace(',', '', $gift['amount'] ?? 0)), 2) }}</td>
+                                            <td class="px-4 py-2 text-sm">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300">
+                                                    {{ $gift['gift_type'] ?? '-' }}
+                                                </span>
+                                            </td>
+                                            <td class="px-4 py-2 text-sm text-gray-600 dark:text-gray-400">
+                                                {{ trim(($gift['first_name'] ?? '') . ' ' . ($gift['last_name'] ?? '')) ?: 'Anonymous' }}
+                                            </td>
+                                            <td class="px-4 py-2 text-xs text-amber-700 dark:text-amber-400">
+                                                {{ $gift['_filter_reason'] ?? 'Excluded by filter' }}
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                @endif
             @else
                 <div class="text-center py-12">
                     <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -343,11 +424,13 @@
     @if($showConfirmModal)
         <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
             <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" wire:click="cancelSync"></div>
+                <!-- Backdrop - z-40 to stay behind modal -->
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity z-40" aria-hidden="true" wire:click="cancelSync"></div>
 
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
-                <div class="inline-block align-bottom bg-white dark:bg-zinc-800 rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                <!-- Modal content - z-50 to stay above backdrop -->
+                <div class="relative z-50 inline-block align-bottom bg-white dark:bg-zinc-800 rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
                     <div class="sm:flex sm:items-start">
                         <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-purple-100 dark:bg-purple-900/30 sm:mx-0 sm:h-10 sm:w-10">
                             <svg class="h-6 w-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -387,13 +470,24 @@
                     </div>
                     <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
                         <button wire:click="performSync"
+                                wire:loading.attr="disabled"
+                                wire:target="performSync"
                                 type="button"
-                                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-purple-600 text-base font-medium text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:ml-3 sm:w-auto sm:text-sm">
-                            Sync Now
+                                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-purple-600 text-base font-medium text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                            <span wire:loading.remove wire:target="performSync">Sync Now</span>
+                            <span wire:loading wire:target="performSync" class="inline-flex items-center">
+                                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Syncing...
+                            </span>
                         </button>
                         <button wire:click="cancelSync"
+                                wire:loading.attr="disabled"
+                                wire:target="performSync"
                                 type="button"
-                                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-zinc-600 shadow-sm px-4 py-2 bg-white dark:bg-zinc-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">
+                                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-zinc-600 shadow-sm px-4 py-2 bg-white dark:bg-zinc-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed">
                             Cancel
                         </button>
                     </div>

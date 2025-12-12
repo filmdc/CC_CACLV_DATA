@@ -667,7 +667,7 @@
                                         {{ isset($gift['gift_date']) && $gift['gift_date'] ? $gift['gift_date'] : '-' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-white cursor-pointer" wire:click="showGiftDetails({{ json_encode($gift) }})">
-                                        ${{ number_format(floatval($gift['amount'] ?? 0), 2) }}
+                                        ${{ number_format(floatval(str_replace(',', '', $gift['amount'] ?? 0)), 2) }}
                                     </td>
                                     <td class="px-6 py-4 text-sm cursor-pointer" wire:click="showGiftDetails({{ json_encode($gift) }})">
                                         @if($codeMappingEnabled && $showMappedCodes)
@@ -728,6 +728,8 @@
                                                 $mapping = $this->getDisplayCodeMapping($gift, 'solicit_code');
                                                 $intacctCode = $mapping['code'];
                                                 $mappingSource = $mapping['source'];
+                                                $isBlocked = $mapping['blocked'] ?? false;
+                                                $blockReason = $mapping['reason'] ?? '';
                                             @endphp
                                             <div class="space-y-0.5">
                                                 <div class="font-mono text-gray-600 dark:text-gray-400 text-xs">
@@ -735,13 +737,22 @@
                                                 </div>
                                                 @if($intacctCode)
                                                     <div class="flex items-center space-x-1">
-                                                        <div class="font-mono text-indigo-600 dark:text-indigo-400 font-semibold text-sm">
-                                                            ✓ {{ $intacctCode }}
-                                                        </div>
-                                                        @if($mappingSource === 'conditional')
-                                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300" title="Uses location-specific conditional mapping">
-                                                                C
+                                                        @if($isBlocked)
+                                                            <div class="font-mono text-red-600 dark:text-red-400 font-semibold text-sm" title="{{ $blockReason }}">
+                                                                ✗ {{ $intacctCode }}
+                                                            </div>
+                                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300" title="{{ $blockReason }}">
+                                                                BLOCKED
                                                             </span>
+                                                        @else
+                                                            <div class="font-mono text-indigo-600 dark:text-indigo-400 font-semibold text-sm">
+                                                                ✓ {{ $intacctCode }}
+                                                            </div>
+                                                            @if($mappingSource === 'conditional')
+                                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300" title="Uses location-specific conditional mapping">
+                                                                    C
+                                                                </span>
+                                                            @endif
                                                         @endif
                                                     </div>
                                                 @else
@@ -761,6 +772,8 @@
                                                 $mapping = $this->getDisplayCodeMapping($gift, 'sub_solicit_code');
                                                 $intacctCode = $mapping['code'];
                                                 $mappingSource = $mapping['source'];
+                                                $isBlocked = $mapping['blocked'] ?? false;
+                                                $blockReason = $mapping['reason'] ?? '';
                                             @endphp
                                             <div class="space-y-0.5">
                                                 <div class="font-mono text-gray-600 dark:text-gray-400 text-xs">
@@ -768,13 +781,22 @@
                                                 </div>
                                                 @if($intacctCode)
                                                     <div class="flex items-center space-x-1">
-                                                        <div class="font-mono text-indigo-600 dark:text-indigo-400 font-semibold text-sm">
-                                                            ✓ {{ $intacctCode }}
-                                                        </div>
-                                                        @if($mappingSource === 'conditional')
-                                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300" title="Uses location-specific conditional mapping">
-                                                                C
+                                                        @if($isBlocked)
+                                                            <div class="font-mono text-red-600 dark:text-red-400 font-semibold text-sm" title="{{ $blockReason }}">
+                                                                ✗ {{ $intacctCode }}
+                                                            </div>
+                                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300" title="{{ $blockReason }}">
+                                                                BLOCKED
                                                             </span>
+                                                        @else
+                                                            <div class="font-mono text-indigo-600 dark:text-indigo-400 font-semibold text-sm">
+                                                                ✓ {{ $intacctCode }}
+                                                            </div>
+                                                            @if($mappingSource === 'conditional')
+                                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300" title="Uses location-specific conditional mapping">
+                                                                    C
+                                                                </span>
+                                                            @endif
                                                         @endif
                                                     </div>
                                                 @else

@@ -433,9 +433,10 @@ class DonorPerfectGiftService
             }
 
             // Convert amount strings to floats for calculations
+            // Strip commas first to handle formatted numbers like "1,000.00"
             $gifts = $gifts->map(function ($gift) {
                 if (isset($gift['amount']) && is_string($gift['amount'])) {
-                    $gift['amount'] = floatval($gift['amount']);
+                    $gift['amount'] = floatval(str_replace(',', '', $gift['amount']));
                 }
 
                 return $gift;
@@ -546,9 +547,10 @@ class DonorPerfectGiftService
      */
     private function formatFieldValue(string $field, $value): mixed
     {
-        // Format currency fields
+        // Format currency fields - store as numeric without comma separators
+        // to avoid issues when converting back to float later
         if (in_array($field, ['gift_amount', 'amount'])) {
-            return is_numeric($value) ? number_format((float) $value, 2, '.', ',') : $value;
+            return is_numeric($value) ? number_format((float) $value, 2, '.', '') : $value;
         }
 
         // Format date fields

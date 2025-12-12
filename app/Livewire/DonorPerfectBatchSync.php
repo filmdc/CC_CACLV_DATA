@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\SageIntacctSyncFilter;
 use App\Services\DonorPerfectGiftService;
 use App\Traits\WithPermissionChecks;
 use Carbon\Carbon;
@@ -17,6 +18,8 @@ class DonorPerfectBatchSync extends Component
     public $selectedBatch = '';
 
     public $availableBatches = [];
+
+    public $filteredOutGifts = [];
 
     public $loadingBatches = false;
 
@@ -47,6 +50,7 @@ class DonorPerfectBatchSync extends Component
     {
         $this->selectedBatch = '';
         $this->previewGifts = [];
+        $this->filteredOutGifts = [];
         $this->showPreview = false;
         $this->syncCompleted = false;
         $this->downloadUrl = '';
@@ -57,6 +61,7 @@ class DonorPerfectBatchSync extends Component
     public function updatedSelectedBatch()
     {
         $this->previewGifts = [];
+        $this->filteredOutGifts = [];
         $this->showPreview = false;
         $this->syncCompleted = false;
         $this->downloadUrl = '';
@@ -147,7 +152,7 @@ class DonorPerfectBatchSync extends Component
             }
 
             // Filter to selected batch (matching prefix before underscore)
-            $this->previewGifts = $result['gifts']
+            $batchGifts = $result['gifts']
                 ->filter(function ($gift) {
                     $batchId = $gift['DP_CheckScan_Batch'] ?? '';
                     if (empty($batchId)) {
@@ -161,7 +166,28 @@ class DonorPerfectBatchSync extends Component
                 ->values()
                 ->toArray();
 
+            // Apply sync filters to separate syncable gifts from filtered-out gifts
+            $this->previewGifts = [];
+            $this->filteredOutGifts = [];
+
+            foreach ($batchGifts as $gift) {
+                $filterResult = SageIntacctSyncFilter::shouldFilterGift($gift);
+
+                if ($filterResult['should_filter']) {
+                    // Add filter reason to the gift for display
+                    $gift['_filter_reason'] = $filterResult['reason'];
+                    $this->filteredOutGifts[] = $gift;
+                } else {
+                    $this->previewGifts[] = $gift;
+                }
+            }
+
             $this->showPreview = true;
+
+            // Show warning if any gifts were filtered
+            if (count($this->filteredOutGifts) > 0) {
+                session()->flash('info', count($this->filteredOutGifts).' gift(s) will be excluded by sync filters.');
+            }
 
         } catch (\Exception $e) {
             Log::error('DonorPerfectBatchSync: Failed to load preview', [
@@ -255,11 +281,20 @@ class DonorPerfectBatchSync extends Component
                 // Generate CSV export
                 $this->generateSyncExport();
 
-                $created = $syncResult['created'] ?? 0;
+                $synced = $syncResult['synced'] ?? 0;
                 $failed = $syncResult['failed'] ?? 0;
                 $skipped = $syncResult['skipped'] ?? 0;
 
-                session()->flash('success', "Batch sync completed: {$created} created, {$skipped} skipped, {$failed} failed");
+                // Build a detailed message
+                $messageParts = ["{$synced} synced"];
+                if ($skipped > 0) {
+                    $messageParts[] = "{$skipped} skipped (missing mappings)";
+                }
+                if ($failed > 0) {
+                    $messageParts[] = "{$failed} failed";
+                }
+
+                session()->flash('success', 'Batch sync completed: '.implode(', ', $messageParts));
             } else {
                 throw new \Exception($syncResult['error'] ?? 'Sync failed');
             }
@@ -418,7 +453,7 @@ class DonorPerfectBatchSync extends Component
         $dpCode = $gift[$fieldType] ?? '';
 
         if (empty($dpCode)) {
-            return ['code' => '', 'source' => null];
+            return ['code' => '', 'source' => null, 'blocked' => false, 'reason' => null];
         }
 
         // For solicit_code and sub_solicit_code, check conditional mappings first
@@ -431,22 +466,40 @@ class DonorPerfectBatchSync extends Component
             }
 
             if ($intacctLocation) {
-                $conditionalCode = \App\Models\ConditionalCodeMapping::getMapping(
+                // Check if conditional rules exist for this location + field type
+                $hasConditionalRules = \App\Models\ConditionalCodeMapping::hasRulesForLocation(
                     $intacctLocation,
-                    $fieldType,
-                    $dpCode
+                    $fieldType
                 );
 
-                if ($conditionalCode) {
-                    return ['code' => $conditionalCode, 'source' => 'conditional'];
+                if ($hasConditionalRules) {
+                    $conditionalCode = \App\Models\ConditionalCodeMapping::getMapping(
+                        $intacctLocation,
+                        $fieldType,
+                        $dpCode
+                    );
+
+                    if ($conditionalCode) {
+                        return ['code' => $conditionalCode, 'source' => 'conditional', 'blocked' => false, 'reason' => null];
+                    } else {
+                        // Rules exist but this code is NOT in the allowlist - will be BLOCKED during sync
+                        $standardCode = \App\Models\DonorPerfectCodeMapping::getMappingFor($fieldType, $dpCode);
+
+                        return [
+                            'code' => $standardCode ?: $dpCode,
+                            'source' => 'standard',
+                            'blocked' => true,
+                            'reason' => "Not allowed for location {$intacctLocation}",
+                        ];
+                    }
                 }
             }
         }
 
-        // Fall back to standard mapping
+        // Fall back to standard mapping (no conditional blocking)
         $standardCode = \App\Models\DonorPerfectCodeMapping::getMappingFor($fieldType, $dpCode);
 
-        return ['code' => $standardCode ?: '', 'source' => $standardCode ? 'standard' : null];
+        return ['code' => $standardCode ?: '', 'source' => $standardCode ? 'standard' : null, 'blocked' => false, 'reason' => null];
     }
 
     public function render()

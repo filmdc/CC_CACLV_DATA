@@ -2036,7 +2036,9 @@ XML;
         $lineItems = $receiptData['receiptitems'] ?? [];
         foreach ($lineItems as $lineItem) {
             $glAccountNo = htmlspecialchars($lineItem['glaccountno'], ENT_XML1, 'UTF-8');
-            $amount = number_format((float) $lineItem['amount'], 2, '.', '');
+            // Strip commas to handle formatted numbers like "1,000.00"
+            $amountRaw = str_replace(',', '', $lineItem['amount'] ?? 0);
+            $amount = number_format((float) $amountRaw, 2, '.', '');
             $memo = isset($lineItem['memo']) ? '<memo>'.htmlspecialchars($lineItem['memo'], ENT_XML1, 'UTF-8').'</memo>' : '';
 
             // Add dimension fields if provided
