@@ -307,6 +307,9 @@ class SageIntacctSyncService
             // Calculate total skipped (includes both skipped during sync and filtered by rules)
             $allSkipped = $toSkip + $totalSkipped + $totalFiltered;
 
+            // Get the already_synced count (duplicates prevented)
+            $alreadySynced = $filteredCount ?? 0;
+
             // Update sync history status
             $finalStatus = $totalFailed > 0 ? 'partial' : 'success';
             $errorMessage = $totalFailed > 0 ? "Failed to sync {$totalFailed} records" : null;
@@ -319,6 +322,7 @@ class SageIntacctSyncService
                 'skipped' => $allSkipped,
                 'skipped_during_transform' => $totalSkipped,
                 'filtered_by_rules' => $totalFiltered,
+                'already_synced' => $alreadySynced,
                 'failed' => $totalFailed,
             ]);
 
@@ -328,6 +332,7 @@ class SageIntacctSyncService
                 'synced' => $totalSynced,
                 'failed' => $totalFailed,
                 'skipped' => $allSkipped,
+                'already_synced' => $alreadySynced,
                 'created' => $totalSynced,
                 'updated' => $toUpdate,
                 'failed_count' => $failedRecords,
@@ -1173,6 +1178,19 @@ class SageIntacctSyncService
                 'skipped_gifts' => $skippedCount,
                 'gift_id_map_size' => count($giftIdMap),
             ]);
+
+            // If all gifts were skipped/filtered, return early without calling API
+            if (empty($transformedRecords)) {
+                Log::info('Sage Intacct: No records to send - all gifts were skipped or filtered');
+
+                return [
+                    'synced' => 0,
+                    'failed' => 0,
+                    'skipped' => $skippedCount,
+                    'filtered' => $filteredCount,
+                    'failed_count' => [],
+                ];
+            }
 
             // Send batch to Intacct based on destination type
             if ($this->setting->use_other_receipts) {

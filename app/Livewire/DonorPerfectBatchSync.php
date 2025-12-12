@@ -284,9 +284,13 @@ class DonorPerfectBatchSync extends Component
                 $synced = $syncResult['synced'] ?? 0;
                 $failed = $syncResult['failed'] ?? 0;
                 $skipped = $syncResult['skipped'] ?? 0;
+                $alreadySynced = $syncResult['already_synced'] ?? 0;
 
                 // Build a detailed message
                 $messageParts = ["{$synced} synced"];
+                if ($alreadySynced > 0) {
+                    $messageParts[] = "{$alreadySynced} already synced (duplicates prevented)";
+                }
                 if ($skipped > 0) {
                     $messageParts[] = "{$skipped} skipped (missing mappings)";
                 }
