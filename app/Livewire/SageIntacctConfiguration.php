@@ -55,6 +55,25 @@ class SageIntacctConfiguration extends Component
 
     public $code_mapping_enabled = false;
 
+    // Sync Destination Settings
+    public $use_other_receipts = true;
+
+    public $use_undeposited_funds = true;
+
+    public $bank_account_id = '';
+
+    public $undeposited_gl_account = '10300';
+
+    // Check Image Settings
+    public $include_check_images = true;
+
+    public $attachment_folder_name = 'DP_Check_Images';
+
+    public $attachment_max_size_mb = 10;
+
+    // Default Dimension Settings
+    public $default_service_id = 'S14999';
+
     // Connection test
     public $testConnectionResult = null;
 
@@ -161,7 +180,7 @@ class SageIntacctConfiguration extends Component
     public function mount()
     {
         // Allow viewing if user has sync view permission or admin permission
-        if (!$this->canAny(['sage.sync.view', 'intacct.configure'])) {
+        if (! $this->canAny(['sage.sync.view', 'intacct.configure'])) {
             abort(403, 'Unauthorized access to Sage Intacct configuration.');
         }
 
@@ -197,6 +216,20 @@ class SageIntacctConfiguration extends Component
             $this->custom_object_name = $settings->custom_object_name ?? 'Donor Perfect Gifts';
             $this->is_active = $settings->is_active ?? false;
             $this->code_mapping_enabled = $settings->code_mapping_enabled ?? false;
+
+            // Sync destination settings
+            $this->use_other_receipts = $settings->use_other_receipts ?? true;
+            $this->use_undeposited_funds = $settings->use_undeposited_funds ?? true;
+            $this->bank_account_id = $settings->bank_account_id ?? '';
+            $this->undeposited_gl_account = $settings->undeposited_gl_account ?? '10300';
+
+            // Check image settings
+            $this->include_check_images = $settings->include_check_images ?? true;
+            $this->attachment_folder_name = $settings->attachment_folder_name ?? 'DP_Check_Images';
+            $this->attachment_max_size_mb = $settings->attachment_max_size_mb ?? 10;
+
+            // Default dimension settings
+            $this->default_service_id = $settings->default_service_id ?? 'S14999';
         } else {
             // No settings exist yet - default to XML for firewalled environments
             $this->auth_method = 'xml';
@@ -222,7 +255,7 @@ class SageIntacctConfiguration extends Component
     public function saveCredentials()
     {
         // Only admins can edit API credentials
-        if (!$this->canEditApiConfig()) {
+        if (! $this->canEditApiConfig()) {
             abort(403, 'Only administrators can modify API configuration.');
         }
 
@@ -251,6 +284,17 @@ class SageIntacctConfiguration extends Component
                 'endpoint_url' => $this->auth_method === 'xml'
                     ? 'https://api.intacct.com/ia/xml/xmlgw.phtml'
                     : 'https://api.intacct.com',
+                // Sync destination settings
+                'use_other_receipts' => $this->use_other_receipts,
+                'use_undeposited_funds' => $this->use_undeposited_funds,
+                'bank_account_id' => $this->bank_account_id,
+                'undeposited_gl_account' => $this->undeposited_gl_account,
+                // Check image settings
+                'include_check_images' => $this->include_check_images,
+                'attachment_folder_name' => $this->attachment_folder_name,
+                'attachment_max_size_mb' => $this->attachment_max_size_mb,
+                // Default dimension settings
+                'default_service_id' => $this->default_service_id,
             ];
 
             if ($settings) {
@@ -582,7 +626,7 @@ class SageIntacctConfiguration extends Component
      */
     public function showCreateConditionalMappingForm()
     {
-        $this->authorizeAction('intacct.configure');
+        $this->authorizeAction('sage.conditional_mappings.edit');
         $this->resetConditionalMappingForm();
         $this->showConditionalMappingForm = true;
     }
@@ -592,7 +636,7 @@ class SageIntacctConfiguration extends Component
      */
     public function showEditConditionalMappingForm($id)
     {
-        $this->authorizeAction('intacct.configure');
+        $this->authorizeAction('sage.conditional_mappings.edit');
 
         $mapping = \App\Models\ConditionalCodeMapping::findOrFail($id);
 
@@ -690,7 +734,7 @@ class SageIntacctConfiguration extends Component
      */
     public function toggleConditionalMappingActive($id)
     {
-        $this->authorizeAction('intacct.configure');
+        $this->authorizeAction('sage.conditional_mappings.edit');
 
         try {
             $mapping = \App\Models\ConditionalCodeMapping::findOrFail($id);
@@ -735,7 +779,7 @@ class SageIntacctConfiguration extends Component
      */
     public function showCreateSyncFilterForm()
     {
-        $this->authorizeAction('intacct.configure');
+        $this->authorizeAction('sage.filters.edit');
         $this->resetSyncFilterForm();
         $this->showSyncFilterForm = true;
     }
@@ -745,7 +789,7 @@ class SageIntacctConfiguration extends Component
      */
     public function showEditSyncFilterForm($id)
     {
-        $this->authorizeAction('intacct.configure');
+        $this->authorizeAction('sage.filters.edit');
 
         $filter = \App\Models\SageIntacctSyncFilter::findOrFail($id);
 
@@ -842,7 +886,7 @@ class SageIntacctConfiguration extends Component
      */
     public function toggleSyncFilterActive($id)
     {
-        $this->authorizeAction('intacct.configure');
+        $this->authorizeAction('sage.filters.edit');
 
         try {
             $filter = \App\Models\SageIntacctSyncFilter::findOrFail($id);

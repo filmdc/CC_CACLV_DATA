@@ -931,6 +931,22 @@ class SageIntacctApiService
             // Parse batch response
             $result = $this->parseBatchResponse($response['xml']);
 
+            // Check for control-level error from parseBatchResponse
+            if (isset($result['error'])) {
+                Log::error('Sage Intacct XML API: Batch create failed with control-level error', [
+                    'object_name' => $objectName,
+                    'error' => $result['error'],
+                ]);
+
+                return [
+                    'success' => false,
+                    'error' => $result['error'],
+                    'created' => 0,
+                    'failed' => count($records),
+                    'details' => [],
+                ];
+            }
+
             Log::info('Sage Intacct XML API: Batch create completed', [
                 'object_name' => $objectName,
                 'total' => count($records),
@@ -941,7 +957,7 @@ class SageIntacctApiService
             return [
                 'success' => true,
                 'created' => $result['created'],
-                'failed' => $result['failed'],
+                'failed' => count($result['failed']),
                 'details' => $result['details'] ?? [],
             ];
 
@@ -1227,15 +1243,20 @@ class SageIntacctApiService
             $objectName = $parameters['CUSTOMOBJECT'];
             $fields = $parameters['CUSTOMOBJECTFIELDS'] ?? [];
 
+            // Sanitize object name for XML element (replace spaces with underscores, remove invalid chars)
+            $sanitizedObjectName = preg_replace('/[^A-Za-z0-9_-]/', '_', $objectName);
+
             $fieldsXml = '';
             foreach ($fields as $fieldName => $fieldValue) {
-                $fieldsXml .= '<'.htmlspecialchars($fieldName).'>'.htmlspecialchars($fieldValue).'</'.htmlspecialchars($fieldName).'>'."\n";
+                // Sanitize field names for XML elements
+                $sanitizedFieldName = preg_replace('/[^A-Za-z0-9_-]/', '_', $fieldName);
+                $fieldsXml .= '<'.$sanitizedFieldName.'>'.htmlspecialchars((string) $fieldValue).'</'.$sanitizedFieldName.'>'."\n";
             }
 
             return '<create>
-                <'.htmlspecialchars($objectName).'>
+                <'.$sanitizedObjectName.'>
                     '.$fieldsXml.'
-                </'.htmlspecialchars($objectName).'>
+                </'.$sanitizedObjectName.'>
             </create>';
         }
 
@@ -1457,6 +1478,9 @@ XML;
     {
         $controlId = $this->generateControlId();
 
+        // Sanitize object name for XML element (replace spaces with underscores, remove invalid chars)
+        $sanitizedObjectName = preg_replace('/[^A-Za-z0-9_-]/', '_', $objectName);
+
         // Build authentication section
         if ($this->sessionId) {
             $authSection = '<sessionid>'.htmlspecialchars($this->sessionId).'</sessionid>';
@@ -1475,14 +1499,16 @@ XML;
 
             $fieldsXml = '';
             foreach ($record as $fieldName => $fieldValue) {
-                $fieldsXml .= '<'.htmlspecialchars($fieldName).'>'.htmlspecialchars($fieldValue).'</'.htmlspecialchars($fieldName).'>'."\n";
+                // Sanitize field names for XML elements
+                $sanitizedFieldName = preg_replace('/[^A-Za-z0-9_-]/', '_', $fieldName);
+                $fieldsXml .= '<'.$sanitizedFieldName.'>'.htmlspecialchars((string) $fieldValue).'</'.$sanitizedFieldName.'>'."\n";
             }
 
             $functionsXml .= '<function controlid="'.$functionId.'">
                 <create>
-                    <'.htmlspecialchars($objectName).'>
+                    <'.$sanitizedObjectName.'>
                         '.$fieldsXml.'
-                    </'.htmlspecialchars($objectName).'>
+                    </'.$sanitizedObjectName.'>
                 </create>
             </function>'."\n";
         }
@@ -1519,12 +1545,45 @@ XML;
                     'created' => 0,
                     'failed' => [],
                     'details' => [],
+                    'error' => 'Failed to parse XML response',
                 ];
             }
 
             $created = 0;
             $failed = [];
             $details = [];
+
+            // Check for control-level failure first
+            $controlStatus = (string) ($xml->control->status ?? '');
+            if ($controlStatus === 'failure') {
+                $errorMessages = $xml->xpath('//errormessage/error');
+                $errorText = 'Control-level failure';
+
+                if (! empty($errorMessages)) {
+                    $errorDetails = [];
+                    foreach ($errorMessages as $error) {
+                        $description = (string) ($error->description2 ?? $error->description ?? '');
+                        if ($description) {
+                            $errorDetails[] = $description;
+                        }
+                    }
+                    if (! empty($errorDetails)) {
+                        $errorText = implode('; ', $errorDetails);
+                    }
+                }
+
+                Log::error('Sage Intacct: Control-level failure in batch response', [
+                    'error' => $errorText,
+                    'xml_preview' => substr($xmlResponse, 0, 2000),
+                ]);
+
+                return [
+                    'created' => 0,
+                    'failed' => [],
+                    'details' => [],
+                    'error' => $errorText,
+                ];
+            }
 
             // Get all function results (try both paths)
             $functionResults = $xml->xpath('//operation/result');
@@ -1551,16 +1610,46 @@ XML;
                         'key' => $key,
                     ];
                 } else {
-                    $errorMessages = $result->xpath('errormessage/error');
-                    $errorText = 'Unknown error';
+                    // Try multiple error paths - Sage Intacct uses different structures
+                    $errorText = '';
 
+                    // Try errormessage/error path
+                    $errorMessages = $result->xpath('errormessage/error');
                     if (! empty($errorMessages)) {
                         $errorDetails = [];
                         foreach ($errorMessages as $error) {
-                            $description = (string) ($error->description2 ?? $error->description ?? 'Unknown error');
-                            $errorDetails[] = $description;
+                            // Get description2 first (more detailed), then description
+                            $desc2 = trim((string) ($error->description2 ?? ''));
+                            $desc1 = trim((string) ($error->description ?? ''));
+                            $correction = trim((string) ($error->correction ?? ''));
+                            $errorno = trim((string) ($error->errorno ?? ''));
+
+                            // Build error message from available parts
+                            $msg = $desc2 ?: $desc1;
+                            if (empty($msg) && $errorno) {
+                                $msg = "Error code: {$errorno}";
+                            }
+                            if ($correction) {
+                                $msg = $msg ? "{$msg} - {$correction}" : $correction;
+                            }
+                            if ($msg) {
+                                $errorDetails[] = $msg;
+                            }
                         }
                         $errorText = implode('; ', $errorDetails);
+                    }
+
+                    // If still empty, log the raw XML and use a fallback message
+                    if (empty($errorText) || $errorText === 'Unknown error') {
+                        // Log the raw result XML for debugging (only log first few failures to avoid spam)
+                        if ($index < 3) {
+                            Log::warning('Sage Intacct: Empty error message from API', [
+                                'index' => $index,
+                                'status' => $status,
+                                'result_xml' => $result->asXML(),
+                            ]);
+                        }
+                        $errorText = $errorText ?: 'API returned failure without error details (check Sage Intacct audit logs)';
                     }
 
                     $failed[] = [

@@ -348,8 +348,94 @@
                     <!-- Sync Settings -->
                     <div>
                         <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Sync Settings</h3>
-                        <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg">
+                        <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg space-y-6">
+
+                            <!-- Sync Destination Mode -->
                             <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                                    Sync Destination
+                                </label>
+                                <div class="space-y-3">
+                                    <label class="flex items-start space-x-3 cursor-pointer p-3 rounded-md hover:bg-gray-100 dark:hover:bg-zinc-600 border {{ $use_other_receipts ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20' : 'border-gray-200 dark:border-zinc-600' }}">
+                                        <input type="radio"
+                                               wire:model.live="use_other_receipts"
+                                               value="1"
+                                               class="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300">
+                                        <div class="flex-1">
+                                            <div class="font-medium text-gray-900 dark:text-white">Other Receipts (Recommended)</div>
+                                            <div class="text-sm text-gray-600 dark:text-gray-400">
+                                                Creates standard Accounts Receivable entries. Best for most organizations.
+                                                Check images are attached as Supporting Documents (SUPDOC).
+                                            </div>
+                                        </div>
+                                    </label>
+
+                                    <label class="flex items-start space-x-3 cursor-pointer p-3 rounded-md hover:bg-gray-100 dark:hover:bg-zinc-600 border {{ !$use_other_receipts ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20' : 'border-gray-200 dark:border-zinc-600' }}">
+                                        <input type="radio"
+                                               wire:model.live="use_other_receipts"
+                                               value="0"
+                                               class="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300">
+                                        <div class="flex-1">
+                                            <div class="font-medium text-gray-900 dark:text-white">Custom Object</div>
+                                            <div class="text-sm text-gray-600 dark:text-gray-400">
+                                                Stores data in a custom Platform Services object. Requires manual setup in Sage Intacct.
+                                                Check images use Document File attributes.
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Bank/Deposit Settings (Other Receipts mode only) -->
+                            @if($use_other_receipts)
+                            <div class="border-t border-gray-200 dark:border-zinc-600 pt-4">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                                    Deposit Settings
+                                </label>
+
+                                <div class="space-y-4">
+                                    <label class="flex items-center space-x-3 cursor-pointer">
+                                        <input type="checkbox"
+                                               wire:model.live="use_undeposited_funds"
+                                               class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                        <div>
+                                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Use Undeposited Funds Account</span>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">Post to an undeposited funds GL account instead of a bank account</p>
+                                        </div>
+                                    </label>
+
+                                    @if($use_undeposited_funds)
+                                    <div>
+                                        <label for="undeposited_gl_account" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                            Undeposited Funds GL Account
+                                        </label>
+                                        <input type="text"
+                                               wire:model="undeposited_gl_account"
+                                               id="undeposited_gl_account"
+                                               placeholder="10300"
+                                               class="w-full max-w-xs px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">GL account number for undeposited funds (default: 10300)</p>
+                                    </div>
+                                    @else
+                                    <div>
+                                        <label for="bank_account_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                            Bank Account ID
+                                        </label>
+                                        <input type="text"
+                                               wire:model="bank_account_id"
+                                               id="bank_account_id"
+                                               placeholder="Enter bank account ID"
+                                               class="w-full max-w-xs px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Sage Intacct bank account ID for direct deposits</p>
+                                    </div>
+                                    @endif
+                                </div>
+                            </div>
+                            @endif
+
+                            <!-- Custom Object Name (Custom Object mode only) -->
+                            @if(!$use_other_receipts)
+                            <div class="border-t border-gray-200 dark:border-zinc-600 pt-4">
                                 <label for="custom_object_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     Custom Object Name <span class="text-red-500">*</span>
                                 </label>
@@ -362,10 +448,78 @@
                                     The name of the custom object in Sage Intacct where gift data will be stored.
                                     <strong>This object must already exist in your Sage Intacct account.</strong>
                                 </p>
-                                <p class="mt-1 text-xs text-blue-600 dark:text-blue-400">
-                                    Default: "Donor Perfect Gifts" - Create this custom object in Sage Intacct with the appropriate fields.
-                                </p>
                                 @error('custom_object_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            </div>
+                            @endif
+
+                            <!-- Check Image Attachment Settings -->
+                            <div class="border-t border-gray-200 dark:border-zinc-600 pt-4">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                                    Check Image Attachments
+                                </label>
+
+                                <div class="space-y-4">
+                                    <label class="flex items-center space-x-3 cursor-pointer">
+                                        <input type="checkbox"
+                                               wire:model.live="include_check_images"
+                                               class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                        <div>
+                                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Include Check Images</span>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">Attach scanned check images from DonorPerfect to Sage Intacct records</p>
+                                        </div>
+                                    </label>
+
+                                    @if($include_check_images)
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pl-7">
+                                        <div>
+                                            <label for="attachment_folder_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                                Attachment Folder Name
+                                            </label>
+                                            <input type="text"
+                                                   wire:model="attachment_folder_name"
+                                                   id="attachment_folder_name"
+                                                   placeholder="DP_Check_Images"
+                                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Folder name in Sage Intacct for attachments</p>
+                                        </div>
+
+                                        <div>
+                                            <label for="attachment_max_size_mb" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                                Max Attachment Size (MB)
+                                            </label>
+                                            <input type="number"
+                                                   wire:model="attachment_max_size_mb"
+                                                   id="attachment_max_size_mb"
+                                                   min="1"
+                                                   max="50"
+                                                   placeholder="10"
+                                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Skip images larger than this size</p>
+                                        </div>
+                                    </div>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <!-- Default Dimension Settings -->
+                            <div class="border-t border-gray-200 dark:border-zinc-600 pt-4">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                                    Default Dimensions
+                                </label>
+
+                                <div>
+                                    <label for="default_service_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Default Service ID (Class)
+                                    </label>
+                                    <input type="text"
+                                           wire:model="default_service_id"
+                                           id="default_service_id"
+                                           placeholder="S14999"
+                                           class="w-full max-w-xs px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                        Used when no sub-solicitation code mapping exists (departmentid dimension)
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
