@@ -11,7 +11,12 @@ class CommunicationLogUpdate extends Model
         'communication_log_id',
         'update_content',
         'update_type',
+        'update_date',
         'created_by',
+    ];
+
+    protected $casts = [
+        'update_date' => 'date',
     ];
 
     protected $appends = [

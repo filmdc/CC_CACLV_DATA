@@ -116,6 +116,13 @@ class CommunicationLog extends Model
             ->withTimestamps();
     }
 
+    // Fund codes relationship
+    public function fundCodes(): BelongsToMany
+    {
+        return $this->belongsToMany(FundCode::class, 'communication_log_fund_code')
+            ->withTimestamps();
+    }
+
     // New relationship for updates/follow-ups
     public function updates(): HasMany
     {

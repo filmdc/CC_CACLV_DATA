@@ -54,6 +54,9 @@
                     @if(auth()->user()->hasPermission('communications_log.view'))
                         <flux:navlist.item icon="chat-bubble-left-right" :href="route('communications-log.management')" :current="request()->routeIs('communications-log.management')" wire:navigate>{{ __('Communications Log') }}</flux:navlist.item>
                     @endif
+                    @if(auth()->user()->hasPermission('fund_codes.view'))
+                        <flux:navlist.item icon="banknotes" :href="route('fund-codes.management')" :current="request()->routeIs('fund-codes.management')" wire:navigate>{{ __('Fund Codes') }}</flux:navlist.item>
+                    @endif
                     @if(auth()->user()->hasPermission('pdf_templates.view'))
                         <flux:navlist.item icon="document-text" :href="route('pdf-templates.index')" :current="request()->routeIs('pdf-templates.*')" wire:navigate>{{ __('PDF Form Templates') }}</flux:navlist.item>
                     @endif

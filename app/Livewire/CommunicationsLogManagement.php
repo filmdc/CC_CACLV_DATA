@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\CommunicationLog;
 use App\Models\CommunicationLogUpdate;
 use App\Models\Contractor;
+use App\Models\FundCode;
 use App\Models\Household;
 use App\Models\HousingJob;
 use App\Models\Participant;
@@ -84,6 +85,11 @@ class CommunicationsLogManagement extends Component
 
     public $newUpdateType = 'note';
 
+    public $newUpdateDate = '';
+
+    // Fund codes
+    public $selectedFundCodeIds = [];
+
     // Entity search fields
     public $participantSearch = '';
 
@@ -124,7 +130,7 @@ class CommunicationsLogManagement extends Component
 
     public $contact_city = '';
 
-    public $contact_state = 'NV';
+    public $contact_state = 'PA';
 
     public $contact_zip = '';
 
@@ -183,7 +189,7 @@ class CommunicationsLogManagement extends Component
 
     public $newPropertyCity = '';
 
-    public $newPropertyState = 'NV';
+    public $newPropertyState = 'PA';
 
     public $newPropertyZip = '';
 
@@ -205,7 +211,7 @@ class CommunicationsLogManagement extends Component
 
     public $addressCity = '';
 
-    public $addressState = 'NV';
+    public $addressState = 'PA';
 
     public $addressZip = '';
 
@@ -525,7 +531,7 @@ class CommunicationsLogManagement extends Component
     {
         $this->newPropertyAddress = '';
         $this->newPropertyCity = '';
-        $this->newPropertyState = 'NV';
+        $this->newPropertyState = 'PA';
         $this->newPropertyZip = '';
     }
 
@@ -547,7 +553,7 @@ class CommunicationsLogManagement extends Component
     {
         $this->addressLine = '';
         $this->addressCity = '';
-        $this->addressState = 'NV';
+        $this->addressState = 'PA';
         $this->addressZip = '';
         $this->createAsProperty = false;
         $this->linkAddressToParticipant = false;
@@ -581,7 +587,7 @@ class CommunicationsLogManagement extends Component
         $this->contact_email = $log->contact_email ?? '';
         $this->contact_address = $log->contact_address ?? '';
         $this->contact_city = $log->contact_city ?? '';
-        $this->contact_state = $log->contact_state ?? 'NV';
+        $this->contact_state = $log->contact_state ?? 'PA';
         $this->contact_zip = $log->contact_zip ?? '';
         $this->contact_organization = $log->contact_organization ?? '';
         $this->contact_role = $log->contact_role ?? '';
@@ -595,6 +601,7 @@ class CommunicationsLogManagement extends Component
         $this->follow_up_action = $log->follow_up_action ?? '';
         $this->selectedServices = $log->services->pluck('id')->toArray();
         $this->selectedTagIds = $log->tags->pluck('id')->toArray();
+        $this->selectedFundCodeIds = $log->fundCodes->pluck('id')->toArray();
         $this->create_project_enrollment = false; // Always false when editing
 
         $this->showForm = true;
@@ -619,13 +626,22 @@ class CommunicationsLogManagement extends Component
         $this->validate([
             'newUpdateContent' => 'required|string|min:1',
             'newUpdateType' => 'required|in:note,follow_up,status_change,outcome,other',
+            'newUpdateDate' => 'nullable|date',
         ]);
 
         $log = CommunicationLog::findOrFail($this->viewingId);
-        $log->addUpdate($this->newUpdateContent, $this->newUpdateType);
+
+        // Create update with optional date
+        $log->updates()->create([
+            'update_content' => $this->newUpdateContent,
+            'update_type' => $this->newUpdateType,
+            'update_date' => $this->newUpdateDate ?: null,
+            'created_by' => Auth::id(),
+        ]);
 
         $this->newUpdateContent = '';
         $this->newUpdateType = 'note';
+        $this->newUpdateDate = '';
 
         session()->flash('success', 'Update added successfully.');
     }
@@ -958,7 +974,7 @@ class CommunicationsLogManagement extends Component
                         $household->addresses()->create([
                             'address' => $log->contact_address,
                             'city' => $log->contact_city,
-                            'state' => strtoupper($log->contact_state ?? 'NV'),
+                            'state' => strtoupper($log->contact_state ?? 'PA'),
                             'zip_code' => $log->contact_zip ?? '',
                             'is_current' => true,
                         ]);
@@ -1011,7 +1027,7 @@ class CommunicationsLogManagement extends Component
                 $property = Property::create([
                     'address_line_1' => $log->contact_address,
                     'city' => $log->contact_city,
-                    'state' => strtoupper($log->contact_state ?? 'NV'),
+                    'state' => strtoupper($log->contact_state ?? 'PA'),
                     'zip_code' => $log->contact_zip ?? '',
                     'participant_id' => $participant?->id,
                     'household_id' => $household?->id,
@@ -1455,6 +1471,9 @@ class CommunicationsLogManagement extends Component
             // Sync tags
             $log->syncTags($this->selectedTagIds);
 
+            // Sync fund codes
+            $log->fundCodes()->sync($this->selectedFundCodeIds);
+
             session()->flash('success', 'Communication log updated successfully.');
         } else {
             $this->authorizeAction('communications_log.create');
@@ -1466,6 +1485,9 @@ class CommunicationsLogManagement extends Component
 
             // Attach tags
             $log->syncTags($this->selectedTagIds);
+
+            // Attach fund codes
+            $log->fundCodes()->sync($this->selectedFundCodeIds);
 
             session()->flash('success', 'Communication log created successfully.');
         }
@@ -1661,7 +1683,7 @@ class CommunicationsLogManagement extends Component
         $this->contact_email = '';
         $this->contact_address = '';
         $this->contact_city = '';
-        $this->contact_state = 'NV';
+        $this->contact_state = 'PA';
         $this->contact_zip = '';
         $this->contact_organization = '';
         $this->contact_role = '';
@@ -1675,6 +1697,7 @@ class CommunicationsLogManagement extends Component
         $this->follow_up_action = '';
         $this->selectedServices = [];
         $this->selectedTagIds = [];
+        $this->selectedFundCodeIds = [];
         $this->newTagName = '';
         $this->tagSearch = '';
 
@@ -1839,6 +1862,7 @@ class CommunicationsLogManagement extends Component
                 'updatedBy',
                 'services',
                 'tags',
+                'fundCodes',
                 'updates.createdBy',
                 'convertedToJob',
                 'convertedBy',
@@ -1856,6 +1880,9 @@ class CommunicationsLogManagement extends Component
             ->limit(50)
             ->get();
 
+        // Get active fund codes for selection
+        $allFundCodes = FundCode::active()->orderBy('code')->get();
+
         return view('livewire.communications-log-management', [
             'logs' => $logs,
             'pendingFollowUps' => $pendingFollowUps,
@@ -1871,6 +1898,7 @@ class CommunicationsLogManagement extends Component
             'searchedTags' => $searchedTags,
             'viewingLog' => $viewingLog,
             'housingJobs' => $housingJobs,
+            'allFundCodes' => $allFundCodes,
         ]);
     }
 }

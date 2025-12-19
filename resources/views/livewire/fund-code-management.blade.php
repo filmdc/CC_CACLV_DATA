@@ -1,0 +1,237 @@
+<div class="max-w-7xl mx-auto p-6">
+    <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl p-6">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Fund Codes</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage fund codes for communication log tracking</p>
+            </div>
+            @if($this->can('fund_codes.create'))
+            <button wire:click="showCreateForm"
+                    class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Add Fund Code
+            </button>
+            @endif
+        </div>
+
+        <!-- Success/Error Messages -->
+        @if (session()->has('success'))
+            <div class="rounded-md bg-green-50 dark:bg-green-900/30 p-4 mb-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-green-800 dark:text-green-200">{{ session('success') }}</p>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        @if (session()->has('error'))
+            <div class="rounded-md bg-red-50 dark:bg-red-900/30 p-4 mb-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-red-800 dark:text-red-200">{{ session('error') }}</p>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        <!-- Filters -->
+        <div class="flex flex-col md:flex-row gap-4 mb-6">
+            <div class="flex-1">
+                <input type="text" wire:model.live.debounce.300ms="search"
+                       placeholder="Search fund codes..."
+                       class="w-full px-4 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div class="w-full md:w-48">
+                <select wire:model.live="activeFilter"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                    <option value="">All Status</option>
+                    <option value="active">Active Only</option>
+                    <option value="inactive">Inactive Only</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Fund Codes Table -->
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700">
+                <thead class="bg-gray-50 dark:bg-zinc-700">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Code</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Description</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Linked Contract</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Usage</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-zinc-700">
+                    @forelse($fundCodes as $fundCode)
+                        <tr class="{{ !$fundCode->is_active ? 'opacity-60' : '' }}">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="font-mono font-semibold text-gray-900 dark:text-white">{{ $fundCode->code }}</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="text-gray-900 dark:text-white">{{ $fundCode->description }}</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                @if($fundCode->contract)
+                                    <a href="{{ route('contracts.show', $fundCode->contract_id) }}"
+                                       class="text-indigo-600 dark:text-indigo-400 hover:underline text-sm">
+                                        {{ $fundCode->contract->title }}
+                                        @if($fundCode->contract->contract_number)
+                                            <span class="text-gray-500 dark:text-gray-400">({{ $fundCode->contract->contract_number }})</span>
+                                        @endif
+                                    </a>
+                                @else
+                                    <span class="text-gray-400 dark:text-gray-500 text-sm italic">No linked contract</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 py-1 text-xs rounded-full bg-gray-100 dark:bg-zinc-700 text-gray-800 dark:text-gray-200">
+                                    {{ $fundCode->communication_logs_count }} log{{ $fundCode->communication_logs_count !== 1 ? 's' : '' }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if($fundCode->is_active)
+                                    <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Active</span>
+                                @else
+                                    <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800 dark:bg-zinc-600 dark:text-gray-300">Inactive</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2">
+                                @if($this->can('fund_codes.edit'))
+                                <button wire:click="showEditForm({{ $fundCode->id }})"
+                                        class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
+                                    Edit
+                                </button>
+                                <button wire:click="toggleActive({{ $fundCode->id }})"
+                                        class="text-amber-600 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-300">
+                                    {{ $fundCode->is_active ? 'Deactivate' : 'Activate' }}
+                                </button>
+                                @endif
+                                @if($this->can('fund_codes.delete'))
+                                <button wire:click="delete({{ $fundCode->id }})"
+                                        wire:confirm="Are you sure you want to delete this fund code?"
+                                        class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
+                                    Delete
+                                </button>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <p class="mt-2 text-sm">No fund codes found.</p>
+                                @if($this->can('fund_codes.create'))
+                                <button wire:click="showCreateForm" class="mt-2 text-indigo-600 dark:text-indigo-400 hover:underline">
+                                    Create your first fund code
+                                </button>
+                                @endif
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="mt-4">
+            {{ $fundCodes->links() }}
+        </div>
+    </div>
+
+    <!-- Create/Edit Modal -->
+    @if($showForm)
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 dark:bg-zinc-900 dark:bg-opacity-75 flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl p-6 max-w-lg w-full mx-4">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                {{ $editingId ? 'Edit Fund Code' : 'Add Fund Code' }}
+            </h3>
+
+            <div class="space-y-4">
+                <!-- Code -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Fund Code <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" wire:model="code"
+                           placeholder="e.g., F7000"
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md uppercase">
+                    @error('code') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Description <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" wire:model="description"
+                           placeholder="e.g., WHR"
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                    @error('description') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                </div>
+
+                <!-- Contract Link -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Link to Contract (Optional)
+                    </label>
+                    <select wire:model="contract_id"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                        <option value="">None</option>
+                        @foreach($contracts as $contract)
+                            <option value="{{ $contract->id }}">
+                                {{ $contract->title }}
+                                @if($contract->contract_number) ({{ $contract->contract_number }}) @endif
+                            </option>
+                        @endforeach
+                    </select>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        Optionally link this fund code to a contract for easy reference
+                    </p>
+                </div>
+
+                <!-- Active Status -->
+                <div>
+                    <label class="flex items-center">
+                        <input type="checkbox" wire:model="is_active"
+                               class="rounded border-gray-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500">
+                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Active</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end space-x-3">
+                <button wire:click="$set('showForm', false)"
+                        class="px-4 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
+                    Cancel
+                </button>
+                <button wire:click="save"
+                        wire:loading.attr="disabled"
+                        wire:loading.class="opacity-50 cursor-not-allowed"
+                        class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                    <span wire:loading.remove wire:target="save">{{ $editingId ? 'Update' : 'Create' }}</span>
+                    <span wire:loading wire:target="save">Saving...</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
+</div>

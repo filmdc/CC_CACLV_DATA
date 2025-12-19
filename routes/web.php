@@ -96,6 +96,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('admin-panel', App\Livewire\AdminPanel::class)->name('admin.panel');
     Route::get('reports', App\Livewire\ReportingManagement::class)->name('reports');
     Route::get('communications-log', App\Livewire\CommunicationsLogManagement::class)->name('communications-log.management');
+    Route::get('fund-codes', App\Livewire\FundCodeManagement::class)->name('fund-codes.management');
 
     // Feedback Routes
     Route::get('admin/feedback', App\Livewire\FeedbackManagement::class)
@@ -277,7 +278,7 @@ Route::middleware(['auth'])->group(function () {
                 $allPngsExist = true;
                 foreach ($cachedMetadata['pages'] as $pageInfo) {
                     $cachedPngPath = 'check_images/converted/'.$pageInfo['filename'];
-                    if (!Storage::disk('local')->exists($cachedPngPath.'.enc')) {
+                    if (! Storage::disk('local')->exists($cachedPngPath.'.enc')) {
                         $allPngsExist = false;
                         break;
                     }
@@ -311,7 +312,7 @@ Route::middleware(['auth'])->group(function () {
                 set_time_limit(90); // 90 seconds max for conversion
 
                 // Try to load the TIFF to check page count quickly
-                $imagick = new \Imagick();
+                $imagick = new \Imagick;
                 $imagick->pingImage($tempPath); // Ping is faster than full load
                 $pageCount = $imagick->getNumberImages();
                 $imagick->clear();
@@ -509,7 +510,7 @@ Route::middleware(['auth'])->group(function () {
             $metadata = json_decode(Storage::disk('local')->get($cachedMetadataPath), true);
 
             // Verify at least one PNG file exists
-            if (!empty($metadata['pages'])) {
+            if (! empty($metadata['pages'])) {
                 $firstPage = $metadata['pages'][0];
                 $cachedPngPath = 'check_images/converted/'.$firstPage['filename'];
 
@@ -517,7 +518,7 @@ Route::middleware(['auth'])->group(function () {
                     return response()->json([
                         'ready' => true,
                         'page_count' => $metadata['page_count'],
-                        'converted_at' => $metadata['converted_at']
+                        'converted_at' => $metadata['converted_at'],
                     ]);
                 }
             }
@@ -651,7 +652,7 @@ Route::middleware(['auth'])->group(function () {
             if (! auth()->check()) {
                 Log::warning('Unauthenticated access attempt to storage file', [
                     'path' => $path,
-                    'ip' => request()->ip()
+                    'ip' => request()->ip(),
                 ]);
                 abort(403, 'Unauthorized access to file');
             }
@@ -662,7 +663,7 @@ Route::middleware(['auth'])->group(function () {
             Log::info('Storage authenticated file request', [
                 'requested_path' => $path,
                 'full_path' => $fullPath,
-                'user_id' => auth()->id()
+                'user_id' => auth()->id(),
             ]);
 
             // Security: Prevent directory traversal attacks
@@ -671,7 +672,7 @@ Route::middleware(['auth'])->group(function () {
 
             if (! $storagePath) {
                 Log::error('Storage base path not found', [
-                    'attempted_path' => storage_path('app/public')
+                    'attempted_path' => storage_path('app/public'),
                 ]);
                 abort(500, 'Storage system configuration error');
             }
@@ -679,7 +680,7 @@ Route::middleware(['auth'])->group(function () {
             if (! $realPath) {
                 Log::warning('File path could not be resolved', [
                     'requested_path' => $path,
-                    'full_path' => $fullPath
+                    'full_path' => $fullPath,
                 ]);
                 abort(404, 'File not found - path could not be resolved');
             }
@@ -689,7 +690,7 @@ Route::middleware(['auth'])->group(function () {
                     'requested_path' => $path,
                     'real_path' => $realPath,
                     'storage_path' => $storagePath,
-                    'user_id' => auth()->id()
+                    'user_id' => auth()->id(),
                 ]);
                 abort(403, 'Invalid file path - security violation');
             }
@@ -699,7 +700,7 @@ Route::middleware(['auth'])->group(function () {
                 Log::warning('Requested file does not exist', [
                     'path' => $path,
                     'full_path' => $fullPath,
-                    'real_path' => $realPath
+                    'real_path' => $realPath,
                 ]);
                 abort(404, 'File not found in storage');
             }
@@ -708,7 +709,7 @@ Route::middleware(['auth'])->group(function () {
             $mimeType = @mime_content_type($fullPath);
             if ($mimeType === false) {
                 Log::warning('Could not determine MIME type, using default', [
-                    'file' => $fullPath
+                    'file' => $fullPath,
                 ]);
                 $mimeType = 'application/octet-stream';
             }
@@ -740,7 +741,7 @@ Route::middleware(['auth'])->group(function () {
                 'file' => $fileName,
                 'mime_type' => $mimeType,
                 'size' => filesize($fullPath),
-                'is_download' => $isDownload
+                'is_download' => $isDownload,
             ]);
 
             // Return file response
@@ -751,7 +752,7 @@ Route::middleware(['auth'])->group(function () {
                 'path' => $path,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
-                'user_id' => auth()->id() ?? 'guest'
+                'user_id' => auth()->id() ?? 'guest',
             ]);
 
             // Return user-friendly error instead of generic 500
