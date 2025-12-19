@@ -65,6 +65,16 @@
             </div>
         @endif
 
+        @if (session()->has('info'))
+            <div class="p-4 bg-blue-50 border-l-4 border-blue-400">
+                <div class="flex">
+                    <div class="ml-3">
+                        <p class="text-sm text-blue-700">{{ session('info') }}</p>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <!-- Create Service Form -->
         @if ($showCreateForm)
             <div class="p-6 border-b">
@@ -362,6 +372,13 @@
                                         <button wire:click="toggleServiceStatus({{ $service->id }})"
                                                 class="px-3 py-1 text-sm rounded {{ $service->active ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200' }}">
                                             {{ $service->active ? 'Deactivate' : 'Activate' }}
+                                        </button>
+                                    @endif
+                                    @if($this->can('services.create') && in_array($service->program_id, $editableProgramIds))
+                                        <button wire:click="duplicateService({{ $service->id }})"
+                                                class="px-3 py-1 text-sm bg-purple-100 text-purple-700 rounded hover:bg-purple-200"
+                                                title="Create a copy of this service">
+                                            Duplicate
                                         </button>
                                     @endif
                                     @if($this->can('services.delete') && in_array($service->program_id, $editableProgramIds))

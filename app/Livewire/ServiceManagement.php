@@ -137,6 +137,53 @@ class ServiceManagement extends Component
         return redirect()->route('service.show', $serviceId);
     }
 
+    /**
+     * Duplicate a service - opens create form pre-filled with existing service data
+     */
+    public function duplicateService($serviceId)
+    {
+        $service = Service::with('contracts')->find($serviceId);
+        if (! $service) {
+            session()->flash('error', 'Service not found.');
+
+            return;
+        }
+
+        // Check if user has any editable programs
+        $editablePrograms = $this->getEditableProgramIds();
+        if (empty($editablePrograms)) {
+            session()->flash('error', 'You do not have permission to create services. You must be assigned to at least one program.');
+
+            return;
+        }
+
+        // Check if user can create in the source service's program
+        if (! $this->canEditProgram($service->program_id)) {
+            session()->flash('error', 'You do not have permission to duplicate services for this program.');
+
+            return;
+        }
+
+        // Set up the create form with copied data
+        $this->showCreateForm = true;
+        $this->showEditForm = false;
+        $this->showViewModal = false;
+        $this->selectedServiceId = null;
+
+        // Fill form with service data, but modify the name
+        $this->name = 'Copy of '.$service->name;
+        $this->description = $service->description;
+        $this->program_id = $service->program_id;
+        $this->start_date = ''; // Don't copy dates - user should set new ones
+        $this->end_date = '';
+        $this->active = $service->active;
+        $this->notes = $service->notes;
+        $this->selectedContracts = $service->contracts->pluck('id')->toArray();
+        $this->contractSearch = '';
+
+        session()->flash('info', 'Service settings copied. Please review and save as a new service.');
+    }
+
     public function resetServiceForm()
     {
         $this->name = '';
