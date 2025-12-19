@@ -9,6 +9,7 @@ use App\Models\FundCode;
 use App\Models\Household;
 use App\Models\HousingJob;
 use App\Models\Participant;
+use App\Models\Program;
 use App\Models\Property;
 use App\Models\Service;
 use App\Models\Tag;
@@ -688,22 +689,53 @@ class CommunicationsLogManagement extends Component
         \Log::info('openConvertModal called', ['logId' => $logId, 'showConvertModal_before' => $this->showConvertModal]);
 
         $this->authorizeAction('projects.create');
-        $log = CommunicationLog::with(['participant', 'property'])->findOrFail($logId);
+        $log = CommunicationLog::with(['participant', 'property', 'services.program'])->findOrFail($logId);
 
         $this->convertingLogId = $logId;
         $this->convertingLog = $log;
         $this->convertJobTitle = $log->subject;
         $this->convertJobDescription = $log->summary ?? $log->notes ?? '';
-        $this->convertProgramId = '';
-        $this->convertServiceId = '';
         $this->convertStep = 1;
         $this->potentialParticipantMatches = [];
         $this->potentialPropertyMatches = [];
         $this->selectedParticipantAction = 'create_new';
         $this->selectedPropertyAction = 'create_new';
+
+        // Auto-select program: First try from linked services, then default to first housing-enabled program
+        $this->convertProgramId = '';
+        $this->convertServiceId = '';
+
+        // Try to get program from linked services (if any have housing enabled)
+        if ($log->services->isNotEmpty()) {
+            foreach ($log->services as $service) {
+                if ($service->program && $service->program->housing_module_enabled && $service->program->active) {
+                    $this->convertProgramId = $service->program->id;
+                    $this->convertServiceId = $service->id;
+                    break;
+                }
+            }
+        }
+
+        // If no program from services, get first housing-enabled program user has access to
+        if (empty($this->convertProgramId)) {
+            $housingProgram = $this->getAccessiblePrograms()
+                ->where('active', true)
+                ->where('housing_module_enabled', true)
+                ->first();
+
+            if ($housingProgram) {
+                $this->convertProgramId = $housingProgram->id;
+            }
+        }
+
         $this->showConvertModal = true;
 
-        \Log::info('openConvertModal completed', ['showConvertModal_after' => $this->showConvertModal, 'convertingLogId' => $this->convertingLogId]);
+        \Log::info('openConvertModal completed', [
+            'showConvertModal_after' => $this->showConvertModal,
+            'convertingLogId' => $this->convertingLogId,
+            'autoSelectedProgramId' => $this->convertProgramId,
+            'autoSelectedServiceId' => $this->convertServiceId,
+        ]);
     }
 
     /**
@@ -1836,6 +1868,9 @@ class CommunicationsLogManagement extends Component
             ->orderBy('name')
             ->get();
 
+        // Get housing-enabled programs for convert to project modal
+        $housingPrograms = $accessiblePrograms->where('housing_module_enabled', true);
+
         // Get all active services from accessible programs for filtering
         $accessibleProgramIds = $accessiblePrograms->pluck('id')->toArray();
         $allServices = Service::where('active', true)
@@ -1893,6 +1928,7 @@ class CommunicationsLogManagement extends Component
             'properties' => $properties,
             'contractors' => $contractors,
             'accessiblePrograms' => $accessiblePrograms,
+            'housingPrograms' => $housingPrograms,
             'allServices' => $allServices,
             'allTags' => $allTags,
             'searchedTags' => $searchedTags,

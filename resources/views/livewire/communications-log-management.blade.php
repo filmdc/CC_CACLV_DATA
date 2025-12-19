@@ -741,14 +741,25 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Program *</label>
-                        <select wire:model.live="convertProgramId"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                            <option value="">Select a program...</option>
-                            @foreach($accessiblePrograms as $program)
-                                <option value="{{ $program->id }}">{{ $program->name }}</option>
-                            @endforeach
-                        </select>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Program</label>
+                        @if($housingPrograms->count() === 1)
+                            {{-- Only one housing program - show as read-only --}}
+                            <div class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700/50 dark:text-white rounded-md bg-gray-50">
+                                {{ $housingPrograms->first()->name }}
+                            </div>
+                        @elseif($housingPrograms->count() > 1)
+                            {{-- Multiple housing programs - show dropdown --}}
+                            <select wire:model.live="convertProgramId"
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                @foreach($housingPrograms as $program)
+                                    <option value="{{ $program->id }}">{{ $program->name }}</option>
+                                @endforeach
+                            </select>
+                        @else
+                            <div class="w-full px-3 py-2 border border-red-300 dark:border-red-600 rounded-md bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 text-sm">
+                                No housing-enabled programs available. Please enable housing module on a program first.
+                            </div>
+                        @endif
                         @error('convertProgramId') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
                     </div>
 
@@ -758,7 +769,7 @@
                         <select wire:model="convertServiceId"
                                 class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
                             <option value="">Select a service...</option>
-                            @foreach($accessiblePrograms->firstWhere('id', $convertProgramId)?->services ?? [] as $service)
+                            @foreach($housingPrograms->firstWhere('id', $convertProgramId)?->services ?? [] as $service)
                                 <option value="{{ $service->id }}">{{ $service->name }}</option>
                             @endforeach
                         </select>
@@ -773,7 +784,8 @@
                     </button>
                     <button wire:click="checkForDuplicates"
                             wire:loading.attr="disabled"
-                            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                            {{ $housingPrograms->isEmpty() ? 'disabled' : '' }}
+                            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed">
                         <span wire:loading.remove wire:target="checkForDuplicates">Continue</span>
                         <span wire:loading wire:target="checkForDuplicates">Checking...</span>
                     </button>
