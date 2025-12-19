@@ -47,6 +47,8 @@ class ServiceManagement extends Component
 
     public $selectedContracts = [];
 
+    public $contractSearch = '';
+
     public function mount()
     {
         // Set default program if filtering by program
@@ -145,6 +147,7 @@ class ServiceManagement extends Component
         $this->active = true;
         $this->notes = '';
         $this->selectedContracts = [];
+        $this->contractSearch = '';
         $this->showViewModal = false;
         $this->selectedViewService = null;
         $this->selectedServiceId = null;
@@ -177,7 +180,7 @@ class ServiceManagement extends Component
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'program_id' => 'required|exists:programs,id',
-            'start_date' => 'required|date',
+            'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after:start_date',
             'notes' => 'nullable|string',
         ]);
@@ -194,8 +197,8 @@ class ServiceManagement extends Component
                 'name' => $this->name,
                 'description' => $this->description,
                 'program_id' => $this->program_id,
-                'start_date' => $this->start_date,
-                'end_date' => $this->end_date,
+                'start_date' => $this->start_date ?: null,
+                'end_date' => $this->end_date ?: null,
                 'active' => $this->active,
                 'notes' => $this->notes,
             ]);
@@ -220,7 +223,7 @@ class ServiceManagement extends Component
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'program_id' => 'required|exists:programs,id',
-            'start_date' => 'required|date',
+            'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after:start_date',
             'notes' => 'nullable|string',
         ]);
@@ -252,8 +255,8 @@ class ServiceManagement extends Component
                 'name' => $this->name,
                 'description' => $this->description,
                 'program_id' => $this->program_id,
-                'start_date' => $this->start_date,
-                'end_date' => $this->end_date,
+                'start_date' => $this->start_date ?: null,
+                'end_date' => $this->end_date ?: null,
                 'active' => $this->active,
                 'notes' => $this->notes,
             ]);
@@ -345,10 +348,27 @@ class ServiceManagement extends Component
             $filteredProgram = Program::find($this->filterProgramId);
         }
 
-        // Get active contracts for selection
+        // Get active contracts for selection (filtered by search)
         $contracts = Contract::active()
+            ->when($this->contractSearch, function ($query) {
+                $search = $this->contractSearch;
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                        ->orWhere('contract_number', 'like', "%{$search}%")
+                        ->orWhere('grant_code', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('grant_code')
             ->orderBy('title')
             ->get();
+
+        // Always include already selected contracts (even if filtered out by search)
+        if (! empty($this->selectedContracts) && $this->contractSearch) {
+            $selectedContractModels = Contract::whereIn('id', $this->selectedContracts)
+                ->whereNotIn('id', $contracts->pluck('id'))
+                ->get();
+            $contracts = $contracts->merge($selectedContractModels)->sortBy('grant_code');
+        }
 
         return view('livewire.service-management', [
             'services' => $services,

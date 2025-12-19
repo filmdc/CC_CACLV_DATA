@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
-use App\Models\Service;
 use App\Models\Program;
+use App\Models\Service;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -98,7 +98,7 @@ class ServiceManagementTest extends TestCase
             ->set('program_id', '')
             ->set('start_date', '')
             ->call('createService')
-            ->assertHasErrors(['name', 'program_id', 'start_date']);
+            ->assertHasErrors(['name', 'program_id']);
     }
 
     public function test_service_view_redirects_to_show_page()

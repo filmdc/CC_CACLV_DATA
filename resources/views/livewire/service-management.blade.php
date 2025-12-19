@@ -104,9 +104,9 @@
 
                         <div>
                             <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1">
-                                Start Date <span class="text-red-500">*</span>
+                                Start Date
                             </label>
-                            <input type="date" wire:model="start_date" id="start_date" 
+                            <input type="date" wire:model="start_date" id="start_date"
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500">
                             @error('start_date') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
@@ -129,24 +129,37 @@
                                 Funding Contracts
                             </label>
                             <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Select the contracts that fund this service (optional)</p>
+                            <input type="text"
+                                   wire:model.live.debounce.300ms="contractSearch"
+                                   placeholder="Search by fund code, title, or contract number..."
+                                   class="w-full px-3 py-2 mb-2 text-sm border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
                             <div class="border border-gray-300 dark:border-zinc-600 rounded-md max-h-48 overflow-y-auto bg-white dark:bg-zinc-700">
                                 @forelse($contracts as $contract)
-                                    <label class="flex items-center px-3 py-2 hover:bg-gray-50 dark:hover:bg-zinc-600 cursor-pointer border-b border-gray-100 dark:border-zinc-600 last:border-b-0">
+                                    <label class="flex items-center px-3 py-2 hover:bg-gray-50 dark:hover:bg-zinc-600 cursor-pointer border-b border-gray-100 dark:border-zinc-600 last:border-b-0 {{ in_array($contract->id, $selectedContracts) ? 'bg-teal-50 dark:bg-teal-900/20' : '' }}">
                                         <input type="checkbox"
                                                wire:model="selectedContracts"
                                                value="{{ $contract->id }}"
                                                class="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 dark:border-zinc-500 rounded">
-                                        <span class="ml-3 text-sm text-gray-900 dark:text-white">
+                                        <span class="ml-3 text-sm text-gray-900 dark:text-white flex-1">
+                                            @if($contract->grant_code)
+                                                <span class="font-mono font-semibold text-indigo-600 dark:text-indigo-400">{{ $contract->grant_code }}</span>
+                                                <span class="text-gray-400 dark:text-gray-500 mx-1">–</span>
+                                            @endif
                                             {{ $contract->title }}
                                             @if($contract->contract_number)
-                                                <span class="text-gray-500 dark:text-gray-400">({{ $contract->contract_number }})</span>
+                                                <span class="text-gray-500 dark:text-gray-400 text-xs ml-1">({{ $contract->contract_number }})</span>
                                             @endif
                                         </span>
                                     </label>
                                 @empty
-                                    <p class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">No active contracts available</p>
+                                    <p class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
+                                        {{ $contractSearch ? 'No contracts match your search' : 'No active contracts available' }}
+                                    </p>
                                 @endforelse
                             </div>
+                            @if(count($selectedContracts) > 0)
+                                <p class="text-xs text-teal-600 dark:text-teal-400 mt-1">{{ count($selectedContracts) }} contract(s) selected</p>
+                            @endif
                         </div>
                     </div>
 
@@ -213,9 +226,9 @@
 
                         <div>
                             <label for="edit_start_date" class="block text-sm font-medium text-gray-700 mb-1">
-                                Start Date <span class="text-red-500">*</span>
+                                Start Date
                             </label>
-                            <input type="date" wire:model="start_date" id="edit_start_date" 
+                            <input type="date" wire:model="start_date" id="edit_start_date"
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500">
                             @error('start_date') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
@@ -238,24 +251,37 @@
                                 Funding Contracts
                             </label>
                             <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Select the contracts that fund this service (optional)</p>
+                            <input type="text"
+                                   wire:model.live.debounce.300ms="contractSearch"
+                                   placeholder="Search by fund code, title, or contract number..."
+                                   class="w-full px-3 py-2 mb-2 text-sm border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
                             <div class="border border-gray-300 dark:border-zinc-600 rounded-md max-h-48 overflow-y-auto bg-white dark:bg-zinc-700">
                                 @forelse($contracts as $contract)
-                                    <label class="flex items-center px-3 py-2 hover:bg-gray-50 dark:hover:bg-zinc-600 cursor-pointer border-b border-gray-100 dark:border-zinc-600 last:border-b-0">
+                                    <label class="flex items-center px-3 py-2 hover:bg-gray-50 dark:hover:bg-zinc-600 cursor-pointer border-b border-gray-100 dark:border-zinc-600 last:border-b-0 {{ in_array($contract->id, $selectedContracts) ? 'bg-teal-50 dark:bg-teal-900/20' : '' }}">
                                         <input type="checkbox"
                                                wire:model="selectedContracts"
                                                value="{{ $contract->id }}"
                                                class="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 dark:border-zinc-500 rounded">
-                                        <span class="ml-3 text-sm text-gray-900 dark:text-white">
+                                        <span class="ml-3 text-sm text-gray-900 dark:text-white flex-1">
+                                            @if($contract->grant_code)
+                                                <span class="font-mono font-semibold text-indigo-600 dark:text-indigo-400">{{ $contract->grant_code }}</span>
+                                                <span class="text-gray-400 dark:text-gray-500 mx-1">–</span>
+                                            @endif
                                             {{ $contract->title }}
                                             @if($contract->contract_number)
-                                                <span class="text-gray-500 dark:text-gray-400">({{ $contract->contract_number }})</span>
+                                                <span class="text-gray-500 dark:text-gray-400 text-xs ml-1">({{ $contract->contract_number }})</span>
                                             @endif
                                         </span>
                                     </label>
                                 @empty
-                                    <p class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">No active contracts available</p>
+                                    <p class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
+                                        {{ $contractSearch ? 'No contracts match your search' : 'No active contracts available' }}
+                                    </p>
                                 @endforelse
                             </div>
+                            @if(count($selectedContracts) > 0)
+                                <p class="text-xs text-teal-600 dark:text-teal-400 mt-1">{{ count($selectedContracts) }} contract(s) selected</p>
+                            @endif
                         </div>
                     </div>
 
