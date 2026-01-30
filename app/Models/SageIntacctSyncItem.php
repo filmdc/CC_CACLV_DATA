@@ -14,8 +14,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $sync_history_id
  * @property int|null $gift_cache_id
- * @property string $status Values: pending, success, failed
+ * @property string $gift_id DonorPerfect gift_id
+ * @property string $status Values: pending, success, failed, skipped, filtered
  * @property string|null $intacct_record_id
+ * @property \Carbon\Carbon|null $sage_deposit_date Deposit date from Sage Intacct
+ * @property \Carbon\Carbon|null $deposit_date_synced_at When deposit date was written back to DP
+ * @property string|null $deposit_sync_error Error message if deposit date sync failed
  * @property string|null $error_message
  * @property \Carbon\Carbon|null $synced_at
  * @property \Carbon\Carbon|null $created_at
@@ -28,21 +32,29 @@ class SageIntacctSyncItem extends Model
     protected $fillable = [
         'sync_history_id',
         'gift_cache_id',
+        'gift_id',
         'status',
         'intacct_record_id',
+        'sage_deposit_date',
+        'deposit_date_synced_at',
+        'deposit_sync_error',
         'error_message',
         'synced_at',
     ];
 
     protected $casts = [
         'synced_at' => 'datetime',
+        'sage_deposit_date' => 'date',
+        'deposit_date_synced_at' => 'datetime',
     ];
 
     /**
      * Sync item status constants
      */
     const STATUS_PENDING = 'pending';
+
     const STATUS_SUCCESS = 'success';
+
     const STATUS_FAILED = 'failed';
 
     /**
@@ -64,8 +76,7 @@ class SageIntacctSyncItem extends Model
     /**
      * Mark this sync item as successful
      *
-     * @param string $intacctRecordId The Sage Intacct record ID
-     * @return bool
+     * @param  string  $intacctRecordId  The Sage Intacct record ID
      */
     public function markAsSuccess(string $intacctRecordId): bool
     {
@@ -87,8 +98,7 @@ class SageIntacctSyncItem extends Model
     /**
      * Mark this sync item as failed
      *
-     * @param string $errorMessage The error message
-     * @return bool
+     * @param  string  $errorMessage  The error message
      */
     public function markAsFailed(string $errorMessage): bool
     {
@@ -101,8 +111,6 @@ class SageIntacctSyncItem extends Model
 
     /**
      * Retry a failed sync item
-     *
-     * @return bool
      */
     public function retry(): bool
     {
@@ -115,8 +123,6 @@ class SageIntacctSyncItem extends Model
 
     /**
      * Check if this item can be retried
-     *
-     * @return bool
      */
     public function canRetry(): bool
     {
@@ -125,15 +131,97 @@ class SageIntacctSyncItem extends Model
 
     /**
      * Get the gift data for this sync item
-     *
-     * @return array|null
      */
     public function getGiftData(): ?array
     {
-        if (!$this->giftCache) {
+        if (! $this->giftCache) {
             return null;
         }
 
         return $this->giftCache->gift_data;
+    }
+
+    /**
+     * Check if this item needs deposit date sync
+     * (Successfully synced to Sage, has Intacct record ID, but no deposit date synced yet)
+     */
+    public function needsDepositDateSync(): bool
+    {
+        return $this->status === self::STATUS_SUCCESS
+            && ! empty($this->intacct_record_id)
+            && is_null($this->deposit_date_synced_at);
+    }
+
+    /**
+     * Check if this item has a deposit date from Sage
+     */
+    public function hasDepositDate(): bool
+    {
+        return ! is_null($this->sage_deposit_date);
+    }
+
+    /**
+     * Update the Sage deposit date
+     *
+     * @param  string|null  $depositDate  The deposit date from Sage (Y-m-d format)
+     */
+    public function updateSageDepositDate(?string $depositDate): bool
+    {
+        return $this->update([
+            'sage_deposit_date' => $depositDate,
+        ]);
+    }
+
+    /**
+     * Mark the deposit date as synced to DonorPerfect
+     */
+    public function markDepositDateSynced(): bool
+    {
+        return $this->update([
+            'deposit_date_synced_at' => now(),
+            'deposit_sync_error' => null,
+        ]);
+    }
+
+    /**
+     * Mark the deposit date sync as failed
+     *
+     * @param  string  $errorMessage  The error message
+     */
+    public function markDepositDateSyncFailed(string $errorMessage): bool
+    {
+        return $this->update([
+            'deposit_sync_error' => $errorMessage,
+        ]);
+    }
+
+    /**
+     * Scope: Items that need deposit date sync
+     * (Successfully synced to Sage with an Intacct record ID, but deposit date not yet synced back to DP)
+     */
+    public function scopeNeedsDepositSync($query)
+    {
+        return $query->where('status', self::STATUS_SUCCESS)
+            ->whereNotNull('intacct_record_id')
+            ->whereNull('deposit_date_synced_at');
+    }
+
+    /**
+     * Scope: Items that have a deposit date from Sage but not synced to DP
+     */
+    public function scopeHasDepositDatePendingSync($query)
+    {
+        return $query->where('status', self::STATUS_SUCCESS)
+            ->whereNotNull('intacct_record_id')
+            ->whereNotNull('sage_deposit_date')
+            ->whereNull('deposit_date_synced_at');
+    }
+
+    /**
+     * Scope: Items with deposit date sync errors
+     */
+    public function scopeWithDepositSyncErrors($query)
+    {
+        return $query->whereNotNull('deposit_sync_error');
     }
 }
