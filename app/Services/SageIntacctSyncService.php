@@ -894,6 +894,11 @@ class SageIntacctSyncService
             $receiptData['CHECK_SCAN_BATCH_ID'] = $giftData['DP_CheckScan_Batch'];
         }
 
+        // Add Gift ID custom field for DonorPerfect gift tracking
+        if (! empty($giftData['gift_id'])) {
+            $receiptData['GIFT_ID'] = (string) $giftData['gift_id'];
+        }
+
         // Add SUPDOC if file attachment was prepared
         if ($fileData && isset($fileData['supdocid'])) {
             $receiptData['supdocid'] = $fileData['supdocid'];

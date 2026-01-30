@@ -2160,14 +2160,35 @@ LINEITEM;
 
         // Build custom fields XML
         $customFieldsXml = '';
+        $customFieldItems = '';
+
+        // Add Check Scan Batch ID if present
         if (! empty($receiptData['CHECK_SCAN_BATCH_ID'])) {
             $checkScanBatchId = htmlspecialchars($receiptData['CHECK_SCAN_BATCH_ID'], ENT_XML1, 'UTF-8');
-            $customFieldsXml = <<<CUSTOMFIELDS
-                    <customfields>
+            $customFieldItems .= <<<CUSTOMFIELD
                         <customfield>
                             <customfieldname>CHECK_SCAN_BATCH_ID</customfieldname>
                             <customfieldvalue>{$checkScanBatchId}</customfieldvalue>
                         </customfield>
+CUSTOMFIELD;
+        }
+
+        // Add Gift ID if present (DonorPerfect gift tracking)
+        if (! empty($receiptData['GIFT_ID'])) {
+            $giftId = htmlspecialchars($receiptData['GIFT_ID'], ENT_XML1, 'UTF-8');
+            $customFieldItems .= <<<CUSTOMFIELD
+                        <customfield>
+                            <customfieldname>GIFT_ID</customfieldname>
+                            <customfieldvalue>{$giftId}</customfieldvalue>
+                        </customfield>
+CUSTOMFIELD;
+        }
+
+        // Wrap custom fields if any exist
+        if (! empty($customFieldItems)) {
+            $customFieldsXml = <<<CUSTOMFIELDS
+                    <customfields>
+{$customFieldItems}
                     </customfields>
 CUSTOMFIELDS;
         }
