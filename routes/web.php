@@ -199,6 +199,10 @@ Route::middleware(['auth'])->group(function () {
         ->name('intacct.sync-history.details')
         ->middleware(['auth', 'permission:sage.sync.view,intacct.configure']);
 
+    Route::get('/accounting/sage-intacct/deposit-date-sync', \App\Livewire\DepositDateSync::class)
+        ->name('intacct.deposit-date-sync')
+        ->middleware(['auth', 'permission:sage.sync.view,intacct.configure']);
+
     // Sage Intacct OAuth Routes
     Route::get('/intacct/oauth/authorize', [\App\Http\Controllers\SageIntacctOAuthController::class, 'authorize'])
         ->name('intacct.oauth.authorize')

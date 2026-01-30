@@ -2160,14 +2160,35 @@ LINEITEM;
 
         // Build custom fields XML
         $customFieldsXml = '';
+        $customFieldItems = '';
+
+        // Add Check Scan Batch ID if present
         if (! empty($receiptData['CHECK_SCAN_BATCH_ID'])) {
             $checkScanBatchId = htmlspecialchars($receiptData['CHECK_SCAN_BATCH_ID'], ENT_XML1, 'UTF-8');
-            $customFieldsXml = <<<CUSTOMFIELDS
-                    <customfields>
+            $customFieldItems .= <<<CUSTOMFIELD
                         <customfield>
                             <customfieldname>CHECK_SCAN_BATCH_ID</customfieldname>
                             <customfieldvalue>{$checkScanBatchId}</customfieldvalue>
                         </customfield>
+CUSTOMFIELD;
+        }
+
+        // Add Gift ID if present (DonorPerfect gift tracking)
+        if (! empty($receiptData['GIFT_ID'])) {
+            $giftId = htmlspecialchars($receiptData['GIFT_ID'], ENT_XML1, 'UTF-8');
+            $customFieldItems .= <<<CUSTOMFIELD
+                        <customfield>
+                            <customfieldname>GIFT_ID</customfieldname>
+                            <customfieldvalue>{$giftId}</customfieldvalue>
+                        </customfield>
+CUSTOMFIELD;
+        }
+
+        // Wrap custom fields if any exist
+        if (! empty($customFieldItems)) {
+            $customFieldsXml = <<<CUSTOMFIELDS
+                    <customfields>
+{$customFieldItems}
                     </customfields>
 CUSTOMFIELDS;
         }
@@ -2632,6 +2653,311 @@ XML;
                 'created' => 0,
                 'failed' => $records,
             ];
+        }
+    }
+
+    // ====================================================================
+    // OTHER RECEIPT QUERY METHODS
+    // ====================================================================
+
+    /**
+     * Query Other Receipts by their RECORDNO values to get deposit information
+     * Used for syncing deposit dates back to DonorPerfect
+     *
+     * @param  array  $recordNos  Array of Sage Intacct RECORDNO values
+     * @return array Result with receipts data including deposit status
+     */
+    public function queryOtherReceiptsByRecordNos(array $recordNos): array
+    {
+        if (empty($recordNos)) {
+            return [
+                'success' => true,
+                'receipts' => [],
+                'count' => 0,
+            ];
+        }
+
+        if ($this->setting->isXmlApi()) {
+            return $this->queryOtherReceiptsByRecordNosXml($recordNos);
+        } else {
+            return $this->queryOtherReceiptsByRecordNosOAuth($recordNos);
+        }
+    }
+
+    /**
+     * Query Other Receipts using XML Web Services
+     */
+    private function queryOtherReceiptsByRecordNosXml(array $recordNos): array
+    {
+        try {
+            // Ensure we have a session
+            if (! $this->sessionId) {
+                $authResult = $this->authenticate();
+                if (! $authResult['success']) {
+                    return [
+                        'success' => false,
+                        'error' => 'Authentication failed: '.($authResult['message'] ?? 'Unknown error'),
+                        'receipts' => [],
+                    ];
+                }
+            }
+
+            // Build query with RECORDNO IN clause
+            // Sage Intacct uses comma-separated values for IN queries
+            $recordNoList = implode(',', array_map('intval', $recordNos));
+            $query = "RECORDNO IN ({$recordNoList})";
+
+            // Fields to retrieve for deposit tracking
+            $fields = 'RECORDNO,PAYEE,REFID,PAYMENTDATE,RECEIVEDDATE,DEPOSITDATE,BANKACCOUNTID,UNDEPGLACCOUNTNO,STATE,TOTALENTERED';
+
+            Log::info('Sage Intacct: Querying Other Receipts', [
+                'record_count' => count($recordNos),
+                'query' => $query,
+            ]);
+
+            $xmlRequest = $this->buildOtherReceiptQueryXml($query, $fields);
+            $response = $this->sendXmlRequest($xmlRequest);
+
+            if (! $response['success']) {
+                return [
+                    'success' => false,
+                    'error' => $response['error'] ?? 'Query failed',
+                    'receipts' => [],
+                ];
+            }
+
+            // Parse response
+            $receipts = $this->parseOtherReceiptQueryResponse($response['xml']);
+
+            Log::info('Sage Intacct: Other Receipts query completed', [
+                'queried' => count($recordNos),
+                'found' => count($receipts),
+            ]);
+
+            return [
+                'success' => true,
+                'receipts' => $receipts,
+                'count' => count($receipts),
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Sage Intacct queryOtherReceiptsByRecordNosXml exception', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'error' => 'Exception: '.$e->getMessage(),
+                'receipts' => [],
+            ];
+        }
+    }
+
+    /**
+     * Query Other Receipts using OAuth REST API
+     */
+    private function queryOtherReceiptsByRecordNosOAuth(array $recordNos): array
+    {
+        try {
+            if (! $this->userToken) {
+                return [
+                    'success' => false,
+                    'error' => 'OAuth authentication requires a user token',
+                    'receipts' => [],
+                ];
+            }
+
+            // Ensure valid token
+            $authResult = $this->authenticateOAuth();
+            if (! $authResult['success']) {
+                return [
+                    'success' => false,
+                    'error' => 'Authentication failed: '.($authResult['message'] ?? 'Unknown error'),
+                    'receipts' => [],
+                ];
+            }
+
+            // Build filter for REST API
+            $recordNoList = implode(',', array_map('intval', $recordNos));
+            $filter = urlencode("RECORDNO in ({$recordNoList})");
+
+            $apiUrl = 'https://api.intacct.com/ia/api/v1/companies/'.urlencode($this->userToken->company_id).
+                      '/objects/OTHERCASHRECEIPT?filter='.$filter.
+                      '&fields=RECORDNO,PAYEE,REFID,PAYMENTDATE,RECEIVEDDATE,DEPOSITDATE,BANKACCOUNTID,UNDEPGLACCOUNTNO,STATE,TOTALENTERED';
+
+            Log::info('Sage Intacct OAuth: Querying Other Receipts', [
+                'record_count' => count($recordNos),
+            ]);
+
+            $response = Http::timeout(60)
+                ->withHeaders([
+                    'Authorization' => 'Bearer '.$this->accessToken,
+                    'Accept' => 'application/json',
+                ])
+                ->get($apiUrl);
+
+            if (! $response->successful()) {
+                $errorData = $response->json();
+                $errorMessage = $errorData['message'] ?? $errorData['error'] ?? 'Query failed';
+
+                Log::error('Sage Intacct OAuth Other Receipt query failed', [
+                    'status' => $response->status(),
+                    'error' => $errorMessage,
+                ]);
+
+                return [
+                    'success' => false,
+                    'error' => $errorMessage,
+                    'receipts' => [],
+                ];
+            }
+
+            $result = $response->json();
+            $receipts = $result['data'] ?? $result['items'] ?? $result;
+
+            // Normalize receipt data
+            $normalizedReceipts = [];
+            foreach ($receipts as $receipt) {
+                $normalizedReceipts[] = [
+                    'recordno' => $receipt['RECORDNO'] ?? $receipt['recordno'] ?? null,
+                    'payee' => $receipt['PAYEE'] ?? $receipt['payee'] ?? null,
+                    'refid' => $receipt['REFID'] ?? $receipt['refid'] ?? null,
+                    'paymentdate' => $receipt['PAYMENTDATE'] ?? $receipt['paymentdate'] ?? null,
+                    'receiveddate' => $receipt['RECEIVEDDATE'] ?? $receipt['receiveddate'] ?? null,
+                    'depositdate' => $receipt['DEPOSITDATE'] ?? $receipt['depositdate'] ?? null,
+                    'bankaccountid' => $receipt['BANKACCOUNTID'] ?? $receipt['bankaccountid'] ?? null,
+                    'undepglaccountno' => $receipt['UNDEPGLACCOUNTNO'] ?? $receipt['undepglaccountno'] ?? null,
+                    'state' => $receipt['STATE'] ?? $receipt['state'] ?? null,
+                    'totalentered' => $receipt['TOTALENTERED'] ?? $receipt['totalentered'] ?? null,
+                ];
+            }
+
+            Log::info('Sage Intacct OAuth: Other Receipts query completed', [
+                'queried' => count($recordNos),
+                'found' => count($normalizedReceipts),
+            ]);
+
+            return [
+                'success' => true,
+                'receipts' => $normalizedReceipts,
+                'count' => count($normalizedReceipts),
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Sage Intacct queryOtherReceiptsByRecordNosOAuth exception', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'error' => 'Exception: '.$e->getMessage(),
+                'receipts' => [],
+            ];
+        }
+    }
+
+    /**
+     * Build XML request to query Other Receipts
+     */
+    private function buildOtherReceiptQueryXml(string $query, string $fields): string
+    {
+        $controlId = $this->generateControlId();
+        $functionId = $this->generateControlId();
+
+        $authSection = $this->sessionId
+            ? "<sessionid>{$this->sessionId}</sessionid>"
+            : "<login>
+                    <userid>{$this->setting->web_services_user_id}</userid>
+                    <companyid>{$this->setting->company_id}</companyid>
+                    <password>{$this->setting->web_services_password}</password>
+                </login>";
+
+        $sanitizedQuery = htmlspecialchars($query, ENT_XML1, 'UTF-8');
+
+        return <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<request>
+    <control>
+        <senderid>{$this->setting->sender_id}</senderid>
+        <password>{$this->setting->sender_password}</password>
+        <controlid>{$controlId}</controlid>
+        <uniqueid>false</uniqueid>
+        <dtdversion>3.0</dtdversion>
+        <includewhitespace>false</includewhitespace>
+    </control>
+    <operation>
+        <authentication>
+            {$authSection}
+        </authentication>
+        <content>
+            <function controlid="{$functionId}">
+                <readByQuery>
+                    <object>OTHERCASHRECEIPT</object>
+                    <query>{$sanitizedQuery}</query>
+                    <fields>{$fields}</fields>
+                    <pagesize>1000</pagesize>
+                </readByQuery>
+            </function>
+        </content>
+    </operation>
+</request>
+XML;
+    }
+
+    /**
+     * Parse the response from Other Receipt query
+     */
+    private function parseOtherReceiptQueryResponse(string $xmlString): array
+    {
+        try {
+            $xml = simplexml_load_string($xmlString);
+            if ($xml === false) {
+                Log::error('Sage Intacct: Failed to parse Other Receipt query response');
+
+                return [];
+            }
+
+            $receipts = [];
+
+            // Try different possible response structures
+            $dataNodes = $xml->xpath('//result/data/OTHERCASHRECEIPT');
+            if (empty($dataNodes)) {
+                $dataNodes = $xml->xpath('//data/OTHERCASHRECEIPT');
+            }
+            if (empty($dataNodes)) {
+                $dataNodes = $xml->xpath('//OTHERCASHRECEIPT');
+            }
+
+            foreach ($dataNodes as $node) {
+                $receipt = [
+                    'recordno' => (string) ($node->RECORDNO ?? ''),
+                    'payee' => (string) ($node->PAYEE ?? ''),
+                    'refid' => (string) ($node->REFID ?? ''),
+                    'paymentdate' => (string) ($node->PAYMENTDATE ?? ''),
+                    'receiveddate' => (string) ($node->RECEIVEDDATE ?? ''),
+                    'depositdate' => (string) ($node->DEPOSITDATE ?? ''),
+                    'bankaccountid' => (string) ($node->BANKACCOUNTID ?? ''),
+                    'undepglaccountno' => (string) ($node->UNDEPGLACCOUNTNO ?? ''),
+                    'state' => (string) ($node->STATE ?? ''),
+                    'totalentered' => (string) ($node->TOTALENTERED ?? ''),
+                ];
+
+                // Only include if we have a valid recordno
+                if (! empty($receipt['recordno'])) {
+                    $receipts[] = $receipt;
+                }
+            }
+
+            return $receipts;
+
+        } catch (\Exception $e) {
+            Log::error('Sage Intacct parseOtherReceiptQueryResponse exception', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return [];
         }
     }
 

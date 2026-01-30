@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\Models\DonorPerfectSetting;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class DonorPerfectApiService
 {
@@ -25,10 +25,10 @@ class DonorPerfectApiService
     public function testConnection(): array
     {
         try {
-            if (!$this->setting->isConfigured()) {
+            if (! $this->setting->isConfigured()) {
                 return [
                     'success' => false,
-                    'message' => 'API credentials are not fully configured'
+                    'message' => 'API credentials are not fully configured',
                 ];
             }
 
@@ -36,24 +36,24 @@ class DonorPerfectApiService
             $testQuery = 'SELECT TOP 1 donor_id FROM dp';
 
             // Build URL manually to avoid double-encoding the API key
-            $url = $this->setting->api_url . '?apikey=' . $this->setting->api_key . '&action=' . urlencode($testQuery);
+            $url = $this->setting->api_url.'?apikey='.$this->setting->api_key.'&action='.urlencode($testQuery);
 
             Log::info('DonorPerfect API: Testing connection', [
-                'url_preview' => substr($url, 0, 100) . '...'
+                'url_preview' => substr($url, 0, 100).'...',
             ]);
 
             // Make API call
             $response = Http::timeout(30)->get($url);
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 Log::error('DonorPerfect API connection test failed', [
                     'status' => $response->status(),
-                    'response' => substr($response->body(), 0, 500)
+                    'response' => substr($response->body(), 0, 500),
                 ]);
 
                 return [
                     'success' => false,
-                    'message' => 'API request failed: ' . $response->status()
+                    'message' => 'API request failed: '.$response->status(),
                 ];
             }
 
@@ -63,24 +63,24 @@ class DonorPerfectApiService
             if (isset($result['error']) || isset($result['auth_error'])) {
                 return [
                     'success' => false,
-                    'message' => $result['error'] ?? 'Unknown error'
+                    'message' => $result['error'] ?? 'Unknown error',
                 ];
             }
 
             return [
                 'success' => true,
-                'message' => 'Connection successful'
+                'message' => 'Connection successful',
             ];
 
         } catch (\Exception $e) {
             Log::error('DonorPerfect API connection test exception', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return [
                 'success' => false,
-                'message' => 'Exception: ' . $e->getMessage()
+                'message' => 'Exception: '.$e->getMessage(),
             ];
         }
     }
@@ -88,20 +88,20 @@ class DonorPerfectApiService
     /**
      * Get gifts from DonorPerfect API within date range
      *
-     * @param string $startDate Date in Y-m-d format
-     * @param string $endDate Date in Y-m-d format
-     * @param array $fields Optional array of field names to retrieve
+     * @param  string  $startDate  Date in Y-m-d format
+     * @param  string  $endDate  Date in Y-m-d format
+     * @param  array  $fields  Optional array of field names to retrieve
      * @return array Array of gift records or error information
      */
     public function getGifts(string $startDate, string $endDate, array $fields = []): array
     {
         try {
-            if (!$this->setting->isConfigured()) {
+            if (! $this->setting->isConfigured()) {
                 throw new \Exception('API credentials are not fully configured');
             }
 
             // Use provided fields or fall back to configured/default fields
-            $fieldsToRetrieve = !empty($fields) ? $fields : $this->setting->getSelectedFields();
+            $fieldsToRetrieve = ! empty($fields) ? $fields : $this->setting->getSelectedFields();
 
             // Map fields to their table sources and aliases
             $giftFields = [];
@@ -125,7 +125,7 @@ class DonorPerfectApiService
                 'TRIBUTE_end_DATE', 'TRIBUTE_MAIN_CONTACT', 'tribute_description', 'line_id',
                 'gift_aid_date', 'batch_id_temp', 'gift_aid_amt', 'gift_aid_eligible_g',
                 'currency', 'vault_id', 'transaction_id', 'PAYMENT_TYPE', 'PROCESSING_METHOD',
-                'ACKNOWLEDGEPREF', 'OFFSET_FEE_AMOUNT', 'SETTLEMENT_ID', 'SETTLEMENT_DATE'
+                'ACKNOWLEDGEPREF', 'OFFSET_FEE_AMOUNT', 'SETTLEMENT_ID', 'SETTLEMENT_DATE',
             ]);
 
             // Known donor table fields (from dp) - normalized to lowercase
@@ -136,7 +136,7 @@ class DonorPerfectApiService
                 'fax_phone', 'mobile_phone', 'email', 'org_rec', 'donor_type', 'nomail',
                 'nomail_reason', 'narrative', 'tag_date', 'initial_gift_date', 'last_contrib_date',
                 'last_contrib_amt', 'ytd', 'gift_total', 'gifts', 'max_date', 'max_amt', 'avg_amt',
-                'yrs_donated', 'donor_rcpt_type', 'receipt_delivery', 'no_email', 'no_email_reason'
+                'yrs_donated', 'donor_rcpt_type', 'receipt_delivery', 'no_email', 'no_email_reason',
             ]);
 
             foreach ($fieldsToRetrieve as $field) {
@@ -153,7 +153,7 @@ class DonorPerfectApiService
                 }
                 // Special case: phone field maps to home_phone
                 elseif ($fieldLower === 'phone' || $fieldLower === 'home_phone') {
-                    $donorFields[] = "d.home_phone as phone";
+                    $donorFields[] = 'd.home_phone as phone';
                     $needsDonorJoin = true;
                 }
                 // Any other field - assume it's a UDF field
@@ -172,18 +172,18 @@ class DonorPerfectApiService
             $dpEndDate = date('n/j/Y', strtotime($endDate));
 
             // Build JOIN query with necessary tables
-            $fromClause = "FROM dpgift g";
+            $fromClause = 'FROM dpgift g';
             if ($needsDonorJoin) {
-                $fromClause .= " INNER JOIN dp d ON g.donor_id = d.donor_id";
+                $fromClause .= ' INNER JOIN dp d ON g.donor_id = d.donor_id';
             }
             if ($needsUdfJoin) {
-                $fromClause .= " LEFT JOIN dpgiftudf u ON g.gift_id = u.gift_id";
+                $fromClause .= ' LEFT JOIN dpgiftudf u ON g.gift_id = u.gift_id';
             }
 
             $selectQuery = "SELECT {$fieldsList} {$fromClause} WHERE g.gift_date BETWEEN '{$dpStartDate}' AND '{$dpEndDate}' ORDER BY g.gift_date DESC";
 
             // Build URL manually to avoid double-encoding the API key (which may already be URL-encoded)
-            $url = $this->setting->api_url . '?apikey=' . $this->setting->api_key . '&action=' . urlencode($selectQuery);
+            $url = $this->setting->api_url.'?apikey='.$this->setting->api_key.'&action='.urlencode($selectQuery);
 
             Log::info('DonorPerfect API: Fetching gifts', [
                 'start_date' => $startDate,
@@ -193,19 +193,19 @@ class DonorPerfectApiService
                 'fields_count' => count($fieldsToRetrieve),
                 'needs_donor_join' => $needsDonorJoin,
                 'needs_udf_join' => $needsUdfJoin,
-                'full_query' => $selectQuery
+                'full_query' => $selectQuery,
             ]);
 
             // Make API call
             $response = Http::timeout(60)->get($url);
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 $statusCode = $response->status();
                 $responseBody = $response->body();
 
                 Log::error('DonorPerfect API gifts request failed', [
                     'status' => $statusCode,
-                    'response' => substr($responseBody, 0, 500)
+                    'response' => substr($responseBody, 0, 500),
                 ]);
 
                 // Check if it's an authentication error
@@ -213,7 +213,7 @@ class DonorPerfectApiService
                     throw new \Exception('Authentication failed: Invalid API credentials. Please check your API Key in the configuration.', 401);
                 }
 
-                throw new \Exception('API request failed with status: ' . $statusCode);
+                throw new \Exception('API request failed with status: '.$statusCode);
             }
 
             // Log the raw response for debugging
@@ -221,7 +221,7 @@ class DonorPerfectApiService
             Log::info('DonorPerfect API: Raw response preview', [
                 'status' => $response->status(),
                 'preview' => substr($responseBody, 0, 500),
-                'length' => strlen($responseBody)
+                'length' => strlen($responseBody),
             ]);
 
             // Parse XML response to array
@@ -237,7 +237,7 @@ class DonorPerfectApiService
 
             Log::info('DonorPerfect API: Gifts retrieved successfully', [
                 'count' => count($result['gifts'] ?? []),
-                'result_keys' => array_keys($result)
+                'result_keys' => array_keys($result),
             ]);
 
             return $result;
@@ -247,13 +247,13 @@ class DonorPerfectApiService
                 'error' => $e->getMessage(),
                 'start_date' => $startDate,
                 'end_date' => $endDate,
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return [
                 'error' => $e->getMessage(),
                 'auth_error' => $e->getCode() === 401,
-                'gifts' => []
+                'gifts' => [],
             ];
         }
     }
@@ -269,9 +269,9 @@ class DonorPerfectApiService
                xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <soap:Body>
         <dpLogin>
-            <user>' . htmlspecialchars($this->setting->api_login) . '</user>
-            <pass>' . htmlspecialchars($this->setting->api_password) . '</pass>
-            <apikey>' . htmlspecialchars($this->setting->api_key) . '</apikey>
+            <user>'.htmlspecialchars($this->setting->api_login).'</user>
+            <pass>'.htmlspecialchars($this->setting->api_password).'</pass>
+            <apikey>'.htmlspecialchars($this->setting->api_key).'</apikey>
         </dpLogin>
     </soap:Body>
 </soap:Envelope>';
@@ -290,12 +290,12 @@ class DonorPerfectApiService
                xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <soap:Body>
         <dpGetGiftList>
-            <user>' . htmlspecialchars($this->setting->api_login) . '</user>
-            <pass>' . htmlspecialchars($this->setting->api_password) . '</pass>
-            <apikey>' . htmlspecialchars($this->setting->api_key) . '</apikey>
-            <startDate>' . htmlspecialchars($startDate) . '</startDate>
-            <endDate>' . htmlspecialchars($endDate) . '</endDate>
-            <fields>' . $fieldsXml . '</fields>
+            <user>'.htmlspecialchars($this->setting->api_login).'</user>
+            <pass>'.htmlspecialchars($this->setting->api_password).'</pass>
+            <apikey>'.htmlspecialchars($this->setting->api_key).'</apikey>
+            <startDate>'.htmlspecialchars($startDate).'</startDate>
+            <endDate>'.htmlspecialchars($endDate).'</endDate>
+            <fields>'.$fieldsXml.'</fields>
         </dpGetGiftList>
     </soap:Body>
 </soap:Envelope>';
@@ -319,8 +319,8 @@ class DonorPerfectApiService
                 libxml_use_internal_errors($previousErrorSetting);
 
                 $errorMessage = 'XML parsing failed';
-                if (!empty($errors)) {
-                    $errorMessage .= ': ' . $errors[0]->message;
+                if (! empty($errors)) {
+                    $errorMessage .= ': '.$errors[0]->message;
                 }
 
                 return ['error' => $errorMessage];
@@ -334,43 +334,43 @@ class DonorPerfectApiService
             // Check for DonorPerfect field-based error response format
             // Format: <result><field name='success' reason='login failed' id='success' value='false'/></result>
             $resultFields = $xml->xpath('//result/field[@name="success"][@value="false"]');
-            if (!empty($resultFields)) {
+            if (! empty($resultFields)) {
                 $reason = (string) $resultFields[0]['reason'] ?? 'Unknown error';
 
                 Log::warning('DonorPerfect API returned failure', [
                     'reason' => $reason,
-                    'field_attributes' => (array) $resultFields[0]->attributes()
+                    'field_attributes' => (array) $resultFields[0]->attributes(),
                 ]);
 
                 // Check if SQL statement not allowed error
                 $sqlErrors = $xml->xpath('//error');
-                $sqlError = !empty($sqlErrors) ? (string) $sqlErrors[0] : '';
+                $sqlError = ! empty($sqlErrors) ? (string) $sqlErrors[0] : '';
 
                 if (str_contains($sqlError, 'SQL statement not allowed') || str_contains($reason, 'not authorized')) {
                     return [
-                        'error' => 'Query not authorized: Some fields or table combinations are not accessible with your API key. ' . ucfirst($reason),
+                        'error' => 'Query not authorized: Some fields or table combinations are not accessible with your API key. '.ucfirst($reason),
                         'auth_error' => true,
-                        'sql_error' => $sqlError
+                        'sql_error' => $sqlError,
                     ];
                 }
 
                 // This is always an authentication error when success=false
                 return [
-                    'error' => 'Authentication failed: ' . ucfirst($reason) . '. Please verify your API Key in the configuration.',
-                    'auth_error' => true
+                    'error' => 'Authentication failed: '.ucfirst($reason).'. Please verify your API Key in the configuration.',
+                    'auth_error' => true,
                 ];
             }
 
             // Check for SOAP fault
             $faults = $xml->xpath('//soap:Fault');
-            if (!empty($faults)) {
+            if (! empty($faults)) {
                 $faultString = (string) $faults[0]->faultstring ?? 'Unknown SOAP fault';
 
                 // Check if it's an authentication error
                 if ($this->isAuthenticationError($faultString)) {
                     return [
                         'error' => 'Authentication failed: Invalid API credentials. Please check your API Key, Login, and Password in the configuration.',
-                        'auth_error' => true
+                        'auth_error' => true,
                     ];
                 }
 
@@ -379,14 +379,14 @@ class DonorPerfectApiService
 
             // Check for DonorPerfect error response
             $dpErrors = $xml->xpath('//error');
-            if (!empty($dpErrors)) {
+            if (! empty($dpErrors)) {
                 $errorMessage = (string) $dpErrors[0];
 
                 // Check if it's an authentication error
                 if ($this->isAuthenticationError($errorMessage)) {
                     return [
                         'error' => 'Authentication failed: Invalid API credentials. Please check your API Key, Login, and Password in the configuration.',
-                        'auth_error' => true
+                        'auth_error' => true,
                     ];
                 }
 
@@ -412,7 +412,7 @@ class DonorPerfectApiService
                     $fieldName = (string) ($attributes['name'] ?? '');
                     $fieldValue = (string) ($attributes['value'] ?? '');
 
-                    if (!empty($fieldName)) {
+                    if (! empty($fieldName)) {
                         // Normalize UDF field names to expected case
                         $normalizedName = $udfFieldMap[$fieldName] ?? $fieldName;
                         $gift[$normalizedName] = $fieldValue;
@@ -423,24 +423,24 @@ class DonorPerfectApiService
 
             Log::info('DonorPerfect API: Parsed gift records', [
                 'total_records' => count($gifts),
-                'first_gift_keys' => !empty($gifts) ? array_keys($gifts[0]) : [],
-                'first_gift_sample' => !empty($gifts) ? array_slice($gifts[0], 0, 5) : []
+                'first_gift_keys' => ! empty($gifts) ? array_keys($gifts[0]) : [],
+                'first_gift_sample' => ! empty($gifts) ? array_slice($gifts[0], 0, 5) : [],
             ]);
 
             return [
                 'success' => true,
                 'gifts' => $gifts,
-                'count' => count($gifts)
+                'count' => count($gifts),
             ];
 
         } catch (\Exception $e) {
             Log::error('XML parsing exception', [
                 'error' => $e->getMessage(),
-                'xml_preview' => substr($xmlString, 0, 500)
+                'xml_preview' => substr($xmlString, 0, 500),
             ]);
 
             return [
-                'error' => 'XML parsing exception: ' . $e->getMessage()
+                'error' => 'XML parsing exception: '.$e->getMessage(),
             ];
         }
     }
@@ -489,12 +489,13 @@ class DonorPerfectApiService
             foreach ($tables as $tableName) {
                 // Query to get one record with all fields
                 $query = "SELECT TOP 1 * FROM {$tableName}";
-                $url = $this->setting->api_url . '?apikey=' . $this->setting->api_key . '&action=' . urlencode($query);
+                $url = $this->setting->api_url.'?apikey='.$this->setting->api_key.'&action='.urlencode($query);
 
                 $response = Http::timeout(15)->get($url);
 
-                if (!$response->successful()) {
+                if (! $response->successful()) {
                     Log::warning("Could not fetch fields for table: {$tableName}");
+
                     continue;
                 }
 
@@ -506,8 +507,9 @@ class DonorPerfectApiService
 
                 // Check for API error
                 $errorFields = $xml->xpath('//field[@name="success"][@value="false"]');
-                if (!empty($errorFields)) {
+                if (! empty($errorFields)) {
                     Log::warning("Access denied for table: {$tableName}");
+
                     continue;
                 }
 
@@ -518,8 +520,8 @@ class DonorPerfectApiService
 
                 $fields = [];
                 foreach ($record[0]->children() as $fieldElement) {
-                    $fieldName = (string)($fieldElement->attributes()['name'] ?? '');
-                    if (!empty($fieldName)) {
+                    $fieldName = (string) ($fieldElement->attributes()['name'] ?? '');
+                    if (! empty($fieldName)) {
                         $fields[] = $fieldName;
                     }
                 }
@@ -529,18 +531,18 @@ class DonorPerfectApiService
 
             return [
                 'success' => true,
-                'tables' => $allFields
+                'tables' => $allFields,
             ];
 
         } catch (\Exception $e) {
             Log::error('Error getting available fields', [
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return [
                 'success' => false,
                 'error' => $e->getMessage(),
-                'tables' => []
+                'tables' => [],
             ];
         }
     }
@@ -551,5 +553,201 @@ class DonorPerfectApiService
     public function getSetting(): DonorPerfectSetting
     {
         return $this->setting;
+    }
+
+    /**
+     * Update a gift's UDF (User Defined Field) value
+     * Uses DonorPerfect's dp_savegiftudf stored procedure
+     *
+     * @param  int  $giftId  The gift ID to update
+     * @param  string  $fieldName  The UDF field name (e.g., 'DEPOSIT_DATE')
+     * @param  string  $fieldValue  The value to set
+     * @return array Result with success status and any error information
+     */
+    public function updateGiftUdf(int $giftId, string $fieldName, string $fieldValue): array
+    {
+        try {
+            if (! $this->setting->isConfigured()) {
+                throw new \Exception('API credentials are not fully configured');
+            }
+
+            // Build the dp_savegiftudf stored procedure call
+            // Format: dp_savegiftudf @gift_id, @field_name, @data_type, @char_value, @date_value, @number_value
+            // For date fields: data_type = 'D', date_value = the date, others null
+            // For char fields: data_type = 'C', char_value = the value, others null
+
+            // Determine if this is a date field by checking the field name
+            $isDateField = str_contains(strtoupper($fieldName), 'DATE');
+
+            if ($isDateField) {
+                // Format date for DonorPerfect (M/D/YYYY format)
+                $formattedDate = date('n/j/Y', strtotime($fieldValue));
+                $query = "EXEC dp_savegiftudf {$giftId}, '{$fieldName}', 'D', NULL, '{$formattedDate}', NULL";
+            } else {
+                // Character field
+                $escapedValue = str_replace("'", "''", $fieldValue);
+                $query = "EXEC dp_savegiftudf {$giftId}, '{$fieldName}', 'C', '{$escapedValue}', NULL, NULL";
+            }
+
+            // Build URL
+            $url = $this->setting->api_url.'?apikey='.$this->setting->api_key.'&action='.urlencode($query);
+
+            Log::info('DonorPerfect API: Updating gift UDF', [
+                'gift_id' => $giftId,
+                'field_name' => $fieldName,
+                'field_value' => $fieldValue,
+                'is_date_field' => $isDateField,
+                'query' => $query,
+            ]);
+
+            // Make API call
+            $response = Http::timeout(30)->get($url);
+
+            if (! $response->successful()) {
+                $statusCode = $response->status();
+                $responseBody = $response->body();
+
+                Log::error('DonorPerfect API UDF update failed', [
+                    'gift_id' => $giftId,
+                    'field_name' => $fieldName,
+                    'status' => $statusCode,
+                    'response' => substr($responseBody, 0, 500),
+                ]);
+
+                if (in_array($statusCode, [401, 403])) {
+                    throw new \Exception('Authentication failed: Invalid API credentials.', 401);
+                }
+
+                throw new \Exception('API request failed with status: '.$statusCode);
+            }
+
+            // Parse response
+            $result = $this->parseUdfUpdateResponse($response->body());
+
+            if (isset($result['error'])) {
+                Log::error('DonorPerfect API UDF update returned error', [
+                    'gift_id' => $giftId,
+                    'field_name' => $fieldName,
+                    'error' => $result['error'],
+                ]);
+
+                return $result;
+            }
+
+            Log::info('DonorPerfect API: UDF updated successfully', [
+                'gift_id' => $giftId,
+                'field_name' => $fieldName,
+                'field_value' => $fieldValue,
+            ]);
+
+            return [
+                'success' => true,
+                'gift_id' => $giftId,
+                'field_name' => $fieldName,
+                'field_value' => $fieldValue,
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('DonorPerfect API updateGiftUdf exception', [
+                'gift_id' => $giftId,
+                'field_name' => $fieldName,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+                'auth_error' => $e->getCode() === 401,
+            ];
+        }
+    }
+
+    /**
+     * Update multiple gift UDF values in batch
+     *
+     * @param  array  $updates  Array of ['gift_id' => int, 'field_name' => string, 'field_value' => string]
+     * @return array Results with success/failure counts
+     */
+    public function batchUpdateGiftUdf(array $updates): array
+    {
+        $results = [
+            'total' => count($updates),
+            'successful' => 0,
+            'failed' => 0,
+            'errors' => [],
+        ];
+
+        foreach ($updates as $update) {
+            $result = $this->updateGiftUdf(
+                $update['gift_id'],
+                $update['field_name'],
+                $update['field_value']
+            );
+
+            if ($result['success'] ?? false) {
+                $results['successful']++;
+            } else {
+                $results['failed']++;
+                $results['errors'][] = [
+                    'gift_id' => $update['gift_id'],
+                    'error' => $result['error'] ?? 'Unknown error',
+                ];
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * Parse the response from a UDF update operation
+     */
+    private function parseUdfUpdateResponse(string $xmlString): array
+    {
+        try {
+            $previousErrorSetting = libxml_use_internal_errors(true);
+            $xml = simplexml_load_string($xmlString);
+
+            if ($xml === false) {
+                $errors = libxml_get_errors();
+                libxml_clear_errors();
+                libxml_use_internal_errors($previousErrorSetting);
+
+                $errorMessage = 'XML parsing failed';
+                if (! empty($errors)) {
+                    $errorMessage .= ': '.$errors[0]->message;
+                }
+
+                return ['success' => false, 'error' => $errorMessage];
+            }
+
+            libxml_use_internal_errors($previousErrorSetting);
+
+            // Check for success response
+            $successFields = $xml->xpath('//field[@name="success"][@value="true"]');
+            if (! empty($successFields)) {
+                return ['success' => true];
+            }
+
+            // Check for failure response
+            $failureFields = $xml->xpath('//field[@name="success"][@value="false"]');
+            if (! empty($failureFields)) {
+                $reason = (string) ($failureFields[0]['reason'] ?? 'Unknown error');
+
+                return ['success' => false, 'error' => $reason];
+            }
+
+            // Check for error node
+            $errorNodes = $xml->xpath('//error');
+            if (! empty($errorNodes)) {
+                return ['success' => false, 'error' => (string) $errorNodes[0]];
+            }
+
+            // If no explicit success/failure, assume success (some DP responses are empty on success)
+            return ['success' => true];
+
+        } catch (\Exception $e) {
+            return ['success' => false, 'error' => 'Exception: '.$e->getMessage()];
+        }
     }
 }
