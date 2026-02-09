@@ -8,6 +8,12 @@ use App\Traits\WithPermissionChecks;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
 class DonorPerfectBatchSync extends Component
 {
@@ -504,6 +510,207 @@ class DonorPerfectBatchSync extends Component
         $standardCode = \App\Models\DonorPerfectCodeMapping::getMappingFor($fieldType, $dpCode);
 
         return ['code' => $standardCode ?: '', 'source' => $standardCode ? 'standard' : null, 'blocked' => false, 'reason' => null];
+    }
+
+    /**
+     * Export the preview gifts to an Excel file for download
+     */
+    public function exportPreviewToExcel()
+    {
+        if (empty($this->previewGifts) && empty($this->filteredOutGifts)) {
+            session()->flash('error', 'No preview data to export. Please load a preview first.');
+            return;
+        }
+
+        try {
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            $sheet->setTitle('Batch Preview');
+
+            // Header style
+            $headerStyle = [
+                'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF'], 'size' => 11],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '4F46E5']],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+                'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
+            ];
+
+            // Title row
+            $sheet->setCellValue('A1', 'Batch ' . $this->selectedBatch . ' Preview - ' . Carbon::parse($this->selectedDate)->format('F j, Y'));
+            $sheet->mergeCells('A1:L1');
+            $sheet->getStyle('A1')->applyFromArray([
+                'font' => ['bold' => true, 'size' => 14, 'color' => ['rgb' => '1F2937']],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT],
+            ]);
+
+            // Summary row
+            $totalAmount = collect($this->previewGifts)->sum('amount');
+            $sheet->setCellValue('A2', 'Total: ' . count($this->previewGifts) . ' gifts | Amount: $' . number_format($totalAmount, 2));
+            $sheet->mergeCells('A2:L2');
+            $sheet->getStyle('A2')->applyFromArray([
+                'font' => ['size' => 11, 'color' => ['rgb' => '6B7280']],
+            ]);
+
+            // Column headers (row 4)
+            $headers = [
+                'A' => 'Gift ID',
+                'B' => 'Gift Date',
+                'C' => 'Batch ID',
+                'D' => 'Amount',
+                'E' => 'Donor Name',
+                'F' => 'GL Code',
+                'G' => 'GL (Intacct)',
+                'H' => 'Campaign',
+                'I' => 'Location (Intacct)',
+                'J' => 'Solicit Code',
+                'K' => 'Project (Intacct)',
+                'L' => 'Sub-Solicit',
+                'M' => 'Service (Intacct)',
+                'N' => 'Payment Type',
+                'O' => 'Check Image',
+            ];
+
+            $headerRow = 4;
+            foreach ($headers as $col => $label) {
+                $sheet->setCellValue($col . $headerRow, $label);
+            }
+            $sheet->getStyle('A' . $headerRow . ':O' . $headerRow)->applyFromArray($headerStyle);
+
+            // Data rows
+            $row = $headerRow + 1;
+            foreach ($this->previewGifts as $gift) {
+                $donorName = trim(($gift['first_name'] ?? '') . ' ' . ($gift['last_name'] ?? ''));
+                $glMapping = $this->getMappedCode($gift, 'gl_code');
+                $campaignMapping = $this->getMappedCode($gift, 'campaign');
+                $solicitMapping = $this->getMappedCode($gift, 'solicit_code');
+                $subSolicitMapping = $this->getMappedCode($gift, 'sub_solicit_code');
+
+                $sheet->setCellValue('A' . $row, $gift['gift_id'] ?? '');
+                $sheet->setCellValue('B' . $row, $gift['gift_date'] ?? '');
+                $sheet->setCellValue('C' . $row, $gift['DP_CheckScan_Batch'] ?? '');
+                $sheet->setCellValue('D' . $row, floatval(str_replace(',', '', $gift['amount'] ?? 0)));
+                $sheet->setCellValue('E' . $row, $donorName ?: 'Anonymous');
+                $sheet->setCellValue('F' . $row, $gift['gl_code'] ?? '');
+                $sheet->setCellValue('G' . $row, $glMapping['code'] ?? '');
+                $sheet->setCellValue('H' . $row, $gift['campaign'] ?? '');
+                $sheet->setCellValue('I' . $row, $campaignMapping['code'] ?? '');
+                $sheet->setCellValue('J' . $row, $gift['solicit_code'] ?? '');
+                $sheet->setCellValue('K' . $row, $solicitMapping['code'] ?? '');
+                $sheet->setCellValue('L' . $row, $gift['sub_solicit_code'] ?? '');
+                $sheet->setCellValue('M' . $row, $subSolicitMapping['code'] ?? '');
+                $sheet->setCellValue('N' . $row, $gift['payment_type'] ?? '');
+                $sheet->setCellValue('O' . $row, !empty($gift['IMAGE_CHECK']) ? 'Yes' : 'No');
+
+                // Alternate row shading
+                if ($row % 2 === 0) {
+                    $sheet->getStyle('A' . $row . ':O' . $row)->applyFromArray([
+                        'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'F3F4F6']],
+                    ]);
+                }
+
+                $row++;
+            }
+
+            // Format amount column as currency
+            $lastDataRow = $row - 1;
+            if ($lastDataRow >= $headerRow + 1) {
+                $sheet->getStyle('D' . ($headerRow + 1) . ':D' . $lastDataRow)
+                    ->getNumberFormat()
+                    ->setFormatCode(NumberFormat::FORMAT_CURRENCY_USD);
+
+                // Data borders
+                $sheet->getStyle('A' . ($headerRow + 1) . ':O' . $lastDataRow)->applyFromArray([
+                    'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => 'E5E7EB']]],
+                ]);
+            }
+
+            // Total row
+            $sheet->setCellValue('C' . $row, 'Total:');
+            $sheet->setCellValue('D' . $row, $totalAmount);
+            $sheet->getStyle('C' . $row . ':D' . $row)->applyFromArray([
+                'font' => ['bold' => true, 'size' => 11],
+                'borders' => ['top' => ['borderStyle' => Border::BORDER_MEDIUM]],
+            ]);
+            $sheet->getStyle('D' . $row)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_CURRENCY_USD);
+
+            // Filtered out gifts sheet
+            if (!empty($this->filteredOutGifts)) {
+                $filteredSheet = $spreadsheet->createSheet();
+                $filteredSheet->setTitle('Filtered Out');
+
+                $filteredSheet->setCellValue('A1', 'Filtered Out Gifts (' . count($this->filteredOutGifts) . ')');
+                $filteredSheet->mergeCells('A1:F1');
+                $filteredSheet->getStyle('A1')->applyFromArray([
+                    'font' => ['bold' => true, 'size' => 14, 'color' => ['rgb' => 'B45309']],
+                ]);
+
+                $filteredHeaders = ['A' => 'Gift ID', 'B' => 'Amount', 'C' => 'Gift Type', 'D' => 'Donor', 'E' => 'Batch ID', 'F' => 'Filter Reason'];
+                $fHeaderStyle = [
+                    'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+                    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'D97706']],
+                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                    'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
+                ];
+
+                foreach ($filteredHeaders as $col => $label) {
+                    $filteredSheet->setCellValue($col . '3', $label);
+                }
+                $filteredSheet->getStyle('A3:F3')->applyFromArray($fHeaderStyle);
+
+                $fRow = 4;
+                foreach ($this->filteredOutGifts as $gift) {
+                    $donorName = trim(($gift['first_name'] ?? '') . ' ' . ($gift['last_name'] ?? ''));
+                    $filteredSheet->setCellValue('A' . $fRow, $gift['gift_id'] ?? '');
+                    $filteredSheet->setCellValue('B' . $fRow, floatval(str_replace(',', '', $gift['amount'] ?? 0)));
+                    $filteredSheet->setCellValue('C' . $fRow, $gift['gift_type'] ?? '');
+                    $filteredSheet->setCellValue('D' . $fRow, $donorName ?: 'Anonymous');
+                    $filteredSheet->setCellValue('E' . $fRow, $gift['DP_CheckScan_Batch'] ?? '');
+                    $filteredSheet->setCellValue('F' . $fRow, $gift['_filter_reason'] ?? 'Excluded by filter');
+                    $fRow++;
+                }
+
+                $filteredSheet->getStyle('B4:B' . max($fRow - 1, 4))
+                    ->getNumberFormat()
+                    ->setFormatCode(NumberFormat::FORMAT_CURRENCY_USD);
+
+                foreach (range('A', 'F') as $col) {
+                    $filteredSheet->getColumnDimension($col)->setAutoSize(true);
+                }
+            }
+
+            // Auto-size columns on main sheet
+            foreach (range('A', 'O') as $col) {
+                $sheet->getColumnDimension($col)->setAutoSize(true);
+            }
+
+            // Set active sheet back to first
+            $spreadsheet->setActiveSheetIndex(0);
+
+            // Save file
+            $filename = 'batch_preview_' . $this->selectedDate . '_batch_' . $this->selectedBatch . '_' . time() . '.xlsx';
+            $filepath = storage_path('app/exports/' . $filename);
+
+            if (!file_exists(storage_path('app/exports'))) {
+                mkdir(storage_path('app/exports'), 0755, true);
+            }
+
+            $writer = new Xlsx($spreadsheet);
+            $writer->save($filepath);
+
+            session()->put('batch_preview_excel_export', [
+                'filename' => $filename,
+                'filepath' => $filepath,
+                'created_at' => now(),
+            ]);
+
+            return redirect()->route('donor-gifts.batch-preview-excel-download');
+
+        } catch (\Exception $e) {
+            Log::error('DonorPerfectBatchSync: Failed to generate Excel export', [
+                'error' => $e->getMessage(),
+            ]);
+            session()->flash('error', 'Failed to generate Excel export: ' . $e->getMessage());
+        }
     }
 
     public function render()

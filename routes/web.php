@@ -190,6 +190,28 @@ Route::middleware(['auth'])->group(function () {
     })->middleware(['auth', 'permission:donor_gifts.view'])
         ->name('donor-gifts.batch-sync-download');
 
+    Route::get('donor-gifts/batch-preview-excel-download', function () {
+        $exportData = session()->get('batch_preview_excel_export');
+
+        if (! $exportData || ! isset($exportData['filepath'])) {
+            return redirect()->route('donor-gifts.batch-sync')->with('error', 'Export not found or expired.');
+        }
+
+        $filepath = $exportData['filepath'];
+        $filename = $exportData['filename'];
+
+        if (! file_exists($filepath)) {
+            return redirect()->route('donor-gifts.batch-sync')->with('error', 'Export file not found.');
+        }
+
+        session()->forget('batch_preview_excel_export');
+
+        return response()->download($filepath, $filename, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ])->deleteFileAfterSend(true);
+    })->middleware(['auth', 'permission:donor_gifts.view'])
+        ->name('donor-gifts.batch-preview-excel-download');
+
     // Sage Intacct Routes
     Route::get('/accounting/sage-intacct/configuration', \App\Livewire\SageIntacctConfiguration::class)
         ->name('sage-intacct.configuration')
