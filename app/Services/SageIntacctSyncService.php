@@ -889,14 +889,23 @@ class SageIntacctSyncService
             'receiptitems' => [$lineItem],
         ], $accountData);
 
+        // Build custom fields array for Sage Intacct
+        $customFields = [];
+
         // Add Check Scan Batch ID custom field if present
         if (! empty($giftData['DP_CheckScan_Batch'])) {
-            $receiptData['CHECK_SCAN_BATCH_ID'] = $giftData['DP_CheckScan_Batch'];
+            $customFields['CHECK_SCAN_BATCH_ID'] = $giftData['DP_CheckScan_Batch'];
         }
 
         // Add Gift ID custom field for DonorPerfect gift tracking
+        // Uses configurable field name from settings (default: DP_GIFT_ID)
         if (! empty($giftData['gift_id'])) {
-            $receiptData['GIFT_ID'] = (string) $giftData['gift_id'];
+            $giftIdFieldName = $this->setting->gift_id_field_name ?? 'DP_GIFT_ID';
+            $customFields[$giftIdFieldName] = (string) $giftData['gift_id'];
+        }
+
+        if (! empty($customFields)) {
+            $receiptData['_custom_fields'] = $customFields;
         }
 
         // Add SUPDOC if file attachment was prepared
@@ -1552,7 +1561,7 @@ class SageIntacctSyncService
             }
 
             // Extract file info - use basename to get just the filename, not full path
-            $originalName = $metadata['original_name'] ?? $cacheFilename;
+            $originalName = $metadata['original_name'] ?? basename($storagePath);
             $baseFilename = basename($originalName); // Strip any directory path
             $pathInfo = pathinfo($baseFilename);
             $fileName = $pathInfo['filename'] ?? 'check_'.$giftId;

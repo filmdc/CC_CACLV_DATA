@@ -71,6 +71,9 @@ class SageIntacctConfiguration extends Component
 
     public $attachment_max_size_mb = 10;
 
+    // Custom Field Names
+    public $gift_id_field_name = 'DP_GIFT_ID';
+
     // Default Dimension Settings
     public $default_service_id = 'S14999';
 
@@ -228,6 +231,9 @@ class SageIntacctConfiguration extends Component
             $this->attachment_folder_name = $settings->attachment_folder_name ?? 'DP_Check_Images';
             $this->attachment_max_size_mb = $settings->attachment_max_size_mb ?? 10;
 
+            // Custom field name settings
+            $this->gift_id_field_name = $settings->gift_id_field_name ?? 'DP_GIFT_ID';
+
             // Default dimension settings
             $this->default_service_id = $settings->default_service_id ?? 'S14999';
         } else {
@@ -293,6 +299,8 @@ class SageIntacctConfiguration extends Component
                 'include_check_images' => $this->include_check_images,
                 'attachment_folder_name' => $this->attachment_folder_name,
                 'attachment_max_size_mb' => $this->attachment_max_size_mb,
+                // Custom field name settings
+                'gift_id_field_name' => $this->gift_id_field_name,
                 // Default dimension settings
                 'default_service_id' => $this->default_service_id,
             ];
