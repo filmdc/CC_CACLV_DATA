@@ -1741,14 +1741,20 @@ XML;
             // Format: CHK-{gift_id}-{timestamp_last_6_digits}
             // Example: CHK-196375-891696
             $timestamp = substr(time(), -6); // Last 6 digits of timestamp
-            $supdocId = 'CHK-'.$fileName.'-'.$timestamp;
 
-            // Ensure it fits within 20 char limit
+            // Extract gift ID from filename (format: Gift_{giftid}_{name}.ext)
+            preg_match('/Gift_(\d+)_/', $fileName, $matches);
+            $giftIdForSupdoc = $matches[1] ?? substr(preg_replace('/[^A-Za-z0-9]/', '', $fileName), 0, 6);
+
+            $supdocId = 'CHK-'.$giftIdForSupdoc.'-'.$timestamp;
+
+            // Enforce 20 character limit - truncate gift ID portion if needed
             if (strlen($supdocId) > 20) {
-                // Use just gift ID from filename if too long
-                preg_match('/Gift_(\d+)_/', $fileName, $matches);
-                $giftId = $matches[1] ?? substr($fileName, 0, 6);
-                $supdocId = 'CHK-'.$giftId.'-'.$timestamp;
+                // CHK- (4) + giftId + - (1) + timestamp (6) = 11 + giftId
+                // Max giftId length = 20 - 11 = 9
+                $maxGiftIdLen = 20 - 4 - 1 - strlen($timestamp);
+                $giftIdForSupdoc = substr($giftIdForSupdoc, 0, $maxGiftIdLen);
+                $supdocId = 'CHK-'.$giftIdForSupdoc.'-'.$timestamp;
             }
 
             Log::info('Sage Intacct XML: Creating SUPDOC attachment', [
@@ -2162,26 +2168,21 @@ LINEITEM;
         $customFieldsXml = '';
         $customFieldItems = '';
 
-        // Add Check Scan Batch ID if present
-        if (! empty($receiptData['CHECK_SCAN_BATCH_ID'])) {
-            $checkScanBatchId = htmlspecialchars($receiptData['CHECK_SCAN_BATCH_ID'], ENT_XML1, 'UTF-8');
-            $customFieldItems .= <<<CUSTOMFIELD
+        // Add custom fields from the _custom_fields array
+        // This allows the sync service to pass custom fields with configurable names
+        if (! empty($receiptData['_custom_fields']) && is_array($receiptData['_custom_fields'])) {
+            foreach ($receiptData['_custom_fields'] as $fieldName => $fieldValue) {
+                if (! empty($fieldValue)) {
+                    $sanitizedFieldName = htmlspecialchars($fieldName, ENT_XML1, 'UTF-8');
+                    $sanitizedFieldValue = htmlspecialchars($fieldValue, ENT_XML1, 'UTF-8');
+                    $customFieldItems .= <<<CUSTOMFIELD
                         <customfield>
-                            <customfieldname>CHECK_SCAN_BATCH_ID</customfieldname>
-                            <customfieldvalue>{$checkScanBatchId}</customfieldvalue>
+                            <customfieldname>{$sanitizedFieldName}</customfieldname>
+                            <customfieldvalue>{$sanitizedFieldValue}</customfieldvalue>
                         </customfield>
 CUSTOMFIELD;
-        }
-
-        // Add Gift ID if present (DonorPerfect gift tracking)
-        if (! empty($receiptData['GIFT_ID'])) {
-            $giftId = htmlspecialchars($receiptData['GIFT_ID'], ENT_XML1, 'UTF-8');
-            $customFieldItems .= <<<CUSTOMFIELD
-                        <customfield>
-                            <customfieldname>GIFT_ID</customfieldname>
-                            <customfieldvalue>{$giftId}</customfieldvalue>
-                        </customfield>
-CUSTOMFIELD;
+                }
+            }
         }
 
         // Wrap custom fields if any exist

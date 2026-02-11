@@ -69,6 +69,7 @@ class SageIntacctSetting extends Model
         'default_gl_account',
         'default_payment_method',
         'default_service_id',
+        'gift_id_field_name',
     ];
 
     protected $casts = [

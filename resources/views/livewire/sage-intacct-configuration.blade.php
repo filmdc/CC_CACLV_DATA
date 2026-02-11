@@ -501,6 +501,26 @@
                                 </div>
                             </div>
 
+                            <!-- Custom Field Names -->
+                            <div class="border-t border-gray-200 dark:border-zinc-600 pt-4">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                                    Custom Field Names
+                                </label>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="gift_id_field_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                            Gift ID Field Name
+                                        </label>
+                                        <input type="text"
+                                               wire:model="gift_id_field_name"
+                                               id="gift_id_field_name"
+                                               placeholder="DP_GIFT_ID"
+                                               class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Integration Name of the DP Gift ID custom field on Other Receipt in Sage Intacct</p>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Default Dimension Settings -->
                             <div class="border-t border-gray-200 dark:border-zinc-600 pt-4">
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
