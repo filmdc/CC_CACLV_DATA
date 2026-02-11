@@ -698,6 +698,145 @@ class SageIntacctApiService
     }
 
     /**
+     * Delete an Other Receipt from Sage Intacct by RECORDNO
+     *
+     * Used during resync to remove the old receipt before creating an updated one.
+     * Gracefully handles cases where the record was already deleted.
+     *
+     * @param  string  $recordNo  The RECORDNO of the Other Receipt to delete
+     * @return array Result with success boolean
+     */
+    public function deleteOtherReceipt(string $recordNo): array
+    {
+        if (! $this->setting->isXmlApi()) {
+            return [
+                'success' => false,
+                'error' => 'Other Receipts are only supported in XML API mode',
+            ];
+        }
+
+        try {
+            // Ensure we have a session
+            if (! $this->sessionId) {
+                $authResult = $this->authenticateXml();
+                if (! $authResult['success']) {
+                    return [
+                        'success' => false,
+                        'error' => 'Authentication failed: '.($authResult['message'] ?? 'Unknown error'),
+                    ];
+                }
+            }
+
+            Log::info('Sage Intacct XML API: Deleting Other Receipt', [
+                'recordno' => $recordNo,
+            ]);
+
+            $controlId = 'delete-receipt-'.time().'-'.uniqid();
+            $functionId = 'func-delete-'.uniqid();
+
+            $xmlRequest = <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<request>
+    <control>
+        <senderid>{$this->setting->sender_id}</senderid>
+        <password>{$this->setting->sender_password}</password>
+        <controlid>{$controlId}</controlid>
+        <uniqueid>false</uniqueid>
+        <dtdversion>3.0</dtdversion>
+    </control>
+    <operation>
+        <authentication>
+            <sessionid>{$this->sessionId}</sessionid>
+        </authentication>
+        <content>
+            <function controlid="{$functionId}">
+                <delete>
+                    <object>OTHERCASHRECEIPT</object>
+                    <keys>{$recordNo}</keys>
+                </delete>
+            </function>
+        </content>
+    </operation>
+</request>
+XML;
+
+            $response = $this->sendXmlRequest($xmlRequest);
+
+            if (! $response['success']) {
+                $errorMsg = $response['error'] ?? 'Failed to delete Other Receipt';
+
+                // Check if the error is "record not found" - this is OK for resync
+                if (str_contains(strtolower($errorMsg), 'not found') ||
+                    str_contains(strtolower($errorMsg), 'does not exist') ||
+                    str_contains(strtolower($errorMsg), 'no records')) {
+
+                    Log::info('Sage Intacct XML API: Other Receipt already deleted or not found (OK for resync)', [
+                        'recordno' => $recordNo,
+                    ]);
+
+                    return [
+                        'success' => true,
+                        'already_deleted' => true,
+                        'message' => 'Record was already deleted or not found',
+                    ];
+                }
+
+                return [
+                    'success' => false,
+                    'error' => $errorMsg,
+                ];
+            }
+
+            // Parse response
+            $result = $this->parseXmlResponse($response['xml']);
+
+            if (! $result['success']) {
+                $errorMsg = $result['error'] ?? 'Failed to parse delete response';
+
+                // Also handle "not found" in parsed response
+                if (str_contains(strtolower($errorMsg), 'not found') ||
+                    str_contains(strtolower($errorMsg), 'does not exist')) {
+
+                    Log::info('Sage Intacct XML API: Other Receipt not found during delete (OK for resync)', [
+                        'recordno' => $recordNo,
+                    ]);
+
+                    return [
+                        'success' => true,
+                        'already_deleted' => true,
+                        'message' => 'Record was already deleted or not found',
+                    ];
+                }
+
+                return [
+                    'success' => false,
+                    'error' => $errorMsg,
+                ];
+            }
+
+            Log::info('Sage Intacct XML API: Other Receipt deleted successfully', [
+                'recordno' => $recordNo,
+            ]);
+
+            return [
+                'success' => true,
+                'deleted' => true,
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Sage Intacct deleteOtherReceipt exception', [
+                'recordno' => $recordNo,
+                'error' => $e->getMessage(),
+            ]);
+
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
      * Query custom object records (XML method)
      *
      * @param  string  $objectName  Custom object name

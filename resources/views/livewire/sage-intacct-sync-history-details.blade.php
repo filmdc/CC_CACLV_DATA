@@ -200,6 +200,35 @@
                 @endphp
 
                 @if($successfulGiftsCount > 0)
+                <!-- Resync Option (Recommended - no duplicates) -->
+                <div class="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-400 p-4 rounded-lg">
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-start">
+                            <svg class="h-6 w-6 text-blue-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            </svg>
+                            <div>
+                                <h4 class="text-sm font-medium text-blue-800 dark:text-blue-300">Resync Gifts (Update Without Duplicates)</h4>
+                                <p class="text-sm text-blue-700 dark:text-blue-400 mt-1">
+                                    If gift data changed in DonorPerfect and you need to update the receipts in Sage, use this option.
+                                    The old receipt will be deleted and a new one created with updated data.
+                                </p>
+                                <p class="text-sm text-blue-700 dark:text-blue-400 mt-1">
+                                    This sync has <strong>{{ $successfulGiftsCount }}</strong> successfully synced gift(s).
+                                    @if($totalRecordsAcrossAllSyncs > $successfulGiftsCount)
+                                        <span class="font-semibold">(Will update {{ $totalRecordsAcrossAllSyncs }} total records across all sync jobs)</span>
+                                    @endif
+                                </p>
+                            </div>
+                        </div>
+                        <button wire:click="confirmResyncAllGifts"
+                                class="ml-4 px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 whitespace-nowrap">
+                            Resync All Gifts
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Reset Option (for when receipts were deleted in Sage) -->
                 <div class="bg-orange-50 dark:bg-orange-900/20 border-l-4 border-orange-400 p-4 rounded-lg">
                     <div class="flex items-start justify-between">
                         <div class="flex items-start">
@@ -207,15 +236,10 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                             </svg>
                             <div>
-                                <h4 class="text-sm font-medium text-orange-800 dark:text-orange-300">Reset Synced Gifts for Re-Sync</h4>
+                                <h4 class="text-sm font-medium text-orange-800 dark:text-orange-300">Reset Synced Gifts (Full Re-Create)</h4>
                                 <p class="text-sm text-orange-700 dark:text-orange-400 mt-1">
-                                    If you deleted these receipts from Sage Intacct and need to re-sync them, you can reset their status here.
-                                </p>
-                                <p class="text-sm text-orange-700 dark:text-orange-400 mt-1">
-                                    This sync has <strong>{{ $successfulGiftsCount }}</strong> successfully synced gift(s).
-                                    @if($totalRecordsAcrossAllSyncs > $successfulGiftsCount)
-                                        <span class="font-semibold">(Will reset {{ $totalRecordsAcrossAllSyncs }} total records across all sync jobs)</span>
-                                    @endif
+                                    If you deleted these receipts from Sage Intacct and need to re-create them from scratch, use this option.
+                                    This clears the Sage record ID and creates brand new receipts.
                                 </p>
                             </div>
                         </div>
@@ -242,6 +266,7 @@
                             <option value="success">Success</option>
                             <option value="failed">Failed</option>
                             <option value="pending">Pending</option>
+                            <option value="resync">Resync Pending</option>
                         </select>
                     </div>
 
@@ -293,6 +318,10 @@
                                         @elseif($item->status === 'failed')
                                             <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
                                                 Failed
+                                            </span>
+                                        @elseif($item->status === 'resync')
+                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                                Resync Pending
                                             </span>
                                         @else
                                             <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
@@ -555,6 +584,109 @@
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
                             Resetting...
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Resync Confirmation Modal -->
+    @if($showResyncConfirmation)
+        @php
+            $giftIdsToResync = DB::table('sage_intacct_sync_items')
+                ->where('sync_history_id', $syncHistory->id)
+                ->where('status', 'success')
+                ->whereNotNull('intacct_record_id')
+                ->pluck('gift_id')
+                ->unique()
+                ->toArray();
+
+            $totalRecordsToResync = 0;
+            if (!empty($giftIdsToResync)) {
+                $totalRecordsToResync = DB::table('sage_intacct_sync_items')
+                    ->whereIn('gift_id', $giftIdsToResync)
+                    ->where('status', 'success')
+                    ->whereNotNull('intacct_record_id')
+                    ->count();
+            }
+        @endphp
+
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="cancelResync">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-lg w-full mx-4">
+                <!-- Modal Header -->
+                <div class="bg-blue-600 text-white p-6 rounded-t-lg">
+                    <h3 class="text-xl font-bold flex items-center">
+                        <svg class="h-6 w-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Confirm Resync
+                    </h3>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="p-6">
+                    <div class="space-y-4">
+                        <p class="text-gray-700 dark:text-gray-300">
+                            You are about to mark <strong class="text-blue-600 dark:text-blue-400">{{ count($giftIdsToResync) }} unique gift(s)</strong> for resync.
+                        </p>
+
+                        @if($totalRecordsToResync > count($giftIdsToResync))
+                        <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-4">
+                            <p class="text-sm text-blue-800 dark:text-blue-300">
+                                <strong>Cross-Sync Resync:</strong>
+                            </p>
+                            <p class="text-sm text-blue-700 dark:text-blue-400 mt-1">
+                                These gifts appear in multiple sync jobs. This will mark <strong>{{ $totalRecordsToResync }} total records</strong> across all sync jobs for resync.
+                            </p>
+                        </div>
+                        @endif
+
+                        <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md p-4">
+                            <p class="text-sm text-green-800 dark:text-green-300">
+                                <strong>What this does:</strong>
+                            </p>
+                            <ul class="list-disc list-inside text-sm text-green-700 dark:text-green-400 mt-2 space-y-1">
+                                <li>Marks gifts as "resync" but <strong>keeps the Sage record ID</strong></li>
+                                <li>On next sync: <strong>deletes the old receipt</strong> in Sage first</li>
+                                <li>Then creates a <strong>new receipt with updated data</strong></li>
+                                <li>No duplicates will be created</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-4">
+                            <p class="text-sm text-yellow-800 dark:text-yellow-300">
+                                <strong>Use this when:</strong>
+                            </p>
+                            <ul class="list-disc list-inside text-sm text-yellow-700 dark:text-yellow-400 mt-2 space-y-1">
+                                <li>Gift data was corrected in DonorPerfect (amount, GL, etc.)</li>
+                                <li>You need to update receipts in Sage without duplicates</li>
+                                <li>Custom fields or dimensions need to be updated</li>
+                            </ul>
+                        </div>
+
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">
+                            Are you sure you want to proceed?
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-b-lg flex justify-end space-x-3">
+                    <button wire:click="cancelResync"
+                            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-zinc-600 border border-gray-300 dark:border-zinc-500 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-500">
+                        Cancel
+                    </button>
+                    <button wire:click="resyncAllGifts"
+                            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            wire:loading.attr="disabled">
+                        <span wire:loading.remove wire:target="resyncAllGifts">Yes, Resync All Gifts</span>
+                        <span wire:loading wire:target="resyncAllGifts" class="flex items-center">
+                            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Marking for Resync...
                         </span>
                     </button>
                 </div>

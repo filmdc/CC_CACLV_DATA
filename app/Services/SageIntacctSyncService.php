@@ -15,6 +15,12 @@ class SageIntacctSyncService
     private $userToken;
 
     /**
+     * Map of gift_id => intacct_record_id for gifts marked for resync.
+     * Used by syncBatch() to delete old receipts before creating new ones.
+     */
+    private array $resyncRecordMap = [];
+
+    /**
      * Constructor - accepts SageIntacctApiService, SageIntacctSetting, and UserSageIntacctToken instances
      */
     public function __construct(SageIntacctApiService $apiService, $setting, $userToken = null)
@@ -91,14 +97,29 @@ class SageIntacctSyncService
                 ]);
 
                 // CRITICAL: Filter out already successfully synced gifts to prevent duplicates
+                // But allow through gifts marked for resync (status = 'resync')
                 $syncedGiftIds = DB::table('sage_intacct_sync_items')
                     ->where('status', 'success')
                     ->pluck('gift_id')
                     ->toArray();
 
+                // Get gifts marked for resync (these should pass through the filter)
+                $resyncItems = DB::table('sage_intacct_sync_items')
+                    ->where('status', 'resync')
+                    ->whereNotNull('intacct_record_id')
+                    ->get()
+                    ->keyBy('gift_id');
+
+                $resyncGiftIds = $resyncItems->pluck('intacct_record_id', 'gift_id')->toArray();
+
                 $originalCount = count($gifts);
-                $gifts = array_filter($gifts, function ($gift) use ($syncedGiftIds) {
+                $gifts = array_filter($gifts, function ($gift) use ($syncedGiftIds, $resyncGiftIds) {
                     $giftId = $gift['gift_id'] ?? null;
+
+                    // Allow resync gifts through even if they were previously successful
+                    if ($giftId && isset($resyncGiftIds[$giftId])) {
+                        return true;
+                    }
 
                     return $giftId && ! in_array($giftId, $syncedGiftIds);
                 });
@@ -106,11 +127,14 @@ class SageIntacctSyncService
 
                 $filteredCount = $originalCount - count($gifts);
 
+                // Store resync map for use in syncBatch()
+                $this->resyncRecordMap = array_merge($this->resyncRecordMap, $resyncGiftIds);
+
                 Log::info('Sage Intacct: Filtered already-synced gifts from selection', [
                     'original_count' => $originalCount,
                     'already_synced' => $filteredCount,
+                    'resync_count' => count($resyncGiftIds),
                     'remaining_to_sync' => count($gifts),
-                    'synced_gift_ids' => $syncedGiftIds,
                 ]);
             } else {
                 // Get all gifts from DonorPerfect (don't filter by local sync status)
@@ -131,22 +155,39 @@ class SageIntacctSyncService
                 ]);
 
                 // Filter out already successfully synced gifts
+                // But allow through gifts marked for resync (status = 'resync')
                 $syncedGiftIds = DB::table('sage_intacct_sync_items')
                     ->where('status', 'success')
                     ->pluck('gift_id')
                     ->toArray();
 
+                $resyncItems = DB::table('sage_intacct_sync_items')
+                    ->where('status', 'resync')
+                    ->whereNotNull('intacct_record_id')
+                    ->get()
+                    ->keyBy('gift_id');
+
+                $resyncGiftIds = $resyncItems->pluck('intacct_record_id', 'gift_id')->toArray();
+
                 $originalCount = count($gifts);
-                $gifts = array_filter($gifts, function ($gift) use ($syncedGiftIds) {
+                $gifts = array_filter($gifts, function ($gift) use ($syncedGiftIds, $resyncGiftIds) {
                     $giftId = $gift['gift_id'] ?? null;
+
+                    if ($giftId && isset($resyncGiftIds[$giftId])) {
+                        return true;
+                    }
 
                     return $giftId && ! in_array($giftId, $syncedGiftIds);
                 });
                 $gifts = array_values($gifts); // Re-index array
 
+                // Store resync map for use in syncBatch()
+                $this->resyncRecordMap = array_merge($this->resyncRecordMap, $resyncGiftIds);
+
                 Log::info('Sage Intacct: Filtered already-synced gifts', [
                     'total_gifts' => $originalCount,
                     'already_synced' => count($syncedGiftIds),
+                    'resync_count' => count($resyncGiftIds),
                     'syncable' => count($gifts),
                 ]);
             }
@@ -1206,10 +1247,49 @@ class SageIntacctSyncService
                 ];
             }
 
+            // Handle resync: delete old receipts in Sage before creating new ones
+            if ($this->setting->use_other_receipts && ! empty($this->resyncRecordMap)) {
+                $resyncedInBatch = 0;
+                foreach ($giftIdMap as $idx => $giftId) {
+                    if (isset($this->resyncRecordMap[$giftId])) {
+                        $oldRecordNo = $this->resyncRecordMap[$giftId];
+
+                        Log::info('Sage Intacct: Deleting old Other Receipt for resync', [
+                            'gift_id' => $giftId,
+                            'old_recordno' => $oldRecordNo,
+                        ]);
+
+                        $deleteResult = $this->apiService->deleteOtherReceipt($oldRecordNo);
+
+                        if ($deleteResult['success']) {
+                            $resyncedInBatch++;
+                            Log::info('Sage Intacct: Old receipt deleted for resync', [
+                                'gift_id' => $giftId,
+                                'old_recordno' => $oldRecordNo,
+                                'already_deleted' => $deleteResult['already_deleted'] ?? false,
+                            ]);
+                        } else {
+                            Log::warning('Sage Intacct: Failed to delete old receipt for resync, will create new anyway', [
+                                'gift_id' => $giftId,
+                                'old_recordno' => $oldRecordNo,
+                                'error' => $deleteResult['error'] ?? 'Unknown',
+                            ]);
+                        }
+                    }
+                }
+
+                if ($resyncedInBatch > 0) {
+                    Log::info('Sage Intacct: Resync deletions complete', [
+                        'deleted_count' => $resyncedInBatch,
+                    ]);
+                }
+            }
+
             // Send batch to Intacct based on destination type
             if ($this->setting->use_other_receipts) {
                 Log::info('Sage Intacct: Creating Other Receipts batch', [
                     'batch_size' => count($transformedRecords),
+                    'resync_count' => count(array_intersect(array_values($giftIdMap), array_keys($this->resyncRecordMap))),
                 ]);
                 $result = $this->apiService->batchCreateOtherReceipts($transformedRecords);
             } else {
@@ -1268,6 +1348,22 @@ class SageIntacctSyncService
                                 'api_response' => json_encode($detail),
                                 'updated_at' => now(),
                             ]);
+
+                        // If this was a resync, update old 'resync' status items to 'success'
+                        // so they don't get picked up again
+                        if (isset($this->resyncRecordMap[$giftId])) {
+                            DB::table('sage_intacct_sync_items')
+                                ->where('gift_id', $giftId)
+                                ->where('status', 'resync')
+                                ->where('sync_history_id', '!=', $syncHistory->id)
+                                ->update([
+                                    'status' => 'success',
+                                    'intacct_record_id' => $recordKey,
+                                    'synced_at' => now(),
+                                    'error_message' => 'Resynced in sync #'.$syncHistory->id,
+                                    'updated_at' => now(),
+                                ]);
+                        }
                     } else {
                         Log::warning('Sage Intacct: Gift sync failed', [
                             'gift_id' => $giftId,

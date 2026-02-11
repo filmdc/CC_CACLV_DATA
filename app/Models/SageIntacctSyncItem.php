@@ -57,6 +57,8 @@ class SageIntacctSyncItem extends Model
 
     const STATUS_FAILED = 'failed';
 
+    const STATUS_RESYNC = 'resync';
+
     /**
      * Get the sync history this item belongs to
      */
@@ -110,7 +112,7 @@ class SageIntacctSyncItem extends Model
     }
 
     /**
-     * Retry a failed sync item
+     * Retry a failed sync item (clears record ID - creates new in Sage)
      */
     public function retry(): bool
     {
@@ -122,11 +124,30 @@ class SageIntacctSyncItem extends Model
     }
 
     /**
+     * Mark for resync (keeps record ID so old receipt can be deleted first)
+     */
+    public function markForResync(): bool
+    {
+        return $this->update([
+            'status' => self::STATUS_RESYNC,
+            'error_message' => null,
+        ]);
+    }
+
+    /**
      * Check if this item can be retried
      */
     public function canRetry(): bool
     {
         return $this->status === self::STATUS_FAILED;
+    }
+
+    /**
+     * Check if this item can be resynced (update existing in Sage)
+     */
+    public function canResync(): bool
+    {
+        return $this->status === self::STATUS_SUCCESS && ! empty($this->intacct_record_id);
     }
 
     /**

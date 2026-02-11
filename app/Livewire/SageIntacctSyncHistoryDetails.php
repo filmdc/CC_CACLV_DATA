@@ -26,6 +26,8 @@ class SageIntacctSyncHistoryDetails extends Component
 
     public $showResetConfirmation = false;
 
+    public $showResyncConfirmation = false;
+
     public function mount($id)
     {
         // Allow viewing if user has sync view permission or admin permission
@@ -165,6 +167,89 @@ class SageIntacctSyncHistoryDetails extends Component
         }
     }
 
+    public function confirmResyncAllGifts()
+    {
+        $this->authorizeAction('sage.sync.perform');
+        $this->showResyncConfirmation = true;
+    }
+
+    public function cancelResync()
+    {
+        $this->showResyncConfirmation = false;
+    }
+
+    /**
+     * Mark all successfully synced gifts for resync (update, not duplicate).
+     * Keeps the intacct_record_id so the old receipt can be deleted in Sage
+     * before creating a new one during the next sync.
+     */
+    public function resyncAllGifts()
+    {
+        $this->authorizeAction('sage.sync.perform');
+
+        try {
+            // Get all gift_ids from this sync that have success status AND an intacct_record_id
+            $giftIds = DB::table('sage_intacct_sync_items')
+                ->where('sync_history_id', $this->syncHistoryId)
+                ->where('status', 'success')
+                ->whereNotNull('intacct_record_id')
+                ->pluck('gift_id')
+                ->unique()
+                ->toArray();
+
+            if (empty($giftIds)) {
+                session()->flash('warning', 'No successfully synced gifts with Sage record IDs found to resync.');
+                $this->showResyncConfirmation = false;
+                return;
+            }
+
+            // Mark ALL occurrences across ALL sync_history_ids as 'resync'
+            // Keep intacct_record_id so the old receipt can be found and deleted
+            $resyncCount = DB::table('sage_intacct_sync_items')
+                ->whereIn('gift_id', $giftIds)
+                ->where('status', 'success')
+                ->whereNotNull('intacct_record_id')
+                ->update([
+                    'status' => 'resync',
+                    'error_message' => null,
+                    'updated_at' => now(),
+                ]);
+
+            // Track in sync history
+            DB::table('sage_intacct_sync_history')
+                ->where('id', $this->syncHistoryId)
+                ->update([
+                    'reset_at' => now(),
+                    'reset_by_user_id' => auth()->id(),
+                    'reset_count' => DB::raw('reset_count + 1'),
+                    'updated_at' => now(),
+                ]);
+
+            \Log::info('Sage Intacct: Gifts marked for resync (will delete old + create new)', [
+                'sync_history_id' => $this->syncHistoryId,
+                'unique_gift_ids' => count($giftIds),
+                'total_records_marked' => $resyncCount,
+                'gift_ids' => $giftIds,
+                'user_id' => auth()->id(),
+                'user_name' => auth()->user()->name,
+            ]);
+
+            session()->flash('success', "Marked {$resyncCount} record(s) for " . count($giftIds) . " unique gift(s) for resync. On the next sync, old receipts will be deleted and new ones created with updated data.");
+
+            $this->showResyncConfirmation = false;
+            $this->loadSyncHistory();
+
+        } catch (\Exception $e) {
+            \Log::error('Sage Intacct: Resync marking failed', [
+                'sync_history_id' => $this->syncHistoryId,
+                'error' => $e->getMessage(),
+            ]);
+
+            session()->flash('error', 'Failed to mark gifts for resync: ' . $e->getMessage());
+            $this->showResyncConfirmation = false;
+        }
+    }
+
     public function getEnvironmentInfo()
     {
         if ($this->syncHistory && $this->syncHistory->environment_info) {
@@ -208,9 +293,10 @@ class SageIntacctSyncHistoryDetails extends Component
         // Order by status (failed first, then pending, then success)
         $query->orderByRaw("CASE
             WHEN status = 'failed' THEN 1
-            WHEN status = 'pending' THEN 2
-            WHEN status = 'success' THEN 3
-            ELSE 4
+            WHEN status = 'resync' THEN 2
+            WHEN status = 'pending' THEN 3
+            WHEN status = 'success' THEN 4
+            ELSE 5
         END");
         $query->orderBy('created_at', 'desc');
 
