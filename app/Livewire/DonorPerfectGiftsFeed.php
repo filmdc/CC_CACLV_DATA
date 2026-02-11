@@ -1432,11 +1432,26 @@ class DonorPerfectGiftsFeed extends Component
                 'uniqueCheckScanBatches' => $uniqueCheckScanBatches,
             ])->layout('components.layouts.app');
         } catch (\Exception $e) {
+            Log::error('DonorPerfect Gifts Feed render error', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile().':'.$e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            $isActuallyConfigured = false;
+            try {
+                $isActuallyConfigured = $giftService->isConfigured();
+            } catch (\Exception $configCheckException) {
+                // Configuration check itself failed
+            }
+
             return view('livewire.donor-perfect-gifts-feed', [
                 'gifts' => collect(),
-                'isConfigured' => false,
+                'isConfigured' => $isActuallyConfigured,
                 'errorMessage' => 'Error fetching gifts: '.$e->getMessage(),
                 'isAuthError' => false,
+                'totalGifts' => 0,
+                'totalAmount' => 0,
             ])->layout('components.layouts.app');
         }
     }

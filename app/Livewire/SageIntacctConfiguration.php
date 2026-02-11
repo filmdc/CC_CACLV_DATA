@@ -72,7 +72,7 @@ class SageIntacctConfiguration extends Component
     public $attachment_max_size_mb = 10;
 
     // Custom Field Names
-    public $gift_id_field_name = 'DP_GIFT_ID';
+    public $gift_id_field_name = 'GIFT_ID';
 
     // Default Dimension Settings
     public $default_service_id = 'S14999';
@@ -203,22 +203,18 @@ class SageIntacctConfiguration extends Component
         $settings = SageIntacctSetting::first();
 
         if ($settings) {
+            // Load non-encrypted fields first
             $this->auth_method = $settings->auth_method ?? 'xml';
             $this->company_id = $settings->company_id ?? 'CACLV-sandbox';
-            $this->client_id = $settings->client_id ?? '';
-            $this->client_secret = $settings->client_secret ?? '';
             $this->redirect_uri = $settings->redirect_uri ?? route('intacct.oauth.callback');
             $this->user_id = $settings->user_id ?? '';
-            $this->sender_id = $settings->sender_id ?? '';
-            $this->sender_password = $settings->sender_password ?? '';
-            $this->web_services_user_id = $settings->web_services_user_id ?? '';
-            $this->web_services_password = $settings->web_services_password ?? '';
             $this->location_id = $settings->location_id ?? '';
             $this->department_id = $settings->department_id ?? '';
             $this->class_id = $settings->class_id ?? '';
             $this->custom_object_name = $settings->custom_object_name ?? 'Donor Perfect Gifts';
             $this->is_active = $settings->is_active ?? false;
             $this->code_mapping_enabled = $settings->code_mapping_enabled ?? false;
+            $this->web_services_user_id = $settings->web_services_user_id ?? '';
 
             // Sync destination settings
             $this->use_other_receipts = $settings->use_other_receipts ?? true;
@@ -236,6 +232,25 @@ class SageIntacctConfiguration extends Component
 
             // Default dimension settings
             $this->default_service_id = $settings->default_service_id ?? 'S14999';
+
+            // Load encrypted fields with fallback - these may fail if APP_KEY changed
+            try {
+                $this->client_id = $settings->client_id ?? '';
+                $this->client_secret = $settings->client_secret ?? '';
+                $this->sender_id = $settings->sender_id ?? '';
+                $this->sender_password = $settings->sender_password ?? '';
+                $this->web_services_password = $settings->web_services_password ?? '';
+            } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+                \Illuminate\Support\Facades\Log::warning('Sage Intacct: encrypted credentials could not be decrypted (APP_KEY may have changed). Please re-enter credentials.', [
+                    'error' => $e->getMessage(),
+                ]);
+                $this->client_id = '';
+                $this->client_secret = '';
+                $this->sender_id = '';
+                $this->sender_password = '';
+                $this->web_services_password = '';
+                session()->flash('error', 'Encrypted credentials could not be loaded (encryption key may have changed). Please re-enter your API credentials and save.');
+            }
         } else {
             // No settings exist yet - default to XML for firewalled environments
             $this->auth_method = 'xml';
@@ -306,7 +321,12 @@ class SageIntacctConfiguration extends Component
             ];
 
             if ($settings) {
-                $settings->update($data);
+                // Build a fresh model instance to avoid decrypting old encrypted
+                // values which fails if the APP_KEY has changed since they were stored.
+                $fresh = new SageIntacctSetting();
+                $fresh->exists = true;
+                $fresh->id = $settings->id;
+                $fresh->forceFill($data)->save();
             } else {
                 SageIntacctSetting::create($data);
             }

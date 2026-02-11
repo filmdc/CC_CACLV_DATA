@@ -898,9 +898,9 @@ class SageIntacctSyncService
         }
 
         // Add Gift ID custom field for DonorPerfect gift tracking
-        // Uses configurable field name from settings (default: DP_GIFT_ID)
+        // Uses configurable field name from settings (default: GIFT_ID)
         if (! empty($giftData['gift_id'])) {
-            $giftIdFieldName = $this->setting->gift_id_field_name ?? 'DP_GIFT_ID';
+            $giftIdFieldName = $this->setting->gift_id_field_name ?? 'GIFT_ID';
             $customFields[$giftIdFieldName] = (string) $giftData['gift_id'];
         }
 

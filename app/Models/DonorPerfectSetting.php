@@ -62,10 +62,14 @@ class DonorPerfectSetting extends Model
      */
     public function isConfigured(): bool
     {
-        return !empty($this->api_url)
-            && !empty($this->api_key)
-            && !empty($this->api_login)
-            && !empty($this->api_password);
+        try {
+            return !empty($this->api_url)
+                && !empty($this->api_key)
+                && !empty($this->api_login)
+                && !empty($this->api_password);
+        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            return false;
+        }
     }
 
     /**

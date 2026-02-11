@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('sage_intacct_settings', function (Blueprint $table) {
-            $table->string('gift_id_field_name', 100)->default('DP_GIFT_ID')->after('default_payment_method');
+            $table->string('gift_id_field_name', 100)->default('GIFT_ID')->after('default_payment_method');
         });
     }
 

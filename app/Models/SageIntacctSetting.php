@@ -115,21 +115,23 @@ class SageIntacctSetting extends Model
      */
     public function isConfigured(): bool
     {
-        $authMethod = $this->auth_method ?? 'xml';
+        try {
+            $authMethod = $this->auth_method ?? 'xml';
 
-        if ($authMethod === 'oauth') {
-            // Check if OAuth/REST API credentials are configured
-            return ! empty($this->company_id)
-                && ! empty($this->client_id)
-                && ! empty($this->client_secret)
-                && ! empty($this->redirect_uri);
-        } else {
-            // Check if XML Web Services credentials are configured
-            return ! empty($this->company_id)
-                && ! empty($this->sender_id)
-                && ! empty($this->sender_password)
-                && ! empty($this->web_services_user_id)
-                && ! empty($this->web_services_password);
+            if ($authMethod === 'oauth') {
+                return ! empty($this->company_id)
+                    && ! empty($this->client_id)
+                    && ! empty($this->client_secret)
+                    && ! empty($this->redirect_uri);
+            } else {
+                return ! empty($this->company_id)
+                    && ! empty($this->sender_id)
+                    && ! empty($this->sender_password)
+                    && ! empty($this->web_services_user_id)
+                    && ! empty($this->web_services_password);
+            }
+        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            return false;
         }
     }
 
