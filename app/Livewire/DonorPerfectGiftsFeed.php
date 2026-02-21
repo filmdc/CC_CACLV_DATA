@@ -6,6 +6,7 @@ use App\Services\DonorPerfectGiftService;
 use App\Traits\WithPermissionChecks;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -14,32 +15,46 @@ class DonorPerfectGiftsFeed extends Component
     use WithPagination, WithPermissionChecks;
 
     // Tab state
+    #[Url]
     public $activeTab = 'gifts';
 
+    #[Url]
     public $search = '';
 
+    #[Url]
     public $startDate;
 
+    #[Url]
     public $endDate;
 
+    #[Url]
     public $syncStatusFilter = 'all'; // all, success, failed, pending, not_synced
 
+    #[Url]
     public $giftTypeFilter = '';
 
+    #[Url]
     public $paymentTypeFilter = '';
 
+    #[Url]
     public $glCodeFilter = '';
 
+    #[Url]
     public $campaignFilter = '';
 
+    #[Url]
     public $solicitCodeFilter = '';
 
+    #[Url]
     public $subSolicitCodeFilter = '';
 
+    #[Url]
     public $checkScanBatchFilter = '';
 
+    #[Url]
     public $sortField = 'gift_date';
 
+    #[Url]
     public $sortDirection = 'desc';
 
     public $showExportModal = false;
@@ -156,9 +171,13 @@ class DonorPerfectGiftsFeed extends Component
         // Check permission
         $this->authorizeAction('donor_gifts.view');
 
-        // Set default dates to last 7 days
-        $this->startDate = Carbon::now()->subDays(7)->format('Y-m-d');
-        $this->endDate = Carbon::now()->format('Y-m-d');
+        // Set default dates to last 7 days only if not already set via URL
+        if (empty($this->startDate)) {
+            $this->startDate = Carbon::now()->subDays(7)->format('Y-m-d');
+        }
+        if (empty($this->endDate)) {
+            $this->endDate = Carbon::now()->format('Y-m-d');
+        }
 
         // Check if code mapping is enabled
         $intacctSetting = \App\Models\SageIntacctSetting::first();
@@ -556,6 +575,20 @@ class DonorPerfectGiftsFeed extends Component
         return $intacctSetting && $intacctSetting->isConfigured();
     }
 
+    /**
+     * Get current Sage Intacct environment string (sandbox or production)
+     */
+    private function getCurrentEnvironment(): string
+    {
+        $setting = \App\Models\SageIntacctSetting::first();
+
+        if ($setting && ! $setting->isSandbox()) {
+            return 'production';
+        }
+
+        return 'sandbox';
+    }
+
     public function getSyncStatus($giftData)
     {
         // Check if this gift has been synced to Intacct
@@ -565,7 +598,11 @@ class DonorPerfectGiftsFeed extends Component
             return 'pending';
         }
 
+        // Filter by current environment so sandbox/production have independent status
+        $currentEnvironment = $this->getCurrentEnvironment();
+
         $syncItem = \App\Models\SageIntacctSyncItem::where('gift_id', $giftId)
+            ->where('environment', $currentEnvironment)
             ->orderBy('created_at', 'desc')
             ->first();
 
@@ -1398,9 +1435,10 @@ class DonorPerfectGiftsFeed extends Component
                 ? \App\Models\SageIntacctFieldMapping::where('setting_id', $settings->id)->orderBy('order')->get()
                 : collect();
 
-            // Sync History tab data
+            // Sync History tab data - filtered by current environment
             $syncHistory = \App\Models\SageIntacctSyncHistory::query()
                 ->with('resetBy')
+                ->where('environment', $this->getCurrentEnvironment())
                 ->when($this->filterStatus, fn ($query) => $query->where('status', $this->filterStatus))
                 ->when($this->filterStartDate, fn ($query) => $query->whereDate('started_at', '>=', $this->filterStartDate))
                 ->when($this->filterEndDate, fn ($query) => $query->whereDate('started_at', '<=', $this->filterEndDate))

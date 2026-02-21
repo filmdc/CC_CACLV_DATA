@@ -93,6 +93,19 @@ class DonorPerfectApiService
      * @param  array  $fields  Optional array of field names to retrieve
      * @return array Array of gift records or error information
      */
+    /**
+     * Page size for keyset pagination.
+     * DonorPerfect API caps results at 500 per query regardless of TOP N.
+     * Must match the API's actual limit so the pagination loop correctly
+     * detects full pages and fetches subsequent pages.
+     */
+    private const PAGE_SIZE = 500;
+
+    /**
+     * Safety cap to prevent runaway loops on huge date ranges.
+     */
+    private const MAX_TOTAL_RECORDS = 50000;
+
     public function getGifts(string $startDate, string $endDate, array $fields = []): array
     {
         try {
@@ -103,144 +116,121 @@ class DonorPerfectApiService
             // Use provided fields or fall back to configured/default fields
             $fieldsToRetrieve = ! empty($fields) ? $fields : $this->setting->getSelectedFields();
 
-            // Map fields to their table sources and aliases
-            $giftFields = [];
-            $donorFields = [];
-            $udfFields = [];
-            $needsUdfJoin = false;
-            $needsDonorJoin = false;
-
-            // Known gift table fields (from dpgift) - normalized to lowercase
-            $knownGiftFields = array_map('strtolower', [
-                'gift_id', 'donor_id', 'record_type', 'gift_date', 'amount', 'gl_code',
-                'solicit_code', 'sub_solicit_code', 'campaign', 'gift_type', 'split_gift',
-                'pledge_payment', 'first_gift', 'reference', 'memory_honor', 'gfname', 'glname',
-                'fmv', 'batch_no', 'gift_narrative', 'ty_letter_no', 'glink', 'plink', 'nocalc',
-                'receipt', 'ty_date', 'start_date', 'total', 'bill', 'balance', 'delinquent',
-                'initial_payment', 'frequency', 'reminder', 'last_bill_date', 'last_paid_date',
-                'writeoff_date', 'writeoff_amount', 'created_by', 'created_date', 'modified_by',
-                'modified_date', 'membership_type', 'membership_level', 'membership_enr_date',
-                'membership_exp_date', 'address_id', 'alink', 'batch_gift_id', 'tlink',
-                'RCPT_TYPE', 'RCPT_STATUS', 'RCPT_DATE', 'RCPT_NUM', 'TRIBUTE_START_DATE',
-                'TRIBUTE_end_DATE', 'TRIBUTE_MAIN_CONTACT', 'tribute_description', 'line_id',
-                'gift_aid_date', 'batch_id_temp', 'gift_aid_amt', 'gift_aid_eligible_g',
-                'currency', 'vault_id', 'transaction_id', 'PAYMENT_TYPE', 'PROCESSING_METHOD',
-                'ACKNOWLEDGEPREF', 'OFFSET_FEE_AMOUNT', 'SETTLEMENT_ID', 'SETTLEMENT_DATE',
-            ]);
-
-            // Known donor table fields (from dp) - normalized to lowercase
-            $knownDonorFields = array_map('strtolower', [
-                'first_name', 'last_name', 'middle_name', 'suffix', 'title', 'salutation',
-                'prof_title', 'opt_line', 'address', 'address2', 'address3', 'address4',
-                'city', 'state', 'zip', 'country', 'address_type', 'home_phone', 'business_phone',
-                'fax_phone', 'mobile_phone', 'email', 'org_rec', 'donor_type', 'nomail',
-                'nomail_reason', 'narrative', 'tag_date', 'initial_gift_date', 'last_contrib_date',
-                'last_contrib_amt', 'ytd', 'gift_total', 'gifts', 'max_date', 'max_amt', 'avg_amt',
-                'yrs_donated', 'donor_rcpt_type', 'receipt_delivery', 'no_email', 'no_email_reason',
-            ]);
-
-            foreach ($fieldsToRetrieve as $field) {
-                $fieldLower = strtolower($field);
-
-                // Fields that exist in dpgift table
-                if (in_array($fieldLower, $knownGiftFields)) {
-                    $giftFields[] = "g.$field";
-                }
-                // Fields that exist in dp (donor) table
-                elseif (in_array($fieldLower, $knownDonorFields)) {
-                    $donorFields[] = "d.$field";
-                    $needsDonorJoin = true;
-                }
-                // Special case: phone field maps to home_phone
-                elseif ($fieldLower === 'phone' || $fieldLower === 'home_phone') {
-                    $donorFields[] = 'd.home_phone as phone';
-                    $needsDonorJoin = true;
-                }
-                // Any other field - assume it's a UDF field
-                else {
-                    $udfFields[] = "u.$field";
-                    $needsUdfJoin = true;
-                }
+            // Ensure gift_id is always included (needed for keyset pagination)
+            if (! in_array('gift_id', array_map('strtolower', $fieldsToRetrieve))) {
+                array_unshift($fieldsToRetrieve, 'gift_id');
             }
 
-            // Combine all fields
-            $allFields = array_merge($giftFields, $donorFields, $udfFields);
-            $fieldsList = implode(', ', $allFields);
+            // Build field mappings and FROM/JOIN clauses (reused across pages)
+            $queryParts = $this->buildGiftQueryParts($fieldsToRetrieve);
+            $fieldsList = $queryParts['fieldsList'];
+            $fromClause = $queryParts['fromClause'];
 
             // Convert date format from Y-m-d to M/D/YYYY for DonorPerfect
             $dpStartDate = date('n/j/Y', strtotime($startDate));
             $dpEndDate = date('n/j/Y', strtotime($endDate));
 
-            // Build JOIN query with necessary tables
-            $fromClause = 'FROM dpgift g';
-            if ($needsDonorJoin) {
-                $fromClause .= ' INNER JOIN dp d ON g.donor_id = d.donor_id';
-            }
-            if ($needsUdfJoin) {
-                $fromClause .= ' LEFT JOIN dpgiftudf u ON g.gift_id = u.gift_id';
-            }
-
-            $selectQuery = "SELECT {$fieldsList} {$fromClause} WHERE g.gift_date BETWEEN '{$dpStartDate}' AND '{$dpEndDate}' ORDER BY g.gift_date DESC";
-
-            // Build URL manually to avoid double-encoding the API key (which may already be URL-encoded)
-            $url = $this->setting->api_url.'?apikey='.$this->setting->api_key.'&action='.urlencode($selectQuery);
-
-            Log::info('DonorPerfect API: Fetching gifts', [
+            Log::info('DonorPerfect API: Fetching gifts with pagination', [
                 'start_date' => $startDate,
                 'end_date' => $endDate,
                 'dp_start_date' => $dpStartDate,
                 'dp_end_date' => $dpEndDate,
                 'fields_count' => count($fieldsToRetrieve),
-                'needs_donor_join' => $needsDonorJoin,
-                'needs_udf_join' => $needsUdfJoin,
-                'full_query' => $selectQuery,
+                'page_size' => self::PAGE_SIZE,
             ]);
 
-            // Make API call
-            $response = Http::timeout(60)->get($url);
+            // Paginate using keyset pagination on gift_id
+            $allGifts = [];
+            $lastGiftId = 0;
+            $page = 0;
 
-            if (! $response->successful()) {
-                $statusCode = $response->status();
-                $responseBody = $response->body();
+            do {
+                $page++;
 
-                Log::error('DonorPerfect API gifts request failed', [
-                    'status' => $statusCode,
-                    'response' => substr($responseBody, 0, 500),
-                ]);
-
-                // Check if it's an authentication error
-                if (in_array($statusCode, [401, 403])) {
-                    throw new \Exception('Authentication failed: Invalid API credentials. Please check your API Key in the configuration.', 401);
+                // Build WHERE clause with keyset pagination
+                $whereClause = "WHERE g.gift_date BETWEEN '{$dpStartDate}' AND '{$dpEndDate}'";
+                if ($lastGiftId > 0) {
+                    $whereClause .= " AND g.gift_id > {$lastGiftId}";
                 }
 
-                throw new \Exception('API request failed with status: '.$statusCode);
-            }
+                $selectQuery = 'SELECT TOP '.self::PAGE_SIZE." {$fieldsList} {$fromClause} {$whereClause} ORDER BY g.gift_id ASC";
 
-            // Log the raw response for debugging
-            $responseBody = $response->body();
-            Log::info('DonorPerfect API: Raw response preview', [
-                'status' => $response->status(),
-                'preview' => substr($responseBody, 0, 500),
-                'length' => strlen($responseBody),
+                $url = $this->setting->api_url.'?apikey='.$this->setting->api_key.'&action='.urlencode($selectQuery);
+
+                Log::info('DonorPerfect API: Fetching page', [
+                    'page' => $page,
+                    'last_gift_id' => $lastGiftId,
+                    'query' => $selectQuery,
+                ]);
+
+                $response = Http::timeout(60)->get($url);
+
+                if (! $response->successful()) {
+                    $statusCode = $response->status();
+
+                    Log::error('DonorPerfect API gifts request failed', [
+                        'status' => $statusCode,
+                        'page' => $page,
+                        'response' => substr($response->body(), 0, 500),
+                    ]);
+
+                    if (in_array($statusCode, [401, 403])) {
+                        throw new \Exception('Authentication failed: Invalid API credentials. Please check your API Key in the configuration.', 401);
+                    }
+
+                    throw new \Exception('API request failed with status: '.$statusCode);
+                }
+
+                $result = $this->parseXmlResponse($response->body());
+
+                if (isset($result['error'])) {
+                    throw new \Exception($result['error']);
+                }
+
+                if (isset($result['auth_error']) && $result['auth_error']) {
+                    throw new \Exception($result['error'] ?? 'Authentication failed', 401);
+                }
+
+                $pageGifts = $result['gifts'] ?? [];
+                $pageCount = count($pageGifts);
+
+                Log::info('DonorPerfect API: Page fetched', [
+                    'page' => $page,
+                    'records_on_page' => $pageCount,
+                    'running_total' => count($allGifts) + $pageCount,
+                ]);
+
+                if ($pageCount === 0) {
+                    break;
+                }
+
+                $allGifts = array_merge($allGifts, $pageGifts);
+
+                // Track the last gift_id for the next page
+                $lastGift = end($pageGifts);
+                $lastGiftId = (int) ($lastGift['gift_id'] ?? 0);
+
+                // Safety cap to prevent runaway loops
+                if (count($allGifts) >= self::MAX_TOTAL_RECORDS) {
+                    Log::warning('DonorPerfect API: Hit safety cap', [
+                        'total_records' => count($allGifts),
+                        'max_allowed' => self::MAX_TOTAL_RECORDS,
+                    ]);
+                    break;
+                }
+
+            } while ($pageCount >= self::PAGE_SIZE);
+
+            Log::info('DonorPerfect API: All gifts retrieved successfully', [
+                'total_count' => count($allGifts),
+                'pages_fetched' => $page,
             ]);
 
-            // Parse XML response to array
-            $result = $this->parseXmlResponse($responseBody);
-
-            if (isset($result['error'])) {
-                throw new \Exception($result['error']);
-            }
-
-            if (isset($result['auth_error']) && $result['auth_error']) {
-                throw new \Exception($result['error'] ?? 'Authentication failed', 401);
-            }
-
-            Log::info('DonorPerfect API: Gifts retrieved successfully', [
-                'count' => count($result['gifts'] ?? []),
-                'result_keys' => array_keys($result),
-            ]);
-
-            return $result;
+            return [
+                'success' => true,
+                'gifts' => $allGifts,
+                'count' => count($allGifts),
+            ];
 
         } catch (\Exception $e) {
             Log::error('DonorPerfect API getGifts exception', [
@@ -256,6 +246,83 @@ class DonorPerfectApiService
                 'gifts' => [],
             ];
         }
+    }
+
+    /**
+     * Build the field list and FROM/JOIN clause for gift queries.
+     * Extracted so it can be reused across paginated requests.
+     */
+    private function buildGiftQueryParts(array $fieldsToRetrieve): array
+    {
+        $giftFields = [];
+        $donorFields = [];
+        $udfFields = [];
+        $needsUdfJoin = false;
+        $needsDonorJoin = false;
+
+        // Known gift table fields (from dpgift) - normalized to lowercase
+        $knownGiftFields = array_map('strtolower', [
+            'gift_id', 'donor_id', 'record_type', 'gift_date', 'amount', 'gl_code',
+            'solicit_code', 'sub_solicit_code', 'campaign', 'gift_type', 'split_gift',
+            'pledge_payment', 'first_gift', 'reference', 'memory_honor', 'gfname', 'glname',
+            'fmv', 'batch_no', 'gift_narrative', 'ty_letter_no', 'glink', 'plink', 'nocalc',
+            'receipt', 'ty_date', 'start_date', 'total', 'bill', 'balance', 'delinquent',
+            'initial_payment', 'frequency', 'reminder', 'last_bill_date', 'last_paid_date',
+            'writeoff_date', 'writeoff_amount', 'created_by', 'created_date', 'modified_by',
+            'modified_date', 'membership_type', 'membership_level', 'membership_enr_date',
+            'membership_exp_date', 'address_id', 'alink', 'batch_gift_id', 'tlink',
+            'RCPT_TYPE', 'RCPT_STATUS', 'RCPT_DATE', 'RCPT_NUM', 'TRIBUTE_START_DATE',
+            'TRIBUTE_end_DATE', 'TRIBUTE_MAIN_CONTACT', 'tribute_description', 'line_id',
+            'gift_aid_date', 'batch_id_temp', 'gift_aid_amt', 'gift_aid_eligible_g',
+            'currency', 'vault_id', 'transaction_id', 'PAYMENT_TYPE', 'PROCESSING_METHOD',
+            'ACKNOWLEDGEPREF', 'OFFSET_FEE_AMOUNT', 'SETTLEMENT_ID', 'SETTLEMENT_DATE',
+        ]);
+
+        // Known donor table fields (from dp) - normalized to lowercase
+        $knownDonorFields = array_map('strtolower', [
+            'first_name', 'last_name', 'middle_name', 'suffix', 'title', 'salutation',
+            'prof_title', 'opt_line', 'address', 'address2', 'address3', 'address4',
+            'city', 'state', 'zip', 'country', 'address_type', 'home_phone', 'business_phone',
+            'fax_phone', 'mobile_phone', 'email', 'org_rec', 'donor_type', 'nomail',
+            'nomail_reason', 'narrative', 'tag_date', 'initial_gift_date', 'last_contrib_date',
+            'last_contrib_amt', 'ytd', 'gift_total', 'gifts', 'max_date', 'max_amt', 'avg_amt',
+            'yrs_donated', 'donor_rcpt_type', 'receipt_delivery', 'no_email', 'no_email_reason',
+        ]);
+
+        foreach ($fieldsToRetrieve as $field) {
+            $fieldLower = strtolower($field);
+
+            if (in_array($fieldLower, $knownGiftFields)) {
+                $giftFields[] = "g.$field";
+            } elseif (in_array($fieldLower, $knownDonorFields)) {
+                $donorFields[] = "d.$field";
+                $needsDonorJoin = true;
+            } elseif ($fieldLower === 'phone' || $fieldLower === 'home_phone') {
+                $donorFields[] = 'd.home_phone as phone';
+                $needsDonorJoin = true;
+            } else {
+                $udfFields[] = "u.$field";
+                $needsUdfJoin = true;
+            }
+        }
+
+        $allFields = array_merge($giftFields, $donorFields, $udfFields);
+        $fieldsList = implode(', ', $allFields);
+
+        $fromClause = 'FROM dpgift g';
+        if ($needsDonorJoin) {
+            $fromClause .= ' INNER JOIN dp d ON g.donor_id = d.donor_id';
+        }
+        if ($needsUdfJoin) {
+            $fromClause .= ' LEFT JOIN dpgiftudf u ON g.gift_id = u.gift_id';
+        }
+
+        return [
+            'fieldsList' => $fieldsList,
+            'fromClause' => $fromClause,
+            'needsDonorJoin' => $needsDonorJoin,
+            'needsUdfJoin' => $needsUdfJoin,
+        ];
     }
 
     /**

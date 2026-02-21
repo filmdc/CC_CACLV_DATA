@@ -31,9 +31,19 @@ class DonorPerfectSetting extends Model
 
     /**
      * Default fields to retrieve from DonorPerfect if none are configured.
+     * Includes gift, donor, and UDF fields needed by the gifts feed and batch sync.
      */
     protected const DEFAULT_FIELDS = [
+        'gift_id',
         'donor_id',
+        'gift_date',
+        'amount',
+        'gl_code',
+        'solicit_code',
+        'sub_solicit_code',
+        'campaign',
+        'gift_type',
+        'batch_no',
         'first_name',
         'last_name',
         'email',
@@ -42,9 +52,10 @@ class DonorPerfectSetting extends Model
         'state',
         'zip',
         'phone',
-        'total_donations',
-        'last_gift_date',
-        'last_gift_amount',
+        'PAYMENT_TYPE',
+        'DP_CheckScan_Batch',
+        'IMAGE_CHECK',
+        'BATCH',
     ];
 
     /**
@@ -63,10 +74,10 @@ class DonorPerfectSetting extends Model
     public function isConfigured(): bool
     {
         try {
-            return !empty($this->api_url)
-                && !empty($this->api_key)
-                && !empty($this->api_login)
-                && !empty($this->api_password);
+            return ! empty($this->api_url)
+                && ! empty($this->api_key)
+                && ! empty($this->api_login)
+                && ! empty($this->api_password);
         } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
             return false;
         }
@@ -78,7 +89,7 @@ class DonorPerfectSetting extends Model
      */
     public function getSelectedFields(): array
     {
-        if (!empty($this->selected_fields) && is_array($this->selected_fields)) {
+        if (! empty($this->selected_fields) && is_array($this->selected_fields)) {
             return $this->selected_fields;
         }
 

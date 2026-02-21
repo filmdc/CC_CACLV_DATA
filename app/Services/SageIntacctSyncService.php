@@ -25,6 +25,16 @@ class SageIntacctSyncService
     }
 
     /**
+     * Get the current environment string based on setting/token configuration
+     */
+    private function getCurrentEnvironment(): string
+    {
+        $isSandbox = $this->userToken ? $this->userToken->isSandbox() : $this->setting->isSandbox();
+
+        return $isSandbox ? 'sandbox' : 'production';
+    }
+
+    /**
      * Sync gifts for a specific date range
      *
      * @param  Carbon  $startDate  Start date for gift sync
@@ -91,8 +101,11 @@ class SageIntacctSyncService
                 ]);
 
                 // CRITICAL: Filter out already successfully synced gifts to prevent duplicates
+                // Only filter by sync items in the CURRENT environment
+                $environment = $this->getCurrentEnvironment();
                 $syncedGiftIds = DB::table('sage_intacct_sync_items')
                     ->where('status', 'success')
+                    ->where('environment', $environment)
                     ->pluck('gift_id')
                     ->toArray();
 
@@ -111,6 +124,7 @@ class SageIntacctSyncService
                     'already_synced' => $filteredCount,
                     'remaining_to_sync' => count($gifts),
                     'synced_gift_ids' => $syncedGiftIds,
+                    'environment' => $environment,
                 ]);
             } else {
                 // Get all gifts from DonorPerfect (don't filter by local sync status)
@@ -130,9 +144,11 @@ class SageIntacctSyncService
                     'count' => count($gifts),
                 ]);
 
-                // Filter out already successfully synced gifts
+                // Filter out already successfully synced gifts in the CURRENT environment
+                $environment = $this->getCurrentEnvironment();
                 $syncedGiftIds = DB::table('sage_intacct_sync_items')
                     ->where('status', 'success')
+                    ->where('environment', $environment)
                     ->pluck('gift_id')
                     ->toArray();
 
@@ -148,6 +164,7 @@ class SageIntacctSyncService
                     'total_gifts' => $originalCount,
                     'already_synced' => count($syncedGiftIds),
                     'syncable' => count($gifts),
+                    'environment' => $environment,
                 ]);
             }
 
@@ -897,6 +914,11 @@ class SageIntacctSyncService
             $customFields['CHECK_SCAN_BATCH_ID'] = $giftData['DP_CheckScan_Batch'];
         }
 
+        // Add Manual Batch custom field if present (from DP BATCH UDF)
+        if (! empty($giftData['BATCH'])) {
+            $customFields['MANUAL_BATCH'] = $giftData['BATCH'];
+        }
+
         // Add Gift ID custom field for DonorPerfect gift tracking
         // Uses configurable field name from settings (default: GIFT_ID)
         if (! empty($giftData['gift_id'])) {
@@ -953,6 +975,7 @@ class SageIntacctSyncService
             $historyId = DB::table('sage_intacct_sync_history')->insertGetId([
                 'triggered_by' => 'user:'.$userId,
                 'executed_by_user_id' => $userId,
+                'environment' => $this->getCurrentEnvironment(),
                 'status' => 'running',
                 'total_records' => $totalRecords,
                 'successful_count' => 0,
@@ -1388,6 +1411,7 @@ class SageIntacctSyncService
         try {
             $itemId = DB::table('sage_intacct_sync_items')->insertGetId([
                 'sync_history_id' => $syncHistory->id,
+                'environment' => $this->getCurrentEnvironment(),
                 'gift_id' => $giftData['gift_id'] ?? null,
                 'gift_cache_id' => null, // TODO: Link to gift cache if needed
                 'gift_data' => json_encode($giftData),
