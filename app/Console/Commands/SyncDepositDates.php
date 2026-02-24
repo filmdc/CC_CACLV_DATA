@@ -166,21 +166,57 @@ class SyncDepositDates extends Command
             return Command::SUCCESS;
         }
 
-        $this->info("Processing up to {$batchSize} items...");
+        $this->info("Processing all {$pendingCount} items in batches of {$batchSize}...");
         $this->newLine();
 
-        // Show progress bar
-        $progressBar = $this->output->createProgressBar(min($batchSize, $pendingCount));
+        // Show progress bar for total pending items
+        $progressBar = $this->output->createProgressBar($pendingCount);
         $progressBar->start();
 
-        // Run sync
-        $result = $service->sync($batchSize, $dryRun);
+        // Loop through all pending items in batches
+        $totals = [
+            'total_pending' => 0,
+            'sage_queried' => 0,
+            'deposited_found' => 0,
+            'dp_updated' => 0,
+            'dp_failed' => 0,
+            'errors' => [],
+            'batches' => 0,
+        ];
+        $hasErrors = false;
+
+        while (true) {
+            $result = $service->sync($batchSize, $dryRun);
+            $totals['batches']++;
+            $totals['total_pending'] += $result['total_pending'];
+            $totals['sage_queried'] += $result['sage_queried'];
+            $totals['deposited_found'] += $result['deposited_found'];
+            $totals['dp_updated'] += $result['dp_updated'];
+            $totals['dp_failed'] += $result['dp_failed'];
+            $totals['errors'] = array_merge($totals['errors'], $result['errors'] ?? []);
+
+            if (! $result['success']) {
+                $hasErrors = true;
+            }
+
+            $progressBar->advance($result['total_pending']);
+
+            // Stop if this batch had no items (we've processed everything)
+            if ($result['total_pending'] === 0) {
+                break;
+            }
+
+            // Stop if we got fewer items than the batch size (last batch)
+            if ($result['total_pending'] < $batchSize) {
+                break;
+            }
+        }
 
         $progressBar->finish();
         $this->newLine(2);
 
         // Display results
-        if ($result['success']) {
+        if (! $hasErrors) {
             $this->info('Sync completed successfully!');
         } else {
             $this->error('Sync completed with errors.');
@@ -190,26 +226,27 @@ class SyncDepositDates extends Command
         $this->table(
             ['Metric', 'Count'],
             [
-                ['Total pending', $result['total_pending']],
-                ['Queried from Sage', $result['sage_queried']],
-                ['Found with deposit date', $result['deposited_found']],
-                ['Updated in DonorPerfect', $result['dp_updated']],
-                ['Failed to update', $result['dp_failed']],
+                ['Total processed', $totals['total_pending']],
+                ['Batches run', $totals['batches']],
+                ['Queried from Sage', $totals['sage_queried']],
+                ['Found with deposit date', $totals['deposited_found']],
+                ['Updated in DonorPerfect', $totals['dp_updated']],
+                ['Failed to update', $totals['dp_failed']],
             ]
         );
 
-        if (! empty($result['errors'])) {
+        if (! empty($totals['errors'])) {
             $this->newLine();
             $this->warn('Errors:');
-            foreach (array_slice($result['errors'], 0, 10) as $error) {
+            foreach (array_slice($totals['errors'], 0, 10) as $error) {
                 $this->line('  - '.$error);
             }
-            if (count($result['errors']) > 10) {
-                $this->line('  ... and '.(count($result['errors']) - 10).' more errors');
+            if (count($totals['errors']) > 10) {
+                $this->line('  ... and '.(count($totals['errors']) - 10).' more errors');
             }
         }
 
-        return $result['success'] ? Command::SUCCESS : Command::FAILURE;
+        return ! $hasErrors ? Command::SUCCESS : Command::FAILURE;
     }
 
     /**
