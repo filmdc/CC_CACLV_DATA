@@ -30,6 +30,8 @@ class DepositDateSyncService
 
     private ?UserSageIntacctToken $userToken = null;
 
+    private ?string $environment = null;
+
     /**
      * The DonorPerfect UDF field name for deposit date
      */
@@ -44,6 +46,26 @@ class DepositDateSyncService
     {
         $this->userToken = $userToken;
         $this->initialize();
+    }
+
+    /**
+     * Get the current environment based on settings/token configuration
+     */
+    public function getEnvironment(): string
+    {
+        if ($this->environment !== null) {
+            return $this->environment;
+        }
+
+        if ($this->userToken) {
+            $this->environment = $this->userToken->isSandbox() ? 'sandbox' : 'production';
+        } elseif ($this->sageSetting) {
+            $this->environment = $this->sageSetting->isSandbox() ? 'sandbox' : 'production';
+        } else {
+            $this->environment = 'production';
+        }
+
+        return $this->environment;
     }
 
     /**
@@ -131,6 +153,7 @@ class DepositDateSyncService
             Log::info('DepositDateSync: Starting sync', [
                 'pending_count' => $pendingItems->count(),
                 'dry_run' => $dryRun,
+                'environment' => $this->getEnvironment(),
             ]);
 
             // Step 2: Query Sage Intacct for deposit status
@@ -232,7 +255,7 @@ class DepositDateSyncService
      */
     public function getPendingItems(int $limit = 100): Collection
     {
-        return SageIntacctSyncItem::needsDepositSync()
+        return SageIntacctSyncItem::needsDepositSync($this->getEnvironment())
             ->orderBy('synced_at', 'asc')
             ->limit($limit)
             ->get();
@@ -243,7 +266,7 @@ class DepositDateSyncService
      */
     public function getPendingCount(): int
     {
-        return SageIntacctSyncItem::needsDepositSync()->count();
+        return SageIntacctSyncItem::needsDepositSync($this->getEnvironment())->count();
     }
 
     /**
@@ -253,7 +276,7 @@ class DepositDateSyncService
      */
     public function getItemsWithDepositDatePendingSync(int $limit = 100): Collection
     {
-        return SageIntacctSyncItem::hasDepositDatePendingSync()
+        return SageIntacctSyncItem::hasDepositDatePendingSync($this->getEnvironment())
             ->orderBy('sage_deposit_date', 'asc')
             ->limit($limit)
             ->get();
@@ -264,7 +287,7 @@ class DepositDateSyncService
      */
     public function getItemsWithErrors(): Collection
     {
-        return SageIntacctSyncItem::withDepositSyncErrors()->get();
+        return SageIntacctSyncItem::withDepositSyncErrors($this->getEnvironment())->get();
     }
 
     /**
@@ -370,25 +393,30 @@ class DepositDateSyncService
      */
     public function getStatistics(): array
     {
+        $env = $this->getEnvironment();
+
         $totalSynced = SageIntacctSyncItem::where('status', SageIntacctSyncItem::STATUS_SUCCESS)
             ->whereNotNull('intacct_record_id')
+            ->where('environment', $env)
             ->count();
 
-        $pendingDepositCheck = SageIntacctSyncItem::needsDepositSync()
+        $pendingDepositCheck = SageIntacctSyncItem::needsDepositSync($env)
             ->whereNull('sage_deposit_date')
             ->count();
 
         $hasDepositDate = SageIntacctSyncItem::where('status', SageIntacctSyncItem::STATUS_SUCCESS)
             ->whereNotNull('sage_deposit_date')
+            ->where('environment', $env)
             ->count();
 
-        $pendingDpUpdate = SageIntacctSyncItem::hasDepositDatePendingSync()->count();
+        $pendingDpUpdate = SageIntacctSyncItem::hasDepositDatePendingSync($env)->count();
 
         $syncedToDP = SageIntacctSyncItem::where('status', SageIntacctSyncItem::STATUS_SUCCESS)
             ->whereNotNull('deposit_date_synced_at')
+            ->where('environment', $env)
             ->count();
 
-        $withErrors = SageIntacctSyncItem::withDepositSyncErrors()->count();
+        $withErrors = SageIntacctSyncItem::withDepositSyncErrors($env)->count();
 
         return [
             'total_synced_to_sage' => $totalSynced,
@@ -397,6 +425,7 @@ class DepositDateSyncService
             'pending_dp_update' => $pendingDpUpdate,
             'synced_to_dp' => $syncedToDP,
             'with_errors' => $withErrors,
+            'environment' => $env,
         ];
     }
 

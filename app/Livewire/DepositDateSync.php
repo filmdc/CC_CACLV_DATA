@@ -39,6 +39,9 @@ class DepositDateSync extends Component
 
     public $configurationStatus = [];
 
+    // Current environment
+    public $currentEnvironment = 'production';
+
     public function mount()
     {
         $this->loadStatistics();
@@ -55,6 +58,7 @@ class DepositDateSync extends Component
 
         $this->isConfigured = $service->isConfigured();
         $this->configurationStatus = $service->getConfigurationStatus();
+        $this->currentEnvironment = $service->getEnvironment();
     }
 
     /**
@@ -196,7 +200,7 @@ class DepositDateSync extends Component
      */
     public function getPendingItemsProperty()
     {
-        $query = SageIntacctSyncItem::needsDepositSync()
+        $query = SageIntacctSyncItem::needsDepositSync($this->currentEnvironment)
             ->orderBy('synced_at', 'desc');
 
         if (! empty($this->searchGiftId)) {
@@ -211,7 +215,7 @@ class DepositDateSync extends Component
      */
     public function getItemsWithDepositDatesProperty()
     {
-        return SageIntacctSyncItem::hasDepositDatePendingSync()
+        return SageIntacctSyncItem::hasDepositDatePendingSync($this->currentEnvironment)
             ->orderBy('sage_deposit_date', 'desc')
             ->paginate(15, ['*'], 'depositPage');
     }
@@ -221,7 +225,7 @@ class DepositDateSync extends Component
      */
     public function getItemsWithErrorsProperty()
     {
-        return SageIntacctSyncItem::withDepositSyncErrors()
+        return SageIntacctSyncItem::withDepositSyncErrors($this->currentEnvironment)
             ->orderBy('updated_at', 'desc')
             ->paginate(15, ['*'], 'errorsPage');
     }
@@ -232,6 +236,7 @@ class DepositDateSync extends Component
     public function getRecentlySyncedItemsProperty()
     {
         return SageIntacctSyncItem::whereNotNull('deposit_date_synced_at')
+            ->where('environment', $this->currentEnvironment)
             ->orderBy('deposit_date_synced_at', 'desc')
             ->limit(20)
             ->get();

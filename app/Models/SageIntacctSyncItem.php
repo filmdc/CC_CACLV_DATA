@@ -31,6 +31,7 @@ class SageIntacctSyncItem extends Model
 
     protected $fillable = [
         'sync_history_id',
+        'environment',
         'gift_cache_id',
         'gift_id',
         'status',
@@ -198,30 +199,54 @@ class SageIntacctSyncItem extends Model
     /**
      * Scope: Items that need deposit date sync
      * (Successfully synced to Sage with an Intacct record ID, but deposit date not yet synced back to DP)
+     *
+     * @param  string|null  $environment  Filter by environment ('sandbox' or 'production'). Null = no filter.
      */
-    public function scopeNeedsDepositSync($query)
+    public function scopeNeedsDepositSync($query, ?string $environment = null)
     {
-        return $query->where('status', self::STATUS_SUCCESS)
+        $query->where('status', self::STATUS_SUCCESS)
             ->whereNotNull('intacct_record_id')
             ->whereNull('deposit_date_synced_at');
+
+        if ($environment !== null) {
+            $query->where('environment', $environment);
+        }
+
+        return $query;
     }
 
     /**
      * Scope: Items that have a deposit date from Sage but not synced to DP
+     *
+     * @param  string|null  $environment  Filter by environment ('sandbox' or 'production'). Null = no filter.
      */
-    public function scopeHasDepositDatePendingSync($query)
+    public function scopeHasDepositDatePendingSync($query, ?string $environment = null)
     {
-        return $query->where('status', self::STATUS_SUCCESS)
+        $query->where('status', self::STATUS_SUCCESS)
             ->whereNotNull('intacct_record_id')
             ->whereNotNull('sage_deposit_date')
             ->whereNull('deposit_date_synced_at');
+
+        if ($environment !== null) {
+            $query->where('environment', $environment);
+        }
+
+        return $query;
     }
 
     /**
      * Scope: Items with deposit date sync errors
+     *
+     * @param  string|null  $environment  Filter by environment ('sandbox' or 'production'). Null = no filter.
      */
-    public function scopeWithDepositSyncErrors($query)
+    public function scopeWithDepositSyncErrors($query, ?string $environment = null)
     {
-        return $query->whereNotNull('deposit_sync_error');
+        $query->whereNotNull('deposit_sync_error');
+
+        if ($environment !== null) {
+            $query->where('environment', $environment);
+        }
+
+        return $query;
     }
 }

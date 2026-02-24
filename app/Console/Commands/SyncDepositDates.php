@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\SageIntacctSetting;
 use App\Models\User;
+use App\Models\UserSageIntacctToken;
 use App\Services\DepositDateSyncService;
 use Illuminate\Console\Command;
 
@@ -51,31 +52,36 @@ class SyncDepositDates extends Command
         if (! $sageSetting->isXmlApi()) {
             $userId = $this->option('user-id');
 
-            if (! $userId) {
-                $this->error('User ID is required for OAuth-based authentication.');
-                $this->info('Usage: php artisan intacct:sync-deposit-dates --user-id=1');
+            if ($userId) {
+                $user = User::find($userId);
 
-                return Command::FAILURE;
+                if (! $user) {
+                    $this->error('User not found with ID: '.$userId);
+
+                    return Command::FAILURE;
+                }
+
+                $userToken = $user->sageIntacctToken;
+            } else {
+                // Auto-detect: find any user with a valid OAuth token
+                $userToken = UserSageIntacctToken::whereNotNull('access_token')
+                    ->whereNotNull('company_id')
+                    ->latest('updated_at')
+                    ->first();
+
+                if ($userToken) {
+                    $this->info('Auto-detected OAuth token for user ID: '.$userToken->user_id);
+                }
             }
-
-            $user = User::find($userId);
-
-            if (! $user) {
-                $this->error('User not found with ID: '.$userId);
-
-                return Command::FAILURE;
-            }
-
-            $userToken = $user->sageIntacctToken;
 
             if (! $userToken || ! $userToken->hasValidToken()) {
-                $this->error('User does not have a valid Sage Intacct OAuth token.');
-                $this->info('The user must authorize access via the web interface first.');
+                $this->error('No valid Sage Intacct OAuth token available.');
+                $this->info('Either pass --user-id=N or ensure a user has authorized via the web interface.');
 
                 return Command::FAILURE;
             }
 
-            $this->info('Using OAuth token for user: '.$user->name);
+            $this->info('Using OAuth token for user: '.($userToken->user->name ?? 'ID '.$userToken->user_id));
         } else {
             $this->info('Using XML Web Services authentication');
         }
@@ -84,6 +90,7 @@ class SyncDepositDates extends Command
 
         // Initialize the service
         $service = new DepositDateSyncService($userToken);
+        $this->info('Environment: '.$service->getEnvironment());
 
         if (! $service->isConfigured()) {
             $this->error('Deposit date sync service is not properly configured.');

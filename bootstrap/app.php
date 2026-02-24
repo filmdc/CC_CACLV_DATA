@@ -1,9 +1,9 @@
 <?php
 
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Console\Scheduling\Schedule;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -43,8 +43,21 @@ return Application::configure(basePath: dirname(__DIR__))
             ->timezone('America/Los_Angeles')
             ->when(function () {
                 $setting = \App\Models\SageIntacctSetting::where('is_active', true)->first();
+
                 return $setting && $setting->isConfigured();
             });
+
+        // Sync deposit dates from Sage Intacct back to DonorPerfect daily at 4:00 AM PST
+        $schedule->command('intacct:sync-deposit-dates')
+            ->daily()
+            ->at('04:00')
+            ->timezone('America/Los_Angeles')
+            ->when(function () {
+                $setting = \App\Models\SageIntacctSetting::where('is_active', true)->first();
+
+                return $setting && $setting->isConfigured();
+            })
+            ->description('Sync deposit dates from Sage Intacct back to DonorPerfect');
 
         // Discover DonorPerfect codes daily at 3:00 AM PST (for code mapping)
         $schedule->command('dp:discover-codes --days=90')
@@ -53,6 +66,7 @@ return Application::configure(basePath: dirname(__DIR__))
             ->timezone('America/Los_Angeles')
             ->when(function () {
                 $setting = \App\Models\SageIntacctSetting::where('is_active', true)->first();
+
                 return $setting && $setting->code_mapping_enabled;
             });
     })
