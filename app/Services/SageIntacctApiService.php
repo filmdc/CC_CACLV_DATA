@@ -2709,7 +2709,9 @@ XML;
             $query = "RECORDNO IN ({$recordNoList})";
 
             // Fields to retrieve for deposit tracking
-            $fields = 'RECORDNO,PAYEE,REFID,PAYMENTDATE,RECEIVEDDATE,DEPOSITDATE,BANKACCOUNTID,UNDEPGLACCOUNTNO,STATE,TOTALENTERED';
+            // OTHERRECEIPTS uses different field names than the legacy create function
+            // Note: UNDEPACCTNO not supported in readByQuery
+            $fields = 'RECORDNO,DESCRIPTION2,DOCNUMBER,WHENPAID,WHENCREATED,DEPOSITDATE,BANKACCOUNTID,STATE,TOTALENTERED';
 
             Log::info('Sage Intacct: Querying Other Receipts', [
                 'record_count' => count($recordNos),
@@ -2784,8 +2786,8 @@ XML;
             $filter = urlencode("RECORDNO in ({$recordNoList})");
 
             $apiUrl = 'https://api.intacct.com/ia/api/v1/companies/'.urlencode($this->userToken->company_id).
-                      '/objects/OTHERCASHRECEIPT?filter='.$filter.
-                      '&fields=RECORDNO,PAYEE,REFID,PAYMENTDATE,RECEIVEDDATE,DEPOSITDATE,BANKACCOUNTID,UNDEPGLACCOUNTNO,STATE,TOTALENTERED';
+                      '/objects/OTHERRECEIPTS?filter='.$filter.
+                      '&fields=RECORDNO,DESCRIPTION2,DOCNUMBER,WHENPAID,WHENCREATED,DEPOSITDATE,BANKACCOUNTID,STATE,TOTALENTERED';
 
             Log::info('Sage Intacct OAuth: Querying Other Receipts', [
                 'record_count' => count($recordNos),
@@ -2895,7 +2897,7 @@ XML;
         <content>
             <function controlid="{$functionId}">
                 <readByQuery>
-                    <object>OTHERCASHRECEIPT</object>
+                    <object>OTHERRECEIPTS</object>
                     <query>{$sanitizedQuery}</query>
                     <fields>{$fields}</fields>
                     <pagesize>1000</pagesize>
@@ -2923,24 +2925,38 @@ XML;
             $receipts = [];
 
             // Try different possible response structures
-            $dataNodes = $xml->xpath('//result/data/OTHERCASHRECEIPT');
+            // Sage Intacct returns <otherreceipts> nodes (lowercase) for the OTHERRECEIPTS object
+            $dataNodes = $xml->xpath('//result/data/otherreceipts');
             if (empty($dataNodes)) {
-                $dataNodes = $xml->xpath('//data/OTHERCASHRECEIPT');
+                $dataNodes = $xml->xpath('//result/data/OTHERRECEIPTS');
             }
             if (empty($dataNodes)) {
-                $dataNodes = $xml->xpath('//OTHERCASHRECEIPT');
+                $dataNodes = $xml->xpath('//data/otherreceipts');
+            }
+            if (empty($dataNodes)) {
+                $dataNodes = $xml->xpath('//data/OTHERRECEIPTS');
             }
 
             foreach ($dataNodes as $node) {
+                // Normalize deposit date to Y-m-d format
+                // Sage returns MM/DD/YYYY from readByQuery but YYYY-MM-DD from read
+                $rawDepositDate = (string) ($node->DEPOSITDATE ?? '');
+                if (! empty($rawDepositDate)) {
+                    $parsedDate = date_create($rawDepositDate);
+                    if ($parsedDate) {
+                        $rawDepositDate = $parsedDate->format('Y-m-d');
+                    }
+                }
+
                 $receipt = [
                     'recordno' => (string) ($node->RECORDNO ?? ''),
-                    'payee' => (string) ($node->PAYEE ?? ''),
-                    'refid' => (string) ($node->REFID ?? ''),
-                    'paymentdate' => (string) ($node->PAYMENTDATE ?? ''),
-                    'receiveddate' => (string) ($node->RECEIVEDDATE ?? ''),
-                    'depositdate' => (string) ($node->DEPOSITDATE ?? ''),
+                    'payee' => (string) ($node->DESCRIPTION2 ?? $node->PAYEE ?? ''),
+                    'refid' => (string) ($node->DOCNUMBER ?? $node->REFID ?? ''),
+                    'paymentdate' => (string) ($node->WHENPAID ?? $node->PAYMENTDATE ?? ''),
+                    'receiveddate' => (string) ($node->WHENCREATED ?? $node->RECEIVEDDATE ?? ''),
+                    'depositdate' => $rawDepositDate,
                     'bankaccountid' => (string) ($node->BANKACCOUNTID ?? ''),
-                    'undepglaccountno' => (string) ($node->UNDEPGLACCOUNTNO ?? ''),
+                    'undepglaccountno' => (string) ($node->UNDEPACCTNO ?? $node->UNDEPGLACCOUNTNO ?? ''),
                     'state' => (string) ($node->STATE ?? ''),
                     'totalentered' => (string) ($node->TOTALENTERED ?? ''),
                 ];
