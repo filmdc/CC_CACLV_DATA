@@ -163,6 +163,10 @@ Route::middleware(['auth'])->group(function () {
         ->name('donor-gifts.audit-log');
 
     // Batch Sync Routes
+    Route::get('donor-gifts/manual-batch-sync', App\Livewire\DonorPerfectManualBatchSync::class)
+        ->middleware(['auth', 'permission:donor_gifts.view'])
+        ->name('donor-gifts.manual-batch-sync');
+
     Route::get('donor-gifts/batch-sync', App\Livewire\DonorPerfectBatchSync::class)
         ->middleware(['auth', 'permission:donor_gifts.view'])
         ->name('donor-gifts.batch-sync');
@@ -211,6 +215,50 @@ Route::middleware(['auth'])->group(function () {
         ])->deleteFileAfterSend(true);
     })->middleware(['auth', 'permission:donor_gifts.view'])
         ->name('donor-gifts.batch-preview-excel-download');
+
+    Route::get('donor-gifts/manual-batch-sync-download', function () {
+        $exportData = session()->get('manual_batch_sync_export');
+
+        if (! $exportData || ! isset($exportData['filepath'])) {
+            return redirect()->route('donor-gifts.manual-batch-sync')->with('error', 'Export not found or expired.');
+        }
+
+        $filepath = $exportData['filepath'];
+        $filename = $exportData['filename'];
+
+        if (! file_exists($filepath)) {
+            return redirect()->route('donor-gifts.manual-batch-sync')->with('error', 'Export file not found.');
+        }
+
+        session()->forget('manual_batch_sync_export');
+
+        return response()->download($filepath, $filename, [
+            'Content-Type' => 'text/csv',
+        ])->deleteFileAfterSend(true);
+    })->middleware(['auth', 'permission:donor_gifts.view'])
+        ->name('donor-gifts.manual-batch-sync-download');
+
+    Route::get('donor-gifts/manual-batch-preview-excel-download', function () {
+        $exportData = session()->get('manual_batch_preview_excel_export');
+
+        if (! $exportData || ! isset($exportData['filepath'])) {
+            return redirect()->route('donor-gifts.manual-batch-sync')->with('error', 'Export not found or expired.');
+        }
+
+        $filepath = $exportData['filepath'];
+        $filename = $exportData['filename'];
+
+        if (! file_exists($filepath)) {
+            return redirect()->route('donor-gifts.manual-batch-sync')->with('error', 'Export file not found.');
+        }
+
+        session()->forget('manual_batch_preview_excel_export');
+
+        return response()->download($filepath, $filename, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ])->deleteFileAfterSend(true);
+    })->middleware(['auth', 'permission:donor_gifts.view'])
+        ->name('donor-gifts.manual-batch-preview-excel-download');
 
     // Sage Intacct Routes
     Route::get('/accounting/sage-intacct/configuration', \App\Livewire\SageIntacctConfiguration::class)

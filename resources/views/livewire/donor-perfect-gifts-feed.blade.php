@@ -208,7 +208,7 @@
                 </div>
 
                 <!-- Sync Status Filter -->
-                @if($intacctConfigured)
+                @if($intacctConfigured ?? false)
                 <div>
                     <label for="syncStatusFilter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Sync Status
@@ -388,7 +388,7 @@
 
                 <div class="flex items-center space-x-2">
                     <!-- Sage Intacct Sync Button -->
-                    @if($intacctConfigured && $this->canAny(['sage.sync.perform', 'intacct.sync']))
+                    @if(($intacctConfigured ?? false) && $this->canAny(['sage.sync.perform', 'intacct.sync']))
                         @php
                             $intacctSetting = \App\Models\SageIntacctSetting::getActive();
                             $isXmlMode = $intacctSetting && $intacctSetting->isXmlApi();
@@ -536,7 +536,7 @@
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700">
                         <thead class="bg-gray-50 dark:bg-zinc-700">
                             <tr>
-                                @if($intacctConfigured && $this->canAny(['sage.sync.perform', 'intacct.sync']))
+                                @if(($intacctConfigured ?? false) && $this->canAny(['sage.sync.perform', 'intacct.sync']))
                                 <th scope="col" class="px-4 py-3 text-center">
                                     @php
                                         $visibleGiftIds = $gifts->pluck('gift_id')->filter()->toArray();
@@ -549,7 +549,7 @@
                                            title="{{ $allVisibleSelected ? 'Deselect all visible gifts' : 'Select all visible gifts' }}">
                                 </th>
                                 @endif
-                                @if($intacctConfigured)
+                                @if($intacctConfigured ?? false)
                                 <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Sync Status</th>
                                 @endif
                                 <!-- Sortable Headers -->
@@ -635,7 +635,7 @@
                                     {{ $isAlreadySynced ? 'opacity-60' : '' }}
                                     {{ !$isSelected ? 'hover:bg-gray-50 dark:hover:bg-zinc-700' : 'hover:bg-purple-100 dark:hover:bg-purple-900/30' }}
                                 ">
-                                    @if($intacctConfigured && $this->canAny(['sage.sync.perform', 'intacct.sync']))
+                                    @if(($intacctConfigured ?? false) && $this->canAny(['sage.sync.perform', 'intacct.sync']))
                                     <td class="px-4 py-4 text-center" onclick="event.stopPropagation()">
                                         <input type="checkbox"
                                                wire:model.live="selectedGiftsForSync"
@@ -646,7 +646,7 @@
                                                title="{{ $isAlreadySynced ? 'Already synced successfully' : ($isSelected ? 'Selected for sync - click to deselect' : 'Select for sync') }}">
                                     </td>
                                     @endif
-                                    @if($intacctConfigured)
+                                    @if($intacctConfigured ?? false)
                                     <td class="px-4 py-4 text-center">
                                         @if($syncStatus === 'synced' || $syncStatus === 'success')
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"

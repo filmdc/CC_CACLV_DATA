@@ -1313,6 +1313,7 @@ class DonorPerfectGiftsFeed extends Component
                     'gifts' => collect(),
                     'isConfigured' => false,
                     'errorMessage' => 'DonorPerfect API is not configured. Please contact your administrator to configure the connection.',
+                    'intacctConfigured' => false,
                 ])->layout('components.layouts.app');
             }
 
@@ -1333,6 +1334,7 @@ class DonorPerfectGiftsFeed extends Component
                     'isAuthError' => $isAuthError,
                     'totalGifts' => 0,
                     'totalAmount' => 0,
+                    'intacctConfigured' => $this->checkIntacctConfigured(),
                 ])->layout('components.layouts.app');
             }
 
@@ -1490,6 +1492,20 @@ class DonorPerfectGiftsFeed extends Component
                 'isAuthError' => false,
                 'totalGifts' => 0,
                 'totalAmount' => 0,
+                'intacctConfigured' => false,
+                'selectedCount' => 0,
+                'codeMappingEnabled' => $this->codeMappingEnabled ?? false,
+                'useIntacctCodes' => $this->useIntacctCodes ?? false,
+                'fieldMappings' => collect(),
+                'availableDpFields' => [],
+                'syncHistory' => collect(),
+                'uniqueGiftTypes' => collect(),
+                'uniquePaymentTypes' => collect(),
+                'uniqueGlCodes' => collect(),
+                'uniqueCampaigns' => collect(),
+                'uniqueSolicitCodes' => collect(),
+                'uniqueSubSolicitCodes' => collect(),
+                'uniqueCheckScanBatches' => collect(),
             ])->layout('components.layouts.app');
         }
     }
