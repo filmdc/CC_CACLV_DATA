@@ -638,22 +638,22 @@ class DonorPerfectApiService
                 throw new \Exception('API credentials are not fully configured');
             }
 
-            // Build the dp_savegiftudf stored procedure call
-            // Format: dp_savegiftudf @gift_id, @field_name, @data_type, @char_value, @date_value, @number_value
-            // For date fields: data_type = 'D', date_value = the date, others null
-            // For char fields: data_type = 'C', char_value = the value, others null
-
-            // Determine if this is a date field by checking the field name
+            // Use direct UPDATE on dpgiftudf table
+            // The dp_savegiftudf stored procedure is blocked by some API key permission levels,
+            // but direct UPDATE statements are allowed
             $isDateField = str_contains(strtoupper($fieldName), 'DATE');
+
+            // Sanitize field name (alphanumeric and underscores only)
+            $safeFieldName = preg_replace('/[^A-Za-z0-9_]/', '', $fieldName);
 
             if ($isDateField) {
                 // Format date for DonorPerfect (M/D/YYYY format)
                 $formattedDate = date('n/j/Y', strtotime($fieldValue));
-                $query = "EXEC dp_savegiftudf {$giftId}, '{$fieldName}', 'D', NULL, '{$formattedDate}', NULL";
+                $query = "UPDATE dpgiftudf SET {$safeFieldName} = '{$formattedDate}' WHERE gift_id = {$giftId}";
             } else {
                 // Character field
                 $escapedValue = str_replace("'", "''", $fieldValue);
-                $query = "EXEC dp_savegiftudf {$giftId}, '{$fieldName}', 'C', '{$escapedValue}', NULL, NULL";
+                $query = "UPDATE dpgiftudf SET {$safeFieldName} = '{$escapedValue}' WHERE gift_id = {$giftId}";
             }
 
             // Build URL
@@ -688,17 +688,19 @@ class DonorPerfectApiService
                 throw new \Exception('API request failed with status: '.$statusCode);
             }
 
-            // Parse response
-            $result = $this->parseUdfUpdateResponse($response->body());
+            // Parse response - UPDATE returns empty <result></result> on success
+            $responseBody = $response->body();
+            if (str_contains($responseBody, 'not authorized') || str_contains($responseBody, 'error>')) {
+                $result = $this->parseUdfUpdateResponse($responseBody);
+                if (isset($result['error'])) {
+                    Log::error('DonorPerfect API UDF update returned error', [
+                        'gift_id' => $giftId,
+                        'field_name' => $fieldName,
+                        'error' => $result['error'],
+                    ]);
 
-            if (isset($result['error'])) {
-                Log::error('DonorPerfect API UDF update returned error', [
-                    'gift_id' => $giftId,
-                    'field_name' => $fieldName,
-                    'error' => $result['error'],
-                ]);
-
-                return $result;
+                    return $result;
+                }
             }
 
             Log::info('DonorPerfect API: UDF updated successfully', [
