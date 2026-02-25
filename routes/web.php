@@ -651,6 +651,30 @@ Route::middleware(['auth'])->group(function () {
         ->middleware(['permission:approvals.view_dashboard'])
         ->name('approvals.pending');
 
+    Route::get('approvals/submit/{type?}', App\Livewire\ApprovalSubmissionCreate::class)
+        ->middleware(['permission:approvals.submit'])
+        ->name('approvals.submit');
+
+    Route::get('approvals/my-submissions', App\Livewire\MyApprovalSubmissions::class)
+        ->name('approvals.my-submissions');
+
+    Route::get('approvals/audit-report', App\Livewire\ApprovalAuditReport::class)
+        ->middleware(['permission:approvals.view_dashboard'])
+        ->name('approvals.audit-report');
+
+    Route::get('approvals/audit-report-download', function () {
+        $filename = request()->query('file');
+        if (! $filename || ! file_exists(storage_path("app/exports/{$filename}"))) {
+            abort(404, 'Export file not found.');
+        }
+
+        return response()->download(
+            storage_path("app/exports/{$filename}"),
+            $filename,
+            ['Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
+        )->deleteFileAfterSend(true);
+    })->middleware(['permission:approvals.view_dashboard'])->name('approvals.audit-report-download');
+
     // Approval Email Actions (with signed URLs)
     Route::get('approvals/{id}/approve', [App\Http\Controllers\ApprovalController::class, 'approveFromEmail'])
         ->middleware(['signed'])

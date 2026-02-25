@@ -52,17 +52,31 @@ class ApprovalRequestedNotification extends Notification implements ShouldQueue
             'id' => $this->pendingApproval->id
         ]);
 
-        return (new MailMessage)
+        $message = (new MailMessage)
             ->subject("Approval Required: {$itemName}")
             ->greeting("Hello {$notifiable->name},")
             ->line("{$submitter->name} submitted {$itemType} for your approval.")
             ->line("**Item:** {$itemName}")
             ->lineIf($itemDescription, "**Description:** {$itemDescription}")
-            ->lineIf($this->pendingApproval->program_id, "**Program:** {$programName}")
-            ->line("**Submitted on:** {$submittedDate}")
+            ->lineIf($this->pendingApproval->program_id, "**Program:** {$programName}");
+
+        // Add chain step info for multi-step approvals
+        if ($this->pendingApproval->approval_type_id && $this->pendingApproval->approvalType) {
+            $totalSteps = $this->pendingApproval->approvalType->getTotalSteps();
+            if ($totalSteps > 1) {
+                $currentStep = $this->pendingApproval->current_chain_step ?? 1;
+                $chain = $this->pendingApproval->approvalType->getChainForStep($currentStep);
+                $stepName = $chain?->step_name ?? "Step {$currentStep}";
+                $message->line("**Approval Step:** {$stepName} ({$currentStep} of {$totalSteps})");
+            }
+        }
+
+        $message->line("**Submitted on:** {$submittedDate}")
             ->action('Review & Approve', $approveUrl)
             ->action('Reject', $rejectUrl)
             ->line('Please review and take action on this approval request.');
+
+        return $message;
     }
 
     /**

@@ -13,20 +13,24 @@ class ApprovalHistory extends Model
     protected $fillable = [
         'approvable_type',
         'approvable_id',
-        'housing_job_id',
-        'document_type',
-        'document_id',
+        'context_type',
+        'context_id',
+        'approval_type_id',
         'version',
         'action',
         'user_id',
         'reason',
         'notes',
         'metadata',
+        'chain_step',
+        'signature_ip',
+        'signature_user_agent',
     ];
 
     protected $casts = [
         'metadata' => 'array',
         'version' => 'integer',
+        'chain_step' => 'integer',
     ];
 
     public function approvable(): MorphTo
@@ -34,9 +38,14 @@ class ApprovalHistory extends Model
         return $this->morphTo();
     }
 
-    public function housingJob(): BelongsTo
+    public function context(): MorphTo
     {
-        return $this->belongsTo(HousingJob::class);
+        return $this->morphTo();
+    }
+
+    public function approvalType(): BelongsTo
+    {
+        return $this->belongsTo(ApprovalType::class);
     }
 
     public function user(): BelongsTo
@@ -44,15 +53,22 @@ class ApprovalHistory extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function scopeForDocument($query, string $documentType, int $documentId)
+    /**
+     * Scope for filtering by context morph.
+     */
+    public function scopeForContext($query, string $contextType, int $contextId)
     {
-        return $query->where('document_type', $documentType)
-                     ->where('document_id', $documentId);
+        return $query->where('context_type', $contextType)
+                     ->where('context_id', $contextId);
     }
 
+    /**
+     * Scope for filtering by housing job via context morph.
+     */
     public function scopeForJob($query, int $jobId)
     {
-        return $query->where('housing_job_id', $jobId);
+        return $query->where('context_type', HousingJob::class)
+                     ->where('context_id', $jobId);
     }
 
     public function scopeApprovals($query)
@@ -96,76 +112,102 @@ class ApprovalHistory extends Model
     }
 
     /**
-     * Log an approval action
+     * Log an approval action.
+     * Accepts either a HousingJob (legacy) or context type/id for generalized usage.
      */
     public static function logApproval(
         Model $document,
         User $user,
-        ?HousingJob $job = null,
+        ?object $contextOrJob = null,
         ?string $notes = null,
         ?array $metadata = null
     ): self {
-        return self::create([
-            'approvable_type' => get_class($document),
-            'approvable_id' => $document->id,
-            'housing_job_id' => $job?->id,
-            'document_type' => get_class($document),
-            'document_id' => $document->id,
-            'version' => $document->document_version ?? 1,
-            'action' => 'approved',
-            'user_id' => $user->id,
-            'notes' => $notes,
-            'metadata' => $metadata,
-        ]);
+        return self::create(array_merge(
+            self::buildBaseRecord($document, $user, 'approved', $notes, $metadata),
+            self::buildContextFields($contextOrJob),
+        ));
     }
 
     /**
-     * Log a rejection action
+     * Log a rejection action.
      */
     public static function logRejection(
         Model $document,
         User $user,
         string $reason,
-        ?HousingJob $job = null,
+        ?object $contextOrJob = null,
         ?string $notes = null,
         ?array $metadata = null
     ): self {
-        return self::create([
-            'approvable_type' => get_class($document),
-            'approvable_id' => $document->id,
-            'housing_job_id' => $job?->id,
-            'document_type' => get_class($document),
-            'document_id' => $document->id,
-            'version' => $document->document_version ?? 1,
-            'action' => 'rejected',
-            'user_id' => $user->id,
-            'reason' => $reason,
-            'notes' => $notes,
-            'metadata' => $metadata,
-        ]);
+        return self::create(array_merge(
+            self::buildBaseRecord($document, $user, 'rejected', $notes, $metadata),
+            self::buildContextFields($contextOrJob),
+            ['reason' => $reason],
+        ));
     }
 
     /**
-     * Log a resubmission action
+     * Log a resubmission action.
      */
     public static function logResubmission(
         Model $document,
         User $user,
-        ?HousingJob $job = null,
+        ?object $contextOrJob = null,
         ?string $notes = null,
         ?array $metadata = null
     ): self {
-        return self::create([
+        return self::create(array_merge(
+            self::buildBaseRecord($document, $user, 'resubmitted', $notes, $metadata),
+            self::buildContextFields($contextOrJob),
+        ));
+    }
+
+    /**
+     * Build the base record fields shared by all log methods.
+     */
+    private static function buildBaseRecord(
+        Model $document,
+        User $user,
+        string $action,
+        ?string $notes,
+        ?array $metadata
+    ): array {
+        return [
             'approvable_type' => get_class($document),
             'approvable_id' => $document->id,
-            'housing_job_id' => $job?->id,
-            'document_type' => get_class($document),
-            'document_id' => $document->id,
             'version' => $document->document_version ?? 1,
-            'action' => 'resubmitted',
+            'action' => $action,
             'user_id' => $user->id,
             'notes' => $notes,
             'metadata' => $metadata,
-        ]);
+        ];
+    }
+
+    /**
+     * Build context fields from a HousingJob or generic context object.
+     */
+    private static function buildContextFields(?object $contextOrJob): array
+    {
+        if (! $contextOrJob) {
+            return [];
+        }
+
+        // HousingJob context
+        if ($contextOrJob instanceof HousingJob) {
+            return [
+                'context_type' => HousingJob::class,
+                'context_id' => $contextOrJob->id,
+            ];
+        }
+
+        // Generic context model
+        if ($contextOrJob instanceof Model) {
+            return [
+                'context_type' => get_class($contextOrJob),
+                'context_id' => $contextOrJob->id,
+            ];
+        }
+
+        return [];
     }
 }

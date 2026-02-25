@@ -71,7 +71,10 @@ class PendingApprovalsManagement extends Component
                 ],
                 'tasks' => [
                     'App\Models\WorkPlanGoal'
-                ]
+                ],
+                'submissions' => [
+                    'App\Models\ApprovalSubmission'
+                ],
             ];
 
             if (isset($typeMap[$this->filterType])) {
@@ -138,29 +141,34 @@ class PendingApprovalsManagement extends Component
                 return;
             }
 
-            $approval->update([
-                'status' => 'approved',
-                'approver_id' => Auth::id(),
-                'approved_at' => now(),
-            ]);
+            $previousStep = $approval->current_chain_step;
+            $approval->approve(Auth::user());
+            $approval->refresh();
 
-            if ($approval->approvable) {
-                $approval->approvable->update([
-                    'approval_status' => 'approved',
-                    'approved_by' => Auth::id(),
-                    'approved_at' => now(),
+            // Check if chain advanced (still pending) vs fully approved
+            if ($approval->status === 'pending' && $approval->current_chain_step > $previousStep) {
+                session()->flash('message', "Step {$previousStep} approved. Advanced to step {$approval->current_chain_step}.");
+            } else {
+                // Also update the underlying approvable's approval fields if applicable
+                if ($approval->approvable && isset($approval->approvable->approval_status)) {
+                    $approval->approvable->update([
+                        'approval_status' => 'approved',
+                        'approved_by' => Auth::id(),
+                        'approved_at' => now(),
+                    ]);
+                }
+
+                ApprovalNotification::create([
+                    'pending_approval_id' => $approval->id,
+                    'notification_type' => 'approved',
+                    'recipient_id' => $approval->submitted_by,
+                    'sent_at' => now(),
                 ]);
+
+                session()->flash('message', 'Item approved successfully.');
             }
 
-            ApprovalNotification::create([
-                'pending_approval_id' => $approval->id,
-                'notification_type' => 'approved',
-                'recipient_id' => $approval->submitted_by,
-                'sent_at' => now(),
-            ]);
-
             DB::commit();
-            session()->flash('message', 'Item approved successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('error', 'Error approving item: ' . $e->getMessage());
@@ -184,14 +192,9 @@ class PendingApprovalsManagement extends Component
                 return;
             }
 
-            $this->selectedApproval->update([
-                'status' => 'rejected',
-                'approver_id' => Auth::id(),
-                'approved_at' => now(),
-                'rejection_reason' => $this->rejectionReason,
-            ]);
+            $this->selectedApproval->reject(Auth::user(), $this->rejectionReason);
 
-            if ($this->selectedApproval->approvable) {
+            if ($this->selectedApproval->approvable && isset($this->selectedApproval->approvable->approval_status)) {
                 $this->selectedApproval->approvable->update([
                     'approval_status' => 'rejected',
                     'approved_by' => Auth::id(),

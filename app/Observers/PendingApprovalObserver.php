@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Models\ApprovalChain;
 use App\Models\PendingApproval;
 use App\Models\User;
 use App\Notifications\ApprovalActionedNotification;
@@ -16,10 +17,8 @@ class PendingApprovalObserver
      */
     public function created(PendingApproval $pendingApproval): void
     {
-        // Get the approvers for this item
         $approvers = $this->getApprovers($pendingApproval);
 
-        // Send notification to all approvers
         foreach ($approvers as $approver) {
             $approver->notify(new ApprovalRequestedNotification($pendingApproval));
         }
@@ -27,11 +26,23 @@ class PendingApprovalObserver
 
     /**
      * Handle the PendingApproval "updated" event.
-     * Send notification to submitter when approval status changes.
+     * Send notification to submitter when approval status changes,
+     * or notify next-step approvers when chain advances.
      */
     public function updated(PendingApproval $pendingApproval): void
     {
-        // Check if status was changed
+        // Chain step advancement: still pending but step changed
+        if ($pendingApproval->wasChanged('current_chain_step') && $pendingApproval->status === 'pending') {
+            $approvers = $this->getApprovers($pendingApproval);
+
+            foreach ($approvers as $approver) {
+                $approver->notify(new ApprovalRequestedNotification($pendingApproval));
+            }
+
+            return;
+        }
+
+        // Status change notifications
         if ($pendingApproval->wasChanged('status')) {
             $oldStatus = $pendingApproval->getOriginal('status');
             $newStatus = $pendingApproval->status;
@@ -59,18 +70,38 @@ class PendingApprovalObserver
 
     /**
      * Get the list of approvers for a pending approval.
+     * Checks chain-based approvers first, then falls back to permission-based lookup.
      */
     protected function getApprovers(PendingApproval $pendingApproval): array
     {
         // If a specific approver is assigned, return only that user
         if ($pendingApproval->approver_id) {
             $approver = User::find($pendingApproval->approver_id);
+
             return $approver ? [$approver] : [];
         }
 
-        // Otherwise, get all users with approval permission
+        // Check for chain-based approvers via approval_type_id
+        if ($pendingApproval->approval_type_id) {
+            $approvalType = $pendingApproval->approvalType;
+            $currentStep = $pendingApproval->current_chain_step ?? 1;
+
+            if ($approvalType) {
+                $chain = $approvalType->getChainForStep($currentStep);
+
+                if ($chain) {
+                    $chainApprovers = $chain->getQualifiedApprovers();
+
+                    if ($chainApprovers->isNotEmpty()) {
+                        return $chainApprovers->all();
+                    }
+                }
+            }
+        }
+
+        // Fallback: get all users with approval permission
         $approvers = User::whereHas('roles.permissions', function ($query) {
-            $query->where('name', 'approvals.approve');
+            $query->where('name', 'approvals.approve_reject');
         })->get();
 
         // If program-specific, filter to users with access to that program
@@ -80,6 +111,6 @@ class PendingApprovalObserver
             });
         }
 
-        return $approvers->toArray();
+        return $approvers->all();
     }
 }

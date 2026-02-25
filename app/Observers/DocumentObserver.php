@@ -118,7 +118,8 @@ class DocumentObserver
         PendingApproval::create([
             'approvable_type' => get_class($document),
             'approvable_id' => $document->id,
-            'housing_job_id' => $housingJob?->id,
+            'context_type' => $housingJob ? get_class($housingJob) : null,
+            'context_id' => $housingJob?->id,
             'item_type' => $this->getDocumentType($document),
             'item_name' => $document->document_name ?? 'Unnamed Document',
             'item_description' => $document->document_description ?? null,
@@ -145,7 +146,8 @@ class DocumentObserver
         PendingApproval::create([
             'approvable_type' => get_class($document),
             'approvable_id' => $document->id,
-            'housing_job_id' => $housingJob?->id,
+            'context_type' => $housingJob ? get_class($housingJob) : null,
+            'context_id' => $housingJob?->id,
             'item_type' => $this->getDocumentType($document),
             'item_name' => $document->document_name ?? 'Unnamed Document',
             'item_description' => "Resubmitted (v{$document->document_version})",
@@ -153,7 +155,7 @@ class DocumentObserver
             'submitted_at' => now(),
             'approver_id' => $original['approved_by'] ?? null,
             'status' => 'pending',
-            'priority' => 1, // Mark as high priority since it's a resubmission
+            'priority' => 1,
         ]);
     }
 

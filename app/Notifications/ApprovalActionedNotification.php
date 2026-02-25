@@ -83,7 +83,7 @@ class ApprovalActionedNotification extends Notification implements ShouldQueue
             ->line("**Rejected by:** {$approver->name}")
             ->line("**Rejected on:** {$actionedDate}")
             ->line("**Reason:** {$rejectionReason}")
-            ->line('Please review the feedback and resubmit your {$itemType}.');
+            ->line("Please review the feedback and resubmit your {$itemType}.");
 
         if ($uploadUrl) {
             $message->action('Upload New Version', $uploadUrl);
@@ -102,15 +102,22 @@ class ApprovalActionedNotification extends Notification implements ShouldQueue
         }
 
         // This can be customized based on your routing structure
+        $approvable = $this->pendingApproval->approvable;
+
+        // Let the approvable model provide its own URL if it implements getApprovalResubmitUrl
+        if (method_exists($approvable, 'getApprovalResubmitUrl')) {
+            return $approvable->getApprovalResubmitUrl();
+        }
+
         return match ($this->pendingApproval->approvable_type) {
             'App\Models\JobDocumentChecklist' => route('housing-jobs.show', [
-                'job' => $this->pendingApproval->approvable->housing_job_id
+                'job' => $approvable->housing_job_id
             ]),
             'App\Models\PropertyDocument' => route('properties.show', [
-                'property' => $this->pendingApproval->approvable->property_id
+                'property' => $approvable->property_id
             ]),
             'App\Models\ContractorDocument' => route('contractors.show', [
-                'contractor' => $this->pendingApproval->approvable->contractor_id
+                'contractor' => $approvable->contractor_id
             ]),
             default => null,
         };

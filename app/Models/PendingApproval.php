@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class PendingApproval extends Model
@@ -15,7 +14,12 @@ class PendingApproval extends Model
         'submitted_by',
         'approver_id',
         'program_id',
-        'housing_job_id',
+        'context_type',
+        'context_id',
+        'approval_type_id',
+        'current_chain_step',
+        'submitter_notes',
+        'priority',
         'item_type',
         'item_name',
         'item_description',
@@ -30,11 +34,23 @@ class PendingApproval extends Model
         'submitted_at' => 'datetime',
         'actioned_at' => 'datetime',
         'approved_at' => 'datetime',
+        'current_chain_step' => 'integer',
+        'priority' => 'integer',
     ];
 
     public function approvable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    public function context(): MorphTo
+    {
+        return $this->morphTo();
+    }
+
+    public function approvalType(): BelongsTo
+    {
+        return $this->belongsTo(ApprovalType::class);
     }
 
     public function submittedBy(): BelongsTo
@@ -52,18 +68,6 @@ class PendingApproval extends Model
         return $this->belongsTo(Program::class);
     }
 
-    /**
-     * Get the housing job associated with this approval.
-     */
-    public function housingJob(): BelongsTo
-    {
-        return $this->belongsTo(HousingJob::class);
-    }
-
-    /**
-     * Get the submitter of this approval request.
-     * Alias for submittedBy() for consistency.
-     */
     public function submitter(): BelongsTo
     {
         return $this->submittedBy();
@@ -84,20 +88,32 @@ class PendingApproval extends Model
         return $query->where('status', 'rejected');
     }
 
-    /**
-     * Scope for filtering approvals for a specific user.
-     */
     public function scopeForUser($query, User $user)
     {
         return $query->where('approver_id', $user->id);
     }
 
-    /**
-     * Scope for filtering approvals for a specific program.
-     */
     public function scopeForProgram($query, Program $program)
     {
         return $query->where('program_id', $program->id);
+    }
+
+    /**
+     * Scope for filtering approvals by context (generalized replacement for housing_job_id).
+     */
+    public function scopeForContext($query, string $contextType, int $contextId)
+    {
+        return $query->where('context_type', $contextType)
+                     ->where('context_id', $contextId);
+    }
+
+    /**
+     * Scope for filtering approvals for a specific housing job via context morph.
+     */
+    public function scopeForJob($query, int $jobId)
+    {
+        return $query->where('context_type', HousingJob::class)
+                     ->where('context_id', $jobId);
     }
 
     public function isPending(): bool
@@ -115,8 +131,43 @@ class PendingApproval extends Model
         return $this->status === 'rejected';
     }
 
+    /**
+     * Approve this approval request.
+     * Supports multi-step chain advancement: if an approval type with multiple
+     * chain steps is configured, advances to the next step instead of fully approving.
+     */
     public function approve(User $approver): void
     {
+        // Check if this has a multi-step approval chain
+        if ($this->approval_type_id) {
+            $approvalType = $this->approvalType;
+
+            if ($approvalType && $approvalType->getTotalSteps() > 1) {
+                $currentStep = $this->current_chain_step ?? 1;
+                $totalSteps = $approvalType->getTotalSteps();
+
+                if ($currentStep < $totalSteps) {
+                    // Advance to next step, stay pending
+                    $this->update([
+                        'current_chain_step' => $currentStep + 1,
+                        'approver_id' => $approver->id,
+                    ]);
+
+                    // Log the step approval
+                    ApprovalHistory::logApproval(
+                        $this->approvable ?? $this,
+                        $approver,
+                        null,
+                        "Chain step {$currentStep} approved",
+                        ['chain_step' => $currentStep, 'total_steps' => $totalSteps]
+                    );
+
+                    return;
+                }
+            }
+        }
+
+        // Final approval (single-step or last step of chain)
         $this->update([
             'status' => 'approved',
             'approver_id' => $approver->id,
@@ -147,9 +198,21 @@ class PendingApproval extends Model
 
     /**
      * Get a human-readable label for the approval type.
+     * Delegates to the approvable model first, then falls back to approval_type, then legacy match.
      */
     public function getTypeLabel(): string
     {
+        // Try delegating to approvable model
+        if ($this->approvable && method_exists($this->approvable, 'getApprovalTypeLabel')) {
+            return $this->approvable->getApprovalTypeLabel();
+        }
+
+        // Try the approval type display name
+        if ($this->approval_type_id && $this->approvalType) {
+            return $this->approvalType->display_name;
+        }
+
+        // Legacy fallback
         return match ($this->item_type) {
             'property_document' => 'Property Document',
             'contractor_document' => 'Contractor Document',
@@ -159,9 +222,6 @@ class PendingApproval extends Model
         };
     }
 
-    /**
-     * Get a display name for the approval item.
-     */
     public function getDisplayName(): string
     {
         return $this->item_name ?? $this->getTypeLabel();

@@ -31,6 +31,7 @@
                         <option value="all">All Types</option>
                         <option value="documents">Documents</option>
                         <option value="tasks">Tasks</option>
+                        <option value="submissions">Submissions</option>
                     </select>
                 </div>
 

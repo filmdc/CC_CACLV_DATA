@@ -63,8 +63,9 @@
                 </flux:navlist.group>
                 @endif
 
-                @if(auth()->user()->hasPermission('approvals.view_dashboard'))
+                @if(auth()->user()->hasAnyPermission(['approvals.view_dashboard', 'approvals.submit']))
                 <flux:navlist.group :heading="__('Approvals')" class="grid">
+                    @if(auth()->user()->hasPermission('approvals.view_dashboard'))
                     <flux:navlist.item icon="clipboard-document-check" :href="route('approvals.pending')" :current="request()->routeIs('approvals.pending')" wire:navigate>
                         <div class="flex items-center justify-between w-full">
                             <span>{{ __('Pending Approvals') }}</span>
@@ -78,6 +79,14 @@
                             @endif
                         </div>
                     </flux:navlist.item>
+                    @endif
+                    @if(auth()->user()->hasPermission('approvals.submit'))
+                    <flux:navlist.item icon="paper-airplane" :href="route('approvals.submit')" :current="request()->routeIs('approvals.submit')" wire:navigate>{{ __('Submit Approval') }}</flux:navlist.item>
+                    @endif
+                    <flux:navlist.item icon="document-text" :href="route('approvals.my-submissions')" :current="request()->routeIs('approvals.my-submissions')" wire:navigate>{{ __('My Submissions') }}</flux:navlist.item>
+                    @if(auth()->user()->hasAnyPermission(['approvals.view_dashboard', 'approvals.view_audit_log']))
+                    <flux:navlist.item icon="magnifying-glass" :href="route('approvals.audit-report')" :current="request()->routeIs('approvals.audit-report')" wire:navigate>{{ __('Audit Report') }}</flux:navlist.item>
+                    @endif
                 </flux:navlist.group>
                 @endif
 

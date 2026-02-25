@@ -111,6 +111,8 @@ class ProjectHousingPermissionsSeeder extends Seeder
             ['name' => 'approvals.view_dashboard', 'display_name' => 'Access Approval Dashboard', 'description' => 'Access approval dashboard', 'category' => 'Approvals'],
             ['name' => 'approvals.approve_reject', 'display_name' => 'Approve or Reject Items', 'description' => 'Approve or reject items', 'category' => 'Approvals'],
             ['name' => 'approvals.bulk_approve', 'display_name' => 'Bulk Approve Items', 'description' => 'Bulk approve items', 'category' => 'Approvals'],
+            ['name' => 'approvals.submit', 'display_name' => 'Submit Approval Requests', 'description' => 'Submit items for approval', 'category' => 'Approvals'],
+            ['name' => 'approvals.view_audit_log', 'display_name' => 'View Approval Audit Log', 'description' => 'View approval audit trail and reports', 'category' => 'Approvals'],
         ];
 
         // Group 10: PDF Templates

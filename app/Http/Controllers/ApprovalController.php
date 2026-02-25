@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ApprovalHistory;
 use App\Models\PendingApproval;
 use App\Notifications\ApprovalActionedNotification;
 use Illuminate\Http\RedirectResponse;
@@ -21,10 +22,21 @@ class ApprovalController extends Controller
             return $redirect;
         }
 
+        $previousStep = $pendingApproval->current_chain_step;
         $pendingApproval->approve(Auth::user());
-        $this->notifySubmitter($pendingApproval, 'approved');
+        $pendingApproval->refresh();
 
-        return $this->successRedirect('Item approved successfully.');
+        // Log the approval with signature info
+        $this->logAuditEntry($pendingApproval, $request, 'approved', $previousStep);
+
+        // Only notify submitter if fully approved (not just chain advancement)
+        if ($pendingApproval->isApproved()) {
+            $this->notifySubmitter($pendingApproval, 'approved');
+
+            return $this->successRedirect('Item approved successfully.');
+        }
+
+        return $this->successRedirect("Step {$previousStep} approved. Advanced to step {$pendingApproval->current_chain_step}.");
     }
 
     /**
@@ -57,6 +69,10 @@ class ApprovalController extends Controller
         }
 
         $pendingApproval->reject(Auth::user(), $request->rejection_reason);
+
+        // Log the rejection with signature info
+        $this->logAuditEntry($pendingApproval, $request, 'rejected');
+
         $this->notifySubmitter($pendingApproval, 'rejected');
 
         return $this->successRedirect('Item rejected. The submitter has been notified.');
@@ -69,17 +85,14 @@ class ApprovalController extends Controller
     {
         $user = Auth::user();
 
-        // Admins can approve anything
         if ($user->isAdmin()) {
             return true;
         }
 
-        // Check if user has approval permission
-        if (!$user->hasPermission('approvals.approve')) {
+        if (! $user->hasPermission('approvals.approve_reject')) {
             return false;
         }
 
-        // Check program-level access if applicable
         if ($pendingApproval->program_id) {
             return $user->hasAccessToProgram($pendingApproval->program_id);
         }
@@ -87,15 +100,12 @@ class ApprovalController extends Controller
         return true;
     }
 
-    /**
-     * Retrieve the approval record and ensure the current user can manage it.
-     */
     private function findApprovalOrAbort(int $id): PendingApproval
     {
         $pendingApproval = PendingApproval::with('submittedBy')->findOrFail($id);
 
         abort_if(
-            !$this->canApprove($pendingApproval),
+            ! $this->canApprove($pendingApproval),
             403,
             'You do not have permission to manage this approval item.'
         );
@@ -103,9 +113,6 @@ class ApprovalController extends Controller
         return $pendingApproval;
     }
 
-    /**
-     * Provide a consistent redirect when the approval has already been processed.
-     */
     private function redirectIfProcessed(PendingApproval $pendingApproval): ?RedirectResponse
     {
         if ($pendingApproval->isPending()) {
@@ -123,8 +130,42 @@ class ApprovalController extends Controller
 
     private function notifySubmitter(PendingApproval $pendingApproval, string $action): void
     {
-        $pendingApproval->submittedBy->notify(
-            new ApprovalActionedNotification($pendingApproval, $action)
-        );
+        if ($pendingApproval->submittedBy) {
+            $pendingApproval->submittedBy->notify(
+                new ApprovalActionedNotification($pendingApproval, $action)
+            );
+        }
+    }
+
+    /**
+     * Log an audit entry with request signature info (IP, user agent).
+     */
+    private function logAuditEntry(PendingApproval $pendingApproval, Request $request, string $action, ?int $chainStep = null): void
+    {
+        $document = $pendingApproval->approvable ?? $pendingApproval;
+
+        $data = [
+            'approvable_type' => get_class($document),
+            'approvable_id' => $document->id,
+            'version' => $document->document_version ?? 1,
+            'action' => $action,
+            'user_id' => Auth::id(),
+            'signature_ip' => $request->ip(),
+            'signature_user_agent' => $request->userAgent(),
+        ];
+
+        if ($pendingApproval->approval_type_id) {
+            $data['approval_type_id'] = $pendingApproval->approval_type_id;
+        }
+
+        if ($chainStep) {
+            $data['chain_step'] = $chainStep;
+        }
+
+        if ($action === 'rejected') {
+            $data['reason'] = $pendingApproval->rejection_reason;
+        }
+
+        ApprovalHistory::create($data);
     }
 }
