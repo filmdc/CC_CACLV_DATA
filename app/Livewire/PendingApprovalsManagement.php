@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\ApprovalHistory;
 use App\Models\PendingApproval;
 use App\Models\ApprovalNotification;
 use App\Models\Program;
@@ -21,6 +22,10 @@ class PendingApprovalsManagement extends Component
     public $search = '';
     public $selectedApproval = null;
     public $showRejectModal = false;
+    public $showDetailModal = false;
+    public $detailApproval = null;
+    public $detailAttachments = [];
+    public $detailHistory = [];
     public $rejectionReason = '';
     public $bulkSelected = [];
 
@@ -105,17 +110,67 @@ class PendingApprovalsManagement extends Component
 
     public function viewDetails($approvalId)
     {
-        $approval = PendingApproval::with(['approvable'])->findOrFail($approvalId);
+        $approval = PendingApproval::with([
+            'approvable',
+            'approvalType',
+            'submittedBy',
+            'approver',
+            'program',
+        ])->findOrFail($approvalId);
 
-        if ($approval->approvable) {
-            $type = $approval->approvable_type;
+        $this->detailApproval = $approval;
 
-            if (str_contains($type, 'WorkPlanGoal')) {
-                return redirect()->route('work-plan.show', $approval->approvable->work_plan_id);
-            }
+        // Load attachments if the approvable is an ApprovalSubmission with media
+        $this->detailAttachments = [];
+        if ($approval->approvable && $approval->approvable instanceof \App\Models\ApprovalSubmission) {
+            $this->detailAttachments = $approval->approvable->getMedia('attachments')->map(function ($media) {
+                return [
+                    'name' => $media->file_name,
+                    'size' => $media->human_readable_size,
+                    'url' => $media->getUrl(),
+                    'mime' => $media->mime_type,
+                ];
+            })->toArray();
         }
 
-        session()->flash('message', 'Item details opened');
+        // Load approval history for this item
+        $this->detailHistory = ApprovalHistory::where('approvable_type', $approval->approvable_type)
+            ->where('approvable_id', $approval->approvable_id)
+            ->with('user')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($entry) {
+                return [
+                    'action' => $entry->action,
+                    'user' => $entry->user->name ?? 'System',
+                    'reason' => $entry->reason,
+                    'notes' => $entry->notes,
+                    'chain_step' => $entry->chain_step,
+                    'created_at' => $entry->created_at->format('M d, Y g:i A'),
+                ];
+            })->toArray();
+
+        $this->showDetailModal = true;
+    }
+
+    public function closeDetailModal()
+    {
+        $this->showDetailModal = false;
+        $this->detailApproval = null;
+        $this->detailAttachments = [];
+        $this->detailHistory = [];
+    }
+
+    public function approveFromDetail($approvalId)
+    {
+        $this->closeDetailModal();
+        $this->approve($approvalId);
+    }
+
+    public function rejectFromDetail($approvalId)
+    {
+        $this->closeDetailModal();
+        $this->showRejectModal($approvalId);
     }
 
     public function showRejectModal($approvalId)
