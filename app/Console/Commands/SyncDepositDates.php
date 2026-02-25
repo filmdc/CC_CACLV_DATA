@@ -178,6 +178,8 @@ class SyncDepositDates extends Command
             'total_pending' => 0,
             'sage_queried' => 0,
             'deposited_found' => 0,
+            'fund_codes_found' => 0,
+            'service_codes_found' => 0,
             'dp_updated' => 0,
             'dp_failed' => 0,
             'errors' => [],
@@ -191,6 +193,8 @@ class SyncDepositDates extends Command
             $totals['total_pending'] += $result['total_pending'];
             $totals['sage_queried'] += $result['sage_queried'];
             $totals['deposited_found'] += $result['deposited_found'];
+            $totals['fund_codes_found'] += $result['fund_codes_found'] ?? 0;
+            $totals['service_codes_found'] += $result['service_codes_found'] ?? 0;
             $totals['dp_updated'] += $result['dp_updated'];
             $totals['dp_failed'] += $result['dp_failed'];
             $totals['errors'] = array_merge($totals['errors'], $result['errors'] ?? []);
@@ -230,6 +234,8 @@ class SyncDepositDates extends Command
                 ['Batches run', $totals['batches']],
                 ['Queried from Sage', $totals['sage_queried']],
                 ['Found with deposit date', $totals['deposited_found']],
+                ['Found with fund code', $totals['fund_codes_found']],
+                ['Found with service code', $totals['service_codes_found']],
                 ['Updated in DonorPerfect', $totals['dp_updated']],
                 ['Failed to update', $totals['dp_failed']],
             ]

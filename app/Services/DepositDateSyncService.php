@@ -38,6 +38,16 @@ class DepositDateSyncService
     const DP_DEPOSIT_DATE_FIELD = 'DEPOSIT_DATE';
 
     /**
+     * The DonorPerfect UDF field name for fund code (Sage PROJECTID)
+     */
+    const DP_FUND_CODE_FIELD = 'FUND_CODE';
+
+    /**
+     * The DonorPerfect UDF field name for service code (Sage DEPARTMENTID)
+     */
+    const DP_SERVICE_CODE_FIELD = 'SERVICE_CODE';
+
+    /**
      * Constructor
      *
      * @param  UserSageIntacctToken|null  $userToken  Optional user token for OAuth-based Sage auth
@@ -125,6 +135,8 @@ class DepositDateSyncService
             'total_pending' => 0,
             'sage_queried' => 0,
             'deposited_found' => 0,
+            'fund_codes_found' => 0,
+            'service_codes_found' => 0,
             'dp_updated' => 0,
             'dp_failed' => 0,
             'errors' => [],
@@ -183,17 +195,31 @@ class DepositDateSyncService
                 }
 
                 $depositDate = $receipt['depositdate'] ?? null;
+                $fundCode = ! empty($receipt['projectid']) ? $receipt['projectid'] : null;
+                $serviceCode = ! empty($receipt['departmentid']) ? $receipt['departmentid'] : null;
 
-                // Update the Sage deposit date in our tracking
-                if (! empty($depositDate)) {
-                    $item->updateSageDepositDate($depositDate);
-                    $results['deposited_found']++;
+                if ($fundCode) {
+                    $results['fund_codes_found']++;
+                }
+                if ($serviceCode) {
+                    $results['service_codes_found']++;
+                }
 
-                    // Step 4: Write deposit date back to DonorPerfect
+                // Update the Sage codes in our tracking
+                if (! empty($depositDate) || $fundCode || $serviceCode) {
+                    $item->updateSageCodes($depositDate, $fundCode, $serviceCode);
+
+                    if (! empty($depositDate)) {
+                        $results['deposited_found']++;
+                    }
+
+                    // Step 4: Write deposit date, fund code, and service code back to DonorPerfect
                     if (! $dryRun) {
-                        $dpResult = $this->updateDonorPerfectDepositDate(
+                        $dpResult = $this->updateDonorPerfectCodes(
                             (int) $item->gift_id,
-                            $depositDate
+                            $depositDate,
+                            $fundCode,
+                            $serviceCode
                         );
 
                         if ($dpResult['success']) {
@@ -203,6 +229,8 @@ class DepositDateSyncService
                             Log::info('DepositDateSync: Successfully updated DP', [
                                 'gift_id' => $item->gift_id,
                                 'deposit_date' => $depositDate,
+                                'fund_code' => $fundCode,
+                                'service_code' => $serviceCode,
                             ]);
                         } else {
                             $item->markDepositDateSyncFailed($dpResult['error'] ?? 'Unknown error');
@@ -218,6 +246,8 @@ class DepositDateSyncService
                         Log::info('DepositDateSync: Dry run - would update DP', [
                             'gift_id' => $item->gift_id,
                             'deposit_date' => $depositDate,
+                            'fund_code' => $fundCode,
+                            'service_code' => $serviceCode,
                         ]);
                     }
                 }
@@ -225,9 +255,11 @@ class DepositDateSyncService
 
             $results['success'] = true;
             $results['message'] = sprintf(
-                'Processed %d items: %d deposited found, %d updated in DP, %d failed',
+                'Processed %d items: %d deposited, %d fund codes, %d service codes, %d updated in DP, %d failed',
                 $results['total_pending'],
                 $results['deposited_found'],
+                $results['fund_codes_found'],
+                $results['service_codes_found'],
                 $results['dp_updated'],
                 $results['dp_failed']
             );
@@ -326,16 +358,18 @@ class DepositDateSyncService
             }
 
             foreach ($errorItems as $item) {
-                if (empty($item->sage_deposit_date)) {
+                if (empty($item->sage_deposit_date) && empty($item->sage_fund_code) && empty($item->sage_service_code)) {
                     continue;
                 }
 
                 $results['retried']++;
 
                 if (! $dryRun) {
-                    $dpResult = $this->updateDonorPerfectDepositDate(
+                    $dpResult = $this->updateDonorPerfectCodes(
                         (int) $item->gift_id,
-                        $item->sage_deposit_date->format('Y-m-d')
+                        $item->sage_deposit_date ? $item->sage_deposit_date->format('Y-m-d') : null,
+                        $item->sage_fund_code,
+                        $item->sage_service_code
                     );
 
                     if ($dpResult['success']) {
@@ -371,19 +405,50 @@ class DepositDateSyncService
     }
 
     /**
-     * Update a gift's deposit date in DonorPerfect
+     * Update a gift's deposit date, fund code, and service code in DonorPerfect
      *
      * @param  int  $giftId  The DonorPerfect gift ID
-     * @param  string  $depositDate  The deposit date (Y-m-d format)
+     * @param  string|null  $depositDate  The deposit date (Y-m-d format)
+     * @param  string|null  $fundCode  The fund code (Sage PROJECTID)
+     * @param  string|null  $serviceCode  The service code (Sage DEPARTMENTID)
      * @return array Result with success status
      */
-    private function updateDonorPerfectDepositDate(int $giftId, string $depositDate): array
+    private function updateDonorPerfectCodes(int $giftId, ?string $depositDate, ?string $fundCode, ?string $serviceCode): array
     {
-        return $this->dpApiService->updateGiftUdf(
-            $giftId,
-            self::DP_DEPOSIT_DATE_FIELD,
-            $depositDate
-        );
+        $errors = [];
+
+        // Write deposit date
+        if (! empty($depositDate)) {
+            $result = $this->dpApiService->updateGiftUdf($giftId, self::DP_DEPOSIT_DATE_FIELD, $depositDate);
+            if (! $result['success']) {
+                $errors[] = 'DEPOSIT_DATE: '.($result['error'] ?? 'Unknown error');
+            }
+        }
+
+        // Write fund code
+        if (! empty($fundCode)) {
+            $result = $this->dpApiService->updateGiftUdf($giftId, self::DP_FUND_CODE_FIELD, $fundCode);
+            if (! $result['success']) {
+                $errors[] = 'FUND_CODE: '.($result['error'] ?? 'Unknown error');
+            }
+        }
+
+        // Write service code
+        if (! empty($serviceCode)) {
+            $result = $this->dpApiService->updateGiftUdf($giftId, self::DP_SERVICE_CODE_FIELD, $serviceCode);
+            if (! $result['success']) {
+                $errors[] = 'SERVICE_CODE: '.($result['error'] ?? 'Unknown error');
+            }
+        }
+
+        if (! empty($errors)) {
+            return [
+                'success' => false,
+                'error' => implode('; ', $errors),
+            ];
+        }
+
+        return ['success' => true];
     }
 
     /**

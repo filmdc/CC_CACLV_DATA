@@ -2687,6 +2687,8 @@ XML;
 
     /**
      * Query Other Receipts using XML Web Services
+     * Uses <read> by keys instead of <readByQuery> to access line-item dimensions
+     * (PROJECTID/DEPARTMENTID) which are flattened into the header by read with fields=*
      */
     private function queryOtherReceiptsByRecordNosXml(array $recordNos): array
     {
@@ -2703,44 +2705,39 @@ XML;
                 }
             }
 
-            // Build query with RECORDNO IN clause
-            // Sage Intacct uses comma-separated values for IN queries
-            $recordNoList = implode(',', array_map('intval', $recordNos));
-            $query = "RECORDNO IN ({$recordNoList})";
-
-            // Fields to retrieve for deposit tracking
-            // OTHERRECEIPTS uses different field names than the legacy create function
-            // Note: UNDEPACCTNO not supported in readByQuery
-            $fields = 'RECORDNO,DESCRIPTION2,DOCNUMBER,WHENPAID,WHENCREATED,DEPOSITDATE,BANKACCOUNTID,STATE,TOTALENTERED';
-
-            Log::info('Sage Intacct: Querying Other Receipts', [
+            Log::info('Sage Intacct: Reading Other Receipts by keys', [
                 'record_count' => count($recordNos),
-                'query' => $query,
             ]);
 
-            $xmlRequest = $this->buildOtherReceiptQueryXml($query, $fields);
-            $response = $this->sendXmlRequest($xmlRequest);
+            // Sage read supports max 100 keys per call, process in chunks
+            $allReceipts = [];
+            $chunks = array_chunk($recordNos, 100);
 
-            if (! $response['success']) {
-                return [
-                    'success' => false,
-                    'error' => $response['error'] ?? 'Query failed',
-                    'receipts' => [],
-                ];
+            foreach ($chunks as $chunk) {
+                $xmlRequest = $this->buildOtherReceiptReadXml($chunk);
+                $response = $this->sendXmlRequest($xmlRequest);
+
+                if (! $response['success']) {
+                    return [
+                        'success' => false,
+                        'error' => $response['error'] ?? 'Read failed',
+                        'receipts' => [],
+                    ];
+                }
+
+                $receipts = $this->parseOtherReceiptQueryResponse($response['xml']);
+                $allReceipts = array_merge($allReceipts, $receipts);
             }
 
-            // Parse response
-            $receipts = $this->parseOtherReceiptQueryResponse($response['xml']);
-
-            Log::info('Sage Intacct: Other Receipts query completed', [
+            Log::info('Sage Intacct: Other Receipts read completed', [
                 'queried' => count($recordNos),
-                'found' => count($receipts),
+                'found' => count($allReceipts),
             ]);
 
             return [
                 'success' => true,
-                'receipts' => $receipts,
-                'count' => count($receipts),
+                'receipts' => $allReceipts,
+                'count' => count($allReceipts),
             ];
 
         } catch (\Exception $e) {
@@ -2787,7 +2784,7 @@ XML;
 
             $apiUrl = 'https://api.intacct.com/ia/api/v1/companies/'.urlencode($this->userToken->company_id).
                       '/objects/OTHERRECEIPTS?filter='.$filter.
-                      '&fields=RECORDNO,DESCRIPTION2,DOCNUMBER,WHENPAID,WHENCREATED,DEPOSITDATE,BANKACCOUNTID,STATE,TOTALENTERED';
+                      '&fields=RECORDNO,DESCRIPTION2,DOCNUMBER,WHENPAID,WHENCREATED,DEPOSITDATE,BANKACCOUNTID,STATE,TOTALENTERED,PROJECTID,DEPARTMENTID';
 
             Log::info('Sage Intacct OAuth: Querying Other Receipts', [
                 'record_count' => count($recordNos),
@@ -2833,6 +2830,8 @@ XML;
                     'undepglaccountno' => $receipt['UNDEPGLACCOUNTNO'] ?? $receipt['undepglaccountno'] ?? null,
                     'state' => $receipt['STATE'] ?? $receipt['state'] ?? null,
                     'totalentered' => $receipt['TOTALENTERED'] ?? $receipt['totalentered'] ?? null,
+                    'projectid' => $receipt['PROJECTID'] ?? $receipt['projectid'] ?? null,
+                    'departmentid' => $receipt['DEPARTMENTID'] ?? $receipt['departmentid'] ?? null,
                 ];
             }
 
@@ -2862,9 +2861,13 @@ XML;
     }
 
     /**
-     * Build XML request to query Other Receipts
+     * Build XML request to read Other Receipts by keys
+     * Uses <read> instead of <readByQuery> to access line-item dimensions
+     * (PROJECTID/DEPARTMENTID are flattened from the first line item into the header)
+     *
+     * @param  array  $keys  Array of RECORDNO values (max 100 per Sage API limit)
      */
-    private function buildOtherReceiptQueryXml(string $query, string $fields): string
+    private function buildOtherReceiptReadXml(array $keys): string
     {
         $controlId = $this->generateControlId();
         $functionId = $this->generateControlId();
@@ -2877,7 +2880,7 @@ XML;
                     <password>{$this->setting->web_services_password}</password>
                 </login>";
 
-        $sanitizedQuery = htmlspecialchars($query, ENT_XML1, 'UTF-8');
+        $keysList = implode(',', array_map('intval', $keys));
 
         return <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
@@ -2896,12 +2899,11 @@ XML;
         </authentication>
         <content>
             <function controlid="{$functionId}">
-                <readByQuery>
+                <read>
                     <object>OTHERRECEIPTS</object>
-                    <query>{$sanitizedQuery}</query>
-                    <fields>{$fields}</fields>
-                    <pagesize>1000</pagesize>
-                </readByQuery>
+                    <keys>{$keysList}</keys>
+                    <fields>*</fields>
+                </read>
             </function>
         </content>
     </operation>
@@ -2959,6 +2961,8 @@ XML;
                     'undepglaccountno' => (string) ($node->UNDEPACCTNO ?? $node->UNDEPGLACCOUNTNO ?? ''),
                     'state' => (string) ($node->STATE ?? ''),
                     'totalentered' => (string) ($node->TOTALENTERED ?? ''),
+                    'projectid' => (string) ($node->PROJECTID ?? ''),
+                    'departmentid' => (string) ($node->DEPARTMENTID ?? ''),
                 ];
 
                 // Only include if we have a valid recordno

@@ -18,6 +18,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $status Values: pending, success, failed, skipped, filtered
  * @property string|null $intacct_record_id
  * @property \Carbon\Carbon|null $sage_deposit_date Deposit date from Sage Intacct
+ * @property string|null $sage_fund_code Fund code (PROJECTID) from Sage Intacct
+ * @property string|null $sage_service_code Service code (DEPARTMENTID) from Sage Intacct
  * @property \Carbon\Carbon|null $deposit_date_synced_at When deposit date was written back to DP
  * @property string|null $deposit_sync_error Error message if deposit date sync failed
  * @property string|null $error_message
@@ -37,6 +39,8 @@ class SageIntacctSyncItem extends Model
         'status',
         'intacct_record_id',
         'sage_deposit_date',
+        'sage_fund_code',
+        'sage_service_code',
         'deposit_date_synced_at',
         'deposit_sync_error',
         'error_message',
@@ -170,6 +174,22 @@ class SageIntacctSyncItem extends Model
     {
         return $this->update([
             'sage_deposit_date' => $depositDate,
+        ]);
+    }
+
+    /**
+     * Update Sage deposit date, fund code, and service code
+     *
+     * @param  string|null  $depositDate  The deposit date from Sage (Y-m-d format)
+     * @param  string|null  $fundCode  The fund code (PROJECTID) from Sage
+     * @param  string|null  $serviceCode  The service code (DEPARTMENTID) from Sage
+     */
+    public function updateSageCodes(?string $depositDate, ?string $fundCode, ?string $serviceCode): bool
+    {
+        return $this->update([
+            'sage_deposit_date' => $depositDate,
+            'sage_fund_code' => $fundCode,
+            'sage_service_code' => $serviceCode,
         ]);
     }
 
