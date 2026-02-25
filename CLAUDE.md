@@ -338,6 +338,56 @@ Housing Module Features:
    - No tests written for housing module yet
    - Need feature tests for all housing components
 
+## Mobile Approvals Portal (approvals.caclv.org)
+
+A responsive, mobile-first approval interface served at `approvals.caclv.org`. Lives within this project using Laravel domain routing — no separate codebase.
+
+### Architecture
+- **Domain routing**: `routes/approvals.php` scoped to `APPROVALS_DOMAIN` env var
+- **Mobile layout**: `resources/views/components/layouts/approvals.blade.php` (bottom tab nav, no sidebar)
+- **Lightweight bundle**: `resources/css/approvals.css` + `resources/js/approvals.js` (no Chart.js/Flux/Jodit)
+- **Shared auth**: Session cookie domain set to `.caclv.org` for cross-subdomain SSO
+- **Components**: `app/Livewire/Mobile/` namespace with 6 components:
+  - `MobileLogin` — login page (uses `approvals-guest` layout)
+  - `ApprovalsDashboard` — stats, quick actions, activity feed
+  - `PendingReview` — approver card queue with filters
+  - `ApprovalDetail` — full detail view with approve/reject action bar
+  - `SubmitRequest` — 4-step submission wizard
+  - `MySubmissions` — requester's submission list
+
+### Setup After Pull (Required Steps)
+
+1. **Add env vars** to `.env`:
+   ```
+   SESSION_DOMAIN=.caclv.org
+   APPROVALS_DOMAIN=approvals.caclv.org
+   ```
+
+2. **Install Apache VirtualHost**:
+   ```bash
+   sudo cp approvals.conf.apache /etc/apache2/sites-available/approvals.conf
+   sudo a2ensite approvals.conf
+   sudo systemctl reload apache2
+   ```
+
+3. **DNS**: Ensure `approvals.caclv.org` A record points to this server
+
+4. **Build assets** (if not using pre-built):
+   ```bash
+   npm install && npx vite build
+   ```
+
+5. **Clear caches**:
+   ```bash
+   php artisan config:clear && php artisan route:clear && php artisan view:clear
+   ```
+
+### Development Notes
+- Bottom nav tabs are permission-aware (Review requires `approvals.view_dashboard`, Submit requires `approvals.submit`)
+- Auth redirect is domain-aware in `bootstrap/app.php` — approvals domain redirects to `mobile.login`
+- All existing approval models, observers, and notifications are reused
+- NO Flux components in mobile views — standard HTML/Tailwind only
+
 ## Memories
 
 - Do not try to run bash mysql commands that require a password, as the terminal prevents that approach
