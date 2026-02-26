@@ -39,6 +39,7 @@ class UserManagement extends Component
     public $name = '';
     public $email = '';
     public $active = true;
+    public $approvalDelegateId = null;
 
     /** @var array<int> */
     public $selectedRoles = [];
@@ -82,6 +83,7 @@ class UserManagement extends Component
             'selectedRoles.*' => ['integer', 'exists:roles,id'],
             'selectedPrograms' => ['array'],
             'selectedPrograms.*' => ['integer', 'exists:programs,id'],
+            'approvalDelegateId' => ['nullable', 'integer', 'exists:users,id'],
         ];
     }
 
@@ -113,6 +115,7 @@ class UserManagement extends Component
             $this->name = $this->selectedUser->name;
             $this->email = $this->selectedUser->email;
             $this->active = $this->selectedUser->active;
+            $this->approvalDelegateId = $this->selectedUser->approval_delegate_id;
             $this->selectedRoles = $this->selectedUser->roles->pluck('id')->toArray();
             $this->selectedPrograms = $this->selectedUser->programs->pluck('id')->toArray();
         }
@@ -146,6 +149,7 @@ class UserManagement extends Component
                 'name' => $this->name,
                 'email' => $this->email,
                 'active' => (bool) $this->active,
+                'approval_delegate_id' => $this->approvalDelegateId ?: null,
             ]);
 
             $this->selectedUser->roles()->sync($this->sanitizeIds($this->selectedRoles));
@@ -231,6 +235,7 @@ class UserManagement extends Component
         $this->name = '';
         $this->email = '';
         $this->active = true;
+        $this->approvalDelegateId = null;
         $this->selectedRoles = [];
         $this->selectedPrograms = [];
         $this->showEditForm = false;
@@ -446,10 +451,22 @@ class UserManagement extends Component
         $roles = Role::orderBy('display_name')->get();
         $programs = Program::orderBy('name')->get();
 
+        $eligibleDelegates = collect();
+        if ($this->selectedUser) {
+            $eligibleDelegates = User::active()
+                ->where('id', '!=', $this->selectedUser->id)
+                ->whereHas('roles.permissions', function ($query) {
+                    $query->where('name', 'approvals.approve_reject');
+                })
+                ->orderBy('name')
+                ->get();
+        }
+
         return view('livewire.user-management', [
             'users' => $users,
             'roles' => $roles,
             'programs' => $programs,
+            'eligibleDelegates' => $eligibleDelegates,
         ])->layout('components.layouts.app');
     }
 

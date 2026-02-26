@@ -90,7 +90,7 @@
 
                     <div>
                         <label class="flex items-center space-x-2">
-                            <input type="checkbox" wire:model="active" 
+                            <input type="checkbox" wire:model="active"
                                    class="rounded border-gray-300 dark:border-zinc-600 text-purple-600 focus:ring-purple-500">
                             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Active User
@@ -98,6 +98,23 @@
                         </label>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Inactive users cannot log in to the system</p>
                     </div>
+
+                    @if($eligibleDelegates->isNotEmpty())
+                    <div>
+                        <label for="approvalDelegateId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Approval Delegate
+                        </label>
+                        <select wire:model="approvalDelegateId" id="approvalDelegateId"
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md shadow-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+                            <option value="">None</option>
+                            @foreach($eligibleDelegates as $delegate)
+                                <option value="{{ $delegate->id }}">{{ $delegate->name }}</option>
+                            @endforeach
+                        </select>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">This person will also receive approval notifications sent to this user</p>
+                        @error('approvalDelegateId') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                    </div>
+                    @endif
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>

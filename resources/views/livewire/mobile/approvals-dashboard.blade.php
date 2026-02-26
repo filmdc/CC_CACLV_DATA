@@ -1,149 +1,224 @@
-<div class="p-4 page-enter">
-    {{-- Greeting --}}
+<div class="p-4 lg:py-8 page-enter">
+    {{-- Header --}}
     @php
         $hour = now()->hour;
         $greeting = $hour < 12 ? 'Good morning' : ($hour < 17 ? 'Good afternoon' : 'Good evening');
         $firstName = explode(' ', auth()->user()->name)[0];
     @endphp
-    <h1 class="text-xl font-semibold text-white mb-1">{{ $greeting }}, {{ $firstName }}</h1>
-    <p class="text-sm text-zinc-400 mb-5">Here's your approvals overview</p>
-
-    {{-- Stat Cards --}}
-    <div class="grid grid-cols-2 gap-3 mb-6">
-        @if($isApprover)
-        <a href="{{ route('mobile.review') }}" wire:navigate class="approval-card bg-zinc-900 rounded-xl p-4 border border-zinc-800">
-            <div class="flex items-center gap-2 mb-2">
-                <div class="flex items-center justify-center h-8 w-8 min-h-0 min-w-0 rounded-lg bg-amber-500/20">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-                <span class="text-xs text-zinc-400">Pending Review</span>
-            </div>
-            <p class="text-2xl font-bold text-amber-400">{{ $pendingReviewCount }}</p>
-        </a>
-        @endif
-
-        <a href="{{ route('mobile.my-submissions') }}" wire:navigate class="approval-card bg-zinc-900 rounded-xl p-4 border border-zinc-800">
-            <div class="flex items-center gap-2 mb-2">
-                <div class="flex items-center justify-center h-8 w-8 min-h-0 min-w-0 rounded-lg bg-blue-500/20">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-                <span class="text-xs text-zinc-400">My Pending</span>
-            </div>
-            <p class="text-2xl font-bold text-blue-400">{{ $myPendingCount }}</p>
-        </a>
-
-        <div class="approval-card bg-zinc-900 rounded-xl p-4 border border-zinc-800">
-            <div class="flex items-center gap-2 mb-2">
-                <div class="flex items-center justify-center h-8 w-8 min-h-0 min-w-0 rounded-lg bg-green-500/20">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-                <span class="text-xs text-zinc-400">Approved</span>
-            </div>
-            <p class="text-2xl font-bold text-green-400">{{ $myApprovedCount }}</p>
+    <div class="flex items-center justify-between mb-5">
+        <div>
+            <h1 class="text-lg lg:text-2xl font-semibold text-white">{{ $greeting }}, {{ $firstName }}</h1>
+            <p class="text-sm text-zinc-400">
+                @if($isApprover)
+                    {{ $pendingCount }} {{ Str::plural('item', $pendingCount) }} awaiting review
+                @else
+                    Your approval submissions
+                @endif
+            </p>
         </div>
-
-        <div class="approval-card bg-zinc-900 rounded-xl p-4 border border-zinc-800">
-            <div class="flex items-center gap-2 mb-2">
-                <div class="flex items-center justify-center h-8 w-8 min-h-0 min-w-0 rounded-lg bg-red-500/20">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-                <span class="text-xs text-zinc-400">Rejected</span>
-            </div>
-            <p class="text-2xl font-bold text-red-400">{{ $myRejectedCount }}</p>
-        </div>
-    </div>
-
-    {{-- Quick Actions --}}
-    <div class="flex gap-3 mb-6 overflow-x-auto pb-1">
-        @if($isApprover)
-        <a href="{{ route('mobile.review') }}" wire:navigate
-            class="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 rounded-lg text-sm font-medium text-white transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
-            </svg>
-            Review Queue
-        </a>
-        @endif
-
         @if($canSubmit)
         <a href="{{ route('mobile.submit') }}" wire:navigate
-            class="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-500 active:bg-green-700 rounded-lg text-sm font-medium text-white transition-colors">
+            class="flex items-center gap-1.5 px-3 py-2 text-sm font-medium bg-green-600 hover:bg-green-500 text-white rounded-lg transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
-            New Request
+            <span class="hidden sm:inline">New Request</span>
+            <span class="sm:hidden">New</span>
         </a>
         @endif
+    </div>
 
-        <a href="{{ route('mobile.my-submissions') }}" wire:navigate
-            class="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 bg-zinc-700 hover:bg-zinc-600 active:bg-zinc-800 rounded-lg text-sm font-medium text-white transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    {{-- Flash Messages --}}
+    @if (session()->has('message'))
+        <div class="mb-4 p-3 rounded-lg bg-green-500/20 border border-green-500/30 text-sm text-green-400">
+            {{ session('message') }}
+        </div>
+    @endif
+
+    {{-- Search & Filters --}}
+    <div class="lg:flex lg:items-center lg:gap-4 mb-4">
+        <div class="mb-3 lg:mb-0 lg:flex-1 lg:max-w-md">
+            <input
+                wire:model.live.debounce.300ms="search"
+                type="search"
+                placeholder="Search{{ $isApprover ? ' by name or title' : ' by title' }}..."
+                class="w-full h-10 px-3 text-sm rounded-lg bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 focus:outline-none"
+            >
+        </div>
+        <div class="flex gap-2 overflow-x-auto pb-1 lg:overflow-visible lg:pb-0">
+            @foreach(['all' => 'All', 'pending' => 'Pending', 'approved' => 'Approved', 'rejected' => 'Rejected'] as $value => $label)
+                <button
+                    wire:click="$set('filterStatus', '{{ $value }}')"
+                    class="flex-shrink-0 px-3 py-1.5 text-xs font-medium rounded-full transition-colors
+                        {{ $filterStatus === $value ? 'bg-indigo-600 text-white' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700' }}"
+                >
+                    {{ $label }}
+                </button>
+            @endforeach
+        </div>
+    </div>
+
+    {{-- Items List --}}
+    @if($items->isEmpty())
+        <div class="bg-zinc-900 rounded-xl border border-zinc-800 p-8 text-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-zinc-600 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
             </svg>
-            My Submissions
-        </a>
-    </div>
+            <p class="text-sm text-zinc-500 mb-3">
+                @if($filterStatus !== 'all' || $search)
+                    No matching items found
+                @elseif($isApprover)
+                    No approval requests yet
+                @else
+                    No submissions yet
+                @endif
+            </p>
+            @if($canSubmit && !$search && $filterStatus === 'all')
+            <a href="{{ route('mobile.submit') }}" wire:navigate
+                class="inline-flex items-center gap-1 px-4 py-2 text-sm font-medium bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors">
+                Create Your First Request
+            </a>
+            @endif
+        </div>
+    @else
+        {{-- Desktop Table --}}
+        <div class="hidden lg:block bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-zinc-800">
+                        <th class="px-4 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">Title</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">Type</th>
+                        @if($isApprover)
+                        <th class="px-4 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">Submitted By</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">Assigned To</th>
+                        @endif
+                        <th class="px-4 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">Program</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">Status</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider">Date</th>
+                        @if($isApprover)
+                        <th class="px-4 py-3 text-right text-xs font-medium text-zinc-500 uppercase tracking-wider"></th>
+                        @endif
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-zinc-800">
+                    @foreach($items as $item)
+                    <tr class="hover:bg-zinc-800/50 transition-colors">
+                        <td class="px-4 py-3">
+                            <p class="text-sm font-medium text-white truncate max-w-[200px]">{{ $item->item_name ?? $item->title }}</p>
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="text-xs text-zinc-400">{{ $item->approvalType?->display_name ?? 'Unknown' }}</span>
+                        </td>
+                        @if($isApprover)
+                        <td class="px-4 py-3">
+                            <span class="text-sm text-zinc-300">{{ $item->submittedBy?->name ?? '-' }}</span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="text-sm text-zinc-300">{{ $item->approver?->name ?? 'All Approvers' }}</span>
+                        </td>
+                        @endif
+                        <td class="px-4 py-3">
+                            <span class="text-xs text-zinc-400">{{ $item->program?->name ?? '-' }}</span>
+                        </td>
+                        <td class="px-4 py-3">
+                            @php $status = $item->status; @endphp
+                            <span class="px-2 py-0.5 rounded text-[10px] font-semibold
+                                {{ $status === 'pending' ? 'status-pending' : '' }}
+                                {{ $status === 'approved' ? 'status-approved' : '' }}
+                                {{ $status === 'rejected' ? 'status-rejected' : '' }}
+                                {{ $status === 'draft' ? 'bg-zinc-700 text-zinc-300' : '' }}
+                                {{ $status === 'cancelled' ? 'bg-zinc-700 text-zinc-400' : '' }}
+                            ">{{ ucfirst($status) }}</span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="text-xs text-zinc-500">{{ ($item->submitted_at ?? $item->created_at)->diffForHumans() }}</span>
+                        </td>
+                        @if($isApprover)
+                        <td class="px-4 py-3 text-right">
+                            @if($item->status === 'pending')
+                            <a href="{{ route('mobile.approval.detail', $item->id) }}" wire:navigate
+                                class="text-xs font-medium text-indigo-400 hover:text-indigo-300 transition-colors">
+                                Review
+                            </a>
+                            @endif
+                        </td>
+                        @endif
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
 
-    {{-- Recent Activity --}}
-    <div>
-        <h2 class="text-sm font-semibold text-zinc-300 uppercase tracking-wider mb-3">Recent Activity</h2>
+        {{-- Mobile Cards --}}
+        <div class="lg:hidden space-y-3">
+            @foreach($items as $item)
+            @if($isApprover)
+                <a href="{{ $item->status === 'pending' ? route('mobile.approval.detail', $item->id) : '#' }}"
+                    @if($item->status === 'pending') wire:navigate @endif
+                    class="block approval-card bg-zinc-900 rounded-xl border border-zinc-800 p-4 {{ $item->status === 'pending' ? '' : 'pointer-events-none' }}">
+            @else
+                <div class="approval-card bg-zinc-900 rounded-xl border border-zinc-800 p-4">
+            @endif
+                    <div class="flex items-start justify-between gap-3 mb-2">
+                        <h3 class="text-sm font-medium text-white flex-1 min-w-0 truncate">{{ $item->item_name ?? $item->title }}</h3>
+                        @php $status = $item->status; @endphp
+                        <span class="flex-shrink-0 px-2 py-0.5 rounded text-[10px] font-semibold
+                            {{ $status === 'pending' ? 'status-pending' : '' }}
+                            {{ $status === 'approved' ? 'status-approved' : '' }}
+                            {{ $status === 'rejected' ? 'status-rejected' : '' }}
+                            {{ $status === 'draft' ? 'bg-zinc-700 text-zinc-300' : '' }}
+                            {{ $status === 'cancelled' ? 'bg-zinc-700 text-zinc-400' : '' }}
+                        ">{{ ucfirst($status) }}</span>
+                    </div>
 
-        @if($recentActivity->isEmpty())
-            <div class="bg-zinc-900 rounded-xl border border-zinc-800 p-6 text-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-zinc-600 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <p class="text-sm text-zinc-500">No recent activity</p>
-            </div>
-        @else
-            <div class="space-y-2">
-                @foreach($recentActivity as $activity)
-                <div class="bg-zinc-900 rounded-xl border border-zinc-800 p-3 flex items-start gap-3">
-                    {{-- Action icon --}}
-                    <div class="flex-shrink-0 mt-0.5">
-                        @if($activity->action === 'approved')
-                            <div class="h-8 w-8 rounded-full bg-green-500/20 flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                                </svg>
-                            </div>
-                        @elseif($activity->action === 'rejected')
-                            <div class="h-8 w-8 rounded-full bg-red-500/20 flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </div>
-                        @else
-                            <div class="h-8 w-8 rounded-full bg-blue-500/20 flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
+                    <div class="text-xs text-zinc-500 space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span>{{ $item->approvalType?->display_name ?? 'Unknown' }}</span>
+                            <span>&middot;</span>
+                            <span>{{ ($item->submitted_at ?? $item->created_at)->diffForHumans() }}</span>
+                        </div>
+
+                        @if($isApprover)
+                        <div class="flex items-center gap-2">
+                            <span class="text-zinc-400">From:</span>
+                            <span class="text-zinc-300">{{ $item->submittedBy?->name ?? '-' }}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-zinc-400">To:</span>
+                            <span class="text-zinc-300">{{ $item->approver?->name ?? 'All Approvers' }}</span>
+                        </div>
+                        @endif
+
+                        @if($item->program)
+                        <div class="flex items-center gap-2">
+                            <span class="text-zinc-400">Program:</span>
+                            <span class="text-zinc-300 truncate">{{ $item->program->name }}</span>
+                        </div>
                         @endif
                     </div>
 
-                    {{-- Activity details --}}
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm text-white">
-                            <span class="font-medium">{{ $activity->user?->name ?? 'System' }}</span>
-                            <span class="text-zinc-400">{{ $activity->action_label ?? $activity->action }}</span>
-                        </p>
-                        @if($activity->reason)
-                            <p class="text-xs text-zinc-500 truncate mt-0.5">{{ $activity->reason }}</p>
-                        @endif
-                        <p class="text-xs text-zinc-600 mt-0.5">{{ $activity->created_at->diffForHumans() }}</p>
+                    @if(!$isApprover && $item->status === 'rejected' && $item->rejection_reason)
+                    <div class="mt-2 p-2 rounded bg-red-500/10 border border-red-500/20">
+                        <p class="text-xs text-red-400">{{ $item->rejection_reason }}</p>
                     </div>
+                    @endif
+
+                    @if($isApprover && $item->status === 'pending')
+                    <div class="mt-2 flex justify-end">
+                        <span class="text-xs font-medium text-indigo-400">Tap to review</span>
+                    </div>
+                    @endif
+            @if($isApprover)
+                </a>
+            @else
                 </div>
-                @endforeach
-            </div>
-        @endif
-    </div>
+            @endif
+            @endforeach
+        </div>
+
+        {{-- Pagination --}}
+        <div class="mt-4">
+            {{ $items->links() }}
+        </div>
+    @endif
 </div>

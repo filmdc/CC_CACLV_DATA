@@ -6,6 +6,7 @@ use App\Models\ApprovalSubmission;
 use App\Models\ApprovalType;
 use App\Models\PendingApproval;
 use App\Models\Program;
+use App\Models\User;
 use App\Traits\WithPermissionChecks;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -21,6 +22,7 @@ class SubmitRequest extends Component
     public $description = '';
     public $submitterNotes = '';
     public $programId = null;
+    public $approverId = null;
     public $attachments = [];
 
     public function mount()
@@ -37,9 +39,43 @@ class SubmitRequest extends Component
         return ApprovalType::find($this->approvalTypeId);
     }
 
+    public function getQualifiedApproversProperty()
+    {
+        if (! $this->approvalTypeId) {
+            return collect();
+        }
+
+        $approvalType = ApprovalType::find($this->approvalTypeId);
+
+        // Check chain step 1 first
+        if ($approvalType) {
+            $chain = $approvalType->getChainForStep(1);
+            if ($chain) {
+                $chainApprovers = $chain->getQualifiedApprovers();
+                if ($chainApprovers->isNotEmpty()) {
+                    return $chainApprovers;
+                }
+            }
+        }
+
+        // Fallback: users with approvals.approve_reject permission
+        $approvers = User::active()->whereHas('roles.permissions', function ($query) {
+            $query->where('name', 'approvals.approve_reject');
+        })->orderBy('name')->get();
+
+        if ($this->programId) {
+            $approvers = $approvers->filter(function ($user) {
+                return $user->hasAccessToProgram($this->programId);
+            })->values();
+        }
+
+        return $approvers;
+    }
+
     public function selectType($typeId)
     {
         $this->approvalTypeId = $typeId;
+        $this->approverId = null;
         $this->step = 2;
     }
 
@@ -76,6 +112,7 @@ class SubmitRequest extends Component
                 'description' => 'nullable|string|max:5000',
                 'submitterNotes' => 'nullable|string|max:2000',
                 'programId' => 'nullable|exists:programs,id',
+                'approverId' => 'nullable|exists:users,id',
             ]);
             return true;
         }
@@ -108,6 +145,7 @@ class SubmitRequest extends Component
             'description' => 'nullable|string|max:5000',
             'submitterNotes' => 'nullable|string|max:2000',
             'programId' => 'nullable|exists:programs,id',
+            'approverId' => 'nullable|exists:users,id',
         ];
 
         if ($approvalType && $approvalType->requires_document) {
@@ -143,6 +181,7 @@ class SubmitRequest extends Component
             'approvable_type' => get_class($submission),
             'approvable_id' => $submission->id,
             'submitted_by' => Auth::id(),
+            'approver_id' => $this->approverId ?: null,
             'approval_type_id' => $this->approvalTypeId,
             'program_id' => $this->programId,
             'item_type' => 'approval_submission',
@@ -165,11 +204,14 @@ class SubmitRequest extends Component
             ->get()
             ->groupBy('category');
 
-        $programs = Program::orderBy('program_name')->get();
+        $programs = Program::orderBy('name')->get();
+
+        $qualifiedApprovers = $this->qualifiedApprovers;
 
         return view('livewire.mobile.submit-request', [
             'approvalTypes' => $approvalTypes,
             'programs' => $programs,
+            'qualifiedApprovers' => $qualifiedApprovers,
         ])->layout('components.layouts.approvals');
     }
 }

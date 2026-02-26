@@ -1,7 +1,7 @@
-<div class="p-4 page-enter">
+<div class="p-4 lg:py-8 page-enter">
     {{-- Header --}}
     <div class="flex items-center justify-between mb-4">
-        <h1 class="text-lg font-semibold text-white">Review Queue</h1>
+        <h1 class="text-lg lg:text-2xl font-semibold text-white">Review Queue</h1>
         <span class="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-amber-500/20 text-amber-400">{{ $pendingCount }} pending</span>
     </div>
 
@@ -17,40 +17,43 @@
         </div>
     @endif
 
-    {{-- Search --}}
-    <div class="mb-3">
-        <input
-            wire:model.live.debounce.300ms="search"
-            type="search"
-            placeholder="Search by name, submitter, or program..."
-            class="w-full h-10 px-3 text-sm rounded-lg bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 focus:outline-none"
-        >
-    </div>
-
-    {{-- Filter Chips --}}
-    <div class="flex gap-2 mb-3 overflow-x-auto pb-1">
-        @foreach(['all' => 'All', 'documents' => 'Documents', 'tasks' => 'Tasks', 'submissions' => 'Submissions'] as $value => $label)
-            <button
-                wire:click="$set('filterType', '{{ $value }}')"
-                class="flex-shrink-0 px-3 py-1.5 text-xs font-medium rounded-full transition-colors
-                    {{ $filterType === $value ? 'bg-indigo-600 text-white' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700' }}"
+    {{-- Search & Filters --}}
+    <div class="lg:flex lg:items-center lg:gap-4 mb-4">
+        {{-- Search --}}
+        <div class="mb-3 lg:mb-0 lg:flex-1 lg:max-w-md">
+            <input
+                wire:model.live.debounce.300ms="search"
+                type="search"
+                placeholder="Search by name, submitter, or program..."
+                class="w-full h-10 px-3 text-sm rounded-lg bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 focus:outline-none"
             >
-                {{ $label }}
-            </button>
-        @endforeach
-    </div>
+        </div>
 
-    {{-- Status Filter --}}
-    <div class="flex gap-2 mb-4 overflow-x-auto pb-1">
-        @foreach(['pending' => 'Pending', 'approved' => 'Approved', 'rejected' => 'Rejected', 'all' => 'All Status'] as $value => $label)
-            <button
-                wire:click="$set('filterStatus', '{{ $value }}')"
-                class="flex-shrink-0 px-3 py-1.5 text-xs font-medium rounded-full transition-colors
-                    {{ $filterStatus === $value ? 'bg-zinc-600 text-white' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700' }}"
-            >
-                {{ $label }}
-            </button>
-        @endforeach
+        {{-- Filter Chips --}}
+        <div class="flex gap-2 mb-3 lg:mb-0 overflow-x-auto pb-1 lg:overflow-visible lg:pb-0">
+            @foreach(['all' => 'All', 'documents' => 'Documents', 'tasks' => 'Tasks', 'submissions' => 'Submissions'] as $value => $label)
+                <button
+                    wire:click="$set('filterType', '{{ $value }}')"
+                    class="flex-shrink-0 px-3 py-1.5 text-xs font-medium rounded-full transition-colors
+                        {{ $filterType === $value ? 'bg-indigo-600 text-white' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700' }}"
+                >
+                    {{ $label }}
+                </button>
+            @endforeach
+        </div>
+
+        {{-- Status Filter --}}
+        <div class="flex gap-2 overflow-x-auto pb-1 lg:overflow-visible lg:pb-0">
+            @foreach(['pending' => 'Pending', 'approved' => 'Approved', 'rejected' => 'Rejected', 'all' => 'All Status'] as $value => $label)
+                <button
+                    wire:click="$set('filterStatus', '{{ $value }}')"
+                    class="flex-shrink-0 px-3 py-1.5 text-xs font-medium rounded-full transition-colors
+                        {{ $filterStatus === $value ? 'bg-zinc-600 text-white' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700' }}"
+                >
+                    {{ $label }}
+                </button>
+            @endforeach
+        </div>
     </div>
 
     {{-- Approval Cards --}}
@@ -62,7 +65,7 @@
             <p class="text-sm text-zinc-500">No items to review</p>
         </div>
     @else
-        <div class="space-y-3">
+        <div class="space-y-3 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0">
             @foreach($approvals as $approval)
             <div class="approval-card bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden">
                 {{-- Card Header --}}
@@ -103,7 +106,7 @@
                         <span>{{ $approval->created_at->diffForHumans() }}</span>
                         @if($approval->program)
                             <span>&middot;</span>
-                            <span class="truncate">{{ $approval->program->program_name }}</span>
+                            <span class="truncate">{{ $approval->program->name }}</span>
                         @endif
                     </div>
                 </a>
@@ -149,7 +152,7 @@
         {{-- Backdrop --}}
         <div class="absolute inset-0 bg-black/60" wire:click="$set('showRejectModal', false)"></div>
 
-        {{-- Modal content (slides up on mobile) --}}
+        {{-- Modal content --}}
         <div class="relative w-full sm:max-w-md bg-zinc-900 rounded-t-2xl sm:rounded-2xl border border-zinc-800 p-6 safe-bottom">
             <h3 class="text-lg font-semibold text-white mb-1">Reject Item</h3>
             <p class="text-sm text-zinc-400 mb-4">Please explain why this item is being rejected.</p>

@@ -33,7 +33,21 @@ class ApprovalDetail extends Component
         }
 
         DB::transaction(function () {
+            $previousStep = $this->approval->current_chain_step;
             $this->approval->approve(Auth::user());
+            $this->approval->refresh();
+
+            $document = $this->approval->approvable ?? $this->approval;
+
+            ApprovalHistory::create(array_filter([
+                'approvable_type' => get_class($document),
+                'approvable_id' => $document->id,
+                'version' => $document->document_version ?? 1,
+                'action' => 'approved',
+                'user_id' => Auth::id(),
+                'approval_type_id' => $this->approval->approval_type_id,
+                'chain_step' => $previousStep,
+            ]));
 
             ApprovalNotification::create([
                 'pending_approval_id' => $this->approval->id,
@@ -71,6 +85,18 @@ class ApprovalDetail extends Component
 
         DB::transaction(function () {
             $this->approval->reject(Auth::user(), $this->rejectionReason);
+
+            $document = $this->approval->approvable ?? $this->approval;
+
+            ApprovalHistory::create(array_filter([
+                'approvable_type' => get_class($document),
+                'approvable_id' => $document->id,
+                'version' => $document->document_version ?? 1,
+                'action' => 'rejected',
+                'user_id' => Auth::id(),
+                'reason' => $this->rejectionReason,
+                'approval_type_id' => $this->approval->approval_type_id,
+            ]));
 
             ApprovalNotification::create([
                 'pending_approval_id' => $this->approval->id,

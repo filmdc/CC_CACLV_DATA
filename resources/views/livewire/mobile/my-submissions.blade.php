@@ -1,7 +1,7 @@
-<div class="p-4 page-enter">
+<div class="p-4 lg:py-8 page-enter">
     {{-- Header --}}
     <div class="flex items-center justify-between mb-4">
-        <h1 class="text-lg font-semibold text-white">My Submissions</h1>
+        <h1 class="text-lg lg:text-2xl font-semibold text-white">My Submissions</h1>
         @if(auth()->user()->hasPermission('approvals.submit'))
         <a href="{{ route('mobile.submit') }}" wire:navigate
             class="flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-green-600 hover:bg-green-500 text-white rounded-lg transition-colors">
@@ -20,27 +20,30 @@
         </div>
     @endif
 
-    {{-- Search --}}
-    <div class="mb-3">
-        <input
-            wire:model.live.debounce.300ms="search"
-            type="search"
-            placeholder="Search by title..."
-            class="w-full h-10 px-3 text-sm rounded-lg bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 focus:outline-none"
-        >
-    </div>
-
-    {{-- Status Filter Tabs --}}
-    <div class="flex gap-2 mb-4 overflow-x-auto pb-1">
-        @foreach(['all' => 'All', 'pending' => 'Pending', 'approved' => 'Approved', 'rejected' => 'Rejected'] as $value => $label)
-            <button
-                wire:click="$set('filterStatus', '{{ $value }}')"
-                class="flex-shrink-0 px-3 py-1.5 text-xs font-medium rounded-full transition-colors
-                    {{ $filterStatus === $value ? 'bg-indigo-600 text-white' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700' }}"
+    {{-- Search & Filters --}}
+    <div class="lg:flex lg:items-center lg:gap-4 mb-4">
+        {{-- Search --}}
+        <div class="mb-3 lg:mb-0 lg:flex-1 lg:max-w-md">
+            <input
+                wire:model.live.debounce.300ms="search"
+                type="search"
+                placeholder="Search by title..."
+                class="w-full h-10 px-3 text-sm rounded-lg bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 focus:outline-none"
             >
-                {{ $label }}
-            </button>
-        @endforeach
+        </div>
+
+        {{-- Status Filter Tabs --}}
+        <div class="flex gap-2 overflow-x-auto pb-1 lg:overflow-visible lg:pb-0">
+            @foreach(['all' => 'All', 'pending' => 'Pending', 'approved' => 'Approved', 'rejected' => 'Rejected'] as $value => $label)
+                <button
+                    wire:click="$set('filterStatus', '{{ $value }}')"
+                    class="flex-shrink-0 px-3 py-1.5 text-xs font-medium rounded-full transition-colors
+                        {{ $filterStatus === $value ? 'bg-indigo-600 text-white' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700' }}"
+                >
+                    {{ $label }}
+                </button>
+            @endforeach
+        </div>
     </div>
 
     {{-- Submission Cards --}}
@@ -58,7 +61,7 @@
             @endif
         </div>
     @else
-        <div class="space-y-3" x-data="{ expanded: null }">
+        <div class="space-y-3 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0" x-data="{ expanded: null }">
             @foreach($submissions as $submission)
             <div class="approval-card bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden">
                 {{-- Card Header (tappable to expand) --}}
@@ -84,7 +87,7 @@
                         <span>{{ ($submission->submitted_at ?? $submission->created_at)->diffForHumans() }}</span>
                         @if($submission->program)
                             <span>&middot;</span>
-                            <span class="truncate">{{ $submission->program->program_name }}</span>
+                            <span class="truncate">{{ $submission->program->name }}</span>
                         @endif
                     </div>
 

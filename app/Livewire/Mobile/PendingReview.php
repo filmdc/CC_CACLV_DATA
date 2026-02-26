@@ -134,7 +134,7 @@ class PendingReview extends Component
                         $q2->where('name', 'like', '%'.$this->search.'%');
                     })
                     ->orWhereHas('program', function ($q2) {
-                        $q2->where('program_name', 'like', '%'.$this->search.'%');
+                        $q2->where('name', 'like', '%'.$this->search.'%');
                     });
             });
         }

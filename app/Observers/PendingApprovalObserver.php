@@ -111,6 +111,25 @@ class PendingApprovalObserver
             });
         }
 
-        return $approvers->all();
+        return $this->expandWithDelegates($approvers->all());
+    }
+
+    protected function expandWithDelegates(array $approvers): array
+    {
+        $expanded = collect($approvers)->keyBy('id');
+
+        foreach ($approvers as $approver) {
+            if ($approver->approval_delegate_id && ! $expanded->has($approver->approval_delegate_id)) {
+                $delegate = User::where('id', $approver->approval_delegate_id)
+                    ->where('active', true)
+                    ->first();
+
+                if ($delegate) {
+                    $expanded->put($delegate->id, $delegate);
+                }
+            }
+        }
+
+        return $expanded->values()->all();
     }
 }

@@ -41,6 +41,14 @@
         min-width: 44px;
     }
 
+    /* On desktop, relax touch target constraints */
+    @media (min-width: 1024px) {
+        button, a, [role="button"] {
+            min-height: unset;
+            min-width: unset;
+        }
+    }
+
     *,
     ::after,
     ::before,
@@ -87,6 +95,17 @@
     transform: scale(0.98);
 }
 
+/* On desktop, use hover effect instead of active press */
+@media (min-width: 1024px) {
+    .approval-card:active {
+        transform: none;
+    }
+    .approval-card:hover {
+        border-color: rgb(63, 63, 70);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+}
+
 /* Status badge colors */
 .status-pending { background-color: rgb(254, 243, 199); color: rgb(146, 64, 14); }
 .status-approved { background-color: rgb(209, 250, 229); color: rgb(6, 95, 70); }
@@ -101,6 +120,11 @@
 }
 .dark .bottom-nav-active {
     color: rgb(129, 140, 248);
+}
+
+/* Sidebar navigation */
+.sidebar-nav-link {
+    transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 /* Pull-to-refresh animation */

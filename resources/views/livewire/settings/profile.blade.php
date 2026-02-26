@@ -109,6 +109,8 @@ new class extends Component {
             </div>
         </form>
 
+        <livewire:settings.approval-delegate />
+
         <livewire:settings.delete-user-form />
     </x-settings.layout>
 </section>

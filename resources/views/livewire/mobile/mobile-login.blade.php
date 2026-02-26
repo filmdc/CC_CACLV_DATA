@@ -1,13 +1,13 @@
-<div class="w-full max-w-sm mx-auto page-enter">
+<div class="w-full max-w-sm lg:max-w-md mx-auto page-enter">
     <div class="text-center mb-8">
         <div class="flex justify-center mb-3">
-            <x-app-logo-icon class="size-10 fill-current text-indigo-400" />
+            <x-app-logo-icon class="size-10 lg:size-12 fill-current text-indigo-400" />
         </div>
-        <h1 class="text-xl font-semibold text-white">CAP TRACK</h1>
+        <h1 class="text-xl lg:text-2xl font-semibold text-white">CAP TRACK</h1>
         <p class="text-sm text-zinc-400 mt-1">Approvals Portal</p>
     </div>
 
-    <div class="bg-zinc-900 rounded-2xl border border-zinc-800 p-6">
+    <div class="bg-zinc-900 rounded-2xl border border-zinc-800 p-6 lg:p-8">
         <form wire:submit="login">
             <div class="space-y-4">
                 <div>
@@ -19,7 +19,7 @@
                         autocomplete="email"
                         autofocus
                         required
-                        class="w-full h-12 px-4 text-base rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none"
+                        class="w-full h-12 lg:h-10 px-4 text-base lg:text-sm rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none"
                         placeholder="you@caclv.org"
                     >
                     @error('email')
@@ -35,7 +35,7 @@
                         type="password"
                         autocomplete="current-password"
                         required
-                        class="w-full h-12 px-4 text-base rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none"
+                        class="w-full h-12 lg:h-10 px-4 text-base lg:text-sm rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none"
                         placeholder="Enter your password"
                     >
                     @error('password')
@@ -47,14 +47,14 @@
                     <input
                         wire:model="remember"
                         type="checkbox"
-                        class="h-5 w-5 rounded border-zinc-600 bg-zinc-800 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-zinc-900"
+                        class="h-5 w-5 lg:h-4 lg:w-4 rounded border-zinc-600 bg-zinc-800 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-zinc-900"
                     >
                     <span class="text-sm text-zinc-400">Remember me</span>
                 </label>
 
                 <button
                     type="submit"
-                    class="w-full h-12 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center"
+                    class="w-full h-12 lg:h-10 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center"
                     wire:loading.attr="disabled"
                     wire:loading.class="opacity-75 cursor-wait"
                 >

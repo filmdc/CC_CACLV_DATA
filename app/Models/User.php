@@ -4,7 +4,9 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
@@ -25,6 +27,7 @@ class User extends Authenticatable
         'password',
         'active',
         'email_verified_at',
+        'approval_delegate_id',
     ];
 
     /**
@@ -84,6 +87,16 @@ class User extends Authenticatable
     public function sageIntacctToken()
     {
         return $this->hasOne(UserSageIntacctToken::class);
+    }
+
+    public function approvalDelegate(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approval_delegate_id');
+    }
+
+    public function delegatedBy(): HasMany
+    {
+        return $this->hasMany(User::class, 'approval_delegate_id');
     }
 
     /**
