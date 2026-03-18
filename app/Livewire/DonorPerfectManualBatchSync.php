@@ -18,6 +18,8 @@ class DonorPerfectManualBatchSync extends Component
 
     public $selectedBatch = '';
 
+    public $manualBatchInput = '';
+
     public $availableBatches = [];
 
     public $filteredOutGifts = [];
@@ -77,6 +79,19 @@ class DonorPerfectManualBatchSync extends Component
         $this->loadBatchesForDate();
     }
 
+    public function clearDate()
+    {
+        $this->selectedDate = '';
+        $this->selectedBatch = '';
+        $this->availableBatches = [];
+        $this->batchesLoaded = false;
+        $this->previewGifts = [];
+        $this->filteredOutGifts = [];
+        $this->showPreview = false;
+        $this->syncCompleted = false;
+        $this->downloadUrl = '';
+    }
+
     public function updatedSelectedDate()
     {
         $this->selectedBatch = '';
@@ -98,16 +113,27 @@ class DonorPerfectManualBatchSync extends Component
         $this->downloadUrl = '';
     }
 
+    public function updatedManualBatchInput()
+    {
+        $this->previewGifts = [];
+        $this->filteredOutGifts = [];
+        $this->showPreview = false;
+        $this->syncCompleted = false;
+        $this->downloadUrl = '';
+    }
+
     /**
      * Extract the batch group prefix by stripping trailing iterative numbers.
      *
      * Examples:
-     *   ACH-001   → ACH
-     *   ACH-002   → ACH
+     *   ACH-001        → ACH
+     *   ACH-002        → ACH
      *   EFT_20260220_1 → EFT_20260220
      *   CashBatch5     → CashBatch
      *   WIRE           → WIRE (no trailing number)
      *   123            → 123  (pure number stays as-is)
+     *   02.10.26 LVCF  → 02.10.26 LVCF (date-based names preserved)
+     *   02.10.26       → 02.10.26      (date-based names preserved)
      */
     protected function extractBatchGroup(string $batchNo): string
     {
@@ -123,7 +149,8 @@ class DonorPerfectManualBatchSync extends Component
         }
 
         // Strip trailing separator + number: e.g. "ACH-001" → "ACH", "EFT_20260220_1" → "EFT_20260220"
-        if (preg_match('/^(.+?)[\s_\-\.]+(\d+)$/', $batchNo, $matches)) {
+        // Note: periods are excluded from separators to preserve date-based names like "02.10.26"
+        if (preg_match('/^(.+?)[\s_\-]+(\d+)$/', $batchNo, $matches)) {
             return $matches[1];
         }
 
@@ -153,7 +180,7 @@ class DonorPerfectManualBatchSync extends Component
             $giftService = app(DonorPerfectGiftService::class);
             $date = Carbon::parse($this->selectedDate);
 
-            $result = $giftService->getGiftsWithMetadata($date, $date, '');
+            $result = $giftService->getGiftsWithMetadata($date, $date, '', ['BATCH']);
 
             if (! $result['success']) {
                 $this->loadingBatches = false;
@@ -192,21 +219,46 @@ class DonorPerfectManualBatchSync extends Component
     }
 
     /**
+     * Get the effective batch to use (from dropdown or manual input)
+     */
+    protected function getEffectiveBatch(): string
+    {
+        if (! empty($this->selectedDate)) {
+            return $this->selectedBatch;
+        }
+
+        return trim($this->manualBatchInput);
+    }
+
+    /**
      * Load preview of gifts for selected date and manual batch group
      */
     public function loadPreview()
     {
-        if (empty($this->selectedDate) || empty($this->selectedBatch)) {
-            session()->flash('error', 'Please select both a date and a batch group');
+        $effectiveBatch = $this->getEffectiveBatch();
+
+        if (empty($effectiveBatch)) {
+            session()->flash('error', empty($this->selectedDate)
+                ? 'Please enter a batch ID'
+                : 'Please select a batch group');
 
             return;
         }
 
         try {
             $giftService = app(DonorPerfectGiftService::class);
-            $date = Carbon::parse($this->selectedDate);
 
-            $result = $giftService->getGiftsWithMetadata($date, $date, '');
+            if (! empty($this->selectedDate)) {
+                // Date mode: search single date
+                $startDate = Carbon::parse($this->selectedDate);
+                $endDate = $startDate->copy();
+            } else {
+                // No-date mode: search last 90 days
+                $endDate = Carbon::now();
+                $startDate = $endDate->copy()->subDays(90);
+            }
+
+            $result = $giftService->getGiftsWithMetadata($startDate, $endDate, '', ['BATCH']);
 
             if (! $result['success']) {
                 session()->flash('error', $result['error'] ?? 'Failed to load gifts');
@@ -214,18 +266,35 @@ class DonorPerfectManualBatchSync extends Component
                 return;
             }
 
+            // Normalize user input to batch group for consistent matching
+            $effectiveBatchGroup = $this->extractBatchGroup($effectiveBatch);
+
             // Filter to gifts whose BATCH UDF maps to the selected group
+            // Match by group OR exact value so users can type either "ACH" or "ACH-001"
             $batchGifts = $result['gifts']
-                ->filter(function ($gift) {
+                ->filter(function ($gift) use ($effectiveBatch, $effectiveBatchGroup) {
                     $batchNo = $gift['BATCH'] ?? '';
                     if (empty($batchNo)) {
                         return false;
                     }
 
-                    return $this->extractBatchGroup((string) $batchNo) === $this->selectedBatch;
+                    $giftGroup = $this->extractBatchGroup((string) $batchNo);
+
+                    return $giftGroup === $effectiveBatchGroup
+                        || $giftGroup === $effectiveBatch
+                        || (string) $batchNo === $effectiveBatch;
                 })
                 ->values()
                 ->toArray();
+
+            if (empty($this->selectedDate) && empty($batchGifts)) {
+                session()->flash('error', 'No gifts found for batch "'.$effectiveBatch.'" in the last 90 days');
+
+                return;
+            }
+
+            // Store the resolved group name for use in preview/sync
+            $this->selectedBatch = $effectiveBatchGroup ?: $effectiveBatch;
 
             // Apply sync filters to separate syncable gifts from filtered-out gifts
             $this->applySyncFilters($batchGifts);
@@ -233,7 +302,7 @@ class DonorPerfectManualBatchSync extends Component
         } catch (\Exception $e) {
             Log::error('DonorPerfectManualBatchSync: Failed to load preview', [
                 'date' => $this->selectedDate,
-                'batch' => $this->selectedBatch,
+                'batch' => $effectiveBatch,
                 'error' => $e->getMessage(),
             ]);
             session()->flash('error', 'Failed to load preview: '.$e->getMessage());

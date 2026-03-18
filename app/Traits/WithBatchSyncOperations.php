@@ -143,7 +143,20 @@ trait WithBatchSyncOperations
         $this->syncInProgress = true;
 
         try {
-            $date = Carbon::parse($this->selectedDate);
+            if (! empty($this->selectedDate)) {
+                $startDate = Carbon::parse($this->selectedDate);
+                $endDate = $startDate->copy();
+            } else {
+                // Derive date range from the gifts themselves
+                $giftDates = collect($this->previewGifts)
+                    ->pluck('gift_date')
+                    ->filter()
+                    ->map(fn ($d) => Carbon::parse($d))
+                    ->sort();
+
+                $startDate = $giftDates->first() ?? Carbon::now();
+                $endDate = $giftDates->last() ?? Carbon::now();
+            }
 
             $intacctSetting = SageIntacctSetting::getActive();
 
@@ -169,8 +182,8 @@ trait WithBatchSyncOperations
             }
 
             $syncResult = $syncService->syncGifts(
-                $date,
-                $date,
+                $startDate,
+                $endDate,
                 auth()->id(),
                 $this->previewGifts
             );
@@ -235,7 +248,8 @@ trait WithBatchSyncOperations
                 'borders' => ['allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN]],
             ];
 
-            $sheet->setCellValue('A1', 'Batch '.$this->selectedBatch.' Preview - '.Carbon::parse($this->selectedDate)->format('F j, Y'));
+            $dateLabel = ! empty($this->selectedDate) ? Carbon::parse($this->selectedDate)->format('F j, Y') : 'All Dates';
+            $sheet->setCellValue('A1', 'Batch '.$this->selectedBatch.' Preview - '.$dateLabel);
             $sheet->mergeCells('A1:L1');
             $sheet->getStyle('A1')->applyFromArray([
                 'font' => ['bold' => true, 'size' => 14, 'color' => ['rgb' => '1F2937']],
@@ -364,7 +378,8 @@ trait WithBatchSyncOperations
 
             $spreadsheet->setActiveSheetIndex(0);
 
-            $filename = 'batch_preview_'.$this->selectedDate.'_batch_'.$this->selectedBatch.'_'.time().'.xlsx';
+            $datePart = ! empty($this->selectedDate) ? $this->selectedDate : 'multi_date';
+            $filename = 'batch_preview_'.$datePart.'_batch_'.$this->selectedBatch.'_'.time().'.xlsx';
             $filepath = storage_path('app/exports/'.$filename);
 
             if (! file_exists(storage_path('app/exports'))) {
@@ -393,7 +408,8 @@ trait WithBatchSyncOperations
     private function generateSyncExport()
     {
         try {
-            $filename = 'batch_sync_'.$this->selectedDate.'_batch_'.$this->selectedBatch.'_'.time().'.csv';
+            $datePart = ! empty($this->selectedDate) ? $this->selectedDate : 'multi_date';
+            $filename = 'batch_sync_'.$datePart.'_batch_'.$this->selectedBatch.'_'.time().'.csv';
             $filepath = storage_path('app/exports/'.$filename);
 
             if (! file_exists(storage_path('app/exports'))) {
@@ -441,7 +457,7 @@ trait WithBatchSyncOperations
             fputcsv($handle, []);
             fputcsv($handle, ['--- SYNC SUMMARY ---']);
             fputcsv($handle, ['Sync Date', now()->format('Y-m-d H:i:s')]);
-            fputcsv($handle, ['Gift Date', $this->selectedDate]);
+            fputcsv($handle, ['Gift Date', ! empty($this->selectedDate) ? $this->selectedDate : 'Multiple Dates']);
             fputcsv($handle, ['Batch', $this->selectedBatch]);
             fputcsv($handle, ['Total Gifts', count($this->previewGifts)]);
             fputcsv($handle, ['Total Amount', '$'.number_format(collect($this->previewGifts)->sum('amount'), 2)]);

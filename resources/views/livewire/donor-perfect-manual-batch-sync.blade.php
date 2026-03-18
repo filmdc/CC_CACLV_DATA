@@ -4,7 +4,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Manual Batch Sync to Sage Intacct</h1>
-                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Sync gifts by date and manual batch number</p>
+                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Sync gifts by manual batch number, optionally filtered by date</p>
             </div>
             <a href="{{ route('donor-gifts.feed') }}"
                class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-zinc-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-600">
@@ -70,12 +70,27 @@
             <!-- Date Selection -->
             <div>
                 <label for="selectedDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Gift Date
+                    Gift Date <span class="text-gray-400 dark:text-gray-500 font-normal">(optional)</span>
                 </label>
-                <input type="date"
-                       wire:model.live="selectedDate"
-                       id="selectedDate"
-                       class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500">
+                <div class="flex gap-2">
+                    <input type="date"
+                           wire:model.live="selectedDate"
+                           id="selectedDate"
+                           class="flex-1 px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    @if(!empty($selectedDate))
+                        <button wire:click="clearDate"
+                                type="button"
+                                class="px-3 py-2 text-gray-400 hover:text-red-500 dark:hover:text-red-400 border border-gray-300 dark:border-zinc-600 rounded-md hover:border-red-300 dark:hover:border-red-600 transition-colors"
+                                title="Clear date to search all dates">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    @endif
+                </div>
+                @if(empty($selectedDate))
+                    <p class="mt-1 text-xs text-blue-600 dark:text-blue-400">Will search across the last 90 days</p>
+                @endif
             </div>
 
             <!-- Batch Selection -->
@@ -83,59 +98,71 @@
                 <label for="selectedBatch" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Manual Batch Group
                 </label>
-                <div class="relative">
-                    <!-- Loading state shown while date changes trigger batch lookup -->
-                    <div wire:loading wire:target="selectedDate" class="w-full">
-                        <select disabled class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md opacity-50">
-                            <option value="">Loading batches...</option>
-                        </select>
-                        <div class="absolute inset-y-0 right-8 flex items-center pointer-events-none">
-                            <svg class="animate-spin h-4 w-4 text-teal-500" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
+
+                @if(!empty($selectedDate))
+                    {{-- Date mode: dropdown populated from API --}}
+                    <div class="relative">
+                        <!-- Loading state shown while date changes trigger batch lookup -->
+                        <div wire:loading wire:target="selectedDate" class="w-full">
+                            <select disabled class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md opacity-50">
+                                <option value="">Loading batches...</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-8 flex items-center pointer-events-none">
+                                <svg class="animate-spin h-4 w-4 text-teal-500" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- Normal state shown when not loading -->
+                        <div wire:loading.remove wire:target="selectedDate">
+                            <select wire:model.live="selectedBatch"
+                                    id="selectedBatch"
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                    {{ empty($availableBatches) ? 'disabled' : '' }}>
+                                @if($batchesLoaded && empty($availableBatches))
+                                    <option value="">No batch numbers found for this date</option>
+                                @elseif(!$batchesLoaded)
+                                    <option value="">Select a date first...</option>
+                                @else
+                                    <option value="">Select a batch group...</option>
+                                    @foreach($availableBatches as $batch)
+                                        <option value="{{ $batch }}">{{ $batch }}</option>
+                                    @endforeach
+                                @endif
+                            </select>
                         </div>
                     </div>
 
-                    <!-- Normal state shown when not loading -->
-                    <div wire:loading.remove wire:target="selectedDate">
-                        <select wire:model.live="selectedBatch"
-                                id="selectedBatch"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
-                                {{ empty($availableBatches) ? 'disabled' : '' }}>
-                            @if($batchesLoaded && empty($availableBatches))
-                                <option value="">No batch numbers found for this date</option>
-                            @elseif(!$batchesLoaded)
-                                <option value="">Select a date first...</option>
-                            @else
-                                <option value="">Select a batch group...</option>
-                                @foreach($availableBatches as $batch)
-                                    <option value="{{ $batch }}">{{ $batch }}</option>
-                                @endforeach
-                            @endif
-                        </select>
+                    <!-- Status messages -->
+                    <div wire:loading wire:target="selectedDate">
+                        <p class="mt-1 text-xs text-teal-600 dark:text-teal-400">
+                            <span class="inline-flex items-center">
+                                <svg class="animate-spin h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Searching for batch numbers...
+                            </span>
+                        </p>
                     </div>
-                </div>
-
-                <!-- Status messages -->
-                <div wire:loading wire:target="selectedDate">
-                    <p class="mt-1 text-xs text-teal-600 dark:text-teal-400">
-                        <span class="inline-flex items-center">
-                            <svg class="animate-spin h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            Searching for batch numbers...
-                        </span>
-                    </p>
-                </div>
-                <div wire:loading.remove wire:target="selectedDate">
-                    @if($batchesLoaded && count($availableBatches) > 0)
-                        <p class="mt-1 text-xs text-green-600 dark:text-green-400">{{ count($availableBatches) }} batch group(s) found for this date</p>
-                    @elseif($batchesLoaded && empty($availableBatches))
-                        <p class="mt-1 text-xs text-amber-600 dark:text-amber-400">No gifts with batch numbers found for this date</p>
-                    @endif
-                </div>
+                    <div wire:loading.remove wire:target="selectedDate">
+                        @if($batchesLoaded && count($availableBatches) > 0)
+                            <p class="mt-1 text-xs text-green-600 dark:text-green-400">{{ count($availableBatches) }} batch group(s) found for this date</p>
+                        @elseif($batchesLoaded && empty($availableBatches))
+                            <p class="mt-1 text-xs text-amber-600 dark:text-amber-400">No gifts with batch numbers found for this date</p>
+                        @endif
+                    </div>
+                @else
+                    {{-- No-date mode: manual text input --}}
+                    <input type="text"
+                           wire:model.live="manualBatchInput"
+                           id="manualBatchInput"
+                           placeholder="Enter batch ID (e.g. ACH, WIRE, 02.10.26 LVCF)"
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Type the batch group name to search across all dates</p>
+                @endif
             </div>
 
             <!-- Preview Button -->
@@ -143,7 +170,7 @@
                 <button wire:click="loadPreview"
                         wire:loading.attr="disabled"
                         class="w-full px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                        {{ empty($selectedDate) || empty($selectedBatch) ? 'disabled' : '' }}>
+                        {{ (!empty($selectedDate) && empty($selectedBatch)) || (empty($selectedDate) && empty($manualBatchInput)) ? 'disabled' : '' }}>
                     <span wire:loading.remove wire:target="loadPreview">
                         <svg class="inline-block h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -173,7 +200,7 @@
                         Batch {{ $selectedBatch }} Preview
                     </h2>
                     <p class="text-sm text-gray-600 dark:text-gray-400">
-                        {{ \Carbon\Carbon::parse($selectedDate)->format('F j, Y') }}
+                        {{ !empty($selectedDate) ? \Carbon\Carbon::parse($selectedDate)->format('F j, Y') : 'All dates (last 90 days)' }}
                     </p>
                 </div>
 
@@ -277,6 +304,9 @@
                         <thead class="bg-gray-50 dark:bg-zinc-700">
                             <tr>
                                 <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Gift ID</th>
+                                @if(empty($selectedDate))
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Gift Date</th>
+                                @endif
                                 <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Batch No</th>
                                 <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Amount</th>
                                 <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Donor</th>
@@ -309,6 +339,11 @@
                                     <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                                         {{ $gift['gift_id'] ?? '-' }}
                                     </td>
+                                    @if(empty($selectedDate))
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                                            {{ isset($gift['gift_date']) ? \Carbon\Carbon::parse($gift['gift_date'])->format('m/d/Y') : '-' }}
+                                        </td>
+                                    @endif
                                     <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300 font-mono">
                                         {{ $gift['BATCH'] ?? '-' }}
                                     </td>
@@ -372,7 +407,7 @@
                         </tbody>
                         <tfoot class="bg-gray-50 dark:bg-zinc-700">
                             <tr>
-                                <td colspan="2" class="px-4 py-3 text-sm font-semibold text-gray-900 dark:text-white">
+                                <td colspan="{{ empty($selectedDate) ? 3 : 2 }}" class="px-4 py-3 text-sm font-semibold text-gray-900 dark:text-white">
                                     Total: {{ count($previewGifts) }} gifts
                                 </td>
                                 <td class="px-4 py-3 text-sm font-bold text-gray-900 dark:text-white">
@@ -471,7 +506,7 @@
                                     <dl class="space-y-1 text-sm">
                                         <div class="flex justify-between">
                                             <dt class="text-gray-500 dark:text-gray-400">Date:</dt>
-                                            <dd class="font-medium text-gray-900 dark:text-white">{{ \Carbon\Carbon::parse($selectedDate)->format('F j, Y') }}</dd>
+                                            <dd class="font-medium text-gray-900 dark:text-white">{{ !empty($selectedDate) ? \Carbon\Carbon::parse($selectedDate)->format('F j, Y') : 'Multiple Dates' }}</dd>
                                         </div>
                                         <div class="flex justify-between">
                                             <dt class="text-gray-500 dark:text-gray-400">Batch Group:</dt>
