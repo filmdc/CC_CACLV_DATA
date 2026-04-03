@@ -162,6 +162,14 @@ Route::middleware(['auth'])->group(function () {
         ->middleware(['role:Administrator'])
         ->name('donor-gifts.audit-log');
 
+    Route::get('donor-gifts/sync-guide', function () {
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('exports.sync-guide-pdf');
+        $pdf->setPaper('letter', 'portrait');
+
+        return $pdf->download('DonorPerfect_Sync_Guide.pdf');
+    })->middleware(['auth', 'permission:donor_gifts.view'])
+        ->name('donor-gifts.sync-guide');
+
     // Batch Sync Routes
     Route::get('donor-gifts/manual-batch-sync', App\Livewire\DonorPerfectManualBatchSync::class)
         ->middleware(['auth', 'permission:donor_gifts.view'])

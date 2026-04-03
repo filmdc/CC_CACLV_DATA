@@ -52,6 +52,9 @@ class DonorPerfectGiftsFeed extends Component
     public $checkScanBatchFilter = '';
 
     #[Url]
+    public $batchFilter = '';
+
+    #[Url]
     public $sortField = 'gift_date';
 
     #[Url]
@@ -166,6 +169,8 @@ class DonorPerfectGiftsFeed extends Component
 
     public $filterEndDate = '';
 
+    public $filterGiftId = '';
+
     public function mount()
     {
         // Check permission
@@ -214,11 +219,15 @@ class DonorPerfectGiftsFeed extends Component
 
     public function updatedStartDate()
     {
+        // Clear cache so date range change fetches fresh data from DP API
+        app(DonorPerfectGiftService::class)->clearAllCache();
         $this->resetPage();
     }
 
     public function updatedEndDate()
     {
+        // Clear cache so date range change fetches fresh data from DP API
+        app(DonorPerfectGiftService::class)->clearAllCache();
         $this->resetPage();
     }
 
@@ -262,6 +271,11 @@ class DonorPerfectGiftsFeed extends Component
         $this->resetPage();
     }
 
+    public function updatedBatchFilter()
+    {
+        $this->resetPage();
+    }
+
     public function clearAllFilters()
     {
         $this->giftTypeFilter = '';
@@ -271,6 +285,7 @@ class DonorPerfectGiftsFeed extends Component
         $this->solicitCodeFilter = '';
         $this->subSolicitCodeFilter = '';
         $this->checkScanBatchFilter = '';
+        $this->batchFilter = '';
         $this->syncStatusFilter = 'all';
         $this->search = '';
         $this->resetPage();
@@ -293,9 +308,9 @@ class DonorPerfectGiftsFeed extends Component
         $this->authorizeAction('donorperfect.sync.refresh');
 
         try {
-            // Clear cache and reload
-            $giftService->clearCache();
-            session()->flash('success', 'Data refreshed successfully.');
+            // Clear ALL cache entries (not just expired) so fresh API data is fetched
+            $giftService->clearAllCache();
+            session()->flash('success', 'Data refreshed successfully from DonorPerfect.');
             $this->resetPage();
         } catch (\Exception $e) {
             session()->flash('error', 'Failed to refresh data: '.$e->getMessage());
@@ -930,6 +945,8 @@ class DonorPerfectGiftsFeed extends Component
             $result = $giftService->discoverAndSyncCodes(90);
 
             if ($result['success']) {
+                // Clear gift cache so newly discovered codes are reflected
+                $giftService->clearAllCache();
                 session()->flash('success', "Code discovery complete! Found {$result['new']} new code(s).");
             } else {
                 session()->flash('error', 'Code discovery failed: '.($result['error'] ?? 'Unknown error'));
@@ -967,6 +984,9 @@ class DonorPerfectGiftsFeed extends Component
                 $mapping->setMapping($this->editingIntacctCode);
                 $mapping->notes = $this->mappingNotes;
                 $mapping->save();
+
+                // Clear gift cache so updated mappings propagate immediately
+                app(DonorPerfectGiftService::class)->clearAllCache();
 
                 session()->flash('success', 'Code mapping saved successfully.');
                 $this->cancelEdit();
@@ -1100,6 +1120,9 @@ class DonorPerfectGiftsFeed extends Component
                 session()->flash('success', 'Conditional mapping created successfully.');
             }
 
+            // Clear gift cache so updated conditional mappings propagate immediately
+            app(DonorPerfectGiftService::class)->clearAllCache();
+
             $this->cancelConditionalMappingForm();
         } catch (\Exception $e) {
             session()->flash('error', 'Failed to save conditional mapping: '.$e->getMessage());
@@ -1170,11 +1193,17 @@ class DonorPerfectGiftsFeed extends Component
         $this->resetPage();
     }
 
+    public function updatedFilterGiftId()
+    {
+        $this->resetPage();
+    }
+
     public function clearFilters()
     {
         $this->filterStatus = '';
         $this->filterStartDate = '';
         $this->filterEndDate = '';
+        $this->filterGiftId = '';
         $this->resetPage();
     }
 
@@ -1320,8 +1349,8 @@ class DonorPerfectGiftsFeed extends Component
             $startDate = Carbon::parse($this->startDate);
             $endDate = Carbon::parse($this->endDate);
 
-            // Get result with metadata from service
-            $result = $giftService->getGiftsWithMetadata($startDate, $endDate, $this->search);
+            // Get result with metadata from service - ensure BATCH UDF field is always included
+            $result = $giftService->getGiftsWithMetadata($startDate, $endDate, $this->search, ['BATCH']);
 
             // Check for errors (including authentication errors)
             if (! $result['success']) {
@@ -1348,6 +1377,7 @@ class DonorPerfectGiftsFeed extends Component
             $uniqueSolicitCodes = $gifts->pluck('solicit_code')->filter()->unique()->sort()->values();
             $uniqueSubSolicitCodes = $gifts->pluck('sub_solicit_code')->filter()->unique()->sort()->values();
             $uniqueCheckScanBatches = $gifts->pluck('DP_CheckScan_Batch')->filter()->unique()->sort()->values();
+            $uniqueBatches = $gifts->pluck('BATCH')->filter()->unique()->sort()->values();
 
             // Filter by sync status if selected
             if ($this->syncStatusFilter !== 'all') {
@@ -1414,6 +1444,14 @@ class DonorPerfectGiftsFeed extends Component
                 });
             }
 
+            if (! empty($this->batchFilter)) {
+                $gifts = $gifts->filter(function ($gift) {
+                    $batchValue = $gift['BATCH'] ?? '';
+
+                    return stripos($batchValue, $this->batchFilter) !== false;
+                });
+            }
+
             // Sort by selected field
             $gifts = $gifts->sortBy($this->sortField, SORT_REGULAR, $this->sortDirection === 'desc')
                 ->values(); // Re-index after sorting
@@ -1442,8 +1480,9 @@ class DonorPerfectGiftsFeed extends Component
                 ->with('resetBy')
                 ->where('environment', $this->getCurrentEnvironment())
                 ->when($this->filterStatus, fn ($query) => $query->where('status', $this->filterStatus))
-                ->when($this->filterStartDate, fn ($query) => $query->whereDate('started_at', '>=', $this->filterStartDate))
-                ->when($this->filterEndDate, fn ($query) => $query->whereDate('started_at', '<=', $this->filterEndDate))
+                ->when($this->filterStartDate, fn ($query) => $query->whereDate('sync_start_date', '>=', $this->filterStartDate))
+                ->when($this->filterEndDate, fn ($query) => $query->whereDate('sync_end_date', '<=', $this->filterEndDate))
+                ->when($this->filterGiftId, fn ($query) => $query->whereHas('syncItems', fn ($q) => $q->where('gift_id', 'like', '%'.$this->filterGiftId.'%')))
                 ->orderBy('started_at', 'desc')
                 ->paginate(15);
 
@@ -1470,6 +1509,7 @@ class DonorPerfectGiftsFeed extends Component
                 'uniqueSolicitCodes' => $uniqueSolicitCodes,
                 'uniqueSubSolicitCodes' => $uniqueSubSolicitCodes,
                 'uniqueCheckScanBatches' => $uniqueCheckScanBatches,
+                'uniqueBatches' => $uniqueBatches,
             ])->layout('components.layouts.app');
         } catch (\Exception $e) {
             Log::error('DonorPerfect Gifts Feed render error', [

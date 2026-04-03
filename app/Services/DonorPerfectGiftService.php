@@ -198,8 +198,8 @@ class DonorPerfectGiftService
                 }
             }
 
-            // Store in cache
-            $cacheDuration = $this->setting->cache_duration ?? 60;
+            // Store in cache (short TTL to keep data fresh for accounting team)
+            $cacheDuration = $this->setting->cache_duration ?? 5;
             $cached = DonorPerfectGiftCache::storeCache(
                 $startDate,
                 $endDate,
@@ -245,9 +245,9 @@ class DonorPerfectGiftService
     }
 
     /**
-     * Clear expired cache entries
+     * Clear expired cache entries (housekeeping only — does NOT force refresh)
      */
-    public function clearCache(): array
+    public function clearExpiredCache(): array
     {
         try {
             $deletedCount = DonorPerfectGiftCache::clearExpired();
@@ -263,7 +263,7 @@ class DonorPerfectGiftService
             ];
 
         } catch (\Exception $e) {
-            Log::error('DonorPerfect clearCache exception', [
+            Log::error('DonorPerfect clearExpiredCache exception', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
@@ -274,6 +274,16 @@ class DonorPerfectGiftService
                 'deleted_count' => 0,
             ];
         }
+    }
+
+    /**
+     * Clear expired cache entries
+     *
+     * @deprecated Use clearExpiredCache() or clearAllCache() explicitly
+     */
+    public function clearCache(): array
+    {
+        return $this->clearAllCache();
     }
 
     /**
@@ -372,7 +382,8 @@ class DonorPerfectGiftService
                         || str_contains(strtolower($gift['campaign'] ?? ''), $searchLower)
                         || str_contains(strtolower($gift['amount'] ?? ''), $searchLower)
                         || str_contains(strtolower($gift['payment_type'] ?? ''), $searchLower)
-                        || str_contains(strtolower($gift['DP_CheckScan_Batch'] ?? ''), $searchLower);
+                        || str_contains(strtolower($gift['DP_CheckScan_Batch'] ?? ''), $searchLower)
+                        || str_contains(strtolower($gift['BATCH'] ?? ''), $searchLower);
                 });
             }
 
@@ -399,15 +410,24 @@ class DonorPerfectGiftService
      * @param  string  $search  Optional search term
      * @return array
      */
-    public function getGiftsWithMetadata($startDate, $endDate, string $search = '')
+    public function getGiftsWithMetadata($startDate, $endDate, string $search = '', array $requiredFields = [], bool $forceRefresh = false)
     {
         try {
             // Convert Carbon to string format
             $startDateStr = $startDate->format('Y-m-d');
             $endDateStr = $endDate->format('Y-m-d');
 
-            // Get cached gifts
-            $result = $this->getCachedGifts($startDateStr, $endDateStr);
+            // Merge required fields with configured fields to ensure they're in the query
+            $fields = [];
+            if (! empty($requiredFields)) {
+                $configuredFields = $this->setting->getSelectedFields();
+                $fields = array_values(array_unique(array_merge($configuredFields, $requiredFields)));
+            }
+
+            // Get gifts - bypass cache when fresh data is needed
+            $result = $forceRefresh
+                ? $this->refreshGifts($startDateStr, $endDateStr, $fields)
+                : $this->getCachedGifts($startDateStr, $endDateStr, $fields);
 
             if (! $result['success']) {
                 return [
@@ -428,7 +448,8 @@ class DonorPerfectGiftService
                         || str_contains(strtolower($gift['campaign'] ?? ''), $searchLower)
                         || str_contains(strtolower($gift['amount'] ?? ''), $searchLower)
                         || str_contains(strtolower($gift['payment_type'] ?? ''), $searchLower)
-                        || str_contains(strtolower($gift['DP_CheckScan_Batch'] ?? ''), $searchLower);
+                        || str_contains(strtolower($gift['DP_CheckScan_Batch'] ?? ''), $searchLower)
+                        || str_contains(strtolower($gift['BATCH'] ?? ''), $searchLower);
                 });
             }
 

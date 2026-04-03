@@ -163,6 +163,20 @@ class DonorPerfectManualBatchSync extends Component
     }
 
     /**
+     * Get the batch value from a gift, checking both BATCH UDF and batch_no fields.
+     */
+    protected function getGiftBatchValue(array $gift): string
+    {
+        // Prefer BATCH UDF, fall back to batch_no
+        $batch = trim((string) ($gift['BATCH'] ?? ''));
+        if ($batch !== '') {
+            return $batch;
+        }
+
+        return trim((string) ($gift['batch_no'] ?? ''));
+    }
+
+    /**
      * Load available manual batches for the selected date
      */
     public function loadBatchesForDate()
@@ -180,7 +194,7 @@ class DonorPerfectManualBatchSync extends Component
             $giftService = app(DonorPerfectGiftService::class);
             $date = Carbon::parse($this->selectedDate);
 
-            $result = $giftService->getGiftsWithMetadata($date, $date, '', ['BATCH']);
+            $result = $giftService->getGiftsWithMetadata($date, $date, '', ['BATCH', 'batch_no'], true);
 
             if (! $result['success']) {
                 $this->loadingBatches = false;
@@ -192,11 +206,9 @@ class DonorPerfectManualBatchSync extends Component
 
             $gifts = $result['gifts'];
 
-            // Extract unique batch groups from BATCH UDF field
+            // Extract unique exact batch values from BATCH UDF and batch_no fields
             $batches = $gifts
-                ->pluck('BATCH')
-                ->filter()
-                ->map(fn ($batchNo) => $this->extractBatchGroup((string) $batchNo))
+                ->map(fn ($gift) => $this->getGiftBatchValue($gift))
                 ->filter()
                 ->unique()
                 ->sort()
@@ -258,7 +270,7 @@ class DonorPerfectManualBatchSync extends Component
                 $startDate = $endDate->copy()->subDays(90);
             }
 
-            $result = $giftService->getGiftsWithMetadata($startDate, $endDate, '', ['BATCH']);
+            $result = $giftService->getGiftsWithMetadata($startDate, $endDate, '', ['BATCH', 'batch_no'], true);
 
             if (! $result['success']) {
                 session()->flash('error', $result['error'] ?? 'Failed to load gifts');
@@ -266,23 +278,17 @@ class DonorPerfectManualBatchSync extends Component
                 return;
             }
 
-            // Normalize user input to batch group for consistent matching
-            $effectiveBatchGroup = $this->extractBatchGroup($effectiveBatch);
+            // Exact match only — return gifts whose batch value matches exactly what the user selected/entered
+            $effectiveBatchLower = strtolower(trim($effectiveBatch));
 
-            // Filter to gifts whose BATCH UDF maps to the selected group
-            // Match by group OR exact value so users can type either "ACH" or "ACH-001"
             $batchGifts = $result['gifts']
-                ->filter(function ($gift) use ($effectiveBatch, $effectiveBatchGroup) {
-                    $batchNo = $gift['BATCH'] ?? '';
+                ->filter(function ($gift) use ($effectiveBatchLower) {
+                    $batchNo = $this->getGiftBatchValue($gift);
                     if (empty($batchNo)) {
                         return false;
                     }
 
-                    $giftGroup = $this->extractBatchGroup((string) $batchNo);
-
-                    return $giftGroup === $effectiveBatchGroup
-                        || $giftGroup === $effectiveBatch
-                        || (string) $batchNo === $effectiveBatch;
+                    return strtolower(trim((string) $batchNo)) === $effectiveBatchLower;
                 })
                 ->values()
                 ->toArray();
@@ -293,8 +299,8 @@ class DonorPerfectManualBatchSync extends Component
                 return;
             }
 
-            // Store the resolved group name for use in preview/sync
-            $this->selectedBatch = $effectiveBatchGroup ?: $effectiveBatch;
+            // Keep the exact batch value for use in preview/sync
+            $this->selectedBatch = $effectiveBatch;
 
             // Apply sync filters to separate syncable gifts from filtered-out gifts
             $this->applySyncFilters($batchGifts);
