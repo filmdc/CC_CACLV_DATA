@@ -20,3 +20,46 @@
     ErrorLog ${APACHE_LOG_DIR}/approvals-error.log
     CustomLog ${APACHE_LOG_DIR}/approvals-access.log combined
 </VirtualHost>
+
+<VirtualHost *:443>
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/CC_CAP_TRACK
+    ServerName approvals.caclv.org
+
+    SSLEngine on
+    SSLCertificateFile /etc/ssl/certs/calvdata-chain.crt
+    SSLCertificateKeyFile /etc/ssl/private/calvdata.key
+
+    <Directory /var/www/CC_CAP_TRACK>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    <Directory /var/www/CC_CAP_TRACK/public/build>
+        Options -Indexes
+        AllowOverride None
+        Require all granted
+    </Directory>
+
+    <Directory /var/www/CC_CAP_TRACK/vendor>
+        Require all denied
+    </Directory>
+
+    <Directory /var/www/CC_CAP_TRACK/database>
+        Require all denied
+    </Directory>
+
+    <Directory /var/www/CC_CAP_TRACK/storage/logs>
+        Require all denied
+    </Directory>
+
+    <Directory /var/www/CC_CAP_TRACK/storage/framework>
+        Require all denied
+    </Directory>
+
+    Alias /build /var/www/CC_CAP_TRACK/public/build
+
+    ErrorLog ${APACHE_LOG_DIR}/approvals-ssl-error.log
+    CustomLog ${APACHE_LOG_DIR}/approvals-ssl-access.log combined
+</VirtualHost>

@@ -51,11 +51,9 @@ class ApprovalDetail extends Component
 
             ApprovalNotification::create([
                 'pending_approval_id' => $this->approval->id,
-                'user_id' => $this->approval->submitted_by,
-                'type' => $this->approval->status === 'approved' ? 'approved' : 'chain_advanced',
-                'message' => $this->approval->status === 'approved'
-                    ? "Your submission '{$this->approval->item_name}' has been approved."
-                    : "Your submission '{$this->approval->item_name}' has advanced to the next approval step.",
+                'recipient_id' => $this->approval->submitted_by,
+                'notification_type' => $this->approval->status === 'approved' ? 'approved' : 'chain_advanced',
+                'sent_at' => now(),
             ]);
         });
 
@@ -100,9 +98,9 @@ class ApprovalDetail extends Component
 
             ApprovalNotification::create([
                 'pending_approval_id' => $this->approval->id,
-                'user_id' => $this->approval->submitted_by,
-                'type' => 'rejected',
-                'message' => "Your submission '{$this->approval->item_name}' has been rejected. Reason: {$this->rejectionReason}",
+                'recipient_id' => $this->approval->submitted_by,
+                'notification_type' => 'rejected',
+                'sent_at' => now(),
             ]);
         });
 

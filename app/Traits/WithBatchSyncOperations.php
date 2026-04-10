@@ -286,7 +286,7 @@ trait WithBatchSyncOperations
 
                 $sheet->setCellValue('A'.$row, $gift['gift_id'] ?? '');
                 $sheet->setCellValue('B'.$row, $gift['gift_date'] ?? '');
-                $sheet->setCellValue('C'.$row, $gift['BATCH'] ?? ($gift['DP_CheckScan_Batch'] ?? ''));
+                $sheet->setCellValue('C'.$row, $gift['BATCH'] ?? ($gift['batch_no'] ?? ($gift['DP_CheckScan_Batch'] ?? '')));
                 $sheet->setCellValue('D'.$row, floatval(str_replace(',', '', $gift['amount'] ?? 0)));
                 $sheet->setCellValue('E'.$row, $donorName ?: 'Anonymous');
                 $sheet->setCellValue('F'.$row, $gift['gl_code'] ?? '');
@@ -358,7 +358,7 @@ trait WithBatchSyncOperations
                     $filteredSheet->setCellValue('B'.$fRow, floatval(str_replace(',', '', $gift['amount'] ?? 0)));
                     $filteredSheet->setCellValue('C'.$fRow, $gift['gift_type'] ?? '');
                     $filteredSheet->setCellValue('D'.$fRow, $donorName ?: 'Anonymous');
-                    $filteredSheet->setCellValue('E'.$fRow, $gift['BATCH'] ?? ($gift['DP_CheckScan_Batch'] ?? ''));
+                    $filteredSheet->setCellValue('E'.$fRow, $gift['BATCH'] ?? ($gift['batch_no'] ?? ($gift['DP_CheckScan_Batch'] ?? '')));
                     $filteredSheet->setCellValue('F'.$fRow, $gift['_filter_reason'] ?? 'Excluded by filter');
                     $fRow++;
                 }
@@ -448,7 +448,7 @@ trait WithBatchSyncOperations
                     $gift['sub_solicit_code'] ?? '',
                     $subSolicitMapping['code'] ?? '',
                     $gift['payment_type'] ?? '',
-                    $gift['BATCH'] ?? ($gift['DP_CheckScan_Batch'] ?? ''),
+                    $gift['BATCH'] ?? ($gift['batch_no'] ?? ($gift['DP_CheckScan_Batch'] ?? '')),
                     $hasCheckImage,
                     'Synced',
                 ]);

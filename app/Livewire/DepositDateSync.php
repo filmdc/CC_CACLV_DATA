@@ -7,11 +7,9 @@ use App\Models\UserSageIntacctToken;
 use App\Services\DepositDateSyncService;
 use App\Traits\WithPermissionChecks;
 use Illuminate\Support\Facades\Auth;
-use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-#[Layout('layouts.app')]
 class DepositDateSync extends Component
 {
     use WithPagination, WithPermissionChecks;
@@ -346,6 +344,6 @@ class DepositDateSync extends Component
             'itemsWithDepositDates' => $this->itemsWithDepositDates,
             'itemsWithErrors' => $this->itemsWithErrors,
             'recentlySyncedItems' => $this->recentlySyncedItems,
-        ]);
+        ])->layout('components.layouts.app');
     }
 }

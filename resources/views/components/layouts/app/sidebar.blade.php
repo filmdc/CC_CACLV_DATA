@@ -112,6 +112,9 @@
                     @if(auth()->user()->hasAnyPermission(['intacct.configure', 'sage.sync.view']))
                         <flux:navlist.item icon="cloud-arrow-up" :href="route('sage-intacct.configuration')" :current="request()->routeIs('sage-intacct.configuration')" wire:navigate>{{ __('Sage Intacct Sync') }}</flux:navlist.item>
                     @endif
+                    @if(auth()->user()->hasAnyPermission(['intacct.configure', 'sage.sync.view']))
+                        <flux:navlist.item icon="arrow-path" :href="route('intacct.deposit-date-sync')" :current="request()->routeIs('intacct.deposit-date-sync')" wire:navigate>{{ __('Deposit Date Sync') }}</flux:navlist.item>
+                    @endif
                 </flux:navlist.group>
                 @endif
 

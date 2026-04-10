@@ -8,11 +8,12 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Url;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
 class DonorPerfectGiftsFeed extends Component
 {
-    use WithPagination, WithPermissionChecks;
+    use WithFileUploads, WithPagination, WithPermissionChecks;
 
     // Tab state
     #[Url]
@@ -121,6 +122,13 @@ class DonorPerfectGiftsFeed extends Component
     public $showArchived = false;
 
     public $mappingNotes = '';
+
+    // Code Mapping Import
+    public $showImportModal = false;
+
+    public $importFile = null;
+
+    public $importResults = null;
 
     // Conditional Code Mapping properties
     public $showConditionalMappingForm = false;
@@ -938,7 +946,7 @@ class DonorPerfectGiftsFeed extends Component
 
     public function discoverNewCodes()
     {
-        $this->authorizeAction('intacct.configure');
+        $this->authorizeAction('sage.code_mappings.edit');
 
         try {
             $giftService = new \App\Services\DonorPerfectGiftService;
@@ -1054,18 +1062,209 @@ class DonorPerfectGiftsFeed extends Component
         $this->resetPage();
     }
 
+    // ========================================
+    // CODE MAPPING IMPORT METHODS
+    // ========================================
+
+    public function showImportMappings()
+    {
+        $this->authorizeAction('sage.code_mappings.edit');
+        $this->showImportModal = true;
+        $this->importFile = null;
+        $this->importResults = null;
+    }
+
+    public function cancelImport()
+    {
+        $this->showImportModal = false;
+        $this->importFile = null;
+        $this->importResults = null;
+    }
+
+    public function downloadImportTemplate()
+    {
+        $fieldType = $this->selectedFieldType;
+        $isConditional = in_array($fieldType, ['solicit_code', 'sub_solicit_code']);
+
+        if ($isConditional) {
+            $headers = "intacct_location_code,dp_code,intacct_code,priority,notes\n";
+            $example = "P1000,ANNLFUND,F8000,0,Optional note\nP1000,CAPITAL,F8100,0,\nP1400,ANNLFUND,F9000,0,Different location\n";
+        } else {
+            $headers = "dp_code,intacct_code,notes\n";
+            $example = "EXAMPLE_CODE,1000,Optional note\n";
+        }
+
+        return response()->streamDownload(function () use ($headers, $example) {
+            echo $headers.$example;
+        }, "code_mapping_template_{$fieldType}.csv", ['Content-Type' => 'text/csv']);
+    }
+
+    public function importCodeMappings()
+    {
+        $this->authorizeAction('sage.code_mappings.edit');
+
+        $this->validate([
+            'importFile' => 'required|file|mimes:csv,txt|max:2048',
+        ], [
+            'importFile.required' => 'Please select a CSV file to import.',
+            'importFile.mimes' => 'File must be a CSV file.',
+            'importFile.max' => 'File must be less than 2MB.',
+        ]);
+
+        try {
+            $path = $this->importFile->getRealPath();
+            $handle = fopen($path, 'r');
+
+            if (! $handle) {
+                session()->flash('error', 'Could not open the uploaded file.');
+
+                return;
+            }
+
+            // Read header row
+            $header = fgetcsv($handle);
+            if (! $header) {
+                fclose($handle);
+                session()->flash('error', 'CSV file is empty.');
+
+                return;
+            }
+
+            // Normalize headers
+            $header = array_map(fn ($h) => strtolower(trim($h)), $header);
+
+            // Validate required columns
+            if (! in_array('dp_code', $header) || ! in_array('intacct_code', $header)) {
+                fclose($handle);
+                session()->flash('error', 'CSV must have "dp_code" and "intacct_code" columns.');
+
+                return;
+            }
+
+            $dpCodeIdx = array_search('dp_code', $header);
+            $intacctCodeIdx = array_search('intacct_code', $header);
+            $notesIdx = array_search('notes', $header);
+            $locationIdx = array_search('intacct_location_code', $header);
+            $priorityIdx = array_search('priority', $header);
+
+            $hasLocationColumn = $locationIdx !== false;
+            $isConditionalType = in_array($this->selectedFieldType, ['solicit_code', 'sub_solicit_code']);
+
+            $created = 0;
+            $updated = 0;
+            $skipped = 0;
+            $conditionalCreated = 0;
+            $conditionalUpdated = 0;
+            $errors = [];
+            $row = 1;
+
+            while (($data = fgetcsv($handle)) !== false) {
+                $row++;
+
+                $dpCode = trim($data[$dpCodeIdx] ?? '');
+                $intacctCode = trim($data[$intacctCodeIdx] ?? '');
+                $notes = $notesIdx !== false ? trim($data[$notesIdx] ?? '') : '';
+                $locationCode = $hasLocationColumn ? trim($data[$locationIdx] ?? '') : '';
+                $priority = $priorityIdx !== false ? (int) trim($data[$priorityIdx] ?? '0') : 0;
+
+                if ($dpCode === '' || $intacctCode === '') {
+                    $skipped++;
+
+                    continue;
+                }
+
+                try {
+                    // If location code is provided and field type supports it, import as conditional mapping
+                    if ($locationCode !== '' && $isConditionalType) {
+                        $this->authorizeAction('sage.conditional_mappings.edit');
+
+                        $mapping = \App\Models\ConditionalCodeMapping::firstOrCreate(
+                            [
+                                'intacct_location_code' => $locationCode,
+                                'field_type' => $this->selectedFieldType,
+                                'dp_code' => $dpCode,
+                            ],
+                            [
+                                'intacct_code' => $intacctCode,
+                                'priority' => $priority,
+                                'is_active' => true,
+                            ]
+                        );
+
+                        if ($mapping->wasRecentlyCreated) {
+                            $conditionalCreated++;
+                        } else {
+                            $mapping->intacct_code = $intacctCode;
+                            $mapping->priority = $priority;
+                            if ($notes !== '') {
+                                $mapping->notes = $notes;
+                            }
+                            $mapping->save();
+                            $conditionalUpdated++;
+                        }
+
+                        if ($notes !== '' && $mapping->wasRecentlyCreated) {
+                            $mapping->update(['notes' => $notes]);
+                        }
+                    } else {
+                        // Standard code mapping
+                        $mapping = \App\Models\DonorPerfectCodeMapping::firstOrCreate(
+                            [
+                                'field_type' => $this->selectedFieldType,
+                                'dp_code' => $dpCode,
+                            ],
+                            [
+                                'first_seen_at' => now(),
+                                'last_seen_at' => now(),
+                            ]
+                        );
+
+                        $wasNew = $mapping->wasRecentlyCreated;
+                        $mapping->setMapping($intacctCode);
+                        if ($notes !== '') {
+                            $mapping->notes = $notes;
+                        }
+                        $mapping->save();
+
+                        $wasNew ? $created++ : $updated++;
+                    }
+                } catch (\Exception $e) {
+                    $errors[] = "Row {$row} ({$dpCode}): {$e->getMessage()}";
+                }
+            }
+
+            fclose($handle);
+
+            // Clear gift cache so updated mappings propagate immediately
+            app(DonorPerfectGiftService::class)->clearAllCache();
+
+            $this->importResults = [
+                'created' => $created,
+                'updated' => $updated,
+                'skipped' => $skipped,
+                'conditional_created' => $conditionalCreated,
+                'conditional_updated' => $conditionalUpdated,
+                'errors' => $errors,
+            ];
+
+            $this->loadMappings($this->selectedFieldType);
+        } catch (\Exception $e) {
+            session()->flash('error', 'Import failed: '.$e->getMessage());
+        }
+    }
+
     // Conditional Code Mapping Methods
 
     public function showCreateConditionalMappingForm()
     {
-        $this->authorizeAction('intacct.configure');
+        $this->authorizeAction('sage.conditional_mappings.edit');
         $this->resetConditionalMappingForm();
         $this->showConditionalMappingForm = true;
     }
 
     public function showEditConditionalMappingForm($id)
     {
-        $this->authorizeAction('intacct.configure');
+        $this->authorizeAction('sage.conditional_mappings.edit');
 
         $mapping = \App\Models\ConditionalCodeMapping::findOrFail($id);
 
@@ -1144,7 +1343,7 @@ class DonorPerfectGiftsFeed extends Component
 
     public function toggleConditionalMappingActive($id)
     {
-        $this->authorizeAction('intacct.configure');
+        $this->authorizeAction('sage.conditional_mappings.edit');
 
         try {
             $mapping = \App\Models\ConditionalCodeMapping::findOrFail($id);
@@ -1213,14 +1412,14 @@ class DonorPerfectGiftsFeed extends Component
 
     public function showCreateSyncFilterForm()
     {
-        $this->authorizeAction('intacct.configure');
+        $this->authorizeAction('sage.filters.edit');
         $this->resetSyncFilterForm();
         $this->showSyncFilterForm = true;
     }
 
     public function showEditSyncFilterForm($id)
     {
-        $this->authorizeAction('intacct.configure');
+        $this->authorizeAction('sage.filters.edit');
 
         $filter = \App\Models\SageIntacctSyncFilter::findOrFail($id);
 
@@ -1302,7 +1501,7 @@ class DonorPerfectGiftsFeed extends Component
 
     public function toggleSyncFilterActive($id)
     {
-        $this->authorizeAction('intacct.configure');
+        $this->authorizeAction('sage.filters.edit');
 
         try {
             $filter = \App\Models\SageIntacctSyncFilter::findOrFail($id);

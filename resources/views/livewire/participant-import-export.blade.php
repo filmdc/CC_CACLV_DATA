@@ -870,15 +870,12 @@
             </div>
         </div>
     @endif
-</div>
 
-<script>
-document.addEventListener('livewire:init', () => {
-    Livewire.on('triggerDownload', (event) => {
-        // Extract data from event (Livewire 3 format)
+    @script
+    <script>
+    $wire.on('triggerDownload', (event) => {
         const data = event[0] || event;
-        
-        // Create a temporary anchor element and trigger download
+
         const link = document.createElement('a');
         link.href = data.url;
         link.download = data.filename || '';
@@ -887,5 +884,6 @@ document.addEventListener('livewire:init', () => {
         link.click();
         document.body.removeChild(link);
     });
-});
-</script>
+    </script>
+    @endscript
+</div>

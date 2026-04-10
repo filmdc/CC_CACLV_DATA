@@ -914,9 +914,10 @@ class SageIntacctSyncService
             $customFields['CHECK_SCAN_BATCH_ID'] = $giftData['DP_CheckScan_Batch'];
         }
 
-        // Add Manual Batch custom field if present (from DP BATCH UDF)
-        if (! empty($giftData['BATCH'])) {
-            $customFields['MANUAL_BATCH'] = $giftData['BATCH'];
+        // Add Manual Batch custom field if present (from DP BATCH UDF or batch_no)
+        $manualBatch = ! empty($giftData['BATCH']) ? $giftData['BATCH'] : ($giftData['batch_no'] ?? '');
+        if (! empty($manualBatch)) {
+            $customFields['MANUAL_BATCH'] = $manualBatch;
         }
 
         // Add Gift ID custom field for DonorPerfect gift tracking

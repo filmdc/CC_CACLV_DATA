@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Mobile;
 
+use App\Models\ApprovalHistory;
 use App\Models\ApprovalNotification;
 use App\Models\PendingApproval;
 use App\Models\Program;
@@ -52,15 +53,27 @@ class PendingReview extends Component
         }
 
         DB::transaction(function () use ($approval) {
+            $previousStep = $approval->current_chain_step;
             $approval->approve(Auth::user());
+            $approval->refresh();
+
+            $document = $approval->approvable ?? $approval;
+
+            ApprovalHistory::create(array_filter([
+                'approvable_type' => get_class($document),
+                'approvable_id' => $document->id,
+                'version' => $document->document_version ?? 1,
+                'action' => 'approved',
+                'user_id' => Auth::id(),
+                'approval_type_id' => $approval->approval_type_id,
+                'chain_step' => $previousStep,
+            ]));
 
             ApprovalNotification::create([
                 'pending_approval_id' => $approval->id,
-                'user_id' => $approval->submitted_by,
-                'type' => $approval->status === 'approved' ? 'approved' : 'chain_advanced',
-                'message' => $approval->status === 'approved'
-                    ? "Your submission '{$approval->item_name}' has been approved."
-                    : "Your submission '{$approval->item_name}' has advanced to the next approval step.",
+                'recipient_id' => $approval->submitted_by,
+                'notification_type' => $approval->status === 'approved' ? 'approved' : 'chain_advanced',
+                'sent_at' => now(),
             ]);
         });
 
@@ -93,11 +106,23 @@ class PendingReview extends Component
         DB::transaction(function () use ($approval) {
             $approval->reject(Auth::user(), $this->rejectionReason);
 
+            $document = $approval->approvable ?? $approval;
+
+            ApprovalHistory::create(array_filter([
+                'approvable_type' => get_class($document),
+                'approvable_id' => $document->id,
+                'version' => $document->document_version ?? 1,
+                'action' => 'rejected',
+                'user_id' => Auth::id(),
+                'reason' => $this->rejectionReason,
+                'approval_type_id' => $approval->approval_type_id,
+            ]));
+
             ApprovalNotification::create([
                 'pending_approval_id' => $approval->id,
-                'user_id' => $approval->submitted_by,
-                'type' => 'rejected',
-                'message' => "Your submission '{$approval->item_name}' has been rejected. Reason: {$this->rejectionReason}",
+                'recipient_id' => $approval->submitted_by,
+                'notification_type' => 'rejected',
+                'sent_at' => now(),
             ]);
         });
 

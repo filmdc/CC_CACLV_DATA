@@ -136,7 +136,7 @@
                         @if($isApprover)
                         <td class="px-4 py-3 text-right">
                             @if($item->status === 'pending')
-                            <a href="{{ route('mobile.approval.detail', $item->id) }}" wire:navigate
+                            <a href="{{ route('mobile.review.detail', $item->id) }}" wire:navigate
                                 class="text-xs font-medium text-indigo-400 hover:text-indigo-300 transition-colors">
                                 Review
                             </a>
@@ -153,7 +153,7 @@
         <div class="lg:hidden space-y-3">
             @foreach($items as $item)
             @if($isApprover)
-                <a href="{{ $item->status === 'pending' ? route('mobile.approval.detail', $item->id) : '#' }}"
+                <a href="{{ $item->status === 'pending' ? route('mobile.review.detail', $item->id) : '#' }}"
                     @if($item->status === 'pending') wire:navigate @endif
                     class="block approval-card bg-zinc-900 rounded-xl border border-zinc-800 p-4 {{ $item->status === 'pending' ? '' : 'pointer-events-none' }}">
             @else

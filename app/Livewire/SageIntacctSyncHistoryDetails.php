@@ -26,6 +26,12 @@ class SageIntacctSyncHistoryDetails extends Component
 
     public $showResetConfirmation = false;
 
+    public $showSingleResetConfirmation = false;
+
+    public $singleResetGiftId = null;
+
+    public $singleResetItemId = null;
+
     public function mount($id)
     {
         // Allow viewing if user has sync view permission or admin permission
@@ -162,6 +168,92 @@ class SageIntacctSyncHistoryDetails extends Component
 
             session()->flash('error', 'Failed to reset gifts: ' . $e->getMessage());
             $this->showResetConfirmation = false;
+        }
+    }
+
+    public function confirmResetSingleGift($itemId, $giftId)
+    {
+        $this->authorizeAction('sage.sync.perform');
+
+        $this->singleResetItemId = $itemId;
+        $this->singleResetGiftId = $giftId;
+        $this->showSingleResetConfirmation = true;
+    }
+
+    public function cancelSingleReset()
+    {
+        $this->showSingleResetConfirmation = false;
+        $this->singleResetGiftId = null;
+        $this->singleResetItemId = null;
+    }
+
+    public function resetSingleGift()
+    {
+        $this->authorizeAction('sage.sync.perform');
+
+        try {
+            $giftId = $this->singleResetGiftId;
+
+            if (empty($giftId)) {
+                session()->flash('warning', 'No gift ID specified for reset.');
+                $this->showSingleResetConfirmation = false;
+                return;
+            }
+
+            // Reset ALL occurrences of this gift_id across ALL sync jobs
+            $resetCount = DB::table('sage_intacct_sync_items')
+                ->where('gift_id', $giftId)
+                ->where('status', 'success')
+                ->update([
+                    'status' => 'pending',
+                    'intacct_record_id' => null,
+                    'synced_at' => null,
+                    'error_message' => null,
+                    'updated_at' => now(),
+                ]);
+
+            // Also reset failed items for this gift so they can be retried
+            $resetFailedCount = DB::table('sage_intacct_sync_items')
+                ->where('gift_id', $giftId)
+                ->where('status', 'failed')
+                ->update([
+                    'status' => 'pending',
+                    'intacct_record_id' => null,
+                    'synced_at' => null,
+                    'error_message' => null,
+                    'updated_at' => now(),
+                ]);
+
+            $totalReset = $resetCount + $resetFailedCount;
+
+            \Log::info('Sage Intacct: Single gift reset for re-sync', [
+                'sync_history_id' => $this->syncHistoryId,
+                'gift_id' => $giftId,
+                'success_records_reset' => $resetCount,
+                'failed_records_reset' => $resetFailedCount,
+                'total_records_reset' => $totalReset,
+                'user_id' => auth()->id(),
+                'user_name' => auth()->user()->name,
+            ]);
+
+            session()->flash('success', "Successfully reset gift #{$giftId} ({$totalReset} record(s) across all sync jobs). This gift can now be re-synced.");
+
+            $this->showSingleResetConfirmation = false;
+            $this->singleResetGiftId = null;
+            $this->singleResetItemId = null;
+            $this->loadSyncHistory();
+
+        } catch (\Exception $e) {
+            \Log::error('Sage Intacct: Single gift reset failed', [
+                'sync_history_id' => $this->syncHistoryId,
+                'gift_id' => $this->singleResetGiftId,
+                'error' => $e->getMessage(),
+            ]);
+
+            session()->flash('error', 'Failed to reset gift: ' . $e->getMessage());
+            $this->showSingleResetConfirmation = false;
+            $this->singleResetGiftId = null;
+            $this->singleResetItemId = null;
         }
     }
 

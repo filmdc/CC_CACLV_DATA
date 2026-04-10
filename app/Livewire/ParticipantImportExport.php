@@ -142,12 +142,12 @@ class ParticipantImportExport extends Component
                 // Store in cache for 5 minutes
                 \Cache::put('download_' . $downloadToken, $downloadData, now()->addMinutes(5));
                 
-                // Trigger JavaScript download
+                // Trigger JavaScript download (use relative URL to avoid APP_URL mismatch)
                 $this->dispatch('triggerDownload', [
-                    'url' => route('secure-download', ['token' => $downloadToken]),
+                    'url' => '/secure-download/' . $downloadToken,
                     'filename' => $result['filename']
                 ]);
-                
+
                 session()->flash('success', 'Template download started.');
             } else {
                 session()->flash('error', 'Template generation failed: ' . $result['error']);
@@ -172,16 +172,16 @@ class ParticipantImportExport extends Component
                 'filename' => $this->exportResult['filename'],
                 'expires_at' => now()->addMinutes(5)->timestamp
             ];
-            
+
             // Store in cache for 5 minutes
             \Cache::put('download_' . $downloadToken, $downloadData, now()->addMinutes(5));
-            
-            // Trigger JavaScript download
+
+            // Trigger JavaScript download (use relative URL to avoid APP_URL mismatch)
             $this->dispatch('triggerDownload', [
-                'url' => route('secure-download', ['token' => $downloadToken]),
+                'url' => '/secure-download/' . $downloadToken,
                 'filename' => $this->exportResult['filename']
             ]);
-            
+
             session()->flash('success', 'Export download started.');
                 
         } catch (\Exception $e) {
@@ -603,9 +603,9 @@ class ParticipantImportExport extends Component
             // Store in cache for 5 minutes
             \Cache::put('download_' . $downloadToken, $downloadData, now()->addMinutes(5));
 
-            // Trigger JavaScript download
+            // Trigger JavaScript download (use relative URL to avoid APP_URL mismatch)
             $this->dispatch('triggerDownload', [
-                'url' => route('secure-download', ['token' => $downloadToken]),
+                'url' => '/secure-download/' . $downloadToken,
                 'filename' => $filename
             ]);
 

@@ -130,6 +130,32 @@
                         </div>
                         @endif
 
+                        @php $attachments = $submission->getMedia('attachments'); @endphp
+                        @if($attachments->isNotEmpty())
+                        <div>
+                            <span class="text-xs text-zinc-500">Attachments ({{ $attachments->count() }})</span>
+                            <div class="mt-1.5 space-y-1.5">
+                                @foreach($attachments as $attachment)
+                                <a href="{{ $attachment->getUrl() }}" target="_blank" rel="noopener"
+                                    class="flex items-center gap-2.5 p-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 transition-colors">
+                                    <div class="flex-shrink-0 h-7 w-7 rounded bg-indigo-500/20 flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
+                                        </svg>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm text-white truncate">{{ $attachment->file_name }}</p>
+                                        <p class="text-[10px] text-zinc-500">{{ number_format($attachment->size / 1024, 1) }} KB</p>
+                                    </div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-zinc-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                                    </svg>
+                                </a>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
+
                         @if($submission->status === 'rejected' && auth()->user()->hasPermission('approvals.submit'))
                         <a href="{{ route('mobile.submit') }}" wire:navigate
                             class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors">

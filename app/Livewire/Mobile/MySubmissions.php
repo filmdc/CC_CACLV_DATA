@@ -28,7 +28,7 @@ class MySubmissions extends Component
     public function render()
     {
         $query = ApprovalSubmission::where('submitted_by', Auth::id())
-            ->with(['approvalType', 'program', 'approvedBy']);
+            ->with(['approvalType', 'program', 'approvedBy', 'media']);
 
         if ($this->filterStatus !== 'all') {
             $query->where('status', $this->filterStatus);

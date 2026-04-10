@@ -30,7 +30,7 @@ class DonorPerfectSageSyncRoleSeeder extends Seeder
             // DonorPerfect
             'donorperfect.sync.view',
             'donorperfect.sync.refresh',
-            'donorperfect.mappings.edit',
+            'donor_gifts.view',
 
             // Sage Intacct
             'sage.sync.view',

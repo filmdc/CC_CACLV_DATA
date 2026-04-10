@@ -7,7 +7,7 @@
                     <h1 class="text-2xl font-bold">Sync Run Details #{{ $syncHistory->id }}</h1>
                     <p class="text-indigo-100 mt-2">Started: {{ $syncHistory->started_at->format('M d, Y H:i:s') }}</p>
                 </div>
-                <a href="{{ route('sage-intacct.configuration') }}?tab=sync-history"
+                <a href="#" onclick="event.preventDefault(); window.history.back();"
                    class="px-4 py-2 bg-white text-indigo-600 rounded-md hover:bg-indigo-50 font-medium">
                     &larr; Back to Sync History
                 </a>
@@ -177,7 +177,7 @@
             </div>
 
             <!-- Reset Gifts Section (for Sync Managers and Admins) -->
-            @if(auth()->user()->hasAnyPermission(['sage.sync.perform', 'intacct.configure']))
+            @if(auth()->user()->hasAnyPermission(['intacct.sync', 'intacct.configure']))
                 @php
                     // Get gift_ids from this sync with success status
                     $giftIdsInThisSync = DB::table('sage_intacct_sync_items')
@@ -324,10 +324,28 @@
                                         @endif
                                     </td>
                                     <td class="px-4 py-3 whitespace-nowrap text-sm">
-                                        <button wire:click="viewItemDetails({{ $item->id }})"
-                                                class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium">
-                                            View Details
-                                        </button>
+                                        <div class="flex items-center space-x-2">
+                                            <button wire:click="viewItemDetails({{ $item->id }})"
+                                                    class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium">
+                                                View
+                                            </button>
+                                            @if(auth()->user()->hasAnyPermission(['intacct.sync', 'intacct.configure']))
+                                                @if(in_array($item->status, ['success', 'failed']))
+                                                    <button wire:click="confirmResetSingleGift({{ $item->id }}, '{{ $item->gift_id }}')"
+                                                            class="inline-flex items-center px-2 py-1 text-xs font-medium rounded
+                                                                {{ $item->status === 'failed'
+                                                                    ? 'text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 border border-red-200 dark:border-red-800'
+                                                                    : 'text-orange-700 dark:text-orange-300 bg-orange-50 dark:bg-orange-900/30 hover:bg-orange-100 dark:hover:bg-orange-900/50 border border-orange-200 dark:border-orange-800'
+                                                                }}"
+                                                            title="Reset this gift for re-sync">
+                                                        <svg class="h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                                        </svg>
+                                                        Reset
+                                                    </button>
+                                                @endif
+                                            @endif
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
@@ -460,7 +478,98 @@
         </div>
     @endif
 
-    <!-- Reset Confirmation Modal -->
+    <!-- Single Gift Reset Confirmation Modal -->
+    @if($showSingleResetConfirmation && $singleResetGiftId)
+        @php
+            $singleGiftRecordCount = DB::table('sage_intacct_sync_items')
+                ->where('gift_id', $singleResetGiftId)
+                ->whereIn('status', ['success', 'failed'])
+                ->count();
+
+            $singleGiftItem = DB::table('sage_intacct_sync_items')
+                ->where('id', $singleResetItemId)
+                ->first();
+            $singleGiftData = $singleGiftItem ? json_decode($singleGiftItem->gift_data, true) : null;
+            $singleGiftDonor = $singleGiftData ? trim(($singleGiftData['first_name'] ?? '') . ' ' . ($singleGiftData['last_name'] ?? '')) : '';
+            $singleGiftAmount = $singleGiftData['amount'] ?? null;
+        @endphp
+
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="cancelSingleReset">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-md w-full mx-4">
+                <div class="bg-orange-600 text-white p-4 rounded-t-lg">
+                    <h3 class="text-lg font-bold flex items-center">
+                        <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Reset Gift #{{ $singleResetGiftId }}
+                    </h3>
+                </div>
+
+                <div class="p-5 space-y-4">
+                    <!-- Gift summary -->
+                    <div class="bg-gray-50 dark:bg-zinc-700 rounded-md p-3">
+                        <dl class="space-y-1 text-sm">
+                            <div class="flex justify-between">
+                                <dt class="text-gray-500 dark:text-gray-400">Gift ID:</dt>
+                                <dd class="font-mono font-medium text-gray-900 dark:text-white">{{ $singleResetGiftId }}</dd>
+                            </div>
+                            @if($singleGiftDonor)
+                                <div class="flex justify-between">
+                                    <dt class="text-gray-500 dark:text-gray-400">Donor:</dt>
+                                    <dd class="font-medium text-gray-900 dark:text-white">{{ $singleGiftDonor ?: 'Anonymous' }}</dd>
+                                </div>
+                            @endif
+                            @if($singleGiftAmount)
+                                <div class="flex justify-between">
+                                    <dt class="text-gray-500 dark:text-gray-400">Amount:</dt>
+                                    <dd class="font-medium text-gray-900 dark:text-white">${{ number_format((float) $singleGiftAmount, 2) }}</dd>
+                                </div>
+                            @endif
+                            @if($singleGiftRecordCount > 1)
+                                <div class="flex justify-between">
+                                    <dt class="text-gray-500 dark:text-gray-400">Records affected:</dt>
+                                    <dd class="font-medium text-orange-600 dark:text-orange-400">{{ $singleGiftRecordCount }} (across all sync jobs)</dd>
+                                </div>
+                            @endif
+                        </dl>
+                    </div>
+
+                    <p class="text-sm text-gray-700 dark:text-gray-300">
+                        This will reset the sync status for this gift so it can be re-synced to Sage Intacct.
+                    </p>
+
+                    <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-3">
+                        <ul class="list-disc list-inside text-xs text-yellow-700 dark:text-yellow-400 space-y-1">
+                            <li>Status will change to "pending" across all sync jobs</li>
+                            <li>Sage Intacct record ID will be cleared</li>
+                            <li>Make sure you've deleted it from Sage first to avoid duplicates</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-b-lg flex justify-end space-x-3">
+                    <button wire:click="cancelSingleReset"
+                            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-zinc-600 border border-gray-300 dark:border-zinc-500 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-500">
+                        Cancel
+                    </button>
+                    <button wire:click="resetSingleGift"
+                            class="px-4 py-2 text-sm font-medium text-white bg-orange-600 border border-transparent rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            wire:loading.attr="disabled">
+                        <span wire:loading.remove wire:target="resetSingleGift">Reset This Gift</span>
+                        <span wire:loading wire:target="resetSingleGift" class="flex items-center">
+                            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Resetting...
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Reset All Confirmation Modal -->
     @if($showResetConfirmation)
         @php
             // Recalculate for modal display

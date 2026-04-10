@@ -9,7 +9,18 @@
 
         <!-- Filters -->
         <div class="bg-gray-50 dark:bg-zinc-700 p-4 rounded-lg">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <div>
+                    <label for="filterGiftId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Gift ID
+                    </label>
+                    <input type="text"
+                           wire:model.live.debounce.300ms="filterGiftId"
+                           id="filterGiftId"
+                           placeholder="Search by Gift ID..."
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+
                 <div>
                     <label for="filterStatus" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Status
@@ -27,7 +38,7 @@
 
                 <div>
                     <label for="filterStartDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Start Date
+                        Gift Date From
                     </label>
                     <input type="date"
                            wire:model.live="filterStartDate"
@@ -37,7 +48,7 @@
 
                 <div>
                     <label for="filterEndDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        End Date
+                        Gift Date To
                     </label>
                     <input type="date"
                            wire:model.live="filterEndDate"
@@ -60,8 +71,8 @@
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700">
                     <thead class="bg-gray-50 dark:bg-zinc-700">
                         <tr>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Started At</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Completed At</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Gift Dates</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Synced At</th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Records</th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Success</th>
@@ -73,10 +84,18 @@
                         @foreach($syncHistory as $sync)
                             <tr class="hover:bg-gray-50 dark:hover:bg-zinc-700">
                                 <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                    {{ $sync->started_at->format('M d, Y H:i') }}
+                                    @if($sync->sync_start_date && $sync->sync_end_date)
+                                        @if($sync->sync_start_date == $sync->sync_end_date)
+                                            {{ \Carbon\Carbon::parse($sync->sync_start_date)->format('M d, Y') }}
+                                        @else
+                                            {{ \Carbon\Carbon::parse($sync->sync_start_date)->format('M d') }} - {{ \Carbon\Carbon::parse($sync->sync_end_date)->format('M d, Y') }}
+                                        @endif
+                                    @else
+                                        <span class="text-gray-400 dark:text-gray-500">-</span>
+                                    @endif
                                 </td>
                                 <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                    {{ $sync->completed_at ? $sync->completed_at->format('M d, Y H:i') : '-' }}
+                                    {{ $sync->started_at->format('M d, Y H:i') }}
                                 </td>
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     <div class="flex items-center space-x-2">

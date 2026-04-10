@@ -588,7 +588,10 @@ class SageIntacctApiService
 
                     // Try multiple possible XML paths for RECORDNO (Intacct uses different node names)
                     $key = null;
-                    if (isset($result->data->otherreceipt)) {
+                    if (isset($result->key) && (string) $result->key !== '') {
+                        // Intacct record_otherreceipt returns the key directly in <key> element
+                        $key = (string) $result->key;
+                    } elseif (isset($result->data->otherreceipt)) {
                         $key = (string) $result->data->otherreceipt->RECORDNO;
                     } elseif (isset($result->data->othercashreceipt)) {
                         $key = (string) $result->data->othercashreceipt->RECORDNO;

@@ -64,9 +64,9 @@ return Application::configure(basePath: dirname(__DIR__))
                 return $setting && $setting->isConfigured();
             });
 
-        // Sync deposit dates from Sage Intacct back to DonorPerfect every 4 hours
+        // Sync deposit dates from Sage Intacct back to DonorPerfect every 2 hours
         $schedule->command('intacct:sync-deposit-dates')
-            ->everyFourHours()
+            ->everyTwoHours()
             ->timezone('America/Los_Angeles')
             ->when(function () {
                 $setting = \App\Models\SageIntacctSetting::where('is_active', true)->first();

@@ -866,7 +866,7 @@
 
                             <div>
                                 <label for="filterStartDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    Start Date
+                                    Gift Date From
                                 </label>
                                 <input type="date"
                                        wire:model.live="filterStartDate"
@@ -876,7 +876,7 @@
 
                             <div>
                                 <label for="filterEndDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    End Date
+                                    Gift Date To
                                 </label>
                                 <input type="date"
                                        wire:model.live="filterEndDate"
@@ -899,8 +899,8 @@
                             <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700">
                                 <thead class="bg-gray-50 dark:bg-zinc-700">
                                     <tr>
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Started At</th>
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Completed At</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Gift Dates</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Synced At</th>
                                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
                                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Records</th>
                                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Success</th>
@@ -912,10 +912,18 @@
                                     @foreach($syncHistory as $sync)
                                         <tr class="hover:bg-gray-50 dark:hover:bg-zinc-700">
                                             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                                {{ $sync->started_at->format('M d, Y H:i') }}
+                                                @if($sync->sync_start_date && $sync->sync_end_date)
+                                                    @if($sync->sync_start_date == $sync->sync_end_date)
+                                                        {{ \Carbon\Carbon::parse($sync->sync_start_date)->format('M d, Y') }}
+                                                    @else
+                                                        {{ \Carbon\Carbon::parse($sync->sync_start_date)->format('M d') }} - {{ \Carbon\Carbon::parse($sync->sync_end_date)->format('M d, Y') }}
+                                                    @endif
+                                                @else
+                                                    <span class="text-gray-400 dark:text-gray-500">-</span>
+                                                @endif
                                             </td>
                                             <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                                {{ $sync->completed_at ? $sync->completed_at->format('M d, Y H:i') : '-' }}
+                                                {{ $sync->started_at->format('M d, Y H:i') }}
                                             </td>
                                             <td class="px-4 py-3 whitespace-nowrap">
                                                 <div class="flex items-center space-x-2">
@@ -1052,13 +1060,149 @@
                             <span>Show archived</span>
                         </label>
                     </div>
-                    <button wire:click="bulkArchiveUnmapped"
-                            class="px-3 py-1 text-sm bg-gray-600 text-white rounded-md hover:bg-gray-700"
-                            wire:loading.attr="disabled"
-                            wire:confirm="Are you sure you want to archive all unmapped codes?">
-                        Archive All Unmapped
-                    </button>
+                    <div class="flex items-center space-x-2">
+                        <button wire:click="showImportMappings"
+                                class="px-3 py-1 text-sm bg-emerald-600 text-white rounded-md hover:bg-emerald-700"
+                                wire:loading.attr="disabled">
+                            Import CSV
+                        </button>
+                        <button wire:click="bulkArchiveUnmapped"
+                                class="px-3 py-1 text-sm bg-gray-600 text-white rounded-md hover:bg-gray-700"
+                                wire:loading.attr="disabled"
+                                wire:confirm="Are you sure you want to archive all unmapped codes?">
+                            Archive All Unmapped
+                        </button>
+                    </div>
                 </div>
+
+                <!-- Import CSV Modal -->
+                @if($showImportModal)
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="cancelImport">
+                    <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-lg w-full mx-4 shadow-xl">
+                        <div class="mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                                Import Code Mappings
+                            </h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                Upload a CSV file to bulk-import mappings for
+                                <span class="font-semibold">{{ str_replace('_', ' ', ucwords($selectedFieldType, '_')) }}</span>.
+                            </p>
+                        </div>
+
+                        @php $isConditionalType = in_array($selectedFieldType, ['solicit_code', 'sub_solicit_code']); @endphp
+
+                        @if($importResults)
+                            <!-- Results Display -->
+                            <div class="space-y-3 mb-4">
+                                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                                    <h4 class="text-sm font-semibold text-green-800 dark:text-green-300 mb-2">Import Complete</h4>
+                                    <div class="grid grid-cols-3 gap-3 text-sm">
+                                        <div class="text-center">
+                                            <div class="text-2xl font-bold text-green-700 dark:text-green-400">{{ $importResults['created'] }}</div>
+                                            <div class="text-green-600 dark:text-green-500">Created</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="text-2xl font-bold text-blue-700 dark:text-blue-400">{{ $importResults['updated'] }}</div>
+                                            <div class="text-blue-600 dark:text-blue-500">Updated</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="text-2xl font-bold text-gray-500 dark:text-gray-400">{{ $importResults['skipped'] }}</div>
+                                            <div class="text-gray-500 dark:text-gray-400">Skipped</div>
+                                        </div>
+                                    </div>
+                                    @if(($importResults['conditional_created'] ?? 0) > 0 || ($importResults['conditional_updated'] ?? 0) > 0)
+                                        <div class="mt-3 pt-3 border-t border-green-200 dark:border-green-800">
+                                            <p class="text-xs font-medium text-green-700 dark:text-green-400 mb-1">Location-Specific Conditional Mappings:</p>
+                                            <div class="grid grid-cols-2 gap-3 text-sm">
+                                                <div class="text-center">
+                                                    <div class="text-xl font-bold text-green-700 dark:text-green-400">{{ $importResults['conditional_created'] }}</div>
+                                                    <div class="text-green-600 dark:text-green-500 text-xs">Created</div>
+                                                </div>
+                                                <div class="text-center">
+                                                    <div class="text-xl font-bold text-blue-700 dark:text-blue-400">{{ $importResults['conditional_updated'] }}</div>
+                                                    <div class="text-blue-600 dark:text-blue-500 text-xs">Updated</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
+                                @if(count($importResults['errors']) > 0)
+                                    <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                                        <h4 class="text-sm font-semibold text-red-800 dark:text-red-300 mb-1">Errors ({{ count($importResults['errors']) }})</h4>
+                                        <ul class="text-xs text-red-700 dark:text-red-400 space-y-1 max-h-32 overflow-y-auto">
+                                            @foreach($importResults['errors'] as $error)
+                                                <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="flex justify-end">
+                                <button wire:click="cancelImport"
+                                        class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
+                                    Done
+                                </button>
+                            </div>
+                        @else
+                            <!-- Upload Form -->
+                            <form wire:submit.prevent="importCodeMappings" class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">CSV File</label>
+                                    <input type="file"
+                                           wire:model="importFile"
+                                           accept=".csv,.txt"
+                                           class="block w-full text-sm text-gray-500 dark:text-gray-400
+                                                  file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0
+                                                  file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700
+                                                  dark:file:bg-indigo-900/30 dark:file:text-indigo-400
+                                                  hover:file:bg-indigo-100 dark:hover:file:bg-indigo-900/50">
+                                    @error('importFile') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                                    <div wire:loading wire:target="importFile" class="text-sm text-indigo-600 dark:text-indigo-400 mt-1">Uploading...</div>
+                                </div>
+
+                                <div class="bg-gray-50 dark:bg-zinc-700 rounded-lg p-3">
+                                    <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">CSV Format</h4>
+                                    @if($isConditionalType)
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                                            Required: <code class="bg-gray-200 dark:bg-zinc-600 px-1 rounded">intacct_location_code</code>, <code class="bg-gray-200 dark:bg-zinc-600 px-1 rounded">dp_code</code>, <code class="bg-gray-200 dark:bg-zinc-600 px-1 rounded">intacct_code</code>.
+                                            Optional: <code class="bg-gray-200 dark:bg-zinc-600 px-1 rounded">priority</code>, <code class="bg-gray-200 dark:bg-zinc-600 px-1 rounded">notes</code>
+                                        </p>
+                                        <pre class="text-xs text-gray-600 dark:text-gray-400 bg-white dark:bg-zinc-800 p-2 rounded border dark:border-zinc-600 overflow-x-auto">intacct_location_code,dp_code,intacct_code,priority,notes
+P1000,ANNLFUND,F8000,0,Annual fund
+P1000,CAPITAL,F8100,0,Capital campaign
+P1400,ANNLFUND,F9000,0,Different location</pre>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Each row maps a DP code to a Sage Intacct code for a specific location. Rows without a location code will be imported as standard code mappings instead.</p>
+                                    @else
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Required columns: <code class="bg-gray-200 dark:bg-zinc-600 px-1 rounded">dp_code</code>, <code class="bg-gray-200 dark:bg-zinc-600 px-1 rounded">intacct_code</code>. Optional: <code class="bg-gray-200 dark:bg-zinc-600 px-1 rounded">notes</code></p>
+                                        <pre class="text-xs text-gray-600 dark:text-gray-400 bg-white dark:bg-zinc-800 p-2 rounded border dark:border-zinc-600 overflow-x-auto">dp_code,intacct_code,notes
+ANNLFUND,40100,Annual fund revenue
+CAPITAL,40200,Capital campaign</pre>
+                                    @endif
+                                    <button type="button" wire:click="downloadImportTemplate"
+                                            class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline mt-2">
+                                        Download template CSV
+                                    </button>
+                                </div>
+
+                                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-zinc-700">
+                                    <button type="button"
+                                            wire:click="cancelImport"
+                                            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-600">
+                                        Cancel
+                                    </button>
+                                    <button type="submit"
+                                            class="px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-md hover:bg-emerald-700 disabled:opacity-50"
+                                            wire:loading.attr="disabled"
+                                            wire:target="importCodeMappings">
+                                        <span wire:loading.remove wire:target="importCodeMappings">Import Mappings</span>
+                                        <span wire:loading wire:target="importCodeMappings">Importing...</span>
+                                    </button>
+                                </div>
+                            </form>
+                        @endif
+                    </div>
+                </div>
+                @endif
 
                 <!-- Code Mappings Table -->
                 <div class="overflow-x-auto">
