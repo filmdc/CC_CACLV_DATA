@@ -514,6 +514,193 @@ CAPITAL,40200,Capital campaign</pre>
                     </div>
                 </div>
                 @endif
+
+                <!-- Location Default Codes Section -->
+                <div class="mt-8 border-t border-gray-200 dark:border-zinc-700 pt-6">
+                    <div class="mb-4 flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Location Default Codes</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                When a gift has no {{ $selectedFieldType === 'solicit_code' ? 'solicitation code' : 'sub-solicitation code' }},
+                                the default Intacct code for that location will be used instead of skipping the gift.
+                            </p>
+                        </div>
+                        <button wire:click="showCreateLocationDefaultForm"
+                                class="px-4 py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700 text-sm font-medium">
+                            + Add Default
+                        </button>
+                    </div>
+
+                    @php
+                        $locationDefaults = \App\Models\LocationDefaultCode::where('field_type', $selectedFieldType)
+                            ->orderBy('intacct_location_code')
+                            ->get();
+                    @endphp
+
+                    @if($locationDefaults->count() > 0)
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700">
+                                <thead class="bg-amber-50 dark:bg-amber-900/20">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Intacct Location</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Default Intacct Code</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Notes</th>
+                                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-zinc-700">
+                                    @foreach($locationDefaults as $default)
+                                    <tr class="{{ $default->is_active ? '' : 'opacity-50' }}">
+                                        <td class="px-6 py-4 text-sm text-gray-900 dark:text-white font-mono font-semibold">
+                                            {{ $default->intacct_location_code }}
+                                        </td>
+                                        <td class="px-6 py-4 text-sm font-mono">
+                                            <span class="text-amber-600 dark:text-amber-400 font-semibold">{{ $default->default_intacct_code }}</span>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            @if($default->is_active)
+                                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                                                    Active
+                                                </span>
+                                            @else
+                                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                                                    Inactive
+                                                </span>
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                                            {{ $default->notes ? Str::limit($default->notes, 50) : '—' }}
+                                        </td>
+                                        <td class="px-6 py-4 text-right space-x-2">
+                                            <button wire:click="showEditLocationDefaultForm({{ $default->id }})"
+                                                    class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm">
+                                                Edit
+                                            </button>
+                                            <button wire:click="toggleLocationDefaultActive({{ $default->id }})"
+                                                    class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300 text-sm">
+                                                {{ $default->is_active ? 'Deactivate' : 'Activate' }}
+                                            </button>
+                                            <button wire:click="deleteLocationDefault({{ $default->id }})"
+                                                    wire:confirm="Are you sure you want to delete this location default?"
+                                                    class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 text-sm">
+                                                Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div class="text-center py-8 bg-amber-50 dark:bg-amber-900/10 rounded-lg border border-amber-200 dark:border-amber-800/30">
+                            <p class="text-gray-500 dark:text-gray-400">
+                                No location defaults configured for {{ $selectedFieldType === 'solicit_code' ? 'Solicitation Code' : 'Sub-Solicitation Code' }}.
+                            </p>
+                            <p class="text-sm text-gray-400 dark:text-gray-500 mt-2">
+                                Gifts with empty {{ $selectedFieldType === 'solicit_code' ? 'solicitation codes' : 'sub-solicitation codes' }} will be skipped during sync.
+                                Add a default to use a fallback Intacct code instead.
+                            </p>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Location Default Form Modal -->
+                @if($showLocationDefaultForm)
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="cancelLocationDefaultForm">
+                    <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-lg w-full mx-4 shadow-xl">
+                        <div class="mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                                {{ $editingLocationDefaultId ? 'Edit' : 'Create' }} Location Default
+                            </h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                Set a default Intacct code to use when a gift has no {{ $selectedFieldType === 'solicit_code' ? 'solicitation code' : 'sub-solicitation code' }} for a specific location.
+                            </p>
+                        </div>
+
+                        <form wire:submit.prevent="saveLocationDefault" class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <!-- Intacct Location Code -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Intacct Location Code <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text"
+                                           wire:model="location_default_location_code"
+                                           class="w-full px-3 py-2 border rounded-md dark:bg-zinc-700 dark:border-zinc-600 dark:text-white focus:ring-indigo-500 focus:border-indigo-500"
+                                           placeholder="e.g., P1000, P1400"
+                                           {{ $editingLocationDefaultId ? 'disabled' : '' }}>
+                                    @error('location_default_location_code') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                </div>
+
+                                <!-- Field Type -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Field Type <span class="text-red-500">*</span>
+                                    </label>
+                                    <select wire:model="location_default_field_type"
+                                            class="w-full px-3 py-2 border rounded-md dark:bg-zinc-700 dark:border-zinc-600 dark:text-white focus:ring-indigo-500 focus:border-indigo-500"
+                                            {{ $editingLocationDefaultId ? 'disabled' : '' }}>
+                                        <option value="solicit_code">Solicitation Code (Project)</option>
+                                        <option value="sub_solicit_code">Sub-Solicitation Code (Department)</option>
+                                    </select>
+                                    @error('location_default_field_type') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <!-- Default Intacct Code -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Default Intacct Code <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text"
+                                       wire:model="location_default_intacct_code"
+                                       class="w-full px-3 py-2 border rounded-md dark:bg-zinc-700 dark:border-zinc-600 dark:text-white focus:ring-indigo-500 focus:border-indigo-500"
+                                       placeholder="e.g., F8000, S14999">
+                                @error('location_default_intacct_code') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    This code will be used when a gift's {{ $selectedFieldType === 'solicit_code' ? 'solicitation code' : 'sub-solicitation code' }} is empty.
+                                </p>
+                            </div>
+
+                            <!-- Active Status -->
+                            <div>
+                                <label class="flex items-center space-x-2 cursor-pointer">
+                                    <input type="checkbox"
+                                           wire:model="location_default_is_active"
+                                           class="rounded border-gray-300 dark:border-zinc-600 text-amber-600 focus:ring-amber-500">
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Active</span>
+                                </label>
+                            </div>
+
+                            <!-- Notes -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Notes
+                                </label>
+                                <textarea wire:model="location_default_notes"
+                                          rows="2"
+                                          class="w-full px-3 py-2 border rounded-md dark:bg-zinc-700 dark:border-zinc-600 dark:text-white focus:ring-indigo-500 focus:border-indigo-500"
+                                          placeholder="Reason for this default..."></textarea>
+                                @error('location_default_notes') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
+
+                            <!-- Form Actions -->
+                            <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-zinc-700">
+                                <button type="button"
+                                        wire:click="cancelLocationDefaultForm"
+                                        class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-600">
+                                    Cancel
+                                </button>
+                                <button type="submit"
+                                        class="px-4 py-2 text-sm font-medium text-white bg-amber-600 rounded-md hover:bg-amber-700">
+                                    {{ $editingLocationDefaultId ? 'Update' : 'Create' }} Default
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                @endif
                 @endif
             </div>
             @endif

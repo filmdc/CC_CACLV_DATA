@@ -149,6 +149,21 @@ class DonorPerfectGiftsFeed extends Component
 
     public $conditional_is_active = true;
 
+    // Location Default Code properties
+    public $showLocationDefaultForm = false;
+
+    public $editingLocationDefaultId = null;
+
+    public $location_default_location_code = '';
+
+    public $location_default_field_type = 'solicit_code';
+
+    public $location_default_intacct_code = '';
+
+    public $location_default_notes = '';
+
+    public $location_default_is_active = true;
+
     // Sync Filter properties
     public $showSyncFilterForm = false;
 
@@ -1374,6 +1389,131 @@ class DonorPerfectGiftsFeed extends Component
     }
 
     // ========================================
+    // LOCATION DEFAULT CODE METHODS
+    // ========================================
+
+    public function showCreateLocationDefaultForm()
+    {
+        $this->authorizeAction('sage.code_mappings.edit');
+        $this->resetLocationDefaultForm();
+        $this->showLocationDefaultForm = true;
+    }
+
+    public function showEditLocationDefaultForm($id)
+    {
+        $this->authorizeAction('sage.code_mappings.edit');
+
+        $default = \App\Models\LocationDefaultCode::findOrFail($id);
+
+        $this->editingLocationDefaultId = $default->id;
+        $this->location_default_location_code = $default->intacct_location_code;
+        $this->location_default_field_type = $default->field_type;
+        $this->location_default_intacct_code = $default->default_intacct_code;
+        $this->location_default_notes = $default->notes ?? '';
+        $this->location_default_is_active = $default->is_active;
+
+        $this->showLocationDefaultForm = true;
+    }
+
+    public function saveLocationDefault()
+    {
+        $this->authorizeAction('sage.code_mappings.edit');
+
+        $this->validate([
+            'location_default_location_code' => 'required|string|max:255',
+            'location_default_field_type' => 'required|in:solicit_code,sub_solicit_code',
+            'location_default_intacct_code' => 'required|string|max:255',
+            'location_default_notes' => 'nullable|string',
+        ]);
+
+        try {
+            $data = [
+                'intacct_location_code' => $this->location_default_location_code,
+                'field_type' => $this->location_default_field_type,
+                'default_intacct_code' => $this->location_default_intacct_code,
+                'is_active' => $this->location_default_is_active,
+                'notes' => $this->location_default_notes,
+            ];
+
+            if ($this->editingLocationDefaultId) {
+                $default = \App\Models\LocationDefaultCode::findOrFail($this->editingLocationDefaultId);
+                $default->update($data);
+                session()->flash('success', 'Location default updated successfully.');
+            } else {
+                // Check for existing default for this location + field_type
+                $existing = \App\Models\LocationDefaultCode::where('intacct_location_code', $this->location_default_location_code)
+                    ->where('field_type', $this->location_default_field_type)
+                    ->first();
+
+                if ($existing) {
+                    session()->flash('error', "A default already exists for location {$this->location_default_location_code} / {$this->location_default_field_type}. Edit the existing entry instead.");
+
+                    return;
+                }
+
+                \App\Models\LocationDefaultCode::create($data);
+                session()->flash('success', 'Location default created successfully.');
+            }
+
+            // Clear gift cache so defaults propagate
+            app(DonorPerfectGiftService::class)->clearAllCache();
+
+            $this->cancelLocationDefaultForm();
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to save location default: '.$e->getMessage());
+        }
+    }
+
+    public function deleteLocationDefault($id)
+    {
+        $this->authorizeAction('sage.code_mappings.edit');
+
+        try {
+            $default = \App\Models\LocationDefaultCode::findOrFail($id);
+            $default->delete();
+
+            app(DonorPerfectGiftService::class)->clearAllCache();
+
+            session()->flash('success', 'Location default deleted successfully.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to delete location default: '.$e->getMessage());
+        }
+    }
+
+    public function toggleLocationDefaultActive($id)
+    {
+        $this->authorizeAction('sage.code_mappings.edit');
+
+        try {
+            $default = \App\Models\LocationDefaultCode::findOrFail($id);
+            $default->update(['is_active' => ! $default->is_active]);
+
+            app(DonorPerfectGiftService::class)->clearAllCache();
+
+            session()->flash('success', 'Location default status updated.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to update location default: '.$e->getMessage());
+        }
+    }
+
+    public function cancelLocationDefaultForm()
+    {
+        $this->showLocationDefaultForm = false;
+        $this->resetLocationDefaultForm();
+    }
+
+    private function resetLocationDefaultForm()
+    {
+        $this->editingLocationDefaultId = null;
+        $this->location_default_location_code = '';
+        $this->location_default_field_type = 'solicit_code';
+        $this->location_default_intacct_code = '';
+        $this->location_default_notes = '';
+        $this->location_default_is_active = true;
+        $this->resetErrorBag();
+    }
+
+    // ========================================
     // SYNC HISTORY TAB METHODS
     // ========================================
 
@@ -1762,6 +1902,21 @@ class DonorPerfectGiftsFeed extends Component
         $dpCode = $gift[$fieldType] ?? '';
 
         if (empty($dpCode)) {
+            // Check for a location-based default when solicit/sub-solicit is empty
+            if (in_array($fieldType, ['solicit_code', 'sub_solicit_code'])) {
+                $dpCampaign = $gift['campaign'] ?? '';
+                $intacctLocation = $dpCampaign
+                    ? \App\Models\DonorPerfectCodeMapping::getMappingFor('campaign', $dpCampaign)
+                    : null;
+
+                if ($intacctLocation) {
+                    $defaultCode = \App\Models\LocationDefaultCode::getDefault($intacctLocation, $fieldType);
+                    if ($defaultCode) {
+                        return ['code' => $defaultCode, 'source' => 'default', 'blocked' => false, 'reason' => "Location default for {$intacctLocation}"];
+                    }
+                }
+            }
+
             return ['code' => '', 'source' => null, 'blocked' => false, 'reason' => null];
         }
 

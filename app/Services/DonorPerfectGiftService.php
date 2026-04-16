@@ -378,7 +378,8 @@ class DonorPerfectGiftService
             if (! empty($search)) {
                 $searchLower = strtolower($search);
                 $gifts = $gifts->filter(function ($gift) use ($searchLower) {
-                    return str_contains(strtolower($gift['donor_name'] ?? ''), $searchLower)
+                    return str_contains(strtolower((string) ($gift['gift_id'] ?? '')), $searchLower)
+                        || str_contains(strtolower($gift['donor_name'] ?? ''), $searchLower)
                         || str_contains(strtolower($gift['campaign'] ?? ''), $searchLower)
                         || str_contains(strtolower($gift['amount'] ?? ''), $searchLower)
                         || str_contains(strtolower($gift['payment_type'] ?? ''), $searchLower)
@@ -444,7 +445,8 @@ class DonorPerfectGiftService
             if (! empty($search)) {
                 $searchLower = strtolower($search);
                 $gifts = $gifts->filter(function ($gift) use ($searchLower) {
-                    return str_contains(strtolower($gift['donor_name'] ?? ''), $searchLower)
+                    return str_contains(strtolower((string) ($gift['gift_id'] ?? '')), $searchLower)
+                        || str_contains(strtolower($gift['donor_name'] ?? ''), $searchLower)
                         || str_contains(strtolower($gift['campaign'] ?? ''), $searchLower)
                         || str_contains(strtolower($gift['amount'] ?? ''), $searchLower)
                         || str_contains(strtolower($gift['payment_type'] ?? ''), $searchLower)

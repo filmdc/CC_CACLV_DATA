@@ -810,7 +810,7 @@ class SageIntacctSyncService
                 }
             }
 
-            // STEP 3: Apply project mapping (use override if available, then conditional mapping)
+            // STEP 3: Apply project mapping (use override if available, then conditional mapping, then location default)
             if ($campaignOverride && $campaignOverride->project_code) {
                 $project = $campaignOverride->project_code;
             } elseif (! empty($giftData['solicit_code'])) {
@@ -836,9 +836,12 @@ class SageIntacctSyncService
                 }
 
                 $project = $result['mapped_code'];
+            } elseif ($location) {
+                // solicit_code is empty — check for a location default
+                $project = \App\Models\LocationDefaultCode::getDefault($location, 'solicit_code');
             }
 
-            // STEP 4: Apply service/class mapping (use override if available, then conditional mapping)
+            // STEP 4: Apply service/class mapping (use override if available, then conditional mapping, then location default)
             if ($campaignOverride) {
                 $class = $campaignOverride->service_code;
             } elseif (! empty($giftData['sub_solicit_code'])) {
@@ -864,6 +867,9 @@ class SageIntacctSyncService
                 }
 
                 $class = $result['mapped_code'];
+            } elseif ($location) {
+                // sub_solicit_code is empty — check for a location default
+                $class = \App\Models\LocationDefaultCode::getDefault($location, 'sub_solicit_code');
             }
         }
 

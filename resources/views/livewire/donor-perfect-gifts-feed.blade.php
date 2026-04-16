@@ -203,7 +203,7 @@
                     <input type="text"
                            wire:model.live="search"
                            id="search"
-                           placeholder="Search donors, amounts, batches..."
+                           placeholder="Search gift ID, donors, amounts, batches..."
                            class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
 
@@ -580,6 +580,20 @@
                                 <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Sync Status</th>
                                 @endif
                                 <!-- Sortable Headers -->
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-700" wire:click="sortBy('gift_id')">
+                                    <div class="flex items-center">
+                                        Gift ID
+                                        @if($sortField === 'gift_id')
+                                            <svg class="ml-1 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                                                @if($sortDirection === 'asc')
+                                                    <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
+                                                @else
+                                                    <path d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"/>
+                                                @endif
+                                            </svg>
+                                        @endif
+                                    </div>
+                                </th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-700" wire:click="sortBy('gift_date')">
                                     <div class="flex items-center">
                                         Gift Date
@@ -702,6 +716,9 @@
                                         @endif
                                     </td>
                                     @endif
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900 dark:text-white cursor-pointer" wire:click="showGiftDetails({{ json_encode($gift) }})">
+                                        {{ $gift['gift_id'] ?? '-' }}
+                                    </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white cursor-pointer" wire:click="showGiftDetails({{ json_encode($gift) }})">
                                         {{ isset($gift['gift_date']) && $gift['gift_date'] ? $gift['gift_date'] : '-' }}
                                     </td>
@@ -791,6 +808,10 @@
                                                                 <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300" title="Uses location-specific conditional mapping">
                                                                     C
                                                                 </span>
+                                                            @elseif($mappingSource === 'default')
+                                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300" title="{{ $mapping['reason'] ?? 'Location default' }}">
+                                                                    D
+                                                                </span>
                                                             @endif
                                                         @endif
                                                     </div>
@@ -834,6 +855,10 @@
                                                             @if($mappingSource === 'conditional')
                                                                 <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300" title="Uses location-specific conditional mapping">
                                                                     C
+                                                                </span>
+                                                            @elseif($mappingSource === 'default')
+                                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300" title="{{ $mapping['reason'] ?? 'Location default' }}">
+                                                                    D
                                                                 </span>
                                                             @endif
                                                         @endif
