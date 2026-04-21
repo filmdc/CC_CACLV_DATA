@@ -410,7 +410,7 @@
                 </div>
             @endforelse
         </div>
-    @else
+    @elseif($viewMode === 'table')
         {{-- Table View --}}
         <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl overflow-hidden mb-6">
             <div class="overflow-x-auto">

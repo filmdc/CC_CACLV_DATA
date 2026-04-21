@@ -275,6 +275,26 @@ class ContractUtilizationService
      */
     public static function getSystemMetrics(): array
     {
+        // Budget and spend totals are computed at the FUND level (from
+        // intacct_fund_budgets / intacct_fund_expenses) so a shared fund
+        // like F8000 — linked by 68 contracts — contributes once, not 68×.
+        // Contracts without any Intacct data still contribute their local
+        // contract.amount as budget (fallback for manual-only rows).
+        $fundBudgetTotal = (float) \App\Models\IntacctFundBudget::sum('amount');
+        $fundSpentTotal = (float) \App\Models\IntacctFundExpense::sum('amount');
+
+        // Sum contract.amount ONLY for contracts whose fund has no Intacct
+        // budget record — otherwise we'd double-count the fund and the
+        // award separately.
+        $localOnlyBudget = (float) Contract::active()
+            ->where('amount', '>', 0)
+            ->whereNotExists(function ($q) {
+                $q->select(\Illuminate\Support\Facades\DB::raw(1))
+                    ->from('intacct_fund_budgets')
+                    ->whereColumn('intacct_fund_budgets.intacct_project_id', 'contracts.grant_code');
+            })
+            ->sum('amount');
+
         $contracts = Contract::active()
             ->where(function ($q) {
                 $q->where('amount', '>', 0)
@@ -282,15 +302,10 @@ class ContractUtilizationService
             })
             ->get();
 
-        $totalAwarded = 0;
-        foreach ($contracts as $c) {
-            $totalAwarded += $c->effective_budget;
-        }
-
         $metrics = [
             'total_contracts' => $contracts->count(),
-            'total_awarded' => $totalAwarded,
-            'total_spent' => 0,
+            'total_awarded' => $fundBudgetTotal + $localOnlyBudget,
+            'total_spent' => $fundSpentTotal,
             'total_remaining' => 0,
             'critical_count' => 0,
             'warning_count' => 0,
@@ -298,9 +313,9 @@ class ContractUtilizationService
             'healthy_count' => 0,
         ];
 
+        $metrics['total_remaining'] = $metrics['total_awarded'] - $metrics['total_spent'];
+
         foreach ($contracts as $contract) {
-            $metrics['total_spent'] += $contract->total_spent;
-            $metrics['total_remaining'] += $contract->remaining_budget;
 
             $remaining = $contract->remaining_percentage;
 

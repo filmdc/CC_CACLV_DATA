@@ -295,14 +295,35 @@ class SageIntacctExpenseService
             }
         }
 
-        // 2. Denormalize budget onto contracts for quick lookup.
+        // 2. Denormalize budget onto contracts ONLY when attribution is
+        //    unambiguous. For shared grant_codes (F8000 with 68 contracts,
+        //    none with service_code), leave intacct_budget_amount null so
+        //    the dashboard falls back to the contract's own awarded amount
+        //    and system metrics don't multi-count a shared fund's budget
+        //    across every sibling contract.
         foreach ($contracts as $contract) {
             $projectId = trim((string) $contract->grant_code);
             $deptId = trim((string) ($contract->service_code ?? ''));
 
             if ($deptId === '') {
-                // Contract has no service_code: sum ALL budget tuples under
-                // this project (matches Sage's fund-level report).
+                $siblings = Contract::where('grant_code', $projectId)
+                    ->where('id', '!=', $contract->id)
+                    ->whereNull('service_code')
+                    ->count();
+
+                if ($siblings > 0) {
+                    // Ambiguous — clear any stale denormalized budget.
+                    $contract->update([
+                        'intacct_budget_amount' => null,
+                        'intacct_budget_synced_at' => now(),
+                        'intacct_budget_source' => null,
+                        'intacct_budget_lines_count' => 0,
+                        'last_synced_at' => now(),
+                    ]);
+                    continue;
+                }
+
+                // Unique owner of the whole project — sum all department splits.
                 $budget = IntacctFundBudget::where('intacct_project_id', $projectId)->sum('amount');
                 $bRow = IntacctFundBudget::where('intacct_project_id', $projectId)
                     ->orderByDesc('amount')
@@ -324,6 +345,7 @@ class SageIntacctExpenseService
                     'intacct_budget_synced_at' => now(),
                     'intacct_budget_source' => $source,
                     'intacct_budget_lines_count' => $linesCount,
+                    'last_synced_at' => now(),
                 ]);
             } else {
                 $contract->update([
@@ -331,10 +353,9 @@ class SageIntacctExpenseService
                     'intacct_budget_synced_at' => now(),
                     'intacct_budget_source' => null,
                     'intacct_budget_lines_count' => 0,
+                    'last_synced_at' => now(),
                 ]);
             }
-
-            $contract->update(['last_synced_at' => now()]);
         }
     }
 
