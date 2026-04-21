@@ -1246,6 +1246,19 @@
                                     @error('intacct_expense_gl_account_to') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                 </div>
                             </div>
+
+                            <div class="mt-4 max-w-xl">
+                                <label for="gl_exclusions" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Excluded Accounts <span class="text-gray-400 font-normal">(optional)</span></label>
+                                <input type="text" wire:model="intacct_expense_gl_account_exclusions" id="gl_exclusions"
+                                       placeholder="e.g. 81150, 81160, 81250, 81260, 81450"
+                                       class="mt-1 block w-full border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                    Comma-separated list of account numbers to exclude from expense sums even if they fall within the range above.
+                                    Useful for non-cash accounts like contributed-commodity distribution (81250/81260) that
+                                    inflate in-kind-heavy funds like F8000 when compared to a cash-focused Sage report.
+                                </p>
+                                @error('intacct_expense_gl_account_exclusions') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
                         </div>
 
                         <!-- Submit + Run Sync buttons -->

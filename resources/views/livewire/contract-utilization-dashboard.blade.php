@@ -556,7 +556,11 @@
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex-1 min-w-0">
                             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                                {{ $fund->project_id }}
+                                <span class="font-mono">{{ $fund->project_id }}</span>
+                                @if($fund->department_id)
+                                    <span class="text-gray-400 dark:text-gray-500">+</span>
+                                    <span class="font-mono text-emerald-700 dark:text-emerald-400">{{ $fund->department_id }}</span>
+                                @endif
                                 @if($fund->project_name)
                                     <span class="block text-sm font-normal text-gray-500 dark:text-gray-400 truncate" title="{{ $fund->project_name }}">
                                         {{ Str::limit($fund->project_name, 40) }}
@@ -571,7 +575,7 @@
                                     </span>
                                 @elseif($fund->contracts->count() > 1)
                                     <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200"
-                                          title="{{ $fund->contracts->count() }} contracts share this fund code">
+                                          title="{{ $fund->contracts->count() }} contracts share this coding">
                                         {{ $fund->contracts->count() }} contracts
                                     </span>
                                 @else
@@ -579,10 +583,10 @@
                                         1 contract
                                     </span>
                                 @endif
-                                @if($fund->budget_tuples > 1)
-                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200"
-                                          title="Budget split across {{ $fund->budget_tuples }} service codes">
-                                        {{ $fund->budget_tuples }} splits
+                                @if(! $fund->has_tuple_budget && $fund->project_wide_budget > 0)
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 dark:bg-zinc-700 dark:text-gray-300"
+                                          title="No tuple-level budget — project-wide budget is ${{ number_format($fund->project_wide_budget, 0) }}">
+                                        No split budget
                                     </span>
                                 @endif
                             </div>
@@ -662,7 +666,7 @@
                             <span></span>
                         @endif
                         @if($fund->expense_lines_count > 0)
-                            <button wire:click="viewFundTransactions('{{ $fund->project_id }}')"
+                            <button wire:click="viewFundTransactions('{{ $fund->project_id }}', '{{ $fund->department_id }}')"
                                     class="text-emerald-700 hover:text-emerald-900 dark:text-emerald-400 dark:hover:text-emerald-300 text-sm font-medium">
                                 View Transactions
                             </button>

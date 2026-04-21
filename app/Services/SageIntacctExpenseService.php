@@ -114,6 +114,9 @@ class SageIntacctExpenseService
     {
         $glFrom = SiteSetting::get('intacct_expense_gl_account_from', '60000');
         $glTo = SiteSetting::get('intacct_expense_gl_account_to', '99999');
+        $exclusions = $this->parseAccountExclusions(
+            (string) SiteSetting::get('intacct_expense_gl_account_exclusions', '')
+        );
 
         // 1. Pull all expense GL entries for the fund (no dept filter — each
         //    returned line carries its own DEPARTMENT value).
@@ -124,6 +127,7 @@ class SageIntacctExpenseService
             to: $to,
             glAccountFrom: $glFrom ?: null,
             glAccountTo: $glTo ?: null,
+            glAccountExclusions: $exclusions,
         );
 
         if (! $expResult['success']) {
@@ -399,6 +403,9 @@ class SageIntacctExpenseService
     {
         $glFrom = SiteSetting::get('intacct_expense_gl_account_from', '60000');
         $glTo = SiteSetting::get('intacct_expense_gl_account_to', '99999');
+        $exclusions = $this->parseAccountExclusions(
+            (string) SiteSetting::get('intacct_expense_gl_account_exclusions', '')
+        );
 
         $budgetIds = $this->resolveBudgetCandidateList();
         $tried = [];
@@ -412,6 +419,7 @@ class SageIntacctExpenseService
                 budgetId: $bid ?: null,
                 glAccountFrom: $glFrom ?: null,
                 glAccountTo: $glTo ?: null,
+                glAccountExclusions: $exclusions,
             );
 
             $tried[] = [
@@ -474,6 +482,26 @@ class SageIntacctExpenseService
         }
 
         return null;
+    }
+
+    /**
+     * Parse a comma/space/newline-separated list of account numbers into
+     * an array of trimmed strings.
+     *
+     * @return list<string>
+     */
+    private function parseAccountExclusions(string $raw): array
+    {
+        if (trim($raw) === '') {
+            return [];
+        }
+
+        $parts = preg_split('/[,\s]+/', $raw) ?: [];
+
+        return array_values(array_filter(
+            array_map(fn ($v) => trim((string) $v), $parts),
+            fn ($v) => $v !== ''
+        ));
     }
 
     private static function parseIntacctDate(string $date): ?Carbon

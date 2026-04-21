@@ -3149,6 +3149,7 @@ XML;
         \Carbon\Carbon $to,
         ?string $glAccountFrom = '60000',
         ?string $glAccountTo = '89999',
+        array $glAccountExclusions = [],
         int $pageSize = 1000
     ): array {
         if (! $this->setting->isXmlApi()) {
@@ -3190,6 +3191,14 @@ XML;
             if ($glAccountFrom !== null && $glAccountTo !== null) {
                 $whereParts[] = "ACCOUNTNO >= '".addslashes($glAccountFrom)."'";
                 $whereParts[] = "ACCOUNTNO <= '".addslashes($glAccountTo)."'";
+            }
+
+            if (! empty($glAccountExclusions)) {
+                $cleanExclusions = array_filter(array_map('trim', $glAccountExclusions), fn ($v) => $v !== '');
+                if (! empty($cleanExclusions)) {
+                    $escaped = array_map(fn ($a) => "'".addslashes($a)."'", $cleanExclusions);
+                    $whereParts[] = 'ACCOUNTNO NOT IN ('.implode(',', $escaped).')';
+                }
             }
 
             $query = implode(' AND ', $whereParts);
@@ -3308,7 +3317,8 @@ XML;
         \Carbon\Carbon $to,
         ?string $budgetId = null,
         ?string $glAccountFrom = '60000',
-        ?string $glAccountTo = '99999'
+        ?string $glAccountTo = '99999',
+        array $glAccountExclusions = []
     ): array {
         if (! $this->setting->isXmlApi()) {
             return ['success' => false, 'error' => 'GLBUDGETITEM query is only supported in XML API mode'];
@@ -3347,6 +3357,14 @@ XML;
             if ($glAccountFrom !== null && $glAccountTo !== null) {
                 $whereParts[] = "GLACCOUNTNO >= '".addslashes($glAccountFrom)."'";
                 $whereParts[] = "GLACCOUNTNO <= '".addslashes($glAccountTo)."'";
+            }
+
+            if (! empty($glAccountExclusions)) {
+                $cleanExclusions = array_filter(array_map('trim', $glAccountExclusions), fn ($v) => $v !== '');
+                if (! empty($cleanExclusions)) {
+                    $escaped = array_map(fn ($a) => "'".addslashes($a)."'", $cleanExclusions);
+                    $whereParts[] = 'GLACCOUNTNO NOT IN ('.implode(',', $escaped).')';
+                }
             }
 
             $query = implode(' AND ', $whereParts);

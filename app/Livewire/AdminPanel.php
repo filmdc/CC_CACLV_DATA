@@ -72,6 +72,7 @@ class AdminPanel extends Component
     public $fiscal_year_start_day = 1;
     public $intacct_expense_gl_account_from = '60000';
     public $intacct_expense_gl_account_to = '89999';
+    public $intacct_expense_gl_account_exclusions = '';
     public $intacct_budget_ids = [];
     public $new_budget_id = '';
 
@@ -251,6 +252,7 @@ class AdminPanel extends Component
         $this->fiscal_year_start_day = (int) SiteSetting::get('fiscal_year_start_day', 1);
         $this->intacct_expense_gl_account_from = SiteSetting::get('intacct_expense_gl_account_from', '60000');
         $this->intacct_expense_gl_account_to = SiteSetting::get('intacct_expense_gl_account_to', '89999');
+        $this->intacct_expense_gl_account_exclusions = (string) SiteSetting::get('intacct_expense_gl_account_exclusions', '');
 
         // Load ordered budget ID list, falling back to the legacy single-value
         // setting for back-compat.
@@ -1006,6 +1008,7 @@ class AdminPanel extends Component
             'fiscal_year_start_day' => 'required|integer|min:1|max:31',
             'intacct_expense_gl_account_from' => 'required|string|max:20',
             'intacct_expense_gl_account_to' => 'required|string|max:20',
+            'intacct_expense_gl_account_exclusions' => 'nullable|string|max:2000',
             'intacct_budget_ids' => 'array',
             'intacct_budget_ids.*' => 'string|max:100',
         ]);
@@ -1021,6 +1024,7 @@ class AdminPanel extends Component
             SiteSetting::set('fiscal_year_start_day', (string) $this->fiscal_year_start_day, 'integer');
             SiteSetting::set('intacct_expense_gl_account_from', $this->intacct_expense_gl_account_from, 'text');
             SiteSetting::set('intacct_expense_gl_account_to', $this->intacct_expense_gl_account_to, 'text');
+            SiteSetting::set('intacct_expense_gl_account_exclusions', trim((string) $this->intacct_expense_gl_account_exclusions), 'text');
             SiteSetting::set('intacct_budget_ids', json_encode($cleanList), 'json');
             // Keep legacy single-value setting mirrored to the first list entry
             // for any caller that still reads it directly.

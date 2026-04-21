@@ -204,11 +204,15 @@ class ContractUtilizationDashboard extends Component
     }
 
     /**
-     * Get system-wide aggregate metrics
+     * Get system-wide aggregate metrics, scoped to the currently-selected
+     * date window so the top-of-dashboard cards track the period picker.
      */
     public function getSystemMetrics(): array
     {
-        return ContractUtilizationService::getSystemMetrics();
+        return ContractUtilizationService::getSystemMetrics(
+            $this->dateFrom ?: null,
+            $this->dateTo ?: null
+        );
     }
 
     /**
@@ -492,6 +496,7 @@ class ContractUtilizationDashboard extends Component
         $this->showTransactionsModal = false;
         $this->transactionsContractId = null;
         $this->transactionsFundProjectId = null;
+        $this->transactionsFundDepartmentId = '';
     }
 
     /**
@@ -582,7 +587,10 @@ class ContractUtilizationDashboard extends Component
     {
         // Fund-level drill-down (from Funds view)
         if ($this->transactionsFundProjectId) {
-            return $this->buildFundTransactionsPayload($this->transactionsFundProjectId);
+            return $this->buildFundTransactionsPayload(
+                $this->transactionsFundProjectId,
+                $this->transactionsFundDepartmentId ?? ''
+            );
         }
 
         if (! $this->transactionsContractId) {
@@ -637,32 +645,41 @@ class ContractUtilizationDashboard extends Component
     }
 
     /**
-     * Build the transactions drill-down for a fund (all lines for the
-     * project_id across any departments + any contract association).
+     * Build the transactions drill-down for a fund tuple (project + optional
+     * dept). Empty dept = include ALL dept splits for the project.
      */
-    private function buildFundTransactionsPayload(string $projectId): array
+    private function buildFundTransactionsPayload(string $projectId, string $departmentId = ''): array
     {
         $from = $this->dateFrom ?: null;
         $to = $this->dateTo ?: null;
 
         $q = IntacctFundExpense::where('intacct_project_id', $projectId);
+        if ($departmentId !== '') {
+            $q->where('intacct_department_id', $departmentId);
+        }
         if ($from && $to) {
             $q->whereBetween('posting_date', [$from, $to]);
         }
         $lines = $q->orderByDesc('posting_date')->orderBy('id')->get();
 
-        $projectName = IntacctFundBudget::where('intacct_project_id', $projectId)->value('intacct_project_name')
+        $projectName = IntacctFundBudget::where('intacct_project_id', $projectId)
+                ->where('intacct_department_id', $departmentId)
+                ->value('intacct_project_name')
+            ?? IntacctFundBudget::where('intacct_project_id', $projectId)->value('intacct_project_name')
             ?? $lines->first()?->intacct_project_name;
 
-        // Synthesize a contract-like shell so the existing modal markup works
-        // unchanged — title/grant_code used for display + CSV filename.
+        $coding = $departmentId === '' ? $projectId : "{$projectId} + {$departmentId}";
+        $budget = IntacctFundBudget::where('intacct_project_id', $projectId)
+            ->where('intacct_department_id', $departmentId)
+            ->sum('amount');
+
         $contract = new Contract([
-            'title' => ($projectName ?: 'Fund '.$projectId),
+            'title' => ($projectName ?: 'Fund '.$coding),
             'grant_code' => $projectId,
-            'service_code' => null,
-            'amount' => IntacctFundBudget::where('intacct_project_id', $projectId)->sum('amount'),
+            'service_code' => $departmentId ?: null,
+            'amount' => $budget,
         ]);
-        $contract->id = 'fund-'.$projectId;
+        $contract->id = 'fund-'.$projectId.($departmentId ? '-'.$departmentId : '');
 
         return [
             'contract' => $contract,
@@ -686,24 +703,36 @@ class ContractUtilizationDashboard extends Component
         $from = $this->dateFrom ?: null;
         $to = $this->dateTo ?: null;
 
-        // Union project_ids that appear in either expenses (within window) or
-        // budgets so we capture Sage-only funds plus budget-only funds.
-        $expenseQuery = IntacctFundExpense::query()
-            ->select('intacct_project_id')
-            ->groupBy('intacct_project_id');
-        if ($from && $to) {
-            $expenseQuery->whereBetween('posting_date', [$from, $to]);
-        }
-        $expenseProjects = $expenseQuery->pluck('intacct_project_id');
+        // Enumerate unique (project_id, department_id) tuples across both
+        // expenses and budgets so every split of a shared fund gets its own
+        // card and Sage-only funds still appear.
+        $expenseTuples = IntacctFundExpense::query()
+            ->select('intacct_project_id', 'intacct_department_id')
+            ->when($from && $to, fn ($q) => $q->whereBetween('posting_date', [$from, $to]))
+            ->groupBy('intacct_project_id', 'intacct_department_id')
+            ->get();
 
-        $budgetProjects = IntacctFundBudget::query()
-            ->select('intacct_project_id')
+        $budgetTuples = IntacctFundBudget::query()
+            ->select('intacct_project_id', 'intacct_department_id')
             ->distinct()
-            ->pluck('intacct_project_id');
+            ->get();
 
-        $allProjects = $expenseProjects->merge($budgetProjects)->unique()->values();
+        $tupleKeys = [];
+        foreach ($expenseTuples as $t) {
+            $tupleKeys[$t->intacct_project_id.'|'.($t->intacct_department_id ?? '')] = [
+                'project_id' => $t->intacct_project_id,
+                'department_id' => $t->intacct_department_id ?? '',
+            ];
+        }
+        foreach ($budgetTuples as $t) {
+            $tupleKeys[$t->intacct_project_id.'|'.($t->intacct_department_id ?? '')] = [
+                'project_id' => $t->intacct_project_id,
+                'department_id' => $t->intacct_department_id ?? '',
+            ];
+        }
+        $tuples = collect(array_values($tupleKeys));
 
-        // Search / filter by project_id or linked contract's title/funder/program
+        // Search across project_id, department_id, and linked contract text
         if ($this->search) {
             $s = strtolower($this->search);
             $matchedViaContracts = Contract::where(function ($q) use ($s) {
@@ -712,14 +741,20 @@ class ContractUtilizationDashboard extends Component
                     ->orWhereRaw('LOWER(grant_code) LIKE ?', ["%{$s}%"]);
             })->pluck('grant_code')->filter()->map(fn ($c) => trim($c))->unique();
 
-            $allProjects = $allProjects->filter(function ($pid) use ($s, $matchedViaContracts) {
-                return str_contains(strtolower($pid), $s) || $matchedViaContracts->contains($pid);
+            $tuples = $tuples->filter(function ($t) use ($s, $matchedViaContracts) {
+                return str_contains(strtolower($t['project_id']), $s)
+                    || str_contains(strtolower($t['department_id']), $s)
+                    || $matchedViaContracts->contains($t['project_id']);
             })->values();
         }
 
-        // Build fund rows
-        $rows = $allProjects->map(function ($projectId) use ($from, $to) {
-            $expQuery = IntacctFundExpense::where('intacct_project_id', $projectId);
+        // Build fund rows per (project, dept) tuple
+        $rows = $tuples->map(function ($t) use ($from, $to) {
+            $projectId = $t['project_id'];
+            $deptId = $t['department_id'];
+
+            $expQuery = IntacctFundExpense::where('intacct_project_id', $projectId)
+                ->where('intacct_department_id', $deptId);
             if ($from && $to) {
                 $expQuery->whereBetween('posting_date', [$from, $to]);
             }
@@ -727,25 +762,48 @@ class ContractUtilizationDashboard extends Component
             $expenseLinesCount = (int) $expQuery->count();
             $lastSyncedAt = $expQuery->max('last_synced_at');
 
-            $budget = (float) IntacctFundBudget::where('intacct_project_id', $projectId)->sum('amount');
-            $budgetTuples = (int) IntacctFundBudget::where('intacct_project_id', $projectId)->count();
-            $budgetRow = IntacctFundBudget::where('intacct_project_id', $projectId)->first();
+            // Budget row for this exact tuple
+            $bRow = IntacctFundBudget::where('intacct_project_id', $projectId)
+                ->where('intacct_department_id', $deptId)
+                ->first();
+            $budget = (float) ($bRow?->amount ?? 0);
 
-            $projectName = $budgetRow?->intacct_project_name
+            // Fund-level budget (if no tuple-specific budget exists, we
+            // display the project-wide budget with a warning).
+            $projectWideBudget = (float) IntacctFundBudget::where('intacct_project_id', $projectId)->sum('amount');
+
+            $projectName = $bRow?->intacct_project_name
+                ?? IntacctFundExpense::where('intacct_project_id', $projectId)
+                    ->where('intacct_department_id', $deptId)
+                    ->value('intacct_project_name')
                 ?? IntacctFundExpense::where('intacct_project_id', $projectId)->value('intacct_project_name');
 
-            $contracts = Contract::where('grant_code', $projectId)->get(['id', 'title', 'service_code', 'archived', 'program_id', 'funder_id']);
+            // Match contracts by (grant_code, service_code). Empty service_code
+            // matches NULL on the contract side.
+            $contractsQuery = Contract::where('grant_code', $projectId);
+            if ($deptId === '') {
+                $contractsQuery->whereNull('service_code');
+            } else {
+                $contractsQuery->where('service_code', $deptId);
+            }
+            $contracts = $contractsQuery->get(['id', 'title', 'service_code', 'archived', 'program_id', 'funder_id']);
+
+            // Build a combined coding label (e.g. "F0412" or "F8000 + S14010")
+            $coding = $deptId === '' ? $projectId : "{$projectId} + {$deptId}";
 
             return (object) [
                 'project_id' => $projectId,
+                'department_id' => $deptId,
+                'coding' => $coding,
                 'project_name' => $projectName,
                 'spent' => $spent,
                 'budget' => $budget,
+                'has_tuple_budget' => $bRow !== null && $budget > 0,
+                'project_wide_budget' => $projectWideBudget,
                 'remaining' => $budget - $spent,
                 'utilization' => $budget > 0 ? round($spent / $budget * 100, 1) : 0.0,
                 'expense_lines_count' => $expenseLinesCount,
-                'budget_tuples' => $budgetTuples,
-                'budget_source' => $budgetRow?->budget_source,
+                'budget_source' => $bRow?->budget_source,
                 'last_synced_at' => $lastSyncedAt,
                 'contracts' => $contracts,
                 'is_sage_only' => $contracts->isEmpty(),
@@ -760,7 +818,7 @@ class ContractUtilizationDashboard extends Component
             $rows = $rows->filter(fn ($r) => $r->contracts->contains('funder_id', $this->filterFunder))->values();
         }
 
-        // Utilization-level filter
+        // Utilization-level filter (only applies to tuples with tuple-level budget)
         if ($this->filterUtilization) {
             $rows = $rows->filter(function ($r) {
                 if ($r->budget <= 0) return false;
@@ -783,13 +841,14 @@ class ContractUtilizationDashboard extends Component
             'amount_desc' => $rows->sortByDesc('budget')->values(),
             'remaining_asc' => $rows->sortBy('remaining')->values(),
             'title_asc' => $rows->sortBy('project_name')->values(),
-            'id_desc', 'id_asc', 'created_desc', 'created_asc', 'start_date_desc', 'start_date_asc' => $rows->sortBy('project_id')->values(),
+            'id_desc', 'id_asc', 'created_desc', 'created_asc', 'start_date_desc', 'start_date_asc' => $rows->sortBy('coding')->values(),
             default => $rows->sortByDesc('utilization')->values(),
         };
 
-        // Paginate manually
-        $page = (int) request()->query('page', 1);
+        // Paginate using Livewire's page state (Paginator::resolveCurrentPage
+        // picks up wire:click on page links correctly).
         $perPage = 12;
+        $page = \Illuminate\Pagination\Paginator::resolveCurrentPage() ?: 1;
         $total = $rows->count();
         $paginated = $rows->slice(($page - 1) * $perPage, $perPage)->values();
 
@@ -798,23 +857,27 @@ class ContractUtilizationDashboard extends Component
             $total,
             $perPage,
             $page,
-            ['path' => request()->url(), 'query' => request()->query()]
+            [
+                'path' => \Illuminate\Pagination\Paginator::resolveCurrentPath(),
+                'pageName' => 'page',
+            ]
         );
     }
 
     /**
-     * Transactions drill-down for a fund (called from fund view). Shows all
-     * expense lines for the project_id within the current date window,
-     * regardless of which contract they're linked to.
+     * Transactions drill-down for a fund tuple (project + optional dept).
      */
-    public function viewFundTransactions(string $projectId): void
+    public function viewFundTransactions(string $projectId, string $departmentId = ''): void
     {
         $this->transactionsContractId = null;
         $this->transactionsFundProjectId = $projectId;
+        $this->transactionsFundDepartmentId = $departmentId;
         $this->showTransactionsModal = true;
     }
 
     public $transactionsFundProjectId = null;
+
+    public $transactionsFundDepartmentId = '';
 
     public function render()
     {

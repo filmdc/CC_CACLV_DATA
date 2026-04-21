@@ -273,15 +273,25 @@ class ContractUtilizationService
     /**
      * Get system-wide utilization metrics
      */
-    public static function getSystemMetrics(): array
+    public static function getSystemMetrics(?string $from = null, ?string $to = null): array
     {
         // Budget and spend totals are computed at the FUND level (from
         // intacct_fund_budgets / intacct_fund_expenses) so a shared fund
         // like F8000 — linked by 68 contracts — contributes once, not 68×.
         // Contracts without any Intacct data still contribute their local
         // contract.amount as budget (fallback for manual-only rows).
+        //
+        // Expense sum is scoped to the posting-date window when provided so
+        // the top-of-dashboard metric cards track the period picker.
+        // Budget stays unscoped (one current-FY budget snapshot per fund);
+        // if the user's window differs from the sync window the total may
+        // overstate relative to a period's expected spend.
         $fundBudgetTotal = (float) \App\Models\IntacctFundBudget::sum('amount');
-        $fundSpentTotal = (float) \App\Models\IntacctFundExpense::sum('amount');
+        $fundSpentQuery = \App\Models\IntacctFundExpense::query();
+        if ($from && $to) {
+            $fundSpentQuery->whereBetween('posting_date', [$from, $to]);
+        }
+        $fundSpentTotal = (float) $fundSpentQuery->sum('amount');
 
         // Sum contract.amount ONLY for contracts whose fund has no Intacct
         // budget record — otherwise we'd double-count the fund and the
