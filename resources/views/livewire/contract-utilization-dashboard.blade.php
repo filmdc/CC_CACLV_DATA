@@ -247,7 +247,20 @@
                     $effectiveBudget = $this->getEffectiveBudget($contract);
                     $intacctBudget = (float) ($contract->intacct_budget_amount ?? 0);
                     $manualBudgeted = (float) ($contract->project_budgets_sum_budgeted_amount ?? 0);
-                    $budgeted = $intacctBudget > 0 ? $intacctBudget : $manualBudgeted;
+                    // "Budgeted" always matches the utilization denominator so
+                    // the card's math stays self-consistent. Source-badge tells
+                    // the user where the figure came from.
+                    $budgeted = $effectiveBudget;
+                    if ($intacctBudget > 0) {
+                        $budgetSource = 'intacct';
+                    } elseif ($manualBudgeted > 0) {
+                        $budgetSource = 'manual';
+                        $budgeted = $manualBudgeted;
+                    } elseif ((float) $contract->amount > 0) {
+                        $budgetSource = 'awarded';
+                    } else {
+                        $budgetSource = 'none';
+                    }
                     $remaining = $effectiveBudget - $spent;
 
                     $statusColors = [
@@ -323,9 +336,17 @@
                         <div>
                             <p class="text-xs text-gray-500 dark:text-gray-400">
                                 Budgeted
-                                @if($intacctBudget > 0)
+                                @if($budgetSource === 'intacct')
                                     <span class="ml-1 text-[10px] font-medium text-emerald-600 dark:text-emerald-400" title="Sourced from Intacct GLBUDGETITEM{{ $contract->intacct_budget_source ? ' ('.$contract->intacct_budget_source.')' : '' }}">
                                         Intacct
+                                    </span>
+                                @elseif($budgetSource === 'manual')
+                                    <span class="ml-1 text-[10px] font-medium text-blue-600 dark:text-blue-400" title="Sum of manually entered project_budgets rows">
+                                        Manual
+                                    </span>
+                                @elseif($budgetSource === 'awarded')
+                                    <span class="ml-1 text-[10px] font-medium text-gray-500 dark:text-gray-400" title="No Intacct or manual budget — using the contract's awarded amount">
+                                        = Awarded
                                     </span>
                                 @endif
                             </p>
