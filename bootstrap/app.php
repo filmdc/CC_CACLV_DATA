@@ -85,6 +85,20 @@ return Application::configure(basePath: dirname(__DIR__))
 
                 return $setting && $setting->code_mapping_enabled;
             });
+
+        // Sync posted Intacct GL expenses to fund utilization daily at 1:00 AM PST
+        $schedule->command('intacct:sync-fund-expenses --force')
+            ->dailyAt('01:00')
+            ->timezone('America/Los_Angeles')
+            ->when(function () {
+                if (\App\Models\SiteSetting::get('intacct_expense_sync_enabled', '1') !== '1') {
+                    return false;
+                }
+                $setting = \App\Models\SageIntacctSetting::where('is_active', true)->first();
+
+                return $setting && $setting->isConfigured() && $setting->isXmlApi();
+            })
+            ->description('Pull posted GL expense totals from Sage Intacct into fund utilization');
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

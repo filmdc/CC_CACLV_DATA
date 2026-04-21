@@ -5,11 +5,59 @@
             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Contract Utilization Dashboard</h1>
             <p class="text-gray-600 dark:text-gray-400">Track budget utilization across all contracts</p>
         </div>
-        <div class="flex gap-2">
+        <div class="flex flex-wrap gap-2 items-center">
+            <button wire:click="syncFromIntacct"
+                    wire:loading.attr="disabled"
+                    wire:target="syncFromIntacct"
+                    class="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm rounded-md shadow-sm">
+                <svg wire:loading.remove wire:target="syncFromIntacct" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                <svg wire:loading wire:target="syncFromIntacct" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span wire:loading.remove wire:target="syncFromIntacct">Sync from Intacct</span>
+                <span wire:loading wire:target="syncFromIntacct">Dispatching…</span>
+            </button>
             <select wire:model.live="viewMode" class="rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white text-sm">
                 <option value="cards">Card View</option>
                 <option value="table">Table View</option>
             </select>
+        </div>
+    </div>
+
+    {{-- Flash messages --}}
+    @if (session()->has('message'))
+        <div class="rounded-md bg-green-50 dark:bg-green-900/40 border border-green-200 dark:border-green-800 p-3 mb-4 text-sm text-green-800 dark:text-green-200">
+            {{ session('message') }}
+        </div>
+    @endif
+    @if (session()->has('error'))
+        <div class="rounded-md bg-red-50 dark:bg-red-900/40 border border-red-200 dark:border-red-800 p-3 mb-4 text-sm text-red-800 dark:text-red-200">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    {{-- Date Range (drives Intacct window for totals + sync) --}}
+    <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl p-4 mb-6">
+        <div class="flex flex-col sm:flex-row sm:items-end gap-3">
+            <div>
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Period — from</label>
+                <input type="date" wire:model.live.debounce.500ms="dateFrom"
+                       class="rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">through</label>
+                <input type="date" wire:model.live.debounce.500ms="dateTo"
+                       class="rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white text-sm">
+            </div>
+            <button wire:click="resetDateRange" class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline self-end pb-2">
+                Reset to current FY
+            </button>
+            <div class="text-xs text-gray-500 dark:text-gray-400 sm:ml-auto pb-2">
+                Intacct-sourced totals below are scoped to this window. Manual-entry contracts show lifetime totals.
+            </div>
         </div>
     </div>
 
@@ -153,7 +201,7 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
                 <select wire:model.live="filterStatus" class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white text-sm">
-                    <option value="">All Statuses</option>
+                    <option value="">Active (Default)</option>
                     @foreach($statusOptions as $value => $label)
                         <option value="{{ $value }}">{{ $label }}</option>
                     @endforeach
@@ -195,7 +243,7 @@
                     $utilization = $this->calculateUtilization($contract);
                     $status = $this->getUtilizationStatus($contract);
                     $colorClass = $this->getUtilizationColorClass($contract);
-                    $spent = (float) ($contract->project_expenses_sum_amount ?? 0);
+                    $spent = $this->getEffectiveSpent($contract);
                     $budgeted = (float) ($contract->project_budgets_sum_budgeted_amount ?? 0);
                     $remaining = (float) $contract->amount - $spent;
 
@@ -215,13 +263,24 @@
                             <h3 class="text-lg font-semibold text-gray-900 dark:text-white truncate" title="{{ $contract->title }}">
                                 {{ Str::limit($contract->title, 35) }}
                             </h3>
-                            <div class="flex flex-wrap gap-2 mt-1">
+                            <div class="flex flex-wrap gap-2 mt-1 items-center">
                                 @if($contract->contract_number)
                                     <span class="text-xs text-gray-500 dark:text-gray-400">#{{ $contract->contract_number }}</span>
                                 @endif
                                 @if($contract->grant_code)
                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-                                        {{ $contract->grant_code }}
+                                        {{ $contract->grant_code }}@if($contract->service_code) / {{ $contract->service_code }}@endif
+                                    </span>
+                                @endif
+                                @if(($contract->intacct_expenses_count ?? 0) > 0)
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200"
+                                          title="Intacct-synced{{ $contract->intacct_last_synced_at ? ' — last synced '.\Carbon\Carbon::parse($contract->intacct_last_synced_at)->diffForHumans() : '' }}">
+                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                                        Intacct
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 dark:bg-zinc-700 dark:text-gray-300" title="Manual expense entries only (no Intacct sync in this window)">
+                                        Manual
                                     </span>
                                 @endif
                             </div>
@@ -287,12 +346,27 @@
                         </div>
                     </div>
 
-                    {{-- View Details Link --}}
-                    <div class="flex justify-end">
-                        <button wire:click="viewContract({{ $contract->id }})"
-                                class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium">
-                            View Details &rarr;
-                        </button>
+                    {{-- Footer: sync info + View Transactions + View Details --}}
+                    <div class="flex flex-wrap justify-between items-center gap-2 text-xs">
+                        @if($contract->intacct_last_synced_at)
+                            <span class="text-gray-500 dark:text-gray-400">
+                                Intacct sync: {{ \Carbon\Carbon::parse($contract->intacct_last_synced_at)->diffForHumans() }}
+                            </span>
+                        @else
+                            <span></span>
+                        @endif
+                        <div class="flex gap-3">
+                            @if($spent > 0 || ($contract->intacct_expenses_count ?? 0) > 0)
+                                <button wire:click="viewTransactions({{ $contract->id }})"
+                                        class="text-emerald-700 hover:text-emerald-900 dark:text-emerald-400 dark:hover:text-emerald-300 text-sm font-medium">
+                                    View Transactions
+                                </button>
+                            @endif
+                            <button wire:click="viewContract({{ $contract->id }})"
+                                    class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium">
+                                View Details &rarr;
+                            </button>
+                        </div>
                     </div>
                 </div>
             @empty
@@ -327,7 +401,7 @@
                                 $utilization = $this->calculateUtilization($contract);
                                 $status = $this->getUtilizationStatus($contract);
                                 $colorClass = $this->getUtilizationColorClass($contract);
-                                $spent = (float) ($contract->project_expenses_sum_amount ?? 0);
+                                $spent = $this->getEffectiveSpent($contract);
                                 $remaining = (float) $contract->amount - $spent;
 
                                 $statusColors = [
@@ -356,8 +430,12 @@
                                 <td class="px-4 py-3 text-right text-sm text-purple-600 dark:text-purple-400">
                                     ${{ number_format($spent, 0) }}
                                 </td>
-                                <td class="px-4 py-3 text-right text-sm {{ $remaining < 0 ? 'text-red-600' : 'text-green-600' }}">
-                                    ${{ number_format(abs($remaining), 0) }}
+                                <td class="px-4 py-3 text-right text-sm font-medium whitespace-nowrap {{ $remaining < 0 ? 'text-red-600' : 'text-green-600' }}">
+                                    @if($remaining < 0)
+                                        (${{ number_format(abs($remaining), 0) }}) over
+                                    @else
+                                        ${{ number_format($remaining, 0) }}
+                                    @endif
                                 </td>
                                 <td class="px-4 py-3">
                                     <div class="flex items-center">
@@ -373,13 +451,25 @@
                                     </span>
                                 </td>
                                 <td class="px-4 py-3 text-center">
-                                    <button wire:click="viewContract({{ $contract->id }})"
-                                            class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                        </svg>
-                                    </button>
+                                    <div class="flex justify-center items-center gap-2">
+                                        @if($spent > 0 || ($contract->intacct_expenses_count ?? 0) > 0)
+                                            <button wire:click="viewTransactions({{ $contract->id }})"
+                                                    title="View transactions"
+                                                    class="text-emerald-600 hover:text-emerald-800 dark:text-emerald-400">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                                                </svg>
+                                            </button>
+                                        @endif
+                                        <button wire:click="viewContract({{ $contract->id }})"
+                                                title="View contract"
+                                                class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
@@ -399,4 +489,145 @@
     <div class="mt-4">
         {{ $contracts->links() }}
     </div>
+
+    {{-- Transactions drill-down modal --}}
+    @if($showTransactionsModal && $transactionsPayload && $transactionsPayload['contract'])
+        @php
+            $tContract = $transactionsPayload['contract'];
+            $tSource = $transactionsPayload['source'];
+            $tLines = $transactionsPayload['lines'];
+            $tTotal = $transactionsPayload['total'];
+        @endphp
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm p-4"
+             wire:click.self="closeTransactionsModal">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col">
+                {{-- Header --}}
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-700 flex justify-between items-start">
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+                            Transactions — {{ $tContract->title }}
+                        </h2>
+                        <div class="mt-1 flex flex-wrap gap-2 items-center text-sm">
+                            @if($tContract->grant_code)
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                    {{ $tContract->grant_code }}@if($tContract->service_code) / {{ $tContract->service_code }}@endif
+                                </span>
+                            @endif
+                            @if($tSource === 'intacct')
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                                    Sourced from Intacct GL
+                                </span>
+                                <span class="text-xs text-gray-500 dark:text-gray-400">
+                                    Window: {{ $dateFrom }} &mdash; {{ $dateTo }}
+                                </span>
+                            @elseif($tSource === 'manual')
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 dark:bg-zinc-700 dark:text-gray-300">
+                                    Manual entries (no Intacct sync)
+                                </span>
+                            @endif
+                        </div>
+                        @if(!empty($transactionsPayload['manual_also_present']))
+                            <p class="mt-2 text-xs text-amber-700 dark:text-amber-300">
+                                Note: this contract also has manual project_expenses rows. Because Intacct-synced data exists, those manual entries are <strong>excluded</strong> from the total shown here and on the card.
+                            </p>
+                        @endif
+                    </div>
+                    <button wire:click="closeTransactionsModal"
+                            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                {{-- Body --}}
+                <div class="flex-1 overflow-auto">
+                    @if($tLines->isEmpty())
+                        <div class="p-12 text-center">
+                            <p class="text-gray-500 dark:text-gray-400">No transactions found in the selected window.</p>
+                        </div>
+                    @else
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700">
+                            <thead class="bg-gray-50 dark:bg-zinc-900/40 sticky top-0">
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Date</th>
+                                    @if($tSource === 'intacct')
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Account</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Description</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Document</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Intacct #</th>
+                                    @else
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Category</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Description</th>
+                                    @endif
+                                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 dark:divide-zinc-700">
+                                @foreach($tLines as $line)
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-zinc-700/40">
+                                        @if($tSource === 'intacct')
+                                            <td class="px-4 py-2 text-sm text-gray-900 dark:text-white whitespace-nowrap">
+                                                {{ $line->posting_date?->format('M d, Y') ?? '—' }}
+                                            </td>
+                                            <td class="px-4 py-2 text-sm text-gray-900 dark:text-white whitespace-nowrap">
+                                                <span class="font-mono">{{ $line->gl_account }}</span>
+                                                @if($line->gl_account_title)
+                                                    <span class="text-xs text-gray-500 dark:text-gray-400 block">{{ $line->gl_account_title }}</span>
+                                                @endif
+                                            </td>
+                                            <td class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
+                                                {{ Str::limit($line->description, 80) ?: '—' }}
+                                            </td>
+                                            <td class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                                                {{ $line->document_no ?? '—' }}
+                                            </td>
+                                            <td class="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 font-mono whitespace-nowrap">
+                                                {{ $line->intacct_record_no }}
+                                            </td>
+                                        @else
+                                            <td class="px-4 py-2 text-sm text-gray-900 dark:text-white whitespace-nowrap">
+                                                {{ $line->expense_date?->format('M d, Y') ?? '—' }}
+                                            </td>
+                                            <td class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                                                {{ $line->category ?? '—' }}
+                                            </td>
+                                            <td class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
+                                                {{ Str::limit($line->description, 80) ?: '—' }}
+                                            </td>
+                                        @endif
+                                        <td class="px-4 py-2 text-right text-sm font-medium whitespace-nowrap {{ $line->amount < 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white' }}">
+                                            ${{ number_format($line->amount, 2) }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    @endif
+                </div>
+
+                {{-- Footer --}}
+                <div class="px-6 py-3 border-t border-gray-200 dark:border-zinc-700 flex flex-wrap justify-between items-center gap-3 bg-gray-50 dark:bg-zinc-900/40 rounded-b-lg">
+                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                        {{ $tLines->count() }} {{ Str::plural('transaction', $tLines->count()) }}
+                    </div>
+                    <div class="flex items-center gap-4">
+                        @if($tLines->isNotEmpty())
+                            <button wire:click="exportTransactions"
+                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 border border-emerald-600 text-emerald-700 dark:text-emerald-400 text-sm font-medium rounded-md hover:bg-emerald-50 dark:hover:bg-emerald-900/20">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4"/>
+                                </svg>
+                                Export CSV
+                            </button>
+                        @endif
+                        <div class="text-base font-semibold text-gray-900 dark:text-white">
+                            Total: ${{ number_format($tTotal, 2) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>

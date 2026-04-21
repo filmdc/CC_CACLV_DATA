@@ -92,6 +92,8 @@ class ContractManagement extends Component
 
     public $grant_code = '';
 
+    public $service_code = '';
+
     public $notes = '';
 
     // File upload
@@ -162,6 +164,7 @@ class ContractManagement extends Component
         $this->start_date = '';
         $this->end_date = '';
         $this->grant_code = '';
+        $this->service_code = '';
         $this->notes = '';
         $this->documents = [];
         $this->showViewModal = false;
@@ -250,6 +253,7 @@ class ContractManagement extends Component
             $this->start_date = $this->selectedContract->start_date ? $this->selectedContract->start_date->format('Y-m-d') : '';
             $this->end_date = $this->selectedContract->end_date ? $this->selectedContract->end_date->format('Y-m-d') : '';
             $this->grant_code = $this->selectedContract->grant_code;
+            $this->service_code = $this->selectedContract->service_code;
             $this->notes = $this->selectedContract->notes;
         }
     }
@@ -270,6 +274,7 @@ class ContractManagement extends Component
             'start_date' => 'required|date',
             'end_date' => 'nullable|date|after:start_date',
             'grant_code' => 'nullable|string|max:255',
+            'service_code' => 'nullable|string|max:50',
             'notes' => 'nullable|string',
             'documents.*' => 'nullable|file|max:10240', // 10MB max
         ]);
@@ -287,6 +292,7 @@ class ContractManagement extends Component
                 'start_date' => $this->start_date,
                 'end_date' => $this->end_date ?: null,
                 'grant_code' => $this->grant_code,
+                'service_code' => $this->service_code ?: null,
                 'notes' => $this->notes,
                 'created_by' => auth()->id(),
             ]);
@@ -325,6 +331,7 @@ class ContractManagement extends Component
             'start_date' => 'required|date',
             'end_date' => 'nullable|date|after:start_date',
             'grant_code' => 'nullable|string|max:255',
+            'service_code' => 'nullable|string|max:50',
             'notes' => 'nullable|string',
             'documents.*' => 'nullable|file|max:10240', // 10MB max
         ]);
@@ -342,6 +349,7 @@ class ContractManagement extends Component
                 'start_date' => $this->start_date,
                 'end_date' => $this->end_date ?: null,
                 'grant_code' => $this->grant_code,
+                'service_code' => $this->service_code ?: null,
                 'notes' => $this->notes,
                 'updated_by' => auth()->id(),
             ]);

@@ -30,6 +30,7 @@ class Contract extends Model implements HasMedia
         'start_date',
         'end_date',
         'grant_code',
+        'service_code',
         'notes',
         'archived',
         'date_archived',
@@ -60,6 +61,7 @@ class Contract extends Model implements HasMedia
         'cfda_number',
         'purpose',
         'grant_code',
+        'service_code',
         'notes',
     ];
 
@@ -147,6 +149,14 @@ class Contract extends Model implements HasMedia
     }
 
     /**
+     * Get Intacct-sourced posted expense lines for this contract
+     */
+    public function intacctFundExpenses(): HasMany
+    {
+        return $this->hasMany(IntacctFundExpense::class);
+    }
+
+    /**
      * Get total budgeted amount across all projects for this contract
      */
     public function getTotalBudgetedAttribute(): float
@@ -155,11 +165,39 @@ class Contract extends Model implements HasMedia
     }
 
     /**
-     * Get total spent amount across all projects for this contract
+     * Get total spent amount for this contract.
+     *
+     * When Intacct-sourced expense lines exist for the contract, those become
+     * the source of truth (posted GL activity). Otherwise, fall back to
+     * manually-entered project_expenses.
      */
     public function getTotalSpentAttribute(): float
     {
+        if ($this->intacctFundExpenses()->exists()) {
+            return (float) $this->intacctFundExpenses()->sum('amount');
+        }
+
         return (float) $this->projectExpenses()->sum('amount');
+    }
+
+    /**
+     * Most recent Intacct sync timestamp across this contract's expense lines,
+     * or null if never synced.
+     */
+    public function getLastIntacctSyncAttribute(): ?\Carbon\Carbon
+    {
+        $timestamp = $this->intacctFundExpenses()->max('last_synced_at');
+
+        return $timestamp ? \Carbon\Carbon::parse($timestamp) : null;
+    }
+
+    /**
+     * Whether this contract is currently sourcing utilization from Intacct
+     * (has at least one synced GL line).
+     */
+    public function getIsIntacctSyncedAttribute(): bool
+    {
+        return $this->intacctFundExpenses()->exists();
     }
 
     /**

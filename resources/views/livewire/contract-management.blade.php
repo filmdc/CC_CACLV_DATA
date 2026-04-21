@@ -120,9 +120,20 @@
 
                         <div>
                             <label for="grant_code" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fund Code</label>
-                            <input type="text" wire:model="grant_code" id="grant_code" 
+                            <input type="text" wire:model="grant_code" id="grant_code"
+                                   placeholder="e.g. F1842"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Sage Intacct Project ID (PROJECTID). Drives fund utilization sync.</p>
                             @error('grant_code') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="service_code" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Service Code <span class="text-gray-400 font-normal">(optional)</span></label>
+                            <input type="text" wire:model="service_code" id="service_code"
+                                   placeholder="e.g. S14100"
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Intacct DEPARTMENTID. Set only when a shared fund (e.g. F8000) is split by service.</p>
+                            @error('service_code') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 
                         <div>
@@ -295,7 +306,12 @@
                                 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Fund Code</label>
-                                    <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $selectedContract->grant_code ?? 'N/A' }}</p>
+                                    <p class="mt-1 text-sm text-gray-900 dark:text-white">
+                                        {{ $selectedContract->grant_code ?? 'N/A' }}
+                                        @if($selectedContract->service_code)
+                                            <span class="text-gray-500 dark:text-gray-400"> + {{ $selectedContract->service_code }}</span>
+                                        @endif
+                                    </p>
                                 </div>
                                 
                                 <div>

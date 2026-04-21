@@ -33,9 +33,13 @@
                         class="py-4 px-1 border-b-2 font-medium text-sm {{ $activeTab === 'settings' ? 'border-purple-500 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
                     Site Settings
                 </button>
-                <button wire:click="setActiveTab('contract_settings')" 
+                <button wire:click="setActiveTab('contract_settings')"
                         class="py-4 px-1 border-b-2 font-medium text-sm {{ $activeTab === 'contract_settings' ? 'border-purple-500 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
                     Contract Settings
+                </button>
+                <button wire:click="setActiveTab('fund_utilization')"
+                        class="py-4 px-1 border-b-2 font-medium text-sm {{ $activeTab === 'fund_utilization' ? 'border-purple-500 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+                    Fund Utilization
                 </button>
                 <button wire:click="setActiveTab('roles')" 
                         class="py-4 px-1 border-b-2 font-medium text-sm {{ $activeTab === 'roles' ? 'border-purple-500 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
@@ -1110,6 +1114,109 @@
                             <button type="submit" 
                                     class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition duration-150 ease-in-out">
                                 Update Contract Settings
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            @elseif ($activeTab === 'fund_utilization')
+                <!-- Fund Utilization / Intacct Expense Sync Settings -->
+                <div class="space-y-6">
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Fund Utilization Settings</h2>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                            Configure how the contract utilization dashboard pulls posted expenses from Sage Intacct.
+                            Runs automatically nightly at 1:00 AM PST when enabled, or can be triggered on-demand from the dashboard.
+                        </p>
+                    </div>
+
+                    <form wire:submit.prevent="updateFundUtilizationSettings" class="space-y-6">
+                        <!-- Sync Enabled Toggle -->
+                        <div class="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg p-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">Intacct Expense Sync</h3>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                                        When enabled, the nightly job pulls posted GLENTRY lines from Intacct into local fund utilization data.
+                                    </p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" wire:model="intacct_expense_sync_enabled" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Fiscal Year Start -->
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-1">Fiscal Year Start</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                                The month and day that starts your fiscal year. Used as the default window for utilization reports and the scheduled sync. Default: July 1 (runs 7/1&ndash;6/30).
+                            </p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md">
+                                <div>
+                                    <label for="fy_start_month" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Start Month</label>
+                                    <select wire:model="fiscal_year_start_month" id="fy_start_month"
+                                            class="mt-1 block w-full border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                                        @foreach([1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April', 5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August', 9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December'] as $m => $label)
+                                            <option value="{{ $m }}">{{ $label }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('fiscal_year_start_month') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                </div>
+                                <div>
+                                    <label for="fy_start_day" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Start Day</label>
+                                    <input type="number" min="1" max="31" wire:model="fiscal_year_start_day" id="fy_start_day"
+                                           class="mt-1 block w-full border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                                    @error('fiscal_year_start_day') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- GL Account Range -->
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-1">Expense Account Range</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                                GL account numbers to include when summing posted expenses. Used as an inclusive range
+                                on the Intacct query (<code>ACCOUNTNO &gt;= from AND ACCOUNTNO &lt;= to</code>) so balance-sheet
+                                activity tied to the same fund is excluded. Default: <strong>60000&ndash;89999</strong>, which
+                                covers the expense accounts in most nonprofit charts of accounts.
+                            </p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md">
+                                <div>
+                                    <label for="gl_from" class="block text-sm font-medium text-gray-700 dark:text-gray-300">From</label>
+                                    <input type="text" wire:model="intacct_expense_gl_account_from" id="gl_from"
+                                           placeholder="60000"
+                                           class="mt-1 block w-full border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                                    @error('intacct_expense_gl_account_from') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                </div>
+                                <div>
+                                    <label for="gl_to" class="block text-sm font-medium text-gray-700 dark:text-gray-300">To</label>
+                                    <input type="text" wire:model="intacct_expense_gl_account_to" id="gl_to"
+                                           placeholder="89999"
+                                           class="mt-1 block w-full border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                                    @error('intacct_expense_gl_account_to') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit + Run Sync buttons -->
+                        <div class="flex flex-wrap justify-between gap-3 pt-4 border-t border-gray-200 dark:border-zinc-700">
+                            <button type="button" wire:click="runFundExpenseSyncNow"
+                                    wire:loading.attr="disabled" wire:target="runFundExpenseSyncNow"
+                                    class="inline-flex items-center gap-2 px-4 py-2 border border-indigo-600 text-indigo-600 dark:text-indigo-400 text-sm font-medium rounded-md hover:bg-indigo-50 dark:hover:bg-indigo-900/20 disabled:opacity-50">
+                                <svg wire:loading.remove wire:target="runFundExpenseSyncNow" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                </svg>
+                                <svg wire:loading wire:target="runFundExpenseSyncNow" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <span wire:loading.remove wire:target="runFundExpenseSyncNow">Run Sync Now</span>
+                                <span wire:loading wire:target="runFundExpenseSyncNow">Dispatching&hellip;</span>
+                            </button>
+                            <button type="submit"
+                                    class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition duration-150 ease-in-out">
+                                Save Settings
                             </button>
                         </div>
                     </form>

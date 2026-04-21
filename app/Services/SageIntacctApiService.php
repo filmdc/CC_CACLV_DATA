@@ -3030,4 +3030,307 @@ XML;
     {
         return $this->userToken;
     }
+
+    /**
+     * Query posted GL entry lines filtered by Intacct dimensions.
+     *
+     * Uses the GLENTRY object (line-level posted GL activity) filtered by
+     * PROJECTID (fund), optional DEPARTMENT (service), entry date range, and
+     * ACCOUNTNO range. STATE='Posted' is enforced so unposted drafts are
+     * excluded.
+     *
+     * Field-name note: GLENTRY uses `DEPARTMENT` (not `DEPARTMENTID`) and
+     * `ENTRY_DATE` (not `POSTINGDATE`), while `PROJECTID` is spelled
+     * consistently. Amounts come back as a positive `AMOUNT` plus a sign
+     * carried in `TR_TYPE` (1 = debit, -1 = credit). The signed value is
+     * computed during parsing so downstream code can simply sum.
+     *
+     * @return array{success: bool, records?: array, numremaining?: int, error?: string}
+     */
+    public function queryPostedGLEntriesByDimensions(
+        string $projectId,
+        ?string $departmentId,
+        \Carbon\Carbon $from,
+        \Carbon\Carbon $to,
+        ?string $glAccountFrom = '60000',
+        ?string $glAccountTo = '89999',
+        int $pageSize = 1000
+    ): array {
+        if (! $this->setting->isXmlApi()) {
+            return [
+                'success' => false,
+                'error' => 'GLENTRY query is only supported in XML API mode',
+            ];
+        }
+
+        try {
+            if (! $this->sessionId) {
+                $authResult = $this->authenticateXml();
+                if (! $authResult['success']) {
+                    return [
+                        'success' => false,
+                        'error' => 'Authentication failed: '.($authResult['message'] ?? 'Unknown error'),
+                    ];
+                }
+            }
+
+            // Intacct readByQuery WHERE clauses use MM/DD/YYYY for date literals.
+            $fromStr = $from->format('m/d/Y');
+            $toStr = $to->format('m/d/Y');
+
+            // Note: GLENTRY records returned by readByQuery are already posted
+            // (unposted drafts live in GLBATCH and aren't yielded here), so no
+            // explicit STATE filter is needed. (STATE also isn't a queryable
+            // field — adding `STATE = 'Posted'` silently returns zero rows.)
+            $whereParts = [
+                "PROJECTID = '".addslashes($projectId)."'",
+                "ENTRY_DATE >= '{$fromStr}'",
+                "ENTRY_DATE <= '{$toStr}'",
+            ];
+
+            if ($departmentId !== null && $departmentId !== '') {
+                $whereParts[] = "DEPARTMENT = '".addslashes($departmentId)."'";
+            }
+
+            if ($glAccountFrom !== null && $glAccountTo !== null) {
+                $whereParts[] = "ACCOUNTNO >= '".addslashes($glAccountFrom)."'";
+                $whereParts[] = "ACCOUNTNO <= '".addslashes($glAccountTo)."'";
+            }
+
+            $query = implode(' AND ', $whereParts);
+
+            Log::info('Sage Intacct XML: Querying GLENTRY', [
+                'project_id' => $projectId,
+                'department_id' => $departmentId,
+                'from' => $fromStr,
+                'to' => $toStr,
+                'query' => $query,
+            ]);
+
+            $xmlRequest = $this->buildReadByQueryXml('GLENTRY', $query, $pageSize);
+            $response = $this->sendXmlRequest($xmlRequest);
+
+            if (! $response['success']) {
+                return [
+                    'success' => false,
+                    'error' => $response['error'] ?? 'GLENTRY query failed',
+                ];
+            }
+
+            $parsed = $this->parseGLEntryResponse($response['xml']);
+            if (! $parsed['success']) {
+                return $parsed;
+            }
+
+            // Follow readMore cursor until Intacct reports numremaining = 0.
+            // Each Intacct page is capped at pagesize (max 1000 by default).
+            $resultId = $this->extractResultId($response['xml']);
+            $safetyCap = 100000;
+            $pages = 1;
+
+            while (! empty($parsed['numremaining']) && $parsed['numremaining'] > 0 && $resultId) {
+                if (count($parsed['records']) >= $safetyCap) {
+                    Log::warning('Sage Intacct GLENTRY: hit safety cap while paginating', [
+                        'records_so_far' => count($parsed['records']),
+                        'remaining' => $parsed['numremaining'],
+                        'safety_cap' => $safetyCap,
+                    ]);
+                    break;
+                }
+
+                $moreXml = $this->buildReadMoreXml($resultId);
+                $moreResponse = $this->sendXmlRequest($moreXml);
+                if (! $moreResponse['success']) {
+                    Log::warning('Sage Intacct GLENTRY: readMore failed mid-pagination', [
+                        'page' => $pages + 1,
+                        'error' => $moreResponse['error'] ?? 'unknown',
+                    ]);
+                    break;
+                }
+
+                $morePage = $this->parseGLEntryResponse($moreResponse['xml']);
+                if (! $morePage['success']) {
+                    Log::warning('Sage Intacct GLENTRY: readMore parse failed', [
+                        'page' => $pages + 1,
+                        'error' => $morePage['error'] ?? 'unknown',
+                    ]);
+                    break;
+                }
+
+                $parsed['records'] = array_merge($parsed['records'], $morePage['records']);
+                $parsed['numremaining'] = $morePage['numremaining'];
+                $resultId = $this->extractResultId($moreResponse['xml']);
+                $pages++;
+            }
+
+            Log::info('Sage Intacct GLENTRY pagination complete', [
+                'project_id' => $projectId,
+                'department_id' => $departmentId,
+                'pages' => $pages,
+                'total_records' => count($parsed['records']),
+                'final_numremaining' => $parsed['numremaining'] ?? 0,
+            ]);
+
+            return $parsed;
+
+        } catch (\Exception $e) {
+            Log::error('Sage Intacct queryPostedGLEntriesByDimensions exception', [
+                'project_id' => $projectId,
+                'department_id' => $departmentId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Extract the resultId attribute from a readByQuery/readMore response so
+     * we can follow the cursor for pagination.
+     */
+    private function extractResultId(string $xmlResponse): ?string
+    {
+        try {
+            $xml = simplexml_load_string($xmlResponse);
+            if ($xml === false) {
+                return null;
+            }
+
+            $dataNodes = $xml->xpath('//result/data');
+            if (empty($dataNodes)) {
+                return null;
+            }
+
+            $attrs = $dataNodes[0]->attributes();
+            $resultId = (string) ($attrs['resultId'] ?? '');
+
+            return $resultId !== '' ? $resultId : null;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Build XML for a readMore call that continues pagination for a prior
+     * readByQuery resultId.
+     */
+    private function buildReadMoreXml(string $resultId): string
+    {
+        $controlId = $this->generateControlId();
+        $functionId = $this->generateControlId();
+
+        $authSection = $this->sessionId
+            ? '<sessionid>'.htmlspecialchars($this->sessionId).'</sessionid>'
+            : '<login>
+                <userid>'.htmlspecialchars($this->setting->web_services_user_id).'</userid>
+                <companyid>'.htmlspecialchars($this->setting->company_id).'</companyid>
+                <password>'.htmlspecialchars($this->setting->web_services_password).'</password>
+            </login>';
+
+        $sanitizedResultId = htmlspecialchars($resultId);
+
+        return <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<request>
+    <control>
+        <senderid>{$this->setting->sender_id}</senderid>
+        <password>{$this->setting->sender_password}</password>
+        <controlid>{$controlId}</controlid>
+        <uniqueid>false</uniqueid>
+        <dtdversion>3.0</dtdversion>
+    </control>
+    <operation>
+        <authentication>
+            {$authSection}
+        </authentication>
+        <content>
+            <function controlid="{$functionId}">
+                <readMore>
+                    <resultId>{$sanitizedResultId}</resultId>
+                </readMore>
+            </function>
+        </content>
+    </operation>
+</request>
+XML;
+    }
+
+    /**
+     * Parse GLENTRY readByQuery response into normalized expense line array.
+     *
+     * @return array{success: bool, records?: array, numremaining?: int, error?: string}
+     */
+    private function parseGLEntryResponse(string $xmlResponse): array
+    {
+        try {
+            $xml = simplexml_load_string($xmlResponse);
+            if ($xml === false) {
+                return ['success' => false, 'error' => 'XML parsing failed'];
+            }
+
+            $errormessage = $xml->xpath('//errormessage');
+            if (! empty($errormessage)) {
+                $errorText = (string) ($errormessage[0]->error->description2 ?? $errormessage[0]->error->description ?? 'GLENTRY query failed');
+
+                return ['success' => false, 'error' => $errorText];
+            }
+
+            $numremaining = 0;
+            $dataNodes = $xml->xpath('//result/data');
+            if (! empty($dataNodes)) {
+                $attrs = $dataNodes[0]->attributes();
+                $numremaining = (int) ($attrs['numremaining'] ?? 0);
+            }
+
+            $recordNodes = $xml->xpath('//data/glentry');
+            $records = [];
+
+            foreach ($recordNodes as $node) {
+                $absAmount = (float) ($node->AMOUNT ?? 0);
+                $trType = (int) ($node->TR_TYPE ?? 1);
+                $signedAmount = $absAmount * ($trType === -1 ? -1 : 1);
+
+                $records[] = [
+                    'record_no' => (string) ($node->RECORDNO ?? ''),
+                    'project_id' => (string) ($node->PROJECTID ?? ''),
+                    'department_id' => (string) ($node->DEPARTMENT ?? ''),
+                    'location_id' => (string) ($node->LOCATION ?? ''),
+                    'posting_date' => (string) ($node->ENTRY_DATE ?? ''),
+                    'account_no' => (string) ($node->ACCOUNTNO ?? ''),
+                    'account_title' => (string) ($node->ACCOUNTTITLE ?? ''),
+                    'amount' => $signedAmount,
+                    'debit' => $trType === 1 ? $absAmount : 0.0,
+                    'credit' => $trType === -1 ? $absAmount : 0.0,
+                    'document_no' => (string) ($node->DOCUMENT ?? ''),
+                    'description' => (string) ($node->DESCRIPTION ?? ''),
+                    'tr_type' => (string) $trType,
+                    'state' => (string) ($node->STATE ?? ''),
+                    'raw' => json_decode(json_encode($node), true),
+                ];
+            }
+
+            if ($numremaining > 0) {
+                Log::warning('Sage Intacct GLENTRY: pagination needed', [
+                    'returned' => count($records),
+                    'numremaining' => $numremaining,
+                ]);
+            }
+
+            return [
+                'success' => true,
+                'records' => $records,
+                'numremaining' => $numremaining,
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Parse GLENTRY response exception', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
 }

@@ -66,6 +66,13 @@ class AdminPanel extends Component
     public $contract_reminder_email_subject = '';
     public $contract_reminder_email_template = '';
 
+    // Fund Utilization / Intacct Expense Sync Settings
+    public $intacct_expense_sync_enabled = true;
+    public $fiscal_year_start_month = 7;
+    public $fiscal_year_start_day = 1;
+    public $intacct_expense_gl_account_from = '60000';
+    public $intacct_expense_gl_account_to = '89999';
+
     public function setActiveTab($tab)
     {
         $this->activeTab = $tab;
@@ -235,6 +242,13 @@ class AdminPanel extends Component
         $this->contract_reminder_test_email = SiteSetting::get('contract_reminder_test_email', '');
         $this->contract_reminder_email_subject = SiteSetting::get('contract_reminder_email_subject', 'Contract Report Reminder: {{report_name}} - Due in {{days_until}} days');
         $this->contract_reminder_email_template = SiteSetting::get('contract_reminder_email_template', '');
+
+        // Load fund utilization / Intacct expense sync settings
+        $this->intacct_expense_sync_enabled = SiteSetting::get('intacct_expense_sync_enabled', '1') === '1';
+        $this->fiscal_year_start_month = (int) SiteSetting::get('fiscal_year_start_month', 7);
+        $this->fiscal_year_start_day = (int) SiteSetting::get('fiscal_year_start_day', 1);
+        $this->intacct_expense_gl_account_from = SiteSetting::get('intacct_expense_gl_account_from', '60000');
+        $this->intacct_expense_gl_account_to = SiteSetting::get('intacct_expense_gl_account_to', '89999');
     }
 
     public function updateSiteSettings()
@@ -933,6 +947,83 @@ class AdminPanel extends Component
         session()->flash('success', 'CSBG Report export functionality coming soon.');
     }
     
+    public function updateFundUtilizationSettings()
+    {
+        $this->validate([
+            'intacct_expense_sync_enabled' => 'boolean',
+            'fiscal_year_start_month' => 'required|integer|min:1|max:12',
+            'fiscal_year_start_day' => 'required|integer|min:1|max:31',
+            'intacct_expense_gl_account_from' => 'required|string|max:20',
+            'intacct_expense_gl_account_to' => 'required|string|max:20',
+        ]);
+
+        try {
+            SiteSetting::set('intacct_expense_sync_enabled', $this->intacct_expense_sync_enabled ? '1' : '0', 'boolean');
+            SiteSetting::set('fiscal_year_start_month', (string) $this->fiscal_year_start_month, 'integer');
+            SiteSetting::set('fiscal_year_start_day', (string) $this->fiscal_year_start_day, 'integer');
+            SiteSetting::set('intacct_expense_gl_account_from', $this->intacct_expense_gl_account_from, 'text');
+            SiteSetting::set('intacct_expense_gl_account_to', $this->intacct_expense_gl_account_to, 'text');
+
+            SiteSetting::clearCache();
+
+            session()->flash('success', 'Fund utilization settings updated successfully.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+        }
+    }
+
+    public function runFundExpenseSyncNow()
+    {
+        try {
+            $setting = \App\Models\SageIntacctSetting::getActive();
+
+            if (! $setting || ! $setting->isConfigured() || ! $setting->isXmlApi()) {
+                session()->flash('error', 'Sage Intacct is not configured for XML API access. Cannot run sync.');
+                return;
+            }
+
+            $phpBin = $this->resolvePhpCliBinary();
+
+            // Background-exec the artisan command so it survives past the
+            // request lifetime without requiring a running queue worker.
+            $process = new \Symfony\Component\Process\Process([
+                $phpBin, base_path('artisan'), 'intacct:sync-fund-expenses', '--force',
+            ]);
+            $process->setWorkingDirectory(base_path());
+            $process->setTimeout(null);
+            $process->disableOutput();
+            $process->start();
+
+            session()->flash('success', 'Fund expense sync started in the background. For ~300 contracts this typically takes 5–15 minutes. Refresh the Contract Utilization Dashboard periodically, or tail storage/logs/laravel.log for progress.');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('runFundExpenseSyncNow failed to start sync', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            session()->flash('error', 'Failed to start sync: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Resolve the PHP CLI binary. Under Apache/mod_php, PHP_BINARY points at
+     * the Apache binary and is useless for spawning a CLI process, so fall
+     * back to common Debian/Ubuntu install paths.
+     */
+    private function resolvePhpCliBinary(): string
+    {
+        if (defined('PHP_BINARY') && PHP_BINARY && is_executable(PHP_BINARY) && str_contains(PHP_BINARY, 'php')) {
+            return PHP_BINARY;
+        }
+
+        foreach (['/usr/bin/php', '/usr/local/bin/php', '/usr/bin/php8.3', '/usr/bin/php8.2', '/usr/bin/php8.1'] as $candidate) {
+            if (is_executable($candidate)) {
+                return $candidate;
+            }
+        }
+
+        throw new \RuntimeException('Could not locate PHP CLI binary. Set a valid path or install /usr/bin/php.');
+    }
+
     public function updateContractSettings()
     {
         $this->validate([
