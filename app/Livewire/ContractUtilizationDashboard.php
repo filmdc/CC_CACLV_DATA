@@ -265,7 +265,9 @@ class ContractUtilizationDashboard extends Component
             ->when($this->filterUtilization, function ($query) use ($from, $to) {
                 // Effective spent = Intacct sum when any synced lines exist in
                 // the window, otherwise fall back to manual project_expenses
-                // sum. Keep this SQL in sync with getEffectiveSpent() in PHP.
+                // sum. Effective budget = intacct_budget_amount when synced,
+                // else contracts.amount. Keep these SQL expressions in sync
+                // with getEffectiveSpent() / getEffectiveBudget() in PHP.
                 $windowed = $from && $to;
 
                 $spentExpr = $windowed
@@ -280,30 +282,32 @@ class ContractUtilizationDashboard extends Component
                         ELSE COALESCE((SELECT SUM(amount) FROM project_expenses WHERE contract_id = contracts.id), 0)
                        END)';
 
+                $budgetExpr = '(CASE WHEN contracts.intacct_budget_amount IS NOT NULL AND contracts.intacct_budget_amount > 0 THEN contracts.intacct_budget_amount ELSE contracts.amount END)';
+
                 // Placeholders per $spentExpr occurrence (4 when windowed, 0 otherwise)
                 $b = $windowed ? [$from, $to, $from, $to] : [];
 
-                $query->where('amount', '>', 0);
+                $query->whereRaw("{$budgetExpr} > 0");
 
                 match ($this->filterUtilization) {
                     'critical' => $query
-                        ->whereRaw("(amount - {$spentExpr}) / amount <= 0.10", $b)
-                        ->whereRaw("{$spentExpr} < amount", $b),
+                        ->whereRaw("({$budgetExpr} - {$spentExpr}) / {$budgetExpr} <= 0.10", $b)
+                        ->whereRaw("{$spentExpr} < {$budgetExpr}", $b),
                     'warning' => $query
-                        ->whereRaw("(amount - {$spentExpr}) / amount > 0.10", $b)
-                        ->whereRaw("(amount - {$spentExpr}) / amount <= 0.25", $b),
+                        ->whereRaw("({$budgetExpr} - {$spentExpr}) / {$budgetExpr} > 0.10", $b)
+                        ->whereRaw("({$budgetExpr} - {$spentExpr}) / {$budgetExpr} <= 0.25", $b),
                     'caution' => $query
-                        ->whereRaw("(amount - {$spentExpr}) / amount > 0.25", $b)
-                        ->whereRaw("(amount - {$spentExpr}) / amount <= 0.50", $b),
-                    'healthy' => $query->whereRaw("(amount - {$spentExpr}) / amount > 0.50", $b),
-                    'depleted' => $query->whereRaw("{$spentExpr} >= amount", $b),
+                        ->whereRaw("({$budgetExpr} - {$spentExpr}) / {$budgetExpr} > 0.25", $b)
+                        ->whereRaw("({$budgetExpr} - {$spentExpr}) / {$budgetExpr} <= 0.50", $b),
+                    'healthy' => $query->whereRaw("({$budgetExpr} - {$spentExpr}) / {$budgetExpr} > 0.50", $b),
+                    'depleted' => $query->whereRaw("{$spentExpr} >= {$budgetExpr}", $b),
                     default => $query,
                 };
             });
 
-        // Build SQL expression for effective spent (Intacct when synced, else manual).
-        // Kept consistent with getEffectiveSpent() in PHP so sort order matches
-        // what users see on cards/rows.
+        // SQL expressions for effective spent + effective budget, mirrored from
+        // getEffectiveSpent() / getEffectiveBudget() so sort ranks match what
+        // users see on cards/rows.
         $sortBindings = [];
         if ($from && $to) {
             $effectiveSpentSql = '(CASE
@@ -319,20 +323,21 @@ class ContractUtilizationDashboard extends Component
                 ELSE COALESCE((SELECT SUM(amount) FROM project_expenses WHERE contract_id = contracts.id), 0)
                END)';
         }
+        $effectiveBudgetSql = '(CASE WHEN contracts.intacct_budget_amount IS NOT NULL AND contracts.intacct_budget_amount > 0 THEN contracts.intacct_budget_amount ELSE contracts.amount END)';
 
         // Apply sorting
         match ($this->sortBy) {
             'utilization_desc' => $query->orderByRaw(
-                "{$effectiveSpentSql} / NULLIF(contracts.amount, 0) DESC",
+                "{$effectiveSpentSql} / NULLIF({$effectiveBudgetSql}, 0) DESC",
                 $sortBindings
             ),
             'utilization_asc' => $query->orderByRaw(
-                "{$effectiveSpentSql} / NULLIF(contracts.amount, 0) ASC",
+                "{$effectiveSpentSql} / NULLIF({$effectiveBudgetSql}, 0) ASC",
                 $sortBindings
             ),
-            'amount_desc' => $query->orderBy('amount', 'desc'),
+            'amount_desc' => $query->orderByRaw("{$effectiveBudgetSql} DESC"),
             'remaining_asc' => $query->orderByRaw(
-                "contracts.amount - {$effectiveSpentSql} ASC",
+                "{$effectiveBudgetSql} - {$effectiveSpentSql} ASC",
                 $sortBindings
             ),
             'title_asc' => $query->orderBy('title', 'asc'),
@@ -363,18 +368,34 @@ class ContractUtilizationDashboard extends Component
     }
 
     /**
+     * Resolve the effective budget (utilization denominator). Intacct budget
+     * takes priority when synced; otherwise fall back to the contract's
+     * awarded amount.
+     */
+    public function getEffectiveBudget($contract): float
+    {
+        $intacctBudget = (float) ($contract->intacct_budget_amount ?? 0);
+
+        if ($intacctBudget > 0) {
+            return $intacctBudget;
+        }
+
+        return (float) $contract->amount;
+    }
+
+    /**
      * Calculate utilization percentage for a contract (percentage SPENT)
      */
     public function calculateUtilization($contract): float
     {
-        $amount = (float) $contract->amount;
+        $budget = $this->getEffectiveBudget($contract);
         $spent = $this->getEffectiveSpent($contract);
 
-        if ($amount <= 0) {
+        if ($budget <= 0) {
             return 0;
         }
 
-        return round(($spent / $amount) * 100, 1);
+        return round(($spent / $budget) * 100, 1);
     }
 
     /**
@@ -382,15 +403,15 @@ class ContractUtilizationDashboard extends Component
      */
     public function getUtilizationColorClass($contract): string
     {
-        $amount = (float) $contract->amount;
+        $budget = $this->getEffectiveBudget($contract);
         $spent = $this->getEffectiveSpent($contract);
-        $remaining = $amount - $spent;
+        $remaining = $budget - $spent;
 
-        if ($amount <= 0) {
+        if ($budget <= 0) {
             return 'bg-gray-500';
         }
 
-        $remainingPercentage = ($remaining / $amount) * 100;
+        $remainingPercentage = ($remaining / $budget) * 100;
 
         if ($remainingPercentage <= 0) {
             return 'bg-red-600';
@@ -424,15 +445,15 @@ class ContractUtilizationDashboard extends Component
      */
     public function getUtilizationStatus($contract): string
     {
-        $amount = (float) $contract->amount;
+        $budget = $this->getEffectiveBudget($contract);
         $spent = $this->getEffectiveSpent($contract);
-        $remaining = $amount - $spent;
+        $remaining = $budget - $spent;
 
-        if ($amount <= 0) {
+        if ($budget <= 0) {
             return 'No Budget';
         }
 
-        $remainingPercentage = ($remaining / $amount) * 100;
+        $remainingPercentage = ($remaining / $budget) * 100;
 
         if ($remainingPercentage <= 0) {
             return 'Depleted';

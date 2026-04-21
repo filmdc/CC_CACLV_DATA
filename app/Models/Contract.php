@@ -27,6 +27,11 @@ class Contract extends Model implements HasMedia
         'funder_id',
         'date_of_award',
         'amount',
+        'intacct_budget_amount',
+        'intacct_budget_synced_at',
+        'intacct_budget_source',
+        'intacct_budget_lines_count',
+        'preferred_intacct_budget_id',
         'start_date',
         'end_date',
         'grant_code',
@@ -42,6 +47,9 @@ class Contract extends Model implements HasMedia
 
     protected $casts = [
         'amount' => 'decimal:2',
+        'intacct_budget_amount' => 'decimal:2',
+        'intacct_budget_synced_at' => 'datetime',
+        'intacct_budget_lines_count' => 'integer',
         'start_date' => 'date',
         'end_date' => 'date',
         'date_of_award' => 'date',
@@ -201,11 +209,25 @@ class Contract extends Model implements HasMedia
     }
 
     /**
-     * Get remaining budget for this contract
+     * Effective budget used as the utilization denominator. Falls back to
+     * the contract's awarded amount when no Intacct budget is synced.
+     */
+    public function getEffectiveBudgetAttribute(): float
+    {
+        if ($this->intacct_budget_amount !== null && (float) $this->intacct_budget_amount > 0) {
+            return (float) $this->intacct_budget_amount;
+        }
+
+        return (float) $this->amount;
+    }
+
+    /**
+     * Get remaining budget for this contract. Uses effective budget (Intacct
+     * when synced, else awarded amount) as the starting point.
      */
     public function getRemainingBudgetAttribute(): float
     {
-        return (float) $this->amount - $this->total_spent;
+        return $this->effective_budget - $this->total_spent;
     }
 
     /**
@@ -459,23 +481,27 @@ class Contract extends Model implements HasMedia
     }
 
     /**
-     * Get utilization percentage (amount spent as percentage of total)
+     * Get utilization percentage (amount spent as percentage of effective
+     * budget — Intacct when synced, else awarded amount).
      */
     public function getUtilizationPercentageAttribute(): float
     {
-        if ($this->amount <= 0) {
+        $budget = $this->effective_budget;
+
+        if ($budget <= 0) {
             return 0;
         }
 
-        return round(($this->total_spent / $this->amount) * 100, 2);
+        return round(($this->total_spent / $budget) * 100, 2);
     }
 
     /**
-     * Get remaining percentage (amount remaining as percentage of total)
+     * Get remaining percentage (amount remaining as percentage of effective
+     * budget).
      */
     public function getRemainingPercentageAttribute(): float
     {
-        if ($this->amount <= 0) {
+        if ($this->effective_budget <= 0) {
             return 0;
         }
 

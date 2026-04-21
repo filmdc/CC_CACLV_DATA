@@ -157,12 +157,20 @@ class SageIntacctExpenseService
             $contract->update(['last_synced_at' => now()]);
         });
 
+        // Also pull the Intacct budget for this fund in the same window so
+        // utilization denominator reflects the real budget (not stale
+        // contract.amount). Non-fatal: budget sync failures are logged but
+        // don't block the expense sync.
+        $budgetResult = $this->syncBudgetForContract($contract, $from, $to);
+
         Log::info('SageIntacctExpenseService: synced contract', [
             'contract_id' => $contract->id,
             'grant_code' => $contract->grant_code,
             'service_code' => $contract->service_code,
             'records_synced' => $inserted,
             'total_amount' => round($totalAmount, 2),
+            'budget_synced' => $budgetResult['success'] ?? false,
+            'budget_amount' => $budgetResult['budget_amount'] ?? null,
             'from' => $from->toDateString(),
             'to' => $to->toDateString(),
         ]);
@@ -172,9 +180,154 @@ class SageIntacctExpenseService
             'contract_id' => $contract->id,
             'records_synced' => $inserted,
             'total_amount' => round($totalAmount, 2),
+            'budget_synced' => $budgetResult['success'] ?? false,
+            'budget_amount' => $budgetResult['budget_amount'] ?? 0.0,
+            'budget_lines' => $budgetResult['lines_count'] ?? 0,
+            'budget_source' => $budgetResult['budget_id'] ?? null,
             'from' => $from->toDateString(),
             'to' => $to->toDateString(),
         ];
+    }
+
+    /**
+     * Pull the Intacct expense budget for a contract's fund and store it on
+     * the contract. Called from syncContract() so a single click refreshes
+     * both actuals and budget.
+     *
+     * Priority for selecting the budget repository:
+     *   1. contract.preferred_intacct_budget_id (explicit per-contract override)
+     *   2. Iterate the site-wide ordered list (intacct_budget_ids JSON) and
+     *      take the FIRST repository that returns a non-zero expense budget
+     *      for this fund.
+     *   3. Auto-detect the DEFAULT_BUDGET flag on GLBUDGETHEADER (fallback
+     *      when no list is configured at all).
+     *
+     * @return array{success: bool, budget_amount?: float, lines_count?: int, budget_id?: ?string, tried?: array, error?: string}
+     */
+    public function syncBudgetForContract(Contract $contract, Carbon $from, Carbon $to): array
+    {
+        if (empty(trim((string) $contract->grant_code))) {
+            return ['success' => false, 'error' => 'No grant_code'];
+        }
+
+        $glFrom = SiteSetting::get('intacct_expense_gl_account_from', '60000');
+        $glTo = SiteSetting::get('intacct_expense_gl_account_to', '99999');
+
+        $tried = [];
+
+        // Build the ordered list of budget IDs to try for this contract.
+        $candidateIds = $this->resolveBudgetCandidateList($contract);
+
+        $lastError = null;
+
+        foreach ($candidateIds as $candidate) {
+            $result = $this->apiService->queryFundBudgetByDimensions(
+                projectId: trim($contract->grant_code),
+                departmentId: $contract->service_code ? trim($contract->service_code) : null,
+                from: $from,
+                to: $to,
+                budgetId: $candidate ?: null, // '' means auto-detect
+                glAccountFrom: $glFrom ?: null,
+                glAccountTo: $glTo ?: null,
+            );
+
+            $budgetTried = $result['budget_id'] ?? ($candidate ?: '(auto)');
+            $totalBudget = (float) ($result['total_expense'] ?? 0);
+            $tried[] = [
+                'budget_id' => $budgetTried,
+                'success' => $result['success'] ?? false,
+                'total' => $totalBudget,
+                'error' => $result['success'] ? null : ($result['error'] ?? null),
+            ];
+
+            if (! $result['success']) {
+                $lastError = $result['error'] ?? 'unknown';
+                continue; // try next repository
+            }
+
+            // If a per-contract preference is set we honor it even if total=0,
+            // otherwise we continue the fallback chain to find one with data.
+            $isExplicitPreference = ! empty($contract->preferred_intacct_budget_id);
+            if ($totalBudget <= 0 && ! $isExplicitPreference) {
+                continue;
+            }
+
+            // Found a usable budget — persist and return.
+            $contract->update([
+                'intacct_budget_amount' => $totalBudget,
+                'intacct_budget_synced_at' => now(),
+                'intacct_budget_source' => $result['budget_id'] ?? null,
+                'intacct_budget_lines_count' => count($result['records'] ?? []),
+            ]);
+
+            return [
+                'success' => true,
+                'budget_amount' => $totalBudget,
+                'lines_count' => count($result['records'] ?? []),
+                'budget_id' => $result['budget_id'] ?? null,
+                'tried' => $tried,
+            ];
+        }
+
+        // No repository returned a non-zero budget. Clear any stale budget
+        // data on this contract so the dashboard falls back to contract.amount.
+        $contract->update([
+            'intacct_budget_amount' => null,
+            'intacct_budget_synced_at' => now(),
+            'intacct_budget_source' => null,
+            'intacct_budget_lines_count' => 0,
+        ]);
+
+        Log::info('SageIntacctExpenseService: no budget found in any repository', [
+            'contract_id' => $contract->id,
+            'grant_code' => $contract->grant_code,
+            'tried' => $tried,
+        ]);
+
+        return [
+            'success' => false,
+            'budget_amount' => 0.0,
+            'lines_count' => 0,
+            'budget_id' => null,
+            'tried' => $tried,
+            'error' => $lastError ?? 'No budget found in any configured repository',
+        ];
+    }
+
+    /**
+     * Resolve the ordered list of budget-IDs to try for a contract. Handles
+     * per-contract overrides, the site-wide list, and back-compat with the
+     * legacy single-value setting.
+     *
+     * @return list<string>  Ordered candidate IDs; empty string entry means "auto-detect default".
+     */
+    private function resolveBudgetCandidateList(Contract $contract): array
+    {
+        // 1. Explicit per-contract override wins.
+        if (! empty($contract->preferred_intacct_budget_id)) {
+            return [trim($contract->preferred_intacct_budget_id)];
+        }
+
+        // 2. Site-wide ordered list (new canonical setting).
+        $json = SiteSetting::get('intacct_budget_ids', null);
+        if ($json) {
+            $list = json_decode($json, true);
+            if (is_array($list)) {
+                $list = array_values(array_filter(array_map('trim', $list), fn ($v) => $v !== ''));
+                if (! empty($list)) {
+                    return $list;
+                }
+            }
+        }
+
+        // 3. Legacy single-value setting.
+        $legacy = trim((string) SiteSetting::get('intacct_default_budget_id', ''));
+        if ($legacy !== '') {
+            return [$legacy];
+        }
+
+        // 4. No configuration → auto-detect the DEFAULT_BUDGET header.
+        return [''];
     }
 
     /**

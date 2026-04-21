@@ -3188,6 +3188,246 @@ XML;
     }
 
     /**
+     * Query the default Intacct budget (or a specified BUDGETID) for expense
+     * budget items tied to the given fund + optional service dimensions,
+     * within a date window. Returns the sum of expense budget lines plus the
+     * individual line breakdown.
+     *
+     * GLBUDGETITEM fields used:
+     *   BUDGETID       - which budget these lines belong to
+     *   PROJECTID      - fund code (e.g. F0412)
+     *   DEPARTMENTID   - service code (when split)
+     *   GLACCOUNTNO    - GL account (for range filtering)
+     *   ACCOUNT_TYPE   - 'I' = income statement
+     *   NORMALBALANCE  - 1 = debit (expense), -1 = credit (revenue)
+     *   AMOUNT         - budgeted amount for the period
+     *   PSTARTDATE     - period start (MM/DD/YYYY)
+     *   PENDDATE       - period end (MM/DD/YYYY)
+     *
+     * @return array{success: bool, records?: array, total_expense?: float, budget_id?: ?string, error?: string}
+     */
+    public function queryFundBudgetByDimensions(
+        string $projectId,
+        ?string $departmentId,
+        \Carbon\Carbon $from,
+        \Carbon\Carbon $to,
+        ?string $budgetId = null,
+        ?string $glAccountFrom = '60000',
+        ?string $glAccountTo = '99999'
+    ): array {
+        if (! $this->setting->isXmlApi()) {
+            return ['success' => false, 'error' => 'GLBUDGETITEM query is only supported in XML API mode'];
+        }
+
+        try {
+            if (! $this->sessionId) {
+                $auth = $this->authenticateXml();
+                if (! $auth['success']) {
+                    return ['success' => false, 'error' => 'Authentication failed: '.($auth['message'] ?? 'Unknown error')];
+                }
+            }
+
+            // Auto-detect the default BUDGETID if not explicitly provided.
+            if ($budgetId === null || $budgetId === '') {
+                $budgetId = $this->detectDefaultBudgetId();
+                if (! $budgetId) {
+                    return ['success' => false, 'error' => 'No default budget configured in Intacct and no BUDGETID provided'];
+                }
+            }
+
+            $fromStr = $from->format('m/d/Y');
+            $toStr = $to->format('m/d/Y');
+
+            $whereParts = [
+                "PROJECTID = '".addslashes($projectId)."'",
+                "BUDGETID = '".addslashes($budgetId)."'",
+                "PSTARTDATE >= '{$fromStr}'",
+                "PENDDATE <= '{$toStr}'",
+            ];
+
+            if ($departmentId !== null && $departmentId !== '') {
+                $whereParts[] = "DEPARTMENTID = '".addslashes($departmentId)."'";
+            }
+
+            if ($glAccountFrom !== null && $glAccountTo !== null) {
+                $whereParts[] = "GLACCOUNTNO >= '".addslashes($glAccountFrom)."'";
+                $whereParts[] = "GLACCOUNTNO <= '".addslashes($glAccountTo)."'";
+            }
+
+            $query = implode(' AND ', $whereParts);
+
+            Log::info('Sage Intacct XML: Querying GLBUDGETITEM', [
+                'project_id' => $projectId,
+                'department_id' => $departmentId,
+                'budget_id' => $budgetId,
+                'from' => $fromStr,
+                'to' => $toStr,
+            ]);
+
+            $xml = $this->buildReadByQueryXml('GLBUDGETITEM', $query, 1000);
+            $response = $this->sendXmlRequest($xml);
+
+            if (! $response['success']) {
+                return ['success' => false, 'error' => $response['error'] ?? 'GLBUDGETITEM query failed'];
+            }
+
+            $parsed = $this->parseGLBudgetItemResponse($response['xml']);
+            if (! $parsed['success']) {
+                return $parsed;
+            }
+
+            // Paginate if Intacct reports more remaining
+            $resultId = $this->extractResultId($response['xml']);
+            while (! empty($parsed['numremaining']) && $parsed['numremaining'] > 0 && $resultId) {
+                if (count($parsed['records']) >= 50000) {
+                    break;
+                }
+                $moreXml = $this->buildReadMoreXml($resultId);
+                $moreResp = $this->sendXmlRequest($moreXml);
+                if (! $moreResp['success']) break;
+                $morePage = $this->parseGLBudgetItemResponse($moreResp['xml']);
+                if (! $morePage['success']) break;
+                $parsed['records'] = array_merge($parsed['records'], $morePage['records']);
+                $parsed['numremaining'] = $morePage['numremaining'];
+                $resultId = $this->extractResultId($moreResp['xml']);
+            }
+
+            $expenseRecords = array_filter($parsed['records'], fn ($r) => $r['is_expense']);
+            $totalExpense = (float) array_sum(array_column($expenseRecords, 'amount'));
+
+            Log::info('Sage Intacct GLBUDGETITEM result', [
+                'project_id' => $projectId,
+                'budget_id' => $budgetId,
+                'total_records' => count($parsed['records']),
+                'expense_records' => count($expenseRecords),
+                'total_expense' => $totalExpense,
+            ]);
+
+            return [
+                'success' => true,
+                'records' => array_values($expenseRecords),
+                'total_expense' => $totalExpense,
+                'budget_id' => $budgetId,
+            ];
+        } catch (\Exception $e) {
+            Log::error('Sage Intacct queryFundBudgetByDimensions exception', [
+                'project_id' => $projectId,
+                'department_id' => $departmentId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Find the BUDGETID marked DEFAULT_BUDGET=true in Intacct's GLBUDGETHEADER,
+     * used when the caller didn't specify one. Cached for the life of this
+     * API-service instance.
+     */
+    private ?string $cachedDefaultBudgetId = null;
+
+    private function detectDefaultBudgetId(): ?string
+    {
+        if ($this->cachedDefaultBudgetId !== null) {
+            return $this->cachedDefaultBudgetId ?: null;
+        }
+
+        try {
+            // STATUS, DEFAULT_BUDGET, etc. aren't queryable on GLBUDGETHEADER
+            // (silently return 0 rows), so pull all headers and filter in PHP.
+            $xml = $this->buildReadByQueryXml('GLBUDGETHEADER', '', 100);
+            $response = $this->sendXmlRequest($xml);
+            if (! $response['success']) {
+                Log::warning('Sage Intacct: GLBUDGETHEADER query failed during default-budget detection', [
+                    'error' => $response['error'] ?? 'unknown',
+                ]);
+
+                return null;
+            }
+
+            $x = simplexml_load_string($response['xml']);
+            $nodes = $x ? $x->xpath('//data/glbudgetheader') : [];
+            foreach ($nodes as $node) {
+                $flag = strtolower((string) ($node->DEFAULT_BUDGET ?? ''));
+                $status = strtolower((string) ($node->STATUS ?? ''));
+                if (($flag === 'true' || $flag === '1') && $status !== 'inactive') {
+                    $id = (string) ($node->BUDGETID ?? '');
+                    if ($id !== '') {
+                        $this->cachedDefaultBudgetId = $id;
+
+                        return $id;
+                    }
+                }
+            }
+
+            $this->cachedDefaultBudgetId = '';
+
+            return null;
+        } catch (\Exception $e) {
+            Log::warning('Sage Intacct: detectDefaultBudgetId failed', ['error' => $e->getMessage()]);
+
+            return null;
+        }
+    }
+
+    /**
+     * Parse GLBUDGETITEM readByQuery response into budget line array.
+     *
+     * @return array{success: bool, records?: array, numremaining?: int, error?: string}
+     */
+    private function parseGLBudgetItemResponse(string $xmlResponse): array
+    {
+        try {
+            $xml = simplexml_load_string($xmlResponse);
+            if ($xml === false) {
+                return ['success' => false, 'error' => 'XML parsing failed'];
+            }
+
+            $errormessage = $xml->xpath('//errormessage');
+            if (! empty($errormessage)) {
+                $errorText = (string) ($errormessage[0]->error->description2 ?? $errormessage[0]->error->description ?? 'GLBUDGETITEM query failed');
+
+                return ['success' => false, 'error' => $errorText];
+            }
+
+            $numremaining = 0;
+            $dataNodes = $xml->xpath('//result/data');
+            if (! empty($dataNodes)) {
+                $attrs = $dataNodes[0]->attributes();
+                $numremaining = (int) ($attrs['numremaining'] ?? 0);
+            }
+
+            $records = [];
+            foreach ($xml->xpath('//data/glbudgetitem') as $node) {
+                $normalBalance = (int) ($node->NORMALBALANCE ?? 0);
+                $accountType = (string) ($node->ACCOUNT_TYPE ?? '');
+                $isExpense = $accountType === 'I' && $normalBalance === 1;
+
+                $records[] = [
+                    'record_no' => (string) ($node->RECORDNO ?? ''),
+                    'budget_id' => (string) ($node->BUDGETID ?? ''),
+                    'project_id' => (string) ($node->PROJECTID ?? ''),
+                    'department_id' => (string) ($node->DEPARTMENTID ?? ''),
+                    'gl_account' => (string) ($node->GLACCOUNTNO ?? ''),
+                    'account_title' => (string) ($node->ACCTTITLE ?? ''),
+                    'account_type' => $accountType,
+                    'normal_balance' => $normalBalance,
+                    'is_expense' => $isExpense,
+                    'amount' => (float) ($node->AMOUNT ?? 0),
+                    'period_name' => (string) ($node->PERIODNAME ?? ''),
+                    'period_start' => (string) ($node->PSTARTDATE ?? ''),
+                    'period_end' => (string) ($node->PENDDATE ?? ''),
+                ];
+            }
+
+            return ['success' => true, 'records' => $records, 'numremaining' => $numremaining];
+        } catch (\Exception $e) {
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+
+    /**
      * Extract the resultId attribute from a readByQuery/readMore response so
      * we can follow the cursor for pagination.
      */

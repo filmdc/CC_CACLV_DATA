@@ -275,11 +275,21 @@ class ContractUtilizationService
      */
     public static function getSystemMetrics(): array
     {
-        $contracts = Contract::active()->where('amount', '>', 0)->get();
+        $contracts = Contract::active()
+            ->where(function ($q) {
+                $q->where('amount', '>', 0)
+                    ->orWhere('intacct_budget_amount', '>', 0);
+            })
+            ->get();
+
+        $totalAwarded = 0;
+        foreach ($contracts as $c) {
+            $totalAwarded += $c->effective_budget;
+        }
 
         $metrics = [
             'total_contracts' => $contracts->count(),
-            'total_awarded' => $contracts->sum('amount'),
+            'total_awarded' => $totalAwarded,
             'total_spent' => 0,
             'total_remaining' => 0,
             'critical_count' => 0,

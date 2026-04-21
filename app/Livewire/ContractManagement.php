@@ -94,6 +94,8 @@ class ContractManagement extends Component
 
     public $service_code = '';
 
+    public $preferred_intacct_budget_id = '';
+
     public $notes = '';
 
     // File upload
@@ -165,6 +167,7 @@ class ContractManagement extends Component
         $this->end_date = '';
         $this->grant_code = '';
         $this->service_code = '';
+        $this->preferred_intacct_budget_id = '';
         $this->notes = '';
         $this->documents = [];
         $this->showViewModal = false;
@@ -254,6 +257,7 @@ class ContractManagement extends Component
             $this->end_date = $this->selectedContract->end_date ? $this->selectedContract->end_date->format('Y-m-d') : '';
             $this->grant_code = $this->selectedContract->grant_code;
             $this->service_code = $this->selectedContract->service_code;
+            $this->preferred_intacct_budget_id = $this->selectedContract->preferred_intacct_budget_id ?? '';
             $this->notes = $this->selectedContract->notes;
         }
     }
@@ -275,6 +279,7 @@ class ContractManagement extends Component
             'end_date' => 'nullable|date|after:start_date',
             'grant_code' => 'nullable|string|max:255',
             'service_code' => 'nullable|string|max:50',
+            'preferred_intacct_budget_id' => 'nullable|string|max:100',
             'notes' => 'nullable|string',
             'documents.*' => 'nullable|file|max:10240', // 10MB max
         ]);
@@ -293,6 +298,7 @@ class ContractManagement extends Component
                 'end_date' => $this->end_date ?: null,
                 'grant_code' => $this->grant_code,
                 'service_code' => $this->service_code ?: null,
+                'preferred_intacct_budget_id' => $this->preferred_intacct_budget_id ?: null,
                 'notes' => $this->notes,
                 'created_by' => auth()->id(),
             ]);
@@ -332,6 +338,7 @@ class ContractManagement extends Component
             'end_date' => 'nullable|date|after:start_date',
             'grant_code' => 'nullable|string|max:255',
             'service_code' => 'nullable|string|max:50',
+            'preferred_intacct_budget_id' => 'nullable|string|max:100',
             'notes' => 'nullable|string',
             'documents.*' => 'nullable|file|max:10240', // 10MB max
         ]);
@@ -350,6 +357,7 @@ class ContractManagement extends Component
                 'end_date' => $this->end_date ?: null,
                 'grant_code' => $this->grant_code,
                 'service_code' => $this->service_code ?: null,
+                'preferred_intacct_budget_id' => $this->preferred_intacct_budget_id ?: null,
                 'notes' => $this->notes,
                 'updated_by' => auth()->id(),
             ]);
@@ -1102,12 +1110,34 @@ class ContractManagement extends Component
         $programs = Program::active()->orderBy('name')->get();
         $funders = Funder::active()->orderBy('name')->get();
 
+        $availableBudgetIds = $this->getConfiguredIntacctBudgetIds();
+
         return view('livewire.contract-management', [
             'contracts' => $contracts,
             'upcomingDeadlines' => $upcomingDeadlines,
             'programs' => $programs,
             'funders' => $funders,
+            'availableBudgetIds' => $availableBudgetIds,
         ])->layout('components.layouts.app');
+    }
+
+    /**
+     * Read the ordered list of Intacct budget IDs configured in site settings.
+     * Used to populate the preferred-budget dropdown on the contract form.
+     *
+     * @return list<string>
+     */
+    private function getConfiguredIntacctBudgetIds(): array
+    {
+        $json = \App\Models\SiteSetting::get('intacct_budget_ids', null);
+        $decoded = $json ? json_decode($json, true) : null;
+        if (is_array($decoded)) {
+            return array_values(array_filter(array_map('trim', $decoded), fn ($v) => $v !== ''));
+        }
+
+        $legacy = trim((string) \App\Models\SiteSetting::get('intacct_default_budget_id', ''));
+
+        return $legacy !== '' ? [$legacy] : [];
     }
 
     private function getUpcomingDeadlines()

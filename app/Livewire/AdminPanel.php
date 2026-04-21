@@ -72,6 +72,8 @@ class AdminPanel extends Component
     public $fiscal_year_start_day = 1;
     public $intacct_expense_gl_account_from = '60000';
     public $intacct_expense_gl_account_to = '89999';
+    public $intacct_budget_ids = [];
+    public $new_budget_id = '';
 
     public function setActiveTab($tab)
     {
@@ -249,6 +251,55 @@ class AdminPanel extends Component
         $this->fiscal_year_start_day = (int) SiteSetting::get('fiscal_year_start_day', 1);
         $this->intacct_expense_gl_account_from = SiteSetting::get('intacct_expense_gl_account_from', '60000');
         $this->intacct_expense_gl_account_to = SiteSetting::get('intacct_expense_gl_account_to', '89999');
+
+        // Load ordered budget ID list, falling back to the legacy single-value
+        // setting for back-compat.
+        $listJson = SiteSetting::get('intacct_budget_ids', null);
+        $decoded = $listJson ? json_decode($listJson, true) : null;
+        if (is_array($decoded) && ! empty($decoded)) {
+            $this->intacct_budget_ids = array_values(array_filter(array_map('trim', $decoded), fn ($v) => $v !== ''));
+        } else {
+            $legacy = trim((string) SiteSetting::get('intacct_default_budget_id', ''));
+            $this->intacct_budget_ids = $legacy !== '' ? [$legacy] : [];
+        }
+    }
+
+    public function addBudgetId(): void
+    {
+        $id = trim((string) $this->new_budget_id);
+        if ($id === '') {
+            return;
+        }
+
+        if (! in_array($id, $this->intacct_budget_ids, true)) {
+            $this->intacct_budget_ids[] = $id;
+        }
+        $this->new_budget_id = '';
+    }
+
+    public function removeBudgetId(int $index): void
+    {
+        if (isset($this->intacct_budget_ids[$index])) {
+            array_splice($this->intacct_budget_ids, $index, 1);
+        }
+    }
+
+    public function moveBudgetIdUp(int $index): void
+    {
+        if ($index <= 0 || ! isset($this->intacct_budget_ids[$index])) {
+            return;
+        }
+        [$this->intacct_budget_ids[$index - 1], $this->intacct_budget_ids[$index]] =
+            [$this->intacct_budget_ids[$index], $this->intacct_budget_ids[$index - 1]];
+    }
+
+    public function moveBudgetIdDown(int $index): void
+    {
+        if (! isset($this->intacct_budget_ids[$index + 1])) {
+            return;
+        }
+        [$this->intacct_budget_ids[$index], $this->intacct_budget_ids[$index + 1]] =
+            [$this->intacct_budget_ids[$index + 1], $this->intacct_budget_ids[$index]];
     }
 
     public function updateSiteSettings()
@@ -955,14 +1006,26 @@ class AdminPanel extends Component
             'fiscal_year_start_day' => 'required|integer|min:1|max:31',
             'intacct_expense_gl_account_from' => 'required|string|max:20',
             'intacct_expense_gl_account_to' => 'required|string|max:20',
+            'intacct_budget_ids' => 'array',
+            'intacct_budget_ids.*' => 'string|max:100',
         ]);
 
         try {
+            $cleanList = array_values(array_filter(
+                array_map(fn ($v) => trim((string) $v), $this->intacct_budget_ids),
+                fn ($v) => $v !== ''
+            ));
+
             SiteSetting::set('intacct_expense_sync_enabled', $this->intacct_expense_sync_enabled ? '1' : '0', 'boolean');
             SiteSetting::set('fiscal_year_start_month', (string) $this->fiscal_year_start_month, 'integer');
             SiteSetting::set('fiscal_year_start_day', (string) $this->fiscal_year_start_day, 'integer');
             SiteSetting::set('intacct_expense_gl_account_from', $this->intacct_expense_gl_account_from, 'text');
             SiteSetting::set('intacct_expense_gl_account_to', $this->intacct_expense_gl_account_to, 'text');
+            SiteSetting::set('intacct_budget_ids', json_encode($cleanList), 'json');
+            // Keep legacy single-value setting mirrored to the first list entry
+            // for any caller that still reads it directly.
+            SiteSetting::set('intacct_default_budget_id', $cleanList[0] ?? '', 'text');
+            $this->intacct_budget_ids = $cleanList;
 
             SiteSetting::clearCache();
 

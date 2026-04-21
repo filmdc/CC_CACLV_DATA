@@ -244,8 +244,11 @@
                     $status = $this->getUtilizationStatus($contract);
                     $colorClass = $this->getUtilizationColorClass($contract);
                     $spent = $this->getEffectiveSpent($contract);
-                    $budgeted = (float) ($contract->project_budgets_sum_budgeted_amount ?? 0);
-                    $remaining = (float) $contract->amount - $spent;
+                    $effectiveBudget = $this->getEffectiveBudget($contract);
+                    $intacctBudget = (float) ($contract->intacct_budget_amount ?? 0);
+                    $manualBudgeted = (float) ($contract->project_budgets_sum_budgeted_amount ?? 0);
+                    $budgeted = $intacctBudget > 0 ? $intacctBudget : $manualBudgeted;
+                    $remaining = $effectiveBudget - $spent;
 
                     $statusColors = [
                         'Depleted' => 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
@@ -318,7 +321,14 @@
                             <p class="text-lg font-bold text-gray-900 dark:text-white">${{ number_format($contract->amount, 0) }}</p>
                         </div>
                         <div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Budgeted</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                Budgeted
+                                @if($intacctBudget > 0)
+                                    <span class="ml-1 text-[10px] font-medium text-emerald-600 dark:text-emerald-400" title="Sourced from Intacct GLBUDGETITEM{{ $contract->intacct_budget_source ? ' ('.$contract->intacct_budget_source.')' : '' }}">
+                                        Intacct
+                                    </span>
+                                @endif
+                            </p>
                             <p class="text-lg font-bold text-blue-600 dark:text-blue-400">${{ number_format($budgeted, 0) }}</p>
                         </div>
                         <div>
@@ -387,7 +397,7 @@
                         <tr>
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Contract</th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Program / Funder</th>
-                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Awarded</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Budget</th>
                             <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Spent</th>
                             <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Remaining</th>
                             <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Utilization</th>
@@ -402,7 +412,9 @@
                                 $status = $this->getUtilizationStatus($contract);
                                 $colorClass = $this->getUtilizationColorClass($contract);
                                 $spent = $this->getEffectiveSpent($contract);
-                                $remaining = (float) $contract->amount - $spent;
+                                $effectiveBudget = $this->getEffectiveBudget($contract);
+                                $intacctBudget = (float) ($contract->intacct_budget_amount ?? 0);
+                                $remaining = $effectiveBudget - $spent;
 
                                 $statusColors = [
                                     'Depleted' => 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
@@ -424,10 +436,15 @@
                                     <div class="text-sm text-gray-900 dark:text-white">{{ $contract->program?->name ?? 'N/A' }}</div>
                                     <div class="text-xs text-gray-500 dark:text-gray-400">{{ $contract->funder?->name ?? 'N/A' }}</div>
                                 </td>
-                                <td class="px-4 py-3 text-right text-sm font-medium text-gray-900 dark:text-white">
-                                    ${{ number_format($contract->amount, 0) }}
+                                <td class="px-4 py-3 text-right text-sm font-medium text-gray-900 dark:text-white whitespace-nowrap">
+                                    ${{ number_format($effectiveBudget, 0) }}
+                                    @if($intacctBudget > 0 && abs($intacctBudget - (float)$contract->amount) > 0.01)
+                                        <div class="text-[10px] text-emerald-600 dark:text-emerald-400" title="Sourced from Intacct; awarded amount on contract is ${{ number_format($contract->amount, 0) }}">
+                                            Intacct
+                                        </div>
+                                    @endif
                                 </td>
-                                <td class="px-4 py-3 text-right text-sm text-purple-600 dark:text-purple-400">
+                                <td class="px-4 py-3 text-right text-sm text-purple-600 dark:text-purple-400 whitespace-nowrap">
                                     ${{ number_format($spent, 0) }}
                                 </td>
                                 <td class="px-4 py-3 text-right text-sm font-medium whitespace-nowrap {{ $remaining < 0 ? 'text-red-600' : 'text-green-600' }}">

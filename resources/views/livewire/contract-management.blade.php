@@ -136,6 +136,24 @@
                             @error('service_code') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 
+                        @if(count($availableBudgetIds) > 1)
+                            <div>
+                                <label for="preferred_intacct_budget_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Preferred Intacct Budget <span class="text-gray-400 font-normal">(optional)</span></label>
+                                <select wire:model="preferred_intacct_budget_id" id="preferred_intacct_budget_id"
+                                        class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500">
+                                    <option value="">Auto — use site priority order</option>
+                                    @foreach($availableBudgetIds as $bid)
+                                        <option value="{{ $bid }}">{{ $bid }}</option>
+                                    @endforeach
+                                </select>
+                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                    Override the site-wide priority for this contract only. Useful when more than one budget repository
+                                    has a line for this fund and you want to pin a specific one.
+                                </p>
+                                @error('preferred_intacct_budget_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            </div>
+                        @endif
+
                         <div>
                             <label for="program_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 Program <span class="text-red-500">*</span>

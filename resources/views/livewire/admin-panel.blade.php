@@ -1172,6 +1172,55 @@
                             </div>
                         </div>
 
+                        <!-- Intacct Budget Repositories (ordered priority list) -->
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-1">Intacct Budget Repositories</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                                Ordered list of Intacct <code>BUDGETID</code> values to pull from. During sync each fund tries
+                                these <strong>in order</strong> — the first repository that returns a non-zero expense budget
+                                is used, and the rest are skipped for that fund.
+                                Override per-fund from the contract edit form.
+                            </p>
+                            <div class="max-w-xl space-y-2">
+                                @forelse($intacct_budget_ids as $i => $bid)
+                                    <div class="flex items-center gap-2 bg-gray-50 dark:bg-zinc-900/40 rounded-md px-3 py-2">
+                                        <span class="text-xs font-mono text-gray-500 dark:text-gray-400 w-6">{{ $i + 1 }}.</span>
+                                        <span class="flex-1 text-sm text-gray-900 dark:text-white font-mono">{{ $bid }}</span>
+                                        <button type="button" wire:click="moveBudgetIdUp({{ $i }})"
+                                                @disabled($i === 0)
+                                                class="p-1 text-gray-500 hover:text-gray-900 dark:hover:text-white disabled:opacity-30">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+                                        </button>
+                                        <button type="button" wire:click="moveBudgetIdDown({{ $i }})"
+                                                @disabled($i === count($intacct_budget_ids) - 1)
+                                                class="p-1 text-gray-500 hover:text-gray-900 dark:hover:text-white disabled:opacity-30">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                        </button>
+                                        <button type="button" wire:click="removeBudgetId({{ $i }})"
+                                                class="p-1 text-red-500 hover:text-red-700">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                        </button>
+                                    </div>
+                                @empty
+                                    <p class="text-xs text-amber-700 dark:text-amber-400 italic">
+                                        No budget repositories configured — sync will auto-detect the <code>DEFAULT_BUDGET</code> in Intacct.
+                                    </p>
+                                @endforelse
+
+                                <div class="flex gap-2 pt-2">
+                                    <input type="text" wire:model="new_budget_id"
+                                           wire:keydown.enter.prevent="addBudgetId"
+                                           placeholder="e.g. FY26_Budget"
+                                           class="flex-1 border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 text-sm">
+                                    <button type="button" wire:click="addBudgetId"
+                                            class="inline-flex items-center px-3 py-1.5 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700">
+                                        Add
+                                    </button>
+                                </div>
+                                @error('intacct_budget_ids.*') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+
                         <!-- GL Account Range -->
                         <div>
                             <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-1">Expense Account Range</h3>
