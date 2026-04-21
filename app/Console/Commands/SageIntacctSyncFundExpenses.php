@@ -16,21 +16,21 @@ use Illuminate\Support\Facades\Log;
 class SageIntacctSyncFundExpenses extends Command
 {
     protected $signature = 'intacct:sync-fund-expenses
-                            {--contract-id= : Sync only the contract with this ID}
-                            {--contract-ids= : Comma-separated list of contract IDs to sync (e.g. 1,2,3)}
-                            {--grant-code= : Sync only contracts matching this fund code (grant_code)}
+                            {--contract-id= : Sync funds referenced by only this contract ID}
+                            {--contract-ids= : Comma-separated list of contract IDs to limit to}
+                            {--grant-code= : Sync only the given Intacct PROJECTID (e.g. F0412)}
+                            {--grant-codes= : Comma-separated list of PROJECTIDs to sync}
                             {--from= : Start date YYYY-MM-DD (default: current fiscal year start)}
                             {--to= : End date YYYY-MM-DD (default: current fiscal year end)}
-                            {--include-archived : Include archived contracts (default: active only)}
                             {--dry-run : Query Intacct and report results without persisting}
                             {--force : Skip production confirmation prompt}';
 
-    protected $description = 'Sync posted GL expense totals from Sage Intacct into local fund utilization data, keyed by contract grant_code + service_code.';
+    protected $description = 'Sync posted GL expenses + budgets from Sage Intacct into the fund-keyed utilization tables (intacct_fund_expenses, intacct_fund_budgets).';
 
     public function handle(): int
     {
-        $this->info('Sage Intacct Fund Expense Sync');
-        $this->info('==============================');
+        $this->info('Sage Intacct Fund Sync (fund-keyed)');
+        $this->info('====================================');
         $this->newLine();
 
         if (SiteSetting::get('intacct_expense_sync_enabled', '1') !== '1') {
@@ -48,7 +48,7 @@ class SageIntacctSyncFundExpenses extends Command
         }
 
         if (! $setting->isXmlApi()) {
-            $this->error('GLDETAIL queries require XML Web Services auth. Switch the active setting to XML mode.');
+            $this->error('GL queries require XML Web Services auth. Switch the active setting to XML mode.');
 
             return Command::FAILURE;
         }
@@ -61,19 +61,15 @@ class SageIntacctSyncFundExpenses extends Command
             $this->warn('DRY RUN MODE — no data will be persisted.');
         }
 
-        $contracts = $this->resolveContracts();
-
-        if ($contracts->isEmpty()) {
-            $this->warn('No contracts matched the filters. Nothing to sync.');
-
-            return Command::SUCCESS;
+        $limitToProjectIds = $this->resolveProjectIdsFilter();
+        if ($limitToProjectIds !== null) {
+            $this->line('Scoped to '.count($limitToProjectIds).' fund(s): '.implode(', ', array_slice($limitToProjectIds, 0, 10)).(count($limitToProjectIds) > 10 ? '...' : ''));
+        } else {
+            $this->line('Syncing all funds with activity in the window (contracts ∪ Intacct GL).');
         }
 
-        $this->info('Contracts to process: '.$contracts->count());
-        $this->newLine();
-
         if (! $dryRun && app()->environment('production') && ! $this->option('force')) {
-            if (! $this->confirm('Proceed with syncing '.$contracts->count().' contract(s) in PRODUCTION?', false)) {
+            if (! $this->confirm('Proceed with fund sync in PRODUCTION?', false)) {
                 $this->line('Aborted.');
 
                 return Command::SUCCESS;
@@ -86,100 +82,52 @@ class SageIntacctSyncFundExpenses extends Command
             'sync_start_date' => $from->toDateString(),
             'sync_end_date' => $to->toDateString(),
             'triggered_by' => 'console:sync-fund-expenses',
-            'sync_notes' => 'Fund expense sync (GLENTRY → intacct_fund_expenses)',
+            'sync_notes' => 'Fund-keyed sync (GLENTRY + GLBUDGETITEM → intacct_fund_expenses + intacct_fund_budgets)',
         ]);
 
         $apiService = new SageIntacctApiService($setting);
-        $expenseService = new SageIntacctExpenseService($apiService);
+        $service = new SageIntacctExpenseService($apiService);
 
-        $results = [
-            'processed' => 0,
-            'synced' => 0,
-            'skipped' => 0,
-            'failed' => 0,
-            'records' => 0,
-            'amount' => 0.0,
-        ];
+        try {
+            $result = $service->syncAllFunds($from, $to, $limitToProjectIds, $dryRun);
+        } catch (\Throwable $e) {
+            Log::error('intacct:sync-fund-expenses fatal', ['error' => $e->getMessage()]);
+            $history?->markAsFailed($e->getMessage());
+            $this->error('Sync failed: '.$e->getMessage());
 
-        $rows = [];
-        $bar = $this->output->createProgressBar($contracts->count());
-        $bar->start();
-
-        foreach ($contracts as $contract) {
-            $results['processed']++;
-
-            try {
-                $result = $expenseService->syncContract($contract, $from, $to, $dryRun);
-
-                if (! empty($result['skipped'])) {
-                    $results['skipped']++;
-                    $rows[] = [$contract->id, $contract->grant_code ?: '-', 'skipped', $result['reason'] ?? '-', '-'];
-                } elseif ($result['success']) {
-                    $results['synced']++;
-                    $lines = $result['records_synced'] ?? $result['records_found'] ?? 0;
-                    $amount = $result['total_amount'] ?? 0.0;
-                    $results['records'] += $lines;
-                    $results['amount'] += $amount;
-                    $rows[] = [$contract->id, $contract->grant_code.($contract->service_code ? ' + '.$contract->service_code : ''), 'ok', $lines.' lines', '$'.number_format($amount, 2)];
-                } else {
-                    $results['failed']++;
-                    $rows[] = [$contract->id, $contract->grant_code ?: '-', 'error', substr($result['error'] ?? 'unknown', 0, 80), '-'];
-                }
-            } catch (\Throwable $e) {
-                $results['failed']++;
-                Log::error('intacct:sync-fund-expenses failed for contract', [
-                    'contract_id' => $contract->id,
-                    'grant_code' => $contract->grant_code,
-                    'error' => $e->getMessage(),
-                ]);
-                $rows[] = [$contract->id, $contract->grant_code ?: '-', 'exception', substr($e->getMessage(), 0, 80), '-'];
-            }
-
-            $bar->advance();
+            return Command::FAILURE;
         }
-
-        $bar->finish();
-        $this->newLine(2);
 
         if ($history) {
             $history->update([
-                'total_records' => $results['processed'],
-                'successful_count' => $results['synced'],
-                'failed_count' => $results['failed'],
-                'skipped_count' => $results['skipped'],
+                'total_records' => count($result['fund_results']),
+                'successful_count' => $result['funds_synced'],
+                'failed_count' => $result['funds_failed'],
             ]);
-
-            if ($results['failed'] === 0) {
+            if ($result['funds_failed'] === 0) {
                 $history->markAsSuccess();
-            } elseif ($results['synced'] === 0) {
-                $history->markAsFailed('All contracts failed to sync');
+            } elseif ($result['funds_synced'] === 0) {
+                $history->markAsFailed('All fund syncs failed');
             } else {
                 $history->markAsPartial();
             }
         }
 
-        $this->table(['Contract', 'Coding', 'Status', 'Detail', 'Amount'], $rows);
+        $this->renderResultsTable($result['fund_results']);
         $this->newLine();
         $this->info(sprintf(
-            'Processed: %d | Synced: %d | Skipped: %d | Failed: %d | Lines: %d | Total: $%s',
-            $results['processed'],
-            $results['synced'],
-            $results['skipped'],
-            $results['failed'],
-            $results['records'],
-            number_format($results['amount'], 2)
+            'Funds synced: %d | Failed: %d | Total expense: $%s | Total budget: $%s',
+            $result['funds_synced'],
+            $result['funds_failed'],
+            number_format($result['total_expense'], 2),
+            number_format($result['total_budget'], 2)
         ));
 
-        return $results['failed'] > 0 && $results['synced'] === 0
+        return $result['funds_failed'] > 0 && $result['funds_synced'] === 0
             ? Command::FAILURE
             : Command::SUCCESS;
     }
 
-    /**
-     * Resolve the [from, to] date window, defaulting to current FY.
-     *
-     * @return array{0: Carbon, 1: Carbon}
-     */
     private function resolveDateWindow(): array
     {
         $from = $this->option('from');
@@ -193,33 +141,65 @@ class SageIntacctSyncFundExpenses extends Command
     }
 
     /**
-     * Resolve the contracts to sync based on command options.
+     * Translate command-line filters into an explicit PROJECTID list, or
+     * return null to sync everything.
      */
-    private function resolveContracts()
+    private function resolveProjectIdsFilter(): ?array
     {
-        $query = Contract::query();
+        $ids = [];
 
-        if (! $this->option('include-archived')) {
-            $query->active();
+        if ($pid = $this->option('grant-code')) {
+            $ids[] = trim($pid);
         }
 
-        $query->whereNotNull('grant_code')->where('grant_code', '!=', '');
-
-        if ($contractId = $this->option('contract-id')) {
-            $query->where('id', $contractId);
-        }
-
-        if ($contractIds = $this->option('contract-ids')) {
-            $ids = array_filter(array_map('intval', explode(',', $contractIds)));
-            if (! empty($ids)) {
-                $query->whereIn('id', $ids);
+        if ($pids = $this->option('grant-codes')) {
+            foreach (explode(',', $pids) as $p) {
+                $t = trim($p);
+                if ($t !== '') $ids[] = $t;
             }
         }
 
-        if ($grantCode = $this->option('grant-code')) {
-            $query->where('grant_code', $grantCode);
+        $contractIds = [];
+        if ($cid = $this->option('contract-id')) {
+            $contractIds[] = (int) $cid;
+        }
+        if ($cids = $this->option('contract-ids')) {
+            foreach (explode(',', $cids) as $c) {
+                $contractIds[] = (int) trim($c);
+            }
         }
 
-        return $query->orderBy('id')->get();
+        if (! empty($contractIds)) {
+            $codes = Contract::whereIn('id', $contractIds)
+                ->whereNotNull('grant_code')->where('grant_code', '!=', '')
+                ->pluck('grant_code')
+                ->map(fn ($g) => trim((string) $g))
+                ->all();
+            $ids = array_merge($ids, $codes);
+        }
+
+        $ids = array_values(array_unique(array_filter($ids)));
+
+        return ! empty($ids) ? $ids : null;
+    }
+
+    private function renderResultsTable(array $results): void
+    {
+        $rows = [];
+        foreach ($results as $r) {
+            $rows[] = [
+                $r['project_id'] ?? '-',
+                $r['success'] ? 'ok' : 'fail',
+                isset($r['expense_lines']) ? $r['expense_lines'] : 0,
+                isset($r['budget_tuples']) ? $r['budget_tuples'] : 0,
+                isset($r['total_expense']) ? '$'.number_format($r['total_expense'], 2) : '-',
+                isset($r['total_budget']) ? '$'.number_format($r['total_budget'], 2) : '-',
+                $r['budget_source'] ?? ($r['error'] ?? '-'),
+            ];
+        }
+        $this->table(
+            ['Fund', 'Status', 'Exp Lines', 'Budget Tuples', 'Total Expense', 'Total Budget', 'Budget Src / Error'],
+            $rows
+        );
     }
 }

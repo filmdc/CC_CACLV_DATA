@@ -5,6 +5,8 @@ namespace App\Livewire;
 use App\Jobs\SyncFundExpensesJob;
 use App\Models\Contract;
 use App\Models\Funder;
+use App\Models\IntacctFundBudget;
+use App\Models\IntacctFundExpense;
 use App\Models\Program;
 use App\Models\ProjectBudget;
 use App\Models\ProjectExpense;
@@ -133,23 +135,14 @@ class ContractUtilizationDashboard extends Component
             return;
         }
 
-        // Scope to the contracts visible on the current page so users can
-        // trigger narrow re-syncs from filtered views without waiting on the
-        // full ~300-contract run.
-        $contractIds = $this->getContractsWithUtilization()->pluck('id')->all();
-
-        if (empty($contractIds)) {
-            session()->flash('error', 'No contracts match the current filters — nothing to sync.');
-
-            return;
-        }
-
+        // Full fund-keyed sync. Enumerates every PROJECTID with activity in
+        // the window from both our contracts table and Intacct's GL, so
+        // Sage-only funds also populate. Takes 5–15 minutes for ~100+ funds.
         $args = [
             $this->resolvePhpCliBinary(),
             base_path('artisan'),
             'intacct:sync-fund-expenses',
             '--force',
-            '--contract-ids='.implode(',', $contractIds),
         ];
 
         if ($this->dateFrom) {
@@ -166,7 +159,7 @@ class ContractUtilizationDashboard extends Component
         $process->start();
 
         $this->syncDispatched = true;
-        session()->flash('message', 'Intacct sync started in the background for '.count($contractIds).' contract(s). This typically takes 1–5 minutes depending on GL volume. Refresh to see updated totals.');
+        session()->flash('message', 'Fund sync started in the background. Syncs all funds with activity in this window from Intacct (including Sage-only funds). Typically takes 5–15 minutes. Refresh periodically to see totals populate.');
     }
 
     public function updatedSearch()
@@ -498,6 +491,7 @@ class ContractUtilizationDashboard extends Component
     {
         $this->showTransactionsModal = false;
         $this->transactionsContractId = null;
+        $this->transactionsFundProjectId = null;
     }
 
     /**
@@ -586,6 +580,11 @@ class ContractUtilizationDashboard extends Component
      */
     public function getTransactionsPayload(): array
     {
+        // Fund-level drill-down (from Funds view)
+        if ($this->transactionsFundProjectId) {
+            return $this->buildFundTransactionsPayload($this->transactionsFundProjectId);
+        }
+
         if (! $this->transactionsContractId) {
             return ['contract' => null, 'source' => 'none', 'lines' => collect(), 'total' => 0.0];
         }
@@ -599,11 +598,20 @@ class ContractUtilizationDashboard extends Component
         $from = $this->dateFrom ?: null;
         $to = $this->dateTo ?: null;
 
-        $intacctLines = $contract->intacctFundExpenses()
-            ->when($from && $to, fn ($q) => $q->whereBetween('posting_date', [$from, $to]))
-            ->orderByDesc('posting_date')
-            ->orderBy('id')
-            ->get();
+        // Pull Intacct lines for this contract's fund using the fund-keyed
+        // table directly — join on project_id/dept_id rather than contract_id
+        // so shared funds with null contract_id still surface.
+        $projectId = trim((string) $contract->grant_code);
+        $deptId = trim((string) ($contract->service_code ?? ''));
+
+        $intacctQuery = IntacctFundExpense::where('intacct_project_id', $projectId);
+        if ($deptId !== '') {
+            $intacctQuery->where('intacct_department_id', $deptId);
+        }
+        if ($from && $to) {
+            $intacctQuery->whereBetween('posting_date', [$from, $to]);
+        }
+        $intacctLines = $intacctQuery->orderByDesc('posting_date')->orderBy('id')->get();
 
         if ($intacctLines->isNotEmpty()) {
             return [
@@ -628,10 +636,189 @@ class ContractUtilizationDashboard extends Component
         ];
     }
 
+    /**
+     * Build the transactions drill-down for a fund (all lines for the
+     * project_id across any departments + any contract association).
+     */
+    private function buildFundTransactionsPayload(string $projectId): array
+    {
+        $from = $this->dateFrom ?: null;
+        $to = $this->dateTo ?: null;
+
+        $q = IntacctFundExpense::where('intacct_project_id', $projectId);
+        if ($from && $to) {
+            $q->whereBetween('posting_date', [$from, $to]);
+        }
+        $lines = $q->orderByDesc('posting_date')->orderBy('id')->get();
+
+        $projectName = IntacctFundBudget::where('intacct_project_id', $projectId)->value('intacct_project_name')
+            ?? $lines->first()?->intacct_project_name;
+
+        // Synthesize a contract-like shell so the existing modal markup works
+        // unchanged — title/grant_code used for display + CSV filename.
+        $contract = new Contract([
+            'title' => ($projectName ?: 'Fund '.$projectId),
+            'grant_code' => $projectId,
+            'service_code' => null,
+            'amount' => IntacctFundBudget::where('intacct_project_id', $projectId)->sum('amount'),
+        ]);
+        $contract->id = 'fund-'.$projectId;
+
+        return [
+            'contract' => $contract,
+            'source' => 'intacct',
+            'lines' => $lines,
+            'total' => (float) $lines->sum('amount'),
+            'is_fund_view' => true,
+        ];
+    }
+
+    /**
+     * Fund-level aggregation for the "Funds" view mode. Groups
+     * intacct_fund_expenses by project_id (summed across all departments),
+     * joins budget + linked contracts, and returns a paginator-like
+     * collection with the same filters as the contract view.
+     *
+     * @return \Illuminate\Pagination\LengthAwarePaginator
+     */
+    public function getFundsWithUtilization()
+    {
+        $from = $this->dateFrom ?: null;
+        $to = $this->dateTo ?: null;
+
+        // Union project_ids that appear in either expenses (within window) or
+        // budgets so we capture Sage-only funds plus budget-only funds.
+        $expenseQuery = IntacctFundExpense::query()
+            ->select('intacct_project_id')
+            ->groupBy('intacct_project_id');
+        if ($from && $to) {
+            $expenseQuery->whereBetween('posting_date', [$from, $to]);
+        }
+        $expenseProjects = $expenseQuery->pluck('intacct_project_id');
+
+        $budgetProjects = IntacctFundBudget::query()
+            ->select('intacct_project_id')
+            ->distinct()
+            ->pluck('intacct_project_id');
+
+        $allProjects = $expenseProjects->merge($budgetProjects)->unique()->values();
+
+        // Search / filter by project_id or linked contract's title/funder/program
+        if ($this->search) {
+            $s = strtolower($this->search);
+            $matchedViaContracts = Contract::where(function ($q) use ($s) {
+                $q->whereRaw('LOWER(title) LIKE ?', ["%{$s}%"])
+                    ->orWhereRaw('LOWER(contract_number) LIKE ?', ["%{$s}%"])
+                    ->orWhereRaw('LOWER(grant_code) LIKE ?', ["%{$s}%"]);
+            })->pluck('grant_code')->filter()->map(fn ($c) => trim($c))->unique();
+
+            $allProjects = $allProjects->filter(function ($pid) use ($s, $matchedViaContracts) {
+                return str_contains(strtolower($pid), $s) || $matchedViaContracts->contains($pid);
+            })->values();
+        }
+
+        // Build fund rows
+        $rows = $allProjects->map(function ($projectId) use ($from, $to) {
+            $expQuery = IntacctFundExpense::where('intacct_project_id', $projectId);
+            if ($from && $to) {
+                $expQuery->whereBetween('posting_date', [$from, $to]);
+            }
+            $spent = (float) $expQuery->sum('amount');
+            $expenseLinesCount = (int) $expQuery->count();
+            $lastSyncedAt = $expQuery->max('last_synced_at');
+
+            $budget = (float) IntacctFundBudget::where('intacct_project_id', $projectId)->sum('amount');
+            $budgetTuples = (int) IntacctFundBudget::where('intacct_project_id', $projectId)->count();
+            $budgetRow = IntacctFundBudget::where('intacct_project_id', $projectId)->first();
+
+            $projectName = $budgetRow?->intacct_project_name
+                ?? IntacctFundExpense::where('intacct_project_id', $projectId)->value('intacct_project_name');
+
+            $contracts = Contract::where('grant_code', $projectId)->get(['id', 'title', 'service_code', 'archived', 'program_id', 'funder_id']);
+
+            return (object) [
+                'project_id' => $projectId,
+                'project_name' => $projectName,
+                'spent' => $spent,
+                'budget' => $budget,
+                'remaining' => $budget - $spent,
+                'utilization' => $budget > 0 ? round($spent / $budget * 100, 1) : 0.0,
+                'expense_lines_count' => $expenseLinesCount,
+                'budget_tuples' => $budgetTuples,
+                'budget_source' => $budgetRow?->budget_source,
+                'last_synced_at' => $lastSyncedAt,
+                'contracts' => $contracts,
+                'is_sage_only' => $contracts->isEmpty(),
+            ];
+        });
+
+        // Filter by program / funder based on linked contracts
+        if ($this->filterProgram) {
+            $rows = $rows->filter(fn ($r) => $r->contracts->contains('program_id', $this->filterProgram))->values();
+        }
+        if ($this->filterFunder) {
+            $rows = $rows->filter(fn ($r) => $r->contracts->contains('funder_id', $this->filterFunder))->values();
+        }
+
+        // Utilization-level filter
+        if ($this->filterUtilization) {
+            $rows = $rows->filter(function ($r) {
+                if ($r->budget <= 0) return false;
+                $remPct = ($r->remaining / $r->budget) * 100;
+                return match ($this->filterUtilization) {
+                    'critical' => $remPct > 0 && $remPct <= 10,
+                    'warning' => $remPct > 10 && $remPct <= 25,
+                    'caution' => $remPct > 25 && $remPct <= 50,
+                    'healthy' => $remPct > 50,
+                    'depleted' => $r->spent >= $r->budget,
+                    default => true,
+                };
+            })->values();
+        }
+
+        // Sort
+        $rows = match ($this->sortBy) {
+            'utilization_desc' => $rows->sortByDesc('utilization')->values(),
+            'utilization_asc' => $rows->sortBy('utilization')->values(),
+            'amount_desc' => $rows->sortByDesc('budget')->values(),
+            'remaining_asc' => $rows->sortBy('remaining')->values(),
+            'title_asc' => $rows->sortBy('project_name')->values(),
+            'id_desc', 'id_asc', 'created_desc', 'created_asc', 'start_date_desc', 'start_date_asc' => $rows->sortBy('project_id')->values(),
+            default => $rows->sortByDesc('utilization')->values(),
+        };
+
+        // Paginate manually
+        $page = (int) request()->query('page', 1);
+        $perPage = 12;
+        $total = $rows->count();
+        $paginated = $rows->slice(($page - 1) * $perPage, $perPage)->values();
+
+        return new \Illuminate\Pagination\LengthAwarePaginator(
+            $paginated,
+            $total,
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+    }
+
+    /**
+     * Transactions drill-down for a fund (called from fund view). Shows all
+     * expense lines for the project_id within the current date window,
+     * regardless of which contract they're linked to.
+     */
+    public function viewFundTransactions(string $projectId): void
+    {
+        $this->transactionsContractId = null;
+        $this->transactionsFundProjectId = $projectId;
+        $this->showTransactionsModal = true;
+    }
+
+    public $transactionsFundProjectId = null;
+
     public function render()
     {
-        return view('livewire.contract-utilization-dashboard', [
-            'contracts' => $this->getContractsWithUtilization(),
+        $data = [
             'systemMetrics' => $this->getSystemMetrics(),
             'transactionsPayload' => $this->showTransactionsModal ? $this->getTransactionsPayload() : null,
             'programs' => Program::orderBy('name')->get(),
@@ -663,6 +850,17 @@ class ContractUtilizationDashboard extends Component
                 'start_date_desc' => 'Start Date (Newest First)',
                 'start_date_asc' => 'Start Date (Oldest First)',
             ],
-        ])->layout('components.layouts.app');
+        ];
+
+        if ($this->viewMode === 'funds') {
+            $data['funds'] = $this->getFundsWithUtilization();
+            $data['contracts'] = null;
+        } else {
+            $data['contracts'] = $this->getContractsWithUtilization();
+            $data['funds'] = null;
+        }
+
+        return view('livewire.contract-utilization-dashboard', $data)
+            ->layout('components.layouts.app');
     }
 }

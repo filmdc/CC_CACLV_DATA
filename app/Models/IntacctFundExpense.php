@@ -12,6 +12,7 @@ class IntacctFundExpense extends Model
         'intacct_record_no',
         'intacct_project_id',
         'intacct_department_id',
+        'intacct_project_name',
         'posting_date',
         'amount',
         'gl_account',

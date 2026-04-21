@@ -21,8 +21,9 @@
                 <span wire:loading wire:target="syncFromIntacct">Dispatching…</span>
             </button>
             <select wire:model.live="viewMode" class="rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white text-sm">
-                <option value="cards">Card View</option>
-                <option value="table">Table View</option>
+                <option value="cards">Contract Cards</option>
+                <option value="table">Contract Table</option>
+                <option value="funds">Fund View</option>
             </select>
         </div>
     </div>
@@ -523,9 +524,166 @@
         </div>
     @endif
 
+    {{-- Fund View --}}
+    @if($viewMode === 'funds' && $funds)
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
+            @forelse($funds as $fund)
+                @php
+                    $utilization = $fund->utilization;
+                    $remaining = $fund->remaining;
+                    $status = 'No Budget';
+                    $colorClass = 'bg-gray-500';
+                    if ($fund->budget > 0) {
+                        $remPct = ($fund->remaining / $fund->budget) * 100;
+                        if ($remPct <= 0) { $status = 'Depleted'; $colorClass = 'bg-red-600'; }
+                        elseif ($remPct < 10) { $status = 'Critical'; $colorClass = 'bg-orange-500'; }
+                        elseif ($remPct < 25) { $status = 'Warning'; $colorClass = 'bg-yellow-500'; }
+                        elseif ($remPct < 50) { $status = 'Caution'; $colorClass = 'bg-yellow-400'; }
+                        elseif ($remPct < 75) { $status = 'Healthy'; $colorClass = 'bg-green-400'; }
+                        else { $status = 'Healthy'; $colorClass = 'bg-green-500'; }
+                    }
+                    $statusColors = [
+                        'Depleted' => 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+                        'Critical' => 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
+                        'Warning' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+                        'Caution' => 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+                        'Healthy' => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+                        'No Budget' => 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200',
+                    ];
+                @endphp
+                <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl p-6 hover:shadow-2xl transition-shadow">
+                    {{-- Header --}}
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                                {{ $fund->project_id }}
+                                @if($fund->project_name)
+                                    <span class="block text-sm font-normal text-gray-500 dark:text-gray-400 truncate" title="{{ $fund->project_name }}">
+                                        {{ Str::limit($fund->project_name, 40) }}
+                                    </span>
+                                @endif
+                            </h3>
+                            <div class="flex flex-wrap gap-2 mt-1">
+                                @if($fund->is_sage_only)
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200"
+                                          title="Fund exists in Intacct but no contract is linked in CAP TRACK">
+                                        Sage-only
+                                    </span>
+                                @elseif($fund->contracts->count() > 1)
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200"
+                                          title="{{ $fund->contracts->count() }} contracts share this fund code">
+                                        {{ $fund->contracts->count() }} contracts
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                        1 contract
+                                    </span>
+                                @endif
+                                @if($fund->budget_tuples > 1)
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200"
+                                          title="Budget split across {{ $fund->budget_tuples }} service codes">
+                                        {{ $fund->budget_tuples }} splits
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+                        <span class="px-2 py-1 rounded-full text-xs font-medium {{ $statusColors[$status] }}">{{ $status }}</span>
+                    </div>
+
+                    {{-- Metrics --}}
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Budget</p>
+                            <p class="text-lg font-bold text-blue-600 dark:text-blue-400">${{ number_format($fund->budget, 0) }}</p>
+                            @if($fund->budget_source)
+                                <p class="text-[10px] text-gray-500 dark:text-gray-400">from {{ $fund->budget_source }}</p>
+                            @endif
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Spent</p>
+                            <p class="text-lg font-bold text-purple-600 dark:text-purple-400">${{ number_format($fund->spent, 0) }}</p>
+                            <p class="text-[10px] text-gray-500 dark:text-gray-400">{{ $fund->expense_lines_count }} GL lines</p>
+                        </div>
+                        <div class="col-span-2">
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Remaining</p>
+                            <p class="text-lg font-bold {{ $remaining < 0 ? 'text-red-600' : 'text-green-600' }}">
+                                @if($remaining < 0)
+                                    (${{ number_format(abs($remaining), 0) }}) over
+                                @else
+                                    ${{ number_format($remaining, 0) }}
+                                @endif
+                            </p>
+                        </div>
+                    </div>
+
+                    {{-- Utilization Progress --}}
+                    <div class="mb-4">
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="text-gray-600 dark:text-gray-400">Utilization</span>
+                            <span class="font-medium text-gray-900 dark:text-white">{{ $utilization }}%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-zinc-700 rounded-full h-3">
+                            <div class="h-3 rounded-full transition-all duration-500 {{ $colorClass }}"
+                                 style="width: {{ min($utilization, 100) }}%"></div>
+                        </div>
+                    </div>
+
+                    {{-- Linked contracts --}}
+                    @if($fund->contracts->isNotEmpty())
+                        <details class="mb-3 text-xs">
+                            <summary class="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+                                Linked contracts ({{ $fund->contracts->count() }})
+                            </summary>
+                            <ul class="mt-2 space-y-1 pl-4 list-disc text-gray-700 dark:text-gray-300">
+                                @foreach($fund->contracts as $linkedContract)
+                                    <li>
+                                        <a href="{{ route('contract.show', $linkedContract->id) }}" class="hover:underline">
+                                            {{ Str::limit($linkedContract->title, 50) }}
+                                        </a>
+                                        @if($linkedContract->service_code)
+                                            <span class="text-gray-500 dark:text-gray-400">/ {{ $linkedContract->service_code }}</span>
+                                        @endif
+                                        @if($linkedContract->archived)
+                                            <span class="text-gray-400">(archived)</span>
+                                        @endif
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </details>
+                    @endif
+
+                    {{-- Footer --}}
+                    <div class="flex justify-between items-center text-xs">
+                        @if($fund->last_synced_at)
+                            <span class="text-gray-500 dark:text-gray-400">
+                                Synced {{ \Carbon\Carbon::parse($fund->last_synced_at)->diffForHumans() }}
+                            </span>
+                        @else
+                            <span></span>
+                        @endif
+                        @if($fund->expense_lines_count > 0)
+                            <button wire:click="viewFundTransactions('{{ $fund->project_id }}')"
+                                    class="text-emerald-700 hover:text-emerald-900 dark:text-emerald-400 dark:hover:text-emerald-300 text-sm font-medium">
+                                View Transactions
+                            </button>
+                        @endif
+                    </div>
+                </div>
+            @empty
+                <div class="col-span-full text-center py-12">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">No funds synced yet — click "Sync from Intacct" to populate.</p>
+                </div>
+            @endforelse
+        </div>
+    @endif
+
     {{-- Pagination --}}
     <div class="mt-4">
-        {{ $contracts->links() }}
+        @if($viewMode === 'funds' && $funds)
+            {{ $funds->links() }}
+        @elseif($contracts)
+            {{ $contracts->links() }}
+        @endif
     </div>
 
     {{-- Transactions drill-down modal --}}

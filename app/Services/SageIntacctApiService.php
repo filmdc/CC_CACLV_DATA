@@ -3032,6 +3032,101 @@ XML;
     }
 
     /**
+     * Enumerate all Intacct project IDs (fund codes) that had posted GL
+     * activity within the given window. Used to discover funds that exist in
+     * Intacct but have no matching contract in the local database.
+     *
+     * @return array{success: bool, project_ids?: list<string>, error?: string}
+     */
+    public function enumerateActiveProjectIdsInWindow(
+        \Carbon\Carbon $from,
+        \Carbon\Carbon $to,
+        ?string $glAccountFrom = '60000',
+        ?string $glAccountTo = '99999',
+        int $pageSize = 2000
+    ): array {
+        if (! $this->setting->isXmlApi()) {
+            return ['success' => false, 'error' => 'Only supported in XML API mode'];
+        }
+
+        try {
+            if (! $this->sessionId) {
+                $auth = $this->authenticateXml();
+                if (! $auth['success']) {
+                    return ['success' => false, 'error' => 'Auth failed: '.($auth['message'] ?? '')];
+                }
+            }
+
+            $fromStr = $from->format('m/d/Y');
+            $toStr = $to->format('m/d/Y');
+
+            $whereParts = [
+                "ENTRY_DATE >= '{$fromStr}'",
+                "ENTRY_DATE <= '{$toStr}'",
+            ];
+
+            if ($glAccountFrom !== null && $glAccountTo !== null) {
+                $whereParts[] = "ACCOUNTNO >= '".addslashes($glAccountFrom)."'";
+                $whereParts[] = "ACCOUNTNO <= '".addslashes($glAccountTo)."'";
+            }
+
+            $query = implode(' AND ', $whereParts);
+
+            $xml = $this->buildReadByQueryXml('GLENTRY', $query, $pageSize);
+            $response = $this->sendXmlRequest($xml);
+
+            if (! $response['success']) {
+                return ['success' => false, 'error' => $response['error'] ?? 'unknown'];
+            }
+
+            $projectIds = [];
+            $paginate = function ($xmlString) use (&$projectIds) {
+                $x = simplexml_load_string($xmlString);
+                if (! $x) return [null, 0];
+                foreach ($x->xpath('//data/glentry') as $node) {
+                    $pid = (string) $node->PROJECTID;
+                    if ($pid !== '') {
+                        $projectIds[$pid] = true;
+                    }
+                }
+                $dataNodes = $x->xpath('//result/data');
+                $numremaining = ! empty($dataNodes) ? (int) ($dataNodes[0]->attributes()['numremaining'] ?? 0) : 0;
+                $resultId = null;
+                if (! empty($dataNodes)) {
+                    $rid = (string) ($dataNodes[0]->attributes()['resultId'] ?? '');
+                    $resultId = $rid !== '' ? $rid : null;
+                }
+
+                return [$resultId, $numremaining];
+            };
+
+            [$resultId, $numremaining] = $paginate($response['xml']);
+            while ($numremaining > 0 && $resultId) {
+                $moreResp = $this->sendXmlRequest($this->buildReadMoreXml($resultId));
+                if (! $moreResp['success']) break;
+                [$resultId, $numremaining] = $paginate($moreResp['xml']);
+                if (count($projectIds) > 100000) break;
+            }
+
+            Log::info('Sage Intacct: enumerated active project IDs', [
+                'count' => count($projectIds),
+                'from' => $fromStr,
+                'to' => $toStr,
+            ]);
+
+            ksort($projectIds);
+
+            return ['success' => true, 'project_ids' => array_keys($projectIds)];
+        } catch (\Exception $e) {
+            Log::error('Sage Intacct enumerateActiveProjectIdsInWindow exception', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+
+    /**
      * Query posted GL entry lines filtered by Intacct dimensions.
      *
      * Uses the GLENTRY object (line-level posted GL activity) filtered by
