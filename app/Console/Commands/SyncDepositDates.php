@@ -20,6 +20,8 @@ class SyncDepositDates extends Command
                             {--batch-size=100 : Number of items to process per batch}
                             {--dry-run : Run without actually updating DonorPerfect}
                             {--retry-failed : Retry previously failed deposit date syncs}
+                            {--backfill-codes : Re-query Sage and write fund/service codes for already-synced items missing codes}
+                            {--limit=100 : Max items to process when using --backfill-codes}
                             {--stats : Show statistics only, do not sync}';
 
     /**
@@ -114,6 +116,11 @@ class SyncDepositDates extends Command
         // Retry failed mode
         if ($this->option('retry-failed')) {
             return $this->retryFailed($service);
+        }
+
+        // Backfill codes mode
+        if ($this->option('backfill-codes')) {
+            return $this->runBackfillCodes($service);
         }
 
         // Main sync
@@ -304,6 +311,56 @@ class SyncDepositDates extends Command
             $this->warn('Errors:');
             foreach (array_slice($result['errors'], 0, 10) as $error) {
                 $this->line('  - '.$error);
+            }
+        }
+
+        return $result['success'] ? Command::SUCCESS : Command::FAILURE;
+    }
+
+    /**
+     * One-time backfill for items that are already "synced" but missing fund/service codes
+     */
+    private function runBackfillCodes(DepositDateSyncService $service): int
+    {
+        $dryRun = $this->option('dry-run');
+        $limit = (int) $this->option('limit');
+
+        if ($dryRun) {
+            $this->warn('DRY RUN MODE - No changes will be made to DonorPerfect');
+            $this->newLine();
+        }
+
+        $this->info("Running code backfill (limit={$limit})...");
+        $this->newLine();
+
+        $result = $service->backfillMissingCodes($limit, $dryRun);
+
+        if ($result['success']) {
+            $this->info('Backfill completed!');
+        } else {
+            $this->error('Backfill completed with errors.');
+        }
+
+        $this->newLine();
+        $this->table(
+            ['Metric', 'Count'],
+            [
+                ['Candidate items (missing codes)', $result['total_candidates']],
+                ['Queried from Sage', $result['sage_queried']],
+                ['With codes on receipt', $result['codes_found']],
+                ['Updated in DonorPerfect', $result['dp_updated']],
+                ['Failed to update', $result['dp_failed']],
+            ]
+        );
+
+        if (! empty($result['errors'])) {
+            $this->newLine();
+            $this->warn('Errors:');
+            foreach (array_slice($result['errors'], 0, 10) as $error) {
+                $this->line('  - '.$error);
+            }
+            if (count($result['errors']) > 10) {
+                $this->line('  ... and '.(count($result['errors']) - 10).' more errors');
             }
         }
 

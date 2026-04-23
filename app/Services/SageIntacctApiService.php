@@ -2690,8 +2690,12 @@ XML;
 
     /**
      * Query Other Receipts using XML Web Services
-     * Uses <read> by keys instead of <readByQuery> to access line-item dimensions
-     * (PROJECTID/DEPARTMENTID) which are flattened into the header by read with fields=*
+     *
+     * Uses <read> by keys (not <readByQuery>) so we can request fields=* and
+     * get the nested <OTHERRECEIPTSENTRIES> line items back. Line-item
+     * dimensions (PROJECTID/DEPARTMENTID) are NOT flattened onto the header —
+     * they stay inside <OTHERRECEIPTSENTRIES><otherreceiptsentry>, and the
+     * response parser pulls them from the first entry.
      */
     private function queryOtherReceiptsByRecordNosXml(array $recordNos): array
     {
@@ -2953,6 +2957,19 @@ XML;
                     }
                 }
 
+                // PROJECTID/DEPARTMENTID live on the <otherreceiptsentry> line items,
+                // not on the header. Read them from the first entry.
+                $projectId = '';
+                $departmentId = '';
+                $entries = $node->OTHERRECEIPTSENTRIES ?? null;
+                if ($entries) {
+                    foreach ($entries->children() as $entry) {
+                        $projectId = (string) ($entry->PROJECTID ?? '');
+                        $departmentId = (string) ($entry->DEPARTMENTID ?? '');
+                        break;
+                    }
+                }
+
                 $receipt = [
                     'recordno' => (string) ($node->RECORDNO ?? ''),
                     'payee' => (string) ($node->DESCRIPTION2 ?? $node->PAYEE ?? ''),
@@ -2964,8 +2981,8 @@ XML;
                     'undepglaccountno' => (string) ($node->UNDEPACCTNO ?? $node->UNDEPGLACCOUNTNO ?? ''),
                     'state' => (string) ($node->STATE ?? ''),
                     'totalentered' => (string) ($node->TOTALENTERED ?? ''),
-                    'projectid' => (string) ($node->PROJECTID ?? ''),
-                    'departmentid' => (string) ($node->DEPARTMENTID ?? ''),
+                    'projectid' => $projectId,
+                    'departmentid' => $departmentId,
                 ];
 
                 // Only include if we have a valid recordno

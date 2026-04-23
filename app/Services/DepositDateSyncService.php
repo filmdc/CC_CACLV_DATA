@@ -405,6 +405,135 @@ class DepositDateSyncService
     }
 
     /**
+     * One-time backfill for items that synced before the parser fix landed —
+     * they have a deposit_date but no fund/service codes. Re-queries Sage,
+     * writes codes to DP, leaves deposit_date untouched.
+     *
+     * @param  int   $limit   Max items per batch
+     * @param  bool  $dryRun  If true, don't actually write to DonorPerfect
+     */
+    public function backfillMissingCodes(int $limit = 100, bool $dryRun = false): array
+    {
+        $results = [
+            'success' => false,
+            'total_candidates' => 0,
+            'sage_queried' => 0,
+            'codes_found' => 0,
+            'dp_updated' => 0,
+            'dp_failed' => 0,
+            'errors' => [],
+            'dry_run' => $dryRun,
+        ];
+
+        try {
+            if (! $this->isConfigured()) {
+                $results['errors'][] = 'Service not properly configured';
+
+                return $results;
+            }
+
+            $candidates = SageIntacctSyncItem::where('status', SageIntacctSyncItem::STATUS_SUCCESS)
+                ->whereNotNull('intacct_record_id')
+                ->whereNotNull('deposit_date_synced_at')
+                ->where('environment', $this->getEnvironment())
+                ->where(function ($q) {
+                    $q->whereNull('sage_fund_code')
+                        ->orWhere('sage_fund_code', '')
+                        ->orWhereNull('sage_service_code')
+                        ->orWhere('sage_service_code', '');
+                })
+                ->orderBy('id')
+                ->limit($limit)
+                ->get();
+
+            $results['total_candidates'] = $candidates->count();
+
+            if ($candidates->isEmpty()) {
+                $results['success'] = true;
+                $results['message'] = 'No items need code backfill';
+
+                return $results;
+            }
+
+            $recordNos = $candidates->pluck('intacct_record_id')->filter()->toArray();
+            $sageResult = $this->sageApiService->queryOtherReceiptsByRecordNos($recordNos);
+
+            if (! $sageResult['success']) {
+                $results['errors'][] = 'Sage query failed: '.($sageResult['error'] ?? 'Unknown error');
+
+                return $results;
+            }
+
+            $results['sage_queried'] = count($recordNos);
+            $receipts = collect($sageResult['receipts'])->keyBy('recordno');
+
+            foreach ($candidates as $item) {
+                $receipt = $receipts->get($item->intacct_record_id);
+                if (! $receipt) {
+                    continue;
+                }
+
+                $fundCode = ! empty($receipt['projectid']) ? $receipt['projectid'] : null;
+                $serviceCode = ! empty($receipt['departmentid']) ? $receipt['departmentid'] : null;
+
+                if (! $fundCode && ! $serviceCode) {
+                    continue;
+                }
+
+                $results['codes_found']++;
+
+                if ($dryRun) {
+                    Log::info('DepositDateSync: Dry-run backfill would update DP', [
+                        'gift_id' => $item->gift_id,
+                        'fund_code' => $fundCode,
+                        'service_code' => $serviceCode,
+                    ]);
+
+                    continue;
+                }
+
+                $depositDateStr = $item->sage_deposit_date
+                    ? $item->sage_deposit_date->format('Y-m-d')
+                    : null;
+                $item->updateSageCodes($depositDateStr, $fundCode, $serviceCode);
+
+                $dpResult = $this->updateDonorPerfectCodes(
+                    (int) $item->gift_id,
+                    null,
+                    $fundCode,
+                    $serviceCode
+                );
+
+                if ($dpResult['success']) {
+                    $results['dp_updated']++;
+                } else {
+                    $results['dp_failed']++;
+                    $results['errors'][] = "Gift {$item->gift_id}: ".($dpResult['error'] ?? 'Unknown');
+                }
+            }
+
+            $results['success'] = true;
+            $results['message'] = sprintf(
+                'Processed %d candidates: %d with codes, %d updated in DP, %d failed',
+                $results['total_candidates'],
+                $results['codes_found'],
+                $results['dp_updated'],
+                $results['dp_failed']
+            );
+
+            return $results;
+
+        } catch (\Exception $e) {
+            Log::error('DepositDateSync: Exception during code backfill', [
+                'error' => $e->getMessage(),
+            ]);
+            $results['errors'][] = 'Exception: '.$e->getMessage();
+
+            return $results;
+        }
+    }
+
+    /**
      * Update a gift's deposit date, fund code, and service code in DonorPerfect
      *
      * @param  int  $giftId  The DonorPerfect gift ID
