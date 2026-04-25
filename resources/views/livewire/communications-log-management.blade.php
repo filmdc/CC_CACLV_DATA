@@ -1199,10 +1199,48 @@
                             @endif
                         </h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- P-01 duplicate-address warning panel -->
+                            @if(!empty($duplicateMatches))
+                                <div class="md:col-span-2 rounded-md border border-amber-300 bg-amber-50 dark:border-amber-700 dark:bg-amber-900/30 p-3">
+                                    <div class="flex items-start gap-3">
+                                        <svg class="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86a2 2 0 001.74-2.99l-6.93-12a2 2 0 00-3.48 0l-6.93 12A2 2 0 005.07 19z"/>
+                                        </svg>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-semibold text-amber-900 dark:text-amber-100">
+                                                Possible duplicate{{ count($duplicateMatches) === 1 ? '' : 's' }} at this address
+                                            </p>
+                                            <ul class="mt-1 space-y-1 text-xs text-amber-800 dark:text-amber-200">
+                                                @foreach($duplicateMatches as $match)
+                                                    <li>
+                                                        <span class="font-medium">{{ ucfirst($match['kind']) }}:</span>
+                                                        {{ $match['address'] }}
+                                                        @if($match['kind'] === 'log')
+                                                            @if($match['contact'])— {{ $match['contact'] }}@endif
+                                                            @if($match['date']) ({{ $match['date'] }})@endif
+                                                            @if($match['subject']) — “{{ \Illuminate\Support\Str::limit($match['subject'], 60) }}”@endif
+                                                        @endif
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                            <div class="mt-2 flex items-center gap-3">
+                                                <button type="button" wire:click="acknowledgeDuplicatesAndSave"
+                                                        class="text-xs px-3 py-1 rounded bg-amber-600 text-white hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600">
+                                                    Save anyway
+                                                </button>
+                                                <span class="text-xs text-amber-700 dark:text-amber-300">
+                                                    Or edit the address above to clear this warning.
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+
                             <!-- Address -->
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Street Address</label>
-                                <input type="text" wire:model="contact_address" placeholder="123 Main Street"
+                                <input type="text" wire:model.live.debounce.500ms="contact_address" placeholder="123 Main Street"
                                        class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
                                 @error('contact_address') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                             </div>
@@ -1210,7 +1248,7 @@
                             <!-- City -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">City</label>
-                                <input type="text" wire:model="contact_city" placeholder="Las Vegas"
+                                <input type="text" wire:model.live.debounce.500ms="contact_city" placeholder="Las Vegas"
                                        class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
                                 @error('contact_city') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                             </div>
