@@ -11,7 +11,7 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   quality:
@@ -19,6 +19,8 @@ jobs:
     environment: Testing
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -33,14 +35,31 @@ jobs:
           composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
           npm install
 
-      - name: Run Pint
-        run: vendor/bin/pint
-
-      # - name: Commit Changes
-      #   uses: stefanzweifel/git-auto-commit-action@v5
-      #   with:
-      #     commit_message: fix code style
-      #     commit_options: '--no-verify'
-      #     file_pattern: |
-      #       **/*
-      #       !.github/workflows/*
+      - name: Run Pint on changed files
+        run: |
+          set -e
+          if [ -n "${{ github.base_ref }}" ]; then
+            git fetch --no-tags --depth=200 origin "${{ github.base_ref }}"
+            BASE="origin/${{ github.base_ref }}"
+          else
+            BASE="HEAD~1"
+          fi
+          CHANGED=$(git diff --name-only --diff-filter=ACMR "$BASE"...HEAD -- '*.php' || true)
+          if [ -z "$CHANGED" ]; then
+            echo "No PHP files changed; skipping Pint."
+            exit 0
+          fi
+          # Skip vendored / generated / scratch paths even if they appear in the diff.
+          # Note: database/migrations and database/seeders are NOT excluded — new ones should be linted.
+          FILTERED=$(echo "$CHANGED" \
+            | grep -v -E '^(documents/|node_modules/|vendor/|storage/|public/|mcp-servers/|bootstrap/cache/)' \
+            | grep -v -E '^(index\.php|test-email\.php|report_due_dates_migration_data\.php|report_due_dates_with_emails\.php)$' \
+            || true)
+          if [ -z "$FILTERED" ]; then
+            echo "All changed files are in Pint exclude paths; skipping."
+            exit 0
+          fi
+          echo "Linting:"
+          echo "$FILTERED"
+          # shellcheck disable=SC2086
+          vendor/bin/pint --test $FILTERED

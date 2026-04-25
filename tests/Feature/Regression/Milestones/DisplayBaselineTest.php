@@ -1,0 +1,26 @@
+<?php
+
+use App\Livewire\ProjectManagement;
+use App\Models\HousingJob;
+use Database\Seeders\RegressionTestSeeder;
+use Livewire\Livewire;
+use Tests\Support\RegressionHelpers;
+use Tests\Support\SnapshotHelper;
+
+beforeEach(function () {
+    $this->seed(RegressionTestSeeder::class);
+    $this->user = RegressionHelpers::adminUser();
+    $this->job = HousingJob::where('job_number', 'JOB-FIX-00002')->firstOrFail();
+});
+
+// HTML snapshot of the ProjectManagement component for HJ-2 — a project with
+// a mid-milestone timeline (Initial Inspection completed, Estimate Approval
+// in_progress, Construction not_started). Captures current milestone display
+// so any Phase 1 structural change surfaces as a diff.
+it('matches the committed HTML snapshot for HJ-2 milestone display', function () {
+    $html = Livewire::actingAs($this->user)
+        ->test(ProjectManagement::class, ['id' => $this->job->id])
+        ->html();
+
+    SnapshotHelper::assertHtmlMatchesSnapshot('milestone_display', $html);
+})->group('regression');

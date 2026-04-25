@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProjectExpense extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'housing_job_id',
         'contract_id',
@@ -84,7 +87,7 @@ class ProjectExpense extends Model
 
     public function getFormattedAmountAttribute(): string
     {
-        return ($this->amount < 0 ? '-$' : '$') . number_format(abs($this->amount), 2);
+        return ($this->amount < 0 ? '-$' : '$').number_format(abs($this->amount), 2);
     }
 
     // Business Logic Methods

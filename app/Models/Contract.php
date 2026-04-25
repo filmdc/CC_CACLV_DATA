@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\Auditable;
 use App\Traits\HasLegacySyncScopes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -16,7 +17,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Contract extends Model implements HasMedia
 {
-    use SoftDeletes, InteractsWithMedia, Auditable, HasLegacySyncScopes;
+    use Auditable, HasFactory, HasLegacySyncScopes, InteractsWithMedia, SoftDeletes;
 
     protected $fillable = [
         'title',
@@ -91,7 +92,7 @@ class Contract extends Model implements HasMedia
                 'image/jpeg',
                 'image/png',
                 'image/gif',
-                'image/jpg'
+                'image/jpg',
             ])
             ->useDisk('public');
     }
@@ -127,7 +128,7 @@ class Contract extends Model implements HasMedia
     public function programs(): BelongsToMany
     {
         return $this->belongsToMany(Program::class, 'contract_program')
-                    ->withTimestamps();
+            ->withTimestamps();
     }
 
     /**
@@ -281,7 +282,7 @@ class Contract extends Model implements HasMedia
             return 'Archived';
         }
 
-        if (!$this->start_date || !$this->end_date) {
+        if (! $this->start_date || ! $this->end_date) {
             return 'Draft';
         }
 
@@ -374,15 +375,15 @@ class Contract extends Model implements HasMedia
     public function getAllPrograms()
     {
         $programs = collect();
-        
+
         // Add the single program if it exists (current system)
         if ($this->program_id && $this->program) {
             $programs->push($this->program);
         }
-        
+
         // Add many-to-many programs (legacy compatibility)
         $programs = $programs->merge($this->programs);
-        
+
         return $programs->unique('id');
     }
 
@@ -410,7 +411,7 @@ class Contract extends Model implements HasMedia
         if ($this->program_id && $this->program) {
             return $this->program;
         }
-        
+
         return $this->programs()->first();
     }
 
@@ -420,18 +421,18 @@ class Contract extends Model implements HasMedia
     public function getDisplayProgramNames(): string
     {
         $allPrograms = $this->getAllPrograms();
-        
+
         if ($allPrograms->isEmpty()) {
             return 'N/A';
         }
-        
+
         if ($allPrograms->count() === 1) {
             return $allPrograms->first()->name;
         }
-        
+
         return $allPrograms->pluck('name')->join(', ');
     }
-    
+
     /**
      * Get formatted program names with count for display
      */
@@ -449,6 +450,7 @@ class Contract extends Model implements HasMedia
 
         $count = $allPrograms->count();
         $firstProgram = $allPrograms->first()->name;
+
         return "{$firstProgram} (+{$count} programs)";
     }
 
@@ -690,5 +692,4 @@ class Contract extends Model implements HasMedia
 
         return 'bg-green-500';
     }
-
 }

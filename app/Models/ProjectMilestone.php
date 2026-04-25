@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,7 +11,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 
 class ProjectMilestone extends Model implements HasMedia
 {
-    use InteractsWithMedia;
+    use HasFactory, InteractsWithMedia;
 
     protected $fillable = [
         'housing_job_id',
@@ -111,12 +112,12 @@ class ProjectMilestone extends Model implements HasMedia
         // 1. Status is 'approved' (for documents requiring approval)
         // 2. Status is 'pending_review' AND doesn't require approval (uploaded files, no approval needed)
         $completedDocs = $this->documents()
-            ->where(function($query) {
+            ->where(function ($query) {
                 $query->where('status', 'approved')
-                      ->orWhere(function($q) {
-                          $q->where('status', 'pending_review')
+                    ->orWhere(function ($q) {
+                        $q->where('status', 'pending_review')
                             ->where('requires_approval', false);
-                      });
+                    });
             })
             ->count();
 
@@ -144,13 +145,13 @@ class ProjectMilestone extends Model implements HasMedia
         // 2. Rejected
         // 3. Requires approval but still pending review (not yet approved)
         $incompleteDocuments = $this->documents()
-            ->where(function($query) {
+            ->where(function ($query) {
                 $query->where('status', 'not_uploaded')
-                      ->orWhere('status', 'rejected')
-                      ->orWhere(function($q) {
-                          $q->where('status', 'pending_review')
+                    ->orWhere('status', 'rejected')
+                    ->orWhere(function ($q) {
+                        $q->where('status', 'pending_review')
                             ->where('requires_approval', true);
-                      });
+                    });
             })
             ->count();
 
@@ -159,7 +160,7 @@ class ProjectMilestone extends Model implements HasMedia
 
     public function markAsCompleted(): bool
     {
-        if (!$this->canBeCompleted()) {
+        if (! $this->canBeCompleted()) {
             return false;
         }
 

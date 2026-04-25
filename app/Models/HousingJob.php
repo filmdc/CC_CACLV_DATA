@@ -3,15 +3,18 @@
 namespace App\Models;
 
 use App\Services\MilestoneApprovalService;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class HousingJob extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'job_number',
         'participant_id',
@@ -79,8 +82,8 @@ class HousingJob extends Model
             ->orderBy('id', 'desc')
             ->first();
 
-        if ($lastJob && preg_match('/JOB-' . $year . '-(\d+)/', $lastJob->job_number, $matches)) {
-            $sequence = str_pad((int)$matches[1] + 1, 5, '0', STR_PAD_LEFT);
+        if ($lastJob && preg_match('/JOB-'.$year.'-(\d+)/', $lastJob->job_number, $matches)) {
+            $sequence = str_pad((int) $matches[1] + 1, 5, '0', STR_PAD_LEFT);
         } else {
             $sequence = '00001';
         }
@@ -217,14 +220,14 @@ class HousingJob extends Model
 
     public function isOverdue(): bool
     {
-        return $this->target_completion_date 
-            && $this->target_completion_date->isPast() 
-            && !in_array($this->status, ['completed', 'cancelled', 'rejected']);
+        return $this->target_completion_date
+            && $this->target_completion_date->isPast()
+            && ! in_array($this->status, ['completed', 'cancelled', 'rejected']);
     }
 
     public function getDaysOverdueAttribute(): ?int
     {
-        if (!$this->isOverdue()) {
+        if (! $this->isOverdue()) {
             return null;
         }
 
@@ -266,6 +269,7 @@ class HousingJob extends Model
     public function canComplete(): bool
     {
         $approvalService = app(MilestoneApprovalService::class);
+
         return $approvalService->canCompleteJob($this);
     }
 
@@ -275,6 +279,7 @@ class HousingJob extends Model
     public function getApprovalProgressAttribute(): array
     {
         $approvalService = app(MilestoneApprovalService::class);
+
         return $approvalService->getApprovalProgress($this);
     }
 
@@ -302,9 +307,9 @@ class HousingJob extends Model
     {
         return $this->milestones()
             ->where('status', 'in_progress')
-            ->orWhere(function($query) {
+            ->orWhere(function ($query) {
                 $query->where('status', 'not_started')
-                      ->whereRaw('sequence_order = (SELECT MIN(sequence_order) FROM project_milestones WHERE housing_job_id = ? AND status = "not_started")', [$this->id]);
+                    ->whereRaw('sequence_order = (SELECT MIN(sequence_order) FROM project_milestones WHERE housing_job_id = ? AND status = "not_started")', [$this->id]);
             })
             ->orderBy('sequence_order')
             ->first();
@@ -322,7 +327,7 @@ class HousingJob extends Model
     {
         $currentMilestone = $this->getCurrentMilestone();
 
-        if (!$currentMilestone) {
+        if (! $currentMilestone) {
             return null;
         }
 
@@ -372,13 +377,13 @@ class HousingJob extends Model
                 'contractor_id', 'status', 'request_date', 'approval_date',
                 'start_date', 'target_completion_date', 'actual_completion_date',
                 'approved_amount', 'actual_cost', 'created_by', 'updated_by',
-                'approved_by'
+                'approved_by',
             ]);
 
             $template->is_template = true;
             $template->template_name = $name;
             $template->template_description = $description;
-            $template->job_number = 'TEMPLATE-' . \Illuminate\Support\Str::uuid();
+            $template->job_number = 'TEMPLATE-'.\Illuminate\Support\Str::uuid();
             $template->status = 'pending';
             $template->created_by = Auth::id();
 
@@ -396,7 +401,7 @@ class HousingJob extends Model
             foreach ($this->milestones as $milestone) {
                 $newMilestone = $milestone->replicate([
                     'housing_job_id', 'status', 'target_date', 'completed_date',
-                    'created_by', 'updated_by'
+                    'created_by', 'updated_by',
                 ]);
                 $newMilestone->housing_job_id = $template->id;
                 $newMilestone->status = 'not_started';
@@ -408,7 +413,7 @@ class HousingJob extends Model
                     $newTask = $task->replicate([
                         'milestone_id', 'status', 'assigned_to', 'deadline',
                         'completed_date', 'approved_by', 'approved_at',
-                        'created_by', 'updated_by'
+                        'created_by', 'updated_by',
                     ]);
                     $newTask->milestone_id = $newMilestone->id;
                     $newTask->status = 'pending';
@@ -421,7 +426,7 @@ class HousingJob extends Model
                     $newDoc = $doc->replicate([
                         'milestone_id', 'status', 'assigned_to', 'uploaded_date',
                         'reviewed_date', 'approved_by', 'approved_at',
-                        'rejection_reason', 'created_by', 'updated_by'
+                        'rejection_reason', 'created_by', 'updated_by',
                     ]);
                     $newDoc->milestone_id = $newMilestone->id;
                     $newDoc->status = 'not_uploaded';
@@ -434,7 +439,7 @@ class HousingJob extends Model
             // Clone budget categories (as starting point with $0 spent)
             foreach ($this->budgets as $budget) {
                 $newBudget = $budget->replicate([
-                    'housing_job_id', 'spent_amount', 'created_by', 'updated_by'
+                    'housing_job_id', 'spent_amount', 'created_by', 'updated_by',
                 ]);
                 $newBudget->housing_job_id = $template->id;
                 $newBudget->spent_amount = 0;
@@ -443,6 +448,7 @@ class HousingJob extends Model
             }
 
             DB::commit();
+
             return $template;
         } catch (\Exception $e) {
             DB::rollBack();
@@ -456,7 +462,7 @@ class HousingJob extends Model
 
         try {
             // Create new job from template
-            $job = new self();
+            $job = new self;
             $job->fill($jobData);
             $job->is_template = false;
             $job->created_by = Auth::id();
@@ -470,7 +476,7 @@ class HousingJob extends Model
             foreach ($milestones as $milestone) {
                 $newMilestone = $milestone->replicate([
                     'housing_job_id', 'status', 'target_date', 'completed_date',
-                    'created_by', 'updated_by'
+                    'created_by', 'updated_by',
                 ]);
                 $newMilestone->housing_job_id = $job->id;
                 $newMilestone->status = $newMilestone->sequence_order == 1 ? 'in_progress' : 'not_started';
@@ -483,7 +489,7 @@ class HousingJob extends Model
                     $newTask = $task->replicate([
                         'milestone_id', 'status', 'assigned_to', 'deadline',
                         'completed_date', 'approved_by', 'approved_at',
-                        'created_by', 'updated_by'
+                        'created_by', 'updated_by',
                     ]);
                     $newTask->milestone_id = $newMilestone->id;
                     $newTask->status = 'pending';
@@ -497,7 +503,7 @@ class HousingJob extends Model
                     $newDoc = $doc->replicate([
                         'milestone_id', 'status', 'assigned_to', 'uploaded_date',
                         'reviewed_date', 'approved_by', 'approved_at',
-                        'rejection_reason', 'created_by', 'updated_by'
+                        'rejection_reason', 'created_by', 'updated_by',
                     ]);
                     $newDoc->milestone_id = $newMilestone->id;
                     $newDoc->status = 'not_uploaded';
@@ -510,7 +516,7 @@ class HousingJob extends Model
             $budgets = ProjectBudget::where('housing_job_id', $template->id)->get();
             foreach ($budgets as $budget) {
                 $newBudget = $budget->replicate([
-                    'housing_job_id', 'spent_amount', 'created_by', 'updated_by'
+                    'housing_job_id', 'spent_amount', 'created_by', 'updated_by',
                 ]);
                 $newBudget->housing_job_id = $job->id;
                 $newBudget->spent_amount = 0;
@@ -522,6 +528,7 @@ class HousingJob extends Model
             $template->increment('times_used');
 
             DB::commit();
+
             return $job;
         } catch (\Exception $e) {
             DB::rollBack();
