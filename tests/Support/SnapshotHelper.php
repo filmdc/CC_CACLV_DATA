@@ -112,9 +112,15 @@ class SnapshotHelper
 
         $normalized = preg_replace(array_keys($patterns), array_values($patterns), $html) ?? $html;
 
-        // Strip trailing whitespace, collapse runs of blank lines.
-        $lines = array_map(fn ($line) => rtrim($line), explode("\n", $normalized));
-        $normalized = preg_replace("/\n{3,}/", "\n\n", implode("\n", $lines)) ?? $normalized;
+        // Strip leading + trailing whitespace per line (HTML indentation drifts
+        // between local view-cache state and CI fresh-compile state — the
+        // structure matters, not the indentation), drop empty lines, then
+        // collapse runs of blank lines.
+        $lines = array_filter(
+            array_map(fn ($line) => trim($line), explode("\n", $normalized)),
+            fn ($line) => $line !== ''
+        );
+        $normalized = implode("\n", $lines);
 
         return rtrim($normalized)."\n";
     }
