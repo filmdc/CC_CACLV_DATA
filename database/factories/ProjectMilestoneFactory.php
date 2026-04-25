@@ -14,7 +14,7 @@ class ProjectMilestoneFactory extends Factory
     {
         return [
             'housing_job_id' => HousingJob::factory(),
-            'name' => 'Fixture Milestone ' . $this->faker->words(2, true),
+            'name' => 'Fixture Milestone '.$this->faker->words(2, true),
             'description' => 'Test milestone for regression coverage.',
             'sequence_order' => $this->faker->numberBetween(1, 10),
             'status' => 'not_started',

@@ -14,9 +14,6 @@ use App\Models\ProjectBudget;
 use App\Models\ProjectExpense;
 use App\Models\ProjectMilestone;
 use App\Models\Property;
-use Database\Seeders\CommunicationsLogPermissionsSeeder;
-use Database\Seeders\FundCodePermissionsSeeder;
-use Database\Seeders\ProjectHousingPermissionsSeeder;
 use Illuminate\Database\Seeder;
 
 class RegressionTestSeeder extends Seeder
@@ -120,7 +117,7 @@ class RegressionTestSeeder extends Seeder
         foreach ($names as $i => $first) {
             $idx = $i + 1;
             $households[$idx] = Household::factory()->create([
-                'household_code' => 'FIX' . str_pad((string) $idx, 4, '0', STR_PAD_LEFT),
+                'household_code' => 'FIX'.str_pad((string) $idx, 4, '0', STR_PAD_LEFT),
                 'household_type' => 'Single Person',
                 'household_size' => 1,
                 'housing_status' => 'Own',
@@ -133,14 +130,14 @@ class RegressionTestSeeder extends Seeder
                 'household_id' => $households[$idx]->id,
                 'first_name' => $first,
                 'last_name' => 'Fixture',
-                'date_of_birth' => '1965-01-' . str_pad((string) $idx, 2, '0', STR_PAD_LEFT),
-                'telephone' => '555-555-0' . str_pad((string) (200 + $idx), 3, '0', STR_PAD_LEFT),
+                'date_of_birth' => '1965-01-'.str_pad((string) $idx, 2, '0', STR_PAD_LEFT),
+                'telephone' => '555-555-0'.str_pad((string) (200 + $idx), 3, '0', STR_PAD_LEFT),
             ]);
 
             $properties[$idx] = Property::factory()->create([
                 'participant_id' => $participants[$idx]->id,
                 'household_id' => $households[$idx]->id,
-                'address_line_1' => $idx . ' Test Lane',
+                'address_line_1' => $idx.' Test Lane',
                 'city' => 'Allentown',
                 'state' => 'PA',
                 'zip_code' => '18101',
@@ -332,8 +329,8 @@ class RegressionTestSeeder extends Seeder
                 'name' => $name,
                 'description' => "$name milestone.",
                 'sequence_order' => $j + 1,
-                'target_date' => '2025-' . str_pad((string) (11 + $j), 2, '0', STR_PAD_LEFT) . '-15',
-                'completed_date' => '2025-' . str_pad((string) (11 + $j), 2, '0', STR_PAD_LEFT) . '-15',
+                'target_date' => '2025-'.str_pad((string) (11 + $j), 2, '0', STR_PAD_LEFT).'-15',
+                'completed_date' => '2025-'.str_pad((string) (11 + $j), 2, '0', STR_PAD_LEFT).'-15',
             ]);
         }
 

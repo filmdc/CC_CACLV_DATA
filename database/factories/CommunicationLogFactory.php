@@ -13,14 +13,14 @@ class CommunicationLogFactory extends Factory
     {
         return [
             'communication_date' => $this->faker->dateTimeBetween('-3 months', 'now')->format('Y-m-d H:i:s'),
-            'subject' => 'Fixture Communication ' . $this->faker->words(3, true),
+            'subject' => 'Fixture Communication '.$this->faker->words(3, true),
             'communication_type' => 'phone_call',
             'direction' => 'outgoing',
             'category' => 'general',
             'priority' => 'normal',
             'contact_first_name' => $this->faker->firstName(),
             'contact_last_name' => 'Fixture',
-            'contact_phone' => '555-555-0' . $this->faker->numberBetween(100, 999),
+            'contact_phone' => '555-555-0'.$this->faker->numberBetween(100, 999),
             'summary' => 'Test summary for regression coverage.',
             'follow_up_completed' => false,
         ];

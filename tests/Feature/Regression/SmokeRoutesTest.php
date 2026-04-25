@@ -30,7 +30,7 @@ it('returns 200 for an authed admin on housing routes', function (string $path) 
     expect($response->status())->toBe(
         200,
         "GET {$path} returned {$response->status()}, expected 200. ".
-        "Body excerpt: ".substr(strip_tags((string) $response->getContent()), 0, 200)
+        'Body excerpt: '.substr(strip_tags((string) $response->getContent()), 0, 200)
     );
 })->with('housingRoutes')->group('regression');
 
@@ -42,7 +42,7 @@ it('returns 200 on the project detail page for a seeded job', function () {
     expect($response->status())->toBe(
         200,
         "GET /project/{$job->id}/manage returned {$response->status()}, expected 200. ".
-        "Body excerpt: ".substr(strip_tags((string) $response->getContent()), 0, 200)
+        'Body excerpt: '.substr(strip_tags((string) $response->getContent()), 0, 200)
     );
 })->group('regression');
 
@@ -62,4 +62,4 @@ it('GET /fund-codes returns 200 — pending fix for undefined route', function (
     $response = $this->actingAs($this->user)->get('/fund-codes');
     expect($response->status())->toBe(200);
 })->skip('Pre-existing: fund-code-management.blade.php:92 references undefined route "contracts.show". Tracked in PHASE_0_NOTES.md.')
-  ->group('regression');
+    ->group('regression');

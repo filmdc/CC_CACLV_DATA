@@ -66,7 +66,7 @@ class SnapshotHelper
             $expected,
             $normalized,
             "HTML differs from committed snapshot '{$name}.html'. "
-            ."If the change is intentional, re-run with REGRESSION_UPDATE_SNAPSHOTS=1 and commit the updated file."
+            .'If the change is intentional, re-run with REGRESSION_UPDATE_SNAPSHOTS=1 and commit the updated file.'
         );
     }
 

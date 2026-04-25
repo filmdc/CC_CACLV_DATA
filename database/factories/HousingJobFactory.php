@@ -19,8 +19,8 @@ class HousingJobFactory extends Factory
             'property_id' => Property::factory(),
             'program_id' => Program::factory(),
             'household_id' => null,
-            'job_number' => 'JOB-FIX-' . $this->faker->unique()->numberBetween(10000, 99999),
-            'job_title' => 'Fixture Job ' . $this->faker->words(2, true),
+            'job_number' => 'JOB-FIX-'.$this->faker->unique()->numberBetween(10000, 99999),
+            'job_title' => 'Fixture Job '.$this->faker->words(2, true),
             'job_description' => 'Test job description for regression coverage.',
             'request_date' => '2026-01-15',
             'status' => 'pending',
@@ -34,7 +34,7 @@ class HousingJobFactory extends Factory
     {
         return $this->state(fn () => [
             'is_template' => true,
-            'template_name' => 'Fixture Template ' . $this->faker->unique()->numberBetween(1, 999),
+            'template_name' => 'Fixture Template '.$this->faker->unique()->numberBetween(1, 999),
             'template_description' => 'Reusable template for regression tests.',
             'times_used' => 0,
         ]);

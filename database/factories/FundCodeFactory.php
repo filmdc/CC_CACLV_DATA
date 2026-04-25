@@ -12,8 +12,8 @@ class FundCodeFactory extends Factory
     public function definition(): array
     {
         return [
-            'code' => 'FC-' . $this->faker->unique()->numberBetween(1000, 9999),
-            'description' => 'Fixture Fund ' . $this->faker->words(2, true),
+            'code' => 'FC-'.$this->faker->unique()->numberBetween(1000, 9999),
+            'description' => 'Fixture Fund '.$this->faker->words(2, true),
             'contract_id' => null,
             'is_active' => true,
         ];

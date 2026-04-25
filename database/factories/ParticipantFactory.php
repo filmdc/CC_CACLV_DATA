@@ -19,7 +19,7 @@ class ParticipantFactory extends Factory
             'date_of_birth' => $this->faker->dateTimeBetween('-80 years', '-18 years')->format('Y-m-d'),
             'is_head_of_household' => false,
             'gender' => $this->faker->randomElement(['Male', 'Female', 'Non-binary', 'Other', 'Prefer not to say']),
-            'telephone' => '555-555-0' . $this->faker->numberBetween(100, 999),
+            'telephone' => '555-555-0'.$this->faker->numberBetween(100, 999),
             'email' => null,
             'employment_income' => $this->faker->randomFloat(2, 0, 60000),
         ];

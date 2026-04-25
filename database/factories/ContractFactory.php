@@ -16,11 +16,11 @@ class ContractFactory extends Factory
         $end = (clone $start)->modify('+1 year');
 
         return [
-            'title' => 'Fixture Contract ' . $this->faker->unique()->numberBetween(1000, 9999),
+            'title' => 'Fixture Contract '.$this->faker->unique()->numberBetween(1000, 9999),
             'program_id' => Program::factory(),
             'start_date' => $start->format('Y-m-d'),
             'end_date' => $end->format('Y-m-d'),
-            'contract_number' => 'CT-' . $this->faker->unique()->numberBetween(10000, 99999),
+            'contract_number' => 'CT-'.$this->faker->unique()->numberBetween(10000, 99999),
             'amount' => $this->faker->randomFloat(2, 10000, 500000),
             'archived' => false,
         ];

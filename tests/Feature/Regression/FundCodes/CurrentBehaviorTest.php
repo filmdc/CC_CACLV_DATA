@@ -1,7 +1,6 @@
 <?php
 
 use App\Livewire\FundCodeManagement;
-use App\Models\CommunicationLog;
 use App\Models\FundCode;
 use Database\Seeders\RegressionTestSeeder;
 use Livewire\Livewire;
