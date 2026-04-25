@@ -19,13 +19,13 @@ class Household extends Model
         'monthly_income',
         'annual_income',
         'hhs_poverty_percentage',
-        'notes'
+        'notes',
     ];
 
     protected $casts = [
         'monthly_income' => 'decimal:2',
         'annual_income' => 'decimal:2',
-        'hhs_poverty_percentage' => 'decimal:2'
+        'hhs_poverty_percentage' => 'decimal:2',
     ];
 
     public function participants(): HasMany
@@ -46,7 +46,7 @@ class Household extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
         static::creating(function ($household) {
             if (empty($household->household_code)) {
                 $household->household_code = static::generateHouseholdCode();
@@ -59,7 +59,7 @@ class Household extends Model
         do {
             $code = strtoupper(substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 7));
         } while (static::where('household_code', $code)->exists());
-        
+
         return $code;
     }
 
@@ -92,7 +92,7 @@ class Household extends Model
     {
         $actualCount = $this->getActualHouseholdSize();
         $manualSize = $this->household_size ?? 0;
-        
+
         // If actual count is greater than manual entry, update to actual count
         // Otherwise, keep the manual entry (staff attestation)
         if ($actualCount > $manualSize) {
@@ -103,7 +103,7 @@ class Household extends Model
     public function fixInflatedHouseholdSize(): void
     {
         $actualCount = $this->getActualHouseholdSize();
-        
+
         // For fixing existing data, we use the actual participant count
         // This corrects inflated counts from the old increment/decrement logic
         $this->update(['household_size' => $actualCount]);
@@ -113,18 +113,18 @@ class Household extends Model
     {
         $fixed = 0;
         $households = self::with('participants')->get();
-        
+
         foreach ($households as $household) {
             $actualCount = $household->getActualHouseholdSize();
             $recordedSize = $household->household_size ?? 0;
-            
+
             // Only fix if recorded size is greater than actual count (indicating inflation)
             if ($recordedSize > $actualCount) {
                 $household->fixInflatedHouseholdSize();
                 $fixed++;
             }
         }
-        
+
         return $fixed;
     }
 
@@ -136,14 +136,14 @@ class Household extends Model
         // First, mark any current address as not current
         $this->currentAddress?->update([
             'is_current' => false,
-            'end_date' => now()->format('Y-m-d')
+            'end_date' => now()->format('Y-m-d'),
         ]);
 
         // Create the new address
         return $this->addresses()->create(array_merge($addressData, [
             'is_current' => true,
             'effective_date' => now()->format('Y-m-d'),
-            'reason_for_change' => $reason
+            'reason_for_change' => $reason,
         ]));
     }
 
@@ -181,7 +181,7 @@ class Household extends Model
             'monthly_income',
             'annual_income',
             'hhs_poverty_percentage',
-            'notes'
+            'notes',
         ];
     }
 
@@ -195,7 +195,7 @@ class Household extends Model
             'household_code',
             'household_size',
             'created_at',
-            'updated_at'
+            'updated_at',
         ];
     }
 }

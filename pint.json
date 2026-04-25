@@ -1,0 +1,20 @@
+{
+    "preset": "laravel",
+    "exclude": [
+        "documents",
+        "node_modules",
+        "vendor",
+        "storage",
+        "bootstrap/cache",
+        "public",
+        "database/migrations",
+        "database/seeders",
+        "mcp-servers"
+    ],
+    "notName": [
+        "index.php",
+        "report_due_dates_migration_data.php",
+        "report_due_dates_with_emails.php",
+        "test-email.php"
+    ]
+}

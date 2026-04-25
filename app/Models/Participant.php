@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Carbon\Carbon;
 
 class Participant extends Model
 {
@@ -51,7 +51,7 @@ class Participant extends Model
         'csbg_age_group',
         'csbg_income_classification',
         'documentation_notes',
-        'notes'
+        'notes',
     ];
 
     protected $casts = [
@@ -72,7 +72,7 @@ class Participant extends Model
         'other_income_sources' => 'array',
         'non_cash_benefits' => 'array',
         'disability_types' => 'array',
-        'assistance_needs' => 'array'
+        'assistance_needs' => 'array',
     ];
 
     public function household(): BelongsTo
@@ -87,8 +87,9 @@ class Participant extends Model
 
     public function getFullNameAttribute(): string
     {
-        $name = trim($this->first_name . ' ' . $this->middle_name . ' ' . $this->last_name);
-        return $this->suffix ? $name . ' ' . $this->suffix : $name;
+        $name = trim($this->first_name.' '.$this->middle_name.' '.$this->last_name);
+
+        return $this->suffix ? $name.' '.$this->suffix : $name;
     }
 
     public function getAgeAttribute(): int
@@ -141,96 +142,123 @@ class Participant extends Model
     public function getCSBGAgeGroupAttribute(): string
     {
         $age = $this->age;
-        
-        if ($age >= 0 && $age <= 5) return '0-5';
-        if ($age >= 6 && $age <= 13) return '6-13';
-        if ($age >= 14 && $age <= 17) return '14-17';
-        if ($age >= 18 && $age <= 24) return '18-24';
-        if ($age >= 25 && $age <= 44) return '25-44';
-        if ($age >= 45 && $age <= 54) return '45-54';
-        if ($age >= 55 && $age <= 59) return '55-59';
-        if ($age >= 60 && $age <= 64) return '60-64';
-        if ($age >= 65 && $age <= 74) return '65-74';
-        if ($age >= 75) return '75+';
-        
+
+        if ($age >= 0 && $age <= 5) {
+            return '0-5';
+        }
+        if ($age >= 6 && $age <= 13) {
+            return '6-13';
+        }
+        if ($age >= 14 && $age <= 17) {
+            return '14-17';
+        }
+        if ($age >= 18 && $age <= 24) {
+            return '18-24';
+        }
+        if ($age >= 25 && $age <= 44) {
+            return '25-44';
+        }
+        if ($age >= 45 && $age <= 54) {
+            return '45-54';
+        }
+        if ($age >= 55 && $age <= 59) {
+            return '55-59';
+        }
+        if ($age >= 60 && $age <= 64) {
+            return '60-64';
+        }
+        if ($age >= 65 && $age <= 74) {
+            return '65-74';
+        }
+        if ($age >= 75) {
+            return '75+';
+        }
+
         return 'Unknown/not reported';
     }
 
     public function getIsDisconnectedYouthAttribute(): bool
     {
         $age = $this->age;
-        
+
         // Youth ages 14-24 who are neither working nor in school
         if ($age >= 14 && $age <= 24) {
             $isWorking = in_array($this->work_status, ['Employed Full-Time', 'Employed Part-Time']);
             $isInSchool = $this->currently_enrolled_in_education;
-            
-            return !$isWorking && !$isInSchool;
+
+            return ! $isWorking && ! $isInSchool;
         }
-        
+
         return false;
     }
 
     public function getCSBGIncomeClassificationAttribute(): string
     {
         $household = $this->household;
-        if (!$household) return 'Unknown/not reported';
-        
+        if (! $household) {
+            return 'Unknown/not reported';
+        }
+
         $householdParticipants = $household->participants;
-        
+
         // Helper function to safely get array from JSON field
-        $getArrayField = function($field) {
-            if (is_array($field)) return $field;
-            if (is_string($field)) return json_decode($field, true) ?? [];
+        $getArrayField = function ($field) {
+            if (is_array($field)) {
+                return $field;
+            }
+            if (is_string($field)) {
+                return json_decode($field, true) ?? [];
+            }
+
             return [];
         };
-        
-        $hasEmployment = $householdParticipants->some(function($p) use ($getArrayField) {
+
+        $hasEmployment = $householdParticipants->some(function ($p) use ($getArrayField) {
             return in_array('Employment', $getArrayField($p->income_sources));
         });
-        
-        $hasOtherIncome = $householdParticipants->some(function($p) use ($getArrayField) {
-            return !empty($getArrayField($p->other_income_sources));
+
+        $hasOtherIncome = $householdParticipants->some(function ($p) use ($getArrayField) {
+            return ! empty($getArrayField($p->other_income_sources));
         });
-        
-        $hasNonCashBenefits = $householdParticipants->some(function($p) use ($getArrayField) {
-            return !empty($getArrayField($p->non_cash_benefits));
+
+        $hasNonCashBenefits = $householdParticipants->some(function ($p) use ($getArrayField) {
+            return ! empty($getArrayField($p->non_cash_benefits));
         });
-        
+
         $hasAnyIncome = $hasEmployment || $hasOtherIncome;
-        
-        if (!$hasAnyIncome && !$hasNonCashBenefits) {
+
+        if (! $hasAnyIncome && ! $hasNonCashBenefits) {
             return 'No Income';
         }
-        
-        if (!$hasAnyIncome && $hasNonCashBenefits) {
+
+        if (! $hasAnyIncome && $hasNonCashBenefits) {
             return 'Non-Cash Benefits Only';
         }
-        
-        if ($hasEmployment && !$hasOtherIncome && !$hasNonCashBenefits) {
+
+        if ($hasEmployment && ! $hasOtherIncome && ! $hasNonCashBenefits) {
             return 'Income from Employment Only';
         }
-        
+
         if ($hasEmployment && $hasOtherIncome && $hasNonCashBenefits) {
             return 'Income from Employment, Other Income Source, and Non-Cash Benefits';
         }
-        
-        if ($hasEmployment && $hasNonCashBenefits && !$hasOtherIncome) {
+
+        if ($hasEmployment && $hasNonCashBenefits && ! $hasOtherIncome) {
             return 'Income from Employment and Non-Cash Benefits';
         }
-        
-        if ($hasEmployment && $hasOtherIncome && !$hasNonCashBenefits) {
+
+        if ($hasEmployment && $hasOtherIncome && ! $hasNonCashBenefits) {
             return 'Income from Employment and Other Income Source';
         }
-        
-        if (!$hasEmployment && $hasOtherIncome && $hasNonCashBenefits) {
+
+        if (! $hasEmployment && $hasOtherIncome && $hasNonCashBenefits) {
             return 'Other Income Source and Non-Cash Benefits';
         }
-        
-        if (!$hasEmployment && $hasOtherIncome && !$hasNonCashBenefits) {
+
+        if (! $hasEmployment && $hasOtherIncome && ! $hasNonCashBenefits) {
             return 'Other Income Source Only';
         }
-        
+
         return 'Unknown/not reported';
     }
 
@@ -308,7 +336,7 @@ class Participant extends Model
             'csbg_age_group',
             'csbg_income_classification',
             'documentation_notes',
-            'notes'
+            'notes',
         ];
     }
 
@@ -330,7 +358,7 @@ class Participant extends Model
             'telephone',
             'email',
             'created_at',
-            'updated_at'
+            'updated_at',
         ];
     }
 }

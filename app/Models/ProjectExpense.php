@@ -87,7 +87,7 @@ class ProjectExpense extends Model
 
     public function getFormattedAmountAttribute(): string
     {
-        return ($this->amount < 0 ? '-$' : '$') . number_format(abs($this->amount), 2);
+        return ($this->amount < 0 ? '-$' : '$').number_format(abs($this->amount), 2);
     }
 
     // Business Logic Methods
