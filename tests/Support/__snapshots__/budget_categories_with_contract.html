@@ -5,7 +5,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <div class="flex items-center space-x-3">
-                        <a href="http://captrack.caclv.org/projects" wire:navigate class="text-indigo-100 hover:text-white">
+                        <a href="__APP_URL__/projects" wire:navigate class="text-indigo-100 hover:text-white">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                             </svg>
@@ -20,12 +20,11 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <!--[if BLOCK]><![endif]-->                        <button wire:click="showEditProject"
+                                            <button wire:click="showEditProject"
                                 class="px-3 py-1 text-sm bg-white/20 hover:bg-white/30 text-white rounded-md border border-white/30">
                             ✏️ Edit Project
                         </button>
-                    <!--[if ENDBLOCK]><![endif]-->
-                    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+
                     <div class="text-right">
                         <div class="text-sm text-indigo-100">Program</div>
                         <div class="text-lg font-semibold">Fixture Housing Program</div>
@@ -35,8 +34,6 @@
         </div>
 
         <!-- Success/Error Messages -->
-        <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
-        <!--[if ENDBLOCK]><![endif]-->
 
         <!-- Project Info Summary Bar -->
         <div class="bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-700 px-6 py-3">
@@ -57,22 +54,21 @@
                         Medium
                     </span>
                 </div>
-                <!--[if BLOCK]><![endif]-->                    <div class="flex items-center">
+                                    <div class="flex items-center">
                         <span class="text-gray-500 dark:text-gray-400 mr-2">Contractor:</span>
                         <span class="text-gray-900 dark:text-white">Acme Fixture Construction</span>
                     </div>
-                <!--[if ENDBLOCK]><![endif]-->
-                <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
-                <!--[if BLOCK]><![endif]-->                    <div class="flex items-center">
+
+                                    <div class="flex items-center">
                         <span class="text-gray-500 dark:text-gray-400 mr-2">Est. Cost:</span>
                         <span class="text-gray-900 dark:text-white">$30,000.00</span>
                     </div>
-                <!--[if ENDBLOCK]><![endif]-->
+
                 <div class="flex-1"></div>
-                <!--[if BLOCK]><![endif]-->                    <button wire:click="showEditProject" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 text-sm font-medium">
+                                    <button wire:click="showEditProject" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 text-sm font-medium">
                         Edit Details
                     </button>
-                <!--[if ENDBLOCK]><![endif]-->
+
             </div>
         </div>
 
@@ -96,7 +92,7 @@
 
         <!-- Tab Content -->
         <div class="p-6">
-            <!--[if BLOCK]><![endif]-->                <!-- Milestones Tab -->
+                            <!-- Milestones Tab -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Left: Milestone List -->
                     <div class="lg:col-span-1">
@@ -108,7 +104,7 @@
                             </button>
                         </div>
 
-                        <!--[if BLOCK]><![endif]-->                            <div class="text-center py-12 bg-gray-50 dark:bg-zinc-700 rounded-lg">
+                                                    <div class="text-center py-12 bg-gray-50 dark:bg-zinc-700 rounded-lg">
                                 <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                                 </svg>
@@ -118,49 +114,39 @@
                                     Create First Milestone
                                 </button>
                             </div>
-                        <!--[if ENDBLOCK]><![endif]-->
+
                     </div>
 
                     <!-- Right: Tasks & Documents -->
                     <div class="lg:col-span-2">
-                        <!--[if BLOCK]><![endif]-->                            <div class="lg:col-span-2 text-center py-12 text-gray-500 dark:text-gray-400">
+                                                    <div class="lg:col-span-2 text-center py-12 text-gray-500 dark:text-gray-400">
                                 Select a milestone to view its tasks and documents
                             </div>
-                        <!--[if ENDBLOCK]><![endif]-->
+
                     </div>
                 </div>
-            <!--[if ENDBLOCK]><![endif]-->
+
         </div>
     </div>
 
     <!-- Milestone Form Modal -->
-    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
 
     <!-- Task Form Modal -->
-    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
 
     <!-- Document Form Modal -->
-    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
 
     <!-- Budget Form Modal -->
-    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
 
     <!-- Expense Form Modal -->
-    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
 
     <!-- Edit Project Modal -->
-    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
 
     <!-- Quick Participant Creation Modal -->
-    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
 
     <!-- Save as Template Modal -->
-    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
 
     <!-- Document Upload Modal -->
-    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
 
     <!-- Document Viewer/Review Modal -->
-    <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
 
 </div>

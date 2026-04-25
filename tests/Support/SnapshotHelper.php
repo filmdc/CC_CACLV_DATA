@@ -73,6 +73,14 @@ class SnapshotHelper
     public static function normalize(string $html): string
     {
         $patterns = [
+            // APP_URL host — varies between local dev (captrack.caclv.org) and
+            // CI (localhost). Mask the scheme+host of any absolute URL so
+            // snapshots are environment-portable.
+            '#https?://[^/"\'\s<>]+#' => '__APP_URL__',
+            // Livewire 3 conditional render markers. These are framework
+            // internals and emit/strip differently across environments
+            // (debug mode, view cache state). Drop them.
+            '/<!--\[if (?:BLOCK|ENDBLOCK)\]><!\[endif\]-->/' => '',
             // Livewire identifiers — regenerated every render.
             '/wire:id="[^"]*"/' => 'wire:id=""',
             '/wire:snapshot="[^"]*"/' => 'wire:snapshot=""',
