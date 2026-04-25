@@ -869,11 +869,14 @@
                             this.search = '';
                         }
                     }" class="relative">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Funding Source (Contract)</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Funding Source (Contract)
+                            <span class="text-gray-500 dark:text-gray-400 font-normal">— Optional</span>
+                        </label>
                         <div class="relative">
                             <button type="button" @click="open = !open"
                                     class="w-full px-3 py-2 text-left border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md flex items-center justify-between">
-                                <span x-show="!selectedContract" class="text-gray-400">Select a contract (optional)</span>
+                                <span x-show="!selectedContract" class="text-gray-400">No contract — leave blank or pick one</span>
                                 <span x-show="selectedContract" class="truncate" x-text="selectedContract ? (selectedContract.title + (selectedContract.grant_code ? ' (' + selectedContract.grant_code + ')' : '')) : ''"></span>
                                 <div class="flex items-center space-x-1">
                                     <button type="button" x-show="selectedContract" @click.stop="clear()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
@@ -912,7 +915,7 @@
                                 </ul>
                             </div>
                         </div>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Associate this budget with a funding source</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Optional. Leave blank to create a budget category with just a category name and amount.</p>
                         @error('budget_contract_id') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
                     </div>
                 </div>
