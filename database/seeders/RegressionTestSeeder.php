@@ -14,12 +14,23 @@ use App\Models\ProjectBudget;
 use App\Models\ProjectExpense;
 use App\Models\ProjectMilestone;
 use App\Models\Property;
+use Database\Seeders\CommunicationsLogPermissionsSeeder;
+use Database\Seeders\FundCodePermissionsSeeder;
+use Database\Seeders\ProjectHousingPermissionsSeeder;
 use Illuminate\Database\Seeder;
 
 class RegressionTestSeeder extends Seeder
 {
     public function run(): void
     {
+        // Permission rows the housing module's components check at mount().
+        // Idempotent: each of these seeders uses firstOrCreate / updateOrCreate.
+        $this->call([
+            CommunicationsLogPermissionsSeeder::class,
+            FundCodePermissionsSeeder::class,
+            ProjectHousingPermissionsSeeder::class,
+        ]);
+
         $program = Program::factory()->create([
             'name' => 'Fixture Housing Program',
             'description' => 'Deterministic seed program for P-33 regression harness.',
