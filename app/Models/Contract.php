@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\Auditable;
 use App\Traits\HasLegacySyncScopes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -16,7 +17,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Contract extends Model implements HasMedia
 {
-    use SoftDeletes, InteractsWithMedia, Auditable, HasLegacySyncScopes;
+    use SoftDeletes, InteractsWithMedia, Auditable, HasFactory, HasLegacySyncScopes;
 
     protected $fillable = [
         'title',
