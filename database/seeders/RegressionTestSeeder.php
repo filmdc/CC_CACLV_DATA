@@ -216,6 +216,8 @@ class RegressionTestSeeder extends Seeder
             'request_date' => '2026-03-04',
             'estimated_cost' => 12000.00,
             'is_template' => false,
+            'created_at' => '2026-03-04 10:00:00',
+            'updated_at' => '2026-03-04 10:00:00',
         ]);
 
         $cl4 = CommunicationLog::factory()->create([
@@ -253,6 +255,8 @@ class RegressionTestSeeder extends Seeder
             'start_date' => '2026-02-01',
             'estimated_cost' => 18500.00,
             'is_template' => false,
+            'created_at' => '2026-01-15 11:00:00',
+            'updated_at' => '2026-02-01 09:00:00',
         ]);
 
         ProjectMilestone::factory()->completed()->create([
@@ -318,6 +322,8 @@ class RegressionTestSeeder extends Seeder
             'estimated_cost' => 22000.00,
             'actual_cost' => 21500.00,
             'is_template' => false,
+            'created_at' => '2025-10-01 09:00:00',
+            'updated_at' => '2026-02-15 16:00:00',
         ]);
 
         foreach (['Inspection', 'Permits', 'Construction', 'Final Walkthrough'] as $j => $name) {
@@ -347,6 +353,8 @@ class RegressionTestSeeder extends Seeder
             'start_date' => '2026-02-15',
             'estimated_cost' => 30000.00,
             'is_template' => false,
+            'created_at' => '2026-04-01 09:00:00',
+            'updated_at' => '2026-04-01 09:00:00',
         ]);
 
         ProjectBudget::factory()->create([
