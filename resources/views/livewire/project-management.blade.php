@@ -216,6 +216,9 @@
                                         @if($currentMilestone->description)
                                             <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ $currentMilestone->description }}</p>
                                         @endif
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                            Started: {{ $currentMilestone->started_at?->format('M d, Y g:i A') ?: '—' }}
+                                        </p>
                                     </div>
                                     <div class="flex items-center space-x-2">
                                         @if($currentMilestone->status !== 'completed')

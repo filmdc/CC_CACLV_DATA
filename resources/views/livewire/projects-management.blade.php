@@ -210,6 +210,9 @@
                                     <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                         {{ $currentMilestone->completion_percentage }}% complete
                                     </div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                                        Started: {{ $currentMilestone->started_at?->format('M d, Y') ?: '—' }}
+                                    </div>
                                 @else
                                     <a href="{{ route('project.management', $project->id) }}" wire:navigate
                                        class="text-xs text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">

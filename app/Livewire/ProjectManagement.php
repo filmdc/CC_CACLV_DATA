@@ -328,6 +328,8 @@ class ProjectManagement extends Component
 
         if ($status === 'completed') {
             $milestone->markAsCompleted();
+        } elseif ($status === 'in_progress') {
+            $milestone->markAsInProgress();
         } else {
             $milestone->status = $status;
             $milestone->save();

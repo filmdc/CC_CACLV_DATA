@@ -21,6 +21,7 @@ class ProjectMilestone extends Model implements HasMedia
         'status',
         'target_date',
         'completed_date',
+        'started_at',
         'icon',
         'color',
         'created_by',
@@ -30,6 +31,7 @@ class ProjectMilestone extends Model implements HasMedia
     protected $casts = [
         'target_date' => 'date',
         'completed_date' => 'date',
+        'started_at' => 'datetime',
         'sequence_order' => 'integer',
     ];
 
@@ -168,18 +170,33 @@ class ProjectMilestone extends Model implements HasMedia
         $this->completed_date = now();
         $this->save();
 
-        // Auto-start next milestone if exists
+        // Auto-start next milestone if exists, routing through
+        // markAsInProgress so its started_at is stamped consistently with
+        // user-initiated transitions (P-19).
         $nextMilestone = self::where('housing_job_id', $this->housing_job_id)
             ->where('sequence_order', $this->sequence_order + 1)
             ->where('status', 'not_started')
             ->first();
 
-        if ($nextMilestone) {
-            $nextMilestone->status = 'in_progress';
-            $nextMilestone->save();
-        }
+        $nextMilestone?->markAsInProgress();
 
         return true;
+    }
+
+    /**
+     * P-19: move this milestone to in_progress and stamp started_at.
+     * Once stamped, started_at is preserved across re-transitions
+     * (in_progress → not_started → in_progress doesn't overwrite the
+     * original timestamp).
+     */
+    public function markAsInProgress(): bool
+    {
+        $this->status = 'in_progress';
+        if ($this->started_at === null) {
+            $this->started_at = now();
+        }
+
+        return $this->save();
     }
 
     public function getPendingTasksCount(): int
