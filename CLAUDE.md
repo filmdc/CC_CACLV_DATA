@@ -59,9 +59,10 @@ php artisan test                          # Run all tests
 php artisan test --filter TestClassName   # Run specific test class
 php artisan test tests/Feature/file.php   # Run specific test file
 ```
-- Uses **Pest PHP** testing framework (extends PHPUnit)
-- Tests run against in-memory SQLite database
-- RefreshDatabase trait is commented out in `tests/Pest.php` (uncomment if needed)
+- Uses **Pest PHP 3.8** (+ `pest-plugin-laravel`, extends PHPUnit)
+- Tests run against **MySQL** database `CC_CACLV_DATA_test` on the local server, routed via `phpunit.xml` env overrides (there is deliberately NO `.env.testing` — overrides apply only to `php artisan test`)
+- `RefreshDatabase` trait is applied **globally** to `tests/Feature` in `tests/Pest.php`
+- Regression harness: `./bin/run-regression.sh` runs only `->group('regression')` tests — see `REGRESSION_HARNESS.md`
 
 ### Code Quality
 ```bash
@@ -230,26 +231,34 @@ class ComponentManagement extends Component
 - `Role` → belongsToMany → `Permission` (via pivot)
 - Program-specific access via `UserProgram`
 
-#### Housing Module (Branch: housing-rehab-job-tracking)
-**Status: Database Layer Complete, UI Layer Not Started**
+#### Housing Module
+**Status: UI complete, in daily production use. Work happens on `main`.**
+
+Core Livewire components:
+- `CommunicationsLogManagement` (`/communications-log`) — entry intake + multi-step `convertToProject()` flow
+- `ProjectsManagement` (`/projects`) — list view with filters and template library modal
+- `ProjectManagement` (`/project/{id}/manage`) — detail view: milestones, tasks, budget categories, expenses, documents
+- `PropertyManagement` (`/property-management`), `ContractorManagement` (`/contractor-management`), `FundCodeManagement` (`/fund-codes`)
 
 Models & Relationships:
 - `Property` → belongsTo → `Participant`, `Household`, `Program`
 - `Contractor` → hasMany → `HousingJobs`, `ContractorDocuments`
-- `HousingJob` → belongsTo → `Property`, `Contractor`, `Participant`, `Household`
-- `HousingJob` → hasMany → `JobContactLedgers`, `JobDocumentChecklists`, `ServiceEnrollments`
+- `HousingJob` → belongsTo → `Property`, `Contractor`, `Participant`, `Household`, `Program`
+- `HousingJob` → hasMany → `ProjectMilestones`, `ProjectBudgets`, `ProjectExpenses`, `JobContactLedgers`, `JobDocumentChecklists`
 - `Property` → hasMany → `PropertyNotes`, `PropertyDocuments`, `HousingJobs`
+- `CommunicationLog` → belongsToMany → `FundCodes` (pivot `communication_log_fund_code`)
 
 Housing Module Features:
 - Program-level activation flag (`housing_module_enabled`)
 - Property management with types (rental, owner-occupied, facade)
 - Contractor tracking with licensing and insurance
-- Job tracking with auto-generated numbers (format: YYYYMMDD-XXXX)
+- Job tracking with auto-generated numbers (current format: `JOB-YYYY-#####`)
 - Contact ledger for outreach tracking
 - Document checklist for compliance
-- Integration with existing services and work plan goals
+- Budget categories + expenses (`ProjectExpense` auto-updates `ProjectBudget.spent_amount` via a booted observer)
+- Templates: implemented as `HousingJob` rows with `is_template=true` + the `HousingJob::templates()` scope + `HousingJob::createFromTemplate()` static (NOT a separate `ProjectTemplate` model)
 
-**TODO: Add HousingModuleSeeder to DatabaseSeeder before running migrations**
+`HousingModuleSeeder` and `ProjectHousingPermissionsSeeder` are wired up in `DatabaseSeeder`.
 
 ### Key Features
 - 7-digit alphanumeric household codes (auto-generated)
@@ -311,7 +320,7 @@ Housing Module Features:
 4. **Permission Naming**: Follow pattern `resource.action` (e.g., `participants.create`)
 5. **Dark Mode First**: All new UI must include dark mode variants
 6. **CSBG Compliance**: Participant data must maintain CSBG field requirements
-7. **Housing Module**: Currently on `housing-rehab-job-tracking` branch with database layer complete but UI not implemented
+7. **Housing Module**: UI complete and in daily production use; work happens on `main`. Templates are `HousingJob` rows flagged `is_template=true`, not a separate model. Regression harness lives in `tests/Feature/Regression/` — run with `./bin/run-regression.sh` before every merge.
 
 ## Current Implementation Status
 
@@ -320,23 +329,12 @@ Housing Module Features:
 - `.htaccess` and `index.php` moved to root directory
 - MySQL database: `CC_CACLV_DATA`
 
-### Pending Tasks
-1. **Housing Module UI Implementation**:
-   - PropertyManagement Livewire component (empty stub exists)
-   - ContractorManagement component (not created)
-   - HousingJobManagement component (not created)
-   - Document upload functionality
-   - Job workflow with phase management
-   - Routes and navigation items
-
-2. **Integration Tasks**:
-   - Add `HousingModuleSeeder::class` to DatabaseSeeder
-   - Add housing navigation items to sidebar (conditional on `housing_module_enabled`)
-   - Implement permission checks in housing components
-
-3. **Testing**:
-   - No tests written for housing module yet
-   - Need feature tests for all housing components
+### Recent work areas
+- **Fund View** (tuple-level / fund-keyed dashboards, GL account exclusions)
+- **Sage Intacct sync** (gifts, budgets, expenses, deposit dates)
+- **DonorPerfect sync** (code discovery, batch feeds, cache invalidation)
+- **Approvals portal** (`approvals.caclv.org` — see the Mobile Approvals section below)
+- **Regression harness** (`tests/Feature/Regression/` — Phase 0 / P-33; see `REGRESSION_HARNESS.md` and `PHASE_0_NOTES.md`)
 
 ## Mobile Approvals Portal (approvals.caclv.org)
 
