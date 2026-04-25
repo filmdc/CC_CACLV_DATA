@@ -178,6 +178,31 @@ class HousingJob extends Model
         return $this->hasOne(ProjectContact::class)->where('is_primary', true);
     }
 
+    public function communicationLogs(): HasMany
+    {
+        return $this->hasMany(CommunicationLog::class, 'housing_job_id');
+    }
+
+    public function originatingCommunicationLogs(): HasMany
+    {
+        return $this->hasMany(CommunicationLog::class, 'converted_to_job_id');
+    }
+
+    /**
+     * Fund codes attached to any communication log that references this job
+     * (either via housing_job_id or converted_to_job_id), deduped by id.
+     * Phase 1 surfaces what already exists; Phase 2 (P-05) will introduce a
+     * managed project↔fund_code link.
+     */
+    public function getDerivedFundCodesAttribute()
+    {
+        return $this->communicationLogs
+            ->merge($this->originatingCommunicationLogs)
+            ->flatMap->fundCodes
+            ->unique('id')
+            ->values();
+    }
+
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
