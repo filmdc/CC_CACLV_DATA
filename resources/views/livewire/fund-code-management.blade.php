@@ -89,7 +89,7 @@
                             </td>
                             <td class="px-6 py-4">
                                 @if($fundCode->contract)
-                                    <a href="{{ route('contracts.show', $fundCode->contract_id) }}"
+                                    <a href="{{ route('contract.show', $fundCode->contract_id) }}"
                                        class="text-indigo-600 dark:text-indigo-400 hover:underline text-sm">
                                         {{ $fundCode->contract->title }}
                                         @if($fundCode->contract->contract_number)
