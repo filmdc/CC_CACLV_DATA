@@ -6,6 +6,7 @@ use App\Services\MilestoneApprovalService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Auth;
@@ -36,6 +37,7 @@ class HousingJob extends Model
         'approved_amount',
         'actual_cost',
         'funding_source',
+        'primary_fund_code_id',
         'work_order_number',
         'contract_number',
         'scope_of_work',
@@ -71,6 +73,39 @@ class HousingJob extends Model
         static::creating(function ($job) {
             if (empty($job->job_number)) {
                 $job->job_number = self::generateJobNumber();
+            }
+        });
+
+        // P-08 invariant: when primary_fund_code_id is set, the same fund
+        // code must already be in the fund_code_housing_job pivot for this
+        // project. Catches mass-assignment / tinker / console paths that
+        // bypass the setPrimaryFundCode() helper.
+        //
+        // NOTE: detach-side enforcement is NOT in this model. If a code is
+        // detached via $job->fundCodes()->detach() without going through
+        // the Livewire ProjectManagement::detachFundCode() method,
+        // primary_fund_code_id can dangle until the next save. The
+        // Livewire layer is the only mutation path in Phase 2 so this is
+        // acceptable; if a future console command or admin API exposes
+        // pivot mutation, promote the detach enforcement here.
+        static::saving(function ($job) {
+            if (! $job->isDirty('primary_fund_code_id')) {
+                return;
+            }
+            if ($job->primary_fund_code_id === null) {
+                return;
+            }
+
+            $attached = DB::table('fund_code_housing_job')
+                ->where('housing_job_id', $job->id)
+                ->where('fund_code_id', $job->primary_fund_code_id)
+                ->exists();
+
+            if (! $attached) {
+                $jobLabel = $job->id ?? 'new';
+                throw new \InvalidArgumentException(
+                    "Cannot set primary_fund_code_id={$job->primary_fund_code_id} on housing job {$jobLabel}: that fund code is not attached to the project. Use HousingJob::setPrimaryFundCode() to attach-and-set safely, or attach the fund code via fundCodes()->attach() first."
+                );
             }
         });
     }
@@ -198,6 +233,38 @@ class HousingJob extends Model
     public function originatingCommunicationLogs(): HasMany
     {
         return $this->hasMany(CommunicationLog::class, 'converted_to_job_id');
+    }
+
+    /**
+     * Fund codes directly assigned to this project. P-08: replaces the
+     * Phase 1 derived-from-comm-log accessor.
+     */
+    public function fundCodes(): BelongsToMany
+    {
+        return $this->belongsToMany(FundCode::class, 'fund_code_housing_job')
+            ->withTimestamps();
+    }
+
+    /**
+     * The single fund code (if any) flagged as primary for this project.
+     * The saving-event guard above ensures this can only be set to a code
+     * that is also in the fundCodes() pivot.
+     */
+    public function primaryFundCode(): BelongsTo
+    {
+        return $this->belongsTo(FundCode::class, 'primary_fund_code_id');
+    }
+
+    /**
+     * Attach (idempotent) and mark a fund code as primary in one shot.
+     * Use this from any code path that mutates the primary FK; bypassing
+     * it via direct property assignment will hit the saving-event guard.
+     */
+    public function setPrimaryFundCode(FundCode $code): void
+    {
+        $this->fundCodes()->syncWithoutDetaching([$code->id]);
+        $this->primary_fund_code_id = $code->id;
+        $this->save();
     }
 
     /**
