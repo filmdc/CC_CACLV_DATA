@@ -81,13 +81,16 @@ class HousingJob extends Model
         // project. Catches mass-assignment / tinker / console paths that
         // bypass the setPrimaryFundCode() helper.
         //
-        // NOTE: detach-side enforcement is NOT in this model. If a code is
-        // detached via $job->fundCodes()->detach() without going through
-        // the Livewire ProjectManagement::detachFundCode() method,
-        // primary_fund_code_id can dangle until the next save. The
-        // Livewire layer is the only mutation path in Phase 2 so this is
-        // acceptable; if a future console command or admin API exposes
-        // pivot mutation, promote the detach enforcement here.
+        // NOTE: detach-side enforcement of (a) the primary FK invariant
+        // and (b) the P-2.5 budget-row invariant (no detaching a code that
+        // a budget row references) lives in HousingJob::detachFundCode()
+        // below. The Livewire ProjectManagement::detachFundCode() routes
+        // through it. A console / tinker caller that bypasses both via
+        // $this->fundCodes()->detach() directly retains the blind spot —
+        // primary_fund_code_id can dangle AND project_budgets.fund_code_id
+        // can orphan. If we ever expose pivot mutation outside Livewire
+        // (a console command, an admin API, etc.), promote the
+        // budget-and-primary checks to a model event on the pivot itself.
         static::saving(function ($job) {
             if (! $job->isDirty('primary_fund_code_id')) {
                 return;
@@ -265,6 +268,46 @@ class HousingJob extends Model
         $this->fundCodes()->syncWithoutDetaching([$code->id]);
         $this->primary_fund_code_id = $code->id;
         $this->save();
+    }
+
+    /**
+     * P-2.5 detach guard: refuse to detach a fund code that any
+     * project_budgets row references. The error message lists the
+     * affected category names so the operator can re-assign them
+     * before retrying. If the detached code was primary, primary_fund_code_id
+     * is cleared in the same call.
+     *
+     * The Livewire ProjectManagement::detachFundCode() routes through
+     * this helper. Direct $this->fundCodes()->detach($id) calls bypass
+     * both the budget-row check AND the primary-clear — see the
+     * blind-spot note on the saving guard above.
+     *
+     * @throws \InvalidArgumentException when one or more budget rows
+     *                                   on this project reference the fund code being detached.
+     */
+    public function detachFundCode(int $id): void
+    {
+        $referencingCategories = ProjectBudget::where('housing_job_id', $this->id)
+            ->where('fund_code_id', $id)
+            ->pluck('category')
+            ->all();
+
+        if (! empty($referencingCategories)) {
+            $list = '"'.implode('", "', $referencingCategories).'"';
+            $noun = count($referencingCategories) === 1 ? 'category' : 'categories';
+            throw new \InvalidArgumentException(
+                "Cannot detach fund code {$id} from housing job {$this->id}: "
+                ."referenced by budget {$noun} {$list}. Re-assign or delete "
+                .'those rows first.'
+            );
+        }
+
+        $this->fundCodes()->detach($id);
+
+        if ((int) $this->primary_fund_code_id === $id) {
+            $this->primary_fund_code_id = null;
+            $this->save();
+        }
     }
 
     public function createdBy(): BelongsTo

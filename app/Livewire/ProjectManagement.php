@@ -1180,15 +1180,17 @@ class ProjectManagement extends Component
     {
         $this->authorizeAction('projects.manage');
 
-        // Detach the pivot row first so the saving-event guard on
-        // HousingJob accepts the primary clear that follows. If the
-        // detached code WAS primary, clear primary_fund_code_id; the guard
-        // permits null primaries unconditionally.
-        $this->job->fundCodes()->detach($id);
+        // Routes through HousingJob::detachFundCode() which enforces both
+        // the primary-clear and the P-2.5 budget-row guard (no detaching a
+        // code that any budget row references). The model throws an
+        // InvalidArgumentException with the affected category names; we
+        // surface it as a session flash so the manager sees what to fix.
+        try {
+            $this->job->detachFundCode($id);
+        } catch (\InvalidArgumentException $e) {
+            session()->flash('error', $e->getMessage());
 
-        if ((int) $this->job->primary_fund_code_id === $id) {
-            $this->job->primary_fund_code_id = null;
-            $this->job->save();
+            return;
         }
 
         $this->refreshJob();
