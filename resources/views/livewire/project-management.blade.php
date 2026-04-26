@@ -531,10 +531,9 @@
                                             <tr>
                                                 <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">{{ $budget->category }}</td>
                                                 <td class="px-4 py-3">
-                                                    {{-- P-22: prominent fund-code badge. Prefer the budget's own
-                                                         contract grant_code; fall back to fund codes derived from the
-                                                         project's communication logs.
-                                                         TODO(Phase 2: P-05): replace with managed budget↔fund_code link. --}}
+                                                    {{-- P-22 / P-08: prominent fund-code badge. Prefer the budget's own
+                                                         contract grant_code; fall back to fund codes directly assigned
+                                                         to the project via the fund_code_housing_job pivot. --}}
                                                     @if($budget->contract && $budget->contract->grant_code)
                                                         <span class="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" title="{{ $budget->contract->title }}">
                                                             {{ $budget->contract->grant_code }}
@@ -543,9 +542,9 @@
                                                         <span class="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" title="{{ $budget->contract->title }}">
                                                             {{ Str::limit($budget->contract->title, 20) }}
                                                         </span>
-                                                    @elseif($job->derived_fund_codes->isNotEmpty())
+                                                    @elseif($job->fundCodes->isNotEmpty())
                                                         <span class="text-sm text-gray-700 dark:text-gray-200 font-medium">
-                                                            {{ $job->derived_fund_codes->pluck('code')->implode(', ') }}
+                                                            {{ $job->fundCodes->pluck('code')->implode(', ') }}
                                                         </span>
                                                     @else
                                                         <span class="text-sm text-gray-400 dark:text-gray-500">—</span>

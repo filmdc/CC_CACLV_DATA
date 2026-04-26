@@ -570,7 +570,7 @@ class ProjectsManagement extends Component
 
         $projects = HousingJob::query()
             ->activeJobs() // Exclude templates by default
-            ->with(['program', 'service', 'participant', 'property', 'contractor', 'milestones.tasks', 'budgets', 'communicationLogs.fundCodes', 'originatingCommunicationLogs.fundCodes'])
+            ->with(['program', 'service', 'participant', 'property', 'contractor', 'milestones.tasks', 'budgets', 'fundCodes'])
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->where('job_title', 'like', '%'.$this->search.'%')

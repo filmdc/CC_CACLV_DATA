@@ -1172,10 +1172,10 @@ class ProjectManagement extends Component
             // (previously the relation was unloaded until the next refresh).
             'budgets.contract',
             'expenses.document',
-            // P-22 fallback: when a budget has no contract, surface fund
-            // codes from this project's associated communication logs.
-            'communicationLogs.fundCodes',
-            'originatingCommunicationLogs.fundCodes',
+            // P-22 / P-08 fallback: when a budget has no contract, surface
+            // fund codes directly assigned to this project via the
+            // fund_code_housing_job pivot.
+            'fundCodes',
         ])->findOrFail($this->jobId);
 
         // Fix any inconsistent document states (e.g., status is 'pending_review' but no files)

@@ -187,14 +187,9 @@
                                 </div>
                             </td>
                             <td class="px-4 py-2">
-                                @php
-                                    // TODO(Phase 2: P-05): replace derived-from-comm-logs with managed
-                                    // project↔fund_code link supporting a primary designation.
-                                    $derivedFundCodes = $project->derived_fund_codes;
-                                @endphp
-                                @if($derivedFundCodes->isNotEmpty())
+                                @if($project->fundCodes->isNotEmpty())
                                     <span class="text-sm text-gray-900 dark:text-white">
-                                        {{ $derivedFundCodes->pluck('code')->implode(', ') }}
+                                        {{ $project->fundCodes->pluck('code')->implode(', ') }}
                                     </span>
                                 @else
                                     <span class="text-sm text-gray-400">—</span>

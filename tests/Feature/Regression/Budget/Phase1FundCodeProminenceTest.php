@@ -1,7 +1,6 @@
 <?php
 
 use App\Livewire\ProjectManagement;
-use App\Models\CommunicationLog;
 use App\Models\Contract;
 use App\Models\FundCode;
 use App\Models\HousingJob;
@@ -39,8 +38,10 @@ it('renders the contract grant_code as a prominent badge when present (P-22)', f
     expect($html)->toContain('text-sm font-semibold');
 })->group('regression');
 
-it('falls back to derived comm-log fund codes when budget has no contract (P-22)', function () {
-    // Job with a budget but no contract; comm log brings two fund codes.
+it('falls back to project-assigned fund codes when budget has no contract (P-22 / P-08)', function () {
+    // Job with a budget but no contract; project has two fund codes
+    // attached directly via the fund_code_housing_job pivot (Phase 2 / P-08
+    // representation — replaces the Phase 1 comm-log-derived fallback).
     $job = HousingJob::factory()->create();
     ProjectBudget::factory()->create([
         'housing_job_id' => $job->id,
@@ -51,9 +52,7 @@ it('falls back to derived comm-log fund codes when budget has no contract (P-22)
 
     $codeA = FundCode::factory()->create(['code' => 'FC-PROM-A']);
     $codeB = FundCode::factory()->create(['code' => 'FC-PROM-B']);
-
-    $log = CommunicationLog::factory()->create(['housing_job_id' => $job->id]);
-    $log->fundCodes()->attach([$codeA->id, $codeB->id]);
+    $job->fundCodes()->attach([$codeA->id, $codeB->id]);
 
     $html = Livewire::actingAs($this->user)
         ->test(ProjectManagement::class, ['id' => $job->id])
@@ -67,7 +66,7 @@ it('falls back to derived comm-log fund codes when budget has no contract (P-22)
     expect($html)->not->toContain('(from comm logs)');
 })->group('regression');
 
-it('renders an em-dash when budget has neither contract nor comm-log fund codes (P-22)', function () {
+it('renders an em-dash when budget has neither contract nor project fund codes (P-22)', function () {
     $job = HousingJob::factory()->create();
     ProjectBudget::factory()->create([
         'housing_job_id' => $job->id,
