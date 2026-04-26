@@ -38,32 +38,35 @@ it('renders the contract grant_code as a prominent badge when present (P-22)', f
     expect($html)->toContain('text-sm font-semibold');
 })->group('regression');
 
-it('falls back to project-assigned fund codes when budget has no contract (P-22 / P-08)', function () {
-    // Job with a budget but no contract; project has two fund codes
-    // attached directly via the fund_code_housing_job pivot (Phase 2 / P-08
-    // representation — replaces the Phase 1 comm-log-derived fallback).
+it('row shows its own fund code via the new per-row column (P-22 / P-2.5)', function () {
+    // Phase 2.5: each budget row owns its fund code via fund_code_id.
+    // The row cell renders that code regardless of whether the project
+    // has other codes attached. The Phase 2 fallback to the project-wide
+    // code list was removed — for legacy NULL+NULL rows, "—" is the
+    // honest answer.
     $job = HousingJob::factory()->create();
+    $code = FundCode::factory()->create(['code' => 'FC-OWN-001']);
+    $job->fundCodes()->attach($code->id);
+
     ProjectBudget::factory()->create([
         'housing_job_id' => $job->id,
         'contract_id' => null,
-        'category' => 'Misc',
+        'fund_code_id' => $code->id,
+        'category' => 'Owned',
         'budgeted_amount' => 1000,
     ]);
-
-    $codeA = FundCode::factory()->create(['code' => 'FC-PROM-A']);
-    $codeB = FundCode::factory()->create(['code' => 'FC-PROM-B']);
-    $job->fundCodes()->attach([$codeA->id, $codeB->id]);
 
     $html = Livewire::actingAs($this->user)
         ->test(ProjectManagement::class, ['id' => $job->id])
         ->set('activeTab', 'budget')
         ->html();
 
-    expect($html)->toContain('FC-PROM-A');
-    expect($html)->toContain('FC-PROM-B');
-    // No provenance label — codes render flat, as the project's fund codes.
-    expect($html)->not->toContain('from comm log');
-    expect($html)->not->toContain('(from comm logs)');
+    // Carve out the tbody so the assertion is specifically about the
+    // budget row, not the Fund Codes assignment section above the tabs
+    // (which would also surface the same code string).
+    preg_match('#<tbody[^>]*>(.*?)</tbody>#s', $html, $matches);
+    $tbody = $matches[1] ?? '';
+    expect($tbody)->toContain('FC-OWN-001');
 })->group('regression');
 
 it('renders an em-dash when budget has neither contract nor project fund codes (P-22)', function () {
