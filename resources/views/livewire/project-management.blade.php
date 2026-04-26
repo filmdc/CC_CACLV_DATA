@@ -530,13 +530,25 @@
                                         @foreach($job->budgets as $budget)
                                             <tr>
                                                 <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">{{ $budget->category }}</td>
-                                                <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                                                    @if($budget->contract)
-                                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300" title="{{ $budget->contract->title }}">
-                                                            {{ $budget->contract->grant_code ?: Str::limit($budget->contract->title, 15) }}
+                                                <td class="px-4 py-3">
+                                                    {{-- P-22: prominent fund-code badge. Prefer the budget's own
+                                                         contract grant_code; fall back to fund codes derived from the
+                                                         project's communication logs.
+                                                         TODO(Phase 2: P-05): replace with managed budget↔fund_code link. --}}
+                                                    @if($budget->contract && $budget->contract->grant_code)
+                                                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" title="{{ $budget->contract->title }}">
+                                                            {{ $budget->contract->grant_code }}
+                                                        </span>
+                                                    @elseif($budget->contract)
+                                                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" title="{{ $budget->contract->title }}">
+                                                            {{ Str::limit($budget->contract->title, 20) }}
+                                                        </span>
+                                                    @elseif($job->derived_fund_codes->isNotEmpty())
+                                                        <span class="text-sm text-gray-700 dark:text-gray-200 font-medium">
+                                                            {{ $job->derived_fund_codes->pluck('code')->implode(', ') }}
                                                         </span>
                                                     @else
-                                                        <span class="text-gray-400 dark:text-gray-500">-</span>
+                                                        <span class="text-sm text-gray-400 dark:text-gray-500">—</span>
                                                     @endif
                                                 </td>
                                                 <td class="px-4 py-3 text-sm text-right text-gray-900 dark:text-white">${{ number_format($budget->budgeted_amount, 2) }}</td>

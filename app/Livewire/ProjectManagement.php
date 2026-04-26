@@ -1167,8 +1167,15 @@ class ProjectManagement extends Component
             'milestones.documents.media',
             'milestones.documents.assignedTo',
             'milestones.documents.approvedBy',
-            'budgets',
+            // P-22: budgets.contract must be hydrated eagerly so the
+            // grant_code badge renders immediately after saveBudget()
+            // (previously the relation was unloaded until the next refresh).
+            'budgets.contract',
             'expenses.document',
+            // P-22 fallback: when a budget has no contract, surface fund
+            // codes from this project's associated communication logs.
+            'communicationLogs.fundCodes',
+            'originatingCommunicationLogs.fundCodes',
         ])->findOrFail($this->jobId);
 
         // Fix any inconsistent document states (e.g., status is 'pending_review' but no files)
