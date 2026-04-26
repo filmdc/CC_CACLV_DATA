@@ -38,32 +38,35 @@ it('renders the contract grant_code as a prominent badge when present (P-22)', f
     expect($html)->toContain('text-sm font-semibold');
 })->group('regression');
 
-it('falls back to project-assigned fund codes when budget has no contract (P-22 / P-08)', function () {
-    // Job with a budget but no contract; project has two fund codes
-    // attached directly via the fund_code_housing_job pivot (Phase 2 / P-08
-    // representation — replaces the Phase 1 comm-log-derived fallback).
+it('row shows its own fund code via the new per-row column (P-22 / P-2.5)', function () {
+    // Phase 2.5: each budget row owns its fund code via fund_code_id.
+    // The row cell renders that code regardless of whether the project
+    // has other codes attached. The Phase 2 fallback to the project-wide
+    // code list was removed — for legacy NULL+NULL rows, "—" is the
+    // honest answer.
     $job = HousingJob::factory()->create();
+    $code = FundCode::factory()->create(['code' => 'FC-OWN-001']);
+    $job->fundCodes()->attach($code->id);
+
     ProjectBudget::factory()->create([
         'housing_job_id' => $job->id,
         'contract_id' => null,
-        'category' => 'Misc',
+        'fund_code_id' => $code->id,
+        'category' => 'Owned',
         'budgeted_amount' => 1000,
     ]);
-
-    $codeA = FundCode::factory()->create(['code' => 'FC-PROM-A']);
-    $codeB = FundCode::factory()->create(['code' => 'FC-PROM-B']);
-    $job->fundCodes()->attach([$codeA->id, $codeB->id]);
 
     $html = Livewire::actingAs($this->user)
         ->test(ProjectManagement::class, ['id' => $job->id])
         ->set('activeTab', 'budget')
         ->html();
 
-    expect($html)->toContain('FC-PROM-A');
-    expect($html)->toContain('FC-PROM-B');
-    // No provenance label — codes render flat, as the project's fund codes.
-    expect($html)->not->toContain('from comm log');
-    expect($html)->not->toContain('(from comm logs)');
+    // Carve out the tbody so the assertion is specifically about the
+    // budget row, not the Fund Codes assignment section above the tabs
+    // (which would also surface the same code string).
+    preg_match('#<tbody[^>]*>(.*?)</tbody>#s', $html, $matches);
+    $tbody = $matches[1] ?? '';
+    expect($tbody)->toContain('FC-OWN-001');
 })->group('regression');
 
 it('renders an em-dash when budget has neither contract nor project fund codes (P-22)', function () {
@@ -88,15 +91,15 @@ it('renders an em-dash when budget has neither contract nor project fund codes (
     expect($tbody)->toContain('—');
 })->group('regression');
 
-it('eager-loads budgets.contract so a freshly-saved budget shows its grant_code without refresh (P-22)', function () {
-    // The pre-fix behavior: saveBudget() then refreshJob() did not load the
-    // contract relation, so the badge cell was empty until the next page
-    // load. After Phase 1 refreshJob() eager-loads budgets.contract.
-    $contract = Contract::factory()->create([
-        'title' => 'Eager Load Probe',
-        'grant_code' => 'GRANT-EAGER-001',
-    ]);
+it('eager-loads budgets.fundCode so a freshly-saved budget shows its code without refresh (P-22 / P-2.5)', function () {
+    // Phase 2.5 swapped the form's Contract picker for a Fund Code picker.
+    // The eager-load assertion that lived here for Phase 1 P-22 still
+    // matters in spirit: refreshJob() must hydrate the relation backing
+    // the row's Fund Code cell so the cell renders the just-saved code
+    // without the user needing to manually refresh the page.
     $job = HousingJob::where('job_number', 'JOB-FIX-00001')->firstOrFail();
+    $code = FundCode::factory()->create(['code' => 'FC-EAGER-001']);
+    $job->fundCodes()->attach($code->id);
 
     $component = Livewire::actingAs($this->user)
         ->test(ProjectManagement::class, ['id' => $job->id])
@@ -104,10 +107,36 @@ it('eager-loads budgets.contract so a freshly-saved budget shows its grant_code 
         ->call('showCreateBudget')
         ->set('budget_category', 'Eager-loaded category')
         ->set('budget_amount', 1234)
-        ->set('budget_contract_id', $contract->id)
+        ->set('budget_fund_code_id', $code->id)
         ->call('saveBudget')
         ->assertHasNoErrors();
 
     $html = $component->html();
-    expect($html)->toContain('GRANT-EAGER-001');
+    expect($html)->toContain('FC-EAGER-001');
+})->group('regression');
+
+it('preserves contract grant_code rendering for legacy contract-bearing rows (P-22 / P-2.5 fallback)', function () {
+    // The form no longer offers a Contract picker, but contract-bearing
+    // rows that pre-date Phase 2.5 still render their grant_code via the
+    // row cell's level-2 fallback. Programmatic creation here mirrors what
+    // a legacy row looks like on disk.
+    $contract = Contract::factory()->create([
+        'title' => 'Legacy Contract Probe',
+        'grant_code' => 'GRANT-LEGACY-001',
+    ]);
+    $job = HousingJob::factory()->create();
+    ProjectBudget::factory()->create([
+        'housing_job_id' => $job->id,
+        'contract_id' => $contract->id,
+        'fund_code_id' => null,
+        'category' => 'Legacy Category',
+        'budgeted_amount' => 5000,
+    ]);
+
+    $html = Livewire::actingAs($this->user)
+        ->test(ProjectManagement::class, ['id' => $job->id])
+        ->set('activeTab', 'budget')
+        ->html();
+
+    expect($html)->toContain('GRANT-LEGACY-001');
 })->group('regression');

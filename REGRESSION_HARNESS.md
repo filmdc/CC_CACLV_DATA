@@ -165,16 +165,25 @@ should be paired with an updated regression test.
 - **Milestone timestamping** — the `started_at` stamp is set once at the
   first transition into `in_progress` and preserved across re-transitions
   (P-19).
-- **Budget shape** — contract optional on a budget category (P-21),
-  prominent fund-code badge with a project-fund-codes fallback (P-22 /
-  P-08 — Phase 2 swapped the source from comm-log-derived to the new
-  pivot).
+- **Budget shape** — per-row fund code required on new and edited
+  rows (P-2.5), the saving-event guard that fund_code_id must be in
+  the parent project's fund_code_housing_job pivot, the soft 3-step
+  row-cell fallback (fund_code → contract grant_code → contract title
+  truncated → em-dash), the Edit flow (P-2.5), and the detach-block
+  guard (no detaching a code that any budget row references; error
+  surfaces affected category names). Phase 1's P-21 contract-optional
+  invariant is preserved at schema/model level (contract_id stays
+  nullable) but no UI surfaces contract on the budget form anymore.
+  Phase 2's P-22 prominent fund-code badge still applies on
+  contract-bearing legacy rows.
 - **Fund Code system** — CRUD on FundCode, requirements management UI
   (add/edit/delete/reorder, hard vs informational), cascade-delete of
   requirements when a fund code is deleted (P-05 / P-06).
 - **Project↔fund-code assignment** — attach / detach / set primary, the
   saving-event invariant that primary_fund_code_id must reference a
-  pivot row, primary auto-clears on detach (P-08).
+  pivot row, primary auto-clears on detach (P-08). Detach is now
+  doubly-guarded: P-08 clears primary, P-2.5 blocks if any budget row
+  references the code (with affected categories listed in the error).
 - **Fund Code requirements panel** — visible above the tabs, grouped by
   code, hard vs informational visual distinction, primary indicator,
   reactive on attach/detach (P-07; new snapshot baseline
