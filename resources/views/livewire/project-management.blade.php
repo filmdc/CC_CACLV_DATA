@@ -111,6 +111,67 @@
             </div>
         </div>
 
+        <!-- P-08: Fund Code assignment — visible above tabs so the manager
+             can see + manage funding without clicking into a tab. -->
+        <div class="bg-emerald-50 dark:bg-emerald-900/10 border-b border-emerald-200 dark:border-emerald-900/30 px-6 py-4">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-semibold text-emerald-900 dark:text-emerald-200 uppercase tracking-wide">
+                    Fund Codes
+                </h3>
+                @if($this->can('projects.manage') && $availableFundCodes->isNotEmpty())
+                    <div class="flex items-center gap-2">
+                        <select wire:model="newFundCodeId"
+                                class="px-3 py-1 text-sm border border-emerald-300 dark:border-emerald-700 dark:bg-zinc-800 dark:text-white rounded-md">
+                            <option value="">Select a fund code…</option>
+                            @foreach($availableFundCodes as $fc)
+                                <option value="{{ $fc->id }}">{{ $fc->code }} – {{ $fc->description }}</option>
+                            @endforeach
+                        </select>
+                        <button wire:click="attachFundCode"
+                                wire:loading.attr="disabled"
+                                class="px-3 py-1 text-sm bg-emerald-600 text-white rounded-md hover:bg-emerald-700 disabled:opacity-50">
+                            + Attach
+                        </button>
+                    </div>
+                @endif
+            </div>
+
+            @if($job->fundCodes->isEmpty())
+                <p class="text-sm text-emerald-700 dark:text-emerald-300 italic">
+                    No fund codes assigned yet. Attach codes to surface their requirements on this project.
+                </p>
+            @else
+                <div class="flex flex-wrap gap-2">
+                    @foreach($job->fundCodes as $fc)
+                        <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-zinc-800 border border-emerald-300 dark:border-emerald-700 rounded-md">
+                            <span class="font-mono text-sm font-semibold text-gray-900 dark:text-white">{{ $fc->code }}</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400">{{ Str::limit($fc->description, 40) }}</span>
+                            @if((int) $job->primary_fund_code_id === (int) $fc->id)
+                                <span class="inline-flex items-center px-2 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200">
+                                    ★ Primary
+                                </span>
+                            @elseif($this->can('projects.manage'))
+                                <button wire:click="setPrimaryFundCode({{ $fc->id }})"
+                                        class="text-xs text-emerald-700 dark:text-emerald-300 hover:underline">
+                                    Make primary
+                                </button>
+                            @endif
+                            @if($this->can('projects.manage'))
+                                <button wire:click="detachFundCode({{ $fc->id }})"
+                                        wire:confirm="Detach {{ $fc->code }} from this project?"
+                                        class="ml-1 text-gray-400 hover:text-red-600"
+                                        aria-label="Detach">
+                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+
         <!-- Tabs -->
         <div class="border-b border-gray-200 dark:border-zinc-700">
             <nav class="flex -mb-px">

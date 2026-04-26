@@ -65,6 +65,32 @@ Edit Details
 </button>
 </div>
 </div>
+<!-- P-08: Fund Code assignment — visible above tabs so the manager
+can see + manage funding without clicking into a tab. -->
+<div class="bg-emerald-50 dark:bg-emerald-900/10 border-b border-emerald-200 dark:border-emerald-900/30 px-6 py-4">
+<div class="flex items-center justify-between mb-2">
+<h3 class="text-sm font-semibold text-emerald-900 dark:text-emerald-200 uppercase tracking-wide">
+Fund Codes
+</h3>
+<div class="flex items-center gap-2">
+<select wire:model="newFundCodeId"
+class="px-3 py-1 text-sm border border-emerald-300 dark:border-emerald-700 dark:bg-zinc-800 dark:text-white rounded-md">
+<option value="">Select a fund code…</option>
+<option value="__ID__">FC-FIX-001 – Fixture Fund — Roofing (Contract A)</option>
+<option value="__ID__">FC-FIX-002 – Fixture Fund — Plumbing (Contract A)</option>
+<option value="__ID__">FC-FIX-003 – Fixture Fund — Standalone (no contract)</option>
+</select>
+<button wire:click="attachFundCode"
+wire:loading.attr="disabled"
+class="px-3 py-1 text-sm bg-emerald-600 text-white rounded-md hover:bg-emerald-700 disabled:opacity-50">
++ Attach
+</button>
+</div>
+</div>
+<p class="text-sm text-emerald-700 dark:text-emerald-300 italic">
+No fund codes assigned yet. Attach codes to surface their requirements on this project.
+</p>
+</div>
 <!-- Tabs -->
 <div class="border-b border-gray-200 dark:border-zinc-700">
 <nav class="flex -mb-px">
