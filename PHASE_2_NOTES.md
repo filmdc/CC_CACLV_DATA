@@ -129,28 +129,51 @@ abandoned drafts. Either is informative for the manager.
 | JOB-2026-00009 | pending | 2026-04-08 | 2105 Schoenersville Rd, Bethlehem |
 | JOB-2026-00010 | pending | 2026-04-20 | 236.5 N 11th St., Allentown |
 
-## P-27 backfill counts
+## P-27 backfill counts (dry-run against dev DB, read-only)
 
-Filled in by commit 11.
+Captured by running the migration's logic without writing — same join,
+same matching, same pre-existence check, just no INSERT. These are the
+numbers David will see when he applies the migration on dev/prod.
 
 | Metric | Count |
 | --- | --- |
-| Tag rows scanned | _populated_ |
-| Comm logs with matched fund-code tag | _populated_ |
-| Pivot attachments written by migration | _populated_ |
-| Pivot attachments skipped (already present) | _populated_ |
-| Suspicious fund-code-shaped tags (no FundCode match) | _populated_ |
+| Tag rows scanned | 4 |
+| Distinct comm logs with a matched fund-code tag | 4 |
+| Pivot attachments the migration WILL write | 2 |
+| Pivot attachments skipped (already present) | 2 |
+| Unmatched free-form tags | 0 |
+| Suspicious fund-code-shaped tags (no FundCode match) | 0 |
 
-## Snapshot baselines — Phase 2 expectations
+Two of the four tag-bearing comm logs already have their fund code in
+the structured pivot (manager added it both ways at some point); the
+other two will pick up their attachment from this migration.
 
-Walked through before commit 6:
+## Snapshot baselines — Phase 2 expectations vs reality
 
-| Baseline | Expectation | Reason |
+Walked through before commit 6, then re-checked after commits 6, 9, 10:
+
+| Baseline | Expected at commit 6 | Actual at each commit |
 | --- | --- | --- |
-| `tests/Support/__snapshots__/projects_list.html` | NO diff | Same codes, same column, same order — only the source changed (comm-log-derived → direct pivot). Any diff is a real change to chase, not a refresh. |
-| `tests/Support/__snapshots__/milestone_display.html` | NO diff | Phase 2 doesn't touch this view. |
-| `tests/Support/__snapshots__/budget_categories_with_contract.html` | NO diff | No-contract budget rows still render the same fallback codes; just from a different source. |
-| `tests/Support/__snapshots__/project_detail_requirements_panel.html` | NEW baseline | First snapshot of P-07's panel; auto-created on first run, committed. |
+| `tests/Support/__snapshots__/projects_list.html` | NO diff | Commit 6: ZERO diff (✓). Commits 9/10: still ZERO diff — Phase 2's UI additions are on the project DETAIL view, not the list. |
+| `tests/Support/__snapshots__/milestone_display.html` | NO diff | Commit 6: ZERO diff (✓). Commit 9: refreshed (+26 lines for the Fund Codes assignment section, additive only). Commit 10: refreshed (+2 lines for the panel-region marker comments). |
+| `tests/Support/__snapshots__/budget_categories_with_contract.html` | NO diff | Commit 6: ZERO diff (✓). Commit 9: refreshed (+26 lines, same reason). Commit 10: refreshed (+2 lines, same reason). |
+| `tests/Support/__snapshots__/project_detail_requirements_panel.html` | NEW baseline | Created in commit 10 with a deterministic mixed-requirements fixture (HJ-1 + FC-FIX-003 with hard+informational reqs; FC-PANEL-EXTRA with one hard req). |
+
+The "should be zero diffs except the new baseline" prediction held for
+commit 6 (the call-site swap, where same codes render in same DOM
+positions, only the source changed). Diffs in commits 9/10 are net-
+additive markup with no rearrangement of pre-existing structure;
+refreshes were called out in each commit message.
+
+## P-08 accessor disposition
+
+`HousingJob::getDerivedFundCodesAttribute()` was **deleted** in commit
+6 along with its 3 reader sites and 2 eager-load sites. The
+`communicationLogs()` and `originatingCommunicationLogs()` relations
+themselves remain (they're harmless and may be useful for any future
+code that wants to walk back to the draft project outline). The
+`fund_code_housing_job` pivot is now the single source of truth for
+project↔fund-code linkage from this point forward.
 
 ## Pre-existing failures observed
 

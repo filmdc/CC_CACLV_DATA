@@ -68,13 +68,14 @@ The next test run will re-migrate.
 
 ## HTML snapshots
 
-Three committed snapshots live under `tests/Support/__snapshots__/`:
+Four committed snapshots live under `tests/Support/__snapshots__/`:
 
 | File | Test | Pre-image of |
 | --- | --- | --- |
 | `projects_list.html` | Projects/ListViewBaselineTest | P-11 |
 | `milestone_display.html` | Milestones/DisplayBaselineTest | (structural baseline) |
 | `budget_categories_with_contract.html` | Budget/CategoryListBaselineTest | P-22 |
+| `project_detail_requirements_panel.html` | Projects/RequirementsPanelTest | P-07 |
 
 ### Updating a snapshot after an intentional UI change
 
@@ -148,17 +149,57 @@ Shape:
   for running-total math verification), HJ-Template (is_template=true,
   "Standard Roofing Workflow").
 
+## What the harness protects against
+
+The harness pins behavior the housing module relies on day-to-day plus a
+few cross-cutting design rules. Adding or changing any of these areas
+should be paired with an updated regression test.
+
+- **Housing list and detail rendering** — projects list (P-09 column
+  layout, P-10 leftmost-property, P-11 fund-codes column, P-12 row
+  density), project detail tabs, milestone status display, budget
+  category list with and without contracts.
+- **Comm Log search and duplicate detection** — fund-code-aware search
+  scope (P-02), duplicate-address warning at form-time (P-01), and the
+  shared `App\Support\AddressNormalizer`.
+- **Milestone timestamping** — the `started_at` stamp is set once at the
+  first transition into `in_progress` and preserved across re-transitions
+  (P-19).
+- **Budget shape** — contract optional on a budget category (P-21),
+  prominent fund-code badge with a project-fund-codes fallback (P-22 /
+  P-08 — Phase 2 swapped the source from comm-log-derived to the new
+  pivot).
+- **Fund Code system** — CRUD on FundCode, requirements management UI
+  (add/edit/delete/reorder, hard vs informational), cascade-delete of
+  requirements when a fund code is deleted (P-05 / P-06).
+- **Project↔fund-code assignment** — attach / detach / set primary, the
+  saving-event invariant that primary_fund_code_id must reference a
+  pivot row, primary auto-clears on detach (P-08).
+- **Fund Code requirements panel** — visible above the tabs, grouped by
+  code, hard vs informational visual distinction, primary indicator,
+  reactive on attach/detach (P-07; new snapshot baseline
+  `project_detail_requirements_panel.html`).
+- **Comm Log fund-code tag → structured field migration** — idempotent,
+  reversible, leaves tags alone, case-insensitive matching (P-27).
+- **Standalone-budget design rule** — `BudgetIsStandaloneTest` is a
+  grep-based tripwire scoped to use-statement and FQN class refs across
+  the housing budget files. It fires if any contributor (human or AI)
+  imports `Sage`, `Intacct`, `Mip`, or `DonorPerfect` into
+  `ProjectBudget`, `ProjectExpense`, `HousingJob`, `ProjectManagement`,
+  or `ProjectsManagement`. Free-text comments mentioning those systems
+  are deliberately ignored — the point is to catch real coupling, not
+  docblock language. See `CLAUDE.md` → "Housing budget module — design
+  intent" (P-24).
+
 ## Pre-existing latent issues
 
-Surfaced during P-33 construction, not in scope to fix:
+Surfaced during P-33 construction. The fund-code one was fixed in
+Phase 2; the others remain out of scope.
 
-- `/fund-codes` returns HTTP 500 when any fund code has `contract_id` set —
-  `resources/views/livewire/fund-code-management.blade.php:92` references
-  `route('contracts.show', …)` but the registered route name is
-  `contract.show` (singular). Production has 7 fund codes all with
-  `contract_id=null` so the broken branch never fires there; the P-33
-  seeder is the first place a contract-linked fund code exists, which is
-  why this surfaces now. Tracked in `PHASE_0_NOTES.md`.
+- ~~`/fund-codes` returns HTTP 500 when any fund code has `contract_id`
+  set~~ — fixed in Phase 2 / P-05 (commit 7 of `phase-2/fund-code-system`,
+  PR #10). The view referenced an undefined `contracts.show` route;
+  corrected to the registered `contract.show`. Smoke test un-skipped.
 
 See `PHASE_0_NOTES.md` for the full list of pre-existing test failures
 (ParticipantImportTest, ServiceManagementTest, Settings/ProfileUpdateTest)
