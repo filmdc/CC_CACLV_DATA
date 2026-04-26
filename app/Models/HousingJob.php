@@ -158,11 +158,23 @@ class HousingJob extends Model
         return $this->hasMany(ProjectMilestone::class)->orderBy('sequence_order');
     }
 
+    /**
+     * Budget categories for this project.
+     *
+     * The Housing budget module is a standalone tracker — see the class
+     * docblock on ProjectBudget. It is intentionally NOT integrated with
+     * Sage Intacct, MIP, DonorPerfect, or any other fiscal system. Do
+     * not add fiscal-system writes, reads, or syncs to budget code.
+     */
     public function budgets(): HasMany
     {
         return $this->hasMany(ProjectBudget::class);
     }
 
+    /**
+     * Expense entries against this project's budget categories.
+     * See class docblock on ProjectExpense — standalone tracker only.
+     */
     public function expenses(): HasMany
     {
         return $this->hasMany(ProjectExpense::class);
