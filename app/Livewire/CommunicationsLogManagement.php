@@ -13,6 +13,7 @@ use App\Models\Program;
 use App\Models\Property;
 use App\Models\Service;
 use App\Models\Tag;
+use App\Support\AddressNormalizer;
 use App\Traits\WithPermissionChecks;
 use App\Traits\WithProgramAccess;
 use Illuminate\Support\Facades\Auth;
@@ -49,6 +50,13 @@ class CommunicationsLogManagement extends Component
     public $showForm = false;
 
     public $editingId = null;
+
+    // P-01 duplicate-address warning state. Populated as the user fills in
+    // contact_address/city; cleared on form reset. Save short-circuits with
+    // a warning panel when this is non-empty AND not yet acknowledged.
+    public $duplicateMatches = [];
+
+    public $duplicateAcknowledged = false;
 
     // Detail view state
     public $viewingId = null;
@@ -292,11 +300,15 @@ class CommunicationsLogManagement extends Component
     public function updatedContactAddress()
     {
         $this->updateSubjectFromAddress();
+        $this->duplicateAcknowledged = false;
+        $this->checkAddressDuplicates();
     }
 
     public function updatedContactCity()
     {
         $this->updateSubjectFromAddress();
+        $this->duplicateAcknowledged = false;
+        $this->checkAddressDuplicates();
     }
 
     public function updatedContactState()
@@ -741,6 +753,108 @@ class CommunicationsLogManagement extends Component
     /**
      * Move to step 2: Check for duplicates and show review screen
      */
+    /**
+     * P-01: surface possible duplicate communication logs / properties at the
+     * address the user just typed. Warning only — never blocks save. Up to 5
+     * matches are returned; ordered by recency.
+     *
+     * Two-pass match using App\Support\AddressNormalizer:
+     *   1. exact-match on normalized (street, city) — catches case, suffix
+     *      ("Street" vs "St"), directional ("North" vs "N"), and punctuation
+     *      drift.
+     *   2. same-city + same leading street number + same first non-direction
+     *      word — catches typos in the rest of the street name.
+     *
+     * Editing an existing log excludes itself from the result.
+     */
+    public function checkAddressDuplicates(): void
+    {
+        $this->duplicateMatches = [];
+
+        $address = trim((string) $this->contact_address);
+        $city = trim((string) $this->contact_city);
+        if ($address === '' || $city === '') {
+            return;
+        }
+
+        $norm = AddressNormalizer::normalize($address, $city);
+        $numAndWord = AddressNormalizer::streetNumberAndFirstWord($address);
+
+        $matches = collect();
+
+        // Pass 1: existing communication logs at the same normalized address.
+        $logs = CommunicationLog::query()
+            ->whereNotNull('contact_address')
+            ->whereNotNull('contact_city')
+            ->when($this->editingId, fn ($q) => $q->where('id', '!=', $this->editingId))
+            ->orderByDesc('communication_date')
+            ->limit(50)
+            ->get(['id', 'contact_address', 'contact_city', 'contact_state', 'contact_zip', 'subject', 'communication_date', 'contact_first_name', 'contact_last_name']);
+
+        foreach ($logs as $log) {
+            $candidate = AddressNormalizer::normalize($log->contact_address, $log->contact_city);
+            $candNumWord = AddressNormalizer::streetNumberAndFirstWord($log->contact_address);
+
+            $isMatch = $candidate['fingerprint'] === $norm['fingerprint']
+                || ($numAndWord !== null
+                    && $candNumWord !== null
+                    && $candidate['city'] === $norm['city']
+                    && $candNumWord === $numAndWord);
+
+            if ($isMatch) {
+                $matches->push([
+                    'kind' => 'log',
+                    'id' => $log->id,
+                    'address' => trim($log->contact_address.', '.$log->contact_city.', '.$log->contact_state.' '.$log->contact_zip),
+                    'subject' => $log->subject,
+                    'date' => optional($log->communication_date)->format('Y-m-d'),
+                    'contact' => trim($log->contact_first_name.' '.$log->contact_last_name),
+                ]);
+            }
+        }
+
+        // Pass 1+2: existing properties at the same normalized address.
+        $properties = Property::query()
+            ->whereNotNull('address_line_1')
+            ->whereNotNull('city')
+            ->limit(50)
+            ->get(['id', 'address_line_1', 'city', 'state', 'zip_code']);
+
+        foreach ($properties as $property) {
+            $candidate = AddressNormalizer::normalize($property->address_line_1, $property->city);
+            $candNumWord = AddressNormalizer::streetNumberAndFirstWord($property->address_line_1);
+
+            $isMatch = $candidate['fingerprint'] === $norm['fingerprint']
+                || ($numAndWord !== null
+                    && $candNumWord !== null
+                    && $candidate['city'] === $norm['city']
+                    && $candNumWord === $numAndWord);
+
+            if ($isMatch) {
+                $matches->push([
+                    'kind' => 'property',
+                    'id' => $property->id,
+                    'address' => trim($property->address_line_1.', '.$property->city.', '.$property->state.' '.$property->zip_code),
+                    'subject' => null,
+                    'date' => null,
+                    'contact' => null,
+                ]);
+            }
+        }
+
+        $this->duplicateMatches = $matches->take(5)->values()->all();
+    }
+
+    /**
+     * P-01: user clicked "Continue anyway" on the duplicate warning.
+     * Marks the warning acknowledged and re-runs save.
+     */
+    public function acknowledgeDuplicatesAndSave(): void
+    {
+        $this->duplicateAcknowledged = true;
+        $this->save();
+    }
+
     public function checkForDuplicates()
     {
         $this->validate([
@@ -810,28 +924,29 @@ class CommunicationsLogManagement extends Component
             }
         }
 
-        // Check for property duplicates if no property is linked but address is provided
+        // Check for property duplicates if no property is linked but address is provided.
+        // Routed through App\Support\AddressNormalizer so the conversion-flow
+        // and the P-01 save-time warning use the same matching rules.
         if (! $log->property_id && $log->contact_address && $log->contact_city) {
-            // Search for similar properties
-            $matches = Property::where(function ($query) use ($log) {
-                // Exact match
-                $query->whereRaw('LOWER(address_line_1) = ?', [strtolower($log->contact_address)])
-                    ->whereRaw('LOWER(city) = ?', [strtolower($log->contact_city)]);
-            })
-                ->orWhere(function ($query) use ($log) {
-                    // Partial address match in same city
-                    $query->whereRaw('LOWER(city) = ?', [strtolower($log->contact_city)])
-                        ->where(function ($q) use ($log) {
-                            // Extract street number if present
-                            if (preg_match('/^(\d+)/', $log->contact_address, $m)) {
-                                $q->where('address_line_1', 'LIKE', $m[1].'%');
-                            } else {
-                                $q->whereRaw('LOWER(address_line_1) LIKE ?', ['%'.strtolower(substr($log->contact_address, 0, 10)).'%']);
-                            }
-                        });
+            $logNorm = AddressNormalizer::normalize($log->contact_address, $log->contact_city);
+            $logNumWord = AddressNormalizer::streetNumberAndFirstWord($log->contact_address);
+
+            $matches = Property::query()
+                ->whereNotNull('address_line_1')
+                ->whereNotNull('city')
+                ->limit(50)
+                ->get()
+                ->filter(function ($property) use ($logNorm, $logNumWord) {
+                    $cand = AddressNormalizer::normalize($property->address_line_1, $property->city);
+                    $candNumWord = AddressNormalizer::streetNumberAndFirstWord($property->address_line_1);
+
+                    return $cand['fingerprint'] === $logNorm['fingerprint']
+                        || ($logNumWord !== null
+                            && $candNumWord !== null
+                            && $cand['city'] === $logNorm['city']
+                            && $candNumWord === $logNumWord);
                 })
-                ->limit(10)
-                ->get();
+                ->take(10);
 
             if ($matches->isNotEmpty()) {
                 $this->potentialPropertyMatches = $matches->map(function ($p) {
@@ -843,7 +958,7 @@ class CommunicationsLogManagement extends Component
                         'zip' => $p->zip_code,
                         'full_address' => $p->address_line_1.', '.$p->city.', '.$p->state.' '.$p->zip_code,
                     ];
-                })->toArray();
+                })->values()->toArray();
                 $needsReview = true;
             }
         }
@@ -1462,6 +1577,16 @@ class CommunicationsLogManagement extends Component
             'selectedServices.*' => 'exists:services,id',
         ]);
 
+        // P-01: warn (but never block) on duplicate-address entries. The user
+        // can confirm via the "Continue anyway" panel which sets
+        // duplicateAcknowledged and re-enters save().
+        if (! $this->duplicateAcknowledged) {
+            $this->checkAddressDuplicates();
+            if (! empty($this->duplicateMatches)) {
+                return;
+            }
+        }
+
         $data = [
             'housing_job_id' => $this->housing_job_id !== '' ? $this->housing_job_id : null,
             'participant_id' => $this->participant_id !== '' ? $this->participant_id : null,
@@ -1746,6 +1871,10 @@ class CommunicationsLogManagement extends Component
         // Reset address entry
         $this->showAddressEntry = false;
         $this->resetAddressEntryFields();
+
+        // Reset duplicate-address warning state.
+        $this->duplicateMatches = [];
+        $this->duplicateAcknowledged = false;
     }
 
     public function render()

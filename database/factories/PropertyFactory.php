@@ -27,7 +27,8 @@ class PropertyFactory extends Factory
             'state' => 'PA',
             'zip_code' => '18101',
             'county' => 'Lehigh',
-            'year_built' => $this->faker->numberBetween(1900, 2020),
+            // MySQL YEAR(4) accepts 1901–2155; using 1900 here flakes inserts.
+            'year_built' => $this->faker->numberBetween(1901, 2020),
             'bedrooms' => $this->faker->numberBetween(1, 5),
             'bathrooms' => $this->faker->randomElement([1.0, 1.5, 2.0, 2.5, 3.0]),
             'square_footage' => $this->faker->numberBetween(600, 3500),

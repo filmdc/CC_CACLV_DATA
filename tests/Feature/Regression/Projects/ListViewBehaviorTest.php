@@ -15,15 +15,20 @@ it('renders all 4 non-template housing jobs in the projects list', function () {
     expect(HousingJob::where('is_template', false)->count())->toBe(4)
         ->and(HousingJob::where('is_template', true)->count())->toBe(1);
 
-    $component = Livewire::actingAs($this->user)
+    // P-09 removed the Project # column from the rendered list, so job_number
+    // is no longer visible HTML. Assert on the paginated viewData collection
+    // instead (job_number is still on the model).
+    $projects = Livewire::actingAs($this->user)
         ->test(ProjectsManagement::class)
-        ->assertSee('JOB-FIX-00001')
-        ->assertSee('JOB-FIX-00002')
-        ->assertSee('JOB-FIX-00003')
-        ->assertSee('JOB-FIX-00004');
+        ->viewData('projects');
 
-    // Template job should NOT be visible by default (showTemplates is false).
-    $component->assertDontSee('JOB-FIX-TPL-00001');
+    $jobNumbers = $projects->pluck('job_number')->all();
+    expect($jobNumbers)
+        ->toContain('JOB-FIX-00001')
+        ->toContain('JOB-FIX-00002')
+        ->toContain('JOB-FIX-00003')
+        ->toContain('JOB-FIX-00004')
+        ->not->toContain('JOB-FIX-TPL-00001');
 })->group('regression');
 
 it('template library modal surfaces the seeded template job', function () {
@@ -37,13 +42,17 @@ it('template library modal surfaces the seeded template job', function () {
 })->group('regression');
 
 it('status filter narrows list to matching jobs only', function () {
-    Livewire::actingAs($this->user)
+    $projects = Livewire::actingAs($this->user)
         ->test(ProjectsManagement::class)
         ->set('filterStatus', 'completed')
-        ->assertSee('JOB-FIX-00003')
-        ->assertDontSee('JOB-FIX-00001')
-        ->assertDontSee('JOB-FIX-00002')
-        ->assertDontSee('JOB-FIX-00004');
+        ->viewData('projects');
+
+    $jobNumbers = $projects->pluck('job_number')->all();
+    expect($jobNumbers)
+        ->toContain('JOB-FIX-00003')
+        ->not->toContain('JOB-FIX-00001')
+        ->not->toContain('JOB-FIX-00002')
+        ->not->toContain('JOB-FIX-00004');
 })->group('regression');
 
 it('orders non-template jobs newest-first by created_at in the paginated result', function () {

@@ -13,14 +13,13 @@ beforeEach(function () {
     $this->job = HousingJob::where('job_number', 'JOB-FIX-00001')->firstOrFail();
 });
 
-// P-21 pre-image: today, ProjectBudget categories CAN be created without a
-// contract reference. Validation in ProjectManagement::saveBudget allows
-// `budget_contract_id` as nullable (app/Livewire/ProjectManagement.php:873),
-// and the form default is ''. Phase 1 P-21 is expected to make contract
-// attachment mandatory at the UI and/or validation layer. When P-21 lands
-// and this test fails, the assertion should flip from "creation succeeds" to
-// "creation is blocked with a specific error".
-it('today: a category with no contract is created successfully (P-21 pre-image)', function () {
+// P-21: budget categories must be creatable without a contract reference.
+// Validation in ProjectManagement::saveBudget keeps `budget_contract_id`
+// nullable. The Phase 1 UI work makes the optional state visually obvious
+// (label "— Optional", placeholder "No contract — leave blank or pick one",
+// help text, and an explicit "No contract (clear selection)" item in the
+// dropdown). This test guards the functional contract.
+it('a category with no contract is created successfully (P-21)', function () {
     $countBefore = ProjectBudget::where('housing_job_id', $this->job->id)->count();
 
     Livewire::actingAs($this->user)

@@ -432,7 +432,12 @@ class CommunicationLog extends Model
                 ->orWhere('contact_email', 'like', "%{$search}%")
                 ->orWhere('contact_phone', 'like', "%{$search}%")
                 ->orWhere('contact_address', 'like', "%{$search}%")
-                ->orWhere('contact_city', 'like', "%{$search}%");
+                ->orWhere('contact_city', 'like', "%{$search}%")
+                // P-02: also match logs by their attached fund codes.
+                ->orWhereHas('fundCodes', function ($fq) use ($search) {
+                    $fq->where('code', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%");
+                });
         });
     }
 }

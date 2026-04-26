@@ -216,6 +216,9 @@
                                         @if($currentMilestone->description)
                                             <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ $currentMilestone->description }}</p>
                                         @endif
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                            Started: {{ $currentMilestone->started_at?->format('M d, Y g:i A') ?: '—' }}
+                                        </p>
                                     </div>
                                     <div class="flex items-center space-x-2">
                                         @if($currentMilestone->status !== 'completed')
@@ -527,13 +530,25 @@
                                         @foreach($job->budgets as $budget)
                                             <tr>
                                                 <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">{{ $budget->category }}</td>
-                                                <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                                                    @if($budget->contract)
-                                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300" title="{{ $budget->contract->title }}">
-                                                            {{ $budget->contract->grant_code ?: Str::limit($budget->contract->title, 15) }}
+                                                <td class="px-4 py-3">
+                                                    {{-- P-22: prominent fund-code badge. Prefer the budget's own
+                                                         contract grant_code; fall back to fund codes derived from the
+                                                         project's communication logs.
+                                                         TODO(Phase 2: P-05): replace with managed budget↔fund_code link. --}}
+                                                    @if($budget->contract && $budget->contract->grant_code)
+                                                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" title="{{ $budget->contract->title }}">
+                                                            {{ $budget->contract->grant_code }}
+                                                        </span>
+                                                    @elseif($budget->contract)
+                                                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" title="{{ $budget->contract->title }}">
+                                                            {{ Str::limit($budget->contract->title, 20) }}
+                                                        </span>
+                                                    @elseif($job->derived_fund_codes->isNotEmpty())
+                                                        <span class="text-sm text-gray-700 dark:text-gray-200 font-medium">
+                                                            {{ $job->derived_fund_codes->pluck('code')->implode(', ') }}
                                                         </span>
                                                     @else
-                                                        <span class="text-gray-400 dark:text-gray-500">-</span>
+                                                        <span class="text-sm text-gray-400 dark:text-gray-500">—</span>
                                                     @endif
                                                 </td>
                                                 <td class="px-4 py-3 text-sm text-right text-gray-900 dark:text-white">${{ number_format($budget->budgeted_amount, 2) }}</td>
@@ -866,11 +881,14 @@
                             this.search = '';
                         }
                     }" class="relative">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Funding Source (Contract)</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Funding Source (Contract)
+                            <span class="text-gray-500 dark:text-gray-400 font-normal">— Optional</span>
+                        </label>
                         <div class="relative">
                             <button type="button" @click="open = !open"
                                     class="w-full px-3 py-2 text-left border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md flex items-center justify-between">
-                                <span x-show="!selectedContract" class="text-gray-400">Select a contract (optional)</span>
+                                <span x-show="!selectedContract" class="text-gray-400">No contract — leave blank or pick one</span>
                                 <span x-show="selectedContract" class="truncate" x-text="selectedContract ? (selectedContract.title + (selectedContract.grant_code ? ' (' + selectedContract.grant_code + ')' : '')) : ''"></span>
                                 <div class="flex items-center space-x-1">
                                     <button type="button" x-show="selectedContract" @click.stop="clear()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
@@ -909,7 +927,7 @@
                                 </ul>
                             </div>
                         </div>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Associate this budget with a funding source</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Optional. Leave blank to create a budget category with just a category name and amount.</p>
                         @error('budget_contract_id') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
                     </div>
                 </div>

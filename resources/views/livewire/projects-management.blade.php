@@ -122,18 +122,18 @@
             <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700">
                 <thead class="bg-gray-100 dark:bg-zinc-900">
                     <tr>
-                        <th class="px-4 py-3 text-left w-12">
+                        <th class="px-4 py-2 text-left w-12">
                             <input type="checkbox" wire:model="selectAll" class="rounded border-gray-300">
                         </th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Project #</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Participant</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Property</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Program</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Service</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Current Milestone</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Budget</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Status</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Actions</th>
+                        <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">Property</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Participant</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Program</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Service</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Fund Codes</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Current Milestone</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Budget</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Status</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-zinc-700">
@@ -145,22 +145,28 @@
                             $totalSpent = $project->getTotalSpent();
                         @endphp
                         <tr class="hover:bg-gray-50 dark:hover:bg-zinc-700 {{ in_array($project->id, $selectedJobs) ? 'bg-indigo-50 dark:bg-indigo-900/20' : '' }}">
-                            <td class="px-4 py-3">
+                            <td class="px-4 py-2">
                                 <input type="checkbox"
                                        wire:click="toggleSelection({{ $project->id }})"
                                        {{ in_array($project->id, $selectedJobs) ? 'checked' : '' }}
                                        class="rounded border-gray-300">
                             </td>
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <a href="{{ route('project.management', $project->id) }}" wire:navigate
-                                   class="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
-                                    {{ $project->job_number }}
-                                </a>
-                                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                    {{ Str::limit($project->job_title, 25) }}
+                            <td class="px-4 py-2">
+                                @if($project->property)
+                                    <a href="{{ route('property.show', $project->property_id) }}" wire:navigate
+                                       class="text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
+                                        {{ $project->property->address_line_1 }}
+                                    </a>
+                                @else
+                                    <span class="text-sm font-semibold text-gray-400">—</span>
+                                @endif
+                                <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                    <a href="{{ route('project.management', $project->id) }}" wire:navigate class="hover:underline">
+                                        {{ Str::limit($project->job_title, 40) }}
+                                    </a>
                                 </div>
                             </td>
-                            <td class="px-4 py-3 whitespace-nowrap">
+                            <td class="px-4 py-2">
                                 @if($project->participant)
                                     <a href="{{ route('participant.show', $project->participant_id) }}" wire:navigate
                                        class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
@@ -170,27 +176,31 @@
                                     <span class="text-sm text-gray-400">No participant</span>
                                 @endif
                             </td>
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                @if($project->property)
-                                    <a href="{{ route('property.show', $project->property_id) }}" wire:navigate
-                                       class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
-                                        {{ Str::limit($project->property->address_line_1, 30) }}
-                                    </a>
-                                @else
-                                    <span class="text-sm text-gray-400">No property</span>
-                                @endif
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap">
+                            <td class="px-4 py-2 whitespace-nowrap">
                                 <div class="text-sm text-gray-900 dark:text-white">
                                     {{ $project->program ? $project->program->name : 'N/A' }}
                                 </div>
                             </td>
-                            <td class="px-4 py-3 whitespace-nowrap">
+                            <td class="px-4 py-2 whitespace-nowrap">
                                 <div class="text-sm text-gray-900 dark:text-white">
                                     {{ $project->service ? $project->service->name : '-' }}
                                 </div>
                             </td>
-                            <td class="px-4 py-3 whitespace-nowrap">
+                            <td class="px-4 py-2">
+                                @php
+                                    // TODO(Phase 2: P-05): replace derived-from-comm-logs with managed
+                                    // project↔fund_code link supporting a primary designation.
+                                    $derivedFundCodes = $project->derived_fund_codes;
+                                @endphp
+                                @if($derivedFundCodes->isNotEmpty())
+                                    <span class="text-sm text-gray-900 dark:text-white">
+                                        {{ $derivedFundCodes->pluck('code')->implode(', ') }}
+                                    </span>
+                                @else
+                                    <span class="text-sm text-gray-400">—</span>
+                                @endif
+                            </td>
+                            <td class="px-4 py-2 whitespace-nowrap">
                                 @if($hasMilestones && $currentMilestone)
                                     <a href="{{ route('project.management', $project->id) }}#milestone-{{ $currentMilestone->id }}" wire:navigate
                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium hover:opacity-80"
@@ -200,6 +210,9 @@
                                     <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                         {{ $currentMilestone->completion_percentage }}% complete
                                     </div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                                        Started: {{ $currentMilestone->started_at?->format('M d, Y') ?: '—' }}
+                                    </div>
                                 @else
                                     <a href="{{ route('project.management', $project->id) }}" wire:navigate
                                        class="text-xs text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">
@@ -207,7 +220,7 @@
                                     </a>
                                 @endif
                             </td>
-                            <td class="px-4 py-3 whitespace-nowrap">
+                            <td class="px-4 py-2 whitespace-nowrap">
                                 @if($hasMilestones && $totalBudget > 0)
                                     <a href="{{ route('project.management', $project->id) }}?tab=budget" wire:navigate
                                        class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
@@ -220,7 +233,7 @@
                                     <span class="text-sm text-gray-400">-</span>
                                 @endif
                             </td>
-                            <td class="px-4 py-3 whitespace-nowrap">
+                            <td class="px-4 py-2 whitespace-nowrap">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                     @if($project->status === 'completed') bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300
                                     @elseif($project->status === 'in_progress') bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300
@@ -238,7 +251,7 @@
                                     </div>
                                 @endif
                             </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm">
+                            <td class="px-4 py-2 whitespace-nowrap text-sm">
                                 <div class="flex items-center space-x-2">
                                     <a href="{{ route('project.management', $project->id) }}" wire:navigate
                                        class="text-indigo-600 dark:text-indigo-400 hover:underline">

@@ -2,18 +2,17 @@
 
 namespace App\Livewire;
 
-use App\Models\HousingJob;
-use App\Models\Property;
 use App\Models\Contractor;
-use App\Models\Program;
-use App\Models\Service;
-use App\Models\Participant;
 use App\Models\Household;
-use App\Models\ReferenceData;
+use App\Models\HousingJob;
+use App\Models\Participant;
+use App\Models\Program;
+use App\Models\Property;
+use App\Models\Service;
 use App\Traits\WithPermissionChecks;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Illuminate\Support\Facades\Auth;
 
 class ProjectsManagement extends Component
 {
@@ -21,54 +20,91 @@ class ProjectsManagement extends Component
 
     // UI State
     public $search = '';
+
     public $showCreateForm = false;
+
     public $showEditForm = false;
+
     public $showTemplateModal = false;
+
     public $selectedTemplateId = null;
+
     public $filterStatus = '';
+
     public $filterProgram = '';
+
     public $filterService = '';
+
     public $filterPriority = '';
+
     public $filterPmEnabled = ''; // all, pm_only, non_pm
+
     public $showTemplates = false; // Toggle to show/hide template jobs
+
     public $selectedJobs = [];
+
     public $selectAll = false;
 
     // Form Fields (simplified for now, full form in modal)
     public $editingJobId = null;
+
     public $participant_id = '';
+
     public $property_id = '';
+
     public $contractor_id = '';
+
     public $program_id = '';
+
     public $service_id = '';
+
     public $job_title = '';
+
     public $job_description = '';
+
     public $status = 'pending';
+
     public $request_date = '';
+
     public $start_date = '';
+
     public $target_completion_date = '';
+
     public $estimated_cost = '';
+
     public $priority = 'medium';
 
     // Quick Create Forms
     public $showQuickParticipantForm = false;
+
     public $showQuickPropertyForm = false;
 
     // Quick Participant Fields
     public $quick_participant_first_name = '';
+
     public $quick_participant_last_name = '';
+
     public $quick_participant_phone = '';
+
     public $quick_participant_email = '';
+
     public $quick_participant_dob = '';
+
     public $quick_participant_address = '';
+
     public $quick_participant_city = '';
+
     public $quick_participant_state = '';
+
     public $quick_participant_zip = '';
 
     // Quick Property Fields
     public $quick_property_address = '';
+
     public $quick_property_city = '';
+
     public $quick_property_state = '';
+
     public $quick_property_zip = '';
 
     protected function getListeners()
@@ -111,15 +147,17 @@ class ProjectsManagement extends Component
 
     public function copyPropertyFromParticipant()
     {
-        if (!$this->participant_id) {
+        if (! $this->participant_id) {
             session()->flash('error', 'Please select a participant first');
+
             return;
         }
 
         $participant = Participant::with(['household.currentAddress'])->findOrFail($this->participant_id);
 
-        if (!$participant->household || !$participant->household->currentAddress) {
+        if (! $participant->household || ! $participant->household->currentAddress) {
             session()->flash('error', 'This participant\'s household has no address on file. Please create property manually.');
+
             return;
         }
 
@@ -198,15 +236,16 @@ class ProjectsManagement extends Component
         $this->participant_id = $participant->id;
         $this->showQuickParticipantForm = false;
 
-        session()->flash('success', 'Participant and household created: ' .
-                         $participant->first_name . ' ' . $participant->last_name .
-                         ' (Household: ' . $household->household_code . ' at ' . $this->quick_participant_address . ')');
+        session()->flash('success', 'Participant and household created: '.
+                         $participant->first_name.' '.$participant->last_name.
+                         ' (Household: '.$household->household_code.' at '.$this->quick_participant_address.')');
     }
 
     public function showQuickPropertyModal()
     {
-        if (!$this->participant_id) {
+        if (! $this->participant_id) {
             session()->flash('error', 'Please select or create a participant first.');
+
             return;
         }
         $this->resetQuickPropertyForm();
@@ -236,7 +275,7 @@ class ProjectsManagement extends Component
 
         $this->property_id = $property->id;
         $this->showQuickPropertyForm = false;
-        session()->flash('success', 'Property created: ' . $property->address_line_1);
+        session()->flash('success', 'Property created: '.$property->address_line_1);
     }
 
     protected function resetQuickParticipantForm()
@@ -353,8 +392,9 @@ class ProjectsManagement extends Component
         $participant = Participant::findOrFail($this->participant_id);
 
         // Verify participant is head of household
-        if (!$participant->is_head_of_household) {
+        if (! $participant->is_head_of_household) {
             session()->flash('error', 'Selected participant must be head of household');
+
             return;
         }
 
@@ -382,7 +422,7 @@ class ProjectsManagement extends Component
             session()->flash('success', 'Project updated successfully');
         } else {
             $job = HousingJob::create(array_merge($jobData, ['created_by' => Auth::id()]));
-            session()->flash('success', 'Project created successfully! ID: ' . $job->id);
+            session()->flash('success', 'Project created successfully! ID: '.$job->id);
         }
 
         $this->showCreateForm = false;
@@ -428,8 +468,9 @@ class ProjectsManagement extends Component
         $participant = Participant::findOrFail($this->participant_id);
 
         // Verify participant is head of household
-        if (!$participant->is_head_of_household) {
+        if (! $participant->is_head_of_household) {
             session()->flash('error', 'Selected participant must be head of household');
+
             return;
         }
 
@@ -453,7 +494,7 @@ class ProjectsManagement extends Component
             'priority' => $this->priority,
         ]);
 
-        session()->flash('success', 'Project created from template with ' . $job->milestones()->count() . ' milestones!');
+        session()->flash('success', 'Project created from template with '.$job->milestones()->count().' milestones!');
         $this->showCreateForm = false;
         $this->selectedTemplateId = null;
         $this->resetForm();
@@ -474,6 +515,7 @@ class ProjectsManagement extends Component
     {
         if (empty($this->selectedJobs)) {
             session()->flash('error', 'No projects selected');
+
             return;
         }
 
@@ -482,7 +524,7 @@ class ProjectsManagement extends Component
             'updated_by' => Auth::id(),
         ]);
 
-        session()->flash('success', count($this->selectedJobs) . ' projects updated');
+        session()->flash('success', count($this->selectedJobs).' projects updated');
         $this->selectedJobs = [];
     }
 
@@ -490,12 +532,13 @@ class ProjectsManagement extends Component
     {
         if (empty($this->selectedJobs)) {
             session()->flash('error', 'No projects selected');
+
             return;
         }
 
         HousingJob::whereIn('id', $this->selectedJobs)->delete();
 
-        session()->flash('success', count($this->selectedJobs) . ' projects deleted');
+        session()->flash('success', count($this->selectedJobs).' projects deleted');
         $this->selectedJobs = [];
     }
 
@@ -527,26 +570,26 @@ class ProjectsManagement extends Component
 
         $projects = HousingJob::query()
             ->activeJobs() // Exclude templates by default
-            ->with(['program', 'service', 'participant', 'property', 'contractor', 'milestones.tasks', 'budgets'])
+            ->with(['program', 'service', 'participant', 'property', 'contractor', 'milestones.tasks', 'budgets', 'communicationLogs.fundCodes', 'originatingCommunicationLogs.fundCodes'])
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
-                    $q->where('job_title', 'like', '%' . $this->search . '%')
-                      ->orWhere('job_number', 'like', '%' . $this->search . '%')
-                      ->orWhereHas('participant', function ($pq) {
-                          $pq->where('first_name', 'like', '%' . $this->search . '%')
-                             ->orWhere('last_name', 'like', '%' . $this->search . '%');
-                      })
-                      ->orWhereHas('property', function ($propq) {
-                          $propq->where('address_line_1', 'like', '%' . $this->search . '%');
-                      });
+                    $q->where('job_title', 'like', '%'.$this->search.'%')
+                        ->orWhere('job_number', 'like', '%'.$this->search.'%')
+                        ->orWhereHas('participant', function ($pq) {
+                            $pq->where('first_name', 'like', '%'.$this->search.'%')
+                                ->orWhere('last_name', 'like', '%'.$this->search.'%');
+                        })
+                        ->orWhereHas('property', function ($propq) {
+                            $propq->where('address_line_1', 'like', '%'.$this->search.'%');
+                        });
                 });
             })
-            ->when($this->filterProgram, fn($q) => $q->where('program_id', $this->filterProgram))
-            ->when($this->filterService, fn($q) => $q->where('service_id', $this->filterService))
-            ->when($this->filterStatus, fn($q) => $q->where('status', $this->filterStatus))
-            ->when($this->filterPriority, fn($q) => $q->where('priority', $this->filterPriority))
-            ->when($this->filterPmEnabled === 'pm_only', fn($q) => $q->whereHas('milestones'))
-            ->when($this->filterPmEnabled === 'non_pm', fn($q) => $q->whereDoesntHave('milestones'))
+            ->when($this->filterProgram, fn ($q) => $q->where('program_id', $this->filterProgram))
+            ->when($this->filterService, fn ($q) => $q->where('service_id', $this->filterService))
+            ->when($this->filterStatus, fn ($q) => $q->where('status', $this->filterStatus))
+            ->when($this->filterPriority, fn ($q) => $q->where('priority', $this->filterPriority))
+            ->when($this->filterPmEnabled === 'pm_only', fn ($q) => $q->whereHas('milestones'))
+            ->when($this->filterPmEnabled === 'non_pm', fn ($q) => $q->whereDoesntHave('milestones'))
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
@@ -558,11 +601,11 @@ class ProjectsManagement extends Component
             : Service::orderBy('name')->get();
 
         // For searchable selects in create form (arrays)
-        $propertiesSearchable = Property::orderBy('address_line_1')->get()->map(function($p) {
+        $propertiesSearchable = Property::orderBy('address_line_1')->get()->map(function ($p) {
             return [
                 'id' => $p->id,
-                'display' => $p->address_line_1 . ', ' . $p->city,
-                'secondary' => $p->state . ' ' . $p->zip_code,
+                'display' => $p->address_line_1.', '.$p->city,
+                'secondary' => $p->state.' '.$p->zip_code,
             ];
         })->toArray();
 
@@ -570,10 +613,10 @@ class ProjectsManagement extends Component
         $participantsSearchable = Participant::where('is_head_of_household', true)
             ->orderBy('last_name')
             ->get()
-            ->map(function($p) {
+            ->map(function ($p) {
                 $secondaryInfo = [];
                 if ($p->household && $p->household->household_code) {
-                    $secondaryInfo[] = 'HH: ' . $p->household->household_code;
+                    $secondaryInfo[] = 'HH: '.$p->household->household_code;
                 }
                 if ($p->email) {
                     $secondaryInfo[] = $p->email;
@@ -583,12 +626,12 @@ class ProjectsManagement extends Component
 
                 return [
                     'id' => $p->id,
-                    'display' => $p->first_name . ' ' . $p->last_name,
+                    'display' => $p->first_name.' '.$p->last_name,
                     'secondary' => implode(' - ', $secondaryInfo),
                 ];
             })->toArray();
 
-        $contractorsSearchable = Contractor::orderBy('company_name')->get()->map(function($c) {
+        $contractorsSearchable = Contractor::orderBy('company_name')->get()->map(function ($c) {
             return [
                 'id' => $c->id,
                 'display' => $c->company_name,
@@ -597,9 +640,9 @@ class ProjectsManagement extends Component
         })->toArray();
 
         // For create form - filter by the selected program in the form
-        $servicesSearchable = Service::when($this->program_id, function($q) {
+        $servicesSearchable = Service::when($this->program_id, function ($q) {
             $q->where('program_id', $this->program_id);
-        })->orderBy('name')->get()->map(function($s) {
+        })->orderBy('name')->get()->map(function ($s) {
             return [
                 'id' => $s->id,
                 'display' => $s->name,
