@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Project Budget — standalone housing project tracker.
@@ -31,6 +32,7 @@ class ProjectBudget extends Model
     protected $fillable = [
         'housing_job_id',
         'contract_id',
+        'fund_code_id',
         'category',
         'budgeted_amount',
         'spent_amount',
@@ -45,6 +47,36 @@ class ProjectBudget extends Model
 
     protected $appends = ['remaining_amount', 'percentage_spent', 'is_over_budget'];
 
+    /**
+     * P-2.5 invariant: when fund_code_id is set, the same fund code must
+     * already be in the parent project's fund_code_housing_job pivot.
+     * Catches mass-assignment / tinker / console paths that bypass the
+     * Livewire form. Mirrors the saving guard on HousingJob's
+     * primary_fund_code_id from Phase 2.
+     */
+    protected static function booted(): void
+    {
+        static::saving(function (ProjectBudget $budget) {
+            if (! $budget->isDirty('fund_code_id')) {
+                return;
+            }
+            if ($budget->fund_code_id === null) {
+                return;
+            }
+
+            $attached = DB::table('fund_code_housing_job')
+                ->where('housing_job_id', $budget->housing_job_id)
+                ->where('fund_code_id', $budget->fund_code_id)
+                ->exists();
+
+            if (! $attached) {
+                throw new \InvalidArgumentException(
+                    "Cannot set fund_code_id={$budget->fund_code_id} on project_budgets row for housing job {$budget->housing_job_id}: that fund code is not assigned to the project. Attach it via HousingJob::fundCodes()->syncWithoutDetaching([id]) before referencing it on a budget row."
+                );
+            }
+        });
+    }
+
     // Relationships
 
     public function housingJob(): BelongsTo
@@ -55,6 +87,11 @@ class ProjectBudget extends Model
     public function contract(): BelongsTo
     {
         return $this->belongsTo(Contract::class);
+    }
+
+    public function fundCode(): BelongsTo
+    {
+        return $this->belongsTo(FundCode::class);
     }
 
     public function expenses(): HasMany
