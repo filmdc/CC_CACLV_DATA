@@ -643,9 +643,20 @@ Route::middleware(['auth'])->group(function () {
 
     // Housing Module Routes
     Route::get('property-management', App\Livewire\PropertyManagement::class)->name('property.management');
-    Route::get('property/{id}', App\Livewire\PropertyShow::class)->name('property.show');
     Route::get('contractor-management', App\Livewire\ContractorManagement::class)->name('contractor.management');
-    Route::get('contractor/{id}', App\Livewire\ContractorShow::class)->name('contractor.show');
+
+    // Legacy detail routes. App\Livewire\PropertyShow and
+    // App\Livewire\ContractorShow were stubbed in 2025-11 but never finished:
+    // each component eager-loads relations that don't exist (PropertyShow's
+    // 'program') and renders a view file that doesn't exist
+    // (livewire.property-show, livewire.contractor-show). Redirect to the
+    // corresponding management page so any cached browser bookmarks land
+    // somewhere working. No live UI links to these routes anymore. The
+    // unfinished components are dead code; cleanup tracked separately.
+    Route::get('property/{id}', fn ($id) => redirect()->route('property.management'))
+        ->name('property.show');
+    Route::get('contractor/{id}', fn ($id) => redirect()->route('contractor.management'))
+        ->name('contractor.show');
 
     // Project Management Module Routes (Unified Interface)
     Route::get('projects', App\Livewire\ProjectsManagement::class)->name('projects.management');
