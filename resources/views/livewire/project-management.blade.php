@@ -594,20 +594,25 @@
                                             <tr>
                                                 <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">{{ $budget->category }}</td>
                                                 <td class="px-4 py-3">
-                                                    {{-- P-22 / P-08: prominent fund-code badge. Prefer the budget's own
-                                                         contract grant_code; fall back to fund codes directly assigned
-                                                         to the project via the fund_code_housing_job pivot. --}}
-                                                    @if($budget->contract && $budget->contract->grant_code)
+                                                    {{-- P-2.5: prefer the budget row's own fund code (the new
+                                                         per-row column). For legacy contract-bearing rows that
+                                                         pre-date this phase, fall through to the contract
+                                                         grant_code / title chain so the visual is preserved
+                                                         until the operator edits the row. The Phase 2
+                                                         project-wide fundCodes fallback is intentionally NOT in
+                                                         this chain — for legacy NULL+NULL rows, "—" is the
+                                                         honest answer; the row doesn't have a code. --}}
+                                                    @if($budget->fundCode)
+                                                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" title="{{ $budget->fundCode->description }}">
+                                                            {{ $budget->fundCode->code }}
+                                                        </span>
+                                                    @elseif($budget->contract && $budget->contract->grant_code)
                                                         <span class="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" title="{{ $budget->contract->title }}">
                                                             {{ $budget->contract->grant_code }}
                                                         </span>
                                                     @elseif($budget->contract)
                                                         <span class="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" title="{{ $budget->contract->title }}">
                                                             {{ Str::limit($budget->contract->title, 20) }}
-                                                        </span>
-                                                    @elseif($job->fundCodes->isNotEmpty())
-                                                        <span class="text-sm text-gray-700 dark:text-gray-200 font-medium">
-                                                            {{ $job->fundCodes->pluck('code')->implode(', ') }}
                                                         </span>
                                                     @else
                                                         <span class="text-sm text-gray-400 dark:text-gray-500">—</span>
@@ -623,7 +628,11 @@
                                                         {{ $budget->percentage_spent }}%
                                                     </span>
                                                 </td>
-                                                <td class="px-4 py-3 text-sm text-right">
+                                                <td class="px-4 py-3 text-sm text-right space-x-2">
+                                                    <button wire:click="editBudget({{ $budget->id }})"
+                                                            class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">
+                                                        Edit
+                                                    </button>
                                                     <button wire:click="deleteBudget({{ $budget->id }})"
                                                             wire:confirm="Delete this budget category?"
                                                             class="text-red-600 hover:text-red-800 dark:text-red-400">
@@ -899,7 +908,9 @@
     @if($showBudgetForm)
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="$set('showBudgetForm', false)">
             <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-md w-full mx-4">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Add Budget Category</h3>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    {{ $editingBudget ? 'Edit Budget Category' : 'Add Budget Category' }}
+                </h3>
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category Name *</label>
@@ -916,81 +927,31 @@
                         </div>
                         @error('budget_amount') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
                     </div>
-                    <div x-data="{
-                        open: false,
-                        search: '',
-                        selectedId: @entangle('budget_contract_id'),
-                        contracts: {{ Js::from($contracts->map(fn($c) => ['id' => $c->id, 'title' => $c->title, 'grant_code' => $c->grant_code, 'funder' => $c->funder?->name])) }},
-                        get filteredContracts() {
-                            if (!this.search) return this.contracts;
-                            const s = this.search.toLowerCase();
-                            return this.contracts.filter(c =>
-                                c.title.toLowerCase().includes(s) ||
-                                (c.grant_code && c.grant_code.toLowerCase().includes(s)) ||
-                                (c.funder && c.funder.toLowerCase().includes(s))
-                            );
-                        },
-                        get selectedContract() {
-                            return this.contracts.find(c => c.id == this.selectedId);
-                        },
-                        selectContract(contract) {
-                            this.selectedId = contract ? contract.id : '';
-                            this.open = false;
-                            this.search = '';
-                        },
-                        clear() {
-                            this.selectedId = '';
-                            this.search = '';
-                        }
-                    }" class="relative">
+                    {{-- P-2.5: Fund Code dropdown — required. Options scoped to
+                         the project's assigned fund codes (the
+                         fund_code_housing_job pivot). The legacy Contract
+                         dropdown that lived here was hidden in P-2.5 per
+                         David's request; project_budgets.contract_id and the
+                         belongsTo(Contract) relation remain in the schema for
+                         legacy contract-bearing rows. --}}
+                    <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Funding Source (Contract)
-                            <span class="text-gray-500 dark:text-gray-400 font-normal">— Optional</span>
+                            Fund Code <span class="text-red-500">*</span>
                         </label>
-                        <div class="relative">
-                            <button type="button" @click="open = !open"
-                                    class="w-full px-3 py-2 text-left border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md flex items-center justify-between">
-                                <span x-show="!selectedContract" class="text-gray-400">No contract — leave blank or pick one</span>
-                                <span x-show="selectedContract" class="truncate" x-text="selectedContract ? (selectedContract.title + (selectedContract.grant_code ? ' (' + selectedContract.grant_code + ')' : '')) : ''"></span>
-                                <div class="flex items-center space-x-1">
-                                    <button type="button" x-show="selectedContract" @click.stop="clear()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                                    </button>
-                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                                </div>
-                            </button>
-                            <div x-show="open" @click.away="open = false" x-transition
-                                 class="absolute z-50 mt-1 w-full bg-white dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md shadow-lg">
-                                <div class="p-2 border-b border-gray-200 dark:border-zinc-600">
-                                    <input type="text" x-model="search" placeholder="Search contracts..."
-                                           class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-                                           @click.stop>
-                                </div>
-                                <ul class="max-h-48 overflow-y-auto">
-                                    <li @click="selectContract(null)"
-                                        class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-600 cursor-pointer">
-                                        No contract (clear selection)
-                                    </li>
-                                    <template x-for="contract in filteredContracts" :key="contract.id">
-                                        <li @click="selectContract(contract)"
-                                            :class="{'bg-indigo-50 dark:bg-indigo-900/30': contract.id == selectedId}"
-                                            class="px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-600 cursor-pointer">
-                                            <div class="text-sm font-medium text-gray-900 dark:text-white truncate" x-text="contract.title"></div>
-                                            <div class="text-xs text-gray-500 dark:text-gray-400">
-                                                <span x-show="contract.grant_code" x-text="contract.grant_code" class="font-medium text-blue-600 dark:text-blue-400"></span>
-                                                <span x-show="contract.grant_code && contract.funder"> · </span>
-                                                <span x-show="contract.funder" x-text="contract.funder"></span>
-                                            </div>
-                                        </li>
-                                    </template>
-                                    <li x-show="filteredContracts.length === 0" class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 text-center">
-                                        No contracts found
-                                    </li>
-                                </ul>
+                        @if($job->fundCodes->isEmpty())
+                            <div class="px-3 py-2 text-sm text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/40 rounded-md">
+                                No fund codes assigned to this project yet. Attach at least one in the Fund Codes section above before creating a budget category.
                             </div>
-                        </div>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Optional. Leave blank to create a budget category with just a category name and amount.</p>
-                        @error('budget_contract_id') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+                        @else
+                            <select wire:model="budget_fund_code_id"
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                <option value="">Select a fund code…</option>
+                                @foreach($job->fundCodes as $fc)
+                                    <option value="{{ $fc->id }}">{{ $fc->code }} – {{ $fc->description }}</option>
+                                @endforeach
+                            </select>
+                        @endif
+                        @error('budget_fund_code_id') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
                     </div>
                 </div>
                 <div class="mt-6 flex justify-end space-x-3">
@@ -999,8 +960,9 @@
                         Cancel
                     </button>
                     <button wire:click="saveBudget"
-                            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
-                        Save
+                            @if($job->fundCodes->isEmpty()) disabled @endif
+                            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                        {{ $editingBudget ? 'Update' : 'Save' }}
                     </button>
                 </div>
             </div>

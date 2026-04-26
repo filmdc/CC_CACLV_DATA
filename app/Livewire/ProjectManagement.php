@@ -102,6 +102,10 @@ class ProjectManagement extends Component
 
     public $budget_contract_id = '';
 
+    // P-2.5: per-row fund code on budget categories. Required for new and
+    // edited rows; legacy rows can render with NULL until next edit.
+    public $budget_fund_code_id = '';
+
     // P-08: Fund-code assignment
     public $newFundCodeId = '';
 
@@ -870,24 +874,70 @@ class ProjectManagement extends Component
         $this->showBudgetForm = true;
     }
 
+    public function editBudget($id)
+    {
+        $this->resetBudgetForm();
+        $budget = ProjectBudget::findOrFail($id);
+
+        // Defensive: don't let this LW component edit a budget from a
+        // different project. Should never happen via the UI, but a
+        // crafted wire:click could try.
+        if ((int) $budget->housing_job_id !== (int) $this->jobId) {
+            session()->flash('error', 'Budget category not editable from this project.');
+
+            return;
+        }
+
+        $this->editingBudget = $id;
+        $this->budget_category = $budget->category;
+        $this->budget_amount = $budget->budgeted_amount;
+        $this->budget_fund_code_id = $budget->fund_code_id !== null ? (string) $budget->fund_code_id : '';
+        $this->showBudgetForm = true;
+    }
+
     public function saveBudget()
     {
-        $validated = $this->validate([
+        $this->validate([
             'budget_category' => 'required|string|max:255',
             'budget_amount' => 'required|numeric|min:0',
-            'budget_contract_id' => 'nullable|exists:contracts,id',
+            // P-2.5: required on new AND edited rows. The model's saving-
+            // event guard verifies the value is one of the project's
+            // assigned fund codes; this Livewire validation just gates
+            // the form against an empty submission.
+            'budget_fund_code_id' => 'required|integer|exists:fund_codes,id',
         ]);
 
         try {
-            ProjectBudget::create([
-                'housing_job_id' => $this->jobId,
-                'contract_id' => $this->budget_contract_id !== '' ? $this->budget_contract_id : null,
-                'category' => $this->budget_category,
-                'budgeted_amount' => $this->budget_amount,
-                'created_by' => Auth::id(),
-            ]);
+            if ($this->editingBudget) {
+                $budget = ProjectBudget::findOrFail($this->editingBudget);
+                if ((int) $budget->housing_job_id !== (int) $this->jobId) {
+                    session()->flash('error', 'Budget category not editable from this project.');
 
-            session()->flash('success', 'Budget category created successfully');
+                    return;
+                }
+                $budget->update([
+                    'category' => $this->budget_category,
+                    'budgeted_amount' => $this->budget_amount,
+                    'fund_code_id' => (int) $this->budget_fund_code_id,
+                    'updated_by' => Auth::id(),
+                ]);
+                session()->flash('success', 'Budget category updated successfully');
+            } else {
+                ProjectBudget::create([
+                    'housing_job_id' => $this->jobId,
+                    // P-2.5: contract_id is no longer surfaced in the
+                    // form. New rows get null. The column and
+                    // belongsTo(Contract) relation are preserved for any
+                    // legacy row + future use.
+                    'contract_id' => null,
+                    'fund_code_id' => (int) $this->budget_fund_code_id,
+                    'category' => $this->budget_category,
+                    'budgeted_amount' => $this->budget_amount,
+                    'created_by' => Auth::id(),
+                ]);
+                session()->flash('success', 'Budget category created successfully');
+            }
+
             $this->showBudgetForm = false;
             $this->resetBudgetForm();
             $this->refreshJob();
@@ -1223,11 +1273,15 @@ class ProjectManagement extends Component
             // grant_code badge renders immediately after saveBudget()
             // (previously the relation was unloaded until the next refresh).
             'budgets.contract',
+            // P-2.5: per-row fund code on budget categories. Eager-loading
+            // here keeps the budget tab's Fund Code cell free of N+1
+            // queries.
+            'budgets.fundCode',
             'expenses.document',
-            // P-22 / P-08 fallback: when a budget has no contract, surface
-            // fund codes directly assigned to this project via the
-            // fund_code_housing_job pivot. P-07 also wants requirements
-            // eager-loaded so the panel renders without N+1 queries.
+            // P-08: fund codes directly assigned to this project via the
+            // fund_code_housing_job pivot, used by the assignment UI and
+            // the requirements panel (P-07 wants requirements
+            // eager-loaded too).
             'fundCodes.requirements',
             'primaryFundCode',
         ])->findOrFail($this->jobId);
@@ -1302,6 +1356,7 @@ class ProjectManagement extends Component
         $this->budget_category = '';
         $this->budget_amount = '';
         $this->budget_contract_id = '';
+        $this->budget_fund_code_id = '';
     }
 
     protected function resetExpenseForm()
