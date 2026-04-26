@@ -111,14 +111,23 @@ Filled in as commits land. All reversible.
 
 ## Zero-fund-code jobs inventory (P-08 backfill manual-review list)
 
-Filled in by commit 5 from a query against the dev DB at backfill time.
-Each row is one of the 4 jobs that had no derivable fund code at backfill,
-so the housing manager can decide whether to assign codes manually or
-mark the project as abandoned.
+Captured from the dev DB at backfill time. Each row is one of the 4
+non-template housing jobs that had no derivable fund code at backfill —
+either because the job has no associated comm logs, or because its
+associated comm logs had no fund codes attached. The housing manager
+will review and assign codes manually (or mark abandoned) in the
+project assignment UI from commit 9.
+
+All four are currently `pending` status, which is interesting — could be
+mid-intake projects that hadn't yet been linked to comm logs, or
+abandoned drafts. Either is informative for the manager.
 
 | job_number | status | created_at | property |
 | --- | --- | --- | --- |
-| _populated by commit 5_ | | | |
+| JOB-2025-00004 | pending | 2025-12-16 | 47 S. Franklin Street, Allentown |
+| JOB-2025-00005 | pending | 2025-12-16 | 233 N. Jordan Street, Allentown |
+| JOB-2026-00009 | pending | 2026-04-08 | 2105 Schoenersville Rd, Bethlehem |
+| JOB-2026-00010 | pending | 2026-04-20 | 236.5 N 11th St., Allentown |
 
 ## P-27 backfill counts
 
