@@ -152,8 +152,14 @@
                                        class="rounded border-gray-300">
                             </td>
                             <td class="px-4 py-2">
+                                {{-- The property address is the project's leftmost identifier (P-10).
+                                     The click takes the user to the project detail view, same
+                                     destination as the job-title link below — they're two visual
+                                     anchors for the same row. The earlier property.show link
+                                     pointed at an unfinished Livewire surface that 500'd; not
+                                     restoring it until that surface is properly built. --}}
                                 @if($project->property)
-                                    <a href="{{ route('property.show', $project->property_id) }}" wire:navigate
+                                    <a href="{{ route('project.management', $project->id) }}" wire:navigate
                                        class="text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
                                         {{ $project->property->address_line_1 }}
                                     </a>
