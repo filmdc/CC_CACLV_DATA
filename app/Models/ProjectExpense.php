@@ -6,6 +6,21 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Project Expense — standalone housing project tracker.
+ *
+ * Records expense entries against a project's budget categories and
+ * updates ProjectBudget.spent_amount via a booted observer.
+ *
+ * Like ProjectBudget, this model is intentionally NOT integrated with
+ * Sage Intacct, MIP, DonorPerfect, or any other fiscal system of record.
+ * The housing project manager enters expenses here for project-level
+ * visibility; Fiscal's own systems remain authoritative for accounting.
+ *
+ * Do not add fiscal-system writes, reads, or syncs here. If a future
+ * requirement seems to call for that, escalate before building. See
+ * tests/Feature/Regression/Budget/BudgetIsStandaloneTest.php.
+ */
 class ProjectExpense extends Model
 {
     use HasFactory;

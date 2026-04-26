@@ -52,14 +52,12 @@ it('redirects guests on housing routes', function (string $path) {
     expect($response->status())->toBeIn([302, 401]);
 })->with('allHousingRoutes')->group('regression');
 
-// Pre-existing latent bug surfaced by the harness — see PHASE_0_NOTES.md.
-// resources/views/livewire/fund-code-management.blade.php:92 references
-// route('contracts.show', ...) but the route is named 'contract.show' (singular).
-// Production fund codes all have contract_id=null so the broken branch never
-// fires there; the seeder's contract-linked fund codes are the first place it
-// surfaces. Out of P-33 scope; flip the skip when fixed.
-it('GET /fund-codes returns 200 — pending fix for undefined route', function () {
+// P-05 (Phase 2): the /fund-codes view used to reference an undefined
+// route name (contracts.show vs the registered contract.show), which
+// 500'd whenever any fund code had a contract_id set. Fixed in commit 7
+// of phase-2/fund-code-system; this test exercises the path that was
+// formerly skipped under P-33.
+it('GET /fund-codes returns 200 with a contract-linked fund code present', function () {
     $response = $this->actingAs($this->user)->get('/fund-codes');
     expect($response->status())->toBe(200);
-})->skip('Pre-existing: fund-code-management.blade.php:92 references undefined route "contracts.show". Tracked in PHASE_0_NOTES.md.')
-    ->group('regression');
+})->group('regression');

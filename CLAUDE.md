@@ -260,6 +260,19 @@ Housing Module Features:
 
 `HousingModuleSeeder` and `ProjectHousingPermissionsSeeder` are wired up in `DatabaseSeeder`.
 
+##### Housing budget module — design intent
+
+The Housing project budget module (`ProjectBudget`, `ProjectExpense`, and the budget-related portions of `HousingJob` / `ProjectManagement`) is, by design, a **standalone tracker**. It is intentionally NOT integrated with Sage Intacct, MIP, DonorPerfect, or any other fiscal system of record.
+
+Its purpose is narrow:
+- Let the housing project manager record a project's funding sources (the fund codes assigned to that project).
+- Let her record the allocated amount per line item.
+- Let her record expenses against those line items, so total expense vs. budgeted amount is visible at a glance per project.
+
+That is the entire scope. It exists so the housing project manager doesn't have to ask Fiscal "how much have we spent on 123 Main Street?" — she can see it herself, in her own tool, sourced from her own data entry. Fiscal teams use their own systems; those remain authoritative for accounting.
+
+This is NOT a gap to be closed in a future phase. Do not propose Sage integration, fiscal writes, or external-fund-system reads on this module. If a future requirement seems to call for that, escalate before building. The `tests/Feature/Regression/Budget/BudgetIsStandaloneTest.php` tripwire guards this contract via grep-based import scanning of housing budget files.
+
 ### Key Features
 - 7-digit alphanumeric household codes (auto-generated)
 - 2025 Federal poverty guidelines calculations

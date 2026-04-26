@@ -102,6 +102,9 @@ class ProjectManagement extends Component
 
     public $budget_contract_id = '';
 
+    // P-08: Fund-code assignment
+    public $newFundCodeId = '';
+
     // Expense Form
     public $showExpenseForm = false;
 
@@ -1156,6 +1159,53 @@ class ProjectManagement extends Component
     }
 
     // Helper Methods
+    // P-08: Fund-code assignment
+
+    public function attachFundCode(): void
+    {
+        $this->authorizeAction('projects.manage');
+
+        if ($this->newFundCodeId === '' || $this->newFundCodeId === null) {
+            return;
+        }
+
+        $code = \App\Models\FundCode::findOrFail($this->newFundCodeId);
+        $this->job->fundCodes()->syncWithoutDetaching([$code->id]);
+        $this->newFundCodeId = '';
+
+        $this->refreshJob();
+    }
+
+    public function detachFundCode(int $id): void
+    {
+        $this->authorizeAction('projects.manage');
+
+        // Detach the pivot row first so the saving-event guard on
+        // HousingJob accepts the primary clear that follows. If the
+        // detached code WAS primary, clear primary_fund_code_id; the guard
+        // permits null primaries unconditionally.
+        $this->job->fundCodes()->detach($id);
+
+        if ((int) $this->job->primary_fund_code_id === $id) {
+            $this->job->primary_fund_code_id = null;
+            $this->job->save();
+        }
+
+        $this->refreshJob();
+    }
+
+    public function setPrimaryFundCode(int $id): void
+    {
+        $this->authorizeAction('projects.manage');
+
+        $code = \App\Models\FundCode::findOrFail($id);
+        // Routes through the model helper so the attach-then-set order is
+        // honored even if the code somehow isn't in the pivot yet.
+        $this->job->setPrimaryFundCode($code);
+
+        $this->refreshJob();
+    }
+
     protected function refreshJob()
     {
         $this->job = HousingJob::with([
@@ -1172,10 +1222,12 @@ class ProjectManagement extends Component
             // (previously the relation was unloaded until the next refresh).
             'budgets.contract',
             'expenses.document',
-            // P-22 fallback: when a budget has no contract, surface fund
-            // codes from this project's associated communication logs.
-            'communicationLogs.fundCodes',
-            'originatingCommunicationLogs.fundCodes',
+            // P-22 / P-08 fallback: when a budget has no contract, surface
+            // fund codes directly assigned to this project via the
+            // fund_code_housing_job pivot. P-07 also wants requirements
+            // eager-loaded so the panel renders without N+1 queries.
+            'fundCodes.requirements',
+            'primaryFundCode',
         ])->findOrFail($this->jobId);
 
         // Fix any inconsistent document states (e.g., status is 'pending_review' but no files)
@@ -1371,6 +1423,14 @@ class ProjectManagement extends Component
                 ];
             })->toArray();
 
+        // P-08: fund codes available to attach (active + not yet on this
+        // project), so the dropdown only offers meaningful options.
+        $attachedIds = $this->job->fundCodes->pluck('id');
+        $availableFundCodes = \App\Models\FundCode::active()
+            ->whereNotIn('id', $attachedIds)
+            ->orderBy('code')
+            ->get(['id', 'code', 'description']);
+
         return view('livewire.project-management', [
             'users' => $users,
             'currentMilestone' => $currentMilestone,
@@ -1379,6 +1439,7 @@ class ProjectManagement extends Component
             'contractors' => $contractors,
             'properties' => $properties,
             'contracts' => $contracts,
+            'availableFundCodes' => $availableFundCodes,
         ]);
     }
 }

@@ -34,10 +34,10 @@ it('renders Property as the leftmost identifier column, before Participant (P-10
     expect($propertyHeaderPos)->toBeLessThan($participantHeaderPos);
 })->group('regression');
 
-it('shows derived fund codes in the projects list, sourced from associated communication logs (P-11)', function () {
-    // RegressionTestSeeder wires CL-4 (with FC-FIX-003) to HJ-1 via both
-    // housing_job_id and converted_to_job_id. The list should surface that
-    // code on the HJ-1 row without any new project↔fund_code schema.
+it('shows project fund codes in the projects list (P-11 / P-08)', function () {
+    // RegressionTestSeeder attaches FC-FIX-003 directly to HJ-1 via the
+    // fund_code_housing_job pivot (post-backfill production shape). The
+    // list should surface that code on the HJ-1 row.
     $html = Livewire::actingAs($this->user)
         ->test(ProjectsManagement::class)
         ->assertSee('Fund Codes')

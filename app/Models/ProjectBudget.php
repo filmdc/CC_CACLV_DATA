@@ -7,6 +7,23 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Project Budget — standalone housing project tracker.
+ *
+ * Tracks funding sources, allocated amounts, and per-category spent totals
+ * for a single housing project. Scoped to the housing project manager's
+ * own data entry, scoped to her view of project-level finances.
+ *
+ * This module is intentionally NOT integrated with Sage Intacct, MIP,
+ * DonorPerfect, or any other fiscal system of record. Fiscal teams use
+ * their own systems; this exists so the housing project manager can see
+ * project-level budget vs. expense without querying Fiscal.
+ *
+ * Do not add fiscal-system writes, reads, or syncs here. If a future
+ * requirement seems to call for that, escalate before building. The
+ * tests/Feature/Regression/Budget/BudgetIsStandaloneTest.php tripwire
+ * guards this contract via grep-based import scanning.
+ */
 class ProjectBudget extends Model
 {
     use HasFactory;
