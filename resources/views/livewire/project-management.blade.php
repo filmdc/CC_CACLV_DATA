@@ -172,6 +172,8 @@
             @endif
         </div>
 
+        @include('livewire.partials.fund-code-requirements-panel')
+
         <!-- Tabs -->
         <div class="border-b border-gray-200 dark:border-zinc-700">
             <nav class="flex -mb-px">

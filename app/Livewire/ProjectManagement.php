@@ -1224,8 +1224,9 @@ class ProjectManagement extends Component
             'expenses.document',
             // P-22 / P-08 fallback: when a budget has no contract, surface
             // fund codes directly assigned to this project via the
-            // fund_code_housing_job pivot.
-            'fundCodes',
+            // fund_code_housing_job pivot. P-07 also wants requirements
+            // eager-loaded so the panel renders without N+1 queries.
+            'fundCodes.requirements',
             'primaryFundCode',
         ])->findOrFail($this->jobId);
 
