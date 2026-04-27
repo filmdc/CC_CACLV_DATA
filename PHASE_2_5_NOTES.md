@@ -156,3 +156,34 @@ rejection record.
       where M is NOT in N's `fund_code_housing_job` pivot. Confirm
       the saving-event guard throws `\InvalidArgumentException` with
       "not assigned to the project" in the message.
+
+## Operational papercuts surfaced during the comms-log/projects-housing hotfix
+
+(Hotfix branch: `hotfix/comms-log-fund-filter-projects-housing-scope`,
+merged into `main` on top of Phase 2.5's start.)
+
+- **View-cache permission drift.** `storage/framework/views/`
+  accumulates Apache-owned (`www-data:www-data`, mode 644) compiled
+  blade files that block CLI test runs by other group members.
+  Symptom: `php artisan test` from a non-`www-data` user returns
+  dozens of `file_put_contents(...): Failed to open stream: Permission denied`
+  ViewException failures even though the directory itself is 775
+  group-writable. Workaround for now: `php artisan view:clear`
+  before each CLI run. Long-term fix is `chmod g+s` on the views
+  directory plus a consistent `umask 002` on the Apache process
+  so newly-compiled views inherit group-write. ~15-30 min standalone
+  infrastructure session — could be batched with the
+  `node_modules/`/`vendor/` git-tracking cleanup that's also pending.
+
+- **`RegressionTestSeeder` "Fixture Housing Program" now carries
+  `housing_module_enabled = true`.** Added during the hotfix so the
+  new housing-only filter on `/projects` continues to surface fixture
+  jobs. The fixture's previous (absent / false) state did not match
+  prod reality, where the one housing program does have the flag set.
+  All 133 existing regression tests pass against the updated fixture,
+  so empirically nothing depends on the old state. **For future
+  tests that need a non-housing fixture program**, add a separate
+  `Program::factory()->create(['housing_module_enabled' => false, ...])`
+  inline in the test (see `tests/Feature/Regression/Projects/HousingScopeTest.php`'s
+  `beforeEach` for the pattern) rather than leaning on the old
+  fixture default.

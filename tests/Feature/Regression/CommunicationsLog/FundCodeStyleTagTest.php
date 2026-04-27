@@ -38,9 +38,15 @@ it('shows only attached fund codes on detail view — unattached ones are absent
     $cl2 = CommunicationLog::where('subject', 'like', 'CL-2:%')->firstOrFail();
     expect($cl2->fundCodes)->toHaveCount(1);
 
-    Livewire::actingAs($this->user)
+    $html = Livewire::actingAs($this->user)
         ->test(CommunicationsLogManagement::class)
         ->call('viewDetail', $cl2->id)
         ->assertSee('FC-FIX-001')
-        ->assertDontSee('FC-FIX-003');
+        ->html();
+
+    // The detail-modal chip wraps codes as <span class="font-mono font-semibold">{code}</span>.
+    // FC-FIX-003 may legitimately appear elsewhere on the page (e.g., the
+    // page-level fund-code filter dropdown), so scope this assertion to the
+    // chip markup rather than the whole document.
+    expect($html)->not->toContain('font-mono font-semibold">FC-FIX-003<');
 })->group('regression');

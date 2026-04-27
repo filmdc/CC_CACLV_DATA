@@ -341,10 +341,13 @@ class ProjectsManagement extends Component
     {
         $this->resetForm();
 
-        // Auto-select CAH program by default
-        $cahProgram = Program::where('name', 'LIKE', '%CAH%')->first();
-        if ($cahProgram) {
-            $this->program_id = $cahProgram->id;
+        // Auto-select CAH program by default if housing-enabled, otherwise the first housing program
+        $defaultProgram = Program::where('housing_module_enabled', true)
+            ->where('name', 'LIKE', '%CAH%')
+            ->first()
+            ?? Program::where('housing_module_enabled', true)->orderBy('name')->first();
+        if ($defaultProgram) {
+            $this->program_id = $defaultProgram->id;
         }
 
         $this->showCreateForm = true;
@@ -568,8 +571,11 @@ class ProjectsManagement extends Component
             ->orderBy('template_name')
             ->get();
 
+        $housingProgramIds = Program::where('housing_module_enabled', true)->pluck('id');
+
         $projects = HousingJob::query()
             ->activeJobs() // Exclude templates by default
+            ->whereIn('program_id', $housingProgramIds)
             ->with(['program', 'service', 'participant', 'property', 'contractor', 'milestones.tasks', 'budgets', 'fundCodes'])
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
@@ -593,12 +599,12 @@ class ProjectsManagement extends Component
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
-        $programs = Program::orderBy('name')->get();
+        $programs = Program::where('housing_module_enabled', true)->orderBy('name')->get();
 
-        // For filter dropdowns (objects)
+        // For filter dropdowns (objects) — services for housing programs only
         $servicesForFilter = $this->filterProgram
             ? Service::where('program_id', $this->filterProgram)->orderBy('name')->get()
-            : Service::orderBy('name')->get();
+            : Service::whereIn('program_id', $housingProgramIds)->orderBy('name')->get();
 
         // For searchable selects in create form (arrays)
         $propertiesSearchable = Property::orderBy('address_line_1')->get()->map(function ($p) {

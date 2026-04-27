@@ -46,6 +46,8 @@ class CommunicationsLogManagement extends Component
 
     public $tagFilter = '';
 
+    public $fundCodeFilter = '';
+
     // Form state
     public $showForm = false;
 
@@ -235,6 +237,7 @@ class CommunicationsLogManagement extends Component
         'priorityFilter' => ['except' => ''],
         'serviceFilter' => ['except' => ''],
         'tagFilter' => ['except' => ''],
+        'fundCodeFilter' => ['except' => ''],
     ];
 
     public function mount()
@@ -268,6 +271,11 @@ class CommunicationsLogManagement extends Component
     }
 
     public function updatedTagFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedFundCodeFilter()
     {
         $this->resetPage();
     }
@@ -1914,6 +1922,10 @@ class CommunicationsLogManagement extends Component
 
         if ($this->tagFilter) {
             $query->whereHas('tags', fn ($q) => $q->where('tags.id', $this->tagFilter));
+        }
+
+        if ($this->fundCodeFilter) {
+            $query->whereHas('fundCodes', fn ($q) => $q->where('fund_codes.id', $this->fundCodeFilter));
         }
 
         if ($this->dateFrom) {

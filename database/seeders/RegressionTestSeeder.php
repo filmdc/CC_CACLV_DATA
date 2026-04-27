@@ -34,6 +34,7 @@ class RegressionTestSeeder extends Seeder
             'start_date' => '2026-01-01',
             'end_date' => '2026-12-31',
             'active' => true,
+            'housing_module_enabled' => true,
         ]);
 
         $contractA = Contract::factory()->create([

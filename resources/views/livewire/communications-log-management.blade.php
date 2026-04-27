@@ -144,16 +144,28 @@
                     </select>
                 </div>
 
-                <!-- Second row for tag filter -->
-                @if($allTags->isNotEmpty())
-                <div class="mt-3">
-                    <select wire:model.live="tagFilter"
-                            class="px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md text-sm">
-                        <option value="">All Tags</option>
-                        @foreach($allTags as $tag)
-                            <option value="{{ $tag->id }}">{{ $tag->name }}</option>
-                        @endforeach
-                    </select>
+                <!-- Second row for tag and fund code filters -->
+                @if($allTags->isNotEmpty() || $allFundCodes->isNotEmpty())
+                <div class="mt-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                    @if($allTags->isNotEmpty())
+                        <select wire:model.live="tagFilter"
+                                class="px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md text-sm">
+                            <option value="">All Tags</option>
+                            @foreach($allTags as $tag)
+                                <option value="{{ $tag->id }}">{{ $tag->name }}</option>
+                            @endforeach
+                        </select>
+                    @endif
+
+                    @if($allFundCodes->isNotEmpty())
+                        <select wire:model.live="fundCodeFilter"
+                                class="px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md text-sm">
+                            <option value="">All Fund Codes</option>
+                            @foreach($allFundCodes as $fundCode)
+                                <option value="{{ $fundCode->id }}">{{ $fundCode->full_display }}</option>
+                            @endforeach
+                        </select>
+                    @endif
                 </div>
                 @endif
             </div>
