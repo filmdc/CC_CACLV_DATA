@@ -237,12 +237,11 @@ class RegressionTestSeeder extends Seeder
         ]);
         $cl4->fundCodes()->attach($fcStandalone->id);
 
-        // P-08: also attach FC-FIX-003 directly to HJ-1 via the new pivot
-        // and mark it primary. In production, this is what the backfill
-        // migration writes for converted-from-comm-log projects. The
-        // seeder mirrors that post-backfill state so regression tests run
-        // against a realistic Phase-2 fixture.
-        $hj1->setPrimaryFundCode($fcStandalone);
+        // Attach FC-FIX-003 directly to HJ-1 via the fund_code_housing_job
+        // pivot. In production, this is what the backfill migration writes
+        // for converted-from-comm-log projects. (Phase 2.7 / P-38 dropped
+        // the primary-fund-code concept; all attached codes are equal.)
+        $hj1->fundCodes()->attach($fcStandalone->id);
 
         // HJ-2 — in_progress, mid-milestone.
         $hj2 = HousingJob::factory()->create([

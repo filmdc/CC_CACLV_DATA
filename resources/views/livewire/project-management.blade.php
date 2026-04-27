@@ -158,16 +158,6 @@
                         <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-zinc-800 border border-emerald-300 dark:border-emerald-700 rounded-md">
                             <span class="font-mono text-sm font-semibold text-gray-900 dark:text-white">{{ $fc->code }}</span>
                             <span class="text-xs text-gray-500 dark:text-gray-400">{{ Str::limit($fc->description, 40) }}</span>
-                            @if((int) $job->primary_fund_code_id === (int) $fc->id)
-                                <span class="inline-flex items-center px-2 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200">
-                                    ★ Primary
-                                </span>
-                            @elseif($this->can('projects.manage'))
-                                <button wire:click="setPrimaryFundCode({{ $fc->id }})"
-                                        class="text-xs text-emerald-700 dark:text-emerald-300 hover:underline">
-                                    Make primary
-                                </button>
-                            @endif
                             @if($this->can('projects.manage'))
                                 <button wire:click="detachFundCode({{ $fc->id }})"
                                         wire:confirm="Detach {{ $fc->code }} from this project?"

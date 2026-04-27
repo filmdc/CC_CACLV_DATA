@@ -51,8 +51,7 @@ class ProjectBudget extends Model
      * P-2.5 invariant: when fund_code_id is set, the same fund code must
      * already be in the parent project's fund_code_housing_job pivot.
      * Catches mass-assignment / tinker / console paths that bypass the
-     * Livewire form. Mirrors the saving guard on HousingJob's
-     * primary_fund_code_id from Phase 2.
+     * Livewire form.
      */
     protected static function booted(): void
     {
