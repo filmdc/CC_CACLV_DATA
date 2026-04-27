@@ -93,6 +93,56 @@ unexpected diffs to keep snapshots green — investigate first.
 - Removing `housing_module_enabled` flag handling — the implicit scope
   from PR #15 stays.
 
+## Snapshot expectations — actual results
+
+| File | Predicted | Actual at refresh time |
+| --- | --- | --- |
+| `tests/Support/__snapshots__/projects_list.html` | Maybe | **Yes** — refreshed in commit 2. Diff: dropdown removed + grid `md:grid-cols-4` → `md:grid-cols-3`. |
+| `tests/Support/__snapshots__/milestone_display.html` | None expected (corrected post-fact) | **Yes** — refreshed in commit 3 follow-up. Both snapshots capture the project detail page in full, header included, so the P-37 header restructure cascades into them. |
+| `tests/Support/__snapshots__/budget_categories_with_contract.html` | None expected (corrected post-fact) | **Yes** — same reason as above; refreshed in commit 3 follow-up. |
+| `tests/Support/__snapshots__/project_detail_requirements_panel.html` | Definite | **Yes** — refreshed in commit 6. Diff: ★ Primary chip in the FC-FIX-003 group removed. No other rearrangement. |
+
+Original prediction was 1 of 4 snapshots affected; actual was 4 of 4
+(the milestone/budget snapshots were misclassified as "header-free"
+in the original Discover map). Per manager addition #3, each diff
+was reviewed before refresh — none were unexpected drift.
+
+## Suite arc across commits
+
+| Commit | Suite state |
+| --- | --- |
+| 1 — docs scaffold | 133 / 0 (pre-existing baseline) |
+| 2 — P-36 dropdown removal | 1 expected fail → refresh `projects_list.html` → 133 / 0 |
+| 3 — P-37 header restructure | 2 expected fails → refresh `milestone_display` + `budget_categories_with_contract` → 133 / 0 |
+| 4 — P-38 code surface removal | 11 expected fails (intentional red zone) |
+| 5 — P-38 schema drop | 13 (red zone unchanged in shape; +2 QueryException on PrimaryGuardTest's column-direct tests) |
+| 6 — P-38 test cleanup + snapshot | **121 / 0 / 356 assertions** (net -12 tests deleted, -29 assertions) |
+| 7 — docs finalize | 121 / 0 (this commit) |
+
 ## Follow-ups & risks
 
-(filled in across commits; finalized in commit 7)
+- **Phase 2 historical migrations are intentionally untouched.**
+  `2026_04_26_000003_add_primary_fund_code_id_to_housing_jobs_table.php`
+  and `2026_04_26_000004_backfill_housing_job_fund_codes_from_communication_logs.php`
+  remain in the migrations directory unchanged. They run forward on a
+  rebuilt test DB (column added, then backfilled, then dropped by the
+  Phase 2.7 migration). Editing the historical migrations to be no-ops
+  was deliberately out of scope — the chain works, and rewriting
+  history is its own risk class.
+- **Production primary FK values are gone.** The 12 prod jobs that had
+  `primary_fund_code_id` set lost those values when commit 5's
+  migration runs on prod. This was a manager-resolved decision; no
+  sidecar table preserves them. If a primary concept is ever wanted
+  again, build it fresh.
+- **`HousingJob::detachFundCode()` survives.** The Livewire
+  `ProjectManagement::detachFundCode()` continues to route through it
+  for the P-2.5 budget-row guard. If a future change wants to bypass
+  the helper, the budget-row invariant still has to be enforced
+  somewhere.
+- **Re-adding the regular-vs-PM filter** (if ever wanted): see the
+  P-36 audit result section above. The criterion was
+  `whereHas('milestones')` for "PM Enabled Only" and
+  `whereDoesntHave('milestones')` for "Regular Jobs Only".
+- **Phase 3 unblocked.** P-36, P-37, P-38 all land cleanly with the
+  suite green; nothing in the workflow/dashboard work for Phase 3
+  needs to wait on this branch.
