@@ -77,8 +77,8 @@ wants the capability back.
 | File | Expected diff | Verified at commit |
 | --- | --- | --- |
 | `tests/Support/__snapshots__/projects_list.html` | Maybe — the `filterPmEnabled` dropdown sits inside the filter form region of the snapshot | Commit 2 (P-36) |
-| `tests/Support/__snapshots__/milestone_display.html` | None expected — snapshot scoped to milestone display, not the page header | Commit 3 (P-37) |
-| `tests/Support/__snapshots__/budget_categories_with_contract.html` | None expected — same reason | Commit 3 (P-37) |
+| `tests/Support/__snapshots__/milestone_display.html` | **Yes** (corrected post-commit-3) — both snapshots capture the project detail page in full, header included. Diff is exactly the P-37 header change | Commit 3 follow-up |
+| `tests/Support/__snapshots__/budget_categories_with_contract.html` | **Yes** (same reason as above) | Commit 3 follow-up |
 | `tests/Support/__snapshots__/project_detail_requirements_panel.html` | Definite — the `★ Primary` chip on line 11 disappears | Commit 6 (P-38 cleanup) |
 
 For each refresh, the diff IS the visual review. Don't suppress
