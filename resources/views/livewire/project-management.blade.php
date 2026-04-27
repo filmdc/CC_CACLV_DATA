@@ -11,11 +11,23 @@
                             </svg>
                         </a>
                         <div>
-                            <h1 class="text-2xl font-bold">{{ $job->job_number }} - {{ $job->job_title }}</h1>
-                            <p class="text-indigo-100 mt-1">
-                                {{ $job->participant ? $job->participant->first_name . ' ' . $job->participant->last_name : 'No Participant' }}
-                                | {{ $job->property ? $job->property->address_line_1 : 'No Property' }}
+                            {{-- P-37: three-line header — address + head-of-household (prominent), fund codes (secondary, equal treatment), job number (small subtitle). --}}
+                            <h1 class="text-2xl font-bold leading-tight">
+                                {{ $job->property?->address_line_1 ?? 'No property on file' }}
+                                @if($job->participant)
+                                    <span class="font-semibold">— {{ $job->participant->first_name }} {{ $job->participant->last_name }}</span>
+                                @endif
+                            </h1>
+                            <p class="text-sm text-indigo-100 mt-2">
+                                @if($job->fundCodes->isNotEmpty())
+                                    @foreach($job->fundCodes->sortBy('code') as $fc)
+                                        <span class="font-mono">{{ $fc->code }}</span>@if(!$loop->last), @endif
+                                    @endforeach
+                                @else
+                                    <span class="italic text-indigo-200">No fund codes assigned</span>
+                                @endif
                             </p>
+                            <p class="text-xs text-indigo-200 mt-1 font-mono">{{ $job->job_number }}</p>
                         </div>
                     </div>
                 </div>
