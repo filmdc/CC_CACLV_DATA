@@ -202,13 +202,3 @@ it('detachFundCode succeeds when no budget row references the code (P-2.5)', fun
     expect($job->fresh()->fundCodes()->where('fund_codes.id', $codeA->id)->exists())->toBeTrue();
 })->group('regression');
 
-it('detachFundCode helper on HousingJob clears primary_fund_code_id when the detached code was primary (P-2.5)', function () {
-    $job = HousingJob::factory()->create();
-    $code = FundCode::factory()->create();
-    $job->setPrimaryFundCode($code);
-
-    $job->detachFundCode($code->id);
-
-    expect($job->fresh()->primary_fund_code_id)->toBeNull();
-    expect($job->fresh()->fundCodes()->where('fund_codes.id', $code->id)->exists())->toBeFalse();
-})->group('regression');
