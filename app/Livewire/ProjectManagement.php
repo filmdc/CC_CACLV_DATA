@@ -124,8 +124,6 @@ class ProjectManagement extends Component
 
     public $expense_document_id = '';
 
-    public $expense_contract_id = '';
-
     // Template Form
     public $showSaveAsTemplateForm = false;
 
@@ -978,13 +976,15 @@ class ProjectManagement extends Component
             'expense_date' => 'required|date',
             'expense_description' => 'nullable|string',
             'expense_document_id' => 'nullable|exists:milestone_documents,id',
-            'expense_contract_id' => 'nullable|exists:contracts,id',
         ]);
 
         try {
             ProjectExpense::create([
                 'housing_job_id' => $this->jobId,
-                'contract_id' => $this->expense_contract_id !== '' ? $this->expense_contract_id : null,
+                // Hotfix (post P-2.5): expense's funding source is no longer
+                // surfaced — it's implied by the matching budget category.
+                // contract_id stays in the schema; new rows get null.
+                'contract_id' => null,
                 'category' => $this->expense_category,
                 'amount' => $this->expense_amount,
                 'expense_date' => $this->expense_date,
@@ -1368,7 +1368,6 @@ class ProjectManagement extends Component
         $this->expense_date = '';
         $this->expense_description = '';
         $this->expense_document_id = '';
-        $this->expense_contract_id = '';
     }
 
     // Contract Override Methods
