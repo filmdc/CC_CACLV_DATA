@@ -17,11 +17,6 @@
                 <div class="border-l-4 border-emerald-500 pl-3">
                     <div class="flex items-center gap-2 mb-2 flex-wrap">
                         <span class="font-mono text-sm font-semibold text-gray-900 dark:text-white">{{ $fc->code }}</span>
-                        @if((int) $job->primary_fund_code_id === (int) $fc->id)
-                            <span class="inline-flex items-center px-2 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200">
-                                ★ Primary
-                            </span>
-                        @endif
                         <span class="text-xs text-gray-500 dark:text-gray-400">{{ $fc->description }}</span>
                     </div>
                     <ul class="space-y-2">

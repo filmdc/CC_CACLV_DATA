@@ -6,8 +6,9 @@ Branch: `phase-2.5/budget-fund-code` cut from `main` after Phase 2
 ## Discovery summary
 
 Phase 2 wired fund codes to the project (the `fund_code_housing_job`
-pivot + `primary_fund_code_id` on `housing_jobs`), but the budget
-category form was left with the legacy Contract dropdown. The
+pivot + `primary_fund_code_id` on `housing_jobs` — **the latter
+dropped in Phase 2.7 / P-38**), but the budget category form was
+left with the legacy Contract dropdown. The
 `// TODO(Phase 2: P-05)` marker for per-row `fund_code_id` on
 `project_budgets` was acknowledged in Phase 2 Discover but the schema
 and form change never landed.
@@ -53,8 +54,8 @@ This phase closes that gap.
 | Commit | Punch list | Summary |
 | --- | --- | --- |
 | 1 | P-2.5 | `add_fund_code_id_to_project_budgets` migration. Nullable FK, nullOnDelete. No backfill. |
-| 2 | P-2.5 | `ProjectBudget::fundCode()` belongsTo + saving-event guard. Throws if `fund_code_id` is set to a code not in the project's `fund_code_housing_job` pivot. Mirrors Phase 2's `primary_fund_code_id` guard on `HousingJob`. |
-| 3 | P-2.5 | `HousingJob::detachFundCode()` helper with budget-row guard. Pre-checks `ProjectBudget` rows; throws `\InvalidArgumentException` listing affected category names if any reference the code being detached. Otherwise detaches and clears `primary_fund_code_id` if it matched. The Livewire layer routes through the helper and surfaces the error via `session()->flash('error', ...)`. |
+| 2 | P-2.5 | `ProjectBudget::fundCode()` belongsTo + saving-event guard. Throws if `fund_code_id` is set to a code not in the project's `fund_code_housing_job` pivot. ~~Mirrors Phase 2's `primary_fund_code_id` guard on `HousingJob`.~~ **Phase 2.7 / P-38: that mirror reference is gone — Phase 2's primary guard was removed; the budget-row guard described here is now standalone.** |
+| 3 | P-2.5 | `HousingJob::detachFundCode()` helper with budget-row guard. Pre-checks `ProjectBudget` rows; throws `\InvalidArgumentException` listing affected category names if any reference the code being detached. Otherwise detaches and clears `primary_fund_code_id` if it matched. The Livewire layer routes through the helper and surfaces the error via `session()->flash('error', ...)`. **Phase 2.7 / P-38: primary clear branch removed.** The helper still exists and the budget-row guard remains; it just no longer touches primary state. |
 | 4 | P-2.5 | Form + row display + edit flow. Contract picker (Alpine combo-box) replaced with a simple Fund Code `<select>` populated from `$job->fundCodes`. New `editBudget($id)` method + Edit action button per row + form modal title and save button text toggle by `$editingBudget`. Row cell collapses to the soft 3-step fallback (fund_code → contract grant_code → contract title → em-dash). Phase 2's project-wide fallback removed. Phase 1's three contract-form-specific tests deleted (`Phase1OptionalContractUiTest`, `CreateCategoryWithContractTest`, `CreateCategoryWithoutContractTest` — they assert on a UI surface that no longer exists). The eager-load probe in `Phase1FundCodeProminenceTest` rewritten to point at the new `fundCode` relation. |
 | 5 | P-2.5 | `BudgetFundCodeAssignmentTest` (10 tests covering required-on-new, must-be-in-pivot, edit flow, detach-block, primary-clear-on-detach). `Phase1FundCodeProminenceTest` "falls back" rewrite — the old test was passing for the wrong reason (codes appeared in the Fund Codes assignment section above the tabs, not in the budget row), now carves to `<tbody>` to exercise the actual row cell. |
 | 6 | P-2.5 | This notes file + REGRESSION_HARNESS.md update. |
@@ -106,7 +107,9 @@ rejection record.
   `$budget_fund_code_id` with `$job->primary_fund_code_id` when the
   Add Budget Category modal opens, so the manager confirms-or-changes
   rather than picks-from-blank. Decision 1 explicitly rejected this:
-  the operator picks the code; the system doesn't guess.
+  the operator picks the code; the system doesn't guess. **Superseded
+  by Phase 2.7 / P-38** — primary fund code no longer exists, so this
+  parked enhancement is moot.
 - **Migration of existing rows to fund_code_id.** A backfill that
   reads each legacy budget's contract → looks up a corresponding
   fund code → writes to fund_code_id. Decision 1 explicitly rejected

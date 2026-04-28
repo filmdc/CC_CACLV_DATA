@@ -37,8 +37,6 @@ class ProjectsManagement extends Component
 
     public $filterPriority = '';
 
-    public $filterPmEnabled = ''; // all, pm_only, non_pm
-
     public $showTemplates = false; // Toggle to show/hide template jobs
 
     public $selectedJobs = [];
@@ -594,8 +592,6 @@ class ProjectsManagement extends Component
             ->when($this->filterService, fn ($q) => $q->where('service_id', $this->filterService))
             ->when($this->filterStatus, fn ($q) => $q->where('status', $this->filterStatus))
             ->when($this->filterPriority, fn ($q) => $q->where('priority', $this->filterPriority))
-            ->when($this->filterPmEnabled === 'pm_only', fn ($q) => $q->whereHas('milestones'))
-            ->when($this->filterPmEnabled === 'non_pm', fn ($q) => $q->whereDoesntHave('milestones'))
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 

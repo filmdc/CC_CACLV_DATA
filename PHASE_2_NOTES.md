@@ -86,11 +86,11 @@ future ad-hoc tag re-introduction.
 | --- | --- | --- |
 | P-06 | Requirements live in a separate `fund_code_requirements` table, not as JSON on FundCode. `cascadeOnDelete` on the FK; no uniqueness constraint on `sort_order` (ties break by id). | P-07's panel needs reactive add/remove/reorder + per-flag queries; JSON forces full-array rewrite on every reorder and resists indexing. |
 | P-08 | Pivot named `fund_code_housing_job` (alphabetical, matches `communication_log_fund_code` precedent in this repo). Composite primary key on `(fund_code_id, housing_job_id)`. | Laravel convention is alphabetical and existing pivot in the repo follows it; staying consistent. |
-| P-08 | Primary fund code lives as `primary_fund_code_id` FK on `housing_jobs`, not as `is_primary` on the pivot. | MySQL has no partial unique index, so an `is_primary` boolean would only be enforceable at the app layer; the FK on the parent table makes "zero-or-one primary per job" structural. |
-| P-08 | App-layer guard on `HousingJob` saving event: throws if `primary_fund_code_id` is set but `(housing_job_id, primary_fund_code_id)` is not in the pivot. Helper `setPrimaryFundCode(FundCode)` does attach-then-set. | Cheap invariant prevents drift if pivot is mutated independently. Detach-side enforcement is in the Livewire layer (commented in HousingJob.php so console/tinker users see it). |
-| P-08 | Backfill primary rule: oldest associated Comm Log's first attached fund code wins. | Empirically degenerate at this snapshot, but the rule still has to exist; chronologically first record is the most defensible answer if questioned later. |
+| P-08 | Primary fund code lives as `primary_fund_code_id` FK on `housing_jobs`, not as `is_primary` on the pivot. **Superseded by Phase 2.7 / P-38** — primary fund code concept removed; see PHASE_2_7_NOTES.md. | MySQL has no partial unique index, so an `is_primary` boolean would only be enforceable at the app layer; the FK on the parent table makes "zero-or-one primary per job" structural. |
+| P-08 | App-layer guard on `HousingJob` saving event: throws if `primary_fund_code_id` is set but `(housing_job_id, primary_fund_code_id)` is not in the pivot. Helper `setPrimaryFundCode(FundCode)` does attach-then-set. **Superseded by Phase 2.7 / P-38** — guard, helper, and the FK column itself all removed. | Cheap invariant prevents drift if pivot is mutated independently. Detach-side enforcement is in the Livewire layer (commented in HousingJob.php so console/tinker users see it). |
+| P-08 | Backfill primary rule: oldest associated Comm Log's first attached fund code wins. **Superseded by Phase 2.7 / P-38** — backfill logic remains in the historical migration but writes nothing once the column drops. | Empirically degenerate at this snapshot, but the rule still has to exist; chronologically first record is the most defensible answer if questioned later. |
 | P-08 | `getDerivedFundCodesAttribute()` is **deleted** after backfill + call-site swap. No "kept as suggestion feed" or "kept as sanity-check." | Single source of truth from day one; blast radius is 3 source edits + 2 eager-load cleanups + 2 test refreshes — small enough for a clean break. |
-| P-08 | Backfill migration `down()` truncates the new pivot and nulls `primary_fund_code_id` across all jobs. **Destructive of Phase 2 data only — documented in the migration docblock.** | At the time `down()` runs, the migration is the only writer of pivot rows and primary FK. "Re-derive and remove matching rows" is brittle if any operator activity sat between up and down. |
+| P-08 | Backfill migration `down()` truncates the new pivot and nulls `primary_fund_code_id` across all jobs. **Destructive of Phase 2 data only — documented in the migration docblock.** **Superseded by Phase 2.7 / P-38** — primary FK no longer exists, so the down()'s nulling step is now a no-op against a missing column; the pivot truncation step still applies. | At the time `down()` runs, the migration is the only writer of pivot rows and primary FK. "Re-derive and remove matching rows" is brittle if any operator activity sat between up and down. |
 | P-22 | Phase 1's no-contract budget fallback rendering switches from comm-log-derived codes to the new project pivot. Same intent (no-contract row falls back to the project's fund codes), different source. | Single source of truth shift — must ship in the same phase as P-08, not later. |
 | P-24 | Housing budget module is a standalone tracker by design. NOT integrated with Sage/Intacct/MIP/DonorPerfect/any external fiscal connector. Documentation (docblocks + CLAUDE.md section) + grep-based tripwire test enforce this. | Two-years-from-now signal so future contributors don't "helpfully" wire Sage in thinking they're filling in missing functionality. |
 | P-24 | Tripwire grep scopes to `use` statements + FQN class refs only (e.g., `use\s+[^;]*\b(Sage\|Intacct\|Mip\|DonorPerfect)\b` and `\\(Sage\|Intacct\|Mip\|DonorPerfect)\\`). NOT free-text. | Otherwise comments like "// not connected to Sage" trip the tripwire and force docblock contortions to satisfy the test, defeating the point. |
@@ -105,7 +105,7 @@ Filled in as commits land. All reversible.
 | --- | --- | --- | --- |
 | `2026_04_26_000001_create_fund_code_requirements_table.php` | P-06 | Yes | (commit 3) |
 | `2026_04_26_000002_create_fund_code_housing_job_table.php` | P-08 schema | Yes | (commit 4) |
-| `2026_04_26_000003_add_primary_fund_code_id_to_housing_jobs_table.php` | P-08 schema | Yes | (commit 4) |
+| `2026_04_26_000003_add_primary_fund_code_id_to_housing_jobs_table.php` | P-08 schema | Yes | (commit 4) — **dropped in Phase 2.7 / P-38** by `2026_04_27_120000_drop_primary_fund_code_id_from_housing_jobs_table.php` |
 | `2026_04_26_000004_backfill_housing_job_fund_codes_from_communication_logs.php` | P-08 backfill | Yes (destructive of Phase 2 data only) | (commit 5) |
 | `2026_04_26_000005_migrate_communication_log_fund_code_tags_to_structured_attachments.php` | P-27 | Yes (idempotent up + selective down) | (commit 11) |
 
@@ -193,7 +193,10 @@ runs `--group=regression` for exactly this reason.
   (the saving guard only catches the *attach* invariant). Comment in
   `HousingJob.php` notes this. If we ever expose pivot mutation outside
   Livewire (a console command, an admin API, etc.), promote the detach
-  enforcement to the model.
+  enforcement to the model. **Superseded by Phase 2.7 / P-38** — primary
+  FK no longer exists, so this dangling concern is moot. The
+  `detachFundCode()` helper still exists, but its only surviving
+  responsibility is the P-2.5 budget-row guard.
 - **Snapshot drift watch on commit 6** — the call-site swap should produce
   zero baseline diffs. If any of `projects_list.html` /
   `budget_categories_with_contract.html` / `milestone_display.html` diff,
@@ -218,7 +221,11 @@ record.
   `ProjectBudget.contract_id` (or a future `primary_fund_code_id` on
   `ProjectBudget`) from `HousingJob.primary_fund_code_id`. Touches
   Phase 1 surface area; defer until the housing manager has worked with
-  the new flow long enough to confirm it'd be a net win.
+  the new flow long enough to confirm it'd be a net win. **Superseded
+  by Phase 2.7 / P-38** — primary fund code no longer exists; this
+  propagation idea is now obsolete. If a fund-code defaulting behavior
+  is ever wanted on the budget form, build it from the project's
+  attached fund codes (the pivot), not from a primary designation.
 
 ## Manual test checklist (for staging)
 
@@ -241,11 +248,12 @@ punch-list item the manager will hand-walk.
       code, with hard items visually distinct.
 - [ ] (P-07) On the same page, attach a new fund code with requirements.
       Confirm the panel updates reactively without a page refresh.
-- [ ] (P-08) Attach two fund codes to a project. Mark one as primary.
+- [ ] (P-08) ~~Attach two fund codes to a project. Mark one as primary.
       Confirm the primary indicator renders. Switch primary; confirm
-      indicator moves.
-- [ ] (P-08) Detach the primary fund code. Confirm `primary_fund_code_id`
-      auto-clears.
+      indicator moves.~~ **Superseded by Phase 2.7 / P-38** — no
+      primary designation; all attached codes are equal.
+- [ ] (P-08) ~~Detach the primary fund code. Confirm `primary_fund_code_id`
+      auto-clears.~~ **Superseded by Phase 2.7 / P-38** — column gone.
 - [ ] (P-22) Create a budget category on a project with no contract but
       with assigned fund codes. Confirm the row renders the project's
       assigned codes (from the new pivot) — same UI shape as Phase 1, new

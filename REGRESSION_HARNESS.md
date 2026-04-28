@@ -179,15 +179,18 @@ should be paired with an updated regression test.
 - **Fund Code system** — CRUD on FundCode, requirements management UI
   (add/edit/delete/reorder, hard vs informational), cascade-delete of
   requirements when a fund code is deleted (P-05 / P-06).
-- **Project↔fund-code assignment** — attach / detach / set primary, the
-  saving-event invariant that primary_fund_code_id must reference a
-  pivot row, primary auto-clears on detach (P-08). Detach is now
-  doubly-guarded: P-08 clears primary, P-2.5 blocks if any budget row
-  references the code (with affected categories listed in the error).
+- **Project↔fund-code assignment** — attach / detach a fund code via
+  the `fund_code_housing_job` pivot (P-08). Detach is guarded by P-2.5:
+  blocks if any budget row references the code, with affected
+  categories listed in the error. (Phase 2.7 / P-38 removed the
+  primary-fund-code concept — no more primary attribute, no
+  setPrimaryFundCode helper, no saving-event guard, no auto-clear on
+  detach. All assigned fund codes are equal.)
 - **Fund Code requirements panel** — visible above the tabs, grouped by
-  code, hard vs informational visual distinction, primary indicator,
-  reactive on attach/detach (P-07; new snapshot baseline
-  `project_detail_requirements_panel.html`).
+  code, hard vs informational visual distinction, reactive on
+  attach/detach (P-07; snapshot baseline
+  `project_detail_requirements_panel.html`). Phase 2.7 / P-38 removed
+  the primary indicator from the panel.
 - **Comm Log fund-code tag → structured field migration** — idempotent,
   reversible, leaves tags alone, case-insensitive matching (P-27).
 - **Standalone-budget design rule** — `BudgetIsStandaloneTest` is a

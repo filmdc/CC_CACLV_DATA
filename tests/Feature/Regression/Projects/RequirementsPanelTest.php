@@ -73,49 +73,6 @@ it('does not render the panel when no attached code has requirements (P-07)', fu
     expect($panel)->not->toContain('Fund Code Requirements');
 })->group('regression');
 
-it('groups requirements by fund code with the primary indicator on the primary code (P-07)', function () {
-    $job = HousingJob::factory()->create();
-    $primary = FundCode::factory()->create(['code' => 'PRIM-001']);
-    $secondary = FundCode::factory()->create(['code' => 'SEC-001']);
-
-    FundCodeRequirement::factory()->hard()->create([
-        'fund_code_id' => $primary->id,
-        'label' => 'Primary code hard req',
-        'sort_order' => 1,
-    ]);
-    FundCodeRequirement::factory()->create([
-        'fund_code_id' => $secondary->id,
-        'label' => 'Secondary code soft req',
-        'sort_order' => 1,
-    ]);
-
-    $job->fundCodes()->attach([$primary->id, $secondary->id]);
-    $job->setPrimaryFundCode($primary);
-
-    $html = Livewire::actingAs($this->user)
-        ->test(ProjectManagement::class, ['id' => $job->id])
-        ->html();
-
-    $panel = extractPanelRegion($html);
-
-    // Both groups present.
-    expect($panel)->toContain('PRIM-001');
-    expect($panel)->toContain('SEC-001');
-
-    // Primary indicator appears in the panel.
-    expect($panel)->toContain('Primary');
-
-    // The Primary indicator sits inside the PRIM-001 code group, not the
-    // SEC-001 group. Carve out the substring between PRIM-001 and SEC-001
-    // and confirm the badge lives there.
-    $primStart = strpos($panel, 'PRIM-001');
-    $secStart = strpos($panel, 'SEC-001');
-    expect($primStart)->not->toBeFalse();
-    expect($secStart)->not->toBeFalse();
-    $primGroup = substr($panel, $primStart, $secStart - $primStart);
-    expect($primGroup)->toContain('Primary');
-})->group('regression');
-
 it('updates reactively when a new fund code with requirements is attached (P-07)', function () {
     $job = HousingJob::factory()->create();
     $code = FundCode::factory()->create(['code' => 'REACT-001']);
@@ -146,8 +103,10 @@ it('snapshot baseline of the panel for a deterministic mixed-requirements fixtur
 
     // Build a deterministic fixture WITHIN this test so the baseline is
     // self-contained. Two fund codes — one already attached (the seeder
-    // attaches FC-FIX-003 to HJ-1 with primary=FC-FIX-003 in commit 6),
-    // the other added here. Each gets a hard + informational req.
+    // attaches FC-FIX-003 to HJ-1 via the fund_code_housing_job pivot;
+    // Phase 2.7 / P-38 dropped the primary-fund-code concept, so it's
+    // attached but not flagged primary), the other added here. Each
+    // gets a hard + informational req.
     $fcStandalone = FundCode::where('code', 'FC-FIX-003')->firstOrFail();
     FundCodeRequirement::factory()->hard()->create([
         'fund_code_id' => $fcStandalone->id,

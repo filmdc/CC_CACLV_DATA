@@ -1246,18 +1246,6 @@ class ProjectManagement extends Component
         $this->refreshJob();
     }
 
-    public function setPrimaryFundCode(int $id): void
-    {
-        $this->authorizeAction('projects.manage');
-
-        $code = \App\Models\FundCode::findOrFail($id);
-        // Routes through the model helper so the attach-then-set order is
-        // honored even if the code somehow isn't in the pivot yet.
-        $this->job->setPrimaryFundCode($code);
-
-        $this->refreshJob();
-    }
-
     protected function refreshJob()
     {
         $this->job = HousingJob::with([
@@ -1283,7 +1271,6 @@ class ProjectManagement extends Component
             // the requirements panel (P-07 wants requirements
             // eager-loaded too).
             'fundCodes.requirements',
-            'primaryFundCode',
         ])->findOrFail($this->jobId);
 
         // Fix any inconsistent document states (e.g., status is 'pending_review' but no files)

@@ -11,11 +11,23 @@
                             </svg>
                         </a>
                         <div>
-                            <h1 class="text-2xl font-bold">{{ $job->job_number }} - {{ $job->job_title }}</h1>
-                            <p class="text-indigo-100 mt-1">
-                                {{ $job->participant ? $job->participant->first_name . ' ' . $job->participant->last_name : 'No Participant' }}
-                                | {{ $job->property ? $job->property->address_line_1 : 'No Property' }}
+                            {{-- P-37: three-line header — address + head-of-household (prominent), fund codes (secondary, equal treatment), job number (small subtitle). --}}
+                            <h1 class="text-2xl font-bold leading-tight">
+                                {{ $job->property?->address_line_1 ?? 'No property on file' }}
+                                @if($job->participant)
+                                    <span class="font-semibold">— {{ $job->participant->first_name }} {{ $job->participant->last_name }}</span>
+                                @endif
+                            </h1>
+                            <p class="text-sm text-indigo-100 mt-2">
+                                @if($job->fundCodes->isNotEmpty())
+                                    @foreach($job->fundCodes->sortBy('code') as $fc)
+                                        <span class="font-mono">{{ $fc->code }}</span>@if(!$loop->last), @endif
+                                    @endforeach
+                                @else
+                                    <span class="italic text-indigo-200">No fund codes assigned</span>
+                                @endif
                             </p>
+                            <p class="text-xs text-indigo-200 mt-1 font-mono">{{ $job->job_number }}</p>
                         </div>
                     </div>
                 </div>
@@ -146,16 +158,6 @@
                         <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-zinc-800 border border-emerald-300 dark:border-emerald-700 rounded-md">
                             <span class="font-mono text-sm font-semibold text-gray-900 dark:text-white">{{ $fc->code }}</span>
                             <span class="text-xs text-gray-500 dark:text-gray-400">{{ Str::limit($fc->description, 40) }}</span>
-                            @if((int) $job->primary_fund_code_id === (int) $fc->id)
-                                <span class="inline-flex items-center px-2 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200">
-                                    ★ Primary
-                                </span>
-                            @elseif($this->can('projects.manage'))
-                                <button wire:click="setPrimaryFundCode({{ $fc->id }})"
-                                        class="text-xs text-emerald-700 dark:text-emerald-300 hover:underline">
-                                    Make primary
-                                </button>
-                            @endif
                             @if($this->can('projects.manage'))
                                 <button wire:click="detachFundCode({{ $fc->id }})"
                                         wire:confirm="Detach {{ $fc->code }} from this project?"

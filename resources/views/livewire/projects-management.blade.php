@@ -74,7 +74,7 @@
             </div>
 
             <!-- Secondary Filters -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mt-3">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
                 <div>
                     <select wire:model.live="filterPriority"
                             class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
@@ -83,14 +83,6 @@
                         <option value="medium">Medium</option>
                         <option value="high">High</option>
                         <option value="emergency">Emergency</option>
-                    </select>
-                </div>
-                <div>
-                    <select wire:model.live="filterPmEnabled"
-                            class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                        <option value="">All Projects</option>
-                        <option value="pm_only">PM Enabled Only</option>
-                        <option value="non_pm">Regular Jobs Only</option>
                     </select>
                 </div>
 
