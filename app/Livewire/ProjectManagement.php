@@ -310,12 +310,83 @@ class ProjectManagement extends Component
         $this->refreshJob();
     }
 
+    // P-18: milestone-delete keep-or-delete prompt state.
+    public $showDeleteMilestoneModal = false;
+
+    public $deletingMilestoneId = null;
+
+    public $deleteMilestoneRequirementCount = 0;
+
+    /**
+     * Entry for milestone delete. Two branches:
+     *   1. No milestone-source requirements → delete immediately.
+     *   2. Has requirements → open keep/delete modal; the actual
+     *      delete happens inside confirmDeleteMilestone().
+     *
+     * Legacy milestone_tasks / milestone_documents always cascade with
+     * the milestone via the FK; that behaviour is unchanged. The prompt
+     * is purely about Phase 3A's requirement rows.
+     */
     public function deleteMilestone($id)
+    {
+        $reqCount = Requirement::where('housing_job_id', $this->job->id)
+            ->where('source_type', Requirement::SOURCE_MILESTONE)
+            ->where('source_id', $id)
+            ->count();
+
+        if ($reqCount === 0) {
+            $this->finalizeDeleteMilestone((int) $id);
+
+            return;
+        }
+
+        $this->deletingMilestoneId = (int) $id;
+        $this->deleteMilestoneRequirementCount = $reqCount;
+        $this->showDeleteMilestoneModal = true;
+    }
+
+    public function confirmDeleteMilestone(bool $deleteRequirements): void
+    {
+        $id = $this->deletingMilestoneId;
+
+        if ($id === null) {
+            $this->closeDeleteMilestoneModal();
+
+            return;
+        }
+
+        if ($deleteRequirements) {
+            Requirement::where('housing_job_id', $this->job->id)
+                ->where('source_type', Requirement::SOURCE_MILESTONE)
+                ->where('source_id', $id)
+                ->delete();
+        } else {
+            // Keep branch: detach the requirements from the milestone
+            // by NULLing source_id so they survive the cascade. They
+            // remain on the project as orphan source=milestone rows.
+            Requirement::where('housing_job_id', $this->job->id)
+                ->where('source_type', Requirement::SOURCE_MILESTONE)
+                ->where('source_id', $id)
+                ->update(['source_id' => null]);
+        }
+
+        $this->finalizeDeleteMilestone($id);
+        $this->closeDeleteMilestoneModal();
+    }
+
+    public function closeDeleteMilestoneModal(): void
+    {
+        $this->showDeleteMilestoneModal = false;
+        $this->deletingMilestoneId = null;
+        $this->deleteMilestoneRequirementCount = 0;
+    }
+
+    protected function finalizeDeleteMilestone(int $id): void
     {
         $milestone = ProjectMilestone::findOrFail($id);
         $milestone->delete();
 
-        if ($this->selectedMilestone == $id) {
+        if ((int) $this->selectedMilestone === $id) {
             $this->selectedMilestone = $this->job->milestones()->first()?->id;
         }
 
@@ -1521,15 +1592,75 @@ class ProjectManagement extends Component
         $this->refreshJob();
     }
 
+    // P-18: detach-fund-code keep-or-delete prompt state.
+    public $showDetachFundCodeModal = false;
+
+    public $detachConfirmFundCodeId = null;
+
+    public $detachConfirmRequirementCount = 0;
+
+    /**
+     * Entry for fund-code detach. Three branches:
+     *   1. Phase 2.5 budget guard fires → flash error, no further action.
+     *   2. No fund-code-source requirements on this project → detach now.
+     *   3. Has requirements → open the keep/delete modal; the actual
+     *      detach happens inside confirmDetachFundCode().
+     */
     public function detachFundCode(int $id): void
     {
         $this->authorizeAction('projects.manage');
 
-        // Routes through HousingJob::detachFundCode() which enforces both
-        // the primary-clear and the P-2.5 budget-row guard (no detaching a
-        // code that any budget row references). The model throws an
-        // InvalidArgumentException with the affected category names; we
-        // surface it as a session flash so the manager sees what to fix.
+        $blocking = $this->job->budgetCategoriesReferencingFundCode($id);
+
+        if (! empty($blocking)) {
+            $list = '"'.implode('", "', $blocking).'"';
+            $noun = count($blocking) === 1 ? 'category' : 'categories';
+            session()->flash('error',
+                "Cannot detach fund code from this project: referenced by budget {$noun} {$list}. Re-assign or delete those rows first."
+            );
+
+            return;
+        }
+
+        $reqCount = Requirement::where('housing_job_id', $this->job->id)
+            ->where('source_type', Requirement::SOURCE_FUND_CODE)
+            ->where('source_id', $id)
+            ->count();
+
+        if ($reqCount === 0) {
+            $this->job->detachFundCode($id);
+            $this->refreshJob();
+
+            return;
+        }
+
+        $this->detachConfirmFundCodeId = $id;
+        $this->detachConfirmRequirementCount = $reqCount;
+        $this->showDetachFundCodeModal = true;
+    }
+
+    public function confirmDetachFundCode(bool $deleteRequirements): void
+    {
+        $this->authorizeAction('projects.manage');
+
+        $id = $this->detachConfirmFundCodeId;
+
+        if ($id === null) {
+            $this->closeDetachFundCodeModal();
+
+            return;
+        }
+
+        if ($deleteRequirements) {
+            Requirement::where('housing_job_id', $this->job->id)
+                ->where('source_type', Requirement::SOURCE_FUND_CODE)
+                ->where('source_id', $id)
+                ->delete();
+        }
+
+        // The model re-runs the budget guard defensively. If a budget
+        // row appeared between the pre-check and now (race), we surface
+        // the error and bail without losing the user's keep/delete pick.
         try {
             $this->job->detachFundCode($id);
         } catch (\InvalidArgumentException $e) {
@@ -1538,7 +1669,15 @@ class ProjectManagement extends Component
             return;
         }
 
+        $this->closeDetachFundCodeModal();
         $this->refreshJob();
+    }
+
+    public function closeDetachFundCodeModal(): void
+    {
+        $this->showDetachFundCodeModal = false;
+        $this->detachConfirmFundCodeId = null;
+        $this->detachConfirmRequirementCount = 0;
     }
 
     protected function refreshJob()

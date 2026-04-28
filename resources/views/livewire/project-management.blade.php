@@ -894,6 +894,60 @@
         </div>
     @endif
 
+    @if($showDeleteMilestoneModal)
+        {{-- P-18: Milestone Delete Confirmation (keep or delete generated requirements) --}}
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="closeDeleteMilestoneModal">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-md w-full mx-4">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Delete milestone</h3>
+                <p class="text-sm text-gray-700 dark:text-gray-300 mb-4">
+                    This milestone has <strong>{{ $deleteMilestoneRequirementCount }}</strong> requirement{{ $deleteMilestoneRequirementCount === 1 ? '' : 's' }} attached.
+                    Keep them on the project (they'll appear as orphaned source=milestone rows for audit), or delete them along with the milestone?
+                </p>
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button wire:click="closeDeleteMilestoneModal"
+                            class="px-4 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
+                        Cancel
+                    </button>
+                    <button wire:click="confirmDeleteMilestone(false)"
+                            class="px-4 py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700">
+                        Keep requirements
+                    </button>
+                    <button wire:click="confirmDeleteMilestone(true)"
+                            class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
+                        Delete everything
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if($showDetachFundCodeModal)
+        {{-- P-18: Fund-code Detach Confirmation (keep or delete generated requirements) --}}
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="closeDetachFundCodeModal">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-md w-full mx-4">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Detach fund code</h3>
+                <p class="text-sm text-gray-700 dark:text-gray-300 mb-4">
+                    This fund code generated <strong>{{ $detachConfirmRequirementCount }}</strong> requirement{{ $detachConfirmRequirementCount === 1 ? '' : 's' }} on this project.
+                    Keep them as-is for audit, or delete them along with the fund-code link?
+                </p>
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button wire:click="closeDetachFundCodeModal"
+                            class="px-4 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
+                        Cancel
+                    </button>
+                    <button wire:click="confirmDetachFundCode(false)"
+                            class="px-4 py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700">
+                        Keep requirements
+                    </button>
+                    <button wire:click="confirmDetachFundCode(true)"
+                            class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
+                        Delete requirements
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
     @if($showCompleteRequirementModal)
         {{-- P-18: Document Completion Modal (upload OR override) --}}
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="closeCompletionModal">

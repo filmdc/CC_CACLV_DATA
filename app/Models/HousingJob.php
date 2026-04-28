@@ -231,6 +231,23 @@ class HousingJob extends Model
     }
 
     /**
+     * P-2.5: returns the budget category names on this project that
+     * reference the given fund code. An empty array means a detach is
+     * allowed; a non-empty array enumerates the rows blocking it. The
+     * Phase 3A lifecycle prompt uses this to decide whether to surface
+     * the keep/delete-requirements modal or a hard-stop error first.
+     *
+     * @return array<int, string>
+     */
+    public function budgetCategoriesReferencingFundCode(int $fundCodeId): array
+    {
+        return ProjectBudget::where('housing_job_id', $this->id)
+            ->where('fund_code_id', $fundCodeId)
+            ->pluck('category')
+            ->all();
+    }
+
+    /**
      * Routes detach through this method to enforce the P-2.5 invariant:
      * a fund code cannot be detached if any project_budgets row references
      * it. Throws \InvalidArgumentException listing the affected category
@@ -241,10 +258,7 @@ class HousingJob extends Model
      */
     public function detachFundCode(int $id): void
     {
-        $referencingCategories = ProjectBudget::where('housing_job_id', $this->id)
-            ->where('fund_code_id', $id)
-            ->pluck('category')
-            ->all();
+        $referencingCategories = $this->budgetCategoriesReferencingFundCode($id);
 
         if (! empty($referencingCategories)) {
             $list = '"'.implode('", "', $referencingCategories).'"';
