@@ -1239,6 +1239,7 @@ class CommunicationsLogManagement extends Component
                 'priority' => $log->priority === 'urgent' ? 'emergency' : ($log->priority === 'high' ? 'high' : 'medium'),
                 'request_date' => now(),
                 'created_by' => Auth::id(),
+                'project_manager_id' => Auth::id(),
             ]);
 
             \Log::info('convertToProject: HousingJob created', ['job_id' => $job->id, 'job_number' => $job->job_number]);

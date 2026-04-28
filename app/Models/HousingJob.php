@@ -542,11 +542,16 @@ class HousingJob extends Model
         DB::beginTransaction();
 
         try {
-            // Create new job from template
+            // Create new job from template. Override project_manager_id
+            // unconditionally — template rows may carry a stale value
+            // (the user who saved the template), and the conceptual
+            // model treats the instantiating user as the new project's
+            // owner. P-18.
             $job = new self;
             $job->fill($jobData);
             $job->is_template = false;
             $job->created_by = Auth::id();
+            $job->project_manager_id = Auth::id();
             $job->save();
 
             // Clone template's milestone structure
