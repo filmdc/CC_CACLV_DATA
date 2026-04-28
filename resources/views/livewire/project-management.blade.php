@@ -836,8 +836,8 @@
         </div>
     @endif
 
-    <!-- P-18: Requirement Form Modal (create/edit) -->
     @if($showRequirementForm)
+        {{-- P-18: Requirement Form Modal (create/edit) --}}
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="$set('showRequirementForm', false)">
             <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-md w-full mx-4">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
@@ -894,8 +894,8 @@
         </div>
     @endif
 
-    <!-- P-18: Document Completion Modal (upload OR override) -->
     @if($showCompleteRequirementModal)
+        {{-- P-18: Document Completion Modal (upload OR override) --}}
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="closeCompletionModal">
             <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-lg w-full mx-4">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">Mark Requirement Complete</h3>

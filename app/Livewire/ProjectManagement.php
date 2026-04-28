@@ -346,7 +346,22 @@ class ProjectManagement extends Component
         $this->refreshJob();
     }
 
-    // Task Methods
+    // ===================================================================
+    // Legacy Task / Document methods (P-18 deprecated).
+    //
+    // These public methods are no longer wired to the milestone-tab UI;
+    // it now writes to the requirements table via the methods further
+    // below. They remain for any audit pathway that still walks
+    // milestone_tasks / milestone_documents directly. The protected
+    // helpers cleanupDocumentMedia() and processDocumentUploads() are
+    // similarly legacy. Retirement is a later phase.
+    //
+    // Do not call these from new code — use saveRequirement(),
+    // toggleTaskRequirementComplete(), saveRequirementCompletion(), or
+    // RequirementInstantiator instead.
+    // ===================================================================
+
+    /** @deprecated P-18 — use showCreateRequirement('task') instead. */
     public function showCreateTask()
     {
         if (! $this->selectedMilestone) {
@@ -358,6 +373,7 @@ class ProjectManagement extends Component
         $this->showTaskForm = true;
     }
 
+    /** @deprecated P-18 — use showEditRequirement(id) on a Requirement of type=task. */
     public function showEditTask($id)
     {
         $task = MilestoneTask::findOrFail($id);
@@ -370,6 +386,7 @@ class ProjectManagement extends Component
         $this->showTaskForm = true;
     }
 
+    /** @deprecated P-18 — use saveRequirement() with requirement_type='task'. */
     public function saveTask()
     {
         $validated = $this->validate([
@@ -425,6 +442,7 @@ class ProjectManagement extends Component
         $this->refreshJob();
     }
 
+    /** @deprecated P-18 — use deleteRequirement(id) for new task-type rows. */
     public function deleteTask($id)
     {
         MilestoneTask::findOrFail($id)->delete();
@@ -432,6 +450,7 @@ class ProjectManagement extends Component
         $this->refreshJob();
     }
 
+    /** @deprecated P-18 — use toggleTaskRequirementComplete(id). */
     public function updateTaskStatus($id, $status)
     {
         $task = MilestoneTask::findOrFail($id);
@@ -448,6 +467,7 @@ class ProjectManagement extends Component
     }
 
     // Document Methods
+    /** @deprecated P-18 — use showCreateRequirement('document'). */
     public function showCreateDocument()
     {
         if (! $this->selectedMilestone) {
@@ -459,6 +479,7 @@ class ProjectManagement extends Component
         $this->showDocumentForm = true;
     }
 
+    /** @deprecated P-18 — use saveRequirement() with requirement_type='document'. */
     public function saveDocument()
     {
         $validated = $this->validate([
@@ -563,6 +584,7 @@ class ProjectManagement extends Component
         }
     }
 
+    /** @deprecated P-18 — use showCompleteRequirementModal(id) — upload+complete is one step now. */
     public function showUploadDocument($id)
     {
         $this->uploadingDocumentId = $id;
@@ -570,6 +592,7 @@ class ProjectManagement extends Component
         $this->showDocumentUploadForm = true;
     }
 
+    /** @deprecated P-18 — use saveRequirementCompletion() handles upload + mark-complete in one path. */
     public function uploadDocumentFiles()
     {
         $this->validate([
@@ -606,6 +629,7 @@ class ProjectManagement extends Component
         $this->refreshJob();
     }
 
+    /** @deprecated P-18 — use no replacement on milestone tab — files render inline; legacy viewer still exists for legacy rows. */
     public function showDocumentViewer($id)
     {
         $this->viewingDocumentId = $id;
@@ -613,6 +637,7 @@ class ProjectManagement extends Component
         $this->showDocumentViewerModal = true;
     }
 
+    /** @deprecated P-18 — use approval workflow dropped per Phase 3A conceptual model; use markComplete(). */
     public function approveDocumentFromViewer()
     {
         $document = MilestoneDocument::findOrFail($this->viewingDocumentId);
@@ -624,6 +649,7 @@ class ProjectManagement extends Component
         $this->refreshJob();
     }
 
+    /** @deprecated P-18 — use approval workflow dropped per Phase 3A conceptual model. */
     public function rejectDocumentFromViewer()
     {
         $this->validate([
@@ -640,6 +666,7 @@ class ProjectManagement extends Component
         $this->refreshJob();
     }
 
+    /** @deprecated P-18 — use approval workflow dropped per Phase 3A conceptual model; use markComplete(). */
     public function approveTask($taskId)
     {
         $this->authorizeAction('projects.manage');
@@ -655,6 +682,7 @@ class ProjectManagement extends Component
         }
     }
 
+    /** @deprecated P-18 — use approval workflow dropped per Phase 3A conceptual model. */
     public function rejectTask()
     {
         $this->authorizeAction('projects.manage');
@@ -679,6 +707,7 @@ class ProjectManagement extends Component
         }
     }
 
+    /** @deprecated P-18 — use approval workflow dropped per Phase 3A conceptual model. */
     public function toggleDocumentApproval($documentId)
     {
         $this->authorizeAction('projects.manage');
@@ -695,6 +724,7 @@ class ProjectManagement extends Component
         }
     }
 
+    /** @deprecated P-18 — use use Spatie media on the Requirement model directly. */
     public function deleteDocumentFile($documentId, $mediaId)
     {
         $document = MilestoneDocument::findOrFail($documentId);
@@ -801,6 +831,7 @@ class ProjectManagement extends Component
         }
     }
 
+    /** @deprecated P-18 — use deleteRequirement(id) for new document-type rows. */
     public function deleteDocument($id)
     {
         MilestoneDocument::findOrFail($id)->delete();
@@ -808,6 +839,7 @@ class ProjectManagement extends Component
         $this->refreshJob();
     }
 
+    /** @deprecated P-18 — use PDF template integration is orthogonal Phase 6 feature; pending decision on retention. */
     public function regeneratePdf($documentId)
     {
         try {
@@ -850,6 +882,7 @@ class ProjectManagement extends Component
         }
     }
 
+    /** @deprecated P-18 — use no replacement — Phase 3A status is outstanding/complete/not_applicable only. */
     public function updateDocumentStatus($id, $status)
     {
         $document = MilestoneDocument::findOrFail($id);
