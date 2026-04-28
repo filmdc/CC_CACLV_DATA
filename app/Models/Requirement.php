@@ -257,12 +257,34 @@ class Requirement extends Model implements HasMedia
         $this->notifyProjectManagerOfCompletion($actor);
     }
 
+    /**
+     * Revert a complete or not_applicable requirement back to
+     * outstanding. Preserves the prior completion_note as history and
+     * appends a "[REOPENED by X on Y]" line so the full timeline is
+     * legible. Override fields are cleared because a re-opened
+     * requirement no longer has an active override; the original
+     * override_reason text is rolled into completion_note for audit
+     * before it disappears from its dedicated column.
+     *
+     * No notification fires — leaving any "your requirement was
+     * reopened" ping to Phase 3B if Kaitlyn asks for it.
+     */
     public function reopen(User $actor): void
     {
+        $history = trim((string) $this->completion_note);
+
+        if (! empty($this->override_reason) && ! str_contains($history, $this->override_reason)) {
+            $history = ($history === '' ? '' : $history."\n").
+                '[OVERRIDE was: '.$this->override_reason.']';
+        }
+
+        $stamp = '[REOPENED by '.$actor->name.' on '.now()->toDateTimeString().']';
+        $history = $history === '' ? $stamp : $history."\n".$stamp;
+
         $this->status = self::STATUS_OUTSTANDING;
         $this->completed_at = null;
         $this->completed_by_user_id = null;
-        $this->completion_note = null;
+        $this->completion_note = $history;
         $this->override_reason = null;
         $this->overridden_by_user_id = null;
         $this->updated_by = $actor->id;

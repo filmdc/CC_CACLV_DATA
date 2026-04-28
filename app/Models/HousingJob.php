@@ -569,7 +569,8 @@ class HousingJob extends Model
                 $newMilestone->created_by = Auth::id();
                 $newMilestone->save();
 
-                // Clone tasks
+                // Clone legacy tasks (write-vestigial — kept until the
+                // legacy tables are retired in a later phase).
                 $tasks = MilestoneTask::where('milestone_id', $milestone->id)->get();
                 foreach ($tasks as $task) {
                     $newTask = $task->replicate([
@@ -583,7 +584,7 @@ class HousingJob extends Model
                     $newTask->save();
                 }
 
-                // Clone documents
+                // Clone legacy documents (vestigial; see above).
                 $documents = MilestoneDocument::where('milestone_id', $milestone->id)->get();
                 foreach ($documents as $doc) {
                     $newDoc = $doc->replicate([
@@ -595,6 +596,42 @@ class HousingJob extends Model
                     $newDoc->status = 'not_uploaded';
                     $newDoc->created_by = Auth::id();
                     $newDoc->save();
+                }
+
+                // P-18: clone milestone-source requirements from the
+                // template to the new project. Remap source_id to the
+                // newly-created milestone, reset status/owner/completion
+                // so the new project lands clean. Spatie media on the
+                // template's requirement rows is intentionally NOT
+                // copied (consistent with legacy clone behaviour: files
+                // do not carry over).
+                $templateRequirements = Requirement::query()
+                    ->where('housing_job_id', $template->id)
+                    ->where('source_type', Requirement::SOURCE_MILESTONE)
+                    ->where('source_id', $milestone->id)
+                    ->get();
+
+                foreach ($templateRequirements as $tplReq) {
+                    Requirement::create([
+                        'housing_job_id' => $job->id,
+                        'type' => $tplReq->type,
+                        'title' => $tplReq->title,
+                        'description' => $tplReq->description,
+                        'status' => Requirement::STATUS_OUTSTANDING,
+                        'owner_user_id' => Auth::id(),
+                        'source_type' => Requirement::SOURCE_MILESTONE,
+                        'source_id' => $newMilestone->id,
+                        'source_template_id' => null,
+                        'source_label_snapshot' => $tplReq->title,
+                        'milestone_gate_text' => $tplReq->milestone_gate_text,
+                        'completed_at' => null,
+                        'completed_by_user_id' => null,
+                        'completion_note' => null,
+                        'override_reason' => null,
+                        'overridden_by_user_id' => null,
+                        'created_by' => Auth::id(),
+                        'updated_by' => Auth::id(),
+                    ]);
                 }
             }
 
