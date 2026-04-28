@@ -16,6 +16,7 @@ class FundCodeRequirementFactory extends Factory
             'fund_code_id' => FundCode::factory(),
             'label' => 'Fixture requirement '.$this->faker->words(3, true),
             'description' => null,
+            'type' => 'task',
             'is_hard_requirement' => false,
             'sort_order' => 0,
         ];
@@ -24,6 +25,11 @@ class FundCodeRequirementFactory extends Factory
     public function hard(): static
     {
         return $this->state(fn () => ['is_hard_requirement' => true]);
+    }
+
+    public function document(): static
+    {
+        return $this->state(fn () => ['type' => 'document']);
     }
 
     public function withDescription(): static

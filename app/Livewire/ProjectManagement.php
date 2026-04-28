@@ -1221,6 +1221,15 @@ class ProjectManagement extends Component
 
         $code = \App\Models\FundCode::findOrFail($this->newFundCodeId);
         $this->job->fundCodes()->syncWithoutDetaching([$code->id]);
+
+        // P-18: instantiate the fund code's requirement templates onto
+        // this project. Idempotent — re-attaching a code does not
+        // duplicate already-instantiated rows. Owner defaults to the
+        // project manager; the assigner (current user) gets no self-ping
+        // when they ARE the project manager.
+        app(\App\Services\RequirementInstantiator::class)
+            ->forFundCode($this->job, $code, Auth::user());
+
         $this->newFundCodeId = '';
 
         $this->refreshJob();
