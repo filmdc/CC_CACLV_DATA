@@ -10,10 +10,14 @@ class FundCodeRequirement extends Model
 {
     use HasFactory;
 
+    public const TYPE_DOCUMENT = 'document';
+    public const TYPE_TASK = 'task';
+
     protected $fillable = [
         'fund_code_id',
         'label',
         'description',
+        'type',
         'is_hard_requirement',
         'sort_order',
     ];

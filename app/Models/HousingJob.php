@@ -222,6 +222,15 @@ class HousingJob extends Model
     }
 
     /**
+     * P-18 (Phase 3A): per-project requirements across all sources
+     * (milestone, fund code, ad-hoc).
+     */
+    public function requirements(): HasMany
+    {
+        return $this->hasMany(Requirement::class);
+    }
+
+    /**
      * Routes detach through this method to enforce the P-2.5 invariant:
      * a fund code cannot be detached if any project_budgets row references
      * it. Throws \InvalidArgumentException listing the affected category

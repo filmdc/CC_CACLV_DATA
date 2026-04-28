@@ -24,6 +24,7 @@ class ProjectMilestone extends Model implements HasMedia
         'started_at',
         'icon',
         'color',
+        'assigned_to_user_id',
         'created_by',
         'updated_by',
     ];
@@ -62,6 +63,17 @@ class ProjectMilestone extends Model implements HasMedia
     public function communications(): HasMany
     {
         return $this->hasMany(MilestoneCommunication::class, 'milestone_id');
+    }
+
+    public function assignedTo(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_to_user_id');
+    }
+
+    public function requirements(): HasMany
+    {
+        return $this->hasMany(Requirement::class, 'source_id')
+            ->where('source_type', Requirement::SOURCE_MILESTONE);
     }
 
     public function createdBy(): BelongsTo
