@@ -76,6 +76,16 @@ class ProjectMilestone extends Model implements HasMedia
             ->where('source_type', Requirement::SOURCE_MILESTONE);
     }
 
+    public function requirementTasks(): HasMany
+    {
+        return $this->requirements()->where('type', Requirement::TYPE_TASK);
+    }
+
+    public function requirementDocuments(): HasMany
+    {
+        return $this->requirements()->where('type', Requirement::TYPE_DOCUMENT);
+    }
+
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');

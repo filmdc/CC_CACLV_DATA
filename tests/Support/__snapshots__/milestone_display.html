@@ -241,35 +241,35 @@ Delete
 </button>
 </div>
 </div>
-<!-- Tasks Section -->
+<!-- Tasks Section (P-18: now reads from requirements WHERE source_type='milestone' AND type='task') -->
 <div>
 <div class="flex items-center justify-between mb-3">
 <h3 class="text-lg font-medium text-gray-900 dark:text-white">Tasks</h3>
-<button wire:click="showCreateTask"
+<button wire:click="showCreateRequirement('task')"
 class="px-3 py-1 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
 + Add Task
 </button>
 </div>
 <div class="text-center py-8 bg-gray-50 dark:bg-zinc-700 rounded-lg">
 <p class="text-sm text-gray-600 dark:text-gray-400">No tasks yet</p>
-<button wire:click="showCreateTask"
+<button wire:click="showCreateRequirement('task')"
 class="mt-2 text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
 Add first task
 </button>
 </div>
 </div>
-<!-- Documents Section -->
+<!-- Documents Section (P-18: now reads from requirements WHERE source_type='milestone' AND type='document') -->
 <div>
 <div class="flex items-center justify-between mb-3">
 <h3 class="text-lg font-medium text-gray-900 dark:text-white">Required Documents</h3>
-<button wire:click="showCreateDocument"
+<button wire:click="showCreateRequirement('document')"
 class="px-3 py-1 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
 + Add Document
 </button>
 </div>
 <div class="text-center py-8 bg-gray-50 dark:bg-zinc-700 rounded-lg">
 <p class="text-sm text-gray-600 dark:text-gray-400">No documents required yet</p>
-<button wire:click="showCreateDocument"
+<button wire:click="showCreateRequirement('document')"
 class="mt-2 text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
 Add first document
 </button>
@@ -283,6 +283,8 @@ Add first document
 <!-- Milestone Form Modal -->
 <!-- Task Form Modal -->
 <!-- Document Form Modal -->
+<!-- P-18: Requirement Form Modal (create/edit) -->
+<!-- P-18: Document Completion Modal (upload OR override) -->
 <!-- Budget Form Modal -->
 <!-- Expense Form Modal -->
 <!-- Edit Project Modal -->

@@ -304,79 +304,68 @@
                                     </div>
                                 </div>
 
-                                <!-- Tasks Section -->
+                                <!-- Tasks Section (P-18: now reads from requirements WHERE source_type='milestone' AND type='task') -->
                                 <div>
                                     <div class="flex items-center justify-between mb-3">
                                         <h3 class="text-lg font-medium text-gray-900 dark:text-white">Tasks</h3>
-                                        <button wire:click="showCreateTask"
+                                        <button wire:click="showCreateRequirement('task')"
                                                 class="px-3 py-1 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
                                             + Add Task
                                         </button>
                                     </div>
 
-                                    @if($currentMilestone->tasks->count() > 0)
+                                    @if($currentMilestone->requirementTasks->count() > 0)
                                         <div class="space-y-2">
-                                            @foreach($currentMilestone->tasks as $task)
+                                            @foreach($currentMilestone->requirementTasks as $task)
                                                 <div class="p-4 bg-gray-50 dark:bg-zinc-700 rounded-lg">
                                                     <div class="flex items-start justify-between">
                                                         <div class="flex items-start space-x-3 flex-1">
                                                             <input type="checkbox"
-                                                                   wire:click="updateTaskStatus({{ $task->id }}, '{{ $task->status === 'completed' ? 'pending' : 'completed' }}')"
-                                                                   {{ $task->status === 'completed' ? 'checked' : '' }}
+                                                                   wire:click="toggleTaskRequirementComplete({{ $task->id }})"
+                                                                   {{ $task->isComplete() ? 'checked' : '' }}
                                                                    class="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
                                                             <div class="flex-1">
-                                                                <div class="font-medium text-gray-900 dark:text-white {{ $task->status === 'completed' ? 'line-through' : '' }}">
-                                                                    {{ $task->name }}
+                                                                <div class="font-medium text-gray-900 dark:text-white {{ $task->isComplete() ? 'line-through' : '' }}">
+                                                                    {{ $task->title }}
                                                                 </div>
                                                                 @if($task->description)
                                                                     <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ $task->description }}</p>
                                                                 @endif
+                                                                @if($task->milestone_gate_text)
+                                                                    <p class="text-xs text-amber-700 dark:text-amber-400 mt-1">⛔ {{ $task->milestone_gate_text }}</p>
+                                                                @endif
                                                                 <div class="flex items-center space-x-4 mt-2 text-xs text-gray-500 dark:text-gray-400">
-                                                                    @if($task->assignedTo)
-                                                                        <span>Assigned: {{ $task->assignedTo->name }}</span>
+                                                                    @if($task->owner)
+                                                                        <span>Owner: {{ $task->owner->name }}</span>
+                                                                    @else
+                                                                        <span class="italic">Unassigned</span>
                                                                     @endif
-                                                                    @if($task->deadline)
-                                                                        <span class="{{ $task->is_overdue ? 'text-red-600 dark:text-red-400 font-semibold' : '' }}">
-                                                                            Due: {{ $task->deadline->format('M d, Y') }}
-                                                                        </span>
-                                                                    @endif
-                                                                    <span class="px-2 py-0.5 rounded {{ $task->status_color === 'green' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ($task->status_color === 'blue' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300') }}">
-                                                                        {{ ucfirst($task->status) }}
+                                                                    <span class="px-2 py-0.5 rounded {{ $task->isComplete() ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ($task->isNotApplicable() ? 'bg-gray-200 text-gray-700 dark:bg-zinc-600 dark:text-gray-300' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300') }}">
+                                                                        {{ ucfirst(str_replace('_', ' ', $task->status)) }}
                                                                     </span>
-                                                                    @if($task->requires_approval)
-                                                                        <span class="px-2 py-0.5 rounded text-xs bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300">
-                                                                            Needs Approval
-                                                                        </span>
-                                                                    @endif
-                                                                    @if($task->status === 'completed' && $task->approved_by)
-                                                                        <span class="text-green-600 dark:text-green-400 flex items-center">
-                                                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                                                            </svg>
-                                                                            Approved by {{ $task->approvedBy->name }}
-                                                                        </span>
+                                                                    @if($task->isComplete() && $task->completedBy)
+                                                                        <span class="text-green-600 dark:text-green-400">Completed by {{ $task->completedBy->name }} on {{ $task->completed_at?->format('M d, Y') }}</span>
                                                                     @endif
                                                                 </div>
-                                                                @if($task->rejection_reason)
-                                                                    <div class="mt-2 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded">
-                                                                        <p class="text-xs font-semibold text-red-800 dark:text-red-200">Rejected</p>
-                                                                        <p class="text-xs text-red-700 dark:text-red-300">{{ $task->rejection_reason }}</p>
-                                                                    </div>
+                                                                @if($task->completion_note)
+                                                                    <p class="mt-1 text-xs italic text-gray-600 dark:text-gray-400">{{ $task->completion_note }}</p>
                                                                 @endif
                                                             </div>
                                                         </div>
                                                         <div class="flex items-center space-x-2 ml-4">
-                                                            @if($task->requires_approval && $task->status === 'completed' && !$task->approved_by)
-                                                                <button wire:click="approveTask({{ $task->id }})"
-                                                                        class="px-3 py-1.5 text-xs bg-green-600 text-white rounded hover:bg-green-700">
-                                                                    Approve
-                                                                </button>
-                                                                <button wire:click="$set('editingTask', {{ $task->id }}); $set('showTaskForm', true)"
-                                                                        class="px-3 py-1.5 text-xs bg-red-600 text-white rounded hover:bg-red-700">
-                                                                    Reject
+                                                            @if($task->isComplete())
+                                                                <button wire:click="reopenRequirement({{ $task->id }})"
+                                                                        class="px-3 py-1 text-xs bg-amber-600 text-white rounded hover:bg-amber-700">
+                                                                    Reopen
                                                                 </button>
                                                             @endif
-                                                            <button wire:click="deleteTask({{ $task->id }})"
+                                                            <button wire:click="showEditRequirement({{ $task->id }})"
+                                                                    class="text-gray-600 hover:text-gray-800 dark:text-gray-300">
+                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                                </svg>
+                                                            </button>
+                                                            <button wire:click="deleteRequirement({{ $task->id }})"
                                                                     wire:confirm="Delete this task?"
                                                                     class="text-red-600 hover:text-red-800 dark:text-red-400">
                                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -391,7 +380,7 @@
                                     @else
                                         <div class="text-center py-8 bg-gray-50 dark:bg-zinc-700 rounded-lg">
                                             <p class="text-sm text-gray-600 dark:text-gray-400">No tasks yet</p>
-                                            <button wire:click="showCreateTask"
+                                            <button wire:click="showCreateRequirement('task')"
                                                     class="mt-2 text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
                                                 Add first task
                                             </button>
@@ -399,148 +388,89 @@
                                     @endif
                                 </div>
 
-                                <!-- Documents Section -->
+                                <!-- Documents Section (P-18: now reads from requirements WHERE source_type='milestone' AND type='document') -->
                                 <div>
                                     <div class="flex items-center justify-between mb-3">
                                         <h3 class="text-lg font-medium text-gray-900 dark:text-white">Required Documents</h3>
-                                        <button wire:click="showCreateDocument"
+                                        <button wire:click="showCreateRequirement('document')"
                                                 class="px-3 py-1 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
                                             + Add Document
                                         </button>
                                     </div>
 
-                                    @if($currentMilestone->documents->count() > 0)
+                                    @if($currentMilestone->requirementDocuments->count() > 0)
                                         <div class="space-y-2">
-                                            @foreach($currentMilestone->documents as $document)
+                                            @foreach($currentMilestone->requirementDocuments as $document)
                                                 @php
-                                                    $validMedia = $document->valid_document_media;
-                                                    $missingMedia = $document->missing_document_media;
-                                                    $hasFiles = $validMedia->isNotEmpty();
+                                                    $files = $document->getMedia('attachments');
+                                                    $hasFiles = $files->isNotEmpty();
                                                 @endphp
                                                 <div class="p-4 bg-gray-50 dark:bg-zinc-700 rounded-lg">
                                                     <div class="flex items-start justify-between">
                                                         <div class="flex-1">
-                                                            <div class="font-medium text-gray-900 dark:text-white">{{ $document->document_type }}</div>
+                                                            <div class="font-medium text-gray-900 dark:text-white {{ $document->isComplete() ? 'line-through' : '' }}">{{ $document->title }}</div>
                                                             @if($document->description)
                                                                 <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ $document->description }}</p>
                                                             @endif
+                                                            @if($document->milestone_gate_text)
+                                                                <p class="text-xs text-amber-700 dark:text-amber-400 mt-1">⛔ {{ $document->milestone_gate_text }}</p>
+                                                            @endif
                                                             <div class="flex items-center space-x-4 mt-2 text-xs text-gray-500 dark:text-gray-400">
-                                                                @if($document->assignedTo)
-                                                                    <span>Assigned: {{ $document->assignedTo->name }}</span>
-                                                                @endif
-                                                                @if($document->isGeneratedFromTemplate())
-                                                                    <span class="px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">
-                                                                        Generated Form
-                                                                    </span>
+                                                                @if($document->owner)
+                                                                    <span>Owner: {{ $document->owner->name }}</span>
                                                                 @else
-                                                                    <span class="px-2 py-0.5 rounded {{ $document->status_color === 'green' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ($document->status_color === 'blue' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : ($document->status_color === 'yellow' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : ($document->status_color === 'red' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300'))) }}">
-                                                                        {{ ucfirst(str_replace('_', ' ', $document->status)) }}
-                                                                    </span>
+                                                                    <span class="italic">Unassigned</span>
                                                                 @endif
-                                                                @if($document->requires_approval)
-                                                                    <span class="px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300">
-                                                                        Needs Approval
-                                                                    </span>
-                                                                @endif
+                                                                <span class="px-2 py-0.5 rounded {{ $document->isComplete() ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ($document->isNotApplicable() ? 'bg-gray-200 text-gray-700 dark:bg-zinc-600 dark:text-gray-300' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300') }}">
+                                                                    {{ ucfirst(str_replace('_', ' ', $document->status)) }}
+                                                                </span>
                                                                 @if($hasFiles)
                                                                     <span class="flex items-center">
                                                                         <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                                             <path d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z"></path>
                                                                         </svg>
-                                                                        {{ $validMedia->count() }} file(s)
+                                                                        {{ $files->count() }} file(s)
                                                                     </span>
                                                                 @endif
+                                                                @if($document->wasOverridden())
+                                                                    <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300">Override</span>
+                                                                @endif
                                                             </div>
-                                                            @if($document->approved_by && $document->approvedBy)
-                                                                <div class="mt-2 flex items-center text-xs text-green-600 dark:text-green-400">
-                                                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                                                    </svg>
-                                                                    Approved by {{ $document->approvedBy->name }} on {{ $document->approved_at?->format('M d, Y') }}
-                                                                </div>
+                                                            @if($document->isComplete() && $document->completedBy)
+                                                                <p class="mt-1 text-xs text-green-600 dark:text-green-400">Completed by {{ $document->completedBy->name }} on {{ $document->completed_at?->format('M d, Y') }}</p>
                                                             @endif
-                                                            @if($document->rejection_reason)
-                                                                <div class="mt-2 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded">
-                                                                    <p class="text-xs font-semibold text-red-800 dark:text-red-200">Rejected</p>
-                                                                    <p class="text-xs text-red-700 dark:text-red-300">{{ $document->rejection_reason }}</p>
-                                                                </div>
+                                                            @if($document->wasOverridden() && $document->override_reason)
+                                                                <p class="mt-1 text-xs italic text-amber-700 dark:text-amber-300">Override reason: {{ $document->override_reason }}</p>
                                                             @endif
-                                                            @if($missingMedia->isNotEmpty())
-                                                                <p class="mt-2 text-xs text-red-600 dark:text-red-300">
-                                                                    {{ $missingMedia->count() }} stored file(s) are unavailable. Please upload replacements.
-                                                                </p>
-                                                            @endif
-
-                                                            {{-- PM/Admin can toggle requires approval --}}
-                                                            @if(auth()->user()->hasRole('project_manager') || auth()->user()->hasRole('admin'))
-                                                                <div class="mt-2">
-                                                                    <label class="flex items-center space-x-2 cursor-pointer">
-                                                                        <input type="checkbox"
-                                                                               wire:click="toggleDocumentApproval({{ $document->id }})"
-                                                                               {{ $document->requires_approval ? 'checked' : '' }}
-                                                                               class="rounded border-gray-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500">
-                                                                        <span class="text-xs text-gray-600 dark:text-gray-400">Requires Approval</span>
-                                                                    </label>
-                                                                </div>
+                                                            @if($document->completion_note)
+                                                                <p class="mt-1 text-xs italic text-gray-600 dark:text-gray-400">{{ $document->completion_note }}</p>
                                                             @endif
                                                         </div>
                                                         <div class="flex items-center space-x-2">
-                                                            {{-- Show Approve/Reject for pending documents --}}
-                                                            @if($hasFiles && $document->status === 'pending_review' && $document->requires_approval && (auth()->user()->hasRole('project_manager') || auth()->user()->hasRole('admin')))
-                                                                <button wire:click="$set('viewingDocumentId', {{ $document->id }}); approveDocumentFromViewer()"
-                                                                        class="px-3 py-1.5 text-xs bg-green-600 text-white rounded hover:bg-green-700 flex items-center">
-                                                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                                                    </svg>
-                                                                    Approve
+                                                            @if(! $document->isComplete())
+                                                                <button wire:click="showCompleteRequirementModal({{ $document->id }})"
+                                                                        class="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700">
+                                                                    Mark Complete
                                                                 </button>
-                                                                <button wire:click="showDocumentViewer({{ $document->id }})"
-                                                                        class="px-3 py-1.5 text-xs bg-red-600 text-white rounded hover:bg-red-700">
-                                                                    Reject
+                                                            @else
+                                                                <button wire:click="reopenRequirement({{ $document->id }})"
+                                                                        class="px-3 py-1 text-xs bg-amber-600 text-white rounded hover:bg-amber-700">
+                                                                    Reopen
                                                                 </button>
                                                             @endif
-
-                                                            {{-- Show Regenerate if PDF was already generated from template --}}
-                                                            @if($document->isGeneratedFromTemplate())
-                                                                <button wire:click="regeneratePdf({{ $document->id }})"
-                                                                        wire:confirm="Regenerate PDF with current project data?"
-                                                                        class="px-3 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 flex items-center">
-                                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                                                                    </svg>
-                                                                    Regenerate
-                                                                </button>
-                                                            @endif
-
-                                                            {{-- Show Upload if no files exist OR if status is explicitly rejected --}}
-                                                            @if(!$hasFiles || $document->status === 'rejected')
-                                                                <button wire:click="showUploadDocument({{ $document->id }})"
-                                                                        class="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700">
-                                                                    {{ $hasFiles ? 'Replace' : 'Upload' }}
-                                                                </button>
-                                                            @endif
-
-                                                            {{-- Show View if files exist (and not showing approve/reject) --}}
-                                                            @if($hasFiles && !($document->status === 'pending_review' && $document->requires_approval && (auth()->user()->hasRole('project_manager') || auth()->user()->hasRole('admin'))))
-                                                                <button wire:click="showDocumentViewer({{ $document->id }})"
-                                                                        class="px-3 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700 flex items-center">
-                                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                                                    </svg>
-                                                                    View
-                                                                </button>
-                                                            @endif
-
-                                                            @if($document->status !== 'pending_review' || !$document->requires_approval)
-                                                                <button wire:click="deleteDocument({{ $document->id }})"
-                                                                        wire:confirm="Delete this document?"
-                                                                        class="text-red-600 hover:text-red-800 dark:text-red-400">
-                                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                                                    </svg>
-                                                                </button>
-                                                            @endif
+                                                            <button wire:click="showEditRequirement({{ $document->id }})"
+                                                                    class="text-gray-600 hover:text-gray-800 dark:text-gray-300">
+                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                                </svg>
+                                                            </button>
+                                                            <button wire:click="deleteRequirement({{ $document->id }})"
+                                                                    wire:confirm="Delete this document requirement?"
+                                                                    class="text-red-600 hover:text-red-800 dark:text-red-400">
+                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                                </svg>
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -549,7 +479,7 @@
                                     @else
                                         <div class="text-center py-8 bg-gray-50 dark:bg-zinc-700 rounded-lg">
                                             <p class="text-sm text-gray-600 dark:text-gray-400">No documents required yet</p>
-                                            <button wire:click="showCreateDocument"
+                                            <button wire:click="showCreateRequirement('document')"
                                                     class="mt-2 text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
                                                 Add first document
                                             </button>
@@ -900,6 +830,105 @@
                     <button wire:click="saveDocument"
                             class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
                         Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- P-18: Requirement Form Modal (create/edit) -->
+    @if($showRequirementForm)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="$set('showRequirementForm', false)">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-md w-full mx-4">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    {{ $editingRequirementId ? 'Edit Requirement' : 'Add Requirement' }}
+                </h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type</label>
+                        <select wire:model="requirement_type"
+                                class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500">
+                            <option value="task">Task — closed with a click + optional note</option>
+                            <option value="document">Document — closed with a file upload OR an override reason</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title</label>
+                        <input type="text" wire:model="requirement_title"
+                               class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500">
+                        @error('requirement_title') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description (optional)</label>
+                        <textarea wire:model="requirement_description" rows="2"
+                                  class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Owner</label>
+                        <select wire:model="requirement_owner_id"
+                                class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500">
+                            <option value="">Unassigned</option>
+                            @foreach(\App\Models\User::orderBy('name')->get() as $u)
+                                <option value="{{ $u->id }}">{{ $u->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Milestone gate (optional)</label>
+                        <input type="text" wire:model="requirement_milestone_gate_text"
+                               placeholder="e.g., must be done before construction starts"
+                               class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500">
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button wire:click="$set('showRequirementForm', false)"
+                            class="px-4 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
+                        Cancel
+                    </button>
+                    <button wire:click="saveRequirement"
+                            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                        Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- P-18: Document Completion Modal (upload OR override) -->
+    @if($showCompleteRequirementModal)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="closeCompletionModal">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-lg w-full mx-4">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">Mark Requirement Complete</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                    Either attach one or more files <strong>or</strong> provide an override reason.
+                    Both fields can be filled to attach a file with explanatory context.
+                </p>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Files</label>
+                        <input type="file" wire:model="completionFiles" multiple
+                               class="w-full text-sm text-gray-700 dark:text-gray-300">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Override reason (only if no file)</label>
+                        <textarea wire:model="completion_override_reason" rows="2"
+                                  placeholder="e.g., hard copy on file in Kaitlyn drawer; no scan available."
+                                  class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Completion note (optional)</label>
+                        <textarea wire:model="completion_note" rows="2"
+                                  class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button wire:click="closeCompletionModal"
+                            class="px-4 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
+                        Cancel
+                    </button>
+                    <button wire:click="saveRequirementCompletion"
+                            class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+                        Mark Complete
                     </button>
                 </div>
             </div>
