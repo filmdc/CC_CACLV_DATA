@@ -126,6 +126,37 @@ class ProjectMilestone extends Model implements HasMedia
         return $this->belongsTo(User::class, 'updated_by');
     }
 
+    /**
+     * Phase 3A / 7.5: bucket the milestone's target_date distance from
+     * today into one of three states. target_date now drives the hard
+     * deadline indicator (per David's call: no separate due_date
+     * column; the soft-vs-hard distinction was rejected as user-
+     * confusion surface). Hardcoded threshold: ≤7 days = approaching,
+     * past = overdue.
+     *
+     * @return 'overdue'|'approaching'|null
+     */
+    public function deadlineIndicator(): ?string
+    {
+        if ($this->target_date === null) {
+            return null;
+        }
+
+        $today = now()->startOfDay();
+        $target = $this->target_date->copy()->startOfDay();
+        $days = (int) $today->diffInDays($target, false);
+
+        if ($days < 0) {
+            return 'overdue';
+        }
+
+        if ($days <= 7) {
+            return 'approaching';
+        }
+
+        return null;
+    }
+
     // Computed Attributes
 
     public function getStatusColorAttribute(): string
