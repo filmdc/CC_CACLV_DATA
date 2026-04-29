@@ -23,4 +23,20 @@ class FundCodeFactory extends Factory
     {
         return $this->state(fn () => ['is_active' => false]);
     }
+
+    public function expiringIn(int $days): static
+    {
+        return $this->state(fn () => ['expires_at' => now()->addDays($days)->toDateString()]);
+    }
+
+    public function expiredSince(int $days): static
+    {
+        return $this->state(fn () => ['expires_at' => now()->subDays($days)->toDateString()]);
+    }
+
+    public function startingIn(int $days): static
+    {
+        return $this->state(fn () => ['starts_at' => now()->addDays($days)->toDateString()]);
+    }
 }
+

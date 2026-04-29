@@ -17,12 +17,16 @@ class FundCode extends Model
         'description',
         'contract_id',
         'is_active',
+        'starts_at',
+        'expires_at',
         'created_by',
         'updated_by',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'starts_at' => 'date',
+        'expires_at' => 'date',
     ];
 
     // Relationships
