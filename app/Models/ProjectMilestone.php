@@ -70,6 +70,36 @@ class ProjectMilestone extends Model implements HasMedia
         return $this->belongsTo(User::class, 'assigned_to_user_id');
     }
 
+    /**
+     * Phase 3A / 7.5: milestones this one depends on. A milestone with
+     * any incomplete dependency requirement is considered "blocked" by
+     * the dashboard precompute, but the state itself is computed, not
+     * stored.
+     */
+    public function dependencies(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(
+            self::class,
+            'milestone_dependencies',
+            'milestone_id',
+            'depends_on_milestone_id'
+        )->withTimestamps();
+    }
+
+    /**
+     * Inverse: milestones that depend on this one. Used by graph
+     * traversal to find downstream blockers.
+     */
+    public function dependents(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(
+            self::class,
+            'milestone_dependencies',
+            'depends_on_milestone_id',
+            'milestone_id'
+        )->withTimestamps();
+    }
+
     public function requirements(): HasMany
     {
         return $this->hasMany(Requirement::class, 'source_id')

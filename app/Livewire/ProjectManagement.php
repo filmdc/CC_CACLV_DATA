@@ -255,6 +255,9 @@ class ProjectManagement extends Component
         $this->showMilestoneForm = true;
     }
 
+    // P-18 / 7.5b: milestone dependencies multi-select.
+    public $milestone_dependency_ids = [];
+
     public function showEditMilestone($id)
     {
         $milestone = ProjectMilestone::findOrFail($id);
@@ -264,10 +267,11 @@ class ProjectManagement extends Component
         $this->milestone_target_date = $milestone->target_date?->format('Y-m-d');
         $this->milestone_icon = $milestone->icon;
         $this->milestone_color = $milestone->color;
+        $this->milestone_dependency_ids = $milestone->dependencies()->pluck('project_milestones.id')->all();
         $this->showMilestoneForm = true;
     }
 
-    public function saveMilestone()
+    public function saveMilestone(\App\Services\MilestoneDependencyValidator $depValidator)
     {
         $validated = $this->validate([
             'milestone_name' => 'required|string|max:255',
@@ -275,10 +279,21 @@ class ProjectManagement extends Component
             'milestone_target_date' => 'nullable|date',
             'milestone_icon' => 'required|string',
             'milestone_color' => 'required|string',
+            'milestone_dependency_ids' => 'array',
+            'milestone_dependency_ids.*' => 'integer|exists:project_milestones,id',
         ]);
 
         if ($this->editingMilestone) {
             $milestone = ProjectMilestone::findOrFail($this->editingMilestone);
+
+            try {
+                $depValidator->validate($milestone, $this->milestone_dependency_ids);
+            } catch (\DomainException $e) {
+                session()->flash('error', $e->getMessage());
+
+                return;
+            }
+
             $milestone->update([
                 'name' => $this->milestone_name,
                 'description' => $this->milestone_description !== '' ? $this->milestone_description : null,
@@ -287,6 +302,9 @@ class ProjectManagement extends Component
                 'color' => $this->milestone_color,
                 'updated_by' => Auth::id(),
             ]);
+
+            $milestone->dependencies()->sync($this->milestone_dependency_ids);
+
             session()->flash('success', 'Milestone updated successfully');
         } else {
             $sequenceOrder = $this->job->milestones()->max('sequence_order') + 1;
@@ -301,6 +319,25 @@ class ProjectManagement extends Component
                 'status' => $sequenceOrder == 1 ? 'in_progress' : 'not_started',
                 'created_by' => Auth::id(),
             ]);
+
+            // New milestones with proposed dependencies get the same
+            // cycle/cross-project guard. The validator runs against the
+            // freshly-created row's id (which has no edges yet, so cycles
+            // are impossible — but cross-project edges are still
+            // rejected, and self-reference can't happen because the form
+            // multi-select excludes self).
+            if (! empty($this->milestone_dependency_ids)) {
+                try {
+                    $depValidator->validate($milestone, $this->milestone_dependency_ids);
+                    $milestone->dependencies()->sync($this->milestone_dependency_ids);
+                } catch (\DomainException $e) {
+                    $milestone->delete();
+                    session()->flash('error', $e->getMessage());
+
+                    return;
+                }
+            }
+
             $this->selectedMilestone = $milestone->id;
             session()->flash('success', 'Milestone created successfully');
         }
@@ -1732,6 +1769,7 @@ class ProjectManagement extends Component
         $this->milestone_target_date = '';
         $this->milestone_icon = 'Circle';
         $this->milestone_color = '#6366f1';
+        $this->milestone_dependency_ids = [];
     }
 
     protected function resetTaskForm()

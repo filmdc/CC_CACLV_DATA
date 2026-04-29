@@ -693,6 +693,21 @@
                         <input type="color" wire:model="milestone_color"
                                class="w-full h-10 border border-gray-300 dark:border-zinc-600 rounded-md">
                     </div>
+                    {{-- P-18 / 7.5b: depends-on multi-select. Scoped to other milestones on this project. --}}
+                    @if($job->milestones->where('id', '!=', $editingMilestone)->count() > 0)
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Depends on</label>
+                            <select wire:model="milestone_dependency_ids" multiple size="4"
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                @foreach($job->milestones->where('id', '!=', $editingMilestone)->sortBy('sequence_order') as $other)
+                                    <option value="{{ $other->id }}">{{ $other->name }}</option>
+                                @endforeach
+                            </select>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                Hold Ctrl/Cmd to select multiple. The dashboard marks this milestone "blocked" while any chosen dependency still has outstanding requirements.
+                            </p>
+                        </div>
+                    @endif
                 </div>
                 <div class="mt-6 flex justify-end space-x-3">
                     <button wire:click="$set('showMilestoneForm', false)"
