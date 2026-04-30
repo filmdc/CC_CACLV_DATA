@@ -308,34 +308,39 @@ class ProjectManagement extends Component
             session()->flash('success', 'Milestone updated successfully');
         } else {
             $sequenceOrder = $this->job->milestones()->max('sequence_order') + 1;
-            $milestone = ProjectMilestone::create([
-                'housing_job_id' => $this->jobId,
-                'name' => $this->milestone_name,
-                'description' => $this->milestone_description !== '' ? $this->milestone_description : null,
-                'target_date' => $this->milestone_target_date !== '' ? $this->milestone_target_date : null,
-                'icon' => $this->milestone_icon,
-                'color' => $this->milestone_color,
-                'sequence_order' => $sequenceOrder,
-                'status' => $sequenceOrder == 1 ? 'in_progress' : 'not_started',
-                'created_by' => Auth::id(),
-            ]);
 
-            // New milestones with proposed dependencies get the same
-            // cycle/cross-project guard. The validator runs against the
-            // freshly-created row's id (which has no edges yet, so cycles
-            // are impossible — but cross-project edges are still
-            // rejected, and self-reference can't happen because the form
-            // multi-select excludes self).
-            if (! empty($this->milestone_dependency_ids)) {
-                try {
-                    $depValidator->validate($milestone, $this->milestone_dependency_ids);
-                    $milestone->dependencies()->sync($this->milestone_dependency_ids);
-                } catch (\DomainException $e) {
-                    $milestone->delete();
-                    session()->flash('error', $e->getMessage());
+            // Wrap the create + dependency sync in a transaction so any
+            // observer side effects (audit log, notifications, etc.)
+            // unwind cleanly if the validator throws. The validator
+            // runs against the freshly-created row — cycles are
+            // impossible (no edges yet) but cross-project edges are
+            // still rejected; self-reference can't happen because the
+            // form multi-select excludes self.
+            try {
+                $milestone = DB::transaction(function () use ($depValidator, $sequenceOrder) {
+                    $created = ProjectMilestone::create([
+                        'housing_job_id' => $this->jobId,
+                        'name' => $this->milestone_name,
+                        'description' => $this->milestone_description !== '' ? $this->milestone_description : null,
+                        'target_date' => $this->milestone_target_date !== '' ? $this->milestone_target_date : null,
+                        'icon' => $this->milestone_icon,
+                        'color' => $this->milestone_color,
+                        'sequence_order' => $sequenceOrder,
+                        'status' => $sequenceOrder == 1 ? 'in_progress' : 'not_started',
+                        'created_by' => Auth::id(),
+                    ]);
 
-                    return;
-                }
+                    if (! empty($this->milestone_dependency_ids)) {
+                        $depValidator->validate($created, $this->milestone_dependency_ids);
+                        $created->dependencies()->sync($this->milestone_dependency_ids);
+                    }
+
+                    return $created;
+                });
+            } catch (\DomainException $e) {
+                session()->flash('error', $e->getMessage());
+
+                return;
             }
 
             $this->selectedMilestone = $milestone->id;

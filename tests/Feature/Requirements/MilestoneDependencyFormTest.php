@@ -77,6 +77,28 @@ it('replaces (not unions) dependency edges when editing', function () {
     expect($deps)->not->toContain($b->id);
 });
 
+it('rolls back a new-milestone insert when the dependency proposal violates the validator', function () {
+    $jobA = HousingJob::factory()->create();
+    $jobB = HousingJob::factory()->create();
+    $milestoneOnB = ProjectMilestone::factory()->create(['housing_job_id' => $jobB->id]);
+
+    $beforeCount = ProjectMilestone::where('housing_job_id', $jobA->id)->count();
+
+    Livewire::actingAs($this->admin)
+        ->test(ProjectManagement::class, ['id' => $jobA->id])
+        ->call('showCreateMilestone')
+        ->set('milestone_name', 'Should not survive')
+        ->set('milestone_icon', 'Circle')
+        ->set('milestone_color', '#6366f1')
+        // Cross-project dependency — validator will throw and the
+        // transaction must roll back the insert.
+        ->set('milestone_dependency_ids', [$milestoneOnB->id])
+        ->call('saveMilestone');
+
+    expect(ProjectMilestone::where('housing_job_id', $jobA->id)->count())->toBe($beforeCount);
+    expect(ProjectMilestone::where('name', 'Should not survive')->exists())->toBeFalse();
+});
+
 it('allows setting an empty dependency list to clear all edges', function () {
     $job = HousingJob::factory()->create();
     $a = ProjectMilestone::factory()->create(['housing_job_id' => $job->id]);
