@@ -291,6 +291,15 @@ class Requirement extends Model implements HasMedia
         $this->save();
     }
 
+    /**
+     * TODO(3B): this is the canonical extension point for additional
+     * notification triggers off requirement completion (e.g.,
+     * "fund-expiring-soon" + "this requirement closes the last
+     * outstanding item on a fund whose expires_at is within 7 days"
+     * could chain off the same call site). Phase 3A keeps it scoped
+     * to the project-manager ping; the dashboard surfaces all the
+     * other signals.
+     */
     protected function notifyProjectManagerOfCompletion(User $actor): void
     {
         $manager = $this->housingJob?->projectManager;

@@ -19,6 +19,11 @@ class RequirementAssignedNotification extends Notification
 
     public function via(object $notifiable): array
     {
+        // TODO(3B): add 'mail' alongside 'database' when the email
+        // channel for requirement notifications is wired. The
+        // toMail() shape will mirror toArray() with project URL +
+        // requirement title; one-line change here, one method add
+        // below.
         return ['database'];
     }
 
