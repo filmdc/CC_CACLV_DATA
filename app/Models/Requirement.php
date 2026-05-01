@@ -292,13 +292,12 @@ class Requirement extends Model implements HasMedia
     }
 
     /**
-     * TODO(3B): this is the canonical extension point for additional
-     * notification triggers off requirement completion (e.g.,
-     * "fund-expiring-soon" + "this requirement closes the last
-     * outstanding item on a fund whose expires_at is within 7 days"
-     * could chain off the same call site). Phase 3A keeps it scoped
-     * to the project-manager ping; the dashboard surfaces all the
-     * other signals.
+     * TODO(3B): completion-chained extension point — e.g., a
+     * "milestone cleared" notification when this completion closes the
+     * last outstanding requirement on its source milestone. Date-driven
+     * notifications (fund-expiration, milestone-overdue) live in a
+     * separate scheduled job; see the marker in
+     * App\Services\DashboardIndicatorSupport.
      */
     protected function notifyProjectManagerOfCompletion(User $actor): void
     {

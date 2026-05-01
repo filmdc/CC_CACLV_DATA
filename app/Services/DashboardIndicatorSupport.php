@@ -8,6 +8,15 @@ use App\Models\Requirement;
 use Illuminate\Support\Collection;
 
 /**
+ * TODO(3B): date-driven notifications live here, not on the Requirement
+ * model. A scheduled job (probably daily) walks the indicator helpers
+ * below to find fund_codes crossing the urgent (≤30d) or expired
+ * threshold and project_milestones crossing the approaching (≤7d) or
+ * overdue threshold, dispatching a notification to the project
+ * manager when a row first crosses a new bucket. The dashboard
+ * surfaces the same signals visually in 3A; 3B adds the email push.
+ */
+/**
  * Phase 3A / 7.5: dashboard indicator precomputes.
  *
  * The "blocked milestone" signal would naively iterate each visible
@@ -45,6 +54,34 @@ class DashboardIndicatorSupport
                     Requirement::STATUS_COMPLETE,
                     Requirement::STATUS_NOT_APPLICABLE,
                 ]);
+            })
+            ->pluck('id')
+            ->all();
+    }
+
+    /**
+     * Returns the set of fund_code_requirements.id values where
+     * is_hard_requirement = true, scoped to fund codes attached to any
+     * of the given housing_jobs. The dashboard uses this to surface a
+     * "hard outstanding" badge per project in O(1) per requirement
+     * row, rather than dereferencing each requirement's
+     * source_template_id one-by-one.
+     *
+     * @param  array<int, int>  $housingJobIds
+     * @return array<int, int>
+     */
+    public function hardRequirementTemplateIds(array $housingJobIds): array
+    {
+        if (empty($housingJobIds)) {
+            return [];
+        }
+
+        return \App\Models\FundCodeRequirement::query()
+            ->where('is_hard_requirement', true)
+            ->whereIn('fund_code_id', function ($q) use ($housingJobIds) {
+                $q->select('fund_code_id')
+                    ->from('fund_code_housing_job')
+                    ->whereIn('housing_job_id', $housingJobIds);
             })
             ->pluck('id')
             ->all();

@@ -282,6 +282,16 @@ class Dashboard extends Component
             return $this->renderContractDashboard($user);
         }
 
+        // P-17: housing users land on the housing dashboard at the same
+        // /dashboard URL feel via redirect. Predicate: has projects.view
+        // (the housing-module read permission) and is not a contract-
+        // dashboard user (handled above). Admins fall through to the
+        // existing programs default unless they also hold projects.view,
+        // which most admins do.
+        if ($user->hasPermission('projects.view')) {
+            return redirect()->route('dashboard.housing');
+        }
+
         // Get user's assigned programs
         $userPrograms = $user->programs()->with(['services', 'programEnrollments.participant', 'workPlans'])->get();
 
