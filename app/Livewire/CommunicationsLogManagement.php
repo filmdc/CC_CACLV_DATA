@@ -36,7 +36,17 @@ class CommunicationsLogManagement extends Component
 
     public $directionFilter = '';
 
-    public $followUpFilter = '';
+    /**
+     * P-03 (Phase 3B): follow-up status is multi-select. Three checkbox
+     * options: pending (future or today, not done), overdue (past, not
+     * done), completed. The legacy scopePendingFollowUp on the model
+     * defines pending more loosely (it counts overdue as pending too)
+     * and is left intact for the dashboard count badge — the multi-
+     * select filter inlines stricter semantics in render().
+     *
+     * @var array<int, string>
+     */
+    public $followUpFilter = [];
 
     public $dateFrom = '';
 
@@ -46,7 +56,21 @@ class CommunicationsLogManagement extends Component
 
     public $tagFilter = '';
 
-    public $fundCodeFilter = '';
+    /**
+     * P-03 (Phase 3B): fund code filter is multi-select.
+     *
+     * @var array<int, int|string>
+     */
+    public $fundCodeFilter = [];
+
+    /**
+     * P-03 (Phase 3B): new conversion-status filter, multi-select.
+     * Options: 'converted' (linked to a housing job), 'not_converted'
+     * (not yet linked).
+     *
+     * @var array<int, string>
+     */
+    public $conversionFilter = [];
 
     // Form state
     public $showForm = false;
@@ -230,14 +254,24 @@ class CommunicationsLogManagement extends Component
 
     public $linkAddressToParticipant = false;
 
+    /**
+     * P-03 (Phase 3B): every visible filter is bookmarkable. URL state
+     * round-trips for the full filter set so a filtered view can be
+     * shared as a link.
+     */
     protected $queryString = [
         'search' => ['except' => ''],
         'typeFilter' => ['except' => ''],
         'categoryFilter' => ['except' => ''],
         'priorityFilter' => ['except' => ''],
+        'directionFilter' => ['except' => ''],
         'serviceFilter' => ['except' => ''],
         'tagFilter' => ['except' => ''],
-        'fundCodeFilter' => ['except' => ''],
+        'fundCodeFilter' => ['except' => []],
+        'followUpFilter' => ['except' => []],
+        'conversionFilter' => ['except' => []],
+        'dateFrom' => ['except' => ''],
+        'dateTo' => ['except' => ''],
     ];
 
     public function mount()
@@ -277,6 +311,52 @@ class CommunicationsLogManagement extends Component
 
     public function updatedFundCodeFilter()
     {
+        $this->resetPage();
+    }
+
+    public function updatedDirectionFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedFollowUpFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedConversionFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedDateFrom()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedDateTo()
+    {
+        $this->resetPage();
+    }
+
+    /**
+     * P-03 (Phase 3B): clear every active filter in one click. Pagination
+     * resets too. URL state round-trips alongside via queryString.
+     */
+    public function clearFilters(): void
+    {
+        $this->search = '';
+        $this->typeFilter = '';
+        $this->categoryFilter = '';
+        $this->priorityFilter = '';
+        $this->directionFilter = '';
+        $this->serviceFilter = '';
+        $this->tagFilter = '';
+        $this->fundCodeFilter = [];
+        $this->followUpFilter = [];
+        $this->conversionFilter = [];
+        $this->dateFrom = '';
+        $this->dateTo = '';
         $this->resetPage();
     }
 
@@ -1911,10 +1991,45 @@ class CommunicationsLogManagement extends Component
             $query->byDirection($this->directionFilter);
         }
 
-        if ($this->followUpFilter === 'pending') {
-            $query->pendingFollowUp();
-        } elseif ($this->followUpFilter === 'overdue') {
-            $query->overdueFollowUp();
+        // P-03 (Phase 3B): follow-up status multi-select. Stricter
+        // semantics than the loose scopePendingFollowUp (which is kept
+        // for the dashboard count badge): "pending" here means future-
+        // or-today AND not done; "overdue" is past AND not done;
+        // "completed" is done. OR-within-category, AND-across-
+        // categories.
+        if (! empty($this->followUpFilter)) {
+            $today = now()->startOfDay();
+            $query->where(function ($q) use ($today) {
+                if (in_array('pending', $this->followUpFilter, true)) {
+                    $q->orWhere(function ($qq) use ($today) {
+                        $qq->whereNotNull('follow_up_date')
+                            ->where('follow_up_completed', false)
+                            ->where('follow_up_date', '>=', $today);
+                    });
+                }
+                if (in_array('overdue', $this->followUpFilter, true)) {
+                    $q->orWhere(function ($qq) use ($today) {
+                        $qq->whereNotNull('follow_up_date')
+                            ->where('follow_up_completed', false)
+                            ->where('follow_up_date', '<', $today);
+                    });
+                }
+                if (in_array('completed', $this->followUpFilter, true)) {
+                    $q->orWhere('follow_up_completed', true);
+                }
+            });
+        }
+
+        // P-03 (Phase 3B): conversion-status multi-select.
+        if (! empty($this->conversionFilter)) {
+            $query->where(function ($q) {
+                if (in_array('converted', $this->conversionFilter, true)) {
+                    $q->orWhereNotNull('converted_to_job_id');
+                }
+                if (in_array('not_converted', $this->conversionFilter, true)) {
+                    $q->orWhereNull('converted_to_job_id');
+                }
+            });
         }
 
         if ($this->serviceFilter) {
@@ -1925,8 +2040,9 @@ class CommunicationsLogManagement extends Component
             $query->whereHas('tags', fn ($q) => $q->where('tags.id', $this->tagFilter));
         }
 
-        if ($this->fundCodeFilter) {
-            $query->whereHas('fundCodes', fn ($q) => $q->where('fund_codes.id', $this->fundCodeFilter));
+        // P-03 (Phase 3B): fund code multi-select.
+        if (! empty($this->fundCodeFilter)) {
+            $query->whereHas('fundCodes', fn ($q) => $q->whereIn('fund_codes.id', $this->fundCodeFilter));
         }
 
         if ($this->dateFrom) {

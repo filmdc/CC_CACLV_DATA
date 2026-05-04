@@ -144,9 +144,8 @@
                     </select>
                 </div>
 
-                <!-- Second row for tag and fund code filters -->
-                @if($allTags->isNotEmpty() || $allFundCodes->isNotEmpty())
-                <div class="mt-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                <!-- P-03: second row for tag, fund code (multi), and date range -->
+                <div class="mt-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3" data-filter-row="2">
                     @if($allTags->isNotEmpty())
                         <select wire:model.live="tagFilter"
                                 class="px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md text-sm">
@@ -159,15 +158,63 @@
 
                     @if($allFundCodes->isNotEmpty())
                         <select wire:model.live="fundCodeFilter"
+                                multiple
+                                size="3"
+                                aria-label="Fund codes (hold Ctrl/Cmd to select multiple)"
                                 class="px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md text-sm">
-                            <option value="">All Fund Codes</option>
                             @foreach($allFundCodes as $fundCode)
                                 <option value="{{ $fundCode->id }}">{{ $fundCode->full_display }}</option>
                             @endforeach
                         </select>
                     @endif
+
+                    <input type="date"
+                           wire:model.live="dateFrom"
+                           aria-label="From date"
+                           placeholder="From"
+                           class="px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md text-sm">
+
+                    <input type="date"
+                           wire:model.live="dateTo"
+                           aria-label="To date"
+                           placeholder="To"
+                           class="px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md text-sm">
                 </div>
-                @endif
+
+                <!-- P-03: third row — multi-select status pills (follow-up + conversion) + clear -->
+                <div class="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2" data-filter-row="3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">Follow-up:</span>
+                        @foreach (['pending' => 'Pending', 'overdue' => 'Overdue', 'completed' => 'Completed'] as $value => $label)
+                            <label class="inline-flex items-center gap-1 px-2 py-1 rounded-md border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-700 text-xs cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-600">
+                                <input type="checkbox"
+                                       wire:model.live="followUpFilter"
+                                       value="{{ $value }}"
+                                       class="rounded border-gray-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500">
+                                <span class="text-gray-900 dark:text-white">{{ $label }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">Conversion:</span>
+                        @foreach (['converted' => 'Converted', 'not_converted' => 'Not converted'] as $value => $label)
+                            <label class="inline-flex items-center gap-1 px-2 py-1 rounded-md border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-700 text-xs cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-600">
+                                <input type="checkbox"
+                                       wire:model.live="conversionFilter"
+                                       value="{{ $value }}"
+                                       class="rounded border-gray-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500">
+                                <span class="text-gray-900 dark:text-white">{{ $label }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+
+                    <button type="button"
+                            wire:click="clearFilters"
+                            class="ml-auto text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline">
+                        Clear all filters
+                    </button>
+                </div>
             </div>
 
             <!-- Communications List -->

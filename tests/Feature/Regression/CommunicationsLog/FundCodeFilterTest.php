@@ -7,11 +7,13 @@ use Database\Seeders\RegressionTestSeeder;
 use Livewire\Livewire;
 use Tests\Support\RegressionHelpers;
 
-// Pins the page-level $fundCodeFilter dropdown added to the Communications
-// Log management view. Fixture coverage:
+// Pins the page-level $fundCodeFilter dropdown on the Communications Log
+// management view. P-03 (Phase 3B) converted this filter from single-
+// select string to multi-select array. Tests assert array-shape state
+// throughout. Fixture coverage:
 //   FC-FIX-001 → CL-2, CL-3 (two attached logs)
 //   FC-FIX-002 → CL-3 (one attached log)
-//   FC-FIX-003 → CL-4 (one attached log; this is the "FC-B" partner here)
+//   FC-FIX-003 → CL-4 (one attached log; the "FC-B" partner here)
 //   CL-1, CL-5 → no fund codes attached.
 
 beforeEach(function () {
@@ -24,7 +26,7 @@ it('narrows the rendered list to logs attached to the chosen fund code', functio
 
     Livewire::actingAs($this->user)
         ->test(CommunicationsLogManagement::class)
-        ->set('fundCodeFilter', (string) $fcA->id)
+        ->set('fundCodeFilter', [(string) $fcA->id])
         ->assertSee('CL-2: Single fund code')
         ->assertSee('CL-3: Multiple fund codes')
         ->assertDontSee('CL-1: General inquiry')
@@ -32,14 +34,14 @@ it('narrows the rendered list to logs attached to the chosen fund code', functio
         ->assertDontSee('CL-5: Converted to project (HJ-2), no fund code');
 })->group('regression');
 
-it('clears the filter when fundCodeFilter is set back to empty string', function () {
+it('clears the filter when fundCodeFilter is set back to an empty array', function () {
     $fcA = FundCode::where('code', 'FC-FIX-001')->firstOrFail();
 
     Livewire::actingAs($this->user)
         ->test(CommunicationsLogManagement::class)
-        ->set('fundCodeFilter', (string) $fcA->id)
+        ->set('fundCodeFilter', [(string) $fcA->id])
         ->assertDontSee('CL-1: General inquiry')
-        ->set('fundCodeFilter', '')
+        ->set('fundCodeFilter', [])
         ->assertSee('CL-1: General inquiry')
         ->assertSee('CL-2: Single fund code')
         ->assertSee('CL-3: Multiple fund codes')
@@ -57,7 +59,7 @@ it('exposes fundCodeFilter via the component query-string config', function () {
     })->call($component->instance());
 
     expect($qs)->toHaveKey('fundCodeFilter')
-        ->and($qs['fundCodeFilter'])->toBe(['except' => '']);
+        ->and($qs['fundCodeFilter'])->toBe(['except' => []]);
 })->group('regression');
 
 it('resets pagination to page 1 when fundCodeFilter changes', function () {
@@ -69,7 +71,7 @@ it('resets pagination to page 1 when fundCodeFilter changes', function () {
 
     expect($component->instance()->getPage())->toBe(2);
 
-    $component->set('fundCodeFilter', (string) $fcA->id);
+    $component->set('fundCodeFilter', [(string) $fcA->id]);
 
     expect($component->instance()->getPage())->toBe(1);
 })->group('regression');
