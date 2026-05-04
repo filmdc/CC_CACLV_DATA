@@ -7,7 +7,6 @@ use App\Models\Requirement;
 use App\Models\User;
 use App\Services\RequirementInstantiator;
 use Database\Seeders\RegressionTestSeeder;
-use Tests\Support\RegressionHelpers;
 
 beforeEach(function () {
     $this->seed(RegressionTestSeeder::class);

@@ -11,6 +11,7 @@ class FundCodeRequirement extends Model
     use HasFactory;
 
     public const TYPE_DOCUMENT = 'document';
+
     public const TYPE_TASK = 'task';
 
     protected $fillable = [

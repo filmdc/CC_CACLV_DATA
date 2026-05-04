@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\HousingJob;
 use App\Models\ProjectMilestone;
 use Database\Seeders\RegressionTestSeeder;
 

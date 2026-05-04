@@ -4,7 +4,6 @@ use App\Livewire\ProjectManagement;
 use App\Models\HousingJob;
 use App\Models\ProjectMilestone;
 use App\Models\Requirement;
-use App\Models\User;
 use Database\Seeders\RegressionTestSeeder;
 use Livewire\Livewire;
 use Tests\Support\RegressionHelpers;

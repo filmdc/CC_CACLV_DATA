@@ -30,14 +30,19 @@ class Requirement extends Model implements HasMedia
     use HasFactory, HasStandardMediaCollections, InteractsWithMedia;
 
     public const TYPE_DOCUMENT = 'document';
+
     public const TYPE_TASK = 'task';
 
     public const STATUS_OUTSTANDING = 'outstanding';
+
     public const STATUS_COMPLETE = 'complete';
+
     public const STATUS_NOT_APPLICABLE = 'not_applicable';
 
     public const SOURCE_MILESTONE = 'milestone';
+
     public const SOURCE_FUND_CODE = 'fund_code';
+
     public const SOURCE_AD_HOC = 'ad_hoc';
 
     protected $fillable = [

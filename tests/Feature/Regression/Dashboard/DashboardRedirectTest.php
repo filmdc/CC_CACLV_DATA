@@ -22,7 +22,6 @@ beforeEach(function () {
  * programs have housing properties without being centrally housing-
  * focused).
  */
-
 function attachHousingPermission(User $user): void
 {
     $role = Role::firstOrCreate(

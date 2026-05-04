@@ -39,4 +39,3 @@ class FundCodeFactory extends Factory
         return $this->state(fn () => ['starts_at' => now()->addDays($days)->toDateString()]);
     }
 }
-

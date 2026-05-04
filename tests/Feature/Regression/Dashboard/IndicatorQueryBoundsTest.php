@@ -23,7 +23,6 @@ beforeEach(function () {
  * (≤ N for both 10 and 100 milestones), not exact pin — exact-pin is
  * brittle to innocuous refactors; bounded catches the real concern.
  */
-
 const QUERY_BUDGET = 5;
 
 function buildBlockedFixture(int $milestoneCount): array
