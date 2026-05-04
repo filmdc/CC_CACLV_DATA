@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Notifications\RequirementAssignedNotification;
 use App\Notifications\RequirementCompletedNotification;
+use App\Notifications\RequirementUpstreamUploadedNotification;
+use App\Services\MilestoneGraph;
 use App\Traits\HasStandardMediaCollections;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -325,5 +327,49 @@ class Requirement extends Model implements HasMedia
         }
 
         $owner->notify(new RequirementCompletedNotification($this, $actor));
+    }
+
+    /**
+     * Phase 3B Step 3: notify owners of open requirements on
+     * milestones that depend on this requirement's source milestone
+     * that an attachment was added here.
+     *
+     * Single-fire per call. Callers should invoke this once per upload
+     * action — not per file — even if the action attached multiple
+     * files. Suppression rules:
+     *   - skipped entirely for fund-code-source and ad-hoc upstream
+     *     requirements (no source milestone, no graph),
+     *   - skipped when the upstream's source milestone has no
+     *     dependents,
+     *   - skipped per-recipient when the owner is the uploader
+     *     (no self-pings),
+     *   - skipped per-recipient when the downstream requirement is
+     *     not in outstanding state (closed work doesn't surface fresh
+     *     pings on its watcher).
+     *
+     * The mail channel inside RequirementUpstreamUploadedNotification
+     * is further gated on the recipient's assignment_email opt-out
+     * — uploads upstream of "your" assigned work share the same toggle
+     * as new assignments, since both are "your-work" notifications.
+     */
+    public function notifyDownstreamOfUpload(User $uploader): void
+    {
+        $graph = app(MilestoneGraph::class);
+        $rows = $graph->downstreamOwnersFor($this);
+
+        foreach ($rows as $row) {
+            $downstream = $row['requirement'];
+            $owner = $row['owner'];
+
+            if ($owner->id === $uploader->id) {
+                continue;
+            }
+
+            $owner->notify(new RequirementUpstreamUploadedNotification(
+                $this,
+                $downstream,
+                $uploader,
+            ));
+        }
     }
 }

@@ -1202,6 +1202,13 @@ class ProjectManagement extends Component
                     ->toMediaCollection('attachments');
             }
 
+            // Phase 3B Step 3: notify downstream owners that an attachment
+            // has landed here. Single fire per save action regardless of
+            // file count — the foreach above is for storage, not for
+            // signaling. No-op for non-milestone-source requirements
+            // (handled inside notifyDownstreamOfUpload).
+            $req->notifyDownstreamOfUpload($actor);
+
             $req->markComplete($actor, $this->completion_note !== '' ? $this->completion_note : null);
         } elseif (trim($this->completion_override_reason) !== '') {
             $req->markCompleteWithOverride(

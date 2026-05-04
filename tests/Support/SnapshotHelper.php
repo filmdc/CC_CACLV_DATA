@@ -77,6 +77,10 @@ class SnapshotHelper
             // CI (localhost). Mask the scheme+host of any absolute URL so
             // snapshots are environment-portable.
             '#https?://[^/"\'\s<>]+#' => '__APP_URL__',
+            // Vite asset hashes — content-hashed filenames change every
+            // time the bundle rebuilds. Normalize to a stable token so
+            // snapshots survive `npm run build` between test runs.
+            '#/build/assets/([^/"\']+)-[A-Za-z0-9_-]{6,}\.(css|js)#' => '/build/assets/$1-__HASH__.$2',
             // Livewire 3 conditional render markers. These are framework
             // internals and emit/strip differently across environments
             // (debug mode, view cache state). Drop them.
