@@ -106,6 +106,10 @@ class SnapshotHelper
             // wire:click="method(N)" / wire:click="method(N, ...)" — the first
             // numeric arg is almost always a DB row id.
             '/wire:click="([a-zA-Z_][a-zA-Z0-9_]*)\(\d+(,[^)]*)?\)"/' => 'wire:click="$1(__ID__$2)"',
+            // data-* attributes that hold autoincrement ids (Phase 3A
+            // dashboard rows tag themselves data-project-id, data-
+            // requirement-id, etc. for selectable testing).
+            '/data-(project|requirement|milestone|task|document|fund-code)-id="\d+"/' => 'data-$1-id="__ID__"',
             // URL fragments like #milestone-42, #task-9 used for scroll-to-anchor.
             '/#([a-zA-Z][a-zA-Z_-]*)-\d+\b/' => '#$1-__ID__',
         ];

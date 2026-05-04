@@ -661,6 +661,12 @@ Route::middleware(['auth'])->group(function () {
     // Project Management Module Routes (Unified Interface)
     Route::get('projects', App\Livewire\ProjectsManagement::class)->name('projects.management');
     Route::get('project/{id}/manage', App\Livewire\ProjectManagement::class)->name('project.management');
+
+    // P-17: housing dashboard. Permission gate via mount() rather than
+    // middleware so the redirect in App\Livewire\Dashboard can carry
+    // unauthenticated/no-permission users back to the default dashboard
+    // without bouncing through a 403.
+    Route::get('dashboard/housing', App\Livewire\HousingDashboard::class)->name('dashboard.housing');
     Route::get('project-reporting', App\Livewire\ProjectReporting::class)
         ->middleware(['permission:projects.view'])
         ->name('project.reporting');

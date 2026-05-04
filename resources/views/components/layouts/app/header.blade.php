@@ -46,6 +46,13 @@
                         label="Documentation"
                     />
                 </flux:tooltip>
+                {{-- P-17: in-app notification bell. Renders even when there
+                     are no notifications (no badge in that case); the
+                     dropdown surfaces requirement-assigned and
+                     requirement-completed events from Phase 3A. --}}
+                @auth
+                    <livewire:notification-bell />
+                @endauth
             </flux:navbar>
 
             <!-- Desktop User Menu -->

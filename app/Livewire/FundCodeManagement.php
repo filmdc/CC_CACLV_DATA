@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\Contract;
 use App\Models\FundCode;
 use App\Models\FundCodeRequirement;
+use App\Models\Requirement;
 use App\Traits\WithPermissionChecks;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -124,21 +125,93 @@ class FundCodeManagement extends Component
         $this->resetForm();
     }
 
+    // P-18: global fund-code delete keep-or-cascade prompt state.
+    public $showDeleteFundCodeModal = false;
+
+    public $deletingFundCodeId = null;
+
+    public $deleteFundCodeRequirementCount = 0;
+
+    /**
+     * Entry for global fund-code delete (admin). Three branches:
+     *   1. Communication-log usage exists → block with flash error
+     *      (existing pre-Phase 3A guard, unchanged).
+     *   2. No fund-code-source requirements anywhere → delete now.
+     *   3. Has requirements (across one or more projects) → open the
+     *      keep/cascade modal; the actual delete happens in
+     *      confirmDeleteFundCode().
+     */
     public function delete($id)
     {
         $this->authorizeAction('fund_codes.delete');
 
         $fundCode = FundCode::findOrFail($id);
 
-        // Check if fund code is being used
         if ($fundCode->communicationLogs()->count() > 0) {
             session()->flash('error', 'Cannot delete fund code that is in use. Consider deactivating it instead.');
 
             return;
         }
 
+        $reqCount = Requirement::where('source_type', Requirement::SOURCE_FUND_CODE)
+            ->where('source_id', $fundCode->id)
+            ->count();
+
+        if ($reqCount === 0) {
+            $fundCode->delete();
+            session()->flash('success', 'Fund code deleted successfully.');
+
+            return;
+        }
+
+        $this->deletingFundCodeId = $fundCode->id;
+        $this->deleteFundCodeRequirementCount = $reqCount;
+        $this->showDeleteFundCodeModal = true;
+    }
+
+    public function confirmDeleteFundCode(bool $cascadeRequirements): void
+    {
+        $this->authorizeAction('fund_codes.delete');
+
+        $id = $this->deletingFundCodeId;
+
+        if ($id === null) {
+            $this->closeDeleteFundCodeModal();
+
+            return;
+        }
+
+        $fundCode = FundCode::find($id);
+
+        if ($fundCode === null) {
+            $this->closeDeleteFundCodeModal();
+
+            return;
+        }
+
+        if ($cascadeRequirements) {
+            Requirement::where('source_type', Requirement::SOURCE_FUND_CODE)
+                ->where('source_id', $id)
+                ->delete();
+        } else {
+            // Keep branch: leave the requirement rows in place. Their
+            // source_id continues to reference an id whose fund_codes
+            // row is gone — by design, the audit text in
+            // source_label_snapshot survives so the project history
+            // remains legible.
+        }
+
         $fundCode->delete();
         session()->flash('success', 'Fund code deleted successfully.');
+
+        $this->closeDeleteFundCodeModal();
+    }
+
+    public function closeDeleteFundCodeModal(): void
+    {
+        $this->showDeleteFundCodeModal = false;
+        $this->deletingFundCodeId = null;
+        $this->deleteFundCodeRequirementCount = 0;
     }
 
     public function toggleActive($id)

@@ -222,6 +222,32 @@ class HousingJob extends Model
     }
 
     /**
+     * P-18 (Phase 3A): per-project requirements across all sources
+     * (milestone, fund code, ad-hoc).
+     */
+    public function requirements(): HasMany
+    {
+        return $this->hasMany(Requirement::class);
+    }
+
+    /**
+     * P-2.5: returns the budget category names on this project that
+     * reference the given fund code. An empty array means a detach is
+     * allowed; a non-empty array enumerates the rows blocking it. The
+     * Phase 3A lifecycle prompt uses this to decide whether to surface
+     * the keep/delete-requirements modal or a hard-stop error first.
+     *
+     * @return array<int, string>
+     */
+    public function budgetCategoriesReferencingFundCode(int $fundCodeId): array
+    {
+        return ProjectBudget::where('housing_job_id', $this->id)
+            ->where('fund_code_id', $fundCodeId)
+            ->pluck('category')
+            ->all();
+    }
+
+    /**
      * Routes detach through this method to enforce the P-2.5 invariant:
      * a fund code cannot be detached if any project_budgets row references
      * it. Throws \InvalidArgumentException listing the affected category
@@ -232,10 +258,7 @@ class HousingJob extends Model
      */
     public function detachFundCode(int $id): void
     {
-        $referencingCategories = ProjectBudget::where('housing_job_id', $this->id)
-            ->where('fund_code_id', $id)
-            ->pluck('category')
-            ->all();
+        $referencingCategories = $this->budgetCategoriesReferencingFundCode($id);
 
         if (! empty($referencingCategories)) {
             $list = '"'.implode('", "', $referencingCategories).'"';
@@ -533,11 +556,16 @@ class HousingJob extends Model
         DB::beginTransaction();
 
         try {
-            // Create new job from template
+            // Create new job from template. Override project_manager_id
+            // unconditionally — template rows may carry a stale value
+            // (the user who saved the template), and the conceptual
+            // model treats the instantiating user as the new project's
+            // owner. P-18.
             $job = new self;
             $job->fill($jobData);
             $job->is_template = false;
             $job->created_by = Auth::id();
+            $job->project_manager_id = Auth::id();
             $job->save();
 
             // Clone template's milestone structure
@@ -555,7 +583,8 @@ class HousingJob extends Model
                 $newMilestone->created_by = Auth::id();
                 $newMilestone->save();
 
-                // Clone tasks
+                // Clone legacy tasks (write-vestigial — kept until the
+                // legacy tables are retired in a later phase).
                 $tasks = MilestoneTask::where('milestone_id', $milestone->id)->get();
                 foreach ($tasks as $task) {
                     $newTask = $task->replicate([
@@ -569,7 +598,7 @@ class HousingJob extends Model
                     $newTask->save();
                 }
 
-                // Clone documents
+                // Clone legacy documents (vestigial; see above).
                 $documents = MilestoneDocument::where('milestone_id', $milestone->id)->get();
                 foreach ($documents as $doc) {
                     $newDoc = $doc->replicate([
@@ -581,6 +610,42 @@ class HousingJob extends Model
                     $newDoc->status = 'not_uploaded';
                     $newDoc->created_by = Auth::id();
                     $newDoc->save();
+                }
+
+                // P-18: clone milestone-source requirements from the
+                // template to the new project. Remap source_id to the
+                // newly-created milestone, reset status/owner/completion
+                // so the new project lands clean. Spatie media on the
+                // template's requirement rows is intentionally NOT
+                // copied (consistent with legacy clone behaviour: files
+                // do not carry over).
+                $templateRequirements = Requirement::query()
+                    ->where('housing_job_id', $template->id)
+                    ->where('source_type', Requirement::SOURCE_MILESTONE)
+                    ->where('source_id', $milestone->id)
+                    ->get();
+
+                foreach ($templateRequirements as $tplReq) {
+                    Requirement::create([
+                        'housing_job_id' => $job->id,
+                        'type' => $tplReq->type,
+                        'title' => $tplReq->title,
+                        'description' => $tplReq->description,
+                        'status' => Requirement::STATUS_OUTSTANDING,
+                        'owner_user_id' => Auth::id(),
+                        'source_type' => Requirement::SOURCE_MILESTONE,
+                        'source_id' => $newMilestone->id,
+                        'source_template_id' => null,
+                        'source_label_snapshot' => $tplReq->title,
+                        'milestone_gate_text' => $tplReq->milestone_gate_text,
+                        'completed_at' => null,
+                        'completed_by_user_id' => null,
+                        'completion_note' => null,
+                        'override_reason' => null,
+                        'overridden_by_user_id' => null,
+                        'created_by' => Auth::id(),
+                        'updated_by' => Auth::id(),
+                    ]);
                 }
             }
 

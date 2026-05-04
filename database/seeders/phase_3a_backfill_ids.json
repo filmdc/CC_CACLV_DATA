@@ -1,0 +1,53 @@
+{
+    "version": "phase-3a",
+    "generated_at": "2026-04-28T09:44:15-04:00",
+    "sections": {
+        "housing_jobs_project_manager": {
+            "housing_job_ids": [
+                2,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20
+            ],
+            "count": 17,
+            "written_at": "2026-04-28T09:44:58-04:00"
+        },
+        "milestone_documents_to_requirements": {
+            "requirement_ids": [
+                7,
+                8,
+                9
+            ],
+            "count": 3,
+            "written_at": "2026-04-28T09:44:58-04:00"
+        },
+        "milestone_tasks_to_requirements": {
+            "requirement_ids": [
+                10
+            ],
+            "count": 1,
+            "written_at": "2026-04-28T09:44:58-04:00"
+        },
+        "fund_code_requirements_instantiation": {
+            "requirement_ids": [
+                11,
+                12
+            ],
+            "count": 2,
+            "written_at": "2026-04-28T09:44:58-04:00"
+        }
+    }
+}

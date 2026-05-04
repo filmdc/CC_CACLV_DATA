@@ -65,11 +65,26 @@ class Dashboard extends Component
 
     public function mount()
     {
+        $user = Auth::user();
+
+        // P-17: housing users land on the housing dashboard. Gated by
+        // the dedicated 'housing_dashboard.view' permission — admins
+        // grant it to whichever roles should see the dashboard
+        // (decoupled from program data because many programs have
+        // housing properties without being centrally housing-focused).
+        // The contract-database-dashboard role still takes precedence
+        // and is handled in render(); this branch fires for the
+        // housing-permitted user before render() runs because Livewire
+        // 3 requires render() to return a view, not a redirect.
+        if (! $user->hasRole('contract-database-dashboard')
+            && $user->hasPermission('housing_dashboard.view')) {
+            return $this->redirectRoute('dashboard.housing', navigate: false);
+        }
+
         // Initialize date filters
         $this->setDateFilter('this_month');
 
         // Set default program for report if user has programs
-        $user = Auth::user();
         $userPrograms = $user->programs()->first();
         if ($userPrograms) {
             $this->selectedProgramForReport = $userPrograms->id;
@@ -281,6 +296,9 @@ class Dashboard extends Component
         if ($user->hasRole('contract-database-dashboard')) {
             return $this->renderContractDashboard($user);
         }
+
+        // P-17 housing-user redirect lives in mount() — render() must
+        // always return a view in Livewire 3.
 
         // Get user's assigned programs
         $userPrograms = $user->programs()->with(['services', 'programEnrollments.participant', 'workPlans'])->get();

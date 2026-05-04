@@ -17,12 +17,16 @@ class FundCode extends Model
         'description',
         'contract_id',
         'is_active',
+        'starts_at',
+        'expires_at',
         'created_by',
         'updated_by',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'starts_at' => 'date',
+        'expires_at' => 'date',
     ];
 
     // Relationships
@@ -60,6 +64,52 @@ class FundCode extends Model
     public function getFullDisplayAttribute(): string
     {
         return "{$this->code} – {$this->description}";
+    }
+
+    /**
+     * Phase 3A / 7.5: bucket the fund's expiration distance from
+     * today's start-of-day into one of four states. Hardcoded
+     * thresholds (≤30 days = urgent, 31–90 days = warning, past =
+     * expired). Documented in PHASE_3A_NOTES.md as a one-line config
+     * change for a future phase if Kaitlyn's cadence differs.
+     *
+     * @return 'urgent'|'warning'|'expired'|null
+     */
+    public function expirationIndicator(): ?string
+    {
+        if ($this->expires_at === null) {
+            return null;
+        }
+
+        $today = now()->startOfDay();
+        $expiresAt = $this->expires_at->copy()->startOfDay();
+        $days = (int) $today->diffInDays($expiresAt, false);
+
+        if ($days < 0) {
+            return 'expired';
+        }
+
+        if ($days <= 30) {
+            return 'urgent';
+        }
+
+        if ($days <= 90) {
+            return 'warning';
+        }
+
+        return null;
+    }
+
+    /**
+     * True if the fund's start date is in the future. Informational
+     * only — no impact on attachment, instantiation, or completion;
+     * the dashboard surfaces a "Fund starts [date]" indicator on rows
+     * tied to the not-yet-started fund.
+     */
+    public function isStartingInFuture(): bool
+    {
+        return $this->starts_at !== null
+            && $this->starts_at->copy()->startOfDay()->isFuture();
     }
 
     // Scopes

@@ -24,6 +24,7 @@ class ProjectMilestone extends Model implements HasMedia
         'started_at',
         'icon',
         'color',
+        'assigned_to_user_id',
         'created_by',
         'updated_by',
     ];
@@ -64,6 +65,57 @@ class ProjectMilestone extends Model implements HasMedia
         return $this->hasMany(MilestoneCommunication::class, 'milestone_id');
     }
 
+    public function assignedTo(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_to_user_id');
+    }
+
+    /**
+     * Phase 3A / 7.5: milestones this one depends on. A milestone with
+     * any incomplete dependency requirement is considered "blocked" by
+     * the dashboard precompute, but the state itself is computed, not
+     * stored.
+     */
+    public function dependencies(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(
+            self::class,
+            'milestone_dependencies',
+            'milestone_id',
+            'depends_on_milestone_id'
+        )->withTimestamps();
+    }
+
+    /**
+     * Inverse: milestones that depend on this one. Used by graph
+     * traversal to find downstream blockers.
+     */
+    public function dependents(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(
+            self::class,
+            'milestone_dependencies',
+            'depends_on_milestone_id',
+            'milestone_id'
+        )->withTimestamps();
+    }
+
+    public function requirements(): HasMany
+    {
+        return $this->hasMany(Requirement::class, 'source_id')
+            ->where('source_type', Requirement::SOURCE_MILESTONE);
+    }
+
+    public function requirementTasks(): HasMany
+    {
+        return $this->requirements()->where('type', Requirement::TYPE_TASK);
+    }
+
+    public function requirementDocuments(): HasMany
+    {
+        return $this->requirements()->where('type', Requirement::TYPE_DOCUMENT);
+    }
+
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
@@ -72,6 +124,37 @@ class ProjectMilestone extends Model implements HasMedia
     public function updatedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    /**
+     * Phase 3A / 7.5: bucket the milestone's target_date distance from
+     * today into one of three states. target_date now drives the hard
+     * deadline indicator (per David's call: no separate due_date
+     * column; the soft-vs-hard distinction was rejected as user-
+     * confusion surface). Hardcoded threshold: ≤7 days = approaching,
+     * past = overdue.
+     *
+     * @return 'overdue'|'approaching'|null
+     */
+    public function deadlineIndicator(): ?string
+    {
+        if ($this->target_date === null) {
+            return null;
+        }
+
+        $today = now()->startOfDay();
+        $target = $this->target_date->copy()->startOfDay();
+        $days = (int) $today->diffInDays($target, false);
+
+        if ($days < 0) {
+            return 'overdue';
+        }
+
+        if ($days <= 7) {
+            return 'approaching';
+        }
+
+        return null;
     }
 
     // Computed Attributes

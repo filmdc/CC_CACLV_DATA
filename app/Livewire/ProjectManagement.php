@@ -10,8 +10,10 @@ use App\Models\MilestoneTask;
 use App\Models\ProjectBudget;
 use App\Models\ProjectExpense;
 use App\Models\ProjectMilestone;
+use App\Models\Requirement;
 use App\Models\User;
 use App\Services\MediaValidationService;
+use App\Services\RequirementInstantiator;
 use App\Traits\WithPermissionChecks;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -253,6 +255,9 @@ class ProjectManagement extends Component
         $this->showMilestoneForm = true;
     }
 
+    // P-18 / 7.5b: milestone dependencies multi-select.
+    public $milestone_dependency_ids = [];
+
     public function showEditMilestone($id)
     {
         $milestone = ProjectMilestone::findOrFail($id);
@@ -262,10 +267,11 @@ class ProjectManagement extends Component
         $this->milestone_target_date = $milestone->target_date?->format('Y-m-d');
         $this->milestone_icon = $milestone->icon;
         $this->milestone_color = $milestone->color;
+        $this->milestone_dependency_ids = $milestone->dependencies()->pluck('project_milestones.id')->all();
         $this->showMilestoneForm = true;
     }
 
-    public function saveMilestone()
+    public function saveMilestone(\App\Services\MilestoneDependencyValidator $depValidator)
     {
         $validated = $this->validate([
             'milestone_name' => 'required|string|max:255',
@@ -273,10 +279,21 @@ class ProjectManagement extends Component
             'milestone_target_date' => 'nullable|date',
             'milestone_icon' => 'required|string',
             'milestone_color' => 'required|string',
+            'milestone_dependency_ids' => 'array',
+            'milestone_dependency_ids.*' => 'integer|exists:project_milestones,id',
         ]);
 
         if ($this->editingMilestone) {
             $milestone = ProjectMilestone::findOrFail($this->editingMilestone);
+
+            try {
+                $depValidator->validate($milestone, $this->milestone_dependency_ids);
+            } catch (\DomainException $e) {
+                session()->flash('error', $e->getMessage());
+
+                return;
+            }
+
             $milestone->update([
                 'name' => $this->milestone_name,
                 'description' => $this->milestone_description !== '' ? $this->milestone_description : null,
@@ -285,20 +302,47 @@ class ProjectManagement extends Component
                 'color' => $this->milestone_color,
                 'updated_by' => Auth::id(),
             ]);
+
+            $milestone->dependencies()->sync($this->milestone_dependency_ids);
+
             session()->flash('success', 'Milestone updated successfully');
         } else {
             $sequenceOrder = $this->job->milestones()->max('sequence_order') + 1;
-            $milestone = ProjectMilestone::create([
-                'housing_job_id' => $this->jobId,
-                'name' => $this->milestone_name,
-                'description' => $this->milestone_description !== '' ? $this->milestone_description : null,
-                'target_date' => $this->milestone_target_date !== '' ? $this->milestone_target_date : null,
-                'icon' => $this->milestone_icon,
-                'color' => $this->milestone_color,
-                'sequence_order' => $sequenceOrder,
-                'status' => $sequenceOrder == 1 ? 'in_progress' : 'not_started',
-                'created_by' => Auth::id(),
-            ]);
+
+            // Wrap the create + dependency sync in a transaction so any
+            // observer side effects (audit log, notifications, etc.)
+            // unwind cleanly if the validator throws. The validator
+            // runs against the freshly-created row — cycles are
+            // impossible (no edges yet) but cross-project edges are
+            // still rejected; self-reference can't happen because the
+            // form multi-select excludes self.
+            try {
+                $milestone = DB::transaction(function () use ($depValidator, $sequenceOrder) {
+                    $created = ProjectMilestone::create([
+                        'housing_job_id' => $this->jobId,
+                        'name' => $this->milestone_name,
+                        'description' => $this->milestone_description !== '' ? $this->milestone_description : null,
+                        'target_date' => $this->milestone_target_date !== '' ? $this->milestone_target_date : null,
+                        'icon' => $this->milestone_icon,
+                        'color' => $this->milestone_color,
+                        'sequence_order' => $sequenceOrder,
+                        'status' => $sequenceOrder == 1 ? 'in_progress' : 'not_started',
+                        'created_by' => Auth::id(),
+                    ]);
+
+                    if (! empty($this->milestone_dependency_ids)) {
+                        $depValidator->validate($created, $this->milestone_dependency_ids);
+                        $created->dependencies()->sync($this->milestone_dependency_ids);
+                    }
+
+                    return $created;
+                });
+            } catch (\DomainException $e) {
+                session()->flash('error', $e->getMessage());
+
+                return;
+            }
+
             $this->selectedMilestone = $milestone->id;
             session()->flash('success', 'Milestone created successfully');
         }
@@ -308,12 +352,83 @@ class ProjectManagement extends Component
         $this->refreshJob();
     }
 
+    // P-18: milestone-delete keep-or-delete prompt state.
+    public $showDeleteMilestoneModal = false;
+
+    public $deletingMilestoneId = null;
+
+    public $deleteMilestoneRequirementCount = 0;
+
+    /**
+     * Entry for milestone delete. Two branches:
+     *   1. No milestone-source requirements → delete immediately.
+     *   2. Has requirements → open keep/delete modal; the actual
+     *      delete happens inside confirmDeleteMilestone().
+     *
+     * Legacy milestone_tasks / milestone_documents always cascade with
+     * the milestone via the FK; that behaviour is unchanged. The prompt
+     * is purely about Phase 3A's requirement rows.
+     */
     public function deleteMilestone($id)
+    {
+        $reqCount = Requirement::where('housing_job_id', $this->job->id)
+            ->where('source_type', Requirement::SOURCE_MILESTONE)
+            ->where('source_id', $id)
+            ->count();
+
+        if ($reqCount === 0) {
+            $this->finalizeDeleteMilestone((int) $id);
+
+            return;
+        }
+
+        $this->deletingMilestoneId = (int) $id;
+        $this->deleteMilestoneRequirementCount = $reqCount;
+        $this->showDeleteMilestoneModal = true;
+    }
+
+    public function confirmDeleteMilestone(bool $deleteRequirements): void
+    {
+        $id = $this->deletingMilestoneId;
+
+        if ($id === null) {
+            $this->closeDeleteMilestoneModal();
+
+            return;
+        }
+
+        if ($deleteRequirements) {
+            Requirement::where('housing_job_id', $this->job->id)
+                ->where('source_type', Requirement::SOURCE_MILESTONE)
+                ->where('source_id', $id)
+                ->delete();
+        } else {
+            // Keep branch: detach the requirements from the milestone
+            // by NULLing source_id so they survive the cascade. They
+            // remain on the project as orphan source=milestone rows.
+            Requirement::where('housing_job_id', $this->job->id)
+                ->where('source_type', Requirement::SOURCE_MILESTONE)
+                ->where('source_id', $id)
+                ->update(['source_id' => null]);
+        }
+
+        $this->finalizeDeleteMilestone($id);
+        $this->closeDeleteMilestoneModal();
+    }
+
+    public function closeDeleteMilestoneModal(): void
+    {
+        $this->showDeleteMilestoneModal = false;
+        $this->deletingMilestoneId = null;
+        $this->deleteMilestoneRequirementCount = 0;
+    }
+
+    protected function finalizeDeleteMilestone(int $id): void
     {
         $milestone = ProjectMilestone::findOrFail($id);
         $milestone->delete();
 
-        if ($this->selectedMilestone == $id) {
+        if ((int) $this->selectedMilestone === $id) {
             $this->selectedMilestone = $this->job->milestones()->first()?->id;
         }
 
@@ -344,7 +459,22 @@ class ProjectManagement extends Component
         $this->refreshJob();
     }
 
-    // Task Methods
+    // ===================================================================
+    // Legacy Task / Document methods (P-18 deprecated).
+    //
+    // These public methods are no longer wired to the milestone-tab UI;
+    // it now writes to the requirements table via the methods further
+    // below. They remain for any audit pathway that still walks
+    // milestone_tasks / milestone_documents directly. The protected
+    // helpers cleanupDocumentMedia() and processDocumentUploads() are
+    // similarly legacy. Retirement is a later phase.
+    //
+    // Do not call these from new code — use saveRequirement(),
+    // toggleTaskRequirementComplete(), saveRequirementCompletion(), or
+    // RequirementInstantiator instead.
+    // ===================================================================
+
+    /** @deprecated P-18 — use showCreateRequirement('task') instead. */
     public function showCreateTask()
     {
         if (! $this->selectedMilestone) {
@@ -356,6 +486,7 @@ class ProjectManagement extends Component
         $this->showTaskForm = true;
     }
 
+    /** @deprecated P-18 — use showEditRequirement(id) on a Requirement of type=task. */
     public function showEditTask($id)
     {
         $task = MilestoneTask::findOrFail($id);
@@ -368,6 +499,7 @@ class ProjectManagement extends Component
         $this->showTaskForm = true;
     }
 
+    /** @deprecated P-18 — use saveRequirement() with requirement_type='task'. */
     public function saveTask()
     {
         $validated = $this->validate([
@@ -423,6 +555,7 @@ class ProjectManagement extends Component
         $this->refreshJob();
     }
 
+    /** @deprecated P-18 — use deleteRequirement(id) for new task-type rows. */
     public function deleteTask($id)
     {
         MilestoneTask::findOrFail($id)->delete();
@@ -430,6 +563,7 @@ class ProjectManagement extends Component
         $this->refreshJob();
     }
 
+    /** @deprecated P-18 — use toggleTaskRequirementComplete(id). */
     public function updateTaskStatus($id, $status)
     {
         $task = MilestoneTask::findOrFail($id);
@@ -446,6 +580,7 @@ class ProjectManagement extends Component
     }
 
     // Document Methods
+    /** @deprecated P-18 — use showCreateRequirement('document'). */
     public function showCreateDocument()
     {
         if (! $this->selectedMilestone) {
@@ -457,6 +592,7 @@ class ProjectManagement extends Component
         $this->showDocumentForm = true;
     }
 
+    /** @deprecated P-18 — use saveRequirement() with requirement_type='document'. */
     public function saveDocument()
     {
         $validated = $this->validate([
@@ -561,6 +697,7 @@ class ProjectManagement extends Component
         }
     }
 
+    /** @deprecated P-18 — use showCompleteRequirementModal(id) — upload+complete is one step now. */
     public function showUploadDocument($id)
     {
         $this->uploadingDocumentId = $id;
@@ -568,6 +705,7 @@ class ProjectManagement extends Component
         $this->showDocumentUploadForm = true;
     }
 
+    /** @deprecated P-18 — use saveRequirementCompletion() handles upload + mark-complete in one path. */
     public function uploadDocumentFiles()
     {
         $this->validate([
@@ -604,6 +742,7 @@ class ProjectManagement extends Component
         $this->refreshJob();
     }
 
+    /** @deprecated P-18 — use no replacement on milestone tab — files render inline; legacy viewer still exists for legacy rows. */
     public function showDocumentViewer($id)
     {
         $this->viewingDocumentId = $id;
@@ -611,6 +750,7 @@ class ProjectManagement extends Component
         $this->showDocumentViewerModal = true;
     }
 
+    /** @deprecated P-18 — use approval workflow dropped per Phase 3A conceptual model; use markComplete(). */
     public function approveDocumentFromViewer()
     {
         $document = MilestoneDocument::findOrFail($this->viewingDocumentId);
@@ -622,6 +762,7 @@ class ProjectManagement extends Component
         $this->refreshJob();
     }
 
+    /** @deprecated P-18 — use approval workflow dropped per Phase 3A conceptual model. */
     public function rejectDocumentFromViewer()
     {
         $this->validate([
@@ -638,6 +779,7 @@ class ProjectManagement extends Component
         $this->refreshJob();
     }
 
+    /** @deprecated P-18 — use approval workflow dropped per Phase 3A conceptual model; use markComplete(). */
     public function approveTask($taskId)
     {
         $this->authorizeAction('projects.manage');
@@ -653,6 +795,7 @@ class ProjectManagement extends Component
         }
     }
 
+    /** @deprecated P-18 — use approval workflow dropped per Phase 3A conceptual model. */
     public function rejectTask()
     {
         $this->authorizeAction('projects.manage');
@@ -677,6 +820,7 @@ class ProjectManagement extends Component
         }
     }
 
+    /** @deprecated P-18 — use approval workflow dropped per Phase 3A conceptual model. */
     public function toggleDocumentApproval($documentId)
     {
         $this->authorizeAction('projects.manage');
@@ -693,6 +837,7 @@ class ProjectManagement extends Component
         }
     }
 
+    /** @deprecated P-18 — use use Spatie media on the Requirement model directly. */
     public function deleteDocumentFile($documentId, $mediaId)
     {
         $document = MilestoneDocument::findOrFail($documentId);
@@ -799,6 +944,7 @@ class ProjectManagement extends Component
         }
     }
 
+    /** @deprecated P-18 — use deleteRequirement(id) for new document-type rows. */
     public function deleteDocument($id)
     {
         MilestoneDocument::findOrFail($id)->delete();
@@ -806,6 +952,7 @@ class ProjectManagement extends Component
         $this->refreshJob();
     }
 
+    /** @deprecated P-18 — use PDF template integration is orthogonal Phase 6 feature; pending decision on retention. */
     public function regeneratePdf($documentId)
     {
         try {
@@ -848,6 +995,7 @@ class ProjectManagement extends Component
         }
     }
 
+    /** @deprecated P-18 — use no replacement — Phase 3A status is outstanding/complete/not_applicable only. */
     public function updateDocumentStatus($id, $status)
     {
         $document = MilestoneDocument::findOrFail($id);
@@ -863,6 +1011,257 @@ class ProjectManagement extends Component
 
         session()->flash('success', 'Document status updated');
         $this->refreshJob();
+    }
+
+    // ===================================================================
+    // P-18 Requirement methods (canonical milestone-tab data path).
+    //
+    // The legacy task/document methods above remain for any audit
+    // pathway that still walks milestone_tasks / milestone_documents
+    // directly, but the milestone tab UI now writes and reads through
+    // the methods below. New tasks and documents are Requirement rows
+    // with source_type=milestone.
+    // ===================================================================
+
+    public $showRequirementForm = false;
+
+    public $editingRequirementId = null;
+
+    public $requirement_type = 'task';
+
+    public $requirement_title = '';
+
+    public $requirement_description = '';
+
+    public $requirement_owner_id = '';
+
+    public $requirement_milestone_gate_text = '';
+
+    public $showCompleteRequirementModal = false;
+
+    public $completingRequirementId = null;
+
+    public $completion_note = '';
+
+    public $completion_override_reason = '';
+
+    public $completionFiles = [];
+
+    public function showCreateRequirement(string $type = 'task'): void
+    {
+        if (! $this->selectedMilestone) {
+            session()->flash('error', 'Please select a milestone first');
+
+            return;
+        }
+
+        $this->resetRequirementForm();
+        $this->requirement_type = in_array($type, ['task', 'document'], true) ? $type : 'task';
+        $this->showRequirementForm = true;
+    }
+
+    public function showEditRequirement(int $id): void
+    {
+        $req = Requirement::findOrFail($id);
+        $this->authorizeRequirementBelongsToJob($req);
+
+        $this->editingRequirementId = $req->id;
+        $this->requirement_type = $req->type;
+        $this->requirement_title = $req->title;
+        $this->requirement_description = $req->description ?? '';
+        $this->requirement_owner_id = $req->owner_user_id ?? '';
+        $this->requirement_milestone_gate_text = $req->milestone_gate_text ?? '';
+        $this->showRequirementForm = true;
+    }
+
+    public function saveRequirement(RequirementInstantiator $instantiator): void
+    {
+        $this->validate([
+            'requirement_type' => 'required|in:task,document',
+            'requirement_title' => 'required|string|max:255',
+            'requirement_description' => 'nullable|string',
+            'requirement_owner_id' => 'nullable|exists:users,id',
+            'requirement_milestone_gate_text' => 'nullable|string',
+        ]);
+
+        $owner = $this->requirement_owner_id !== '' ? User::find($this->requirement_owner_id) : null;
+        $actor = Auth::user();
+
+        if ($this->editingRequirementId) {
+            $req = Requirement::findOrFail($this->editingRequirementId);
+            $this->authorizeRequirementBelongsToJob($req);
+
+            $previousOwnerId = $req->owner_user_id;
+
+            $req->fill([
+                'type' => $this->requirement_type,
+                'title' => $this->requirement_title,
+                'description' => $this->requirement_description !== '' ? $this->requirement_description : null,
+                'milestone_gate_text' => $this->requirement_milestone_gate_text !== '' ? $this->requirement_milestone_gate_text : null,
+                'updated_by' => $actor->id,
+            ]);
+            $req->save();
+
+            if ($owner?->id !== $previousOwnerId) {
+                $req->assign($owner, $actor);
+            }
+
+            session()->flash('success', 'Requirement updated');
+        } else {
+            if (! $this->selectedMilestone) {
+                session()->flash('error', 'Please select a milestone first');
+
+                return;
+            }
+
+            $milestone = ProjectMilestone::findOrFail($this->selectedMilestone);
+
+            $instantiator->forMilestone(
+                $milestone,
+                $this->requirement_type,
+                $this->requirement_title,
+                $actor,
+                $owner,
+                [
+                    'description' => $this->requirement_description !== '' ? $this->requirement_description : null,
+                    'milestone_gate_text' => $this->requirement_milestone_gate_text !== '' ? $this->requirement_milestone_gate_text : null,
+                ]
+            );
+
+            session()->flash('success', 'Requirement created');
+        }
+
+        $this->showRequirementForm = false;
+        $this->resetRequirementForm();
+        $this->refreshJob();
+    }
+
+    public function toggleTaskRequirementComplete(int $id): void
+    {
+        $req = Requirement::findOrFail($id);
+        $this->authorizeRequirementBelongsToJob($req);
+
+        if ($req->type !== Requirement::TYPE_TASK) {
+            session()->flash('error', 'Document requirements need a file or override reason — use the Complete button instead.');
+
+            return;
+        }
+
+        $actor = Auth::user();
+
+        if ($req->isComplete()) {
+            $req->reopen($actor);
+        } else {
+            $req->markComplete($actor);
+        }
+
+        $this->refreshJob();
+    }
+
+    public function showCompleteRequirementModal(int $id): void
+    {
+        $req = Requirement::findOrFail($id);
+        $this->authorizeRequirementBelongsToJob($req);
+
+        $this->completingRequirementId = $req->id;
+        $this->completion_note = '';
+        $this->completion_override_reason = '';
+        $this->completionFiles = [];
+        $this->showCompleteRequirementModal = true;
+    }
+
+    public function saveRequirementCompletion(): void
+    {
+        if (! $this->completingRequirementId) {
+            return;
+        }
+
+        $req = Requirement::findOrFail($this->completingRequirementId);
+        $this->authorizeRequirementBelongsToJob($req);
+
+        $actor = Auth::user();
+
+        if ($req->type === Requirement::TYPE_TASK) {
+            $req->markComplete($actor, $this->completion_note !== '' ? $this->completion_note : null);
+            $this->closeCompletionModal();
+            $this->refreshJob();
+
+            return;
+        }
+
+        // Document type — must end up with media OR a non-empty override
+        // reason, never both bypassed.
+        if (! empty($this->completionFiles)) {
+            foreach ($this->completionFiles as $file) {
+                MediaValidationService::validate($file, MediaValidationService::DOCUMENT_MIME_TYPES, MediaValidationService::SIZE_100MB);
+
+                $req->addMedia($file->getRealPath())
+                    ->usingName($file->getClientOriginalName())
+                    ->usingFileName(MediaValidationService::sanitizeFileName($file->getClientOriginalName()))
+                    ->withCustomProperties(['uploaded_by' => $actor->id, 'uploaded_at' => now()->toISOString()])
+                    ->toMediaCollection('attachments');
+            }
+
+            $req->markComplete($actor, $this->completion_note !== '' ? $this->completion_note : null);
+        } elseif (trim($this->completion_override_reason) !== '') {
+            $req->markCompleteWithOverride(
+                $actor,
+                $this->completion_override_reason,
+                $this->completion_note !== '' ? $this->completion_note : null,
+            );
+        } else {
+            session()->flash('error', 'Either upload at least one file or provide an override reason.');
+
+            return;
+        }
+
+        $this->closeCompletionModal();
+        $this->refreshJob();
+    }
+
+    public function reopenRequirement(int $id): void
+    {
+        $req = Requirement::findOrFail($id);
+        $this->authorizeRequirementBelongsToJob($req);
+
+        $req->reopen(Auth::user());
+        $this->refreshJob();
+    }
+
+    public function deleteRequirement(int $id): void
+    {
+        $req = Requirement::findOrFail($id);
+        $this->authorizeRequirementBelongsToJob($req);
+
+        $req->delete();
+        session()->flash('success', 'Requirement deleted');
+        $this->refreshJob();
+    }
+
+    public function closeCompletionModal(): void
+    {
+        $this->showCompleteRequirementModal = false;
+        $this->completingRequirementId = null;
+        $this->completion_note = '';
+        $this->completion_override_reason = '';
+        $this->completionFiles = [];
+    }
+
+    protected function resetRequirementForm(): void
+    {
+        $this->editingRequirementId = null;
+        $this->requirement_type = 'task';
+        $this->requirement_title = '';
+        $this->requirement_description = '';
+        $this->requirement_owner_id = '';
+        $this->requirement_milestone_gate_text = '';
+    }
+
+    protected function authorizeRequirementBelongsToJob(Requirement $req): void
+    {
+        if ($req->housing_job_id !== (int) $this->jobId) {
+            abort(403, 'Requirement does not belong to this project.');
+        }
     }
 
     // Budget Methods
@@ -1221,20 +1620,89 @@ class ProjectManagement extends Component
 
         $code = \App\Models\FundCode::findOrFail($this->newFundCodeId);
         $this->job->fundCodes()->syncWithoutDetaching([$code->id]);
+
+        // P-18: instantiate the fund code's requirement templates onto
+        // this project. Idempotent — re-attaching a code does not
+        // duplicate already-instantiated rows. Owner defaults to the
+        // project manager; the assigner (current user) gets no self-ping
+        // when they ARE the project manager.
+        app(\App\Services\RequirementInstantiator::class)
+            ->forFundCode($this->job, $code, Auth::user());
+
         $this->newFundCodeId = '';
 
         $this->refreshJob();
     }
 
+    // P-18: detach-fund-code keep-or-delete prompt state.
+    public $showDetachFundCodeModal = false;
+
+    public $detachConfirmFundCodeId = null;
+
+    public $detachConfirmRequirementCount = 0;
+
+    /**
+     * Entry for fund-code detach. Three branches:
+     *   1. Phase 2.5 budget guard fires → flash error, no further action.
+     *   2. No fund-code-source requirements on this project → detach now.
+     *   3. Has requirements → open the keep/delete modal; the actual
+     *      detach happens inside confirmDetachFundCode().
+     */
     public function detachFundCode(int $id): void
     {
         $this->authorizeAction('projects.manage');
 
-        // Routes through HousingJob::detachFundCode() which enforces both
-        // the primary-clear and the P-2.5 budget-row guard (no detaching a
-        // code that any budget row references). The model throws an
-        // InvalidArgumentException with the affected category names; we
-        // surface it as a session flash so the manager sees what to fix.
+        $blocking = $this->job->budgetCategoriesReferencingFundCode($id);
+
+        if (! empty($blocking)) {
+            $list = '"'.implode('", "', $blocking).'"';
+            $noun = count($blocking) === 1 ? 'category' : 'categories';
+            session()->flash('error',
+                "Cannot detach fund code from this project: referenced by budget {$noun} {$list}. Re-assign or delete those rows first."
+            );
+
+            return;
+        }
+
+        $reqCount = Requirement::where('housing_job_id', $this->job->id)
+            ->where('source_type', Requirement::SOURCE_FUND_CODE)
+            ->where('source_id', $id)
+            ->count();
+
+        if ($reqCount === 0) {
+            $this->job->detachFundCode($id);
+            $this->refreshJob();
+
+            return;
+        }
+
+        $this->detachConfirmFundCodeId = $id;
+        $this->detachConfirmRequirementCount = $reqCount;
+        $this->showDetachFundCodeModal = true;
+    }
+
+    public function confirmDetachFundCode(bool $deleteRequirements): void
+    {
+        $this->authorizeAction('projects.manage');
+
+        $id = $this->detachConfirmFundCodeId;
+
+        if ($id === null) {
+            $this->closeDetachFundCodeModal();
+
+            return;
+        }
+
+        if ($deleteRequirements) {
+            Requirement::where('housing_job_id', $this->job->id)
+                ->where('source_type', Requirement::SOURCE_FUND_CODE)
+                ->where('source_id', $id)
+                ->delete();
+        }
+
+        // The model re-runs the budget guard defensively. If a budget
+        // row appeared between the pre-check and now (race), we surface
+        // the error and bail without losing the user's keep/delete pick.
         try {
             $this->job->detachFundCode($id);
         } catch (\InvalidArgumentException $e) {
@@ -1243,7 +1711,15 @@ class ProjectManagement extends Component
             return;
         }
 
+        $this->closeDetachFundCodeModal();
         $this->refreshJob();
+    }
+
+    public function closeDetachFundCodeModal(): void
+    {
+        $this->showDetachFundCodeModal = false;
+        $this->detachConfirmFundCodeId = null;
+        $this->detachConfirmRequirementCount = 0;
     }
 
     protected function refreshJob()
@@ -1253,10 +1729,16 @@ class ProjectManagement extends Component
             'participant',
             'property',
             'contractor',
-            'milestones.tasks.assignedTo',
-            'milestones.documents.media',
-            'milestones.documents.assignedTo',
-            'milestones.documents.approvedBy',
+            // P-18: milestone-tab now reads requirements (source_type=
+            // milestone). Legacy tasks/documents relations stay
+            // unloaded — they remain queryable for audit but are no
+            // longer the canonical milestone-tab data source.
+            'milestones.assignedTo',
+            'milestones.requirementTasks.owner',
+            'milestones.requirementTasks.completedBy',
+            'milestones.requirementDocuments.owner',
+            'milestones.requirementDocuments.completedBy',
+            'milestones.requirementDocuments.media',
             // P-22: budgets.contract must be hydrated eagerly so the
             // grant_code badge renders immediately after saveBudget()
             // (previously the relation was unloaded until the next refresh).
@@ -1272,25 +1754,6 @@ class ProjectManagement extends Component
             // eager-loaded too).
             'fundCodes.requirements',
         ])->findOrFail($this->jobId);
-
-        // Fix any inconsistent document states (e.g., status is 'pending_review' but no files)
-        foreach ($this->job->milestones as $milestone) {
-            foreach ($milestone->documents as $document) {
-                $hasFiles = $document->getMedia('documents')->count() > 0;
-
-                // If status indicates files should exist but they don't, reset to 'not_uploaded'
-                if (! $hasFiles && in_array($document->status, ['pending_review', 'uploaded'])) {
-                    $document->status = 'not_uploaded';
-                    $document->uploaded_date = null;
-                    $document->save();
-
-                    // Clean up any orphaned media records (files that don't exist on disk)
-                    $document->clearMediaCollection('documents');
-                }
-
-                $this->cleanupDocumentMedia($document);
-            }
-        }
     }
 
     protected function resetForms()
@@ -1311,6 +1774,7 @@ class ProjectManagement extends Component
         $this->milestone_target_date = '';
         $this->milestone_icon = 'Circle';
         $this->milestone_color = '#6366f1';
+        $this->milestone_dependency_ids = [];
     }
 
     protected function resetTaskForm()

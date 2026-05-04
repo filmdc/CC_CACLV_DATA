@@ -392,4 +392,31 @@
         </div>
     </div>
     @endif
+
+    @if($showDeleteFundCodeModal)
+        {{-- P-18: Global Fund-Code Delete Confirmation (keep or cascade requirements across all projects) --}}
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="closeDeleteFundCodeModal">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-md w-full mx-4">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Delete fund code</h3>
+                <p class="text-sm text-gray-700 dark:text-gray-300 mb-4">
+                    This fund code generated <strong>{{ $deleteFundCodeRequirementCount }}</strong> requirement{{ $deleteFundCodeRequirementCount === 1 ? '' : 's' }} across one or more projects.
+                    Keep them as-is for audit (their source_label_snapshot text survives), or cascade-delete them along with the fund code?
+                </p>
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button wire:click="closeDeleteFundCodeModal"
+                            class="px-4 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
+                        Cancel
+                    </button>
+                    <button wire:click="confirmDeleteFundCode(false)"
+                            class="px-4 py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700">
+                        Keep requirements
+                    </button>
+                    <button wire:click="confirmDeleteFundCode(true)"
+                            class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
+                        Cascade delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>
