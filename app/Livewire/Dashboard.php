@@ -67,14 +67,18 @@ class Dashboard extends Component
     {
         $user = Auth::user();
 
-        // P-17: housing users land on the housing dashboard at the same
-        // /dashboard URL feel via redirect. Predicate: has projects.view
-        // (the housing-module read permission) and is not a contract-
-        // dashboard user (the contract-dashboard branch in render() is
-        // the higher-precedence routing). Must fire from mount() —
-        // Livewire's render() must return a view, not a RedirectResponse.
-        if (! $user->hasRole('contract-database-dashboard')
-            && $user->hasPermission('projects.view')) {
+        // P-17: housing users land on the housing dashboard. Predicate
+        // is data-driven (NOT permission-driven) so removing a user
+        // from the housing program via the user_program pivot reliably
+        // stops the redirect — even for admins, who would otherwise
+        // pass any permission check by virtue of the admin role.
+        //
+        // A user is treated as a "housing user" iff they're explicitly
+        // linked to a housing-enabled program via user_program OR
+        // they're the project_manager on at least one non-template
+        // housing job. The contract-database-dashboard role takes
+        // precedence (handled in render()).
+        if (! $user->hasRole('contract-database-dashboard') && self::isHousingUser($user)) {
             return $this->redirectRoute('dashboard.housing', navigate: false);
         }
 
@@ -86,6 +90,28 @@ class Dashboard extends Component
         if ($userPrograms) {
             $this->selectedProgramForReport = $userPrograms->id;
         }
+    }
+
+    /**
+     * P-17: predicate for the housing-dashboard auto-redirect. Public
+     * so the existing /dashboard view can also surface a "Switch to
+     * housing dashboard" link for users who want it without the
+     * automatic landing.
+     */
+    public static function isHousingUser(\App\Models\User $user): bool
+    {
+        $hasHousingProgram = $user->programs()
+            ->where('programs.housing_module_enabled', true)
+            ->exists();
+
+        if ($hasHousingProgram) {
+            return true;
+        }
+
+        return \App\Models\HousingJob::query()
+            ->where('is_template', false)
+            ->where('project_manager_id', $user->id)
+            ->exists();
     }
 
     public function toggleExpandedWorkPlans()
