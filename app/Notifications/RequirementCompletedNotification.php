@@ -4,18 +4,24 @@ namespace App\Notifications;
 
 use App\Models\Requirement;
 use App\Models\User;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
 /**
- * P-17 (Phase 3A): in-app ping to the project manager when a
- * requirement on her project closes out. Database channel only;
- * Phase 3B adds 'mail' to via().
+ * Phase 3A: in-app ping when a requirement closes out.
  *
- * Self-completion suppression (manager closes her own item) is handled
- * at the dispatch site (Requirement::notifyProjectManagerOfCompletion).
+ * Phase 3B retrofit (Step 1): implements ShouldQueue so dispatch goes
+ * through the database queue worker. Step 2 swaps the recipient from
+ * "project manager" to "owner-of-record at completion time" and adds
+ * the mail channel under the completion_email opt-out.
+ *
+ * Self-completion suppression is handled at the dispatch site.
  */
-class RequirementCompletedNotification extends Notification
+class RequirementCompletedNotification extends Notification implements ShouldQueue
 {
+    use Queueable;
+
     public function __construct(
         public Requirement $requirement,
         public User $completer,
@@ -23,11 +29,6 @@ class RequirementCompletedNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        // TODO(3B): add 'mail' alongside 'database' when the email
-        // channel for requirement notifications is wired. The
-        // toMail() shape will mirror toArray() and emphasize the
-        // completer's name + project URL; one-line change here, one
-        // method add below.
         return ['database'];
     }
 

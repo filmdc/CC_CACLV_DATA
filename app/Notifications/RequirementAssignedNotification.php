@@ -3,27 +3,29 @@
 namespace App\Notifications;
 
 use App\Models\Requirement;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
 /**
- * P-17 (Phase 3A): in-app ping when a requirement gets assigned to a
- * user. Database channel only for 3A; Phase 3B adds 'mail' to via().
+ * Phase 3A: in-app ping when a requirement gets assigned to a user.
+ *
+ * Phase 3B retrofit (Step 1): implements ShouldQueue so dispatch goes
+ * through the database queue worker (deploy/systemd/cc_caclv_data-queue.service).
+ * The mail channel is wired in Step 2 alongside the per-user opt-out.
  *
  * Suppression of self-pings is handled at the dispatch site
  * (Requirement::assign) — this class assumes it should fire if
  * dispatched.
  */
-class RequirementAssignedNotification extends Notification
+class RequirementAssignedNotification extends Notification implements ShouldQueue
 {
+    use Queueable;
+
     public function __construct(public Requirement $requirement) {}
 
     public function via(object $notifiable): array
     {
-        // TODO(3B): add 'mail' alongside 'database' when the email
-        // channel for requirement notifications is wired. The
-        // toMail() shape will mirror toArray() with project URL +
-        // requirement title; one-line change here, one method add
-        // below.
         return ['database'];
     }
 
