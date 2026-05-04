@@ -142,6 +142,13 @@ class ProjectBudget extends Model
         $this->save();
     }
 
+    /**
+     * @deprecated Phase 3B Step 6: this method does in-memory delta
+     * math which can drift from the actual sum of project_expenses
+     * rows. The observer-driven recalculateSpent() pattern (fired by
+     * ProjectExpense::booted) is the canonical path. No callers exist
+     * outside this file; pending removal in a follow-up cleanup PR.
+     */
     public function addExpense(float $amount): void
     {
         $this->spent_amount += $amount;
