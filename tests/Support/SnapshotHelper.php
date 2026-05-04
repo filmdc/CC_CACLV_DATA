@@ -87,11 +87,17 @@ class SnapshotHelper
             '/wire:effects="[^"]*"/' => 'wire:effects=""',
             '/wire:initial-data="[^"]*"/' => 'wire:initial-data=""',
             '/wire:socket="[^"]*"/' => 'wire:socket=""',
-            // CSRF tokens.
-            '/<input\s+type="hidden"\s+name="_token"\s+value="[^"]*"\s*\/?>/i' => '<input type="hidden" name="_token" value="" />',
-            '/<meta\s+name="csrf-token"\s+content="[^"]*"\s*\/?>/i' => '<meta name="csrf-token" content="" />',
+            // CSRF tokens. Use a value-attribute-only match so additional
+            // attributes (e.g. autocomplete="off") elsewhere on the same
+            // tag don't break normalization.
+            '/(name="_token"[^>]*?\s+value=)"[^"]*"/i' => '$1""',
+            '/(name="csrf-token"[^>]*?\s+content=)"[^"]*"/i' => '$1""',
             '/data-csrf="[^"]*"/' => 'data-csrf=""',
             '/x-csrf-token="[^"]*"/' => 'x-csrf-token=""',
+            // Livewire component IDs leak through x-init expressions
+            // like `window.Livewire.find('XYZ').on('$refresh', ...)`.
+            // The ID is regenerated every render.
+            '/Livewire\.find\(\'[^\']*\'\)/' => "Livewire.find('__WIRE_ID__')",
             // ISO 8601 timestamps.
             '/\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:?\d{2})?/' => '__TIMESTAMP__',
             // Resource URLs with autoincrement IDs.
