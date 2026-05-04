@@ -209,18 +209,42 @@
                         @endforeach
                     </div>
 
-                    <button type="button"
-                            wire:click="clearFilters"
-                            class="ml-auto text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline">
-                        Clear all filters
-                    </button>
+                    <!-- P-04: view-mode toggle (table | card). URL-persisted, no per-user default. -->
+                    <div class="ml-auto flex items-center gap-2" data-view-mode-toggle>
+                        <div class="inline-flex rounded-md border border-gray-300 dark:border-zinc-600 overflow-hidden text-xs">
+                            <button type="button"
+                                    wire:click="$set('viewMode', 'table')"
+                                    aria-pressed="{{ $viewMode === 'table' ? 'true' : 'false' }}"
+                                    class="px-2 py-1 inline-flex items-center gap-1 {{ $viewMode === 'table' ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-zinc-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-600' }}">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                                </svg>
+                                Table
+                            </button>
+                            <button type="button"
+                                    wire:click="$set('viewMode', 'card')"
+                                    aria-pressed="{{ $viewMode === 'card' ? 'true' : 'false' }}"
+                                    class="px-2 py-1 inline-flex items-center gap-1 border-l border-gray-300 dark:border-zinc-600 {{ $viewMode === 'card' ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-zinc-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-600' }}">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                                </svg>
+                                Cards
+                            </button>
+                        </div>
+
+                        <button type="button"
+                                wire:click="clearFilters"
+                                class="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline">
+                            Clear all filters
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Communications List -->
-            <div class="divide-y divide-gray-200 dark:divide-zinc-700">
+            <!-- Communications List — table or card view per viewMode -->
+            <div class="divide-y divide-gray-200 dark:divide-zinc-700" data-view-mode="{{ $viewMode }}">
                 @forelse($logs as $log)
-                    <div class="p-4 hover:bg-gray-50 dark:hover:bg-zinc-700/50 cursor-pointer" wire:click="viewDetail({{ $log->id }})">
+                    <div class="{{ $viewMode === 'card' ? 'p-6' : 'p-4' }} hover:bg-gray-50 dark:hover:bg-zinc-700/50 cursor-pointer" wire:click="viewDetail({{ $log->id }})">
                         <div class="flex items-start justify-between">
                             <div class="flex-1">
                                 <div class="flex items-center gap-3 mb-2">
@@ -320,13 +344,51 @@
                                 @endif
 
                                 @if($log->summary)
-                                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">{{ Str::limit($log->summary, 200) }}</p>
+                                    {{-- P-04: table view clips at 200 chars; card view shows the full summary. --}}
+                                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-2 {{ $viewMode === 'card' ? 'whitespace-pre-line' : '' }}">
+                                        {{ $viewMode === 'card' ? $log->summary : Str::limit($log->summary, 200) }}
+                                    </p>
                                 @endif
 
                                 @if($log->outcome)
                                     <div class="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded text-sm">
                                         <span class="font-medium text-blue-800 dark:text-blue-300">Outcome:</span>
                                         <span class="text-blue-700 dark:text-blue-400">{{ $log->outcome }}</span>
+                                    </div>
+                                @endif
+
+                                {{-- P-04 card-only sections: full notes body, fund-code badges, contact metadata. --}}
+                                @if($viewMode === 'card' && $log->notes)
+                                    <div class="mt-3 p-3 bg-gray-50 dark:bg-zinc-700/40 rounded text-sm text-gray-700 dark:text-gray-200 whitespace-pre-line" data-card-notes>
+                                        {{ $log->notes }}
+                                    </div>
+                                @endif
+
+                                @if($viewMode === 'card' && $log->fundCodes->isNotEmpty())
+                                    <div class="mt-3 flex flex-wrap items-center gap-2 text-xs" data-card-fund-codes>
+                                        <span class="font-medium text-gray-600 dark:text-gray-400">Fund codes:</span>
+                                        @foreach($log->fundCodes as $fundCode)
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" title="{{ $fundCode->description }}">
+                                                {{ $fundCode->code }}
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                @endif
+
+                                @if($viewMode === 'card' && ($log->contact_organization || $log->contact_email || $log->contact_phone || $log->contact_address))
+                                    <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 text-xs text-gray-600 dark:text-gray-300" data-card-contact-metadata>
+                                        @if($log->contact_organization)
+                                            <div><span class="font-medium text-gray-700 dark:text-gray-200">Organization:</span> {{ $log->contact_organization }}</div>
+                                        @endif
+                                        @if($log->contact_email)
+                                            <div><span class="font-medium text-gray-700 dark:text-gray-200">Email:</span> {{ $log->contact_email }}</div>
+                                        @endif
+                                        @if($log->contact_phone)
+                                            <div><span class="font-medium text-gray-700 dark:text-gray-200">Phone:</span> {{ $log->contact_phone }}</div>
+                                        @endif
+                                        @if($log->contact_address)
+                                            <div class="sm:col-span-2"><span class="font-medium text-gray-700 dark:text-gray-200">Address:</span> {{ $log->contact_address }}@if($log->contact_city), {{ $log->contact_city }}@endif @if($log->contact_state) {{ $log->contact_state }}@endif @if($log->contact_zip) {{ $log->contact_zip }}@endif</div>
+                                        @endif
                                     </div>
                                 @endif
 

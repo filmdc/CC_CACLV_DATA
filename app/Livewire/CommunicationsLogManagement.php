@@ -72,6 +72,14 @@ class CommunicationsLogManagement extends Component
      */
     public $conversionFilter = [];
 
+    /**
+     * P-04 (Phase 3B): two view modes for the log list. 'table' is the
+     * existing dense one-row-per-entry layout; 'card' surfaces full
+     * notes body, fund codes, and contact metadata per entry. URL-only
+     * persistence per phase scope — no per-user default.
+     */
+    public $viewMode = 'table';
+
     // Form state
     public $showForm = false;
 
@@ -272,6 +280,8 @@ class CommunicationsLogManagement extends Component
         'conversionFilter' => ['except' => []],
         'dateFrom' => ['except' => ''],
         'dateTo' => ['except' => ''],
+        // P-04: view-mode toggle persists in URL only — no per-user default.
+        'viewMode' => ['except' => 'table'],
     ];
 
     public function mount()
@@ -1968,7 +1978,10 @@ class CommunicationsLogManagement extends Component
 
     public function render()
     {
-        $query = CommunicationLog::with(['participant', 'household', 'property', 'contractor', 'createdBy', 'services', 'tags', 'convertedToJob'])
+        // Eager-load fundCodes alongside the existing relations so the
+        // card view can render fund-code badges per row without N+1.
+        // Cheap on table view too (typically 0–3 codes per log).
+        $query = CommunicationLog::with(['participant', 'household', 'property', 'contractor', 'createdBy', 'services', 'tags', 'convertedToJob', 'fundCodes'])
             ->orderBy('communication_date', 'desc');
 
         if ($this->search) {
