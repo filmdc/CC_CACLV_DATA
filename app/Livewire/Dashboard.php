@@ -65,11 +65,23 @@ class Dashboard extends Component
 
     public function mount()
     {
+        $user = Auth::user();
+
+        // P-17: housing users land on the housing dashboard at the same
+        // /dashboard URL feel via redirect. Predicate: has projects.view
+        // (the housing-module read permission) and is not a contract-
+        // dashboard user (the contract-dashboard branch in render() is
+        // the higher-precedence routing). Must fire from mount() —
+        // Livewire's render() must return a view, not a RedirectResponse.
+        if (! $user->hasRole('contract-database-dashboard')
+            && $user->hasPermission('projects.view')) {
+            return $this->redirectRoute('dashboard.housing', navigate: false);
+        }
+
         // Initialize date filters
         $this->setDateFilter('this_month');
 
         // Set default program for report if user has programs
-        $user = Auth::user();
         $userPrograms = $user->programs()->first();
         if ($userPrograms) {
             $this->selectedProgramForReport = $userPrograms->id;
@@ -282,15 +294,8 @@ class Dashboard extends Component
             return $this->renderContractDashboard($user);
         }
 
-        // P-17: housing users land on the housing dashboard at the same
-        // /dashboard URL feel via redirect. Predicate: has projects.view
-        // (the housing-module read permission) and is not a contract-
-        // dashboard user (handled above). Admins fall through to the
-        // existing programs default unless they also hold projects.view,
-        // which most admins do.
-        if ($user->hasPermission('projects.view')) {
-            return redirect()->route('dashboard.housing');
-        }
+        // P-17 housing-user redirect lives in mount() — render() must
+        // always return a view in Livewire 3.
 
         // Get user's assigned programs
         $userPrograms = $user->programs()->with(['services', 'programEnrollments.participant', 'workPlans'])->get();

@@ -7,14 +7,27 @@ use App\Models\Program;
 use App\Models\ProjectMilestone;
 use App\Models\Property;
 use App\Models\Requirement;
+use Carbon\Carbon;
 use Database\Seeders\RegressionTestSeeder;
 use Livewire\Livewire;
 use Tests\Support\RegressionHelpers;
 use Tests\Support\SnapshotHelper;
 
 beforeEach(function () {
+    // Pin time so seeded milestone target_dates (2026-02-05, 2026-03-15,
+    // 2026-05-01, etc.) and our relative fixture dates always render
+    // into the same indicator buckets regardless of when the test
+    // runs. Without this, the day-7 "approaching" boundary on seeded
+    // milestone target_date='2026-05-01' silently shifts to "overdue"
+    // a few days later and the snapshot diffs.
+    Carbon::setTestNow('2026-05-01 12:00:00');
+
     $this->seed(RegressionTestSeeder::class);
     $this->admin = RegressionHelpers::adminUser();
+});
+
+afterEach(function () {
+    Carbon::setTestNow();
 });
 
 /**
