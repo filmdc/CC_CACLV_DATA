@@ -51,7 +51,7 @@ class HousingDashboard extends Component
 
     public function mount(): void
     {
-        $this->authorizeAction('projects.view');
+        $this->authorizeAction('housing_dashboard.view');
     }
 
     public function setTab(string $tab): void

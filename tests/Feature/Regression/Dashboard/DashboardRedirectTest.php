@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\HousingJob;
-use App\Models\Program;
+use App\Models\Permission;
+use App\Models\Role;
 use App\Models\User;
 use Database\Seeders\RegressionTestSeeder;
 
@@ -15,63 +15,64 @@ beforeEach(function () {
  *   "Method Livewire\\Features\\SupportRedirects\\Redirector::render
  *   does not exist."
  *
- * The housing-user redirect lives in mount() and uses a data-driven
- * predicate (user_program link to a housing-enabled program OR
- * project_manager on a housing job) rather than a permission check.
- * Permission-based predicates fail for admins because the admin role
- * auto-grants every permission; admins removed from a housing program
- * via the user_program pivot would still redirect under
- * hasPermission('projects.view').
+ * The housing-user redirect lives in mount() and is gated by the
+ * dedicated 'housing_dashboard.view' permission. Admins explicitly
+ * grant the permission to roles via the existing role-permission UI;
+ * housing-program assignment is no longer the discriminator (many
+ * programs have housing properties without being centrally housing-
+ * focused).
  */
 
-it('a user with a user_program link to a housing-enabled program is redirected from /dashboard', function () {
-    $housingProgram = Program::factory()->create(['housing_module_enabled' => true]);
-
-    $user = User::factory()->create(['email_verified_at' => now()]);
-    $user->programs()->attach($housingProgram->id);
-
-    $this->actingAs($user)
-        ->get(route('dashboard'))
-        ->assertRedirect(route('dashboard.housing'));
-})->group('regression');
-
-it('a user who is project_manager on a non-template housing job is redirected', function () {
-    $program = Program::factory()->create(['housing_module_enabled' => true]);
-    $user = User::factory()->create(['email_verified_at' => now()]);
-
-    HousingJob::factory()->create([
-        'program_id' => $program->id,
-        'is_template' => false,
-        'project_manager_id' => $user->id,
-    ]);
-
-    $this->actingAs($user)
-        ->get(route('dashboard'))
-        ->assertRedirect(route('dashboard.housing'));
-})->group('regression');
-
-it('an admin without housing program assignment or housing project_manager rows is NOT redirected', function () {
-    // The original bug: admin role auto-grants projects.view, so a
-    // permission-based predicate redirected admins regardless of
-    // their actual housing involvement. The data-driven predicate
-    // must NOT redirect this user.
-    $adminRole = \App\Models\Role::firstOrCreate(
-        ['name' => 'admin'],
-        ['display_name' => 'Administrator']
+function attachHousingPermission(User $user): void
+{
+    $role = Role::firstOrCreate(
+        ['name' => 'test-housing-dashboard-viewer'],
+        ['display_name' => 'Test Housing Dashboard Viewer']
     );
+    $permissionId = Permission::where('name', 'housing_dashboard.view')->value('id');
+    $role->permissions()->syncWithoutDetaching([$permissionId]);
+    $user->roles()->attach($role->id);
+}
+
+it('a user with the housing_dashboard.view permission is redirected from /dashboard', function () {
+    $user = User::factory()->create(['email_verified_at' => now()]);
+    attachHousingPermission($user);
+
+    $this->actingAs($user)
+        ->get(route('dashboard'))
+        ->assertRedirect(route('dashboard.housing'));
+})->group('regression');
+
+it('a user without the housing_dashboard.view permission is NOT redirected', function () {
+    $user = User::factory()->create(['email_verified_at' => now()]);
+    expect($user->hasPermission('housing_dashboard.view'))->toBeFalse();
+
+    $this->actingAs($user)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertDontSee('Housing Dashboard');
+})->group('regression');
+
+it('an admin without housing_dashboard.view explicitly attached is NOT redirected', function () {
+    // The bug we fixed: admin role auto-grants every permission. An
+    // admin who hasn't been granted the new permission specifically
+    // should NOT be redirected. The migration creates the permission
+    // row but does NOT auto-attach to any role; only admins who hold
+    // a role with this permission attached get the redirect.
+    $adminRole = Role::firstOrCreate(
+        ['name' => 'admin-without-housing-dashboard'],
+        ['display_name' => 'Admin Without Housing Dashboard']
+    );
+    // Attach every permission EXCEPT housing_dashboard.view.
     $adminRole->permissions()->syncWithoutDetaching(
-        \App\Models\Permission::pluck('id')->toArray()
+        Permission::where('name', '!=', 'housing_dashboard.view')->pluck('id')->all()
     );
 
     $admin = User::factory()->create(['email_verified_at' => now()]);
     $admin->roles()->attach($adminRole->id);
-    expect($admin->isAdmin())->toBeTrue();
-    expect($admin->hasPermission('projects.view'))->toBeTrue();
 
-    // No user_program assignments to any housing-enabled program.
-    expect($admin->programs()->where('programs.housing_module_enabled', true)->exists())->toBeFalse();
-    // No project_manager_id rows.
-    expect(HousingJob::where('project_manager_id', $admin->id)->exists())->toBeFalse();
+    expect($admin->hasPermission('projects.view'))->toBeTrue();
+    expect($admin->hasPermission('housing_dashboard.view'))->toBeFalse();
 
     $this->actingAs($admin)
         ->get(route('dashboard'))
@@ -79,52 +80,59 @@ it('an admin without housing program assignment or housing project_manager rows 
         ->assertDontSee('Housing Dashboard');
 })->group('regression');
 
-it('a contract-dashboard user lands on /dashboard without redirecting, even with housing assignment', function () {
+it('a contract-dashboard user lands on /dashboard without redirecting, even with the housing permission', function () {
     // contract-database-dashboard role takes precedence over the
-    // housing-user predicate. Even a user with housing program
-    // assignment lands on the contract dashboard if they hold the
-    // contract role.
-    $contractRole = \App\Models\Role::firstOrCreate(
+    // housing-permission predicate.
+    $contractRole = Role::firstOrCreate(
         ['name' => 'contract-database-dashboard'],
         ['display_name' => 'Contract Database Dashboard']
     );
-    $housingProgram = Program::factory()->create(['housing_module_enabled' => true]);
 
     $user = User::factory()->create(['email_verified_at' => now()]);
     $user->roles()->attach($contractRole->id);
-    $user->programs()->attach($housingProgram->id);
+    attachHousingPermission($user);
+
+    expect($user->hasPermission('housing_dashboard.view'))->toBeTrue();
 
     $this->actingAs($user)
         ->get(route('dashboard'))
         ->assertOk();
 })->group('regression');
 
-it('a user with no roles and no program assignments falls through to the existing programs default', function () {
+it('removing housing_dashboard.view from the role stops the redirect on the next request', function () {
     $user = User::factory()->create(['email_verified_at' => now()]);
+    attachHousingPermission($user);
 
-    $this->actingAs($user)
-        ->get(route('dashboard'))
-        ->assertOk()
-        ->assertDontSee('Housing Dashboard');
-})->group('regression');
-
-it('detaching a user_program row stops the redirect on the next request', function () {
-    $housingProgram = Program::factory()->create(['housing_module_enabled' => true]);
-    $user = User::factory()->create(['email_verified_at' => now()]);
-    $user->programs()->attach($housingProgram->id);
-
-    // First request: redirected.
     $this->actingAs($user)
         ->get(route('dashboard'))
         ->assertRedirect(route('dashboard.housing'));
 
-    // Detach the pivot row — simulates the admin UI's "remove user from
-    // program" action.
-    $user->programs()->detach($housingProgram->id);
+    // Detach the permission from the role — simulates the admin UI's
+    // "remove permission from role" action.
+    $role = Role::where('name', 'test-housing-dashboard-viewer')->firstOrFail();
+    $permissionId = Permission::where('name', 'housing_dashboard.view')->value('id');
+    $role->permissions()->detach($permissionId);
 
     // Subsequent request: no redirect.
     $this->actingAs($user)
         ->get(route('dashboard'))
         ->assertOk()
         ->assertDontSee('Housing Dashboard');
+})->group('regression');
+
+it('direct access to /dashboard/housing without the permission returns 403', function () {
+    $user = User::factory()->create(['email_verified_at' => now()]);
+
+    $this->actingAs($user)
+        ->get(route('dashboard.housing'))
+        ->assertStatus(403);
+})->group('regression');
+
+it('direct access to /dashboard/housing with the permission renders 200', function () {
+    $user = User::factory()->create(['email_verified_at' => now()]);
+    attachHousingPermission($user);
+
+    $this->actingAs($user)
+        ->get(route('dashboard.housing'))
+        ->assertOk();
 })->group('regression');

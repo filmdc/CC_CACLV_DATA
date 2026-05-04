@@ -371,9 +371,9 @@ it('Cut B sorts fund-source requirements by fund code alphabetically, then by ti
     expect($posM)->toBeLessThan($posAdHoc);
 })->group('regression');
 
-it('a user with no roles (no projects.view permission) is forbidden from mounting the housing dashboard', function () {
+it('a user without the housing_dashboard.view permission is forbidden from mounting the housing dashboard', function () {
     $user = User::factory()->create();
-    expect($user->hasPermission('projects.view'))->toBeFalse();
+    expect($user->hasPermission('housing_dashboard.view'))->toBeFalse();
 
     Livewire::actingAs($user)
         ->test(HousingDashboard::class)
@@ -381,21 +381,21 @@ it('a user with no roles (no projects.view permission) is forbidden from mountin
 })->group('regression');
 
 it('a non-admin housing user sees only projects they manage / created / own a requirement on', function () {
-    // Build a "housing-coordinator" role with just projects.view, attach
-    // it to a non-admin user. Two projects: one managed by them, one
-    // managed by a different user. Predicate should isolate the first.
+    // Build a "housing-coordinator" role with just housing_dashboard.view,
+    // attach it to a non-admin user. Two projects: one managed by them,
+    // one managed by a different user. Predicate should isolate the first.
     $housingRole = \App\Models\Role::firstOrCreate(
         ['name' => 'test-housing-coordinator'],
         ['display_name' => 'Test Housing Coordinator']
     );
     $housingRole->permissions()->syncWithoutDetaching(
-        \App\Models\Permission::where('name', 'projects.view')->pluck('id')->all()
+        \App\Models\Permission::where('name', 'housing_dashboard.view')->pluck('id')->all()
     );
 
     $userA = User::factory()->create();
     $userA->roles()->attach($housingRole->id);
     expect($userA->isAdmin())->toBeFalse();
-    expect($userA->hasPermission('projects.view'))->toBeTrue();
+    expect($userA->hasPermission('housing_dashboard.view'))->toBeTrue();
 
     $userB = User::factory()->create();
 

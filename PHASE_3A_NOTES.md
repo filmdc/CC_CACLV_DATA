@@ -62,6 +62,29 @@ addition (Step 7.5):
    notifications:table`. Phase 3B adds `'mail'` to each via() in a
    one-line change per class.
 
+### Housing-dashboard access is gated by a dedicated permission
+
+Post-deploy hotfix decision: the redirect from `/dashboard` and the
+mount on `/dashboard/housing` are both gated by a new
+`housing_dashboard.view` permission. The migration
+(`2026_05_04_120001_add_housing_dashboard_view_permission.php`) creates
+the row but does NOT auto-attach to any role — production admins
+explicitly grant it via the existing role-permission UI.
+
+Two earlier predicates were tried and rejected:
+
+1. `hasPermission('projects.view')` — failed because the admin role
+   auto-grants every permission, so admins removed from a housing
+   program at the `user_program` level still got redirected.
+2. Data-driven check on `user_program` link to a housing-enabled
+   program OR `project_manager_id` on a housing job — too broad
+   because many programs have housing properties without being
+   centrally housing-focused.
+
+The dedicated permission decouples access entirely from program data.
+Admins control who lands on the housing dashboard by attaching/
+detaching `housing_dashboard.view` from roles.
+
 ### Phase 2 fund-code requirement schema gains a `type` column
 
 Option (b) over (a): a `nullable type enum('document','task') default
