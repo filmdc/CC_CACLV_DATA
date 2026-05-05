@@ -3,7 +3,8 @@
 use Illuminate\Support\Facades\Auth;
 use Livewire\Volt\Component;
 
-new class extends Component {
+new class extends Component
+{
     public bool $assignment_email = true;
 
     public bool $completion_email = true;

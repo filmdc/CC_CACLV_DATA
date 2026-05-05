@@ -207,4 +207,3 @@ it('detachFundCode succeeds when no budget row references the code (P-2.5)', fun
     // codeA still attached, untouched.
     expect($job->fresh()->fundCodes()->where('fund_codes.id', $codeA->id)->exists())->toBeTrue();
 })->group('regression');
-

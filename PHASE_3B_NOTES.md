@@ -166,6 +166,18 @@ If a future test wants to pin the new visual states, build a separate snapshot f
 
 ---
 
+## 10b. Snapshot stability across midnight rollover (CI lesson)
+
+The first CI run on PR #18 surfaced an instructive snapshot failure on `communications_log_card_view.html`. The test captured the snapshot locally on May 4, then CI ran at 11:48 UTC on May 5; the rendered "Created by Unknown on May 04, 2026" line on each log entry shifted to "May 05, 2026" and the snapshot diff'd by exactly that text.
+
+The cause: the snapshot test seeded fixtures whose `created_at` defaulted to `now()`, and that timestamp leaked through into a rendered date format that the SnapshotHelper's `__TIMESTAMP__` regex didn't match (the rule targets ISO 8601, not human-formatted "May 04, 2026").
+
+**Lesson:** any snapshot that captures a rendered timestamp — even a date-only one — needs `Carbon::setTestNow()` (or fixture date pinning via `->state(['created_at' => '...'])` if the timestamp comes from a model column rather than `now()` at render time). The Phase 3A "indicator math reads now()" pattern only handles relative-date math (the buckets stay stable across runs once `now()` is pinned), not displayed dates that fall through to a human-readable strftime call.
+
+The fix in `tests/Feature/Regression/CommunicationsLog/ViewModeTest.php` was a one-line `Carbon::setTestNow('2026-05-04 12:00:00')` at the top of the snapshot test plus a `Carbon::setTestNow()` reset at the end (so other tests in the file aren't time-pinned). Mirror this pattern in any future snapshot test that includes "Created by/on" or similar rendered date lines.
+
+---
+
 ## 11. Snapshot scoping via preg_match
 
 Used in `BudgetModifyModalSnapshotTest` to capture **just the modal block**, not the full project-management page render which includes faker-generated participant address, name, and job description text that drifts every run.

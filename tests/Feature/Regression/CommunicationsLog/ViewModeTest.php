@@ -57,7 +57,7 @@ it('table view clips long summaries; card view shows the full body', function ()
     // its summary deliberately longer than 200 chars so the table-vs-
     // card divergence is visible in render.
     $cl3 = CommunicationLog::where('subject', 'CL-3: Multiple fund codes, not converted')->firstOrFail();
-    $longSummary = 'OPENING-MARKER ' . str_repeat('Lorem ipsum dolor sit amet, consectetur adipiscing elit. ', 8) . 'CLOSING-MARKER';
+    $longSummary = 'OPENING-MARKER '.str_repeat('Lorem ipsum dolor sit amet, consectetur adipiscing elit. ', 8).'CLOSING-MARKER';
     $cl3->update(['summary' => $longSummary]);
 
     // Table view: closing marker should be clipped off (Str::limit at 200).
@@ -159,6 +159,13 @@ it('toggle interacts cleanly with active filters (filter state survives view swi
 })->group('regression');
 
 it('snapshot pins the card-mode markup', function () {
+    // Pin time so the rendered "Created by [user] on [date]" line on
+    // each log entry stays deterministic across runs. The fixture
+    // captures the snapshot on whatever day the test runs, so without
+    // a Carbon pin the snapshot fails the moment the local capture
+    // and the CI run cross midnight.
+    \Carbon\Carbon::setTestNow('2026-05-04 12:00:00');
+
     $cl3 = CommunicationLog::where('subject', 'CL-3: Multiple fund codes, not converted')->firstOrFail();
     $cl3->update([
         'contact_organization' => 'Snapshot Org',
@@ -173,4 +180,6 @@ it('snapshot pins the card-mode markup', function () {
         ->html();
 
     SnapshotHelper::assertHtmlMatchesSnapshot('communications_log_card_view', $html);
+
+    \Carbon\Carbon::setTestNow();
 })->group('regression');

@@ -86,7 +86,7 @@ it('is a no-op when the upstream requirement is fund-code-source (no milestone g
 
     $tony = User::factory()->create();
     $kaitlyn = User::factory()->create();
-    [$job, , , , ] = makeUpstreamDownstreamPair($kaitlyn);
+    [$job] = makeUpstreamDownstreamPair($kaitlyn);
 
     // Build a separate fund-code-source upstream on the same project.
     $fundUpstream = Requirement::factory()->document()->create([
@@ -105,7 +105,7 @@ it('is a no-op when the upstream requirement is ad-hoc (no milestone graph)', fu
 
     $tony = User::factory()->create();
     $kaitlyn = User::factory()->create();
-    [$job, , , , ] = makeUpstreamDownstreamPair($kaitlyn);
+    [$job] = makeUpstreamDownstreamPair($kaitlyn);
 
     $adHocUpstream = Requirement::factory()->task()->create([
         'housing_job_id' => $job->id,
