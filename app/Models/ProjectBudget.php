@@ -99,6 +99,17 @@ class ProjectBudget extends Model
             ->where('housing_job_id', $this->housing_job_id);
     }
 
+    /**
+     * Phase 3B Step 7: append-only audit ledger of budgeted_amount
+     * changes on this budget row. Ordered newest-first so the
+     * ledger modal shows recent activity at the top.
+     */
+    public function modifications(): HasMany
+    {
+        return $this->hasMany(BudgetModification::class, 'project_budget_id')
+            ->orderByDesc('created_at');
+    }
+
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');

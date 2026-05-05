@@ -497,6 +497,42 @@
             @else
                 <!-- Budget Tab -->
                 <div class="space-y-6">
+                    {{-- P-23 Step 7: persistent over-budget banner.
+                         Shown whenever any category on this project is over.
+                         Cannot be dismissed by the user; resolution paths
+                         (reduce expense, reassign expense, modify budget cap)
+                         are the only ways to clear it. --}}
+                    @php
+                        $overBudgetCategories = $job->budgets->filter(fn ($b) => $b->is_over_budget);
+                    @endphp
+                    @if($overBudgetCategories->isNotEmpty())
+                        <div class="rounded-md border border-red-300 bg-red-50 dark:bg-red-900/30 dark:border-red-700 p-4" role="alert" data-over-budget-banner>
+                            <div class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4a2 2 0 00-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z"/>
+                                </svg>
+                                <div class="flex-1">
+                                    <h3 class="text-sm font-semibold text-red-800 dark:text-red-200">Budget exceeded</h3>
+                                    <p class="text-sm text-red-700 dark:text-red-300 mt-1">
+                                        {{ $overBudgetCategories->count() }} {{ Str::plural('category', $overBudgetCategories->count()) }} on this project {{ $overBudgetCategories->count() === 1 ? 'is' : 'are' }} over budget. Reduce or reassign expenses, or modify the budget cap with a comment.
+                                    </p>
+                                    <ul class="mt-2 space-y-1 text-sm text-red-700 dark:text-red-300">
+                                        @foreach($overBudgetCategories as $b)
+                                            @php
+                                                $overage = (float) $b->spent_amount - (float) $b->budgeted_amount;
+                                            @endphp
+                                            <li>
+                                                <span class="font-medium">{{ $b->category }}</span>:
+                                                ${{ number_format($b->spent_amount, 2) }} spent of ${{ number_format($b->budgeted_amount, 2) }} budgeted —
+                                                <span class="font-semibold">${{ number_format($overage, 2) }} over</span>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                     <!-- Budget Categories -->
                     <div>
                         <div class="flex items-center justify-between mb-4">
@@ -556,11 +592,21 @@
                                                     ${{ number_format($budget->remaining_amount, 2) }}
                                                 </td>
                                                 <td class="px-4 py-3 text-sm text-right">
-                                                    <span class="px-2 py-1 rounded text-xs {{ $budget->is_over_budget ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ($budget->percentage_spent > 90 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300') }}">
+                                                    {{-- P-23 Step 7: 80% soft warning replaces the previous >90% threshold. --}}
+                                                    <span class="px-2 py-1 rounded text-xs {{ $budget->is_over_budget ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ($budget->percentage_spent >= 80 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300') }}">
                                                         {{ $budget->percentage_spent }}%
                                                     </span>
                                                 </td>
                                                 <td class="px-4 py-3 text-sm text-right space-x-2">
+                                                    {{-- P-23 Step 7: ledger button only renders when modifications exist for this budget. --}}
+                                                    @if($budget->modifications_count > 0)
+                                                        <button wire:click="showBudgetLedger({{ $budget->id }})"
+                                                                class="text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300"
+                                                                data-budget-modified-indicator
+                                                                title="View modification history">
+                                                            Modified ({{ $budget->modifications_count }})
+                                                        </button>
+                                                    @endif
                                                     <button wire:click="editBudget({{ $budget->id }})"
                                                             class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">
                                                         Edit
@@ -1065,6 +1111,116 @@
                         {{ $editingBudget ? 'Update' : 'Save' }}
                     </button>
                 </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- P-23 Step 7: budget modification confirmation modal. Triggered
+         by saveBudget when an existing budget's amount is changing.
+         Server-side validation enforces a 10-char minimum on the
+         comment so the audit ledger has substance. --}}
+    @if($showBudgetModConfirmModal)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="cancelBudgetModification" data-budget-mod-modal>
+            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-md w-full mx-4">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    Confirm budget change
+                </h3>
+                <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                    You are changing the budgeted amount for <span class="font-medium">{{ $budget_category }}</span>.
+                    Please add a short note explaining the change. The note is recorded in the audit ledger
+                    and emailed to the configured over-budget recipients.
+                </p>
+
+                <div class="grid grid-cols-2 gap-4 text-sm bg-gray-50 dark:bg-zinc-700/50 rounded p-3 mb-4">
+                    <div>
+                        <div class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Previous</div>
+                        <div class="font-semibold text-gray-900 dark:text-white">${{ number_format($budgetModOldAmount, 2) }}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">New</div>
+                        <div class="font-semibold text-gray-900 dark:text-white">${{ number_format($budgetModNewAmount, 2) }}</div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Reason for the change <span class="text-red-500">*</span>
+                    </label>
+                    <textarea wire:model="budgetModComment"
+                              rows="3"
+                              minlength="10"
+                              placeholder="At least 10 characters explaining what changed and why."
+                              class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md text-sm"
+                              data-budget-mod-comment></textarea>
+                    @error('budgetModComment')
+                        <span class="text-red-600 text-xs">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button type="button"
+                            wire:click="cancelBudgetModification"
+                            class="px-4 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
+                        Cancel
+                    </button>
+                    <button type="button"
+                            wire:click="confirmBudgetModification"
+                            class="px-4 py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700">
+                        Confirm change
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- P-23 Step 7: budget modification ledger viewer. Read-only list
+         of every modification on the selected budget. Append-only on
+         the model side; this view never offers an edit affordance. --}}
+    @if($showBudgetLedgerModal && $viewingLedgerBudgetId)
+        @php
+            $ledgerBudget = $job->budgets->firstWhere('id', $viewingLedgerBudgetId);
+            $ledgerEntries = $ledgerBudget?->modifications()->with('modifier')->get() ?? collect();
+        @endphp
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="closeBudgetLedger" data-budget-ledger-modal>
+            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                            Modification history
+                        </h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">
+                            {{ $ledgerBudget?->category ?? 'Budget' }} — append-only audit ledger
+                        </p>
+                    </div>
+                    <button type="button"
+                            wire:click="closeBudgetLedger"
+                            class="text-gray-500 hover:text-gray-800 dark:hover:text-white">
+                        ✕
+                    </button>
+                </div>
+
+                @if($ledgerEntries->isEmpty())
+                    <p class="text-sm text-gray-500 dark:text-gray-400 italic">No modifications recorded.</p>
+                @else
+                    <ul class="divide-y divide-gray-200 dark:divide-zinc-700">
+                        @foreach($ledgerEntries as $entry)
+                            <li class="py-3" data-ledger-entry>
+                                <div class="flex items-baseline justify-between gap-3">
+                                    <div class="text-sm text-gray-900 dark:text-white">
+                                        <span class="font-medium">{{ $entry->modifier?->name ?? 'Unknown' }}</span>
+                                        <span class="text-gray-500 dark:text-gray-400">on {{ $entry->created_at->format('M d, Y g:i a') }}</span>
+                                    </div>
+                                    <div class="text-sm whitespace-nowrap">
+                                        <span class="text-gray-500 dark:text-gray-400">${{ number_format($entry->old_amount, 2) }}</span>
+                                        <span class="text-gray-400">→</span>
+                                        <span class="font-semibold text-gray-900 dark:text-white">${{ number_format($entry->new_amount, 2) }}</span>
+                                    </div>
+                                </div>
+                                <p class="mt-1 text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">{{ $entry->comment }}</p>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
             </div>
         </div>
     @endif

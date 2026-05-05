@@ -114,6 +114,12 @@ it('saveBudget updates an existing budget row when in edit mode (P-2.5)', functi
         ->set('budget_fund_code_id', $codeB->id)
         ->call('saveBudget')
         ->assertHasNoErrors()
+        // Phase 3B Step 7: amount change opens the modification confirm
+        // modal (audit ledger entry point). Provide the comment to
+        // complete the save.
+        ->assertSet('showBudgetModConfirmModal', true)
+        ->set('budgetModComment', 'Switching this budget to fund code B.')
+        ->call('confirmBudgetModification')
         ->assertSet('showBudgetForm', false);
 
     $budget->refresh();
