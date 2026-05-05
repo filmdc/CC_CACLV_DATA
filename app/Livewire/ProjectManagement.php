@@ -3,10 +3,12 @@
 namespace App\Livewire;
 
 use App\Exceptions\ContractFullyUtilizedException;
+use App\Models\BudgetModification;
 use App\Models\Contract;
 use App\Models\HousingJob;
 use App\Models\MilestoneDocument;
 use App\Models\MilestoneTask;
+use App\Models\OverBudgetEmailRecipient;
 use App\Models\ProjectBudget;
 use App\Models\ProjectExpense;
 use App\Models\ProjectMilestone;
@@ -95,6 +97,19 @@ class ProjectManagement extends Component
 
     // Budget Form
     public $showBudgetForm = false;
+
+    // Phase 3B Step 7 — budget modification (amount-change) audit flow.
+    public $showBudgetModConfirmModal = false;
+
+    public $budgetModOldAmount = 0;
+
+    public $budgetModNewAmount = 0;
+
+    public $budgetModComment = '';
+
+    public $showBudgetLedgerModal = false;
+
+    public $viewingLedgerBudgetId = null;
 
     public $editingBudget = null;
 
@@ -211,7 +226,9 @@ class ProjectManagement extends Component
             'milestones.documents.media',
             'milestones.documents.assignedTo',
             'milestones.documents.approvedBy',
-            'budgets',
+            // Phase 3B Step 7: same closure as in refreshJob() so the
+            // mount-time payload matches the post-write payload.
+            'budgets' => fn ($q) => $q->with(['contract', 'fundCode'])->withCount('modifications'),
             'expenses',
         ])->findOrFail($id);
 
@@ -1202,6 +1219,13 @@ class ProjectManagement extends Component
                     ->toMediaCollection('attachments');
             }
 
+            // Phase 3B Step 3: notify downstream owners that an attachment
+            // has landed here. Single fire per save action regardless of
+            // file count — the foreach above is for storage, not for
+            // signaling. No-op for non-milestone-source requirements
+            // (handled inside notifyDownstreamOfUpload).
+            $req->notifyDownstreamOfUpload($actor);
+
             $req->markComplete($actor, $this->completion_note !== '' ? $this->completion_note : null);
         } elseif (trim($this->completion_override_reason) !== '') {
             $req->markCompleteWithOverride(
@@ -1304,20 +1328,109 @@ class ProjectManagement extends Component
             'budget_fund_code_id' => 'required|integer|exists:fund_codes,id',
         ]);
 
+        // Phase 3B Step 7: amount-change on an existing budget routes
+        // through the modification audit modal (10-char comment min,
+        // ledger row, recipient notifications). New rows and edits
+        // that don't touch the amount go straight to commitBudget.
+        if ($this->editingBudget) {
+            $budget = ProjectBudget::findOrFail($this->editingBudget);
+
+            if ((int) $budget->housing_job_id !== (int) $this->jobId) {
+                session()->flash('error', 'Budget category not editable from this project.');
+
+                return;
+            }
+
+            $amountChanged = (float) $budget->budgeted_amount !== (float) $this->budget_amount;
+
+            if ($amountChanged && ! $this->showBudgetModConfirmModal) {
+                $this->openBudgetModificationConfirmation($budget);
+
+                return;
+            }
+        }
+
+        $this->commitBudget();
+    }
+
+    /**
+     * Phase 3B Step 7: stash the modification metadata and open the
+     * comment-required confirmation modal. Called from saveBudget
+     * when an existing budget's amount is changing.
+     */
+    protected function openBudgetModificationConfirmation(ProjectBudget $budget): void
+    {
+        $this->budgetModOldAmount = (float) $budget->budgeted_amount;
+        $this->budgetModNewAmount = (float) $this->budget_amount;
+        $this->budgetModComment = '';
+        $this->showBudgetModConfirmModal = true;
+    }
+
+    /**
+     * Phase 3B Step 7: validate the comment (10-char min, server-side)
+     * and commit the modification through the unified write path.
+     */
+    public function confirmBudgetModification(): void
+    {
+        $this->validate([
+            'budgetModComment' => 'required|string|min:10',
+        ], [
+            'budgetModComment.min' => 'Please provide at least 10 characters explaining this change.',
+        ]);
+
+        $this->commitBudget();
+    }
+
+    public function cancelBudgetModification(): void
+    {
+        $this->showBudgetModConfirmModal = false;
+        $this->budgetModComment = '';
+        $this->budgetModOldAmount = 0;
+        $this->budgetModNewAmount = 0;
+    }
+
+    /**
+     * Phase 3B Step 7: unified write path for budget create + edit.
+     * Called directly by saveBudget for non-modification cases, by
+     * confirmBudgetModification for the audited path, and by
+     * confirmOverride for the contract-cap override retry. Writes the
+     * ledger row + dispatches BudgetModifiedNotification when a
+     * modification comment is present and the amount actually changed.
+     */
+    protected function commitBudget(): void
+    {
         try {
+            $modification = null;
+
             if ($this->editingBudget) {
                 $budget = ProjectBudget::findOrFail($this->editingBudget);
+
                 if ((int) $budget->housing_job_id !== (int) $this->jobId) {
                     session()->flash('error', 'Budget category not editable from this project.');
 
                     return;
                 }
+
+                $oldAmount = (float) $budget->budgeted_amount;
+                $newAmount = (float) $this->budget_amount;
+
                 $budget->update([
                     'category' => $this->budget_category,
                     'budgeted_amount' => $this->budget_amount,
                     'fund_code_id' => (int) $this->budget_fund_code_id,
                     'updated_by' => Auth::id(),
                 ]);
+
+                if ($this->budgetModComment !== '' && $oldAmount !== $newAmount) {
+                    $modification = BudgetModification::create([
+                        'project_budget_id' => $budget->id,
+                        'modified_by_user_id' => Auth::id(),
+                        'old_amount' => $oldAmount,
+                        'new_amount' => $newAmount,
+                        'comment' => $this->budgetModComment,
+                    ]);
+                }
+
                 session()->flash('success', 'Budget category updated successfully');
             } else {
                 ProjectBudget::create([
@@ -1335,6 +1448,23 @@ class ProjectManagement extends Component
                 session()->flash('success', 'Budget category created successfully');
             }
 
+            // Phase 3B Step 7: dispatch the modification notification
+            // AFTER the DB write succeeds. Recipients come from
+            // OverBudgetEmailRecipient::activeRecipientUsers; per-user
+            // mail opt-out is handled inside the notification's via().
+            // No-op when the recipient list is empty (the ledger still
+            // records the modification regardless).
+            if ($modification !== null) {
+                $recipients = OverBudgetEmailRecipient::activeRecipientUsers();
+                if ($recipients->isNotEmpty()) {
+                    \Illuminate\Support\Facades\Notification::send($recipients, new \App\Notifications\BudgetModifiedNotification($modification));
+                }
+            }
+
+            $this->showBudgetModConfirmModal = false;
+            $this->budgetModComment = '';
+            $this->budgetModOldAmount = 0;
+            $this->budgetModNewAmount = 0;
             $this->showBudgetForm = false;
             $this->resetBudgetForm();
             $this->refreshJob();
@@ -1345,11 +1475,36 @@ class ProjectManagement extends Component
                 $this->overrideContractTitle = $e->getContract()->title;
                 $this->overrideRemainingAmount = $e->getRemainingFunds();
                 $this->showOverrideWarning = true;
+                // Close the mod-confirm modal while the override flow
+                // takes over; budgetModComment is retained on the
+                // component instance so confirmOverride → commitBudget
+                // can use it on retry.
+                $this->showBudgetModConfirmModal = false;
                 session()->flash('warning', $e->getUserMessage().' As an admin, you can override this restriction.');
             } else {
                 session()->flash('error', $e->getUserMessage());
             }
         }
+    }
+
+    public function showBudgetLedger(int $budgetId): void
+    {
+        $budget = ProjectBudget::findOrFail($budgetId);
+
+        if ((int) $budget->housing_job_id !== (int) $this->jobId) {
+            session()->flash('error', 'Budget category not viewable from this project.');
+
+            return;
+        }
+
+        $this->viewingLedgerBudgetId = $budgetId;
+        $this->showBudgetLedgerModal = true;
+    }
+
+    public function closeBudgetLedger(): void
+    {
+        $this->viewingLedgerBudgetId = null;
+        $this->showBudgetLedgerModal = false;
     }
 
     public function deleteBudget($id)
@@ -1739,14 +1894,15 @@ class ProjectManagement extends Component
             'milestones.requirementDocuments.owner',
             'milestones.requirementDocuments.completedBy',
             'milestones.requirementDocuments.media',
-            // P-22: budgets.contract must be hydrated eagerly so the
-            // grant_code badge renders immediately after saveBudget()
-            // (previously the relation was unloaded until the next refresh).
-            'budgets.contract',
-            // P-2.5: per-row fund code on budget categories. Eager-loading
-            // here keeps the budget tab's Fund Code cell free of N+1
-            // queries.
-            'budgets.fundCode',
+            // P-22: budgets.contract eager so the grant_code badge
+            //       renders immediately after saveBudget().
+            // P-2.5: budgets.fundCode eager so the per-row Fund Code
+            //       cell is free of N+1.
+            // Phase 3B Step 7: withCount('modifications') so the
+            //       "Modified (N)" indicator renders without N+1.
+            // All three constraints live on a single closure to avoid
+            // conflicts between dotted paths and the closure form.
+            'budgets' => fn ($q) => $q->with(['contract', 'fundCode'])->withCount('modifications'),
             'expenses.document',
             // P-08: fund codes directly assigned to this project via the
             // fund_code_housing_job pivot, used by the assignment UI and
@@ -1838,7 +1994,11 @@ class ProjectManagement extends Component
         // Retry the original operation
         if ($this->pendingOverrideType === 'budget') {
             $this->showOverrideWarning = false;
-            $this->saveBudget();
+            // Phase 3B Step 7: route through commitBudget directly so
+            // any pending modification comment ($this->budgetModComment)
+            // survives the retry and lands in the ledger row alongside
+            // the override reason.
+            $this->commitBudget();
         } elseif ($this->pendingOverrideType === 'expense') {
             $this->showOverrideWarning = false;
             $this->saveExpense();
@@ -1866,6 +2026,23 @@ class ProjectManagement extends Component
 
     public function render()
     {
+        // Phase 3B Step 7: withCount aliases (modifications_count) on
+        // public Livewire model properties don't survive automatic
+        // re-hydration across requests. Re-fetch the budgets with the
+        // count fresh on every render so the "Modified (N)" indicator
+        // stays truthful after a tab switch. Cheaper than refreshJob
+        // (single SELECT + the COUNT subquery, not the full 12-relation
+        // payload).
+        if ($this->job) {
+            $this->job->setRelation(
+                'budgets',
+                ProjectBudget::with(['contract', 'fundCode'])
+                    ->withCount('modifications')
+                    ->where('housing_job_id', $this->jobId)
+                    ->get()
+            );
+        }
+
         // Get only users who have access to the CAH program
         $cahProgram = \App\Models\Program::where('name', 'LIKE', '%CAH%')->first();
 

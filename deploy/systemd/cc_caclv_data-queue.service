@@ -1,0 +1,64 @@
+# CC_CAP_TRACK Laravel queue worker.
+#
+# Drains the database-backed queue (config/queue.php default = database).
+# All ShouldQueue notifications + jobs land here.
+#
+# DEPLOY (one-time on prod, per PHASE_3B_NOTES.md):
+#   sudo cp deploy/systemd/cc_caclv_data-queue.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now cc_caclv_data-queue.service
+#
+# AFTER EVERY CODE DEPLOY (workers cache the bootstrapped app):
+#   sudo systemctl restart cc_caclv_data-queue.service
+#   # OR equivalently from the project root:
+#   php artisan queue:restart
+#
+# OBSERVE:
+#   sudo systemctl status cc_caclv_data-queue.service
+#   sudo journalctl -u cc_caclv_data-queue.service -f
+#
+# PRE-DEPLOY INSPECTION (before first enable):
+#   php artisan queue:failed | head
+#   mysql -e 'SELECT COUNT(*) FROM jobs;' CC_CACLV_DATA
+#   # Report state to David before enabling — do not blindly flush.
+
+[Unit]
+Description=CC_CAP_TRACK Laravel queue worker (database driver)
+After=network.target mysql.service
+Requires=mysql.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/CC_CAP_TRACK
+
+# --tries=3       : each job retries up to 3 times before landing in failed_jobs
+# --max-time=3600 : recycle the worker every hour to drop any leaked memory;
+#                   systemd Restart=always brings it right back up
+# --sleep=3       : when the queue is empty, poll every 3s (database driver
+#                   has no native push, so this is a poll interval)
+# --queue=default : explicit queue name; matches the default in config/queue.php
+ExecStart=/usr/bin/php /var/www/CC_CAP_TRACK/artisan queue:work \
+    --queue=default \
+    --tries=3 \
+    --max-time=3600 \
+    --sleep=3
+
+# Laravel handles SIGTERM by finishing the current job, then exiting cleanly.
+# 60s is generous head-room for the slowest job (Office 365 SMTP can take ~10s
+# on a bad day; a job with 4 mails has plenty of buffer).
+KillSignal=SIGTERM
+TimeoutStopSec=60
+
+# Always come back. 10s back-off prevents tight crashloops during transient
+# DB / SMTP outages.
+Restart=always
+RestartSec=10
+
+# Logs go to journald. Read with: journalctl -u cc_caclv_data-queue.service
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -28,6 +29,7 @@ class User extends Authenticatable
         'active',
         'email_verified_at',
         'approval_delegate_id',
+        'notification_preferences',
     ];
 
     /**
@@ -51,7 +53,34 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'active' => 'boolean',
+            'notification_preferences' => AsArrayObject::class,
         ];
+    }
+
+    /**
+     * Phase 3B: should this user receive the email channel for the given
+     * notification category?
+     *
+     * Categories are 'assignment_email', 'completion_email',
+     * 'over_budget_email'. Null preferences (the default for fresh users
+     * and existing rows pre-3B) mean every category is on — opt-in by
+     * default.
+     *
+     * The over_budget_email category is also gated downstream on whether
+     * the user is on the over_budget_email_recipients list; this method
+     * only handles the per-user opt-out, not the recipient eligibility.
+     */
+    public function shouldEmailFor(string $category): bool
+    {
+        $prefs = $this->notification_preferences;
+
+        if ($prefs === null) {
+            return true;
+        }
+
+        $value = $prefs[$category] ?? true;
+
+        return (bool) $value;
     }
 
     /**

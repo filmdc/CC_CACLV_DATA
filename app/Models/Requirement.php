@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Notifications\RequirementAssignedNotification;
 use App\Notifications\RequirementCompletedNotification;
+use App\Notifications\RequirementUpstreamUploadedNotification;
+use App\Services\MilestoneGraph;
 use App\Traits\HasStandardMediaCollections;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -206,8 +208,8 @@ class Requirement extends Model implements HasMedia
     /**
      * Mark a task-type or document-type requirement complete. For
      * document-type without media, callers must use
-     * markCompleteWithOverride() instead. Notifies the project manager
-     * unless the actor IS the project manager.
+     * markCompleteWithOverride() instead. Notifies the requirement's
+     * owner-of-record unless the actor IS the owner (self-completion).
      */
     public function markComplete(User $actor, ?string $note = null): void
     {
@@ -225,7 +227,7 @@ class Requirement extends Model implements HasMedia
         $this->updated_by = $actor->id;
         $this->save();
 
-        $this->notifyProjectManagerOfCompletion($actor);
+        $this->notifyOwnerOfCompletion($actor);
     }
 
     /**
@@ -247,7 +249,7 @@ class Requirement extends Model implements HasMedia
         $this->updated_by = $actor->id;
         $this->save();
 
-        $this->notifyProjectManagerOfCompletion($actor);
+        $this->notifyOwnerOfCompletion($actor);
     }
 
     public function markNotApplicable(User $actor, ?string $note = null): void
@@ -259,7 +261,7 @@ class Requirement extends Model implements HasMedia
         $this->updated_by = $actor->id;
         $this->save();
 
-        $this->notifyProjectManagerOfCompletion($actor);
+        $this->notifyOwnerOfCompletion($actor);
     }
 
     /**
@@ -297,25 +299,77 @@ class Requirement extends Model implements HasMedia
     }
 
     /**
-     * TODO(3B): completion-chained extension point — e.g., a
+     * Phase 3B subscriber-semantics refinement: notify the requirement's
+     * owner-of-record at completion time, not the project manager.
+     *
+     * Suppressed when the owner is null (unassigned requirement) or
+     * when the owner is the actor (self-completion). The mail channel
+     * inside RequirementCompletedNotification is further gated on the
+     * recipient's completion_email opt-out via User::shouldEmailFor().
+     *
+     * TODO(3B+): completion-chained extension point — e.g., a
      * "milestone cleared" notification when this completion closes the
      * last outstanding requirement on its source milestone. Date-driven
      * notifications (fund-expiration, milestone-overdue) live in a
      * separate scheduled job; see the marker in
      * App\Services\DashboardIndicatorSupport.
      */
-    protected function notifyProjectManagerOfCompletion(User $actor): void
+    protected function notifyOwnerOfCompletion(User $actor): void
     {
-        $manager = $this->housingJob?->projectManager;
+        $owner = $this->owner;
 
-        if ($manager === null) {
+        if ($owner === null) {
             return;
         }
 
-        if ($manager->id === $actor->id) {
+        if ($owner->id === $actor->id) {
             return;
         }
 
-        $manager->notify(new RequirementCompletedNotification($this, $actor));
+        $owner->notify(new RequirementCompletedNotification($this, $actor));
+    }
+
+    /**
+     * Phase 3B Step 3: notify owners of open requirements on
+     * milestones that depend on this requirement's source milestone
+     * that an attachment was added here.
+     *
+     * Single-fire per call. Callers should invoke this once per upload
+     * action — not per file — even if the action attached multiple
+     * files. Suppression rules:
+     *   - skipped entirely for fund-code-source and ad-hoc upstream
+     *     requirements (no source milestone, no graph),
+     *   - skipped when the upstream's source milestone has no
+     *     dependents,
+     *   - skipped per-recipient when the owner is the uploader
+     *     (no self-pings),
+     *   - skipped per-recipient when the downstream requirement is
+     *     not in outstanding state (closed work doesn't surface fresh
+     *     pings on its watcher).
+     *
+     * The mail channel inside RequirementUpstreamUploadedNotification
+     * is further gated on the recipient's assignment_email opt-out
+     * — uploads upstream of "your" assigned work share the same toggle
+     * as new assignments, since both are "your-work" notifications.
+     */
+    public function notifyDownstreamOfUpload(User $uploader): void
+    {
+        $graph = app(MilestoneGraph::class);
+        $rows = $graph->downstreamOwnersFor($this);
+
+        foreach ($rows as $row) {
+            $downstream = $row['requirement'];
+            $owner = $row['owner'];
+
+            if ($owner->id === $uploader->id) {
+                continue;
+            }
+
+            $owner->notify(new RequirementUpstreamUploadedNotification(
+                $this,
+                $downstream,
+                $uploader,
+            ));
+        }
     }
 }

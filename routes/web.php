@@ -42,6 +42,7 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
     Volt::route('settings/password', 'settings.password')->name('settings.password');
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
+    Volt::route('settings/notifications', 'settings.notifications')->name('settings.notifications');
 
     // CAP TRACK Routes
 
@@ -71,6 +72,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('media/{media}/download', [App\Http\Controllers\MediaController::class, 'download'])->name('media.download');
     Route::get('admin/contract-notification-test', App\Livewire\ContractNotificationTest::class)->name('contract.notification-test')->middleware(['permission:contracts.manage']);
     Route::get('admin/notification-recipients', App\Livewire\NotificationRecipientsManagement::class)->name('notification-recipients.management')->middleware(['permission:contracts.view']);
+    Route::get('admin/over-budget-recipients', App\Livewire\OverBudgetRecipientsManagement::class)->name('over-budget-recipients.management')->middleware(['permission:over_budget_recipients.manage']);
     Route::get('admin/legacy-contract-import', App\Livewire\LegacyContractImport::class)->name('legacy.contract.import')->middleware(['permission:contracts.import_legacy']);
     Route::get('funder-management', App\Livewire\FunderManagement::class)->name('funder.management');
     Route::get('funder/{id}', App\Livewire\FunderShow::class)->name('funder.show');

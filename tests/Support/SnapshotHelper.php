@@ -77,6 +77,10 @@ class SnapshotHelper
             // CI (localhost). Mask the scheme+host of any absolute URL so
             // snapshots are environment-portable.
             '#https?://[^/"\'\s<>]+#' => '__APP_URL__',
+            // Vite asset hashes — content-hashed filenames change every
+            // time the bundle rebuilds. Normalize to a stable token so
+            // snapshots survive `npm run build` between test runs.
+            '#/build/assets/([^/"\']+)-[A-Za-z0-9_-]{6,}\.(css|js)#' => '/build/assets/$1-__HASH__.$2',
             // Livewire 3 conditional render markers. These are framework
             // internals and emit/strip differently across environments
             // (debug mode, view cache state). Drop them.
@@ -87,11 +91,17 @@ class SnapshotHelper
             '/wire:effects="[^"]*"/' => 'wire:effects=""',
             '/wire:initial-data="[^"]*"/' => 'wire:initial-data=""',
             '/wire:socket="[^"]*"/' => 'wire:socket=""',
-            // CSRF tokens.
-            '/<input\s+type="hidden"\s+name="_token"\s+value="[^"]*"\s*\/?>/i' => '<input type="hidden" name="_token" value="" />',
-            '/<meta\s+name="csrf-token"\s+content="[^"]*"\s*\/?>/i' => '<meta name="csrf-token" content="" />',
+            // CSRF tokens. Use a value-attribute-only match so additional
+            // attributes (e.g. autocomplete="off") elsewhere on the same
+            // tag don't break normalization.
+            '/(name="_token"[^>]*?\s+value=)"[^"]*"/i' => '$1""',
+            '/(name="csrf-token"[^>]*?\s+content=)"[^"]*"/i' => '$1""',
             '/data-csrf="[^"]*"/' => 'data-csrf=""',
             '/x-csrf-token="[^"]*"/' => 'x-csrf-token=""',
+            // Livewire component IDs leak through x-init expressions
+            // like `window.Livewire.find('XYZ').on('$refresh', ...)`.
+            // The ID is regenerated every render.
+            '/Livewire\.find\(\'[^\']*\'\)/' => "Livewire.find('__WIRE_ID__')",
             // ISO 8601 timestamps.
             '/\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:?\d{2})?/' => '__TIMESTAMP__',
             // Resource URLs with autoincrement IDs.
@@ -108,8 +118,10 @@ class SnapshotHelper
             '/wire:click="([a-zA-Z_][a-zA-Z0-9_]*)\(\d+(,[^)]*)?\)"/' => 'wire:click="$1(__ID__$2)"',
             // data-* attributes that hold autoincrement ids (Phase 3A
             // dashboard rows tag themselves data-project-id, data-
-            // requirement-id, etc. for selectable testing).
+            // requirement-id, etc. for selectable testing). Phase 3B
+            // adds data-recipient-row for the over-budget admin page.
             '/data-(project|requirement|milestone|task|document|fund-code)-id="\d+"/' => 'data-$1-id="__ID__"',
+            '/data-recipient-row="\d+"/' => 'data-recipient-row="__ID__"',
             // URL fragments like #milestone-42, #task-9 used for scroll-to-anchor.
             '/#([a-zA-Z][a-zA-Z_-]*)-\d+\b/' => '#$1-__ID__',
         ];

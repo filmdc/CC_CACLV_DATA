@@ -4,18 +4,24 @@ namespace App\Notifications;
 
 use App\Models\Requirement;
 use App\Models\User;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 /**
- * P-17 (Phase 3A): in-app ping to the project manager when a
- * requirement on her project closes out. Database channel only;
- * Phase 3B adds 'mail' to via().
+ * Phase 3A: in-app ping when a requirement closes out.
  *
- * Self-completion suppression (manager closes her own item) is handled
- * at the dispatch site (Requirement::notifyProjectManagerOfCompletion).
+ * Phase 3B Step 2 — subscriber-semantics refinement: the recipient is
+ * now the requirement's owner-of-record at completion time (not the
+ * project manager), and mail is gated on the completion_email opt-out.
+ * Self-completion suppression is handled at the dispatch site
+ * (Requirement::notifyOwnerOfCompletion).
  */
-class RequirementCompletedNotification extends Notification
+class RequirementCompletedNotification extends Notification implements ShouldQueue
 {
+    use Queueable;
+
     public function __construct(
         public Requirement $requirement,
         public User $completer,
@@ -23,12 +29,33 @@ class RequirementCompletedNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        // TODO(3B): add 'mail' alongside 'database' when the email
-        // channel for requirement notifications is wired. The
-        // toMail() shape will mirror toArray() and emphasize the
-        // completer's name + project URL; one-line change here, one
-        // method add below.
-        return ['database'];
+        $channels = ['database'];
+
+        if ($notifiable instanceof User && $notifiable->shouldEmailFor('completion_email')) {
+            $channels[] = 'mail';
+        }
+
+        return $channels;
+    }
+
+    public function toMail(object $notifiable): MailMessage
+    {
+        $job = $this->requirement->housingJob;
+        $url = $job ? route('project.management', $job->id) : url('/');
+        $jobLabel = $job ? "{$job->job_title} (#{$job->job_number})" : 'a project';
+        $statusLabel = $this->requirement->status === Requirement::STATUS_NOT_APPLICABLE
+            ? 'marked not applicable'
+            : 'completed';
+        $overrideNote = $this->requirement->wasOverridden()
+            ? ' (closed without an upload via override)'
+            : '';
+
+        return (new MailMessage)
+            ->subject("{$this->requirement->title} was {$statusLabel}")
+            ->greeting("Hello {$notifiable->name},")
+            ->line("{$this->completer->name} {$statusLabel} **{$this->requirement->title}** on {$jobLabel}{$overrideNote}.")
+            ->action('Open project', $url)
+            ->line('You can opt out of these emails in Settings → Notifications.');
     }
 
     public function toArray(object $notifiable): array

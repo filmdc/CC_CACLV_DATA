@@ -44,19 +44,45 @@ class ProjectExpense extends Model
 
     protected $appends = ['is_credit', 'formatted_amount'];
 
+    /**
+     * Phase 3B (P-23 Step 6) math-hardening: budget rows are keyed on
+     * the (housing_job_id, category) tuple. When an expense's tuple
+     * changes (most commonly a category edit, occasionally a project
+     * move), the OLD budget tuple is now stale and needs a recompute
+     * too — not just the NEW one. Pre-3B the observer only touched
+     * the current-value tuple, leaving the abandoned tuple's
+     * spent_amount permanently inflated.
+     *
+     * The fix: capture original values via getOriginal() at update time
+     * and recompute both sides if the grouping key changed. created
+     * and deleted only have one tuple to recompute.
+     */
     protected static function booted()
     {
-        // Update budget spent_amount when expense is created/updated/deleted
-        static::created(function ($expense) {
-            $expense->updateBudget();
+        static::created(function (ProjectExpense $expense) {
+            $expense->recomputeBudgetForCurrentTuple();
         });
 
-        static::updated(function ($expense) {
-            $expense->updateBudget();
+        static::updated(function (ProjectExpense $expense) {
+            $originalCategory = $expense->getOriginal('category');
+            $originalHousingJobId = $expense->getOriginal('housing_job_id');
+
+            $tupleChanged = $originalCategory !== $expense->category
+                || $originalHousingJobId !== $expense->housing_job_id;
+
+            if ($tupleChanged) {
+                $expense->recomputeBudgetForTuple($originalHousingJobId, $originalCategory);
+            }
+
+            $expense->recomputeBudgetForCurrentTuple();
         });
 
-        static::deleted(function ($expense) {
-            $expense->updateBudget();
+        static::deleted(function (ProjectExpense $expense) {
+            // Eloquent retains attribute values on the in-memory model
+            // after delete, so the (housing_job_id, category) tuple is
+            // still readable here and recalculateSpent will see the row
+            // is gone from the DB.
+            $expense->recomputeBudgetForCurrentTuple();
         });
     }
 
@@ -107,10 +133,31 @@ class ProjectExpense extends Model
 
     // Business Logic Methods
 
-    protected function updateBudget(): void
+    /**
+     * Phase 3B (P-23 Step 6): recompute spent_amount on the budget row
+     * matching this expense's current (housing_job_id, category)
+     * tuple. No-op when no matching budget exists — uncategorized
+     * expenses don't track against a budget, by design.
+     */
+    protected function recomputeBudgetForCurrentTuple(): void
     {
-        $budget = ProjectBudget::where('housing_job_id', $this->housing_job_id)
-            ->where('category', $this->category)
+        $this->recomputeBudgetForTuple($this->housing_job_id, $this->category);
+    }
+
+    /**
+     * Phase 3B (P-23 Step 6): recompute spent_amount for an explicit
+     * (housing_job_id, category) tuple. Used by the updated event to
+     * refresh both old and new tuples when an expense's grouping key
+     * changes.
+     */
+    protected function recomputeBudgetForTuple(?int $housingJobId, ?string $category): void
+    {
+        if ($housingJobId === null || $category === null) {
+            return;
+        }
+
+        $budget = ProjectBudget::where('housing_job_id', $housingJobId)
+            ->where('category', $category)
             ->first();
 
         if ($budget) {

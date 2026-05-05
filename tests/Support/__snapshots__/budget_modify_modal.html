@@ -1,0 +1,20 @@
+<div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="cancelBudgetModification" data-budget-mod-modal>
+<div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-md w-full mx-4">
+<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+Confirm budget change
+</h3>
+<p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
+You are changing the budgeted amount for <span class="font-medium">Construction labor</span>.
+Please add a short note explaining the change. The note is recorded in the audit ledger
+and emailed to the configured over-budget recipients.
+</p>
+<div class="grid grid-cols-2 gap-4 text-sm bg-gray-50 dark:bg-zinc-700/50 rounded p-3 mb-4">
+<div>
+<div class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Previous</div>
+<div class="font-semibold text-gray-900 dark:text-white">$1,000.00</div>
+</div>
+<div>
+<div class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">New</div>
+<div class="font-semibold text-gray-900 dark:text-white">$1,500.00</div>
+</div>
+</div>

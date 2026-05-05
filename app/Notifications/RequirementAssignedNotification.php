@@ -3,28 +3,54 @@
 namespace App\Notifications;
 
 use App\Models\Requirement;
+use App\Models\User;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 /**
- * P-17 (Phase 3A): in-app ping when a requirement gets assigned to a
- * user. Database channel only for 3A; Phase 3B adds 'mail' to via().
+ * Phase 3A: in-app ping when a requirement gets assigned to a user.
  *
- * Suppression of self-pings is handled at the dispatch site
- * (Requirement::assign) — this class assumes it should fire if
- * dispatched.
+ * Phase 3B Step 2: adds mail channel under the assignment_email opt-out
+ * (which also gates RequirementUpstreamUploaded — both are
+ * "your-work" notifications and share a single user toggle).
+ *
+ * Self-assignment suppression is handled at the dispatch site
+ * (Requirement::assign).
  */
-class RequirementAssignedNotification extends Notification
+class RequirementAssignedNotification extends Notification implements ShouldQueue
 {
+    use Queueable;
+
     public function __construct(public Requirement $requirement) {}
 
     public function via(object $notifiable): array
     {
-        // TODO(3B): add 'mail' alongside 'database' when the email
-        // channel for requirement notifications is wired. The
-        // toMail() shape will mirror toArray() with project URL +
-        // requirement title; one-line change here, one method add
-        // below.
-        return ['database'];
+        $channels = ['database'];
+
+        if ($notifiable instanceof User && $notifiable->shouldEmailFor('assignment_email')) {
+            $channels[] = 'mail';
+        }
+
+        return $channels;
+    }
+
+    public function toMail(object $notifiable): MailMessage
+    {
+        $job = $this->requirement->housingJob;
+        $url = $job ? route('project.management', $job->id) : url('/');
+        $jobLabel = $job ? "{$job->job_title} (#{$job->job_number})" : 'a project';
+        $typeLabel = $this->requirement->type === Requirement::TYPE_DOCUMENT ? 'document' : 'task';
+
+        return (new MailMessage)
+            ->subject("New {$typeLabel} assigned: {$this->requirement->title}")
+            ->greeting("Hello {$notifiable->name},")
+            ->line("A {$typeLabel} on {$jobLabel} has been assigned to you.")
+            ->line("**{$this->requirement->title}**")
+            ->lineIf(! empty($this->requirement->description), $this->requirement->description ?? '')
+            ->action('Open project', $url)
+            ->line('You can opt out of these emails in Settings → Notifications.');
     }
 
     public function toArray(object $notifiable): array
