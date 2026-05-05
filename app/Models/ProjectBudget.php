@@ -55,6 +55,16 @@ class ProjectBudget extends Model
      */
     protected static function booted(): void
     {
+        // When a budget row is created, sync spent_amount from any
+        // existing expenses that share its (housing_job_id, category)
+        // tuple. Without this, expenses orphaned by a prior delete of
+        // the same-named category stay invisible to the new row's
+        // spent total — the over-budget banner would not fire even
+        // though the expenses were already there.
+        static::created(function (ProjectBudget $budget) {
+            $budget->recalculateSpent();
+        });
+
         static::saving(function (ProjectBudget $budget) {
             if (! $budget->isDirty('fund_code_id')) {
                 return;
