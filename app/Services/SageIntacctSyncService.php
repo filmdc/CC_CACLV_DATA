@@ -894,7 +894,7 @@ class SageIntacctSyncService
         $lineItem = [
             'glaccountno' => $glAccount,
             'amount' => $giftData['amount'] ?? '0.00',
-            'memo' => $giftData['gift_narrative'] ?? $giftData['campaign'] ?? 'Donation',
+            'memo' => $payee,
             'locationid' => $location,       // Location dimension → "Program" in UI
             'departmentid' => $class,        // Department dimension → "Service" in UI
             'projectid' => $project,         // Project dimension → "Fund" in UI

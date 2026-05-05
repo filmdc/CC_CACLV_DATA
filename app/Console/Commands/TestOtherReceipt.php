@@ -356,7 +356,7 @@ class TestOtherReceipt extends Command
         $lineItem = [
             'glaccountno' => $giftData['gl_code'],
             'amount' => $giftData['amount'],
-            'memo' => $giftData['gift_narrative'] ?? 'Test donation',
+            'memo' => $payee,
             'locationid' => $giftData['campaign'],           // Program
             'departmentid' => $giftData['sub_solicit_code'], // Service
             'projectid' => $giftData['solicit_code'],        // Fund
