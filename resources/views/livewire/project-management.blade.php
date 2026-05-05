@@ -516,6 +516,18 @@
                                     <p class="text-sm text-red-700 dark:text-red-300 mt-1">
                                         {{ $overBudgetCategories->count() }} {{ Str::plural('category', $overBudgetCategories->count()) }} on this project {{ $overBudgetCategories->count() === 1 ? 'is' : 'are' }} over budget. Reduce or reassign expenses, or modify the budget cap with a comment.
                                     </p>
+                                    <details class="mt-2 text-sm text-red-700 dark:text-red-300">
+                                        <summary class="cursor-pointer underline decoration-dotted underline-offset-2 hover:text-red-900 dark:hover:text-red-100">
+                                            How do I modify the budget cap?
+                                        </summary>
+                                        <ol class="list-decimal pl-5 mt-2 space-y-1 text-red-700 dark:text-red-300">
+                                            <li>Find the over-budget category in the <span class="font-medium">Budget Categories</span> table below.</li>
+                                            <li>Click <span class="font-medium">Edit</span> in that row's Actions column.</li>
+                                            <li>Change the <span class="font-medium">Budgeted Amount</span> and click <span class="font-medium">Save</span>.</li>
+                                            <li>A confirmation prompt will ask for a comment (10 characters minimum) explaining the change.</li>
+                                            <li>The change is logged to the budget's modification ledger and emailed to the configured over-budget recipients.</li>
+                                        </ol>
+                                    </details>
                                     <ul class="mt-2 space-y-1 text-sm text-red-700 dark:text-red-300">
                                         @foreach($overBudgetCategories as $b)
                                             @php
@@ -1167,6 +1179,52 @@
                             wire:click="confirmBudgetModification"
                             class="px-4 py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700">
                         Confirm change
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- Budget delete confirmation: triggered by deleteBudget when the
+         category has expenses. The (housing_job_id, category) tuple is
+         the join key, so a silent delete would orphan the expenses and
+         hide them from the over-budget banner. Three explicit choices:
+         cancel, delete budget + expenses, or keep expenses as orphans. --}}
+    @if($showDeleteBudgetModal)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="closeDeleteBudgetModal" data-budget-delete-modal>
+            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-md w-full mx-4">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    Delete budget category?
+                </h3>
+                <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                    <span class="font-medium">{{ $deleteBudgetCategory }}</span> has
+                    <span class="font-medium">{{ $deleteBudgetExpenseCount }}</span>
+                    {{ Str::plural('expense', $deleteBudgetExpenseCount) }} totaling
+                    <span class="font-medium">${{ number_format($deleteBudgetExpenseTotal, 2) }}</span>
+                    tied to it. What should happen to those expenses?
+                </p>
+
+                <div class="rounded-md bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 p-3 text-sm text-amber-800 dark:text-amber-200 mb-4">
+                    <strong>Heads up:</strong> kept expenses stay on the project as uncategorized history.
+                    If you later create a new category with the exact same name, those expenses will
+                    automatically re-bind to it.
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <button type="button"
+                            wire:click="confirmDeleteBudget(true)"
+                            class="w-full px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm">
+                        Delete budget AND its {{ $deleteBudgetExpenseCount }} {{ Str::plural('expense', $deleteBudgetExpenseCount) }}
+                    </button>
+                    <button type="button"
+                            wire:click="confirmDeleteBudget(false)"
+                            class="w-full px-4 py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700 text-sm">
+                        Delete budget only — keep expenses as orphans
+                    </button>
+                    <button type="button"
+                            wire:click="closeDeleteBudgetModal"
+                            class="w-full px-4 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500 text-sm">
+                        Cancel
                     </button>
                 </div>
             </div>

@@ -19,6 +19,7 @@ use App\Services\RequirementInstantiator;
 use App\Traits\WithPermissionChecks;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -112,6 +113,20 @@ class ProjectManagement extends Component
     public $viewingLedgerBudgetId = null;
 
     public $editingBudget = null;
+
+    // Budget-delete confirmation modal state. When the user clicks Delete
+    // on a budget row that has expenses tied by (housing_job_id, category),
+    // we halt and ask: also delete the expenses, or keep them as orphans?
+    // Empty-budget rows delete immediately with no modal.
+    public $showDeleteBudgetModal = false;
+
+    public $deletingBudgetId = null;
+
+    public $deleteBudgetCategory = '';
+
+    public $deleteBudgetExpenseCount = 0;
+
+    public $deleteBudgetExpenseTotal = 0.0;
 
     public $budget_category = '';
 
@@ -1319,13 +1334,22 @@ class ProjectManagement extends Component
     public function saveBudget()
     {
         $this->validate([
-            'budget_category' => 'required|string|max:255',
+            'budget_category' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('project_budgets', 'category')
+                    ->where(fn ($q) => $q->where('housing_job_id', $this->jobId))
+                    ->ignore($this->editingBudget),
+            ],
             'budget_amount' => 'required|numeric|min:0',
             // P-2.5: required on new AND edited rows. The model's saving-
             // event guard verifies the value is one of the project's
             // assigned fund codes; this Livewire validation just gates
             // the form against an empty submission.
             'budget_fund_code_id' => 'required|integer|exists:fund_codes,id',
+        ], [
+            'budget_category.unique' => 'A budget category with this name already exists for this project.',
         ]);
 
         // Phase 3B Step 7: amount-change on an existing budget routes
@@ -1509,9 +1533,84 @@ class ProjectManagement extends Component
 
     public function deleteBudget($id)
     {
-        ProjectBudget::findOrFail($id)->delete();
-        session()->flash('success', 'Budget category deleted successfully');
+        $budget = ProjectBudget::findOrFail($id);
+
+        if ((int) $budget->housing_job_id !== (int) $this->jobId) {
+            session()->flash('error', 'Budget category not deletable from this project.');
+
+            return;
+        }
+
+        $expenses = ProjectExpense::where('housing_job_id', $budget->housing_job_id)
+            ->where('category', $budget->category)
+            ->get(['id', 'amount']);
+
+        if ($expenses->isEmpty()) {
+            $budget->delete();
+            session()->flash('success', 'Budget category deleted successfully');
+            $this->refreshJob();
+
+            return;
+        }
+
+        // Has expenses — halt and let the user choose orphan vs. cascade.
+        // Without this gate the expenses silently de-link from the budget
+        // (they're tied by category string, not FK), which then hides
+        // them from the over-budget banner on the next visit.
+        $this->deletingBudgetId = (int) $budget->id;
+        $this->deleteBudgetCategory = (string) $budget->category;
+        $this->deleteBudgetExpenseCount = $expenses->count();
+        $this->deleteBudgetExpenseTotal = (float) $expenses->sum('amount');
+        $this->showDeleteBudgetModal = true;
+    }
+
+    public function confirmDeleteBudget(bool $deleteExpenses): void
+    {
+        if ($this->deletingBudgetId === null) {
+            $this->closeDeleteBudgetModal();
+
+            return;
+        }
+
+        $budget = ProjectBudget::findOrFail($this->deletingBudgetId);
+
+        if ((int) $budget->housing_job_id !== (int) $this->jobId) {
+            $this->closeDeleteBudgetModal();
+            session()->flash('error', 'Budget category not deletable from this project.');
+
+            return;
+        }
+
+        if ($deleteExpenses) {
+            // Cascade: delete each expense individually so the observer
+            // fires per-row. Mass delete() would skip the booted hook.
+            ProjectExpense::where('housing_job_id', $budget->housing_job_id)
+                ->where('category', $budget->category)
+                ->get()
+                ->each
+                ->delete();
+            $msg = 'Budget category and its expenses deleted successfully';
+        } else {
+            // Keep branch: expenses survive as orphans. They keep their
+            // (housing_job_id, category) tuple so a future budget row
+            // with the same category re-binds via the created observer
+            // on ProjectBudget.
+            $msg = 'Budget category deleted; expenses kept as uncategorized history';
+        }
+
+        $budget->delete();
+        session()->flash('success', $msg);
+        $this->closeDeleteBudgetModal();
         $this->refreshJob();
+    }
+
+    public function closeDeleteBudgetModal(): void
+    {
+        $this->showDeleteBudgetModal = false;
+        $this->deletingBudgetId = null;
+        $this->deleteBudgetCategory = '';
+        $this->deleteBudgetExpenseCount = 0;
+        $this->deleteBudgetExpenseTotal = 0.0;
     }
 
     // Expense Methods
