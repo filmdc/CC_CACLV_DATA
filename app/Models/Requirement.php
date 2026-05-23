@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Contracts\HasMediaAuthorization;
 use App\Notifications\RequirementAssignedNotification;
 use App\Notifications\RequirementCompletedNotification;
 use App\Notifications\RequirementUpstreamUploadedNotification;
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * Phase 3A unified requirement.
@@ -27,9 +29,19 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * 'ad_hoc' with both nulled. No FK on source_id because it is a typed
  * polymorphic pointer; lifecycle prompts handle cleanup explicitly.
  */
-class Requirement extends Model implements HasMedia
+class Requirement extends Model implements HasMedia, HasMediaAuthorization
 {
     use HasFactory, HasStandardMediaCollections, InteractsWithMedia;
+
+    /**
+     * P-39a: matches the page-level access rule on ProjectManagement
+     * (app/Livewire/ProjectManagement.php:250 — requires `projects.view`).
+     * Admin short-circuit is handled by MediaPolicy.
+     */
+    public function canViewMedia(User $user, Media $media): bool
+    {
+        return $user->hasPermission('projects.view');
+    }
 
     public const TYPE_DOCUMENT = 'document';
 

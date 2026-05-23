@@ -2,16 +2,26 @@
 
 namespace App\Models;
 
+use App\Contracts\HasMediaAuthorization;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class ProjectMilestone extends Model implements HasMedia
+class ProjectMilestone extends Model implements HasMedia, HasMediaAuthorization
 {
     use HasFactory, InteractsWithMedia;
+
+    /**
+     * P-39a: rides on the ProjectManagement page-level gate.
+     */
+    public function canViewMedia(User $user, Media $media): bool
+    {
+        return $user->hasPermission('projects.view');
+    }
 
     protected $fillable = [
         'housing_job_id',

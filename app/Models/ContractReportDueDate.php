@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Contracts\HasMediaAuthorization;
 use App\Traits\Auditable;
 use App\Traits\HasLegacySyncScopes;
 use Carbon\Carbon;
@@ -14,9 +15,18 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class ContractReportDueDate extends Model implements HasMedia
+class ContractReportDueDate extends Model implements HasMedia, HasMediaAuthorization
 {
     use Auditable, HasLegacySyncScopes, InteractsWithMedia, SoftDeletes;
+
+    /**
+     * P-39a: matches ContractManagement / ContractReportDueDateManagement
+     * page-level gate (due_dates.view).
+     */
+    public function canViewMedia(User $user, Media $media): bool
+    {
+        return $user->hasPermission('due_dates.view');
+    }
 
     public const STATUS_OPTIONS = [
         'pending' => 'Pending',

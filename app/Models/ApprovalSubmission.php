@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Contracts\HasMediaAuthorization;
 use App\Traits\Auditable;
 use App\Traits\HasApprovals;
 use App\Traits\HasStandardMediaCollections;
@@ -12,9 +13,23 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class ApprovalSubmission extends Model implements HasMedia
+class ApprovalSubmission extends Model implements HasMedia, HasMediaAuthorization
 {
     use Auditable, HasApprovals, HasFactory, HasStandardMediaCollections, InteractsWithMedia;
+
+    /**
+     * P-39a: submitter sees their own; approvers/admin gated by
+     * `approvals.view_dashboard` (see PendingApprovalsManagement:34,
+     * MyApprovalSubmissions which filters by submitted_by).
+     */
+    public function canViewMedia(User $user, Media $media): bool
+    {
+        if ($this->submitted_by === $user->id) {
+            return true;
+        }
+
+        return $user->hasPermission('approvals.view_dashboard');
+    }
 
     protected $fillable = [
         'approval_type_id',

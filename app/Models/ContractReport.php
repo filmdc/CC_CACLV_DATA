@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
+use App\Contracts\HasMediaAuthorization;
 use App\Traits\Auditable;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,9 +11,17 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class ContractReport extends Model implements HasMedia
+class ContractReport extends Model implements HasMedia, HasMediaAuthorization
 {
-    use SoftDeletes, InteractsWithMedia, Auditable;
+    use Auditable, InteractsWithMedia, SoftDeletes;
+
+    /**
+     * P-39a: matches ContractManagement page-level gate (contract_reports.view).
+     */
+    public function canViewMedia(User $user, Media $media): bool
+    {
+        return $user->hasPermission('contract_reports.view');
+    }
 
     public const STATUS_OPTIONS = [
         'draft' => 'Draft',
@@ -71,7 +79,7 @@ class ContractReport extends Model implements HasMedia
                 'image/jpeg',
                 'image/png',
                 'image/gif',
-                'image/jpg'
+                'image/jpg',
             ])
             ->useDisk('public');
     }
@@ -79,7 +87,7 @@ class ContractReport extends Model implements HasMedia
     /**
      * Register media conversions
      */
-    public function registerMediaConversions(Media $media = null): void
+    public function registerMediaConversions(?Media $media = null): void
     {
         $this->addMediaConversion('thumb')->fit('crop', 150, 150);
         $this->addMediaConversion('preview')->fit('crop', 300, 300);
@@ -100,7 +108,7 @@ class ContractReport extends Model implements HasMedia
     {
         return $this->belongsTo(ContractReportDueDate::class);
     }
-    
+
     /**
      * Get the user who created this report
      */
@@ -119,6 +127,7 @@ class ContractReport extends Model implements HasMedia
 
     /**
      * Get documents attached to this report (legacy accessor)
+     *
      * @deprecated Use getSubmissionsAttribute() instead
      */
     public function getDocumentsAttribute()
@@ -163,7 +172,7 @@ class ContractReport extends Model implements HasMedia
      */
     public function canBeSubmitted(): bool
     {
-        return $this->status === 'draft' && !empty($this->title) && !empty($this->description);
+        return $this->status === 'draft' && ! empty($this->title) && ! empty($this->description);
     }
 
     /**
@@ -171,7 +180,7 @@ class ContractReport extends Model implements HasMedia
      */
     public function submit(): bool
     {
-        if (!$this->canBeSubmitted()) {
+        if (! $this->canBeSubmitted()) {
             return false;
         }
 
@@ -193,20 +202,21 @@ class ContractReport extends Model implements HasMedia
      */
     public function approve(): bool
     {
-        if (!in_array($this->status, ['submitted', 'under_review'])) {
+        if (! in_array($this->status, ['submitted', 'under_review'])) {
             return false;
         }
 
         $this->update(['status' => 'approved']);
+
         return true;
     }
 
     /**
      * Reject the report
      */
-    public function reject(string $reason = null): bool
+    public function reject(?string $reason = null): bool
     {
-        if (!in_array($this->status, ['submitted', 'under_review'])) {
+        if (! in_array($this->status, ['submitted', 'under_review'])) {
             return false;
         }
 
@@ -227,9 +237,9 @@ class ContractReport extends Model implements HasMedia
     /**
      * Request revision for the report
      */
-    public function requestRevision(string $feedback = null): bool
+    public function requestRevision(?string $feedback = null): bool
     {
-        if (!in_array($this->status, ['submitted', 'under_review'])) {
+        if (! in_array($this->status, ['submitted', 'under_review'])) {
             return false;
         }
 

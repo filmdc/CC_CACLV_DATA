@@ -5,9 +5,11 @@ namespace App\Providers;
 use App\Models\Participant;
 use App\Models\ProgramEnrollment;
 use App\Models\ServiceEnrollment;
-use App\Policies\ParticipantPolicy;
 use App\Policies\EnrollmentPolicy;
+use App\Policies\MediaPolicy;
+use App\Policies\ParticipantPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -18,6 +20,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         Participant::class => ParticipantPolicy::class,
+        Media::class => MediaPolicy::class,
         // Note: EnrollmentPolicy handles both ProgramEnrollment and ServiceEnrollment
         // but we register it under the generic class name for manual policy resolution
     ];
