@@ -364,10 +364,10 @@
                                     </div>
                                 @endif
 
-                                @if($viewMode === 'card' && $log->fundCodes->isNotEmpty())
+                                @if($viewMode === 'card' && $log->anticipatedFundCodes->isNotEmpty())
                                     <div class="mt-3 flex flex-wrap items-center gap-2 text-xs" data-card-fund-codes>
                                         <span class="font-medium text-gray-600 dark:text-gray-400">Fund codes:</span>
-                                        @foreach($log->fundCodes as $fundCode)
+                                        @foreach($log->anticipatedFundCodes as $fundCode)
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" title="{{ $fundCode->description }}">
                                                 {{ $fundCode->code }}
                                             </span>
@@ -621,11 +621,11 @@
                 @endif
 
                 <!-- Fund Codes -->
-                @if($viewingLog->fundCodes->isNotEmpty())
+                @if($viewingLog->anticipatedFundCodes->isNotEmpty())
                 <div class="mb-6">
                     <h4 class="font-medium text-gray-900 dark:text-white mb-2">Fund Codes</h4>
                     <div class="flex flex-wrap gap-2">
-                        @foreach($viewingLog->fundCodes as $fundCode)
+                        @foreach($viewingLog->anticipatedFundCodes as $fundCode)
                             <span class="px-3 py-1 text-sm rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">
                                 <span class="font-mono font-semibold">{{ $fundCode->code }}</span>
                                 <span class="opacity-75">– {{ $fundCode->description }}</span>

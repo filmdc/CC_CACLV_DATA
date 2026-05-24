@@ -78,7 +78,7 @@ it('table view clips long summaries; card view shows the full body', function ()
 it('card view surfaces fund-code badges that the table view omits', function () {
     // CL-3 in the fixture has FC-FIX-001 + FC-FIX-002 attached.
     $cl3 = CommunicationLog::where('subject', 'CL-3: Multiple fund codes, not converted')->firstOrFail();
-    expect($cl3->fundCodes()->count())->toBe(2);
+    expect($cl3->anticipatedFundCodes()->count())->toBe(2);
 
     // Table view does NOT render the per-row fund-code badge block —
     // fund codes are only surfaced in the filter dropdown.

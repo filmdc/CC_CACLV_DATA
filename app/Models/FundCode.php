@@ -36,10 +36,16 @@ class FundCode extends Model
         return $this->belongsTo(Contract::class);
     }
 
+    /**
+     * P-39b (addendum D-2): inverse of CommunicationLog::anticipatedFundCodes.
+     * The legacy `communication_log_fund_code` tag pivot was migrated
+     * into `communication_log_anticipated_fund_codes` and then dropped
+     * in the same PR.
+     */
     public function communicationLogs(): BelongsToMany
     {
-        return $this->belongsToMany(CommunicationLog::class, 'communication_log_fund_code')
-            ->withTimestamps();
+        return $this->belongsToMany(CommunicationLog::class, 'communication_log_anticipated_fund_codes')
+            ->withPivot('created_by_user_id', 'created_at');
     }
 
     public function requirements(): HasMany

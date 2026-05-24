@@ -33,6 +33,7 @@ class CommunicationLog extends Model
         'contact_organization',
         'contact_role',
         'subject',
+        'subject_overridden_at',
         'summary',
         'notes',
         'outcome',
@@ -56,6 +57,7 @@ class CommunicationLog extends Model
         'follow_up_completed' => 'boolean',
         'follow_up_completed_at' => 'datetime',
         'converted_at' => 'datetime',
+        'subject_overridden_at' => 'datetime',
     ];
 
     protected $appends = [
@@ -117,11 +119,31 @@ class CommunicationLog extends Model
             ->withTimestamps();
     }
 
-    // Fund codes relationship
-    public function fundCodes(): BelongsToMany
+    /**
+     * P-39b (addendum D-2): authoritative fund-code association on a
+     * CommunicationLog. Replaces the legacy `communication_log_fund_code`
+     * tag pivot, which was dropped in the same PR. Drives
+     * IntakeRequirementInstantiator::forFundCode().
+     */
+    public function anticipatedFundCodes(): BelongsToMany
     {
-        return $this->belongsToMany(FundCode::class, 'communication_log_fund_code')
-            ->withTimestamps();
+        // Pivot has only created_at (no updated_at) — see the migration's
+        // rationale. withTimestamps() is intentionally omitted; callers
+        // that care about audit set created_at + created_by_user_id
+        // explicitly (see IntakeRequirementInstantiator::reconcileAnticipatedFundCodes).
+        return $this->belongsToMany(FundCode::class, 'communication_log_anticipated_fund_codes')
+            ->withPivot('created_by_user_id', 'created_at');
+    }
+
+    /**
+     * P-39b: intake-phase requirements on this CommunicationLog.
+     * Independent lifecycle from project-execution Requirements; see
+     * IntakeRequirementInstantiator and the "Intake vs. Project
+     * requirements" section of CLAUDE.md.
+     */
+    public function intakeRequirements(): HasMany
+    {
+        return $this->hasMany(IntakeRequirement::class);
     }
 
     // New relationship for updates/follow-ups
@@ -433,8 +455,9 @@ class CommunicationLog extends Model
                 ->orWhere('contact_phone', 'like', "%{$search}%")
                 ->orWhere('contact_address', 'like', "%{$search}%")
                 ->orWhere('contact_city', 'like', "%{$search}%")
-                // P-02: also match logs by their attached fund codes.
-                ->orWhereHas('fundCodes', function ($fq) use ($search) {
+                // P-02: also match logs by their anticipated fund codes.
+                // (Relation renamed in P-39b — see addendum D-2.)
+                ->orWhereHas('anticipatedFundCodes', function ($fq) use ($search) {
                     $fq->where('code', 'like', "%{$search}%")
                         ->orWhere('description', 'like', "%{$search}%");
                 });

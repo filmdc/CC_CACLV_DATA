@@ -21,6 +21,7 @@ class FundCodeRequirement extends Model
         'type',
         'is_hard_requirement',
         'sort_order',
+        'phase',
     ];
 
     protected $casts = [

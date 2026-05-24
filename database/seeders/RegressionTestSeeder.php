@@ -26,6 +26,7 @@ class RegressionTestSeeder extends Seeder
             CommunicationsLogPermissionsSeeder::class,
             FundCodePermissionsSeeder::class,
             ProjectHousingPermissionsSeeder::class,
+            IntakeRequirementsPermissionsSeeder::class,
         ]);
 
         $program = Program::factory()->create([
@@ -182,7 +183,7 @@ class RegressionTestSeeder extends Seeder
             'contact_last_name' => 'Fixture',
             'contact_phone' => '555-555-0202',
         ]);
-        $cl2->fundCodes()->attach($fcA1->id);
+        $cl2->anticipatedFundCodes()->attach($fcA1->id);
 
         $cl3 = CommunicationLog::factory()->create([
             'communication_date' => '2026-03-03 09:00:00',
@@ -198,7 +199,7 @@ class RegressionTestSeeder extends Seeder
             'contact_last_name' => 'Fixture',
             'contact_phone' => '555-555-0203',
         ]);
-        $cl3->fundCodes()->attach([$fcA1->id, $fcA2->id]);
+        $cl3->anticipatedFundCodes()->attach([$fcA1->id, $fcA2->id]);
 
         // HJ-1 — converted from CL-4, status pending.
         $hj1 = HousingJob::factory()->create([
@@ -235,7 +236,7 @@ class RegressionTestSeeder extends Seeder
             'contact_last_name' => 'Fixture',
             'contact_phone' => '555-555-0204',
         ]);
-        $cl4->fundCodes()->attach($fcStandalone->id);
+        $cl4->anticipatedFundCodes()->attach($fcStandalone->id);
 
         // Attach FC-FIX-003 directly to HJ-1 via the fund_code_housing_job
         // pivot. In production, this is what the backfill migration writes

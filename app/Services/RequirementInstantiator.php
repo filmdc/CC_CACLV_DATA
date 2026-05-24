@@ -45,7 +45,10 @@ class RequirementInstantiator
 
         $created = collect();
 
-        foreach ($fundCode->requirements()->ordered()->get() as $template) {
+        // P-39b (addendum D-1): project-execution requirements draw only
+        // from project-phase templates. Eligibility-phase templates are
+        // intake-only and flow through IntakeRequirementInstantiator.
+        foreach ($fundCode->requirements()->where('phase', 'project')->ordered()->get() as $template) {
             if (in_array($template->id, $existingTemplateIds, true)) {
                 continue;
             }

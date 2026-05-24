@@ -712,7 +712,7 @@ class CommunicationsLogManagement extends Component
         $this->follow_up_action = $log->follow_up_action ?? '';
         $this->selectedServices = $log->services->pluck('id')->toArray();
         $this->selectedTagIds = $log->tags->pluck('id')->toArray();
-        $this->selectedFundCodeIds = $log->fundCodes->pluck('id')->toArray();
+        $this->selectedFundCodeIds = $log->anticipatedFundCodes->pluck('id')->toArray();
         $this->create_project_enrollment = false; // Always false when editing
 
         $this->showForm = true;
@@ -1727,8 +1727,8 @@ class CommunicationsLogManagement extends Component
             // Sync tags
             $log->syncTags($this->selectedTagIds);
 
-            // Sync fund codes
-            $log->fundCodes()->sync($this->selectedFundCodeIds);
+            // Sync anticipated fund codes (P-39b: legacy tag pivot dropped).
+            $log->anticipatedFundCodes()->sync($this->selectedFundCodeIds);
 
             session()->flash('success', 'Communication log updated successfully.');
         } else {
@@ -1742,8 +1742,8 @@ class CommunicationsLogManagement extends Component
             // Attach tags
             $log->syncTags($this->selectedTagIds);
 
-            // Attach fund codes
-            $log->fundCodes()->sync($this->selectedFundCodeIds);
+            // Attach anticipated fund codes (P-39b: legacy tag pivot dropped).
+            $log->anticipatedFundCodes()->sync($this->selectedFundCodeIds);
 
             session()->flash('success', 'Communication log created successfully.');
         }
@@ -1978,10 +1978,11 @@ class CommunicationsLogManagement extends Component
 
     public function render()
     {
-        // Eager-load fundCodes alongside the existing relations so the
-        // card view can render fund-code badges per row without N+1.
+        // Eager-load anticipatedFundCodes alongside the existing relations
+        // so the card view can render fund-code badges per row without N+1.
         // Cheap on table view too (typically 0–3 codes per log).
-        $query = CommunicationLog::with(['participant', 'household', 'property', 'contractor', 'createdBy', 'services', 'tags', 'convertedToJob', 'fundCodes'])
+        // (Relation renamed in P-39b — addendum D-2 — from the legacy tag pivot.)
+        $query = CommunicationLog::with(['participant', 'household', 'property', 'contractor', 'createdBy', 'services', 'tags', 'convertedToJob', 'anticipatedFundCodes'])
             ->orderBy('communication_date', 'desc');
 
         if ($this->search) {
@@ -2055,7 +2056,7 @@ class CommunicationsLogManagement extends Component
 
         // P-03 (Phase 3B): fund code multi-select.
         if (! empty($this->fundCodeFilter)) {
-            $query->whereHas('fundCodes', fn ($q) => $q->whereIn('fund_codes.id', $this->fundCodeFilter));
+            $query->whereHas('anticipatedFundCodes', fn ($q) => $q->whereIn('fund_codes.id', $this->fundCodeFilter));
         }
 
         if ($this->dateFrom) {
@@ -2168,7 +2169,7 @@ class CommunicationsLogManagement extends Component
                 'updatedBy',
                 'services',
                 'tags',
-                'fundCodes',
+                'anticipatedFundCodes',
                 'updates.createdBy',
                 'convertedToJob',
                 'convertedBy',

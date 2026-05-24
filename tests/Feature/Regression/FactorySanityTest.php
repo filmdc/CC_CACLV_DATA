@@ -60,8 +60,8 @@ it('RegressionTestSeeder runs and produces the expected fixture shape', function
     // Fund code attachment counts.
     $cl2 = CommunicationLog::where('subject', 'like', 'CL-2:%')->first();
     $cl3 = CommunicationLog::where('subject', 'like', 'CL-3:%')->first();
-    expect($cl2->fundCodes)->toHaveCount(1)
-        ->and($cl3->fundCodes)->toHaveCount(2);
+    expect($cl2->anticipatedFundCodes)->toHaveCount(1)
+        ->and($cl3->anticipatedFundCodes)->toHaveCount(2);
 
     // Running-total target: HJ-4 Roofing expenses sum to 7000.
     $hj4 = HousingJob::where('job_number', 'JOB-FIX-00004')->first();
