@@ -99,6 +99,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('reports', App\Livewire\ReportingManagement::class)->name('reports');
     Route::get('communications-log', App\Livewire\CommunicationsLogManagement::class)->name('communications-log.management');
     Route::get('fund-codes', App\Livewire\FundCodeManagement::class)->name('fund-codes.management');
+    Route::get('requirements-library', App\Livewire\RequirementsLibraryManagement::class)
+        ->middleware('permission:requirements_library.view')
+        ->name('requirements-library.management');
 
     // Feedback Routes
     Route::get('admin/feedback', App\Livewire\FeedbackManagement::class)

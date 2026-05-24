@@ -27,6 +27,7 @@ class RegressionTestSeeder extends Seeder
             FundCodePermissionsSeeder::class,
             ProjectHousingPermissionsSeeder::class,
             IntakeRequirementsPermissionsSeeder::class,
+            RequirementsLibraryPermissionsSeeder::class,
         ]);
 
         $program = Program::factory()->create([
