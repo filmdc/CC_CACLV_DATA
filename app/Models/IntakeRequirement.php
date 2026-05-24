@@ -209,17 +209,29 @@ class IntakeRequirement extends Model
      */
     public function markReceived(User $actor, ?string $notes = null): void
     {
+        $previous = $this->status;
+
         if ($this->status !== self::STATUS_RECEIVED) {
             $this->received_at = now();
             $this->received_by_user_id = $actor->id;
         }
 
-        $this->status = self::STATUS_RECEIVED;
         if ($notes !== null && $notes !== '') {
             $this->notes = $this->appendNote($this->notes, $notes);
         }
-        $this->updated_by_user_id = $actor->id;
-        $this->save();
+        $this->applyTransition(self::STATUS_RECEIVED, $actor, $previous);
+    }
+
+    /**
+     * Move to "requested" — we have asked the client, awaiting return.
+     */
+    public function markRequested(User $actor, ?string $note = null): void
+    {
+        $previous = $this->status;
+        if ($note !== null && $note !== '') {
+            $this->notes = $this->appendNote($this->notes, $note);
+        }
+        $this->applyTransition(self::STATUS_REQUESTED, $actor, $previous);
     }
 
     /**
@@ -234,29 +246,108 @@ class IntakeRequirement extends Model
             throw new \InvalidArgumentException('A reason is required to waive an intake requirement.');
         }
 
-        $this->status = self::STATUS_WAIVED;
+        $previous = $this->status;
         $this->received_at = now();
         $this->received_by_user_id = $actor->id;
         $this->notes = $this->appendNote($this->notes, '[WAIVED] '.$reason);
-        $this->updated_by_user_id = $actor->id;
-        $this->save();
+        $this->applyTransition(self::STATUS_WAIVED, $actor, $previous, '[WAIVED] '.$reason);
     }
 
     /**
-     * Revert to outstanding. Clears the receipt stamp and appends a
+     * Mark not applicable — the requirement doesn't apply to this case.
+     * Reason required and appended to notes; counts toward the gate as
+     * "met". received_at left null (this isn't a closure-with-receipt).
+     */
+    public function markNotApplicable(User $actor, string $reason): void
+    {
+        if (trim($reason) === '') {
+            throw new \InvalidArgumentException('A reason is required to mark a requirement N/A.');
+        }
+
+        $previous = $this->status;
+        $this->notes = $this->appendNote($this->notes, '[N/A] '.$reason);
+        $this->applyTransition(self::STATUS_NA, $actor, $previous, '[N/A] '.$reason);
+    }
+
+    /**
+     * System-only: an external check (kind=external) is in flight. Used
+     * by the PHFA / partner check workflow per spec §5.7. Not a user-
+     * driven action — exposed publicly so the instantiator can call it.
+     */
+    public function markBlocked(User $actor, ?string $note = null): void
+    {
+        $previous = $this->status;
+        if ($note !== null && $note !== '') {
+            $this->notes = $this->appendNote($this->notes, $note);
+        }
+        $this->applyTransition(self::STATUS_BLOCKED, $actor, $previous);
+    }
+
+    /**
+     * Revert to pending. Clears the receipt stamp and appends a
      * [REOPENED ...] audit line to notes (matches Requirement::reopen
      * audit pattern at Requirement.php:279-299).
      */
     public function reopen(User $actor): void
     {
+        $previous = $this->status;
         $stamp = '[REOPENED by '.$actor->name.' on '.now()->toDateTimeString().']';
 
-        $this->status = self::STATUS_OUTSTANDING;
         $this->received_at = null;
         $this->received_by_user_id = null;
         $this->notes = $this->appendNote($this->notes, $stamp);
+        $this->applyTransition(self::STATUS_PENDING, $actor, $previous, $stamp);
+    }
+
+    /**
+     * Shared transition path. Stamps status + audit columns, writes a
+     * `status_change` CommunicationLogUpdate on the parent log so the
+     * Activity feed reads as the audit trail (per spec §5.7), and saves.
+     *
+     * Skips the activity-update side-effect when the status didn't
+     * actually change (re-marking the same status is a no-op for audit
+     * purposes — only `notes` etc. get updated).
+     */
+    protected function applyTransition(string $newStatus, User $actor, ?string $previous, ?string $extraNote = null): void
+    {
+        $this->status = $newStatus;
+        $this->status_changed_at = now();
+        $this->status_changed_by_user_id = $actor->id;
         $this->updated_by_user_id = $actor->id;
         $this->save();
+
+        if ($previous === $newStatus) {
+            return;
+        }
+
+        $log = $this->communicationLog()->first();
+        if ($log === null) {
+            return;
+        }
+
+        $label = $this->label ?: ('Requirement #'.$this->id);
+        $msg = "Requirement \"{$label}\" → ".self::statusDisplay($newStatus);
+        if ($previous) {
+            $msg = "Requirement \"{$label}\": ".self::statusDisplay($previous).' → '.self::statusDisplay($newStatus);
+        }
+        if ($extraNote !== null && $extraNote !== '') {
+            $msg .= ' ('.$extraNote.')';
+        }
+
+        $log->addUpdate($msg, 'status_change', $actor->id);
+    }
+
+    public static function statusDisplay(string $status): string
+    {
+        return match ($status) {
+            self::STATUS_PENDING   => 'Pending',
+            self::STATUS_REQUESTED => 'Requested',
+            self::STATUS_RECEIVED  => 'Received',
+            self::STATUS_WAIVED    => 'Waived',
+            self::STATUS_NA        => 'N/A',
+            self::STATUS_BLOCKED   => 'Blocked',
+            default                => ucfirst($status),
+        };
     }
 
     /**
