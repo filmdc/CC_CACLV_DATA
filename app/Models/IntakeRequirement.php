@@ -35,11 +35,30 @@ class IntakeRequirement extends Model
 
     public const TYPE_TASK = 'task';
 
-    public const STATUS_OUTSTANDING = 'outstanding';
+    // 6-state lifecycle (Comm Log v2 / Option A). The legacy
+    // STATUS_OUTSTANDING was backfilled to STATUS_PENDING in migration
+    // 2026_05_24_100005 and is no longer accepted by the column enum.
+    public const STATUS_PENDING = 'pending';
+
+    public const STATUS_REQUESTED = 'requested';
 
     public const STATUS_RECEIVED = 'received';
 
     public const STATUS_WAIVED = 'waived';
+
+    public const STATUS_NA = 'na';
+
+    public const STATUS_BLOCKED = 'blocked';
+
+    /** @deprecated kept for back-compat with P-39b code paths during migration. */
+    public const STATUS_OUTSTANDING = self::STATUS_PENDING;
+
+    /** Statuses that count toward the Convert-to-Project requirements gate. */
+    public const MET_STATUSES = [
+        self::STATUS_RECEIVED,
+        self::STATUS_WAIVED,
+        self::STATUS_NA,
+    ];
 
     public const SOURCE_BASELINE = 'baseline';
 
@@ -47,15 +66,36 @@ class IntakeRequirement extends Model
 
     public const SOURCE_AD_HOC = 'ad_hoc';
 
+    public const SOURCE_TEMPLATE_SET = 'template_set';
+
+    public const SOURCE_DEFINITION = 'definition';
+
+    // Atom kinds (snapshot copy of RequirementDefinition::KIND_*).
+    public const KIND_DOC = 'doc';
+
+    public const KIND_FORM = 'form';
+
+    public const KIND_DATA = 'data';
+
+    public const KIND_VERIFY = 'verify';
+
+    public const KIND_EXTERNAL = 'external';
+
     protected $fillable = [
         'communication_log_id',
         'type',
         'label',
+        'key',
+        'kind',
+        'via',
         'status',
         'received_at',
         'received_by_user_id',
+        'status_changed_at',
+        'status_changed_by_user_id',
         'source_type',
         'source_template_id',
+        'source_definition_id',
         'source_label_snapshot',
         'is_orphaned',
         'notes',
@@ -65,8 +105,15 @@ class IntakeRequirement extends Model
 
     protected $casts = [
         'received_at' => 'datetime',
+        'status_changed_at' => 'datetime',
         'is_orphaned' => 'boolean',
+        'via' => 'array',
     ];
+
+    public function isMet(): bool
+    {
+        return in_array($this->status, self::MET_STATUSES, true);
+    }
 
     // Relationships
 
@@ -88,6 +135,16 @@ class IntakeRequirement extends Model
     public function updatedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'updated_by_user_id');
+    }
+
+    public function statusChangedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'status_changed_by_user_id');
+    }
+
+    public function definition(): BelongsTo
+    {
+        return $this->belongsTo(RequirementDefinition::class, 'source_definition_id');
     }
 
     // Scopes
