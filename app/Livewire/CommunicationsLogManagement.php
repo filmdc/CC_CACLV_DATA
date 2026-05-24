@@ -145,6 +145,22 @@ class CommunicationsLogManagement extends Component
     // Form fields
     public $housing_job_id = '';
 
+    // v2 state machine: 'intake' (no project) | 'project' (attached).
+    // Derived from housing_job_id at form-open; explicit user intent via
+    // the anchor radio at the top of the v2 edit form.
+    public string $anchor = 'intake';
+
+    // v2: opt-in reveal of fund codes / services in INTAKE state. Per
+    // spec §4.1, those sections are hidden by default in INTAKE and
+    // accessed via a single "show" link.
+    public bool $showFundCodesInIntake = false;
+
+    public bool $showServicesInIntake = false;
+
+    // v2 project picker (⌘P): search-bound by the parent so the picker
+    // can render filtered results without owning Livewire state itself.
+    public string $projectPickerSearch = '';
+
     public $participant_id = '';
 
     public $household_id = '';
@@ -675,7 +691,62 @@ class CommunicationsLogManagement extends Component
         $this->authorizeAction('communications_log.create');
         $this->resetForm();
         $this->communication_date = now()->format('Y-m-d');
+        $this->anchor = 'intake'; // new entries default to general intake
         $this->showForm = true;
+    }
+
+    /**
+     * v2 state machine: derive the form's composition state from the
+     * presence of housing_job_id. 'intake' hides fund codes + services
+     * by default (per spec §4.1); 'project' scopes them to the project.
+     */
+    public function getStateProperty(): string
+    {
+        return ! empty($this->housing_job_id) ? 'project' : 'intake';
+    }
+
+    /**
+     * Anchor radio handler. 'intake' clears the project and snaps the
+     * form to INTAKE; 'project' opens the picker so the user can choose.
+     */
+    public function setAnchor(string $value): void
+    {
+        if ($value === 'intake') {
+            $this->housing_job_id = '';
+            $this->anchor = 'intake';
+            $this->showFundCodesInIntake = false;
+            $this->showServicesInIntake = false;
+        } elseif ($value === 'project') {
+            $this->anchor = 'project';
+            // If no project yet, open the picker so the user can choose.
+            if (empty($this->housing_job_id)) {
+                $this->dispatch('open-project-picker');
+            }
+        }
+    }
+
+    /**
+     * Called by the x-comm.project-picker when the user picks a row.
+     * Passing null is the "General intake" sentinel that detaches.
+     */
+    public function selectProject(?int $id): void
+    {
+        $this->housing_job_id = $id ?: '';
+        $this->anchor = $id ? 'project' : 'intake';
+        if (! $id) {
+            $this->showFundCodesInIntake = false;
+            $this->showServicesInIntake = false;
+        }
+    }
+
+    public function revealFundCodes(): void
+    {
+        $this->showFundCodesInIntake = true;
+    }
+
+    public function revealServices(): void
+    {
+        $this->showServicesInIntake = true;
     }
 
     public function showEditForm($id)
@@ -685,6 +756,10 @@ class CommunicationsLogManagement extends Component
 
         $this->editingId = $id;
         $this->housing_job_id = $log->housing_job_id ?? '';
+        // v2: derive anchor from the loaded log's project linkage.
+        $this->anchor = $log->housing_job_id ? 'project' : 'intake';
+        $this->showFundCodesInIntake = false;
+        $this->showServicesInIntake = false;
         $this->participant_id = $log->participant_id ?? '';
         $this->household_id = $log->household_id ?? '';
         $this->property_id = $log->property_id ?? '';
@@ -1921,6 +1996,11 @@ class CommunicationsLogManagement extends Component
     {
         $this->editingId = null;
         $this->housing_job_id = '';
+        // v2 state-machine resets
+        $this->anchor = 'intake';
+        $this->showFundCodesInIntake = false;
+        $this->showServicesInIntake = false;
+        $this->projectPickerSearch = '';
         $this->participant_id = '';
         $this->household_id = '';
         $this->property_id = '';
@@ -2190,6 +2270,37 @@ class CommunicationsLogManagement extends Component
         // Get active fund codes for selection
         $allFundCodes = FundCode::active()->orderBy('code')->get();
 
+        // v2 project picker: filtered + shaped for x-comm.project-picker.
+        $pickerProjects = HousingJob::query()
+            ->select('id', 'job_number', 'job_title', 'status', 'updated_at')
+            ->when($this->projectPickerSearch !== '', function ($q) {
+                $term = '%'.$this->projectPickerSearch.'%';
+                $q->where(function ($qq) use ($term) {
+                    $qq->where('job_number', 'like', $term)
+                       ->orWhere('job_title', 'like', $term);
+                });
+            })
+            ->whereIn('status', ['pending', 'in_progress', 'on_hold'])
+            ->orderByDesc('updated_at')
+            ->limit(20)
+            ->get()
+            ->map(fn ($j) => [
+                'id'         => $j->id,
+                'code'       => $j->job_number,
+                'name'       => $j->job_title,
+                'meta'       => 'Status: '.ucwords(str_replace('_', ' ', $j->status)).' · updated '.$j->updated_at->diffForHumans(),
+            ])
+            ->all();
+
+        // v2 requirements pill / panel: load current intake requirements for the
+        // editing entry (or empty when creating).
+        $currentRequirements = $this->editingId
+            ? \App\Models\IntakeRequirement::query()
+                ->where('communication_log_id', $this->editingId)
+                ->where('is_orphaned', false)
+                ->get()
+            : collect();
+
         return view('livewire.communications-log-management', [
             'logs' => $logs,
             'pendingFollowUps' => $pendingFollowUps,
@@ -2207,6 +2318,8 @@ class CommunicationsLogManagement extends Component
             'viewingLog' => $viewingLog,
             'housingJobs' => $housingJobs,
             'allFundCodes' => $allFundCodes,
+            'pickerProjects' => $pickerProjects,
+            'currentRequirements' => $currentRequirements,
         ]);
     }
 }

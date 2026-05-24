@@ -1064,6 +1064,63 @@
                     {{ $editingId ? 'Edit Communication' : 'New Communication Entry' }}
                 </h3>
 
+                {{-- v2 anchor selector / project banner ─────────────────── --}}
+                @if($this->state === 'intake')
+                    {{-- INTAKE: two radio cards at top per spec §4.1 --}}
+                    <div class="grid grid-cols-2 gap-3 mb-5">
+                        <button type="button" wire:click="setAnchor('intake')"
+                                class="text-left p-3 rounded-md border-2 {{ $anchor === 'intake' ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30' : 'border-gray-200 dark:border-zinc-600 bg-white dark:bg-zinc-700' }}">
+                            <div class="flex items-center gap-2">
+                                <input type="radio" @checked($anchor === 'intake') class="text-indigo-600 focus:ring-indigo-500" readonly>
+                                <span class="font-medium text-gray-900 dark:text-white">General intake</span>
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1.5 pl-6">
+                                Log an interaction not (yet) tied to a project — outreach, partner call, exploratory inquiry.
+                            </p>
+                        </button>
+                        <button type="button" wire:click="setAnchor('project')"
+                                class="text-left p-3 rounded-md border-2 border-gray-200 dark:border-zinc-600 bg-white dark:bg-zinc-700 hover:border-teal-500">
+                            <div class="flex items-center gap-2">
+                                <input type="radio" class="text-teal-600 focus:ring-teal-500" readonly>
+                                <span class="font-medium text-gray-900 dark:text-white">Attach to project</span>
+                                <span class="ml-auto text-[10px] uppercase tracking-wider text-gray-500 dark:text-gray-400">⌘P</span>
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1.5 pl-6">
+                                Pick an existing project; fund codes and program services scope to it.
+                            </p>
+                        </button>
+                    </div>
+                @else
+                    {{-- PROJECT: teal sticky banner per spec §4.2 --}}
+                    @php
+                        $linkedJob = $housingJobs->firstWhere('id', (int) $housing_job_id);
+                    @endphp
+                    @if($linkedJob)
+                        <div class="mb-5 flex items-center gap-3 px-4 py-3 rounded-md bg-teal-700 text-white shadow">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-sm bg-white/15 font-mono text-xs">{{ $linkedJob->job_number }}</span>
+                            <div class="min-w-0 flex-1">
+                                <div class="text-[10px] uppercase tracking-wider text-white/70">Project</div>
+                                <div class="text-sm font-medium truncate">{{ $linkedJob->job_title }}</div>
+                            </div>
+                            <button type="button" x-on:click="$dispatch('open-project-picker')"
+                                    class="text-xs underline underline-offset-2 hover:text-white/80">
+                                Change
+                            </button>
+                            <button type="button" wire:click="setAnchor('intake')"
+                                    class="text-xs underline underline-offset-2 hover:text-white/80">
+                                Detach
+                            </button>
+                        </div>
+                    @endif
+                @endif
+
+                {{-- v2 requirements summary pill (visible whenever there are requirements) --}}
+                @if($editingId && $currentRequirements->isNotEmpty())
+                    <div class="mb-5">
+                        <x-comm.requirements-summary-pill :items="$currentRequirements" />
+                    </div>
+                @endif
+
                 <!-- Validation Errors Display -->
                 @if ($errors->any())
                     <div class="mb-4 p-4 bg-red-50 dark:bg-red-900/50 border border-red-200 dark:border-red-700 rounded-md">
@@ -1216,6 +1273,9 @@
                         </select>
                     </div>
 
+                    {{-- v2: legacy dropdown hidden — anchor selector / picker is the new UI.
+                         Kept in the DOM (inside the `@if`) so wire:model binding survives. --}}
+                    @if(false)
                     <!-- Related to a Project? -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Related to a Project?</label>
@@ -1236,6 +1296,7 @@
                             @endforeach
                         </select>
                     </div>
+                    @endif
 
                     <!-- Contact First Name -->
                     <div>
@@ -1444,8 +1505,8 @@
                         </div>
                     </div>
 
-                    <!-- Service Association Section -->
-                    @if($accessiblePrograms->isNotEmpty())
+                    <!-- Service Association Section (v2: hidden by default in INTAKE) -->
+                    @if($accessiblePrograms->isNotEmpty() && ($this->state === 'project' || $showServicesInIntake))
                     <div class="md:col-span-2 border-t border-gray-200 dark:border-zinc-600 pt-4 mt-2">
                         <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Associate with Program Services (Optional)</h4>
                         <div class="space-y-3">
@@ -1518,8 +1579,26 @@
                         </div>
                     </div>
 
-                    <!-- Fund Codes Section -->
-                    @if($allFundCodes->isNotEmpty())
+                    <!-- Fund Codes Section (v2: hidden by default in INTAKE; reveal via link below) -->
+                    @if($this->state === 'intake' && ! $showFundCodesInIntake && $allFundCodes->isNotEmpty())
+                        <div class="md:col-span-2 border-t border-gray-200 dark:border-zinc-600 pt-4 mt-2">
+                            <button type="button" wire:click="revealFundCodes"
+                                    class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
+                                + Show fund codes
+                            </button>
+                            @if(! $showServicesInIntake && $accessiblePrograms->isNotEmpty())
+                                <span class="mx-2 text-gray-300 dark:text-zinc-600">·</span>
+                                <button type="button" wire:click="revealServices"
+                                        class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
+                                    + Show program services
+                                </button>
+                            @endif
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                Hidden by default on intake entries. Reveal if you need to anticipate fund-code or service tags before promoting to a project.
+                            </p>
+                        </div>
+                    @endif
+                    @if($allFundCodes->isNotEmpty() && ($this->state === 'project' || $showFundCodesInIntake))
                     <div class="md:col-span-2 border-t border-gray-200 dark:border-zinc-600 pt-4 mt-2">
                         <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Fund Codes (Optional)</h4>
                         <div class="flex flex-wrap gap-2">
@@ -1557,5 +1636,12 @@
                 </div>
             </div>
         </div>
+
+        {{-- v2 project picker mount — listens for `open-project-picker` and
+             ⌘P/⌃P globally; calls back to selectProject($id|null). --}}
+        <x-comm.project-picker
+            :projects="$pickerProjects"
+            search-model="projectPickerSearch"
+            select-method="selectProject" />
     @endif
 </div>
