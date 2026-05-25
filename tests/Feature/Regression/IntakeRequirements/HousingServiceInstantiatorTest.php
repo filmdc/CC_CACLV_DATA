@@ -21,13 +21,12 @@ beforeEach(function () {
     $this->service = app(IntakeRequirementInstantiator::class);
 });
 
-it('forHousingService stamps atoms from linked bundles', function () {
+it('forHousingService stamps atoms attached directly to the service (Phase 10: bundle path removed)', function () {
     $log = CommunicationLog::factory()->create();
     $svc = HousingService::factory()->create();
     $atom = RequirementDefinition::factory()->create(['key' => 'photo-id']);
-    $bundle = RequirementTemplateSet::factory()->create();
-    $bundle->items()->attach($atom->id, ['position' => 0]);
-    $svc->templateSets()->attach($bundle->id, ['created_at' => now()]);
+    // Phase 10: atoms link directly to the service, no bundle wrapper.
+    $svc->requirementDefinitions()->attach($atom->id, ['created_at' => now()]);
 
     $result = $this->service->forHousingService($log, $svc, $this->actor);
 
@@ -69,9 +68,7 @@ it('forHousingService is idempotent — re-running merges via tags', function ()
     $log = CommunicationLog::factory()->create();
     $svc = HousingService::factory()->create();
     $atom = RequirementDefinition::factory()->create(['key' => 'photo-id']);
-    $bundle = RequirementTemplateSet::factory()->create();
-    $bundle->items()->attach($atom->id, ['position' => 0]);
-    $svc->templateSets()->attach($bundle->id, ['created_at' => now()]);
+    $svc->requirementDefinitions()->attach($atom->id, ['created_at' => now()]);
 
     $this->service->forHousingService($log, $svc, $this->actor);
     $this->service->forHousingService($log, $svc, $this->actor);

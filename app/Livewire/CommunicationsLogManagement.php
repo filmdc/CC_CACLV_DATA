@@ -1522,9 +1522,19 @@ class CommunicationsLogManagement extends Component
             // v2 (Phase 7): requirements gate — block conversion if any
             // required-and-non-orphaned intake requirement is unmet AND
             // the user did not tick the audit-logged override.
+            // Phase 10: only Phase-1 categories block promotion;
+            // service-delivery-compliance items are evaluated on the
+            // project page after conversion.
             $unmetCount = $log->intakeRequirements()
                 ->where('is_orphaned', false)
                 ->whereNotIn('status', \App\Models\IntakeRequirement::MET_STATUSES)
+                ->with('definition')
+                ->get()
+                ->filter(fn ($r) => in_array(
+                    $r->definition?->category ?? \App\Models\RequirementDefinition::CATEGORY_ELIGIBILITY,
+                    \App\Models\RequirementDefinition::PHASE_1_CATEGORIES,
+                    true
+                ))
                 ->count();
 
             if ($unmetCount > 0 && ! $this->requirementOverride) {
@@ -2522,12 +2532,22 @@ class CommunicationsLogManagement extends Component
             ->all();
 
         // v2 requirements pill / panel: load current intake requirements for the
-        // editing entry (or empty when creating).
+        // editing entry (or empty when creating). Phase 10: filter to Phase 1
+        // (eligibility + compliance) — intake-phase. Service-delivery-
+        // compliance items still exist on the row but surface on the project
+        // page after Convert-to-Project.
         $currentRequirements = $this->editingId
             ? \App\Models\IntakeRequirement::query()
                 ->where('communication_log_id', $this->editingId)
                 ->where('is_orphaned', false)
+                ->with('definition')
                 ->get()
+                ->filter(fn ($r) => in_array(
+                    $r->definition?->category ?? \App\Models\RequirementDefinition::CATEGORY_ELIGIBILITY,
+                    \App\Models\RequirementDefinition::PHASE_1_CATEGORIES,
+                    true
+                ))
+                ->values()
             : collect();
 
         return view('livewire.communications-log-management', [

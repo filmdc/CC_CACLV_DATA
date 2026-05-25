@@ -60,6 +60,22 @@ class FundCode extends Model
             ->orderBy('id');
     }
 
+    /**
+     * Phase 10: atom-library requirements attached directly to this fund
+     * code (the new path that replaces the bundle abstraction). When the
+     * fund code is anticipated on a Comm Log, each linked atom is
+     * stamped as an IntakeRequirement with via:'fund:N'.
+     */
+    public function requirementDefinitions(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            RequirementDefinition::class,
+            'fund_code_requirement_definitions',
+            'fund_code_id',
+            'requirement_definition_id'
+        )->withPivot('created_by_user_id', 'created_at');
+    }
+
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');

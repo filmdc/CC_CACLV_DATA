@@ -5,7 +5,9 @@ namespace App\Livewire;
 use App\Models\Contract;
 use App\Models\FundCode;
 use App\Models\FundCodeRequirement;
+use App\Models\HousingService;
 use App\Models\Requirement;
+use App\Models\RequirementDefinition;
 use App\Traits\WithPermissionChecks;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -15,10 +17,37 @@ class FundCodeManagement extends Component
 {
     use WithPagination, WithPermissionChecks;
 
+    // Phase 10: top-level tab on the page — 'fund_codes' | 'housing_services'.
+    public string $activeTab = 'fund_codes';
+
     // Search and Filters
     public $search = '';
 
     public $activeFilter = '';
+
+    // ── Phase 10: per-fund-code atom attachment modal ─────────────
+    public bool $showAtomLinkModal = false;
+
+    public ?int $atomLinkFundCodeId = null;
+
+    public array $atomLinkSelectedIds = [];
+
+    // ── Phase 10: housing-services tab state ──────────────────────
+    public bool $showServiceForm = false;
+
+    public ?int $serviceFormId = null;
+
+    public string $serviceName = '';
+
+    public string $serviceDescription = '';
+
+    public bool $serviceActive = true;
+
+    public ?int $editingServiceId = null;
+
+    public array $serviceLinkedFundCodeIds = [];
+
+    public array $serviceLinkedAtomIds = [];
 
     // Form state
     public $showForm = false;
@@ -54,7 +83,20 @@ class FundCodeManagement extends Component
     protected $queryString = [
         'search' => ['except' => ''],
         'activeFilter' => ['except' => ''],
+        'activeTab' => ['as' => 'tab', 'except' => 'fund_codes'],
+        'editingServiceId' => ['as' => 'service'],
     ];
+
+    public function setTab(string $tab): void
+    {
+        if (! in_array($tab, ['fund_codes', 'housing_services'], true)) {
+            return;
+        }
+        $this->activeTab = $tab;
+        $this->resetPage();
+        $this->search = '';
+        $this->editingServiceId = null;
+    }
 
     public function mount()
     {
@@ -379,6 +421,186 @@ class FundCodeManagement extends Component
         $this->showRequirementForm = false;
     }
 
+    // ─────────────────────────────────────────────────────────────
+    // Phase 10: per-fund-code atom attachment (replaces the bundle path).
+    // ─────────────────────────────────────────────────────────────
+
+    public function openAtomLinkModal(int $fundCodeId): void
+    {
+        $this->authorizeAction('fund_codes.edit');
+        $fc = FundCode::with('requirementDefinitions')->findOrFail($fundCodeId);
+        $this->atomLinkFundCodeId = $fc->id;
+        $this->atomLinkSelectedIds = $fc->requirementDefinitions->pluck('id')->all();
+        $this->showAtomLinkModal = true;
+    }
+
+    public function closeAtomLinkModal(): void
+    {
+        $this->showAtomLinkModal = false;
+        $this->atomLinkFundCodeId = null;
+        $this->atomLinkSelectedIds = [];
+    }
+
+    public function toggleAtomLink(int $atomId): void
+    {
+        $current = array_map('intval', $this->atomLinkSelectedIds);
+        if (in_array($atomId, $current, true)) {
+            $this->atomLinkSelectedIds = array_values(array_filter($current, fn ($v) => $v !== $atomId));
+        } else {
+            $this->atomLinkSelectedIds = [...$current, $atomId];
+        }
+    }
+
+    public function saveAtomLinks(): void
+    {
+        $this->authorizeAction('fund_codes.edit');
+        if (! $this->atomLinkFundCodeId) {
+            return;
+        }
+        $fc = FundCode::findOrFail($this->atomLinkFundCodeId);
+        $payload = collect($this->atomLinkSelectedIds)
+            ->mapWithKeys(fn ($id) => [(int) $id => ['created_by_user_id' => Auth::id(), 'created_at' => now()]])
+            ->all();
+        $fc->requirementDefinitions()->sync($payload);
+        session()->flash('success', 'Linked requirements updated.');
+        $this->closeAtomLinkModal();
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // Phase 10: housing services CRUD (merged from /requirements-library).
+    // ─────────────────────────────────────────────────────────────
+
+    public function showCreateService(): void
+    {
+        $this->authorizeAction('fund_codes.edit');
+        $this->resetServiceForm();
+        $this->serviceFormId = null;
+        $this->showServiceForm = true;
+    }
+
+    public function showEditService(int $id): void
+    {
+        $this->authorizeAction('fund_codes.edit');
+        $svc = HousingService::withTrashed()->findOrFail($id);
+        $this->serviceFormId = $svc->id;
+        $this->serviceName = $svc->name;
+        $this->serviceDescription = $svc->description ?? '';
+        $this->serviceActive = (bool) $svc->is_active;
+        $this->showServiceForm = true;
+    }
+
+    public function saveService(): void
+    {
+        $this->authorizeAction('fund_codes.edit');
+
+        $validated = $this->validate([
+            'serviceName' => 'required|string|max:255',
+            'serviceDescription' => 'nullable|string|max:1000',
+            'serviceActive' => 'boolean',
+        ]);
+
+        $payload = [
+            'name' => $validated['serviceName'],
+            'description' => $validated['serviceDescription'] !== '' ? $validated['serviceDescription'] : null,
+            'is_active' => $validated['serviceActive'],
+            'updated_by_user_id' => Auth::id(),
+        ];
+
+        if ($this->serviceFormId) {
+            HousingService::findOrFail($this->serviceFormId)->update($payload);
+            session()->flash('success', 'Service updated.');
+        } else {
+            $payload['created_by_user_id'] = Auth::id();
+            $svc = HousingService::create($payload);
+            session()->flash('success', 'Service created.');
+            $this->editingServiceId = $svc->id;
+            $this->loadServiceDetail($svc->id);
+        }
+
+        $this->showServiceForm = false;
+        $this->resetServiceForm();
+    }
+
+    public function deleteService(int $id): void
+    {
+        $this->authorizeAction('fund_codes.edit');
+        HousingService::findOrFail($id)->delete();
+        session()->flash('success', 'Service moved to trash.');
+        if ($this->editingServiceId === $id) {
+            $this->editingServiceId = null;
+        }
+    }
+
+    public function openService(int $id): void
+    {
+        $this->authorizeAction('fund_codes.view');
+        $this->editingServiceId = $id;
+        $this->loadServiceDetail($id);
+    }
+
+    public function closeService(): void
+    {
+        $this->editingServiceId = null;
+        $this->serviceLinkedFundCodeIds = [];
+        $this->serviceLinkedAtomIds = [];
+    }
+
+    private function loadServiceDetail(int $id): void
+    {
+        $svc = HousingService::with(['fundCodes', 'requirementDefinitions'])->find($id);
+        if (! $svc) {
+            $this->editingServiceId = null;
+            return;
+        }
+        $this->serviceLinkedFundCodeIds = $svc->fundCodes->pluck('id')->all();
+        $this->serviceLinkedAtomIds = $svc->requirementDefinitions->pluck('id')->all();
+    }
+
+    public function toggleServiceFundCode(int $id): void
+    {
+        $this->serviceLinkedFundCodeIds = $this->toggleId($this->serviceLinkedFundCodeIds, $id);
+    }
+
+    public function toggleServiceAtom(int $id): void
+    {
+        $this->serviceLinkedAtomIds = $this->toggleId($this->serviceLinkedAtomIds, $id);
+    }
+
+    public function saveServiceLinks(): void
+    {
+        $this->authorizeAction('fund_codes.edit');
+        if (! $this->editingServiceId) {
+            return;
+        }
+        $svc = HousingService::findOrFail($this->editingServiceId);
+        $payload = fn (array $ids) => collect($ids)
+            ->mapWithKeys(fn ($id) => [(int) $id => ['created_by_user_id' => Auth::id(), 'created_at' => now()]])
+            ->all();
+        $svc->fundCodes()->sync($payload($this->serviceLinkedFundCodeIds));
+        $svc->requirementDefinitions()->sync($payload($this->serviceLinkedAtomIds));
+        session()->flash('success', 'Service links updated.');
+    }
+
+    private function toggleId(array $list, int $id): array
+    {
+        $intList = array_map('intval', $list);
+        $id = (int) $id;
+        if (in_array($id, $intList, true)) {
+            return array_values(array_filter($intList, fn ($v) => $v !== $id));
+        }
+        $intList[] = $id;
+        return $intList;
+    }
+
+    private function resetServiceForm(): void
+    {
+        $this->serviceFormId = null;
+        $this->serviceName = '';
+        $this->serviceDescription = '';
+        $this->serviceActive = true;
+        $this->resetErrorBag();
+    }
+
     public function render()
     {
         $query = FundCode::with(['contract', 'createdBy', 'updatedBy'])
@@ -410,11 +632,46 @@ class FundCodeManagement extends Component
             ? FundCode::find($this->requirementsForFundCodeId)
             : null;
 
+        // Phase 10: data for atom-link modal and the housing-services tab.
+        $allAtoms = RequirementDefinition::orderBy('label')->get();
+
+        $housingServicesQuery = HousingService::query()
+            ->withCount(['fundCodes', 'requirementDefinitions'])
+            ->when($this->search !== '' && $this->activeTab === 'housing_services',
+                fn ($q) => $q->where('name', 'like', '%'.$this->search.'%'))
+            ->orderBy('name');
+
+        $housingServices = $this->activeTab === 'housing_services'
+            ? $housingServicesQuery->paginate(20)
+            : collect();
+
+        $servicesDetail = null;
+        $servicesAllFundCodes = collect();
+        $servicesAllAtoms = collect();
+        if ($this->editingServiceId) {
+            $servicesDetail = HousingService::withTrashed()->find($this->editingServiceId);
+            if ($servicesDetail) {
+                $servicesAllFundCodes = FundCode::active()->orderBy('code')->get();
+                $servicesAllAtoms = $allAtoms;
+            }
+        }
+
+        $atomLinkFundCode = $this->atomLinkFundCodeId
+            ? FundCode::find($this->atomLinkFundCodeId)
+            : null;
+
         return view('livewire.fund-code-management', [
             'fundCodes' => $fundCodes,
             'contracts' => $contracts,
             'activeRequirements' => $activeRequirements,
             'activeFundCode' => $activeFundCode,
+            // Phase 10 additions
+            'allAtoms' => $allAtoms,
+            'atomLinkFundCode' => $atomLinkFundCode,
+            'housingServices' => $housingServices,
+            'servicesDetail' => $servicesDetail,
+            'servicesAllFundCodes' => $servicesAllFundCodes,
+            'servicesAllAtoms' => $servicesAllAtoms,
         ]);
     }
 }

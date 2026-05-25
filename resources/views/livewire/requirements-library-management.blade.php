@@ -44,22 +44,17 @@
             </div>
         @endif
 
-        {{-- Tab bar --}}
+        {{-- Phase 10: bundles abstraction removed; services moved to /fund-codes.
+             Library is now atoms-only with category-based phase filtering. --}}
         <div class="border-b border-gray-200 dark:border-zinc-700 mb-4">
-            <nav class="flex gap-6" aria-label="Tabs">
-                <button type="button" wire:click="setTab('atoms')"
-                        class="py-3 px-1 -mb-px border-b-2 text-sm font-medium {{ $activeTab === 'atoms' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200' }}">
-                    Atoms
-                </button>
-                <button type="button" wire:click="setTab('bundles')"
-                        class="py-3 px-1 -mb-px border-b-2 text-sm font-medium {{ $activeTab === 'bundles' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200' }}">
-                    Bundles
-                </button>
-                <button type="button" wire:click="setTab('services')"
-                        class="py-3 px-1 -mb-px border-b-2 text-sm font-medium {{ $activeTab === 'services' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200' }}">
-                    Services
-                </button>
-            </nav>
+            <div class="flex items-center justify-between flex-wrap gap-3 py-3">
+                <div>
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-200">Requirement atoms</h2>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                        The master library. Atoms link directly to fund codes and housing services (managed on the Fund Codes page).
+                    </p>
+                </div>
+            </div>
         </div>
 
         {{-- Service detail drill-down ────────────────────────── --}}
@@ -96,6 +91,13 @@
                             <option value="{{ $k }}">{{ ucfirst($k) }}</option>
                         @endforeach
                     </select>
+                    <select wire:model.live="categoryFilter"
+                            class="rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+                        <option value="">All phases</option>
+                        <option value="eligibility">Phase 1 · Eligibility</option>
+                        <option value="compliance">Phase 1 · Compliance</option>
+                        <option value="service_delivery_compliance">Phase 2 · Service delivery</option>
+                    </select>
                 @endif
 
                 <label class="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
@@ -114,6 +116,7 @@
                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Label</th>
                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Key</th>
                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Kind</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Phase / Category</th>
                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Default required</th>
                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Hint</th>
                                 <th class="px-3 py-2"></th>
@@ -131,6 +134,17 @@
                                     <td class="px-3 py-2 text-sm font-mono text-gray-600 dark:text-gray-300">{{ $atom->key }}</td>
                                     <td class="px-3 py-2 text-sm text-gray-700 dark:text-gray-200">
                                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-gray-100 dark:bg-zinc-700">{{ $atom->kind }}</span>
+                                    </td>
+                                    <td class="px-3 py-2 text-sm text-gray-700 dark:text-gray-200">
+                                        @php
+                                            $catLabel = match($atom->category ?? 'eligibility') {
+                                                'eligibility' => ['Phase 1 · Eligibility', 'bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200'],
+                                                'compliance' => ['Phase 1 · Compliance', 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200'],
+                                                'service_delivery_compliance' => ['Phase 2 · Service delivery', 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'],
+                                                default => [$atom->category ?? '—', 'bg-gray-100 text-gray-800'],
+                                            };
+                                        @endphp
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs {{ $catLabel[1] }}">{{ $catLabel[0] }}</span>
                                     </td>
                                     <td class="px-3 py-2 text-sm text-gray-700 dark:text-gray-200">
                                         {{ $atom->default_required ? 'Required' : 'Optional' }}
@@ -152,7 +166,7 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="6" class="px-3 py-8 text-center text-sm text-gray-500 dark:text-gray-400">No atoms found. Click "+ New atom" to start your library.</td></tr>
+                                <tr><td colspan="7" class="px-3 py-8 text-center text-sm text-gray-500 dark:text-gray-400">No atoms found. Click "+ New atom" to start your library.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -365,13 +379,23 @@
                             </p>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Default required</label>
-                            <label class="inline-flex items-center gap-2 mt-2">
-                                <input type="checkbox" wire:model="atomDefaultRequired"
-                                       class="rounded border-gray-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500" />
-                                <span class="text-sm text-gray-700 dark:text-gray-200">Required by default</span>
-                            </label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Phase / Category</label>
+                            <select wire:model="atomCategory"
+                                    class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500">
+                                <option value="eligibility">Phase 1 · Eligibility</option>
+                                <option value="compliance">Phase 1 · Compliance</option>
+                                <option value="service_delivery_compliance">Phase 2 · Service delivery</option>
+                            </select>
+                            @error('atomCategory') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                         </div>
+                    </div>
+
+                    <div>
+                        <label class="inline-flex items-center gap-2">
+                            <input type="checkbox" wire:model="atomDefaultRequired"
+                                   class="rounded border-gray-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500" />
+                            <span class="text-sm text-gray-700 dark:text-gray-200">Required by default</span>
+                        </label>
                     </div>
 
                     <div>

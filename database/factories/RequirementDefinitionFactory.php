@@ -26,9 +26,15 @@ class RequirementDefinitionFactory extends Factory
             'key' => Str::slug($label).'-'.$this->faker->unique()->numberBetween(1000, 9999),
             'label' => $label,
             'kind' => $this->faker->randomElement(RequirementDefinition::KINDS),
+            'category' => RequirementDefinition::CATEGORY_ELIGIBILITY,
             'default_required' => true,
             'hint' => null,
         ];
+    }
+
+    public function category(string $cat): static
+    {
+        return $this->state(fn () => ['category' => $cat]);
     }
 
     public function optional(): static

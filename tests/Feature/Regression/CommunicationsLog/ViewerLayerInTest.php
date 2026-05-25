@@ -78,6 +78,7 @@ it('viewer renders the requirements-panel inline when the log has intake require
     Livewire::actingAs($this->user)
         ->test(CommunicationsLogManagement::class)
         ->call('viewDetail', $log->id)
-        ->assertSee('Application requirements')
+        // Phase 10.5: panel is retitled to reflect the phase filter.
+        ->assertSee('Phase 1', false)
         ->assertSee('Hardship statement');
 })->group('regression');

@@ -486,6 +486,28 @@
                     </button>
                 </div>
 
+                {{-- Phase 11: three-focus quick-nav. Kaitlyn moves between the three
+                     mental models of a Comm Log entry: logging, services, requirements. --}}
+                <nav class="flex flex-wrap gap-2 mb-4 text-[11px]" aria-label="Sections">
+                    <a href="#focus-logging" class="px-3 py-1.5 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-900/70 font-medium">
+                        1 · Communication logging
+                    </a>
+                    <a href="#focus-services" class="px-3 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-200 hover:bg-emerald-200 dark:hover:bg-emerald-900/70 font-medium">
+                        2 · Service selection
+                    </a>
+                    <a href="#focus-requirements" class="px-3 py-1.5 rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-200 hover:bg-purple-200 dark:hover:bg-purple-900/70 font-medium">
+                        3 · Requirements &amp; compliance
+                    </a>
+                </nav>
+
+                {{-- Focus 1 — Communication logging --}}
+                <section id="focus-logging" class="scroll-mt-4">
+                    <div class="flex items-baseline gap-2 mb-2 border-b border-blue-200 dark:border-blue-800 pb-2">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold bg-blue-600 text-white">Focus 1</span>
+                        <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-200">Communication logging</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">What happened — date, type, contact, summary, activity thread.</p>
+                    </div>
+
                 <!-- Status Tags -->
                 <div class="flex flex-wrap gap-2 mb-4">
                     <span class="px-3 py-1 rounded-full text-sm {{ $viewingLog->direction === 'outgoing' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' }}">
@@ -694,6 +716,68 @@
                 </div>
                 @endif
 
+                </section>{{-- /Focus 1 --}}
+
+                {{-- Focus 2 — Service selection --}}
+                <section id="focus-services" class="scroll-mt-4 mt-6">
+                    <div class="flex items-baseline gap-2 mb-3 border-b border-emerald-200 dark:border-emerald-800 pb-2">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold bg-emerald-600 text-white">Focus 2</span>
+                        <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-200">Service selection</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">What we're offering — housing services + anticipated fund codes.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        {{-- Housing services attached --}}
+                        <div class="bg-emerald-50/40 dark:bg-emerald-900/15 rounded-lg p-4 border border-emerald-100 dark:border-emerald-900/40">
+                            <h5 class="text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 mb-2">Housing services</h5>
+                            @php $vhs = $viewingLog->housingServices()->withTrashed()->get(); @endphp
+                            @if($vhs->isEmpty())
+                                <p class="text-xs text-gray-500 dark:text-gray-400 italic">No housing service selected. Edit this entry to attach one.</p>
+                            @else
+                                <ul class="space-y-1.5">
+                                    @foreach($vhs as $hs)
+                                        <li class="flex items-start gap-2">
+                                            <span class="mt-0.5 inline-flex items-center justify-center w-4 h-4 rounded-full bg-emerald-200 text-emerald-700 text-[10px]">✓</span>
+                                            <div class="min-w-0">
+                                                <div class="text-sm text-gray-900 dark:text-white truncate">{{ $hs->name }}</div>
+                                                @if($hs->description)
+                                                    <div class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ $hs->description }}</div>
+                                                @endif
+                                            </div>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                        </div>
+
+                        {{-- Fund codes anticipated --}}
+                        <div class="bg-amber-50/40 dark:bg-amber-900/15 rounded-lg p-4 border border-amber-100 dark:border-amber-900/40">
+                            <h5 class="text-xs font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-300 mb-2">Anticipated fund codes</h5>
+                            @php $vfc = $viewingLog->anticipatedFundCodes()->get(); @endphp
+                            @if($vfc->isEmpty())
+                                <p class="text-xs text-gray-500 dark:text-gray-400 italic">None yet — fund codes auto-attach when you pick a housing service.</p>
+                            @else
+                                <ul class="space-y-1.5">
+                                    @foreach($vfc as $fc)
+                                        <li class="flex items-start gap-2">
+                                            <span class="font-mono text-xs text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/40 px-1.5 py-0.5 rounded">{{ $fc->code }}</span>
+                                            <span class="text-xs text-gray-700 dark:text-gray-200 truncate">{{ $fc->description ?? '' }}</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                        </div>
+                    </div>
+                </section>{{-- /Focus 2 --}}
+
+                {{-- Focus 3 — Requirements & compliance --}}
+                <section id="focus-requirements" class="scroll-mt-4 mt-6">
+                    <div class="flex items-baseline gap-2 mb-3 border-b border-purple-200 dark:border-purple-800 pb-2">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold bg-purple-600 text-white">Focus 3</span>
+                        <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-200">Requirements &amp; compliance</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">What's needed to satisfy this case — Phase 1 (eligibility + compliance).</p>
+                    </div>
+
                 {{-- v2 §4.4 / §4.5: state banner + Requirements panel between Summary and Activity. --}}
                 @if(! $viewingLog->housing_job_id)
                     <div class="mb-4 px-4 py-3 rounded-md bg-amber-50 dark:bg-amber-900/30 border-l-4 border-amber-500">
@@ -732,15 +816,30 @@
                     @endif
                 @endif
 
-                @php $viewerReqs = $viewingLog->intakeRequirements()->where('is_orphaned', false)->get(); @endphp
+                @php
+                    /* Phase 10: filter the viewer panel to Phase 1 categories (eligibility + compliance).
+                       Service-delivery-compliance items live on the same log but surface on the project page. */
+                    $viewerReqs = $viewingLog->intakeRequirements()
+                        ->where('is_orphaned', false)
+                        ->with('definition')
+                        ->get()
+                        ->filter(fn ($r) => in_array(
+                            $r->definition?->category ?? \App\Models\RequirementDefinition::CATEGORY_ELIGIBILITY,
+                            \App\Models\RequirementDefinition::PHASE_1_CATEGORIES,
+                            true
+                        ))
+                        ->values();
+                @endphp
                 @if($viewerReqs->isNotEmpty())
                     <div class="mb-4">
-                        <x-comm.requirements-panel :items="$viewerReqs" />
+                        <x-comm.requirements-panel :items="$viewerReqs" title="Phase 1 · Eligibility &amp; Compliance" />
                     </div>
                 @endif
 
-                <!-- Updates/Activity Log -->
-                <div class="border-t border-gray-200 dark:border-zinc-600 pt-4 mb-4">
+                </section>{{-- /Focus 3 --}}
+
+                <!-- Updates/Activity Log — audit trail across all three focuses -->
+                <div class="border-t border-gray-200 dark:border-zinc-600 pt-4 mb-4 mt-6">
                     <h4 class="font-medium text-gray-900 dark:text-white mb-3">Activity Updates & Follow-up History</h4>
 
                     <!-- Add Update Form -->
@@ -893,9 +992,22 @@
                 <!-- Step 1: Basic Info -->
                 @if($convertStep === 1)
                 <div class="space-y-4">
-                    {{-- v2 (Phase 7): Requirements Gate at the top of step 1. --}}
+                    {{-- v2 (Phase 7): Requirements Gate at the top of step 1.
+                         Phase 10: gate only counts Phase 1 categories — service-delivery-
+                         compliance items don't block promotion (they're evaluated post-conversion). --}}
                     @if($convertingLog)
-                        @php $convertReqs = $convertingLog->intakeRequirements()->where('is_orphaned', false)->get(); @endphp
+                        @php
+                            $convertReqs = $convertingLog->intakeRequirements()
+                                ->where('is_orphaned', false)
+                                ->with('definition')
+                                ->get()
+                                ->filter(fn ($r) => in_array(
+                                    $r->definition?->category ?? \App\Models\RequirementDefinition::CATEGORY_ELIGIBILITY,
+                                    \App\Models\RequirementDefinition::PHASE_1_CATEGORIES,
+                                    true
+                                ))
+                                ->values();
+                        @endphp
                         @if($convertReqs->isNotEmpty())
                             <x-comm.requirements-gate :items="$convertReqs"
                                                       override-model="requirementOverride"

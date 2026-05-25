@@ -1,20 +1,43 @@
 <div class="max-w-7xl mx-auto p-6">
     <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl p-6">
         <!-- Header -->
-        <div class="flex justify-between items-center mb-6">
+        <div class="flex justify-between items-center mb-4">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Fund Codes</h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage fund codes for communication log tracking</p>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Fund Codes &amp; Services</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    Fund codes for budgeting, and the housing-service catalog that ties them to requirements.
+                </p>
             </div>
             @if($this->can('fund_codes.create'))
-            <button wire:click="showCreateForm"
-                    class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 flex items-center">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                </svg>
-                Add Fund Code
-            </button>
+                @if($activeTab === 'fund_codes')
+                    <button wire:click="showCreateForm"
+                            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Add Fund Code
+                    </button>
+                @else
+                    <button wire:click="showCreateService"
+                            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 flex items-center">
+                        + New Housing Service
+                    </button>
+                @endif
             @endif
+        </div>
+
+        {{-- Phase 10: tabs --}}
+        <div class="border-b border-gray-200 dark:border-zinc-700 mb-4">
+            <nav class="flex gap-6" aria-label="Tabs">
+                <button type="button" wire:click="setTab('fund_codes')"
+                        class="py-3 px-1 -mb-px border-b-2 text-sm font-medium {{ $activeTab === 'fund_codes' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200' }}">
+                    Fund Codes
+                </button>
+                <button type="button" wire:click="setTab('housing_services')"
+                        class="py-3 px-1 -mb-px border-b-2 text-sm font-medium {{ $activeTab === 'housing_services' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200' }}">
+                    Housing Services
+                </button>
+            </nav>
         </div>
 
         <!-- Success/Error Messages -->
@@ -47,6 +70,8 @@
                 </div>
             </div>
         @endif
+
+        @if($activeTab === 'fund_codes')
 
         <!-- Filters -->
         <div class="flex flex-col md:flex-row gap-4 mb-6">
@@ -114,9 +139,15 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2">
                                 @if($this->can('fund_codes.edit'))
+                                <button wire:click="openAtomLinkModal({{ $fundCode->id }})"
+                                        class="text-purple-700 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300"
+                                        title="Link requirement atoms from the library to this fund code">
+                                    Atoms
+                                </button>
                                 <button wire:click="manageRequirements({{ $fundCode->id }})"
-                                        class="text-emerald-700 dark:text-emerald-400 hover:text-emerald-900 dark:hover:text-emerald-300">
-                                    Requirements ({{ $fundCode->requirements_count }})
+                                        class="text-emerald-700 dark:text-emerald-400 hover:text-emerald-900 dark:hover:text-emerald-300"
+                                        title="Legacy fund-code-requirements (P-39b)">
+                                    Legacy reqs ({{ $fundCode->requirements_count }})
                                 </button>
                                 <button wire:click="showEditForm({{ $fundCode->id }})"
                                         class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
@@ -159,9 +190,219 @@
         <div class="mt-4">
             {{ $fundCodes->links() }}
         </div>
+
+        @endif  {{-- /activeTab === fund_codes --}}
+
+        {{-- Phase 10: Housing Services tab content --}}
+        @if($activeTab === 'housing_services')
+            @if($editingServiceId && $servicesDetail)
+                {{-- Service detail: link fund codes + atoms --}}
+                <div class="flex items-center justify-between mb-4">
+                    <button wire:click="closeService" class="inline-flex items-center text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to services</button>
+                    <div class="text-right">
+                        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{{ $servicesDetail->name }}</h2>
+                        @if($servicesDetail->description)
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 max-w-md text-right">{{ $servicesDetail->description }}</p>
+                        @endif
+                    </div>
+                </div>
+
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                    Picking this service on a Communication Log auto-attaches the linked fund codes AND stamps every linked atom onto intake requirements.
+                </p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div class="bg-gray-50 dark:bg-zinc-900 rounded-md p-4 border border-gray-200 dark:border-zinc-700">
+                        <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300 mb-2">Linked fund codes</h3>
+                        <div class="bg-white dark:bg-zinc-800 rounded border border-gray-200 dark:border-zinc-700 max-h-96 overflow-y-auto">
+                            @forelse($servicesAllFundCodes as $fc)
+                                <label class="flex items-center gap-2 px-3 py-1.5 border-b border-gray-100 dark:border-zinc-700 last:border-b-0 cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-700">
+                                    <input type="checkbox" wire:click="toggleServiceFundCode({{ $fc->id }})"
+                                           @checked(in_array($fc->id, $serviceLinkedFundCodeIds))
+                                           class="rounded border-gray-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500" />
+                                    <div class="min-w-0">
+                                        <span class="block font-mono text-xs text-gray-900 dark:text-white">{{ $fc->code }}</span>
+                                        <span class="block text-xs text-gray-500 dark:text-gray-400 truncate">{{ $fc->description ?? '' }}</span>
+                                    </div>
+                                </label>
+                            @empty
+                                <div class="px-3 py-4 text-center text-xs text-gray-500 dark:text-gray-400">No active fund codes.</div>
+                            @endforelse
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 dark:bg-zinc-900 rounded-md p-4 border border-gray-200 dark:border-zinc-700">
+                        <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300 mb-2">Linked requirement atoms</h3>
+                        <div class="bg-white dark:bg-zinc-800 rounded border border-gray-200 dark:border-zinc-700 max-h-96 overflow-y-auto">
+                            @forelse($servicesAllAtoms as $a)
+                                <label class="flex items-center gap-2 px-3 py-1.5 border-b border-gray-100 dark:border-zinc-700 last:border-b-0 cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-700">
+                                    <input type="checkbox" wire:click="toggleServiceAtom({{ $a->id }})"
+                                           @checked(in_array($a->id, $serviceLinkedAtomIds))
+                                           class="rounded border-gray-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500" />
+                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] uppercase font-mono bg-gray-100 dark:bg-zinc-700 text-gray-700 dark:text-gray-200">{{ $a->kind }}</span>
+                                    <div class="min-w-0">
+                                        <span class="block text-sm text-gray-900 dark:text-white truncate">{{ $a->label }}</span>
+                                        <span class="block text-xs font-mono text-gray-500 dark:text-gray-400 truncate">{{ $a->key }}</span>
+                                    </div>
+                                </label>
+                            @empty
+                                <div class="px-3 py-4 text-center text-xs text-gray-500 dark:text-gray-400">No atoms defined yet — create some on <a href="{{ route('requirements-library.management') }}" class="text-indigo-600 hover:underline">/requirements-library</a>.</div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 flex justify-end">
+                    <button wire:click="saveServiceLinks"
+                            class="px-4 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium">
+                        Save service links
+                    </button>
+                </div>
+            @else
+                {{-- Service list --}}
+                <div class="mb-4">
+                    <input type="text" wire:model.live.debounce.300ms="search"
+                           placeholder="Search service name…"
+                           class="w-full md:w-1/2 px-4 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700">
+                        <thead class="bg-gray-50 dark:bg-zinc-900">
+                            <tr>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Service</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Fund codes</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Atoms</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Active</th>
+                                <th class="px-3 py-2"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-zinc-700">
+                            @forelse($housingServices as $svc)
+                                <tr>
+                                    <td class="px-3 py-2 text-sm text-gray-900 dark:text-white">
+                                        <button wire:click="openService({{ $svc->id }})" class="text-indigo-600 hover:underline dark:text-indigo-400">{{ $svc->name }}</button>
+                                        @if($svc->description)
+                                            <div class="text-xs text-gray-500 dark:text-gray-400 truncate max-w-md">{{ $svc->description }}</div>
+                                        @endif
+                                    </td>
+                                    <td class="px-3 py-2 text-sm text-gray-700 dark:text-gray-200">{{ $svc->fund_codes_count }}</td>
+                                    <td class="px-3 py-2 text-sm text-gray-700 dark:text-gray-200">{{ $svc->requirement_definitions_count }}</td>
+                                    <td class="px-3 py-2 text-sm">
+                                        @if($svc->is_active)
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Active</span>
+                                        @else
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-600 dark:bg-zinc-700 dark:text-gray-300">Inactive</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-3 py-2 text-sm text-right whitespace-nowrap">
+                                        @if($this->can('fund_codes.edit'))
+                                            <button wire:click="showEditService({{ $svc->id }})" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 mr-3">Rename</button>
+                                            <button wire:click="openService({{ $svc->id }})" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 mr-3">Manage</button>
+                                            <button wire:click="deleteService({{ $svc->id }})"
+                                                    wire:confirm="Move this service to trash? Historical comm-log references are preserved."
+                                                    class="text-red-600 hover:text-red-900 dark:text-red-400">Delete</button>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="5" class="px-3 py-8 text-center text-sm text-gray-500 dark:text-gray-400">No services yet. Click "+ New Housing Service" to start the catalog.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-4">{{ $housingServices->links() }}</div>
+            @endif
+        @endif
     </div>
 
-    <!-- P-06 Requirements Modal -->
+    {{-- Phase 10: per-fund-code atom-link modal --}}
+    @if($showAtomLinkModal && $atomLinkFundCode)
+        <div class="fixed inset-0 bg-gray-500/75 dark:bg-black/70 flex items-center justify-center p-4 z-50">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-2xl w-full">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-700">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        Requirements — <span class="font-mono">{{ $atomLinkFundCode->code }}</span>
+                    </h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        Atoms ticked here auto-stamp on a Communication Log when this fund code is anticipated.
+                    </p>
+                </div>
+                <div class="px-6 py-4 max-h-[60vh] overflow-y-auto">
+                    @forelse($allAtoms as $a)
+                        <label class="flex items-center gap-2 px-2 py-1.5 border-b border-gray-100 dark:border-zinc-700 last:border-b-0 cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-700">
+                            <input type="checkbox" wire:click="toggleAtomLink({{ $a->id }})"
+                                   @checked(in_array($a->id, $atomLinkSelectedIds))
+                                   class="rounded border-gray-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500" />
+                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] uppercase font-mono bg-gray-100 dark:bg-zinc-700 text-gray-700 dark:text-gray-200">{{ $a->kind }}</span>
+                            @php
+                                $catLabel = match($a->category ?? 'eligibility') {
+                                    'eligibility' => ['Eligibility', 'bg-teal-100 text-teal-800'],
+                                    'compliance' => ['Compliance', 'bg-amber-100 text-amber-800'],
+                                    'service_delivery_compliance' => ['Service delivery', 'bg-purple-100 text-purple-800'],
+                                    default => [$a->category, 'bg-gray-100 text-gray-800'],
+                                };
+                            @endphp
+                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] {{ $catLabel[1] }} dark:bg-opacity-30">{{ $catLabel[0] }}</span>
+                            <div class="min-w-0">
+                                <span class="block text-sm text-gray-900 dark:text-white truncate">{{ $a->label }}</span>
+                                <span class="block text-xs font-mono text-gray-500 dark:text-gray-400 truncate">{{ $a->key }}</span>
+                            </div>
+                        </label>
+                    @empty
+                        <div class="px-2 py-4 text-center text-xs text-gray-500 dark:text-gray-400">No atoms defined yet.</div>
+                    @endforelse
+                </div>
+                <div class="px-6 py-3 border-t border-gray-200 dark:border-zinc-700 flex justify-end gap-2">
+                    <button type="button" wire:click="closeAtomLinkModal"
+                            class="px-4 py-2 rounded-md border border-gray-300 dark:border-zinc-600 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-700">Cancel</button>
+                    <button type="button" wire:click="saveAtomLinks"
+                            class="px-4 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium">Save</button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- Phase 10: housing-service create/rename modal --}}
+    @if($showServiceForm)
+        <div class="fixed inset-0 bg-gray-500/75 dark:bg-black/70 flex items-center justify-center p-4 z-50">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-lg w-full shadow-xl">
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    {{ $serviceFormId ? 'Rename service' : 'New housing service' }}
+                </h2>
+                <form wire:submit.prevent="saveService" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Name</label>
+                        <input type="text" wire:model="serviceName"
+                               placeholder="First-Time Homebuyer Counseling"
+                               class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500" />
+                        @error('serviceName') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Description <span class="text-xs text-gray-500 font-normal">(optional)</span></label>
+                        <textarea wire:model="serviceDescription" rows="3"
+                                  class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+                    </div>
+                    <div>
+                        <label class="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
+                            <input type="checkbox" wire:model="serviceActive"
+                                   class="rounded border-gray-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500" />
+                            Active (selectable on Communication Log entries)
+                        </label>
+                    </div>
+                    <div class="flex justify-end gap-2 pt-2">
+                        <button type="button" wire:click="$set('showServiceForm', false)"
+                                class="px-4 py-2 rounded-md border border-gray-300 dark:border-zinc-600 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-700">Cancel</button>
+                        <button type="submit"
+                                class="px-4 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium">
+                            {{ $serviceFormId ? 'Save' : 'Create & manage links' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
+
+    {{-- Original P-06 Requirements Modal continues below --}}
     @if($showRequirementsModal && $activeFundCode)
     <div class="fixed inset-0 bg-gray-500 bg-opacity-75 dark:bg-zinc-900 dark:bg-opacity-75 flex items-center justify-center z-50 p-4">
         <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] flex flex-col">

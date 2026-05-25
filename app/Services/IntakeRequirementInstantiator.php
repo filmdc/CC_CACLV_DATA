@@ -86,28 +86,59 @@ class IntakeRequirementInstantiator
      */
     public function forFundCode(CommunicationLog $log, FundCode $fundCode, User $actor): Collection
     {
+        $result = collect();
+        $fundTag = 'fund:'.$fundCode->id;
+
+        // 1. Legacy fund_code_requirements templates (P-39b path).
         $templates = $fundCode->requirements()
             ->where('phase', 'eligibility')
             ->ordered()
             ->get();
 
-        if ($templates->isEmpty()) {
-            return collect();
+        if ($templates->isNotEmpty()) {
+            $existingByTemplateId = IntakeRequirement::query()
+                ->where('communication_log_id', $log->id)
+                ->where('source_type', IntakeRequirement::SOURCE_FUND_CODE)
+                ->whereIn('source_template_id', $templates->pluck('id')->all())
+                ->get()
+                ->keyBy('source_template_id');
+
+            foreach ($templates as $template) {
+                $existing = $existingByTemplateId->get($template->id);
+
+                if ($existing !== null) {
+                    if ($existing->is_orphaned) {
+                        $existing->unmarkOrphaned($actor);
+                    }
+                    $result->push($existing);
+
+                    continue;
+                }
+
+                $row = $this->insert($log, [
+                    'type' => $template->type ?? IntakeRequirement::TYPE_DOCUMENT,
+                    'label' => $template->label,
+                    'source_type' => IntakeRequirement::SOURCE_FUND_CODE,
+                    'source_template_id' => $template->id,
+                    'source_label_snapshot' => $template->label,
+                ], $actor);
+
+                $result->push($row);
+            }
         }
 
-        $existingByTemplateId = IntakeRequirement::query()
-            ->where('communication_log_id', $log->id)
-            ->where('source_type', IntakeRequirement::SOURCE_FUND_CODE)
-            ->whereIn('source_template_id', $templates->pluck('id')->all())
-            ->get()
-            ->keyBy('source_template_id');
-
-        $result = collect();
-
-        foreach ($templates as $template) {
-            $existing = $existingByTemplateId->get($template->id);
+        // 2. Phase 10 — atom-library requirements linked to this fund
+        // code via fund_code_requirement_definitions. Stamped with
+        // via:'fund:N' so detaching the fund code can correctly orphan
+        // them later.
+        foreach ($fundCode->requirementDefinitions()->get() as $atom) {
+            $existing = IntakeRequirement::query()
+                ->where('communication_log_id', $log->id)
+                ->where('key', $atom->key)
+                ->first();
 
             if ($existing !== null) {
+                $this->mergeViaTags($existing, [$fundTag], $actor);
                 if ($existing->is_orphaned) {
                     $existing->unmarkOrphaned($actor);
                 }
@@ -116,15 +147,19 @@ class IntakeRequirementInstantiator
                 continue;
             }
 
-            $row = $this->insert($log, [
-                'type' => $template->type ?? IntakeRequirement::TYPE_DOCUMENT,
-                'label' => $template->label,
-                'source_type' => IntakeRequirement::SOURCE_FUND_CODE,
-                'source_template_id' => $template->id,
-                'source_label_snapshot' => $template->label,
-            ], $actor);
-
-            $result->push($row);
+            $result->push($this->insert($log, [
+                'type' => $atom->kind === RequirementDefinition::KIND_DOC
+                    ? IntakeRequirement::TYPE_DOCUMENT
+                    : IntakeRequirement::TYPE_TASK,
+                'label' => $atom->label,
+                'key' => $atom->key,
+                'kind' => $atom->kind,
+                'via' => [$fundTag],
+                'source_type' => IntakeRequirement::SOURCE_DEFINITION,
+                'source_template_id' => null,
+                'source_definition_id' => $atom->id,
+                'source_label_snapshot' => $atom->label,
+            ], $actor));
         }
 
         return $result;
@@ -361,14 +396,10 @@ class IntakeRequirementInstantiator
         return DB::transaction(function () use ($log, $service, $actor, $serviceTag) {
             $result = collect();
 
-            // 1. Bundled atoms.
-            foreach ($service->templateSets()->get() as $bundle) {
-                $result = $result->merge(
-                    $this->forTemplateSet($log, $bundle, $actor, $serviceTag)
-                );
-            }
-
-            // 2. Direct atoms (not in any bundle).
+            // Phase 10 — bundle path removed. Atoms link directly to
+            // services now via housing_service_definitions (and to fund
+            // codes via fund_code_requirement_definitions, picked up
+            // below as a side-effect of the fund-code reconcile).
             foreach ($service->requirementDefinitions()->get() as $atom) {
                 $existing = IntakeRequirement::query()
                     ->where('communication_log_id', $log->id)
@@ -400,7 +431,7 @@ class IntakeRequirementInstantiator
                 ], $actor));
             }
 
-            // 3. Fund codes — merge into the log's anticipatedFundCodes
+            // Fund codes — merge into the log's anticipatedFundCodes
             //    via the existing reconciler. This is additive: any
             //    funds already anticipated stay, and the service's funds
             //    are unioned in. This also picks up legacy fund-code-

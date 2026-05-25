@@ -41,6 +41,9 @@ class RequirementsLibraryManagement extends Component
 
     public ?string $kindFilter = null;      // atoms tab only
 
+    /** Phase 10: filter atoms by workflow-phase category. */
+    public ?string $categoryFilter = null;
+
     // ── Atom form state ───────────────────────────────────────────
     public bool $showAtomForm = false;
 
@@ -51,6 +54,8 @@ class RequirementsLibraryManagement extends Component
     public string $atomLabel = '';
 
     public string $atomKind = 'doc';
+
+    public string $atomCategory = 'eligibility';
 
     public bool $atomDefaultRequired = true;
 
@@ -105,12 +110,11 @@ class RequirementsLibraryManagement extends Component
         $this->authorizeAction('requirements_library.view');
         $this->canManage = $this->can('requirements_library.manage');
 
-        if ($this->editingBundleId) {
-            $this->loadBundleDetail($this->editingBundleId);
-        }
-        if ($this->editingServiceId) {
-            $this->loadServiceDetail($this->editingServiceId);
-        }
+        // Phase 10: library is atoms-only. Pin the tab and clear any
+        // stale bundle/service drill state inherited from query string.
+        $this->activeTab = 'atoms';
+        $this->editingBundleId = null;
+        $this->editingServiceId = null;
     }
 
     public function updatedSearch(): void
@@ -162,6 +166,7 @@ class RequirementsLibraryManagement extends Component
         $this->atomKey = $atom->key;
         $this->atomLabel = $atom->label;
         $this->atomKind = $atom->kind;
+        $this->atomCategory = $atom->category ?? 'eligibility';
         $this->atomDefaultRequired = (bool) $atom->default_required;
         $this->atomHint = $atom->hint ?? '';
         $this->showAtomForm = true;
@@ -175,6 +180,7 @@ class RequirementsLibraryManagement extends Component
             'atomKey'             => 'required|string|max:80|regex:/^[a-z0-9-]+$/',
             'atomLabel'           => 'required|string|max:255',
             'atomKind'            => 'required|in:'.implode(',', RequirementDefinition::KINDS),
+            'atomCategory'        => 'required|in:'.implode(',', RequirementDefinition::CATEGORIES),
             'atomDefaultRequired' => 'boolean',
             'atomHint'            => 'nullable|string|max:1000',
         ], [
@@ -195,6 +201,7 @@ class RequirementsLibraryManagement extends Component
             'key'              => $validated['atomKey'],
             'label'            => $validated['atomLabel'],
             'kind'             => $validated['atomKind'],
+            'category'         => $validated['atomCategory'],
             'default_required' => $validated['atomDefaultRequired'],
             'hint'             => $validated['atomHint'] !== '' ? $validated['atomHint'] : null,
             'updated_by_user_id' => Auth::id(),
@@ -248,6 +255,7 @@ class RequirementsLibraryManagement extends Component
         $this->atomKey = '';
         $this->atomLabel = '';
         $this->atomKind = 'doc';
+        $this->atomCategory = 'eligibility';
         $this->atomDefaultRequired = true;
         $this->atomHint = '';
         $this->resetErrorBag();
@@ -640,6 +648,7 @@ class RequirementsLibraryManagement extends Component
                   ->orWhere('key', 'like', "%{$this->search}%");
             }))
             ->when($this->kindFilter, fn ($q) => $q->where('kind', $this->kindFilter))
+            ->when($this->categoryFilter, fn ($q) => $q->where('category', $this->categoryFilter))
             ->orderBy('label');
 
         $bundlesQuery = RequirementTemplateSet::query()
@@ -701,6 +710,7 @@ class RequirementsLibraryManagement extends Component
             'bundles' => $this->activeTab === 'bundles' ? $bundlesQuery->paginate(25) : collect(),
             'housingServices' => $this->activeTab === 'services' ? $housingServicesQuery->paginate(25) : collect(),
             'kinds' => RequirementDefinition::KINDS,
+            'categories' => RequirementDefinition::CATEGORIES,
             'bundleDetail' => $bundleDetail,
             'bundleItems' => $bundleItems,
             'atomsForPicker' => $atomsForPicker,
