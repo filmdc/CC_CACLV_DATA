@@ -100,6 +100,17 @@ class CommunicationsLogManagement extends Component
     // Convert to project state
     public $showConvertModal = false;
 
+    /**
+     * v2 (Phase 7): the Requirements Gate on the Convert-to-Project
+     * modal. When the intake has any unmet required application
+     * requirements, the user MUST tick this checkbox AND provide a
+     * written reason to proceed; the values are persisted on the new
+     * housing_job's requirement_override_* audit columns.
+     */
+    public bool $requirementOverride = false;
+
+    public string $requirementOverrideReason = '';
+
     public $convertingLogId = null;
 
     public $convertJobTitle = '';
@@ -132,6 +143,14 @@ class CommunicationsLogManagement extends Component
 
     // Fund codes
     public $selectedFundCodeIds = [];
+
+    /**
+     * v2 (Phase 4): snapshot of fund-code IDs that were already
+     * attached when the form opened. Used by the save-time validator
+     * to distinguish "already-checked expired fund" (allowed; preserves
+     * historical data) from "newly checking an expired fund" (blocked).
+     */
+    public array $originallySelectedFundCodeIds = [];
 
     // Entity search fields
     public $participantSearch = '';
@@ -198,6 +217,21 @@ class CommunicationsLogManagement extends Component
     public $contact_role = '';
 
     public $subject = '';
+
+    /**
+     * v2 (Phase 5): subject is editable; once the user touches it, the
+     * override is sticky. Persisted as subject_overridden_at on the
+     * model. Loaded on showEditForm; flipped to "now" on save when the
+     * subjectTouched transient is set.
+     */
+    public ?string $subject_overridden_at = null;
+
+    /**
+     * Transient. Set true by the updatedSubject() lifecycle hook when
+     * the user types in the Subject input. Not persisted directly —
+     * triggers $subject_overridden_at = now() on save.
+     */
+    public bool $subjectTouched = false;
 
     public $summary = '';
 
@@ -390,13 +424,31 @@ class CommunicationsLogManagement extends Component
     {
         if ($value) {
             $property = Property::find($value);
-            if ($property) {
+            if ($property && ! $this->subjectIsOverridden()) {
                 $this->subject = $property->address_line_1;
                 if ($property->city) {
                     $this->subject .= ', '.$property->city;
                 }
             }
         }
+    }
+
+    /**
+     * v2 (Phase 5): user-typed Subject locks the auto-derivation off.
+     * Set the transient touched flag so save() persists the override.
+     */
+    public function updatedSubject($value): void
+    {
+        $this->subjectTouched = true;
+    }
+
+    /**
+     * True when the user has overridden the subject this session
+     * (just typed it) OR previously (subject_overridden_at is set).
+     */
+    protected function subjectIsOverridden(): bool
+    {
+        return $this->subjectTouched || $this->subject_overridden_at !== null;
     }
 
     public function updatedParticipantId($value)
@@ -437,6 +489,11 @@ class CommunicationsLogManagement extends Component
 
     protected function updateSubjectFromAddress()
     {
+        // v2 (Phase 5): never clobber a user-overridden Subject.
+        if ($this->subjectIsOverridden()) {
+            return;
+        }
+
         if ($this->contact_address && $this->contact_city) {
             $parts = [trim($this->contact_address), trim($this->contact_city)];
 
@@ -778,6 +835,8 @@ class CommunicationsLogManagement extends Component
         $this->contact_organization = $log->contact_organization ?? '';
         $this->contact_role = $log->contact_role ?? '';
         $this->subject = $log->subject;
+        $this->subject_overridden_at = $log->subject_overridden_at?->toDateTimeString();
+        $this->subjectTouched = false;
         $this->summary = $log->summary ?? '';
         $this->notes = $log->notes ?? '';
         $this->outcome = $log->outcome ?? '';
@@ -788,6 +847,7 @@ class CommunicationsLogManagement extends Component
         $this->selectedServices = $log->services->pluck('id')->toArray();
         $this->selectedTagIds = $log->tags->pluck('id')->toArray();
         $this->selectedFundCodeIds = $log->anticipatedFundCodes->pluck('id')->toArray();
+        $this->originallySelectedFundCodeIds = $this->selectedFundCodeIds;
         $this->create_project_enrollment = false; // Always false when editing
 
         $this->showForm = true;
@@ -807,11 +867,40 @@ class CommunicationsLogManagement extends Component
         $this->viewingId = null;
     }
 
+    /**
+     * v2 (Phase 8): viewer hotkey "E" — close the viewer and open the
+     * Edit form on the same entry.
+     */
+    public function editFromViewer(): void
+    {
+        if (! $this->viewingId) {
+            return;
+        }
+        $id = $this->viewingId;
+        $this->closeDetailModal();
+        $this->showEditForm($id);
+    }
+
+    /**
+     * v2 (Phase 8): form hotkey ⌘⇧⏎ — save the current entry and
+     * immediately open a blank Create form. Persists nothing on the
+     * second open beyond what showCreateForm() initializes.
+     */
+    public function saveAndNew(): void
+    {
+        $this->save();
+        if ($this->getErrorBag()->isNotEmpty()) {
+            return;
+        }
+        // save() closes the form via $showForm = false; re-open as new.
+        $this->showCreateForm();
+    }
+
     public function addUpdate()
     {
         $this->validate([
             'newUpdateContent' => 'required|string|min:1',
-            'newUpdateType' => 'required|in:note,follow_up,status_change,outcome,other',
+            'newUpdateType' => 'required|in:note,follow_up,status_change,outcome,other,action,email',
             'newUpdateDate' => 'nullable|date',
         ]);
 
@@ -1208,6 +1297,9 @@ class CommunicationsLogManagement extends Component
         $this->potentialPropertyMatches = [];
         $this->selectedParticipantAction = 'create_new';
         $this->selectedPropertyAction = 'create_new';
+        // v2 (Phase 7): clear gate state.
+        $this->requirementOverride = false;
+        $this->requirementOverrideReason = '';
     }
 
     public function convertToProject()
@@ -1391,6 +1483,26 @@ class CommunicationsLogManagement extends Component
                 'property_id' => $property?->id,
             ]);
 
+            // v2 (Phase 7): requirements gate — block conversion if any
+            // required-and-non-orphaned intake requirement is unmet AND
+            // the user did not tick the audit-logged override.
+            $unmetCount = $log->intakeRequirements()
+                ->where('is_orphaned', false)
+                ->whereNotIn('status', \App\Models\IntakeRequirement::MET_STATUSES)
+                ->count();
+
+            if ($unmetCount > 0 && ! $this->requirementOverride) {
+                DB::rollBack();
+                $this->addError('requirementOverride', "{$unmetCount} required application requirement(s) are unmet. Tick the override box and provide a reason to proceed.");
+                return;
+            }
+
+            if ($this->requirementOverride && trim($this->requirementOverrideReason) === '') {
+                DB::rollBack();
+                $this->addError('requirementOverrideReason', 'A reason is required when overriding unmet requirements.');
+                return;
+            }
+
             $job = HousingJob::create([
                 'job_title' => $this->convertJobTitle,
                 'job_description' => $this->convertJobDescription,
@@ -1410,6 +1522,15 @@ class CommunicationsLogManagement extends Component
             \Log::info('convertToProject: HousingJob created', ['job_id' => $job->id, 'job_number' => $job->job_number]);
 
             $log->convertToProject($job, Auth::id());
+
+            // v2 (Phase 7): record the override audit + (eventually) copy
+            // the intake_requirements forward into project_requirements.
+            app(\App\Services\IntakeRequirementInstantiator::class)->carryForwardToProject(
+                $log,
+                $job,
+                Auth::user(),
+                $this->requirementOverride ? $this->requirementOverrideReason : null
+            );
 
             DB::commit();
 
@@ -1751,6 +1872,26 @@ class CommunicationsLogManagement extends Component
             'selectedServices.*' => 'exists:services,id',
         ]);
 
+        // v2 §5.5: cannot NEWLY check an expired fund code. Existing
+        // attachments to expired funds (originallySelectedFundCodeIds)
+        // are preserved untouched so historical data isn't disturbed.
+        $newlyChecked = array_diff(
+            array_map('intval', $this->selectedFundCodeIds),
+            array_map('intval', $this->originallySelectedFundCodeIds)
+        );
+        if (! empty($newlyChecked)) {
+            $expiredNew = \App\Models\FundCode::query()
+                ->whereIn('id', $newlyChecked)
+                ->get()
+                ->filter(fn ($f) => $f->expiry_state === 'expired');
+
+            if ($expiredNew->isNotEmpty()) {
+                $codes = $expiredNew->pluck('code')->implode(', ');
+                $this->addError('selectedFundCodeIds', "Cannot tag expired fund codes ({$codes}). They can no longer accept new attachments.");
+                return;
+            }
+        }
+
         // P-01: warn (but never block) on duplicate-address entries. The user
         // can confirm via the "Continue anyway" panel which sets
         // duplicateAcknowledged and re-enters save().
@@ -1781,6 +1922,11 @@ class CommunicationsLogManagement extends Component
             'contact_organization' => $this->contact_organization !== '' ? $this->contact_organization : null,
             'contact_role' => $this->contact_role !== '' ? $this->contact_role : null,
             'subject' => $this->subject,
+            // v2 (Phase 5): persist the override flag if the user typed
+            // in the Subject this session. Once set, the field is sticky.
+            'subject_overridden_at' => $this->subjectTouched
+                ? now()
+                : ($this->subject_overridden_at ?: null),
             'summary' => $this->summary !== '' ? $this->summary : null,
             'notes' => $this->notes !== '' ? $this->notes : null,
             'outcome' => $this->outcome !== '' ? $this->outcome : null,
@@ -2024,6 +2170,8 @@ class CommunicationsLogManagement extends Component
         $this->contact_organization = '';
         $this->contact_role = '';
         $this->subject = '';
+        $this->subject_overridden_at = null;
+        $this->subjectTouched = false;
         $this->summary = '';
         $this->notes = '';
         $this->outcome = '';
@@ -2034,6 +2182,7 @@ class CommunicationsLogManagement extends Component
         $this->selectedServices = [];
         $this->selectedTagIds = [];
         $this->selectedFundCodeIds = [];
+        $this->originallySelectedFundCodeIds = [];
         $this->newTagName = '';
         $this->tagSearch = '';
 

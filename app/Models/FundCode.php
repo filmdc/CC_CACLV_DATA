@@ -29,6 +29,11 @@ class FundCode extends Model
         'expires_at' => 'date',
     ];
 
+    protected $appends = [
+        'expiry_state',
+        'days_to_expiry',
+    ];
+
     // Relationships
 
     public function contract(): BelongsTo
@@ -104,6 +109,49 @@ class FundCode extends Model
         }
 
         return null;
+    }
+
+    /**
+     * Comm Log v2 (§5.2): the 5-state expiry taxonomy the fund-chip
+     * component renders. Wraps expirationIndicator() with two extra
+     * buckets that the v2 design distinguishes:
+     *   - 'perpetual' for funds with no expires_at,
+     *   - 'ok'        for funds >90 days from expiry.
+     *
+     * @return 'soon'|'warning'|'ok'|'perpetual'|'expired'
+     */
+    public function getExpiryStateAttribute(): string
+    {
+        if ($this->expires_at === null) {
+            return 'perpetual';
+        }
+
+        return match ($this->expirationIndicator()) {
+            'expired' => 'expired',
+            'urgent'  => 'soon',
+            'warning' => 'warning',
+            default   => 'ok',
+        };
+    }
+
+    /**
+     * Signed days-to-expiry for the chip label. Positive when in the
+     * future, negative when in the past, null when perpetual.
+     * Today returns 0.
+     */
+    public function getDaysToExpiryAttribute(): ?int
+    {
+        if ($this->expires_at === null) {
+            return null;
+        }
+
+        $today = now()->startOfDay();
+        $expiresAt = $this->expires_at->copy()->startOfDay();
+        $signedDays = (int) $today->diffInDays($expiresAt, false);
+
+        // For 'expired' chip label ("Expired Nd ago") we want the
+        // absolute past-distance, not the signed negative.
+        return abs($signedDays);
     }
 
     /**

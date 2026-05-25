@@ -1,7 +1,7 @@
 @props([
     'fund',                  // FundCode model (or stdClass w/ code, name, expiry_state, days_to_expiry)
     'checked' => false,
-    'name' => 'selectedFundCodeIds[]',
+    'wireModel' => null,     // when set: drives the <input> via wire:model on the parent's array
 ])
 
 @php
@@ -12,7 +12,7 @@
     $config = [
         'soon'      => ['dot' => 'bg-calv-red',     'label' => $days !== null ? "Expires in {$days}d" : 'Expires soon',         'labelTone' => 'text-calv-red',     'disabled' => false],
         'warning'   => ['dot' => 'bg-calv-amber',   'label' => $days !== null ? "Expires in {$days}d" : 'Warning',              'labelTone' => 'text-[#8A6410]',     'disabled' => false],
-        'ok'        => ['dot' => 'bg-calv-sage',    'label' => $fund?->end_date?->format('Y-m-d') ?? 'OK',                       'labelTone' => 'text-calv-slate-65', 'disabled' => false],
+        'ok'        => ['dot' => 'bg-calv-sage',    'label' => 'Expires '.($fund?->expires_at?->format('M j, Y') ?? '—'),      'labelTone' => 'text-calv-slate-65', 'disabled' => false],
         'perpetual' => ['dot' => 'bg-calv-slate-35','label' => 'No expiry',                                                       'labelTone' => 'text-calv-slate-65', 'disabled' => false],
         'expired'   => ['dot' => 'bg-calv-slate',   'label' => $days !== null ? "Expired {$days}d ago" : 'Expired',              'labelTone' => 'text-calv-slate-65', 'disabled' => true],
     ];
@@ -27,7 +27,7 @@
 ]) }}>
     <input
         type="checkbox"
-        name="{{ $name }}"
+        @if($wireModel) wire:model.live="{{ $wireModel }}" @endif
         value="{{ $fund?->id }}"
         @checked($checked)
         @disabled($c['disabled'] && !$checked)

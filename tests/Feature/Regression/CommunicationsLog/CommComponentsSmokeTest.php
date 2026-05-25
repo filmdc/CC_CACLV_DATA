@@ -52,8 +52,8 @@ it('x-comm.fund-chip renders all expiry states', function () {
             'code' => 'TEST',
             'name' => 'Test fund',
             'expiry_state' => $state,
-            'days_to_expiry' => $state === 'soon' ? 15 : ($state === 'warning' ? 60 : null),
-            'end_date' => null,
+            'days_to_expiry' => $state === 'soon' ? 15 : ($state === 'warning' ? 60 : ($state === 'expired' ? 7 : null)),
+            'expires_at' => $state === 'perpetual' ? null : \Illuminate\Support\Carbon::now()->addDays(180),
         ];
         $html = Blade::render('<x-comm.fund-chip :fund="$fund" />', ['fund' => $fund]);
         expect($html)->toContain('TEST');

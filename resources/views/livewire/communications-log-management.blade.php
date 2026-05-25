@@ -449,7 +449,30 @@
 
     <!-- Detail View Modal -->
     @if($showDetailModal && $viewingLog)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="closeDetailModal">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50"
+             wire:click.self="closeDetailModal"
+             x-data="{
+                 handleKey(e) {
+                     const tag = document.activeElement?.tagName;
+                     const inField = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+                     // E — Edit (spec §6). Don't intercept when typing in a field.
+                     if (!inField && (e.key === 'e' || e.key === 'E')) {
+                         e.preventDefault();
+                         $wire.call('editFromViewer');
+                         return;
+                     }
+                     // N — focus the Activity Updates composer.
+                     if (!inField && (e.key === 'n' || e.key === 'N')) {
+                         e.preventDefault();
+                         document.querySelector('[data-comm-composer]')?.focus();
+                         return;
+                     }
+                     if (e.key === 'Escape' && !inField) {
+                         $wire.call('closeDetailModal');
+                     }
+                 },
+             }"
+             x-on:keydown.window="handleKey">
             <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
                 <div class="flex justify-between items-start mb-4">
                     <div>
@@ -671,6 +694,51 @@
                 </div>
                 @endif
 
+                {{-- v2 §4.4 / §4.5: state banner + Requirements panel between Summary and Activity. --}}
+                @if(! $viewingLog->housing_job_id)
+                    <div class="mb-4 px-4 py-3 rounded-md bg-amber-50 dark:bg-amber-900/30 border-l-4 border-amber-500">
+                        <div class="flex items-start justify-between gap-3 flex-wrap">
+                            <div>
+                                <div class="text-[10px] uppercase tracking-wider font-semibold text-amber-800 dark:text-amber-300">General intake</div>
+                                <p class="text-sm text-gray-700 dark:text-gray-300 mt-1">
+                                    Not yet attached to a project. Promote when the application requirements are met.
+                                </p>
+                            </div>
+                            <div class="flex gap-2">
+                                @can('communications_log.create')
+                                    <button type="button" wire:click="startConvertToProject({{ $viewingLog->id }})"
+                                            class="px-3 py-1.5 rounded bg-teal-600 hover:bg-teal-700 text-white text-xs font-medium">
+                                        Convert to project
+                                    </button>
+                                @endcan
+                                <button type="button"
+                                        x-on:click="$dispatch('open-project-picker')"
+                                        class="px-3 py-1.5 rounded bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 text-xs font-medium hover:bg-gray-300 dark:hover:bg-zinc-500">
+                                    Attach to existing
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                @else
+                    @php $jb = $viewingLog->convertedToJob ?? \App\Models\HousingJob::find($viewingLog->housing_job_id); @endphp
+                    @if($jb)
+                        <div class="mb-4 flex items-center gap-3 px-4 py-3 rounded-md bg-teal-700 text-white shadow">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-sm bg-white/15 font-mono text-xs">{{ $jb->job_number }}</span>
+                            <div class="min-w-0 flex-1">
+                                <div class="text-[10px] uppercase tracking-wider text-white/70">Project</div>
+                                <div class="text-sm font-medium truncate">{{ $jb->job_title }}</div>
+                            </div>
+                        </div>
+                    @endif
+                @endif
+
+                @php $viewerReqs = $viewingLog->intakeRequirements()->where('is_orphaned', false)->get(); @endphp
+                @if($viewerReqs->isNotEmpty())
+                    <div class="mb-4">
+                        <x-comm.requirements-panel :items="$viewerReqs" />
+                    </div>
+                @endif
+
                 <!-- Updates/Activity Log -->
                 <div class="border-t border-gray-200 dark:border-zinc-600 pt-4 mb-4">
                     <h4 class="font-medium text-gray-900 dark:text-white mb-3">Activity Updates & Follow-up History</h4>
@@ -682,9 +750,12 @@
                             <select wire:model.live="newUpdateType" class="px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md text-sm">
                                 <option value="note">Note</option>
                                 <option value="follow_up">Follow-up</option>
-                                <option value="status_change">Status Change</option>
-                                <option value="outcome">Outcome</option>
-                                <option value="other">Other</option>
+                                <option value="action">Action</option>
+                                <option value="email">Email</option>
+                                {{-- status_change is system-only per spec §5.4 — kept here for completeness when an admin needs to log one manually. --}}
+                                <option value="status_change">Status (system)</option>
+                                <option value="outcome">Outcome (legacy)</option>
+                                <option value="other">Other (legacy)</option>
                             </select>
                             @if($newUpdateType === 'follow_up')
                             <input type="date" wire:model="newUpdateDate"
@@ -692,6 +763,7 @@
                                    title="Follow-up date (when the follow-up occurred)">
                             @endif
                             <input type="text" wire:model="newUpdateContent"
+                                   data-comm-composer
                                    placeholder="{{ $newUpdateType === 'follow_up' ? 'What happened during follow-up...' : 'Add an update or note...' }}"
                                    wire:keydown.enter="addUpdate"
                                    class="flex-1 min-w-[200px] px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md text-sm">
@@ -821,6 +893,22 @@
                 <!-- Step 1: Basic Info -->
                 @if($convertStep === 1)
                 <div class="space-y-4">
+                    {{-- v2 (Phase 7): Requirements Gate at the top of step 1. --}}
+                    @if($convertingLog)
+                        @php $convertReqs = $convertingLog->intakeRequirements()->where('is_orphaned', false)->get(); @endphp
+                        @if($convertReqs->isNotEmpty())
+                            <x-comm.requirements-gate :items="$convertReqs"
+                                                      override-model="requirementOverride"
+                                                      override-reason-model="requirementOverrideReason" />
+                            @error('requirementOverride')
+                                <div class="p-3 rounded-md bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 text-sm text-red-800 dark:text-red-200">{{ $message }}</div>
+                            @enderror
+                            @error('requirementOverrideReason')
+                                <div class="p-3 rounded-md bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 text-sm text-red-800 dark:text-red-200">{{ $message }}</div>
+                            @enderror
+                        @endif
+                    @endif
+
                     <!-- Contact Info Summary -->
                     @if($convertingLog)
                     <div class="p-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-md text-sm">
@@ -1058,7 +1146,32 @@
 
     <!-- Form Modal -->
     @if($showForm)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50"
+             x-data="{
+                 handleKey(e) {
+                     // ⌘/⌃ + Enter: Save
+                     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && !e.shiftKey) {
+                         e.preventDefault();
+                         $wire.call('save');
+                         return;
+                     }
+                     // ⌘/⌃ + Shift + Enter: Save & New (spec §6 calls this ⌘⏎N)
+                     if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 'Enter') {
+                         e.preventDefault();
+                         $wire.call('saveAndNew');
+                         return;
+                     }
+                     // Esc: close modal (unless the picker is currently swallowing it)
+                     if (e.key === 'Escape') {
+                         const tag = document.activeElement?.tagName;
+                         if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') {
+                             return;
+                         }
+                         $wire.set('showForm', false);
+                     }
+                 },
+             }"
+             x-on:keydown.window="handleKey">
             <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                     {{ $editingId ? 'Edit Communication' : 'New Communication Entry' }}
@@ -1601,16 +1714,29 @@
                     @if($allFundCodes->isNotEmpty() && ($this->state === 'project' || $showFundCodesInIntake))
                     <div class="md:col-span-2 border-t border-gray-200 dark:border-zinc-600 pt-4 mt-2">
                         <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Fund Codes (Optional)</h4>
-                        <div class="flex flex-wrap gap-2">
+
+                        {{-- v2 §5.2: inline red callout when ANY selected fund expires ≤30 days. --}}
+                        @php
+                            $selectedSoonFunds = $allFundCodes->whereIn('id', $selectedFundCodeIds)->filter(fn ($f) => $f->expiry_state === 'soon');
+                        @endphp
+                        @if($selectedSoonFunds->isNotEmpty())
+                            <div class="mb-3 p-3 rounded-md bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 text-sm text-red-800 dark:text-red-200">
+                                @foreach($selectedSoonFunds as $sf)
+                                    <div><strong class="font-mono">{{ $sf->code }}</strong> expires in {{ $sf->days_to_expiry }}d. Any work tagged to it must close by {{ $sf->expires_at->format('M j, Y') }}.</div>
+                                @endforeach
+                            </div>
+                        @endif
+
+                        @error('selectedFundCodeIds')
+                            <div class="mb-3 p-3 rounded-md bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 text-sm text-red-700 dark:text-red-300">{{ $message }}</div>
+                        @enderror
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                             @foreach($allFundCodes as $fundCode)
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" wire:model="selectedFundCodeIds" value="{{ $fundCode->id }}"
-                                           class="rounded border-gray-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500">
-                                    <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                                        <span class="font-mono font-semibold">{{ $fundCode->code }}</span>
-                                        <span class="text-gray-500 dark:text-gray-400">– {{ $fundCode->description }}</span>
-                                    </span>
-                                </label>
+                                <x-comm.fund-chip
+                                    :fund="$fundCode"
+                                    :checked="in_array($fundCode->id, $selectedFundCodeIds)"
+                                    wire-model="selectedFundCodeIds" />
                             @endforeach
                         </div>
                     </div>
@@ -1621,18 +1747,29 @@
 
                 </div>
 
-                <div class="mt-6 flex justify-end space-x-3">
-                    <button wire:click="$set('showForm', false)"
-                            class="px-4 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
-                        Cancel
-                    </button>
-                    <button wire:click="save"
-                            wire:loading.attr="disabled"
-                            wire:loading.class="opacity-50 cursor-not-allowed"
-                            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
-                        <span wire:loading.remove wire:target="save">{{ $editingId ? 'Update' : 'Save' }}</span>
-                        <span wire:loading wire:target="save">Saving...</span>
-                    </button>
+                <div class="mt-6 flex items-center justify-between gap-3 flex-wrap">
+                    <div class="text-[11px] text-gray-500 dark:text-gray-400 flex items-center gap-2 flex-wrap">
+                        <x-comm.kbd :keys="['⌘', '⏎']" /> Save
+                        <span class="text-gray-300 dark:text-zinc-600">·</span>
+                        <x-comm.kbd :keys="['⌘', '⇧', '⏎']" /> Save &amp; new
+                        <span class="text-gray-300 dark:text-zinc-600">·</span>
+                        <x-comm.kbd :keys="['⌘', 'P']" /> Project picker
+                        <span class="text-gray-300 dark:text-zinc-600">·</span>
+                        <x-comm.kbd>Esc</x-comm.kbd> Cancel
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button wire:click="$set('showForm', false)"
+                                class="px-4 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
+                            Cancel
+                        </button>
+                        <button wire:click="save"
+                                wire:loading.attr="disabled"
+                                wire:loading.class="opacity-50 cursor-not-allowed"
+                                class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                            <span wire:loading.remove wire:target="save">{{ $editingId ? 'Update' : 'Save' }}</span>
+                            <span wire:loading wire:target="save">Saving...</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
