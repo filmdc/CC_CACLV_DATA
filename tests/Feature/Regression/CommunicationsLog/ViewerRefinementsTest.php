@@ -312,7 +312,7 @@ it('media routes refuse unauthenticated access', function () {
     expect($resp->status())->toBeIn([302, 401, 403]);
 })->group('regression');
 
-it('attachment row in the action modal exposes both View and Download for previewable files', function () {
+it('requirements panel row exposes View and Download chips for attached previewable files', function () {
     \Illuminate\Support\Facades\Storage::fake('private_media');
 
     $log = CommunicationLog::factory()->create();
@@ -331,13 +331,74 @@ it('attachment row in the action modal exposes both View and Download for previe
         ->usingName('receipt.txt')
         ->toMediaCollection('documents');
 
+    // The panel renders inline within the viewer detail modal — no need to
+    // open the per-row Edit/Action modal to View/Download.
     Livewire::actingAs($this->user)
         ->test(CommunicationsLogManagement::class)
         ->call('viewDetail', $log->id)
-        ->call('openRequirementActionModal', $req->id)
         ->assertSee('receipt.txt')
         ->assertSee('View')
         ->assertSee('Download');
+})->group('regression');
+
+it('deleteRequirementMedia(reqId, mediaId) removes an attachment without needing the action modal open', function () {
+    \Illuminate\Support\Facades\Storage::fake('private_media');
+
+    $log = CommunicationLog::factory()->create();
+    $req = IntakeRequirement::create([
+        'communication_log_id' => $log->id,
+        'type' => IntakeRequirement::TYPE_DOCUMENT,
+        'label' => 'Old upload',
+        'key' => 'old-'.uniqid(),
+        'kind' => 'doc',
+        'status' => IntakeRequirement::STATUS_RECEIVED,
+        'source_type' => IntakeRequirement::SOURCE_AD_HOC,
+    ]);
+
+    $req->addMediaFromString("draft\n")
+        ->usingFileName('draft.txt')
+        ->usingName('draft.txt')
+        ->toMediaCollection('documents');
+
+    $media = $req->fresh()->getMedia('documents')->firstOrFail();
+
+    Livewire::actingAs($this->user)
+        ->test(CommunicationsLogManagement::class)
+        ->call('viewDetail', $log->id)
+        // No openRequirementActionModal call — delete is callable from the panel row.
+        ->assertSet('actingOnRequirementId', null)
+        ->call('deleteRequirementMedia', $req->id, $media->id);
+
+    expect($req->fresh()->getMedia('documents')->count())->toBe(0);
+})->group('regression');
+
+it('deleteRequirementMedia rejects mediaId on a requirement from another log', function () {
+    \Illuminate\Support\Facades\Storage::fake('private_media');
+
+    $logA = CommunicationLog::factory()->create();
+    $logB = CommunicationLog::factory()->create();
+    $reqB = IntakeRequirement::create([
+        'communication_log_id' => $logB->id,
+        'type' => IntakeRequirement::TYPE_DOCUMENT,
+        'label' => 'Other-log doc',
+        'key' => 'otherdoc-'.uniqid(),
+        'kind' => 'doc',
+        'status' => IntakeRequirement::STATUS_RECEIVED,
+        'source_type' => IntakeRequirement::SOURCE_AD_HOC,
+    ]);
+    $reqB->addMediaFromString("x\n")
+        ->usingFileName('x.txt')
+        ->usingName('x.txt')
+        ->toMediaCollection('documents');
+    $media = $reqB->fresh()->getMedia('documents')->firstOrFail();
+
+    Livewire::actingAs($this->user)
+        ->test(CommunicationsLogManagement::class)
+        ->call('viewDetail', $logA->id)
+        ->call('deleteRequirementMedia', $reqB->id, $media->id)
+        ->assertForbidden();
+
+    expect($reqB->fresh()->getMedia('documents')->count())->toBe(1);
 })->group('regression');
 
 it('applyRequirementAction rejects cross-log requirement IDs', function () {

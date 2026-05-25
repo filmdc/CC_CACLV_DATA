@@ -1061,21 +1061,19 @@ class CommunicationsLogManagement extends Component
     }
 
     /**
-     * Delete a media file off the acting-on requirement. Admin-only:
-     * Kaitlyn shouldn't be able to silently drop attachments, but
-     * removing a wrong upload is necessary.
+     * Delete a media file off a requirement attached to the currently
+     * viewed log. Called inline from the requirements panel (no need
+     * to open the Edit modal). Admin-only — Kaitlyn shouldn't be able
+     * to silently drop attachments, but removing a wrong upload is
+     * necessary.
      */
-    public function deleteRequirementMedia(int $mediaId): void
+    public function deleteRequirementMedia(int $requirementId, int $mediaId): void
     {
         if (! Auth::user()?->isAdmin()) {
             $this->authorizeAction('communications_log.delete');
         }
 
-        if (! $this->actingOnRequirementId) {
-            return;
-        }
-
-        $req = \App\Models\IntakeRequirement::findOrFail($this->actingOnRequirementId);
+        $req = \App\Models\IntakeRequirement::findOrFail($requirementId);
 
         if ($req->communication_log_id !== (int) $this->viewingId) {
             abort(403);

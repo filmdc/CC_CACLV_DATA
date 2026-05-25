@@ -129,6 +129,48 @@
                             @endforeach
                         </div>
                     @endif
+
+                    {{-- Phase 12.1: attachments surface inline on the row so the user
+                         can View/Download without opening the Edit modal. Edit is
+                         reserved for changes (status transitions + new uploads). --}}
+                    @php
+                        $rowMedia = ($item->type ?? null) === IntakeRequirement::TYPE_DOCUMENT && method_exists($item, 'getMedia')
+                            ? $item->getMedia('documents')
+                            : collect();
+                    @endphp
+                    @if($rowMedia->isNotEmpty())
+                        <ul class="flex flex-wrap gap-x-3 gap-y-1 mt-2">
+                            @foreach($rowMedia as $m)
+                                @php
+                                    $previewable = in_array($m->mime_type, [
+                                        'application/pdf',
+                                        'image/jpeg', 'image/jpg', 'image/png', 'image/gif',
+                                        'image/webp', 'image/svg+xml',
+                                        'text/plain', 'text/csv',
+                                    ], true);
+                                @endphp
+                                <li class="inline-flex items-center gap-1.5 text-[11px] bg-calv-sand-15 px-2 py-1 rounded-calv-xs">
+                                    <x-lucide name="paperclip" :size="11" class="text-calv-slate-65 shrink-0" />
+                                    <span class="text-calv-slate truncate max-w-[180px]" title="{{ $m->name }} · {{ $m->mime_type }}">{{ $m->name }}</span>
+                                    <span class="text-calv-slate-65">·</span>
+                                    @if($previewable)
+                                        <a href="{{ route('media.preview', $m->id) }}" target="_blank" rel="noopener"
+                                           class="text-calv-teal hover:underline">View</a>
+                                        <span class="text-calv-slate-35">/</span>
+                                    @endif
+                                    <a href="{{ route('media.download', $m->id) }}"
+                                       class="text-calv-teal hover:underline">Download</a>
+                                    @if(auth()->user()?->isAdmin())
+                                        <span class="text-calv-slate-35">/</span>
+                                        <button type="button"
+                                                wire:click="deleteRequirementMedia({{ $item->id }}, {{ $m->id }})"
+                                                wire:confirm="Delete this attachment?"
+                                                class="text-calv-red hover:underline">Remove</button>
+                                    @endif
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
                 </div>
 
                 <x-comm.meta-chip :tone="$statusTone[$item->status] ?? 'neutral'">

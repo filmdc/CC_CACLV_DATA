@@ -868,58 +868,17 @@
                                     @endif
                                 </p>
 
-                                {{-- Phase 12: file uploads for type=document requirements.
-                                     Shows existing attachments + an upload widget; uploading
-                                     marks the requirement received in the same action. --}}
+                                {{-- Phase 12.1: the Edit modal only handles CHANGES — uploading
+                                     new files + status transitions. Viewing/downloading existing
+                                     attachments happens inline on the requirements panel rows. --}}
                                 @if($actingReq->type === \App\Models\IntakeRequirement::TYPE_DOCUMENT)
-                                    @php $existingMedia = $actingReq->getMedia('documents'); @endphp
-
-                                    @if($existingMedia->isNotEmpty())
-                                        <div class="mb-4 p-3 rounded border border-gray-200 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-900/30">
-                                            <h4 class="text-[11px] font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300 mb-2">Attached files ({{ $existingMedia->count() }})</h4>
-                                            <ul class="space-y-2">
-                                                @foreach($existingMedia as $m)
-                                                    @php
-                                                        // Browser-renderable types get a Preview button (opens inline
-                                                        // in a new tab); everything else gets Download only.
-                                                        $previewable = in_array($m->mime_type, [
-                                                            'application/pdf',
-                                                            'image/jpeg', 'image/jpg', 'image/png', 'image/gif',
-                                                            'image/webp', 'image/svg+xml',
-                                                            'text/plain', 'text/csv',
-                                                        ], true);
-                                                    @endphp
-                                                    <li class="flex items-center justify-between gap-2 text-sm">
-                                                        <div class="min-w-0 flex-1">
-                                                            <div class="text-gray-900 dark:text-white truncate">{{ $m->name }}</div>
-                                                            <div class="text-xs text-gray-500 dark:text-gray-400">
-                                                                {{ $m->mime_type ?: 'unknown' }} · {{ \Illuminate\Support\Number::fileSize($m->size, precision: 1) }}
-                                                            </div>
-                                                        </div>
-                                                        <div class="flex items-center gap-2 shrink-0">
-                                                            @if($previewable)
-                                                                <a href="{{ route('media.preview', $m->id) }}" target="_blank" rel="noopener"
-                                                                   class="px-2 py-1 text-xs rounded border border-indigo-300 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/30">
-                                                                    View
-                                                                </a>
-                                                            @endif
-                                                            <a href="{{ route('media.download', $m->id) }}"
-                                                               class="px-2 py-1 text-xs rounded border border-gray-300 dark:border-zinc-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-700">
-                                                                Download
-                                                            </a>
-                                                            @if(auth()->user()->isAdmin())
-                                                                <button type="button"
-                                                                        wire:click="deleteRequirementMedia({{ $m->id }})"
-                                                                        wire:confirm="Delete this attachment?"
-                                                                        class="px-2 py-1 text-xs rounded border border-red-300 dark:border-red-800 text-red-600 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20">
-                                                                    Remove
-                                                                </button>
-                                                            @endif
-                                                        </div>
-                                                    </li>
-                                                @endforeach
-                                            </ul>
-                                        </div>
+                                    @php $existingCount = $actingReq->getMedia('documents')->count(); @endphp
+                                    @if($existingCount > 0)
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                                            <span class="font-medium">{{ $existingCount }}</span>
+                                            file{{ $existingCount === 1 ? '' : 's' }} already attached — view or download
+                                            them from the requirement row in the panel below.
+                                        </p>
                                     @endif
 
                                     <div class="mb-4 p-3 rounded border-2 border-dashed border-indigo-200 dark:border-indigo-800 bg-indigo-50/40 dark:bg-indigo-900/10">
