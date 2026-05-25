@@ -2,6 +2,8 @@
 
 namespace App\Livewire;
 
+use App\Models\FundCode;
+use App\Models\HousingService;
 use App\Models\RequirementDefinition;
 use App\Models\RequirementTemplateSet;
 use App\Models\Service;
@@ -27,9 +29,11 @@ class RequirementsLibraryManagement extends Component
     use WithPagination, WithPermissionChecks;
 
     // ── Tab + drill state ─────────────────────────────────────────
-    public string $activeTab = 'atoms';     // 'atoms' | 'bundles'
+    public string $activeTab = 'atoms';     // 'atoms' | 'bundles' | 'services'
 
     public ?int $editingBundleId = null;    // when set: bundle detail view
+
+    public ?int $editingServiceId = null;   // when set: housing-service detail view
 
     public bool $showTrashed = false;
 
@@ -68,11 +72,29 @@ class RequirementsLibraryManagement extends Component
 
     public array $linkedServiceIds = [];    // service ids currently linked
 
+    // ── Service form + detail state ───────────────────────────────
+    public bool $showServiceForm = false;
+
+    public ?int $serviceFormId = null;
+
+    public string $serviceName = '';
+
+    public string $serviceDescription = '';
+
+    public bool $serviceActive = true;
+
+    public array $serviceLinkedFundCodeIds = [];
+
+    public array $serviceLinkedBundleIds = [];
+
+    public array $serviceLinkedAtomIds = [];
+
     public bool $canManage = false;
 
     protected $queryString = [
         'activeTab' => ['as' => 'tab', 'except' => 'atoms'],
         'editingBundleId' => ['as' => 'bundle'],
+        'editingServiceId' => ['as' => 'service'],
         'showTrashed' => ['as' => 'trashed', 'except' => false],
         'search' => ['except' => ''],
         'kindFilter' => ['as' => 'kind', 'except' => null],
@@ -85,6 +107,9 @@ class RequirementsLibraryManagement extends Component
 
         if ($this->editingBundleId) {
             $this->loadBundleDetail($this->editingBundleId);
+        }
+        if ($this->editingServiceId) {
+            $this->loadServiceDetail($this->editingServiceId);
         }
     }
 
@@ -99,6 +124,7 @@ class RequirementsLibraryManagement extends Component
         $this->search = '';
         $this->kindFilter = null;
         $this->editingBundleId = null;
+        $this->editingServiceId = null;
     }
 
     public function updatedShowTrashed(): void
@@ -108,7 +134,7 @@ class RequirementsLibraryManagement extends Component
 
     public function setTab(string $tab): void
     {
-        if (! in_array($tab, ['atoms', 'bundles'], true)) {
+        if (! in_array($tab, ['atoms', 'bundles', 'services'], true)) {
             return;
         }
         $this->activeTab = $tab;
@@ -447,6 +473,161 @@ class RequirementsLibraryManagement extends Component
     }
 
     // ─────────────────────────────────────────────────────────────
+    // HOUSING SERVICE CRUD + DETAIL
+    // ─────────────────────────────────────────────────────────────
+
+    public function showCreateService(): void
+    {
+        $this->authorizeAction('requirements_library.manage');
+        $this->resetServiceForm();
+        $this->serviceFormId = null;
+        $this->showServiceForm = true;
+    }
+
+    public function showEditService(int $id): void
+    {
+        $this->authorizeAction('requirements_library.manage');
+        $svc = HousingService::withTrashed()->findOrFail($id);
+        $this->serviceFormId = $svc->id;
+        $this->serviceName = $svc->name;
+        $this->serviceDescription = $svc->description ?? '';
+        $this->serviceActive = (bool) $svc->is_active;
+        $this->showServiceForm = true;
+    }
+
+    public function saveService(): void
+    {
+        $this->authorizeAction('requirements_library.manage');
+
+        $validated = $this->validate([
+            'serviceName' => 'required|string|max:255',
+            'serviceDescription' => 'nullable|string|max:1000',
+            'serviceActive' => 'boolean',
+        ]);
+
+        $payload = [
+            'name' => $validated['serviceName'],
+            'description' => $validated['serviceDescription'] !== '' ? $validated['serviceDescription'] : null,
+            'is_active' => $validated['serviceActive'],
+            'updated_by_user_id' => Auth::id(),
+        ];
+
+        if ($this->serviceFormId) {
+            HousingService::findOrFail($this->serviceFormId)->update($payload);
+            session()->flash('message', 'Service updated.');
+        } else {
+            $payload['created_by_user_id'] = Auth::id();
+            $svc = HousingService::create($payload);
+            session()->flash('message', 'Service created.');
+            $this->editingServiceId = $svc->id;
+            $this->loadServiceDetail($svc->id);
+        }
+
+        $this->showServiceForm = false;
+        $this->resetServiceForm();
+    }
+
+    public function deleteService(int $id): void
+    {
+        $this->authorizeAction('requirements_library.manage');
+        HousingService::findOrFail($id)->delete();
+        session()->flash('message', 'Service moved to trash. Historical comm-log references are preserved.');
+        if ($this->editingServiceId === $id) {
+            $this->editingServiceId = null;
+        }
+    }
+
+    public function restoreService(int $id): void
+    {
+        $this->authorizeAction('requirements_library.manage');
+        HousingService::withTrashed()->findOrFail($id)->restore();
+        session()->flash('message', 'Service restored.');
+    }
+
+    public function openService(int $id): void
+    {
+        $this->authorizeAction('requirements_library.view');
+        $this->editingServiceId = $id;
+        $this->loadServiceDetail($id);
+    }
+
+    public function closeService(): void
+    {
+        $this->editingServiceId = null;
+        $this->serviceLinkedFundCodeIds = [];
+        $this->serviceLinkedBundleIds = [];
+        $this->serviceLinkedAtomIds = [];
+    }
+
+    private function loadServiceDetail(int $id): void
+    {
+        $svc = HousingService::with(['fundCodes', 'templateSets', 'requirementDefinitions'])->find($id);
+        if (! $svc) {
+            $this->editingServiceId = null;
+
+            return;
+        }
+        $this->serviceLinkedFundCodeIds = $svc->fundCodes->pluck('id')->all();
+        $this->serviceLinkedBundleIds = $svc->templateSets->pluck('id')->all();
+        $this->serviceLinkedAtomIds = $svc->requirementDefinitions->pluck('id')->all();
+    }
+
+    public function toggleServiceFundCode(int $id): void
+    {
+        $this->serviceLinkedFundCodeIds = $this->toggleId($this->serviceLinkedFundCodeIds, $id);
+    }
+
+    public function toggleServiceBundle(int $id): void
+    {
+        $this->serviceLinkedBundleIds = $this->toggleId($this->serviceLinkedBundleIds, $id);
+    }
+
+    public function toggleServiceAtom(int $id): void
+    {
+        $this->serviceLinkedAtomIds = $this->toggleId($this->serviceLinkedAtomIds, $id);
+    }
+
+    public function saveServiceLinks2(): void
+    {
+        $this->authorizeAction('requirements_library.manage');
+        if (! $this->editingServiceId) {
+            return;
+        }
+        $svc = HousingService::findOrFail($this->editingServiceId);
+        $userId = Auth::id();
+        $now = now();
+        $sync = fn (array $ids) => collect($ids)
+            ->mapWithKeys(fn ($id) => [(int) $id => ['created_by_user_id' => $userId, 'created_at' => $now]])
+            ->all();
+
+        $svc->fundCodes()->sync($sync($this->serviceLinkedFundCodeIds));
+        $svc->templateSets()->sync($sync($this->serviceLinkedBundleIds));
+        $svc->requirementDefinitions()->sync($sync($this->serviceLinkedAtomIds));
+
+        session()->flash('message', 'Service links updated.');
+    }
+
+    private function toggleId(array $list, int $id): array
+    {
+        $intList = array_map('intval', $list);
+        $id = (int) $id;
+        if (in_array($id, $intList, true)) {
+            return array_values(array_filter($intList, fn ($v) => $v !== $id));
+        }
+        $intList[] = $id;
+        return $intList;
+    }
+
+    private function resetServiceForm(): void
+    {
+        $this->serviceFormId = null;
+        $this->serviceName = '';
+        $this->serviceDescription = '';
+        $this->serviceActive = true;
+        $this->resetErrorBag();
+    }
+
+    // ─────────────────────────────────────────────────────────────
     // RENDER
     // ─────────────────────────────────────────────────────────────
 
@@ -495,14 +676,39 @@ class RequirementsLibraryManagement extends Component
             }
         }
 
+        // Services tab data
+        $housingServicesQuery = HousingService::query()
+            ->withCount(['fundCodes', 'templateSets', 'requirementDefinitions'])
+            ->when($this->showTrashed, fn ($q) => $q->withTrashed())
+            ->when($this->search !== '', fn ($q) => $q->where('name', 'like', "%{$this->search}%"))
+            ->orderBy('name');
+
+        $housingServiceDetail = null;
+        $serviceAllFundCodes = collect();
+        $serviceAllBundles = collect();
+        $serviceAllAtoms = collect();
+        if ($this->editingServiceId) {
+            $housingServiceDetail = HousingService::withTrashed()->find($this->editingServiceId);
+            if ($housingServiceDetail) {
+                $serviceAllFundCodes = FundCode::active()->orderBy('code')->get();
+                $serviceAllBundles = RequirementTemplateSet::orderBy('name')->get();
+                $serviceAllAtoms = RequirementDefinition::orderBy('label')->get();
+            }
+        }
+
         return view('livewire.requirements-library-management', [
             'atoms' => $this->activeTab === 'atoms' ? $atomsQuery->paginate(25) : collect(),
             'bundles' => $this->activeTab === 'bundles' ? $bundlesQuery->paginate(25) : collect(),
+            'housingServices' => $this->activeTab === 'services' ? $housingServicesQuery->paginate(25) : collect(),
             'kinds' => RequirementDefinition::KINDS,
             'bundleDetail' => $bundleDetail,
             'bundleItems' => $bundleItems,
             'atomsForPicker' => $atomsForPicker,
             'allServices' => $allServices,
+            'housingServiceDetail' => $housingServiceDetail,
+            'serviceAllFundCodes' => $serviceAllFundCodes,
+            'serviceAllBundles' => $serviceAllBundles,
+            'serviceAllAtoms' => $serviceAllAtoms,
             'canManage' => $this->can('requirements_library.manage'),
         ]);
     }

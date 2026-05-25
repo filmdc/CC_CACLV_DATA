@@ -1618,6 +1618,32 @@
                         </div>
                     </div>
 
+                    {{-- v2 / Phase 9: Housing Services picker (Kaitlyn's catalog). --}}
+                    @if($allHousingServices->isNotEmpty())
+                        <div class="md:col-span-2 border-t border-gray-200 dark:border-zinc-600 pt-4 mt-2">
+                            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Housing Services</h4>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                                Tick a service to auto-attach its fund codes for budgeting AND auto-stamp its requirements onto this log.
+                            </p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                @foreach($allHousingServices as $hs)
+                                    <label class="flex items-start gap-2.5 px-3 py-2 rounded-md border border-gray-200 dark:border-zinc-600 hover:bg-gray-50 dark:hover:bg-zinc-700 cursor-pointer">
+                                        <input type="checkbox"
+                                               wire:click="toggleHousingService({{ $hs->id }})"
+                                               @checked(in_array($hs->id, $selectedHousingServiceIds))
+                                               class="mt-1 rounded border-gray-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500" />
+                                        <div class="min-w-0 flex-1">
+                                            <div class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ $hs->name }}</div>
+                                            @if($hs->description)
+                                                <div class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ $hs->description }}</div>
+                                            @endif
+                                        </div>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
                     <!-- Service Association Section (v2: hidden by default in INTAKE) -->
                     @if($accessiblePrograms->isNotEmpty() && ($this->state === 'project' || $showServicesInIntake))
                     <div class="md:col-span-2 border-t border-gray-200 dark:border-zinc-600 pt-4 mt-2">

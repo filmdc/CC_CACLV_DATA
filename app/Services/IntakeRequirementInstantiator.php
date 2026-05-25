@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\CommunicationLog;
 use App\Models\FundCode;
 use App\Models\HousingJob;
+use App\Models\HousingService;
 use App\Models\IntakeRequirement;
 use App\Models\RequirementDefinition;
 use App\Models\RequirementTemplateSet;
@@ -332,6 +333,90 @@ class IntakeRequirementInstantiator
             'source_definition_id' => $atom->id,
             'source_label_snapshot' => $atom->label,
         ], $actor);
+    }
+
+    /**
+     * Comm Log v2 / Phase 9: stamp every requirement implied by a
+     * HousingService (the Kaitlyn-curated catalog item) onto the log.
+     *
+     * Three sources contribute:
+     *   1. atoms in every linked bundle (forTemplateSet, tagged via:'service:N')
+     *   2. atoms linked directly to the service (no bundle wrapper)
+     *   3. fund codes linked to the service (reconciled into the log's
+     *      anticipated_fund_codes pivot — that in turn instantiates the
+     *      legacy fund-code-driven eligibility templates via forFundCode).
+     *
+     * Idempotent on all three axes — re-running with the same service
+     * merges via tags rather than creating dupes. Runs in a transaction.
+     *
+     * @return Collection<int, IntakeRequirement>  all instances created or merged
+     */
+    public function forHousingService(
+        CommunicationLog $log,
+        HousingService $service,
+        User $actor
+    ): Collection {
+        $serviceTag = 'service:'.$service->id;
+
+        return DB::transaction(function () use ($log, $service, $actor, $serviceTag) {
+            $result = collect();
+
+            // 1. Bundled atoms.
+            foreach ($service->templateSets()->get() as $bundle) {
+                $result = $result->merge(
+                    $this->forTemplateSet($log, $bundle, $actor, $serviceTag)
+                );
+            }
+
+            // 2. Direct atoms (not in any bundle).
+            foreach ($service->requirementDefinitions()->get() as $atom) {
+                $existing = IntakeRequirement::query()
+                    ->where('communication_log_id', $log->id)
+                    ->where('key', $atom->key)
+                    ->first();
+
+                if ($existing !== null) {
+                    $this->mergeViaTags($existing, [$serviceTag], $actor);
+                    if ($existing->is_orphaned) {
+                        $existing->unmarkOrphaned($actor);
+                    }
+                    $result->push($existing);
+
+                    continue;
+                }
+
+                $result->push($this->insert($log, [
+                    'type' => $atom->kind === RequirementDefinition::KIND_DOC
+                        ? IntakeRequirement::TYPE_DOCUMENT
+                        : IntakeRequirement::TYPE_TASK,
+                    'label' => $atom->label,
+                    'key' => $atom->key,
+                    'kind' => $atom->kind,
+                    'via' => [$serviceTag],
+                    'source_type' => IntakeRequirement::SOURCE_DEFINITION,
+                    'source_template_id' => null,
+                    'source_definition_id' => $atom->id,
+                    'source_label_snapshot' => $atom->label,
+                ], $actor));
+            }
+
+            // 3. Fund codes — merge into the log's anticipatedFundCodes
+            //    via the existing reconciler. This is additive: any
+            //    funds already anticipated stay, and the service's funds
+            //    are unioned in. This also picks up legacy fund-code-
+            //    eligibility templates via forFundCode under the hood.
+            $serviceFundIds = $service->fundCodes()->pluck('fund_codes.id')->all();
+            if (! empty($serviceFundIds)) {
+                $currentFundIds = $log->anticipatedFundCodes()->pluck('fund_codes.id')->all();
+                $merged = array_values(array_unique(array_merge(
+                    array_map('intval', $currentFundIds),
+                    array_map('intval', $serviceFundIds)
+                )));
+                $this->reconcileAnticipatedFundCodes($log, $merged, $actor);
+            }
+
+            return $result;
+        });
     }
 
     /**

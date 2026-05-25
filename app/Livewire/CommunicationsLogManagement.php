@@ -247,8 +247,16 @@ class CommunicationsLogManagement extends Component
 
     public $follow_up_action = '';
 
-    // Service multi-select
+    // Service multi-select (legacy program services)
     public $selectedServices = [];
+
+    /**
+     * Comm Log v2 / Phase 9: housing services (Kaitlyn's custom catalog,
+     * decoupled from program services). On toggle, the linked fund codes
+     * are merged into $selectedFundCodeIds. On save(), each selected
+     * housing service triggers IntakeRequirementInstantiator::forHousingService.
+     */
+    public array $selectedHousingServiceIds = [];
 
     // Tag management
     public $selectedTagIds = [];
@@ -806,10 +814,37 @@ class CommunicationsLogManagement extends Component
         $this->showServicesInIntake = true;
     }
 
+    /**
+     * Comm Log v2 / Phase 9: toggle a housing service on the entry's
+     * selection. When ADDED, auto-merges the service's linked fund-code
+     * IDs into $selectedFundCodeIds. When REMOVED, leaves fund codes
+     * alone (the user already saw them and may have a reason to keep
+     * them — explicit detach if undesired).
+     */
+    public function toggleHousingService(int $id): void
+    {
+        $current = array_map('intval', $this->selectedHousingServiceIds);
+        if (in_array($id, $current, true)) {
+            $this->selectedHousingServiceIds = array_values(array_filter($current, fn ($v) => $v !== $id));
+            return;
+        }
+
+        $this->selectedHousingServiceIds = [...$current, $id];
+
+        // Merge the service's fund codes into the selection so the user
+        // sees the "funds for budgeting" auto-checked in real time.
+        $svc = \App\Models\HousingService::with('fundCodes')->find($id);
+        if ($svc) {
+            $svcFundIds = $svc->fundCodes->pluck('id')->map(fn ($v) => (int) $v)->all();
+            $existingFundIds = array_map('intval', $this->selectedFundCodeIds);
+            $this->selectedFundCodeIds = array_values(array_unique([...$existingFundIds, ...$svcFundIds]));
+        }
+    }
+
     public function showEditForm($id)
     {
         $this->authorizeAction('communications_log.edit');
-        $log = CommunicationLog::with(['services', 'tags'])->findOrFail($id);
+        $log = CommunicationLog::with(['services', 'tags', 'housingServices'])->findOrFail($id);
 
         $this->editingId = $id;
         $this->housing_job_id = $log->housing_job_id ?? '';
@@ -845,6 +880,7 @@ class CommunicationsLogManagement extends Component
         $this->follow_up_date = $log->follow_up_date?->format('Y-m-d') ?? '';
         $this->follow_up_action = $log->follow_up_action ?? '';
         $this->selectedServices = $log->services->pluck('id')->toArray();
+        $this->selectedHousingServiceIds = $log->housingServices->pluck('id')->toArray();
         $this->selectedTagIds = $log->tags->pluck('id')->toArray();
         $this->selectedFundCodeIds = $log->anticipatedFundCodes->pluck('id')->toArray();
         $this->originallySelectedFundCodeIds = $this->selectedFundCodeIds;
@@ -1951,6 +1987,10 @@ class CommunicationsLogManagement extends Component
             // Sync anticipated fund codes (P-39b: legacy tag pivot dropped).
             $log->anticipatedFundCodes()->sync($this->selectedFundCodeIds);
 
+            // v2 / Phase 9: sync housing services + run the instantiator
+            // for any newly-attached ones so requirements auto-stamp.
+            $this->syncHousingServices($log);
+
             session()->flash('success', 'Communication log updated successfully.');
         } else {
             $this->authorizeAction('communications_log.create');
@@ -1966,11 +2006,50 @@ class CommunicationsLogManagement extends Component
             // Attach anticipated fund codes (P-39b: legacy tag pivot dropped).
             $log->anticipatedFundCodes()->sync($this->selectedFundCodeIds);
 
+            // v2 / Phase 9: sync housing services + auto-stamp requirements.
+            $this->syncHousingServices($log);
+
             session()->flash('success', 'Communication log created successfully.');
         }
 
         $this->showForm = false;
         $this->resetForm();
+    }
+
+    /**
+     * Comm Log v2 / Phase 9: sync the comm-log ↔ housing-service pivot
+     * AND run IntakeRequirementInstantiator::forHousingService for every
+     * newly-attached service so requirements + fund codes auto-stamp.
+     *
+     * Idempotent — re-running for an already-attached service merges
+     * via tags without creating duplicate IntakeRequirement rows.
+     */
+    protected function syncHousingServices(CommunicationLog $log): void
+    {
+        $currentIds = $log->housingServices()->pluck('housing_services.id')->map(fn ($v) => (int) $v)->all();
+        $targetIds = array_map('intval', $this->selectedHousingServiceIds);
+
+        $toAdd = array_diff($targetIds, $currentIds);
+        $toRemove = array_diff($currentIds, $targetIds);
+
+        if (! empty($toRemove)) {
+            $log->housingServices()->detach($toRemove);
+        }
+
+        $instantiator = app(\App\Services\IntakeRequirementInstantiator::class);
+        $actor = Auth::user();
+
+        foreach ($toAdd as $serviceId) {
+            $log->housingServices()->attach($serviceId, [
+                'created_by_user_id' => $actor->id,
+                'created_at' => now(),
+            ]);
+
+            $svc = \App\Models\HousingService::find($serviceId);
+            if ($svc !== null) {
+                $instantiator->forHousingService($log, $svc, $actor);
+            }
+        }
     }
 
     public function delete($id)
@@ -2180,6 +2259,7 @@ class CommunicationsLogManagement extends Component
         $this->follow_up_date = '';
         $this->follow_up_action = '';
         $this->selectedServices = [];
+        $this->selectedHousingServiceIds = [];
         $this->selectedTagIds = [];
         $this->selectedFundCodeIds = [];
         $this->originallySelectedFundCodeIds = [];
@@ -2469,6 +2549,7 @@ class CommunicationsLogManagement extends Component
             'allFundCodes' => $allFundCodes,
             'pickerProjects' => $pickerProjects,
             'currentRequirements' => $currentRequirements,
+            'allHousingServices' => \App\Models\HousingService::active()->orderBy('name')->get(),
         ]);
     }
 }

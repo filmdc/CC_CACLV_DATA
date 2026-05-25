@@ -136,6 +136,22 @@ class CommunicationLog extends Model
     }
 
     /**
+     * Comm Log v2 / Phase 9: housing services attached to this log.
+     * Selecting a housing service auto-attaches its fund codes to
+     * anticipatedFundCodes() and auto-stamps its bundled + direct atoms
+     * via IntakeRequirementInstantiator::forHousingService.
+     */
+    public function housingServices(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            HousingService::class,
+            'communication_log_housing_services',
+            'communication_log_id',
+            'housing_service_id'
+        )->withPivot('created_by_user_id', 'created_at');
+    }
+
+    /**
      * P-39b: intake-phase requirements on this CommunicationLog.
      * Independent lifecycle from project-execution Requirements; see
      * IntakeRequirementInstantiator and the "Intake vs. Project
