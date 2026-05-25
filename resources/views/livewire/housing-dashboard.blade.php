@@ -6,6 +6,10 @@
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Housing Dashboard</h1>
                 <p class="text-sm text-gray-600 dark:text-gray-400">Outstanding requirements across your projects.</p>
             </div>
+            <a href="{{ route('communications-log.management') }}"
+               class="text-sm text-indigo-600 dark:text-indigo-300 hover:underline mr-4">
+                Open Communications Log →
+            </a>
             <div class="inline-flex rounded-md border border-gray-300 dark:border-zinc-600 overflow-hidden" data-test="dashboard-tab-toggle">
                 <button wire:click="setTab('projects')"
                         class="px-4 py-2 text-sm {{ $tab === 'projects' ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-zinc-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50' }}">
@@ -17,6 +21,81 @@
                 </button>
             </div>
         </div>
+
+        {{-- Phase 12.2: Intake pipeline card — surfaces non-converted comm
+             logs ranked by Phase 1 requirement completion so the worker
+             can prioritize follow-ups on the cases closest to convertible. --}}
+        @if($intakePipeline->isNotEmpty())
+            <section data-test="intake-pipeline-card" class="mb-6 rounded-lg border border-indigo-200 dark:border-indigo-900/50 bg-indigo-50/50 dark:bg-indigo-900/10 overflow-hidden">
+                <header class="flex items-center justify-between px-4 py-2.5 bg-indigo-100/70 dark:bg-indigo-900/30 border-b border-indigo-200 dark:border-indigo-900/50">
+                    <div>
+                        <h2 class="text-sm font-semibold text-indigo-900 dark:text-indigo-100">Intake pipeline · closest to convert</h2>
+                        <p class="text-[11px] text-indigo-800/70 dark:text-indigo-200/70">Phase 1 (eligibility + compliance). Follow up to push them across the line.</p>
+                    </div>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-600 text-white">
+                        {{ $intakePipeline->count() }}
+                    </span>
+                </header>
+
+                <ul class="divide-y divide-indigo-100 dark:divide-indigo-900/40">
+                    @foreach($intakePipeline as $row)
+                        @php
+                            $ready = $row['pct'] >= 100;
+                            $stale = !is_null($row['days_idle']) && $row['days_idle'] >= 7;
+                            $barColor = $ready
+                                ? 'bg-emerald-500'
+                                : ($row['pct'] >= 70 ? 'bg-amber-500' : 'bg-indigo-400');
+                        @endphp
+                        <li class="px-4 py-2.5 hover:bg-white/60 dark:hover:bg-zinc-800/40">
+                            <div class="flex items-center gap-3">
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <a href="{{ route('communications-log.management') }}?view={{ $row['id'] }}"
+                                           class="text-sm font-medium text-gray-900 dark:text-white hover:underline truncate">
+                                            {{ $row['name'] }}
+                                        </a>
+                                        @if(!$row['has_participant'])
+                                            <span class="text-[10px] uppercase tracking-wider text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/40 px-1.5 py-0.5 rounded">not linked</span>
+                                        @endif
+                                        @if($row['priority'] === 'urgent' || $row['priority'] === 'high')
+                                            <span class="text-[10px] uppercase tracking-wider text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900/40 px-1.5 py-0.5 rounded">{{ $row['priority'] }}</span>
+                                        @endif
+                                        @if($ready)
+                                            <span class="text-[10px] uppercase tracking-wider text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/40 px-1.5 py-0.5 rounded">ready</span>
+                                        @elseif($stale)
+                                            <span class="text-[10px] uppercase tracking-wider text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/40 px-1.5 py-0.5 rounded">needs follow-up</span>
+                                        @endif
+                                    </div>
+                                    <div class="mt-1.5 flex items-center gap-3">
+                                        <div class="flex-1 h-1.5 rounded-full bg-indigo-100 dark:bg-indigo-900/40 overflow-hidden max-w-xs">
+                                            <div class="h-full {{ $barColor }} transition-all" style="width: {{ $row['pct'] }}%"></div>
+                                        </div>
+                                        <span class="text-xs tabular-nums text-gray-700 dark:text-gray-200 shrink-0">
+                                            {{ $row['met'] }}/{{ $row['total'] }} · {{ $row['pct'] }}%
+                                        </span>
+                                        <span class="text-xs text-gray-500 dark:text-gray-400 shrink-0">
+                                            @if($row['days_idle'] === null)
+                                                no activity yet
+                                            @elseif($row['days_idle'] === 0)
+                                                today
+                                            @elseif($row['days_idle'] === 1)
+                                                1d ago
+                                            @else
+                                                {{ $row['days_idle'] }}d ago
+                                            @endif
+                                        </span>
+                                    </div>
+                                </div>
+                                <a href="{{ route('communications-log.management') }}?view={{ $row['id'] }}"
+                                   class="shrink-0 px-2.5 py-1 rounded border border-indigo-300 dark:border-indigo-700 text-xs text-indigo-700 dark:text-indigo-200 hover:bg-indigo-100 dark:hover:bg-indigo-900/30">
+                                    View
+                                </a>
+                            </div>
+                        </li>
+                    @endforeach
+                </ul>
+            </section>
+        @endif
 
         @if($tab === 'projects')
             {{-- Cut A: per-project view --}}

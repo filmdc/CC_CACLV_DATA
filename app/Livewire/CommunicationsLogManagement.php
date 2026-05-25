@@ -363,6 +363,16 @@ class CommunicationsLogManagement extends Component
     public function mount()
     {
         $this->authorizeAction('communications_log.view');
+
+        // Phase 12.2: deep-link to a specific log via ?view={id}. Used by
+        // the Housing Dashboard intake-pipeline card so clicking a row
+        // lands directly in that log's detail viewer.
+        $viewId = (int) request()->query('view', 0);
+        if ($viewId > 0) {
+            if (CommunicationLog::whereKey($viewId)->exists()) {
+                $this->viewDetail($viewId);
+            }
+        }
     }
 
     public function updatedSearch()
