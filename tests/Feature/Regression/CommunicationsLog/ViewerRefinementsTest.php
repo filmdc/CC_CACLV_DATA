@@ -234,6 +234,112 @@ it('uploadRequirementFiles refuses task-type requirements (422)', function () {
     expect($req->fresh()->status)->toBe(IntakeRequirement::STATUS_PENDING);
 })->group('regression');
 
+it('uploaded requirement files are downloadable via the media.download route', function () {
+    \Illuminate\Support\Facades\Storage::fake('private_media');
+
+    $log = CommunicationLog::factory()->create();
+    $req = IntakeRequirement::create([
+        'communication_log_id' => $log->id,
+        'type' => IntakeRequirement::TYPE_DOCUMENT,
+        'label' => 'Lease agreement',
+        'key' => 'lease-'.uniqid(),
+        'kind' => 'doc',
+        'status' => IntakeRequirement::STATUS_PENDING,
+        'source_type' => IntakeRequirement::SOURCE_AD_HOC,
+    ]);
+
+    $req->addMediaFromString("rented apartment contract\n")
+        ->usingFileName('lease.txt')
+        ->usingName('lease.txt')
+        ->toMediaCollection('documents');
+
+    $media = $req->getMedia('documents')->firstOrFail();
+
+    $resp = $this->actingAs($this->user)->get(route('media.download', $media->id));
+    $resp->assertOk()
+        ->assertHeader('content-disposition', 'attachment; filename='.$media->file_name);
+})->group('regression');
+
+it('uploaded requirement files are previewable inline via the media.preview route', function () {
+    \Illuminate\Support\Facades\Storage::fake('private_media');
+
+    $log = CommunicationLog::factory()->create();
+    $req = IntakeRequirement::create([
+        'communication_log_id' => $log->id,
+        'type' => IntakeRequirement::TYPE_DOCUMENT,
+        'label' => 'Income statement',
+        'key' => 'income-'.uniqid(),
+        'kind' => 'doc',
+        'status' => IntakeRequirement::STATUS_PENDING,
+        'source_type' => IntakeRequirement::SOURCE_AD_HOC,
+    ]);
+
+    $req->addMediaFromString("income figures\n")
+        ->usingFileName('income.txt')
+        ->usingName('income.txt')
+        ->toMediaCollection('documents');
+
+    $media = $req->getMedia('documents')->firstOrFail();
+
+    $resp = $this->actingAs($this->user)->get(route('media.preview', $media->id));
+    $resp->assertOk()
+        ->assertHeader('content-disposition', 'inline; filename="'.$media->file_name.'"');
+})->group('regression');
+
+it('media routes refuse unauthenticated access', function () {
+    \Illuminate\Support\Facades\Storage::fake('private_media');
+
+    $log = CommunicationLog::factory()->create();
+    $req = IntakeRequirement::create([
+        'communication_log_id' => $log->id,
+        'type' => IntakeRequirement::TYPE_DOCUMENT,
+        'label' => 'Private doc',
+        'key' => 'private-'.uniqid(),
+        'kind' => 'doc',
+        'status' => IntakeRequirement::STATUS_PENDING,
+        'source_type' => IntakeRequirement::SOURCE_AD_HOC,
+    ]);
+
+    $req->addMediaFromString("secret\n")
+        ->usingFileName('secret.txt')
+        ->usingName('secret.txt')
+        ->toMediaCollection('documents');
+
+    $media = $req->getMedia('documents')->firstOrFail();
+
+    // No actingAs — the auth middleware on the route group should redirect/reject.
+    $resp = $this->get(route('media.download', $media->id));
+    expect($resp->status())->toBeIn([302, 401, 403]);
+})->group('regression');
+
+it('attachment row in the action modal exposes both View and Download for previewable files', function () {
+    \Illuminate\Support\Facades\Storage::fake('private_media');
+
+    $log = CommunicationLog::factory()->create();
+    $req = IntakeRequirement::create([
+        'communication_log_id' => $log->id,
+        'type' => IntakeRequirement::TYPE_DOCUMENT,
+        'label' => 'Receipt scan',
+        'key' => 'receipt-'.uniqid(),
+        'kind' => 'doc',
+        'status' => IntakeRequirement::STATUS_RECEIVED,
+        'source_type' => IntakeRequirement::SOURCE_AD_HOC,
+    ]);
+
+    $req->addMediaFromString("receipt text\n")
+        ->usingFileName('receipt.txt')
+        ->usingName('receipt.txt')
+        ->toMediaCollection('documents');
+
+    Livewire::actingAs($this->user)
+        ->test(CommunicationsLogManagement::class)
+        ->call('viewDetail', $log->id)
+        ->call('openRequirementActionModal', $req->id)
+        ->assertSee('receipt.txt')
+        ->assertSee('View')
+        ->assertSee('Download');
+})->group('regression');
+
 it('applyRequirementAction rejects cross-log requirement IDs', function () {
     $logA = CommunicationLog::factory()->create();
     $logB = CommunicationLog::factory()->create();
