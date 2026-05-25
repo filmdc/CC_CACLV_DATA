@@ -108,17 +108,16 @@ it('selectProject(null) detaches and returns to intake', function () {
         ->assertSet('housing_job_id', '');
 })->group('regression');
 
-it('INTAKE state hides fund-codes section by default; revealFundCodes shows it', function () {
+it('the edit form never renders the fund-codes section (managed from the viewer Focus 2)', function () {
+    // UX shift: fund codes + housing services are managed from the
+    // detail viewer's Focus 2 section, not from the edit form. The
+    // form is for logging the communication only.
     Livewire::actingAs($this->user)
         ->test(CommunicationsLogManagement::class)
         ->call('showCreateForm')
         ->assertSet('anchor', 'intake')
-        ->assertSet('showFundCodesInIntake', false)
-        ->assertSee('Show fund codes')
-        ->assertDontSee('Fund Codes (Optional)', false)
-        ->call('revealFundCodes')
-        ->assertSet('showFundCodesInIntake', true)
-        ->assertSee('Fund Codes (Optional)');
+        ->assertDontSee('Fund Codes (Optional)')
+        ->assertDontSee('Show fund codes');
 })->group('regression');
 
 it('INTAKE state hides program-services section by default; revealServices shows it', function () {
@@ -132,17 +131,17 @@ it('INTAKE state hides program-services section by default; revealServices shows
         ->assertSee('Associate with Program Services (Optional)');
 })->group('regression');
 
-it('PROJECT state shows fund codes and services unconditionally', function () {
+it('PROJECT state shows program services unconditionally (fund codes managed from viewer)', function () {
     $job = HousingJob::factory()->create();
 
     Livewire::actingAs($this->user)
         ->test(CommunicationsLogManagement::class)
         ->call('showCreateForm')
         ->set('housing_job_id', $job->id)
-        // The state-machine derives from housing_job_id; even before
-        // any reveal toggles, the sections should be visible.
-        ->assertSee('Fund Codes (Optional)')
-        ->assertSee('Associate with Program Services (Optional)');
+        // Program services (legacy CSBG-tied) still appear in PROJECT state.
+        // Fund codes are NOT in the form anymore — viewer Focus 2 owns them.
+        ->assertSee('Associate with Program Services (Optional)')
+        ->assertDontSee('Fund Codes (Optional)');
 })->group('regression');
 
 it('resetForm restores the anchor + reveal defaults', function () {

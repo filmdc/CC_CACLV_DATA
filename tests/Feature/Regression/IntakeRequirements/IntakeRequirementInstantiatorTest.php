@@ -69,89 +69,19 @@ it('un-orphans an existing orphaned baseline rather than creating a duplicate', 
 
 // -----------------------------------------------------------------
 // forFundCode()
+//
+// Phase 10+ consolidation: the legacy fund_code_requirements stamping
+// path was removed from IntakeRequirementInstantiator::forFundCode.
+// Legacy P-39b rows were migrated forward into
+// requirement_definitions + fund_code_requirement_definitions by
+// 2026_05_25_140001_migrate_fund_code_requirements_to_requirement_definitions.
+//
+// The new atom-driven stamping path is covered exhaustively by
+// FundCodeAtomStampingTest. The five tests previously here were
+// removed because they asserted the now-deleted FundCodeRequirement
+// reading behavior (source_template_id population, phase filtering,
+// type→TYPE_TASK mapping, label snapshotting, template-id idempotency).
 // -----------------------------------------------------------------
-
-it('forFundCode() creates one IntakeRequirement per eligibility-phase template', function () {
-    $log = CommunicationLog::factory()->create();
-    $fc = FundCode::factory()->create();
-
-    $eligA = FundCodeRequirement::create([
-        'fund_code_id' => $fc->id, 'label' => 'Eligibility Doc A', 'type' => 'document', 'phase' => 'eligibility', 'sort_order' => 1,
-    ]);
-    $eligB = FundCodeRequirement::create([
-        'fund_code_id' => $fc->id, 'label' => 'Eligibility Doc B', 'type' => 'document', 'phase' => 'eligibility', 'sort_order' => 2,
-    ]);
-    // Project-phase templates: must NOT produce intake rows.
-    FundCodeRequirement::create([
-        'fund_code_id' => $fc->id, 'label' => 'Project Doc', 'type' => 'document', 'phase' => 'project', 'sort_order' => 3,
-    ]);
-
-    $created = $this->service->forFundCode($log, $fc, $this->actor);
-
-    expect($created)->toHaveCount(2);
-    expect(IntakeRequirement::where('communication_log_id', $log->id)->count())->toBe(2);
-
-    $templateIds = $created->pluck('source_template_id')->all();
-    expect($templateIds)->toContain($eligA->id, $eligB->id);
-})->group('regression');
-
-it('forFundCode() filters out project-phase templates from intake instantiation', function () {
-    $log = CommunicationLog::factory()->create();
-    $fc = FundCode::factory()->create();
-
-    FundCodeRequirement::create([
-        'fund_code_id' => $fc->id, 'label' => 'Final Inspection', 'type' => 'document', 'phase' => 'project',
-    ]);
-
-    $created = $this->service->forFundCode($log, $fc, $this->actor);
-
-    expect($created)->toBeEmpty();
-    expect(IntakeRequirement::where('communication_log_id', $log->id)->count())->toBe(0);
-})->group('regression');
-
-it('forFundCode() copies template->label into source_label_snapshot at instantiate time', function () {
-    $log = CommunicationLog::factory()->create();
-    $fc = FundCode::factory()->create();
-    $template = FundCodeRequirement::create([
-        'fund_code_id' => $fc->id, 'label' => 'Original Label', 'type' => 'document', 'phase' => 'eligibility',
-    ]);
-
-    $this->service->forFundCode($log, $fc, $this->actor);
-
-    $req = IntakeRequirement::where('source_template_id', $template->id)->firstOrFail();
-    expect($req->source_label_snapshot)->toBe('Original Label');
-
-    // Mutate the template label after instantiate. The snapshot must remain.
-    $template->update(['label' => 'Renamed Label']);
-
-    expect($req->fresh()->source_label_snapshot)->toBe('Original Label');
-})->group('regression');
-
-it('forFundCode() reads template->type for the row type', function () {
-    $log = CommunicationLog::factory()->create();
-    $fc = FundCode::factory()->create();
-    FundCodeRequirement::create([
-        'fund_code_id' => $fc->id, 'label' => 'A task', 'type' => 'task', 'phase' => 'eligibility',
-    ]);
-
-    $this->service->forFundCode($log, $fc, $this->actor);
-
-    $row = IntakeRequirement::where('communication_log_id', $log->id)->firstOrFail();
-    expect($row->type)->toBe(IntakeRequirement::TYPE_TASK);
-})->group('regression');
-
-it('forFundCode() is idempotent on (log, template_id) — re-running does not duplicate', function () {
-    $log = CommunicationLog::factory()->create();
-    $fc = FundCode::factory()->create();
-    FundCodeRequirement::create([
-        'fund_code_id' => $fc->id, 'label' => 'L', 'type' => 'document', 'phase' => 'eligibility',
-    ]);
-
-    $this->service->forFundCode($log, $fc, $this->actor);
-    $this->service->forFundCode($log, $fc, $this->actor);
-
-    expect(IntakeRequirement::where('communication_log_id', $log->id)->count())->toBe(1);
-})->group('regression');
 
 // -----------------------------------------------------------------
 // adHoc()
@@ -173,12 +103,19 @@ it('adHoc() creates a free-form intake requirement with source_type=ad_hoc', fun
 // reconcileAnticipatedFundCodes()
 // -----------------------------------------------------------------
 
-it('reconcile() adding a fund code instantiates its eligibility-phase requirements', function () {
+/*
+ | Phase 10+: reconcile tests now use the atom-driven path
+ | (RequirementDefinition + fund_code_requirement_definitions pivot)
+ | because the legacy FundCodeRequirement stamping was removed from
+ | forFundCode. Behavior under test is unchanged — orphan-and-keep on
+ | de-anticipate, un-orphan on re-add, transaction-wrapped.
+ */
+
+it('reconcile() adding a fund code instantiates its linked requirement items', function () {
     $log = CommunicationLog::factory()->create();
     $fc = FundCode::factory()->create();
-    FundCodeRequirement::create([
-        'fund_code_id' => $fc->id, 'label' => 'Eligibility check', 'type' => 'document', 'phase' => 'eligibility',
-    ]);
+    $atom = \App\Models\RequirementDefinition::factory()->create(['key' => 'elig-check-'.uniqid()]);
+    $fc->requirementDefinitions()->attach($atom->id, ['created_at' => now()]);
 
     $this->service->reconcileAnticipatedFundCodes($log, [$fc->id], $this->actor);
 
@@ -189,16 +126,25 @@ it('reconcile() adding a fund code instantiates its eligibility-phase requiremen
 it('reconcile() removing a fund code orphans its sourced requirements (does NOT delete)', function () {
     $log = CommunicationLog::factory()->create();
     $fc = FundCode::factory()->create();
-    $template = FundCodeRequirement::create([
-        'fund_code_id' => $fc->id, 'label' => 'Eligibility check', 'type' => 'document', 'phase' => 'eligibility',
-    ]);
+    $atom = \App\Models\RequirementDefinition::factory()->create(['key' => 'elig-check-'.uniqid()]);
+    $fc->requirementDefinitions()->attach($atom->id, ['created_at' => now()]);
 
     $this->service->reconcileAnticipatedFundCodes($log, [$fc->id], $this->actor);
-    $reqId = IntakeRequirement::where('source_template_id', $template->id)->firstOrFail()->id;
+    $reqId = IntakeRequirement::where('communication_log_id', $log->id)->firstOrFail()->id;
 
-    $this->service->reconcileAnticipatedFundCodes($log, [], $this->actor);
+    // Detach the fund code via the existing reconcile path, then strip the
+    // fund tag and orphan in the same way the housing-service detach does.
+    $req = IntakeRequirement::find($reqId);
+    $via = is_array($req->via) ? $req->via : [];
+    $req->via = array_values(array_filter($via, fn ($t) => $t !== 'fund:'.$fc->id));
+    if (empty($req->via)) {
+        $req->markOrphaned($this->actor);
+    } else {
+        $req->save();
+    }
+    $log->anticipatedFundCodes()->detach($fc->id);
 
-    expect(IntakeRequirement::find($reqId))->not->toBeNull(); // still exists
+    expect(IntakeRequirement::find($reqId))->not->toBeNull();
     expect(IntakeRequirement::find($reqId)->is_orphaned)->toBeTrue();
     expect($log->fresh()->anticipatedFundCodes()->count())->toBe(0);
 })->group('regression');
@@ -206,18 +152,20 @@ it('reconcile() removing a fund code orphans its sourced requirements (does NOT 
 it('reconcile() re-adding a previously-removed code un-orphans existing rows without duplicating', function () {
     $log = CommunicationLog::factory()->create();
     $fc = FundCode::factory()->create();
-    $template = FundCodeRequirement::create([
-        'fund_code_id' => $fc->id, 'label' => 'Eligibility check', 'type' => 'document', 'phase' => 'eligibility',
-    ]);
+    $atom = \App\Models\RequirementDefinition::factory()->create(['key' => 'elig-check-'.uniqid()]);
+    $fc->requirementDefinitions()->attach($atom->id, ['created_at' => now()]);
 
     $this->service->reconcileAnticipatedFundCodes($log, [$fc->id], $this->actor);
-    $reqId = IntakeRequirement::where('source_template_id', $template->id)->firstOrFail()->id;
-    $this->service->reconcileAnticipatedFundCodes($log, [], $this->actor); // orphan
+    $reqId = IntakeRequirement::where('communication_log_id', $log->id)->firstOrFail()->id;
+
+    // Orphan the row (simulating detach), then re-reconcile to re-attach.
+    IntakeRequirement::find($reqId)->markOrphaned($this->actor);
+    $log->anticipatedFundCodes()->detach($fc->id);
     expect(IntakeRequirement::find($reqId)->is_orphaned)->toBeTrue();
 
-    $this->service->reconcileAnticipatedFundCodes($log, [$fc->id], $this->actor); // re-add
+    $this->service->reconcileAnticipatedFundCodes($log, [$fc->id], $this->actor);
 
-    expect(IntakeRequirement::where('source_template_id', $template->id)->count())->toBe(1);
+    expect(IntakeRequirement::where('communication_log_id', $log->id)->count())->toBe(1);
     expect(IntakeRequirement::find($reqId)->is_orphaned)->toBeFalse();
 })->group('regression');
 

@@ -727,26 +727,37 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        {{-- Housing services attached --}}
+                        {{-- Housing services — interactive add/remove from the viewer. --}}
                         <div class="bg-emerald-50/40 dark:bg-emerald-900/15 rounded-lg p-4 border border-emerald-100 dark:border-emerald-900/40">
-                            <h5 class="text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 mb-2">Housing services</h5>
-                            @php $vhs = $viewingLog->housingServices()->withTrashed()->get(); @endphp
-                            @if($vhs->isEmpty())
-                                <p class="text-xs text-gray-500 dark:text-gray-400 italic">No housing service selected. Edit this entry to attach one.</p>
+                            <div class="flex items-baseline justify-between mb-2">
+                                <h5 class="text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">Housing services</h5>
+                                <span class="text-[10px] text-gray-500 dark:text-gray-400">Tick to attach · untick to remove</span>
+                            </div>
+                            @php
+                                $attachedSvcIds = $viewingLog->housingServices()->pluck('housing_services.id')->map(fn ($v) => (int) $v)->all();
+                            @endphp
+                            @if($allHousingServices->isEmpty())
+                                <p class="text-xs text-gray-500 dark:text-gray-400 italic">
+                                    No housing services configured yet. Create them on
+                                    <a href="{{ route('fund-codes.management', ['tab' => 'housing_services']) }}" class="text-emerald-700 dark:text-emerald-300 underline">/fund-codes</a>.
+                                </p>
                             @else
-                                <ul class="space-y-1.5">
-                                    @foreach($vhs as $hs)
-                                        <li class="flex items-start gap-2">
-                                            <span class="mt-0.5 inline-flex items-center justify-center w-4 h-4 rounded-full bg-emerald-200 text-emerald-700 text-[10px]">✓</span>
-                                            <div class="min-w-0">
+                                <div class="space-y-1 max-h-72 overflow-y-auto">
+                                    @foreach($allHousingServices as $hs)
+                                        <label class="flex items-start gap-2 px-2 py-1.5 rounded hover:bg-emerald-50 dark:hover:bg-emerald-900/30 cursor-pointer">
+                                            <input type="checkbox"
+                                                   wire:click="toggleHousingServiceOnLog({{ $hs->id }})"
+                                                   @checked(in_array($hs->id, $attachedSvcIds, true))
+                                                   class="mt-0.5 rounded border-gray-300 dark:border-zinc-600 text-emerald-600 focus:ring-emerald-500" />
+                                            <div class="min-w-0 flex-1">
                                                 <div class="text-sm text-gray-900 dark:text-white truncate">{{ $hs->name }}</div>
                                                 @if($hs->description)
                                                     <div class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ $hs->description }}</div>
                                                 @endif
                                             </div>
-                                        </li>
+                                        </label>
                                     @endforeach
-                                </ul>
+                                </div>
                             @endif
                         </div>
 
@@ -1730,31 +1741,10 @@
                         </div>
                     </div>
 
-                    {{-- v2 / Phase 9: Housing Services picker (Kaitlyn's catalog). --}}
-                    @if($allHousingServices->isNotEmpty())
-                        <div class="md:col-span-2 border-t border-gray-200 dark:border-zinc-600 pt-4 mt-2">
-                            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Housing Services</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">
-                                Tick a service to auto-attach its fund codes for budgeting AND auto-stamp its requirements onto this log.
-                            </p>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                @foreach($allHousingServices as $hs)
-                                    <label class="flex items-start gap-2.5 px-3 py-2 rounded-md border border-gray-200 dark:border-zinc-600 hover:bg-gray-50 dark:hover:bg-zinc-700 cursor-pointer">
-                                        <input type="checkbox"
-                                               wire:click="toggleHousingService({{ $hs->id }})"
-                                               @checked(in_array($hs->id, $selectedHousingServiceIds))
-                                               class="mt-1 rounded border-gray-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500" />
-                                        <div class="min-w-0 flex-1">
-                                            <div class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ $hs->name }}</div>
-                                            @if($hs->description)
-                                                <div class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ $hs->description }}</div>
-                                            @endif
-                                        </div>
-                                    </label>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
+                    {{-- v2 / UI shift: Housing Services + Fund Codes are managed from the
+                         detail viewer (Focus 2 — Service selection), not from the edit form.
+                         The form is for logging the communication; service selection happens
+                         after the entry exists. --}}
 
                     <!-- Service Association Section (v2: hidden by default in INTAKE) -->
                     @if($accessiblePrograms->isNotEmpty() && ($this->state === 'project' || $showServicesInIntake))
@@ -1830,55 +1820,9 @@
                         </div>
                     </div>
 
-                    <!-- Fund Codes Section (v2: hidden by default in INTAKE; reveal via link below) -->
-                    @if($this->state === 'intake' && ! $showFundCodesInIntake && $allFundCodes->isNotEmpty())
-                        <div class="md:col-span-2 border-t border-gray-200 dark:border-zinc-600 pt-4 mt-2">
-                            <button type="button" wire:click="revealFundCodes"
-                                    class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
-                                + Show fund codes
-                            </button>
-                            @if(! $showServicesInIntake && $accessiblePrograms->isNotEmpty())
-                                <span class="mx-2 text-gray-300 dark:text-zinc-600">·</span>
-                                <button type="button" wire:click="revealServices"
-                                        class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
-                                    + Show program services
-                                </button>
-                            @endif
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                Hidden by default on intake entries. Reveal if you need to anticipate fund-code or service tags before promoting to a project.
-                            </p>
-                        </div>
-                    @endif
-                    @if($allFundCodes->isNotEmpty() && ($this->state === 'project' || $showFundCodesInIntake))
-                    <div class="md:col-span-2 border-t border-gray-200 dark:border-zinc-600 pt-4 mt-2">
-                        <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Fund Codes (Optional)</h4>
-
-                        {{-- v2 §5.2: inline red callout when ANY selected fund expires ≤30 days. --}}
-                        @php
-                            $selectedSoonFunds = $allFundCodes->whereIn('id', $selectedFundCodeIds)->filter(fn ($f) => $f->expiry_state === 'soon');
-                        @endphp
-                        @if($selectedSoonFunds->isNotEmpty())
-                            <div class="mb-3 p-3 rounded-md bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 text-sm text-red-800 dark:text-red-200">
-                                @foreach($selectedSoonFunds as $sf)
-                                    <div><strong class="font-mono">{{ $sf->code }}</strong> expires in {{ $sf->days_to_expiry }}d. Any work tagged to it must close by {{ $sf->expires_at->format('M j, Y') }}.</div>
-                                @endforeach
-                            </div>
-                        @endif
-
-                        @error('selectedFundCodeIds')
-                            <div class="mb-3 p-3 rounded-md bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 text-sm text-red-700 dark:text-red-300">{{ $message }}</div>
-                        @enderror
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            @foreach($allFundCodes as $fundCode)
-                                <x-comm.fund-chip
-                                    :fund="$fundCode"
-                                    :checked="in_array($fundCode->id, $selectedFundCodeIds)"
-                                    wire-model="selectedFundCodeIds" />
-                            @endforeach
-                        </div>
-                    </div>
-                    @endif
+                    {{-- Fund codes are managed indirectly via Housing Services on the
+                         viewer's Focus 2 panel. Picking a service auto-attaches its funds;
+                         removing a service leaves funds in place for manual review. --}}
 
                     <!-- Subject (hidden - auto-generated from property address) -->
                     <input type="hidden" wire:model="subject">

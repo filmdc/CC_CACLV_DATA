@@ -142,12 +142,7 @@
                                 <button wire:click="openAtomLinkModal({{ $fundCode->id }})"
                                         class="text-purple-700 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300"
                                         title="Link requirement items from the library to this fund code">
-                                    Requirements
-                                </button>
-                                <button wire:click="manageRequirements({{ $fundCode->id }})"
-                                        class="text-emerald-700 dark:text-emerald-400 hover:text-emerald-900 dark:hover:text-emerald-300"
-                                        title="Legacy fund-code-requirements (P-39b)">
-                                    Legacy reqs ({{ $fundCode->requirements_count }})
+                                    Fund Requirements
                                 </button>
                                 <button wire:click="showEditForm({{ $fundCode->id }})"
                                         class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">

@@ -89,48 +89,13 @@ class IntakeRequirementInstantiator
         $result = collect();
         $fundTag = 'fund:'.$fundCode->id;
 
-        // 1. Legacy fund_code_requirements templates (P-39b path).
-        $templates = $fundCode->requirements()
-            ->where('phase', 'eligibility')
-            ->ordered()
-            ->get();
+        // Phase 10+: the legacy fund_code_requirements stamping path has
+        // been removed. Legacy rows were migrated forward into
+        // requirement_definitions + fund_code_requirement_definitions
+        // by migration 2026_05_25_140001 — they're now picked up by
+        // the loop below. Stamping both paths would double-create
+        // IntakeRequirement rows.
 
-        if ($templates->isNotEmpty()) {
-            $existingByTemplateId = IntakeRequirement::query()
-                ->where('communication_log_id', $log->id)
-                ->where('source_type', IntakeRequirement::SOURCE_FUND_CODE)
-                ->whereIn('source_template_id', $templates->pluck('id')->all())
-                ->get()
-                ->keyBy('source_template_id');
-
-            foreach ($templates as $template) {
-                $existing = $existingByTemplateId->get($template->id);
-
-                if ($existing !== null) {
-                    if ($existing->is_orphaned) {
-                        $existing->unmarkOrphaned($actor);
-                    }
-                    $result->push($existing);
-
-                    continue;
-                }
-
-                $row = $this->insert($log, [
-                    'type' => $template->type ?? IntakeRequirement::TYPE_DOCUMENT,
-                    'label' => $template->label,
-                    'source_type' => IntakeRequirement::SOURCE_FUND_CODE,
-                    'source_template_id' => $template->id,
-                    'source_label_snapshot' => $template->label,
-                ], $actor);
-
-                $result->push($row);
-            }
-        }
-
-        // 2. Phase 10 — atom-library requirements linked to this fund
-        // code via fund_code_requirement_definitions. Stamped with
-        // via:'fund:N' so detaching the fund code can correctly orphan
-        // them later.
         foreach ($fundCode->requirementDefinitions()->get() as $atom) {
             $existing = IntakeRequirement::query()
                 ->where('communication_log_id', $log->id)

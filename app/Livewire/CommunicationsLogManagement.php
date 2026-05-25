@@ -897,6 +897,70 @@ class CommunicationsLogManagement extends Component
         $this->newUpdateType = 'note';
     }
 
+    /**
+     * Viewer / Focus 2 — toggle a housing service on the currently-viewed
+     * log. Attaches or detaches the pivot AND runs the side-effects:
+     *   - on attach: forHousingService() stamps requirements + auto-attaches funds
+     *   - on detach: strips via:'service:N' tags from intake_requirements;
+     *     orphans rows whose via becomes empty AND source is template_set
+     *     / definition. Fund codes are LEFT IN PLACE — Kaitlyn can remove
+     *     them manually if no longer wanted.
+     */
+    public function toggleHousingServiceOnLog(int $svcId): void
+    {
+        $this->authorizeAction('communications_log.edit');
+        if (! $this->viewingId) {
+            return;
+        }
+        $log = CommunicationLog::findOrFail($this->viewingId);
+        $svc = \App\Models\HousingService::findOrFail($svcId);
+
+        $alreadyAttached = $log->housingServices()->where('housing_services.id', $svcId)->exists();
+        $actor = Auth::user();
+        $serviceTag = 'service:'.$svcId;
+
+        if ($alreadyAttached) {
+            $log->housingServices()->detach($svcId);
+
+            // Strip the tag and orphan auto-applied requirements that no
+            // longer have any other source. Manual atom picks (source_type
+            // = definition with definition:N tag) survive.
+            $affected = \App\Models\IntakeRequirement::query()
+                ->where('communication_log_id', $log->id)
+                ->get();
+
+            foreach ($affected as $req) {
+                $via = is_array($req->via) ? $req->via : [];
+                if (! in_array($serviceTag, $via, true)) {
+                    continue;
+                }
+                $remaining = array_values(array_filter($via, fn ($t) => $t !== $serviceTag));
+                $req->via = $remaining;
+                $req->updated_by_user_id = $actor->id;
+                $req->save();
+
+                if (empty($remaining) && in_array(
+                    $req->source_type,
+                    [\App\Models\IntakeRequirement::SOURCE_TEMPLATE_SET, \App\Models\IntakeRequirement::SOURCE_DEFINITION],
+                    true
+                ) && ! $req->is_orphaned) {
+                    $req->markOrphaned($actor);
+                }
+            }
+
+            session()->flash('success', 'Removed "'.$svc->name.'" from this entry.');
+        } else {
+            $log->housingServices()->attach($svcId, [
+                'created_by_user_id' => $actor->id,
+                'created_at' => now(),
+            ]);
+            app(\App\Services\IntakeRequirementInstantiator::class)
+                ->forHousingService($log, $svc, $actor);
+
+            session()->flash('success', 'Added "'.$svc->name.'" — fund codes and requirements have been attached.');
+        }
+    }
+
     public function closeDetailModal()
     {
         $this->showDetailModal = false;

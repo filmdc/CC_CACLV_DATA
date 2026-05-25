@@ -48,12 +48,14 @@ it('Service selection section lists attached housing services + anticipated fund
         ->assertSee('HSG-X-99');
 })->group('regression');
 
-it('Service selection section shows empty-state hints when nothing is attached', function () {
+it('Service selection section shows interactive controls + empty-state for fund codes', function () {
     $log = CommunicationLog::factory()->create();
 
     Livewire::actingAs($this->user)
         ->test(CommunicationsLogManagement::class)
         ->call('viewDetail', $log->id)
-        ->assertSee('No housing service selected.')
+        // Interactive UX hint always shown.
+        ->assertSee('Tick to attach')
+        // Fund codes empty-state hint when no funds attached.
         ->assertSee('None yet');
 })->group('regression');
