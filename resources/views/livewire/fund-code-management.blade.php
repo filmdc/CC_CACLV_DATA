@@ -141,8 +141,8 @@
                                 @if($this->can('fund_codes.edit'))
                                 <button wire:click="openAtomLinkModal({{ $fundCode->id }})"
                                         class="text-purple-700 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300"
-                                        title="Link requirement atoms from the library to this fund code">
-                                    Atoms
+                                        title="Link requirement items from the library to this fund code">
+                                    Requirements
                                 </button>
                                 <button wire:click="manageRequirements({{ $fundCode->id }})"
                                         class="text-emerald-700 dark:text-emerald-400 hover:text-emerald-900 dark:hover:text-emerald-300"
@@ -208,7 +208,7 @@
                 </div>
 
                 <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                    Picking this service on a Communication Log auto-attaches the linked fund codes AND stamps every linked atom onto intake requirements.
+                    Picking this service on a Communication Log auto-attaches the linked fund codes AND stamps every linked requirement item onto the intake checklist.
                 </p>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -232,7 +232,7 @@
                     </div>
 
                     <div class="bg-gray-50 dark:bg-zinc-900 rounded-md p-4 border border-gray-200 dark:border-zinc-700">
-                        <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300 mb-2">Linked requirement atoms</h3>
+                        <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300 mb-2">Linked requirement items</h3>
                         <div class="bg-white dark:bg-zinc-800 rounded border border-gray-200 dark:border-zinc-700 max-h-96 overflow-y-auto">
                             @forelse($servicesAllAtoms as $a)
                                 <label class="flex items-center gap-2 px-3 py-1.5 border-b border-gray-100 dark:border-zinc-700 last:border-b-0 cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-700">
@@ -246,7 +246,7 @@
                                     </div>
                                 </label>
                             @empty
-                                <div class="px-3 py-4 text-center text-xs text-gray-500 dark:text-gray-400">No atoms defined yet — create some on <a href="{{ route('requirements-library.management') }}" class="text-indigo-600 hover:underline">/requirements-library</a>.</div>
+                                <div class="px-3 py-4 text-center text-xs text-gray-500 dark:text-gray-400">No requirement items yet — create some on <a href="{{ route('requirements-library.management') }}" class="text-indigo-600 hover:underline">the Requirements Library</a>.</div>
                             @endforelse
                         </div>
                     </div>
@@ -271,7 +271,7 @@
                             <tr>
                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Service</th>
                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Fund codes</th>
-                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Atoms</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Items</th>
                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Active</th>
                                 <th class="px-3 py-2"></th>
                             </tr>
@@ -324,7 +324,7 @@
                         Requirements — <span class="font-mono">{{ $atomLinkFundCode->code }}</span>
                     </h3>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        Atoms ticked here auto-stamp on a Communication Log when this fund code is anticipated.
+                        Requirement items ticked here auto-stamp onto a Communication Log when this fund code is anticipated.
                     </p>
                 </div>
                 <div class="px-6 py-4 max-h-[60vh] overflow-y-auto">
@@ -349,7 +349,7 @@
                             </div>
                         </label>
                     @empty
-                        <div class="px-2 py-4 text-center text-xs text-gray-500 dark:text-gray-400">No atoms defined yet.</div>
+                        <div class="px-2 py-4 text-center text-xs text-gray-500 dark:text-gray-400">No requirement items defined yet.</div>
                     @endforelse
                 </div>
                 <div class="px-6 py-3 border-t border-gray-200 dark:border-zinc-700 flex justify-end gap-2">

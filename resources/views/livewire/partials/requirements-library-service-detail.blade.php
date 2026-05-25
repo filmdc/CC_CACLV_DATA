@@ -17,7 +17,7 @@
 
     <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
         Picking this service on a Communication Log auto-attaches the linked fund codes (for budgeting + eligibility templates),
-        and stamps every linked atom + bundle onto the log's intake requirements.
+        and stamps every linked requirement item + bundle onto the log's intake checklist.
     </p>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -47,7 +47,7 @@
         {{-- Bundles --}}
         <div class="bg-gray-50 dark:bg-zinc-900 rounded-md p-4 border border-gray-200 dark:border-zinc-700">
             <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300 mb-1">Requirement bundles</h3>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Every atom in these bundles auto-stamps onto the log.</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Every requirement item in these bundles auto-stamps onto the log.</p>
             <div class="bg-white dark:bg-zinc-800 rounded border border-gray-200 dark:border-zinc-700 max-h-96 overflow-y-auto">
                 @forelse($allBundles as $b)
                     <label class="flex items-center gap-2 px-3 py-1.5 border-b border-gray-100 dark:border-zinc-700 last:border-b-0 cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-700">
@@ -64,10 +64,10 @@
             </div>
         </div>
 
-        {{-- Direct atoms --}}
+        {{-- Direct requirement items --}}
         <div class="bg-gray-50 dark:bg-zinc-900 rounded-md p-4 border border-gray-200 dark:border-zinc-700">
-            <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300 mb-1">Direct atoms</h3>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">One-off atoms attached without going through a bundle.</p>
+            <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300 mb-1">Direct requirement items</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">One-off items attached without going through a bundle.</p>
             <div class="bg-white dark:bg-zinc-800 rounded border border-gray-200 dark:border-zinc-700 max-h-96 overflow-y-auto">
                 @forelse($allAtoms as $a)
                     <label class="flex items-center gap-2 px-3 py-1.5 border-b border-gray-100 dark:border-zinc-700 last:border-b-0 cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-700">
@@ -83,7 +83,7 @@
                         </div>
                     </label>
                 @empty
-                    <div class="px-3 py-4 text-center text-xs text-gray-500 dark:text-gray-400">No atoms defined yet.</div>
+                    <div class="px-3 py-4 text-center text-xs text-gray-500 dark:text-gray-400">No requirement items defined yet.</div>
                 @endforelse
             </div>
         </div>

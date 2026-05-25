@@ -5,7 +5,7 @@
             <div>
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Requirements Library</h1>
                 <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
-                    Curate the master list of requirement items (atoms) and group them into named bundles.
+                    Curate the master list of requirement items used across fund codes and housing services.
                     Bundles linked to a program service auto-instantiate on any Communication Log entry tagged with that service.
                 </p>
             </div>
@@ -15,7 +15,7 @@
                     @if($activeTab === 'atoms')
                         <button type="button" wire:click="showCreateAtom"
                                 class="inline-flex items-center px-4 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium">
-                            + New atom
+                            + New requirement item
                         </button>
                     @elseif($activeTab === 'bundles')
                         <button type="button" wire:click="showCreateBundle"
@@ -49,9 +49,9 @@
         <div class="border-b border-gray-200 dark:border-zinc-700 mb-4">
             <div class="flex items-center justify-between flex-wrap gap-3 py-3">
                 <div>
-                    <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-200">Requirement atoms</h2>
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-200">Requirement items</h2>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                        The master library. Atoms link directly to fund codes and housing services (managed on the Fund Codes page).
+                        The master library. Items link directly to fund codes and housing services (managed on the Fund Codes page).
                     </p>
                 </div>
             </div>
@@ -159,14 +159,14 @@
                                                 <button wire:click="showEditAtom({{ $atom->id }})"
                                                         class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 mr-3">Edit</button>
                                                 <button wire:click="deleteAtom({{ $atom->id }})"
-                                                        wire:confirm="Move this atom to trash? Historical instances will keep their reference."
+                                                        wire:confirm="Move this requirement item to trash? Historical references on Communication Logs will be preserved."
                                                         class="text-red-600 hover:text-red-900 dark:text-red-400">Delete</button>
                                             @endif
                                         @endif
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="7" class="px-3 py-8 text-center text-sm text-gray-500 dark:text-gray-400">No atoms found. Click "+ New atom" to start your library.</td></tr>
+                                <tr><td colspan="7" class="px-3 py-8 text-center text-sm text-gray-500 dark:text-gray-400">No requirement items yet. Click "+ New requirement item" to start your library.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -219,7 +219,7 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="5" class="px-3 py-8 text-center text-sm text-gray-500 dark:text-gray-400">No bundles yet. Click "+ New bundle" to group atoms.</td></tr>
+                                <tr><td colspan="5" class="px-3 py-8 text-center text-sm text-gray-500 dark:text-gray-400">No bundles yet. Click "+ New bundle" to group requirement items.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -236,7 +236,7 @@
                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Service</th>
                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Fund codes</th>
                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Bundles</th>
-                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Direct atoms</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Direct items</th>
                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Active</th>
                                 <th class="px-3 py-2"></th>
                             </tr>
@@ -342,7 +342,7 @@
         <div class="fixed inset-0 bg-gray-500/75 dark:bg-black/70 flex items-center justify-center p-4 z-50">
             <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-lg w-full shadow-xl">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    {{ $atomFormId ? 'Edit atom' : 'New atom' }}
+                    {{ $atomFormId ? 'Edit requirement item' : 'New requirement item' }}
                 </h2>
 
                 <form wire:submit.prevent="saveAtom" class="space-y-4">

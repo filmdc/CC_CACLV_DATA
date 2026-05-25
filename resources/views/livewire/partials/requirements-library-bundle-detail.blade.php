@@ -53,13 +53,13 @@
                             </div>
 
                             <button wire:click="removeItem({{ $atom->id }})"
-                                    wire:confirm="Remove this atom from the bundle? It stays in the library."
+                                    wire:confirm="Remove this requirement item from the bundle? It stays in the library."
                                     class="text-red-600 hover:text-red-900 dark:text-red-400 text-xs">Remove</button>
                         @endif
                     </div>
                 @empty
                     <div class="px-3 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
-                        No atoms in this bundle yet. Add one from the picker on the right.
+                        No requirement items in this bundle yet. Add one from the picker on the right.
                     </div>
                 @endforelse
             </div>
@@ -67,7 +67,7 @@
             {{-- Atom picker --}}
             @if($canManage)
                 <div class="mt-4 bg-white dark:bg-zinc-800 rounded border border-gray-200 dark:border-zinc-700 p-3">
-                    <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300 mb-2">Add an atom from the library</h4>
+                    <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300 mb-2">Add a requirement item from the library</h4>
                     <div class="flex gap-2">
                         <input type="text" wire:model.live.debounce.250ms="itemPickerSearch"
                                placeholder="Search library…"

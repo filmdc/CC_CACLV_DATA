@@ -193,7 +193,7 @@ class RequirementsLibraryManagement extends Component
             ->whereNull('deleted_at')
             ->exists();
         if ($dupe) {
-            $this->addError('atomKey', 'Another active atom already uses this key.');
+            $this->addError('atomKey', 'Another active requirement item already uses this key.');
             return;
         }
 
@@ -209,11 +209,11 @@ class RequirementsLibraryManagement extends Component
 
         if ($this->atomFormId) {
             RequirementDefinition::findOrFail($this->atomFormId)->update($payload);
-            session()->flash('message', 'Atom updated.');
+            session()->flash('message', 'Requirement item updated.');
         } else {
             $payload['created_by_user_id'] = Auth::id();
             RequirementDefinition::create($payload);
-            session()->flash('message', 'Atom created.');
+            session()->flash('message', 'Requirement item created.');
         }
 
         $this->showAtomForm = false;
@@ -224,14 +224,14 @@ class RequirementsLibraryManagement extends Component
     {
         $this->authorizeAction('requirements_library.manage');
         RequirementDefinition::findOrFail($id)->delete();
-        session()->flash('message', 'Atom moved to trash. Historical instances are preserved.');
+        session()->flash('message', 'Requirement item moved to trash. Historical references on Communication Logs are preserved.');
     }
 
     public function restoreAtom(int $id): void
     {
         $this->authorizeAction('requirements_library.manage');
         RequirementDefinition::withTrashed()->findOrFail($id)->restore();
-        session()->flash('message', 'Atom restored.');
+        session()->flash('message', 'Requirement item restored.');
     }
 
     public function suggestKey(): void
@@ -387,7 +387,7 @@ class RequirementsLibraryManagement extends Component
 
         $this->newItemAtomId = null;
         $this->itemPickerSearch = '';
-        session()->flash('message', 'Added "'.$atom->label.'" to bundle.');
+        session()->flash('message', 'Added "'.$atom->label.'" to the bundle.');
     }
 
     public function removeItem(int $atomId): void
