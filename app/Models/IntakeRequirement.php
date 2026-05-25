@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use App\Traits\HasStandardMediaCollections;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
 /**
  * P-39b: intake-phase requirement on a CommunicationLog.
@@ -24,12 +27,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * rows; re-anticipating flips it back. Progress denominators filter
  * `is_orphaned = false`.
  *
- * 39c will add Spatie HasMedia + the HasMediaAuthorization contract
- * (introduced in P-39a). This model is deliberately media-free in 39b.
+ * Phase 12 (Comm Log v2 refinements): Spatie HasMedia is wired up with
+ * a 'documents' collection (disk: private_media) so document-type intake
+ * requirements can hold their actual scanned/uploaded supporting files.
  */
-class IntakeRequirement extends Model
+class IntakeRequirement extends Model implements HasMedia
 {
-    use HasFactory;
+    use HasFactory, HasStandardMediaCollections, InteractsWithMedia;
+
+    public function registerMediaCollections(): void
+    {
+        // Phase 12: store uploaded documents for type=document requirements
+        // on the 'documents' collection (disk: private_media).
+        $this->registerStandardDocumentCollection('documents');
+    }
 
     public const TYPE_DOCUMENT = 'document';
 
@@ -340,13 +351,13 @@ class IntakeRequirement extends Model
     public static function statusDisplay(string $status): string
     {
         return match ($status) {
-            self::STATUS_PENDING   => 'Pending',
+            self::STATUS_PENDING => 'Pending',
             self::STATUS_REQUESTED => 'Requested',
-            self::STATUS_RECEIVED  => 'Received',
-            self::STATUS_WAIVED    => 'Waived',
-            self::STATUS_NA        => 'N/A',
-            self::STATUS_BLOCKED   => 'Blocked',
-            default                => ucfirst($status),
+            self::STATUS_RECEIVED => 'Received',
+            self::STATUS_WAIVED => 'Waived',
+            self::STATUS_NA => 'N/A',
+            self::STATUS_BLOCKED => 'Blocked',
+            default => ucfirst($status),
         };
     }
 

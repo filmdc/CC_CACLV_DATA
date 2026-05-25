@@ -578,7 +578,8 @@
                         </dl>
                     </div>
 
-                    <!-- Linked Records -->
+                    <!-- Linked Records — only render if at least one is linked. -->
+                    @if($viewingLog->participant || $viewingLog->property || $viewingLog->housingJob)
                     <div class="bg-gray-50 dark:bg-zinc-700/50 rounded-lg p-4">
                         <h4 class="font-medium text-gray-900 dark:text-white mb-3">Linked Records</h4>
                         <dl class="space-y-2 text-sm">
@@ -639,16 +640,14 @@
                                 </dd>
                             </div>
                             @endif
-                            @if(!$viewingLog->participant && !$viewingLog->property && !$viewingLog->housingJob)
-                            <p class="text-gray-500 dark:text-gray-400 italic">No linked records</p>
-                            @endif
                         </dl>
-                        @if(auth()->user()->isAdmin() && ($viewingLog->participant || $viewingLog->property || $viewingLog->housingJob))
+                        @if(auth()->user()->isAdmin())
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-3 pt-2 border-t border-gray-200 dark:border-zinc-600">
                             <span class="text-red-600 dark:text-red-400">Admin:</span> Click <svg class="w-3 h-3 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg> to unlink a record
                         </p>
                         @endif
                     </div>
+                    @endif
                 </div>
 
                 <!-- Services -->
@@ -789,32 +788,10 @@
                         <p class="text-xs text-gray-500 dark:text-gray-400">What's needed to satisfy this case — Phase 1 (eligibility + compliance).</p>
                     </div>
 
-                {{-- v2 §4.4 / §4.5: state banner + Requirements panel between Summary and Activity. --}}
-                @if(! $viewingLog->housing_job_id)
-                    <div class="mb-4 px-4 py-3 rounded-md bg-amber-50 dark:bg-amber-900/30 border-l-4 border-amber-500">
-                        <div class="flex items-start justify-between gap-3 flex-wrap">
-                            <div>
-                                <div class="text-[10px] uppercase tracking-wider font-semibold text-amber-800 dark:text-amber-300">General intake</div>
-                                <p class="text-sm text-gray-700 dark:text-gray-300 mt-1">
-                                    Not yet attached to a project. Promote when the application requirements are met.
-                                </p>
-                            </div>
-                            <div class="flex gap-2">
-                                @can('communications_log.create')
-                                    <button type="button" wire:click="startConvertToProject({{ $viewingLog->id }})"
-                                            class="px-3 py-1.5 rounded bg-teal-600 hover:bg-teal-700 text-white text-xs font-medium">
-                                        Convert to project
-                                    </button>
-                                @endcan
-                                <button type="button"
-                                        x-on:click="$dispatch('open-project-picker')"
-                                        class="px-3 py-1.5 rounded bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 text-xs font-medium hover:bg-gray-300 dark:hover:bg-zinc-500">
-                                    Attach to existing
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                @else
+                {{-- v2 §4.4: project chip shown when attached. The "General intake" CTA banner
+                     was removed — promotion is offered by the bottom action bar (gated by
+                     requirements) and on the edit form. --}}
+                @if($viewingLog->housing_job_id)
                     @php $jb = $viewingLog->convertedToJob ?? \App\Models\HousingJob::find($viewingLog->housing_job_id); @endphp
                     @if($jb)
                         <div class="mb-4 flex items-center gap-3 px-4 py-3 rounded-md bg-teal-700 text-white shadow">
@@ -841,13 +818,167 @@
                         ))
                         ->values();
                 @endphp
-                @if($viewerReqs->isNotEmpty())
-                    <div class="mb-4">
-                        <x-comm.requirements-panel :items="$viewerReqs" title="Phase 1 · Eligibility &amp; Compliance" />
+                <div class="mb-4">
+                    <x-comm.requirements-panel :items="$viewerReqs" title="Phase 1 · Eligibility &amp; Compliance" />
+                </div>
+
+                {{-- Ad-hoc requirement add-form (inline, toggled by the panel's
+                     "+ ad-hoc requirement" button which dispatches add-ad-hoc-requirement). --}}
+                @if($showAdHocReqForm)
+                    <div class="mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-md">
+                        <div class="flex items-center justify-between mb-2">
+                            <h5 class="text-xs font-semibold uppercase tracking-wider text-amber-800 dark:text-amber-300">New ad-hoc requirement</h5>
+                            <button type="button" wire:click="cancelAdHocRequirement" class="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700">Cancel</button>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-[1fr_auto_auto] gap-2 items-start">
+                            <div>
+                                <input type="text" wire:model.defer="adHocReqLabel" placeholder="e.g. Proof of residency"
+                                       class="w-full px-3 py-2 text-sm rounded border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500" />
+                                @error('adHocReqLabel') <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+                            </div>
+                            <select wire:model.defer="adHocReqType"
+                                    class="px-3 py-2 text-sm rounded border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white">
+                                <option value="document">Document</option>
+                                <option value="task">Task</option>
+                            </select>
+                            <button type="button" wire:click="saveAdHocRequirement"
+                                    class="px-4 py-2 text-sm rounded bg-amber-600 text-white hover:bg-amber-700">
+                                Add
+                            </button>
+                        </div>
                     </div>
                 @endif
 
                 </section>{{-- /Focus 3 --}}
+
+                {{-- Per-row action modal (opened by panel's act-on-requirement event). --}}
+                @if($actingOnRequirementId)
+                    @php $actingReq = \App\Models\IntakeRequirement::find($actingOnRequirementId); @endphp
+                    @if($actingReq && $actingReq->communication_log_id === (int) $viewingLog->id)
+                        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[60]"
+                             wire:click.self="closeRequirementActionModal">
+                            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">{{ $actingReq->label }}</h3>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                                    Current status: <span class="font-medium">{{ \App\Models\IntakeRequirement::statusDisplay($actingReq->status) }}</span>
+                                    @if($actingReq->type === \App\Models\IntakeRequirement::TYPE_DOCUMENT)
+                                        · <span class="font-medium">Document</span>
+                                    @else
+                                        · <span class="font-medium">Task</span>
+                                    @endif
+                                </p>
+
+                                {{-- Phase 12: file uploads for type=document requirements.
+                                     Shows existing attachments + an upload widget; uploading
+                                     marks the requirement received in the same action. --}}
+                                @if($actingReq->type === \App\Models\IntakeRequirement::TYPE_DOCUMENT)
+                                    @php $existingMedia = $actingReq->getMedia('documents'); @endphp
+
+                                    @if($existingMedia->isNotEmpty())
+                                        <div class="mb-4 p-3 rounded border border-gray-200 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-900/30">
+                                            <h4 class="text-[11px] font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300 mb-2">Attached files ({{ $existingMedia->count() }})</h4>
+                                            <ul class="space-y-1">
+                                                @foreach($existingMedia as $m)
+                                                    <li class="flex items-center justify-between gap-2 text-sm">
+                                                        <a href="{{ route('media.download', $m->id) }}" target="_blank"
+                                                           class="text-indigo-600 dark:text-indigo-400 hover:underline truncate flex-1">
+                                                            {{ $m->name }}
+                                                        </a>
+                                                        <span class="text-xs text-gray-500 dark:text-gray-400 shrink-0">{{ \Illuminate\Support\Number::fileSize($m->size, precision: 1) }}</span>
+                                                        @if(auth()->user()->isAdmin())
+                                                            <button type="button"
+                                                                    wire:click="deleteRequirementMedia({{ $m->id }})"
+                                                                    wire:confirm="Delete this attachment?"
+                                                                    class="text-xs text-red-600 hover:text-red-800 dark:text-red-400 shrink-0">
+                                                                Remove
+                                                            </button>
+                                                        @endif
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    @endif
+
+                                    <div class="mb-4 p-3 rounded border-2 border-dashed border-indigo-200 dark:border-indigo-800 bg-indigo-50/40 dark:bg-indigo-900/10">
+                                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-indigo-700 dark:text-indigo-300 mb-2">
+                                            Upload supporting document(s)
+                                        </label>
+                                        <input type="file" wire:model="requirementFiles" multiple
+                                               class="block w-full text-sm text-gray-700 dark:text-gray-200 file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700" />
+                                        @error('requirementFiles') <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+                                        @error('requirementFiles.*') <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+
+                                        <div wire:loading wire:target="requirementFiles" class="text-xs text-gray-500 dark:text-gray-400 mt-1">Selecting…</div>
+
+                                        @if(!empty($requirementFiles))
+                                            <button type="button" wire:click="uploadRequirementFiles"
+                                                    wire:loading.attr="disabled" wire:target="uploadRequirementFiles"
+                                                    class="mt-2 px-3 py-1.5 text-sm rounded bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-60">
+                                                <span wire:loading.remove wire:target="uploadRequirementFiles">Upload &amp; mark received</span>
+                                                <span wire:loading wire:target="uploadRequirementFiles">Saving…</span>
+                                            </button>
+                                        @else
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Max 100MB per file. Stored on the secure private_media disk.</p>
+                                        @endif
+                                    </div>
+                                @endif
+
+                                <div class="space-y-2">
+                                    @if($actingReq->status !== \App\Models\IntakeRequirement::STATUS_REQUESTED && $actingReq->status === \App\Models\IntakeRequirement::STATUS_PENDING)
+                                        <button type="button" wire:click="applyRequirementAction('requested')"
+                                                class="w-full text-left px-3 py-2 rounded border border-gray-300 dark:border-zinc-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 text-sm">
+                                            <span class="font-medium">Mark requested</span>
+                                            <span class="block text-xs text-gray-500 dark:text-gray-400">We've asked the client; awaiting return.</span>
+                                        </button>
+                                    @endif
+
+                                    @if($actingReq->status !== \App\Models\IntakeRequirement::STATUS_RECEIVED)
+                                        <button type="button" wire:click="applyRequirementAction('received')"
+                                                class="w-full text-left px-3 py-2 rounded border border-gray-300 dark:border-zinc-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 text-sm">
+                                            <span class="font-medium">Mark received</span>
+                                            <span class="block text-xs text-gray-500 dark:text-gray-400">Client has provided this; counts toward conversion.</span>
+                                        </button>
+                                    @endif
+
+                                    @if($actingReq->status === \App\Models\IntakeRequirement::STATUS_PENDING || $actingReq->status === \App\Models\IntakeRequirement::STATUS_REQUESTED)
+                                        <div class="px-3 py-2 rounded border border-gray-300 dark:border-zinc-600">
+                                            <label class="text-xs font-medium text-gray-700 dark:text-gray-300 block mb-1">Reason (required for waive / N/A)</label>
+                                            <textarea wire:model.defer="reqActionReason" rows="2"
+                                                      class="w-full px-2 py-1 text-sm rounded border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white"
+                                                      placeholder="e.g. Already on file from prior case"></textarea>
+                                            @error('reqActionReason') <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+                                            <div class="flex gap-2 mt-2">
+                                                <button type="button" wire:click="applyRequirementAction('waived')"
+                                                        class="flex-1 px-3 py-1.5 text-sm rounded bg-sand-100 text-amber-900 border border-amber-300 hover:bg-amber-100 dark:text-amber-200 dark:bg-amber-900/30 dark:border-amber-700">
+                                                    Waive
+                                                </button>
+                                                <button type="button" wire:click="applyRequirementAction('na')"
+                                                        class="flex-1 px-3 py-1.5 text-sm rounded bg-gray-100 text-gray-800 border border-gray-300 hover:bg-gray-200 dark:text-gray-200 dark:bg-zinc-700 dark:border-zinc-600">
+                                                    Mark N/A
+                                                </button>
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    @if($actingReq->status !== \App\Models\IntakeRequirement::STATUS_PENDING)
+                                        <button type="button" wire:click="applyRequirementAction('reopen')"
+                                                class="w-full text-left px-3 py-2 rounded border border-gray-300 dark:border-zinc-600 hover:bg-gray-50 dark:hover:bg-zinc-700 text-sm">
+                                            <span class="font-medium">Reopen</span>
+                                            <span class="block text-xs text-gray-500 dark:text-gray-400">Reset to pending.</span>
+                                        </button>
+                                    @endif
+                                </div>
+
+                                <div class="mt-4 flex justify-end">
+                                    <button type="button" wire:click="closeRequirementActionModal"
+                                            class="px-3 py-1.5 text-sm bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded hover:bg-gray-300 dark:hover:bg-zinc-500">
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                @endif
 
                 <!-- Updates/Activity Log — audit trail across all three focuses -->
                 <div class="border-t border-gray-200 dark:border-zinc-600 pt-4 mb-4 mt-6">
@@ -942,14 +1073,26 @@
                 </div>
 
                 <!-- Action Buttons -->
+                @php $gate = $this->intakeRequirementsGate($viewingLog); @endphp
                 <div class="flex justify-between items-center mt-6 pt-4 border-t border-gray-200 dark:border-zinc-600">
-                    <div class="flex gap-2">
+                    <div class="flex gap-2 items-center">
                         @if(!$viewingLog->converted_to_job_id)
                             @can('projects.create')
-                            <button wire:click="openConvertModal({{ $viewingLog->id }})"
-                                    class="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 text-sm">
-                                Convert to Project
-                            </button>
+                            @if($gate['ready'])
+                                <button wire:click="openConvertModal({{ $viewingLog->id }})"
+                                        class="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 text-sm">
+                                    Convert to Project
+                                </button>
+                            @else
+                                <button type="button" disabled
+                                        title="{{ $gate['unmet'] }} eligibility/compliance requirement(s) still unmet. Mark them received, waived, or N/A first."
+                                        class="px-4 py-2 bg-gray-300 dark:bg-zinc-600 text-gray-500 dark:text-gray-400 rounded-md text-sm cursor-not-allowed">
+                                    Convert to Project
+                                </button>
+                                <span class="text-xs text-amber-700 dark:text-amber-400">
+                                    {{ $gate['met'] }}/{{ $gate['total'] }} requirements met
+                                </span>
+                            @endif
                             @endcan
                         @else
                             @if(auth()->user()->isAdmin())

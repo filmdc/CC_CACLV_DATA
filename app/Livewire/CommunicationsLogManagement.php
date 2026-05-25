@@ -18,12 +18,14 @@ use App\Traits\WithPermissionChecks;
 use App\Traits\WithProgramAccess;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\On;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
 class CommunicationsLogManagement extends Component
 {
-    use WithPagination, WithPermissionChecks, WithProgramAccess;
+    use WithFileUploads, WithPagination, WithPermissionChecks, WithProgramAccess;
 
     // Search and Filters
     public $search = '';
@@ -110,6 +112,22 @@ class CommunicationsLogManagement extends Component
     public bool $requirementOverride = false;
 
     public string $requirementOverrideReason = '';
+
+    // Focus 3 — ad-hoc requirement add-form state (viewer panel).
+    public bool $showAdHocReqForm = false;
+
+    public string $adHocReqLabel = '';
+
+    public string $adHocReqType = \App\Models\IntakeRequirement::TYPE_DOCUMENT;
+
+    // Focus 3 — per-row action modal state.
+    public ?int $actingOnRequirementId = null;
+
+    public string $reqActionReason = '';
+
+    // Focus 3 — pending file upload for the acted-on document requirement.
+    // Multiple files allowed (one requirement, many supporting documents).
+    public $requirementFiles = [];
 
     public $convertingLogId = null;
 
@@ -826,6 +844,7 @@ class CommunicationsLogManagement extends Component
         $current = array_map('intval', $this->selectedHousingServiceIds);
         if (in_array($id, $current, true)) {
             $this->selectedHousingServiceIds = array_values(array_filter($current, fn ($v) => $v !== $id));
+
             return;
         }
 
@@ -898,6 +917,233 @@ class CommunicationsLogManagement extends Component
     }
 
     /**
+     * Phase 1 (intake) requirements gate for a given log. Returns
+     *   ['met' => int, 'total' => int, 'ready' => bool, 'unmet' => int]
+     * counting non-orphaned IntakeRequirements whose RequirementDefinition
+     * category falls in PHASE_1_CATEGORIES (eligibility + compliance).
+     * Mirrors the server-side gate in confirmConvertToProject().
+     */
+    public function intakeRequirementsGate(CommunicationLog $log): array
+    {
+        $reqs = $log->intakeRequirements()
+            ->where('is_orphaned', false)
+            ->with('definition')
+            ->get()
+            ->filter(fn ($r) => in_array(
+                $r->definition?->category ?? \App\Models\RequirementDefinition::CATEGORY_ELIGIBILITY,
+                \App\Models\RequirementDefinition::PHASE_1_CATEGORIES,
+                true
+            ));
+
+        $total = $reqs->count();
+        $met = $reqs->filter(fn ($r) => $r->isMet())->count();
+
+        return [
+            'total' => $total,
+            'met' => $met,
+            'unmet' => $total - $met,
+            'ready' => $total === 0 || $met === $total,
+        ];
+    }
+
+    // -----------------------------------------------------------------
+    // Focus 3 — ad-hoc requirement add-form
+    // -----------------------------------------------------------------
+
+    #[On('add-ad-hoc-requirement')]
+    public function openAdHocRequirementForm(): void
+    {
+        $this->authorizeAction('communications_log.edit');
+        $this->showAdHocReqForm = true;
+        $this->adHocReqLabel = '';
+        $this->adHocReqType = \App\Models\IntakeRequirement::TYPE_DOCUMENT;
+        $this->resetErrorBag(['adHocReqLabel', 'adHocReqType']);
+    }
+
+    public function cancelAdHocRequirement(): void
+    {
+        $this->showAdHocReqForm = false;
+        $this->adHocReqLabel = '';
+        $this->adHocReqType = \App\Models\IntakeRequirement::TYPE_DOCUMENT;
+        $this->resetErrorBag(['adHocReqLabel', 'adHocReqType']);
+    }
+
+    public function saveAdHocRequirement(): void
+    {
+        $this->authorizeAction('communications_log.edit');
+
+        $this->validate([
+            'adHocReqLabel' => ['required', 'string', 'max:200'],
+            'adHocReqType' => ['required', 'in:'.\App\Models\IntakeRequirement::TYPE_DOCUMENT.','.\App\Models\IntakeRequirement::TYPE_TASK],
+        ]);
+
+        if (! $this->viewingId) {
+            return;
+        }
+
+        $log = CommunicationLog::findOrFail($this->viewingId);
+
+        app(\App\Services\IntakeRequirementInstantiator::class)->adHoc(
+            $log,
+            trim($this->adHocReqLabel),
+            $this->adHocReqType,
+            Auth::user()
+        );
+
+        $this->cancelAdHocRequirement();
+        session()->flash('success', 'Ad-hoc requirement added.');
+    }
+
+    // -----------------------------------------------------------------
+    // Focus 3 — per-row action modal
+    // -----------------------------------------------------------------
+
+    #[On('act-on-requirement')]
+    public function openRequirementActionModal(int $id): void
+    {
+        $this->authorizeAction('communications_log.edit');
+        $this->actingOnRequirementId = $id;
+        $this->reqActionReason = '';
+        $this->resetErrorBag(['reqActionReason']);
+    }
+
+    public function closeRequirementActionModal(): void
+    {
+        $this->actingOnRequirementId = null;
+        $this->reqActionReason = '';
+        $this->requirementFiles = [];
+        $this->resetErrorBag(['reqActionReason', 'requirementFiles', 'requirementFiles.*']);
+    }
+
+    /**
+     * Upload one-or-more files to the acting-on requirement's 'documents'
+     * collection. Marks the requirement received once the upload succeeds
+     * (matches the parallel Requirement model's "upload → complete" UX).
+     * Only valid for type=document requirements.
+     */
+    public function uploadRequirementFiles(): void
+    {
+        $this->authorizeAction('communications_log.edit');
+
+        if (! $this->actingOnRequirementId) {
+            return;
+        }
+
+        $this->validate([
+            'requirementFiles' => ['required', 'array', 'min:1'],
+            'requirementFiles.*' => ['file', 'max:102400'], // 100MB
+        ]);
+
+        $req = \App\Models\IntakeRequirement::findOrFail($this->actingOnRequirementId);
+
+        if ($req->communication_log_id !== (int) $this->viewingId) {
+            abort(403);
+        }
+
+        if ($req->type !== \App\Models\IntakeRequirement::TYPE_DOCUMENT) {
+            abort(422, 'File uploads are only supported for document-type requirements.');
+        }
+
+        foreach ($this->requirementFiles as $file) {
+            $req->addMedia($file->getRealPath())
+                ->usingName($file->getClientOriginalName())
+                ->usingFileName($file->hashName())
+                ->toMediaCollection('documents');
+        }
+
+        // Receiving a file naturally satisfies the requirement.
+        if ($req->status !== \App\Models\IntakeRequirement::STATUS_RECEIVED) {
+            $req->markReceived(Auth::user());
+        }
+
+        $this->closeRequirementActionModal();
+        session()->flash('success', 'File(s) uploaded and requirement marked received.');
+    }
+
+    /**
+     * Delete a media file off the acting-on requirement. Admin-only:
+     * Kaitlyn shouldn't be able to silently drop attachments, but
+     * removing a wrong upload is necessary.
+     */
+    public function deleteRequirementMedia(int $mediaId): void
+    {
+        if (! Auth::user()?->isAdmin()) {
+            $this->authorizeAction('communications_log.delete');
+        }
+
+        if (! $this->actingOnRequirementId) {
+            return;
+        }
+
+        $req = \App\Models\IntakeRequirement::findOrFail($this->actingOnRequirementId);
+
+        if ($req->communication_log_id !== (int) $this->viewingId) {
+            abort(403);
+        }
+
+        $media = $req->getMedia('documents')->firstWhere('id', $mediaId);
+        if ($media) {
+            $media->delete();
+            session()->flash('success', 'Attachment removed.');
+        }
+    }
+
+    /**
+     * Apply a status transition to the acting-on requirement.
+     * action ∈ {requested, received, waived, na, reopen, blocked}.
+     * waived + na require a non-empty reason.
+     */
+    public function applyRequirementAction(string $action): void
+    {
+        $this->authorizeAction('communications_log.edit');
+
+        if (! $this->actingOnRequirementId) {
+            return;
+        }
+
+        $req = \App\Models\IntakeRequirement::findOrFail($this->actingOnRequirementId);
+
+        if ($req->communication_log_id !== (int) $this->viewingId) {
+            abort(403);
+        }
+
+        $actor = Auth::user();
+
+        switch ($action) {
+            case 'requested':
+                $req->markRequested($actor);
+                break;
+            case 'received':
+                $req->markReceived($actor);
+                break;
+            case 'waived':
+                if (trim($this->reqActionReason) === '') {
+                    $this->addError('reqActionReason', 'A reason is required to waive.');
+
+                    return;
+                }
+                $req->markWaived($actor, trim($this->reqActionReason));
+                break;
+            case 'na':
+                if (trim($this->reqActionReason) === '') {
+                    $this->addError('reqActionReason', 'A reason is required to mark N/A.');
+
+                    return;
+                }
+                $req->markNotApplicable($actor, trim($this->reqActionReason));
+                break;
+            case 'reopen':
+                $req->reopen($actor);
+                break;
+            default:
+                abort(422, 'Unknown requirement action.');
+        }
+
+        $this->closeRequirementActionModal();
+        session()->flash('success', 'Requirement updated.');
+    }
+
+    /**
      * Viewer / Focus 2 — toggle a housing service on the currently-viewed
      * log. Attaches or detaches the pivot AND runs the side-effects:
      *   - on attach: forHousingService() stamps requirements + auto-attaches funds
@@ -965,6 +1211,10 @@ class CommunicationsLogManagement extends Component
     {
         $this->showDetailModal = false;
         $this->viewingId = null;
+        $this->showAdHocReqForm = false;
+        $this->adHocReqLabel = '';
+        $this->actingOnRequirementId = null;
+        $this->reqActionReason = '';
     }
 
     /**
@@ -1604,12 +1854,14 @@ class CommunicationsLogManagement extends Component
             if ($unmetCount > 0 && ! $this->requirementOverride) {
                 DB::rollBack();
                 $this->addError('requirementOverride', "{$unmetCount} required application requirement(s) are unmet. Tick the override box and provide a reason to proceed.");
+
                 return;
             }
 
             if ($this->requirementOverride && trim($this->requirementOverrideReason) === '') {
                 DB::rollBack();
                 $this->addError('requirementOverrideReason', 'A reason is required when overriding unmet requirements.');
+
                 return;
             }
 
@@ -1998,6 +2250,7 @@ class CommunicationsLogManagement extends Component
             if ($expiredNew->isNotEmpty()) {
                 $codes = $expiredNew->pluck('code')->implode(', ');
                 $this->addError('selectedFundCodeIds', "Cannot tag expired fund codes ({$codes}). They can no longer accept new attachments.");
+
                 return;
             }
         }
@@ -2580,7 +2833,7 @@ class CommunicationsLogManagement extends Component
                 $term = '%'.$this->projectPickerSearch.'%';
                 $q->where(function ($qq) use ($term) {
                     $qq->where('job_number', 'like', $term)
-                       ->orWhere('job_title', 'like', $term);
+                        ->orWhere('job_title', 'like', $term);
                 });
             })
             ->whereIn('status', ['pending', 'in_progress', 'on_hold'])
@@ -2588,10 +2841,10 @@ class CommunicationsLogManagement extends Component
             ->limit(20)
             ->get()
             ->map(fn ($j) => [
-                'id'         => $j->id,
-                'code'       => $j->job_number,
-                'name'       => $j->job_title,
-                'meta'       => 'Status: '.ucwords(str_replace('_', ' ', $j->status)).' · updated '.$j->updated_at->diffForHumans(),
+                'id' => $j->id,
+                'code' => $j->job_number,
+                'name' => $j->job_title,
+                'meta' => 'Status: '.ucwords(str_replace('_', ' ', $j->status)).' · updated '.$j->updated_at->diffForHumans(),
             ])
             ->all();
 

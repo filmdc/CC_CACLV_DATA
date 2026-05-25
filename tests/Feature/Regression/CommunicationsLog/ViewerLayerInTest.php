@@ -1,9 +1,10 @@
 <?php
 
 /*
-| Phase 6: viewer enhancements.
+| Phase 6 + Phase 12 refinement: viewer enhancements.
 | - update_type enum accepts the new 'action' and 'email' values
-| - intake viewer shows the "General intake" sand banner + CTAs
+| - the "General intake" CTA banner was removed (Phase 12) — promotion is
+|   surfaced via the gated bottom action bar instead
 | - project-attached viewer shows the teal project banner
 | - the requirements panel renders inline when the log has requirements
 */
@@ -36,7 +37,10 @@ it('communication_log_updates.update_type now accepts action + email', function 
     }
 })->group('regression');
 
-it('intake viewer shows the General intake banner + Convert CTA', function () {
+it('intake viewer no longer shows the General intake CTA banner (Phase 12)', function () {
+    // The amber "General intake" banner above Focus 3 was removed because
+    // it duplicated the Convert-to-Project action that already exists on
+    // the edit form and in the gated bottom action bar.
     $log = CommunicationLog::factory()->create([
         'housing_job_id' => null,
         'contact_first_name' => 'Maria',
@@ -45,9 +49,10 @@ it('intake viewer shows the General intake banner + Convert CTA', function () {
     Livewire::actingAs($this->user)
         ->test(CommunicationsLogManagement::class)
         ->call('viewDetail', $log->id)
-        ->assertSee('General intake')
-        ->assertSee('Convert to project')
-        ->assertSee('Attach to existing');
+        ->assertDontSee('General intake')
+        ->assertDontSee('Attach to existing')
+        // The bottom action-bar Convert button is still rendered (gated).
+        ->assertSee('Convert to Project');
 })->group('regression');
 
 it('project-attached viewer shows the teal project banner', function () {
