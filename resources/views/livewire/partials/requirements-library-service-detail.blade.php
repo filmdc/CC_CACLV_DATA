@@ -24,7 +24,7 @@
         {{-- Fund codes --}}
         <div class="bg-gray-50 dark:bg-zinc-900 rounded-md p-4 border border-gray-200 dark:border-zinc-700">
             <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300 mb-1">Fund codes</h3>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Auto-attached to the log's anticipated fund codes when this service is picked.</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Auto-attached to the log's fund codes when this county is picked.</p>
             <div class="bg-white dark:bg-zinc-800 rounded border border-gray-200 dark:border-zinc-700 max-h-96 overflow-y-auto">
                 @forelse($allFundCodes as $fc)
                     <label class="flex items-center gap-2 px-3 py-1.5 border-b border-gray-100 dark:border-zinc-700 last:border-b-0 cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-700">

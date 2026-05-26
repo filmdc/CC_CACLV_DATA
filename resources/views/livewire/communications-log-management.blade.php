@@ -820,20 +820,9 @@
                 </div>
                 @endif
 
-                <!-- Fund Codes -->
-                @if($viewingLog->anticipatedFundCodes->isNotEmpty())
-                <div class="mb-6">
-                    <h4 class="font-medium text-gray-900 dark:text-white mb-2">Fund Codes</h4>
-                    <div class="flex flex-wrap gap-2">
-                        @foreach($viewingLog->anticipatedFundCodes as $fundCode)
-                            <span class="px-3 py-1 text-sm rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">
-                                <span class="font-mono font-semibold">{{ $fundCode->code }}</span>
-                                <span class="opacity-75">– {{ $fundCode->description }}</span>
-                            </span>
-                        @endforeach
-                    </div>
-                </div>
-                @endif
+                {{-- v2 / Phase 12.9: standalone Fund Codes pills removed — the Focus 2
+                     "Fund codes" panel below already surfaces them, and they auto-populate
+                     when a county is picked. --}}
 
                 <!-- Tags -->
                 @if($viewingLog->tags->isNotEmpty())
@@ -877,15 +866,15 @@
                 <section id="focus-services" class="scroll-mt-4 mt-6">
                     <div class="flex items-baseline gap-2 mb-3 border-b border-emerald-200 dark:border-emerald-800 pb-2">
                         <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold bg-emerald-600 text-white">Focus 2</span>
-                        <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-200">Service selection</h4>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">What we're offering — housing services + anticipated fund codes.</p>
+                        <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-200">County &amp; fund codes</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Pick the county — fund codes auto-attach.</p>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        {{-- Housing services — interactive add/remove from the viewer. --}}
+                        {{-- County (the entity formerly known as "housing services") — interactive add/remove from the viewer. --}}
                         <div class="bg-emerald-50/40 dark:bg-emerald-900/15 rounded-lg p-4 border border-emerald-100 dark:border-emerald-900/40">
                             <div class="flex items-baseline justify-between mb-2">
-                                <h5 class="text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">Housing services</h5>
+                                <h5 class="text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">County</h5>
                                 <span class="text-[10px] text-gray-500 dark:text-gray-400">Tick to attach · untick to remove</span>
                             </div>
                             @php
@@ -893,7 +882,7 @@
                             @endphp
                             @if($allHousingServices->isEmpty())
                                 <p class="text-xs text-gray-500 dark:text-gray-400 italic">
-                                    No housing services configured yet. Create them on
+                                    No counties configured yet. Create them on
                                     <a href="{{ route('fund-codes.management', ['tab' => 'housing_services']) }}" class="text-emerald-700 dark:text-emerald-300 underline">/fund-codes</a>.
                                 </p>
                             @else
@@ -916,12 +905,12 @@
                             @endif
                         </div>
 
-                        {{-- Fund codes anticipated --}}
+                        {{-- Fund codes (auto-populated from the picked county). --}}
                         <div class="bg-amber-50/40 dark:bg-amber-900/15 rounded-lg p-4 border border-amber-100 dark:border-amber-900/40">
-                            <h5 class="text-xs font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-300 mb-2">Anticipated fund codes</h5>
+                            <h5 class="text-xs font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-300 mb-2">Fund codes</h5>
                             @php $vfc = $viewingLog->anticipatedFundCodes()->get(); @endphp
                             @if($vfc->isEmpty())
-                                <p class="text-xs text-gray-500 dark:text-gray-400 italic">None yet — fund codes auto-attach when you pick a housing service.</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 italic">None yet — fund codes auto-attach when you pick a county.</p>
                             @else
                                 <ul class="space-y-1.5">
                                     @foreach($vfc as $fc)

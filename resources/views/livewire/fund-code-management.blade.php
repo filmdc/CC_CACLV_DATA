@@ -3,9 +3,9 @@
         <!-- Header -->
         <div class="flex justify-between items-center mb-4">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Fund Codes &amp; Services</h1>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Fund Codes &amp; Counties</h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    Fund codes for budgeting, and the housing-service catalog that ties them to requirements.
+                    Fund codes for budgeting, and the county catalog that ties them to requirements.
                 </p>
             </div>
             @if($this->can('fund_codes.create'))
@@ -20,7 +20,7 @@
                 @else
                     <button wire:click="showCreateService"
                             class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 flex items-center">
-                        + New Housing Service
+                        + New County
                     </button>
                 @endif
             @endif
@@ -35,7 +35,7 @@
                 </button>
                 <button type="button" wire:click="setTab('housing_services')"
                         class="py-3 px-1 -mb-px border-b-2 text-sm font-medium {{ $activeTab === 'housing_services' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200' }}">
-                    Housing Services
+                    Counties
                 </button>
             </nav>
         </div>
@@ -193,7 +193,7 @@
             @if($editingServiceId && $servicesDetail)
                 {{-- Service detail: link fund codes + atoms --}}
                 <div class="flex items-center justify-between mb-4">
-                    <button wire:click="closeService" class="inline-flex items-center text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to services</button>
+                    <button wire:click="closeService" class="inline-flex items-center text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to counties</button>
                     <div class="text-right">
                         <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{{ $servicesDetail->name }}</h2>
                         @if($servicesDetail->description)
@@ -203,7 +203,7 @@
                 </div>
 
                 <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                    Picking this service on a Communication Log auto-attaches the linked fund codes AND stamps every linked requirement item onto the intake checklist.
+                    Picking this county on a Communication Log auto-attaches the linked fund codes AND stamps every linked requirement item onto the intake checklist.
                 </p>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -250,21 +250,21 @@
                 <div class="mt-4 flex justify-end">
                     <button wire:click="saveServiceLinks"
                             class="px-4 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium">
-                        Save service links
+                        Save county links
                     </button>
                 </div>
             @else
                 {{-- Service list --}}
                 <div class="mb-4">
                     <input type="text" wire:model.live.debounce.300ms="search"
-                           placeholder="Search service name…"
+                           placeholder="Search county name…"
                            class="w-full md:w-1/2 px-4 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:ring-indigo-500 focus:border-indigo-500">
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700">
                         <thead class="bg-gray-50 dark:bg-zinc-900">
                             <tr>
-                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Service</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">County</th>
                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Fund codes</th>
                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Items</th>
                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Active</th>
@@ -294,13 +294,13 @@
                                             <button wire:click="showEditService({{ $svc->id }})" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 mr-3">Rename</button>
                                             <button wire:click="openService({{ $svc->id }})" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 mr-3">Manage</button>
                                             <button wire:click="deleteService({{ $svc->id }})"
-                                                    wire:confirm="Move this service to trash? Historical comm-log references are preserved."
+                                                    wire:confirm="Move this county to trash? Historical comm-log references are preserved."
                                                     class="text-red-600 hover:text-red-900 dark:text-red-400">Delete</button>
                                         @endif
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="5" class="px-3 py-8 text-center text-sm text-gray-500 dark:text-gray-400">No services yet. Click "+ New Housing Service" to start the catalog.</td></tr>
+                                <tr><td colspan="5" class="px-3 py-8 text-center text-sm text-gray-500 dark:text-gray-400">No counties yet. Click "+ New County" to start the catalog.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -362,13 +362,13 @@
         <div class="fixed inset-0 bg-gray-500/75 dark:bg-black/70 flex items-center justify-center p-4 z-50">
             <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-lg w-full shadow-xl">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    {{ $serviceFormId ? 'Rename service' : 'New housing service' }}
+                    {{ $serviceFormId ? 'Rename county' : 'New county' }}
                 </h2>
                 <form wire:submit.prevent="saveService" class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Name</label>
                         <input type="text" wire:model="serviceName"
-                               placeholder="First-Time Homebuyer Counseling"
+                               placeholder="Clark County"
                                class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500" />
                         @error('serviceName') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                     </div>
@@ -381,7 +381,7 @@
                         <label class="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
                             <input type="checkbox" wire:model="serviceActive"
                                    class="rounded border-gray-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500" />
-                            Active (selectable on Communication Log entries)
+                            Active (selectable on Communication Log entries — counties listed in the dropdown)
                         </label>
                     </div>
                     <div class="flex justify-end gap-2 pt-2">

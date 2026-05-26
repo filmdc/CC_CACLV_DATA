@@ -5,7 +5,7 @@
             <div>
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Requirements Library</h1>
                 <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
-                    Curate the master list of requirement items used across fund codes and housing services.
+                    Curate the master list of requirement items used across fund codes and counties.
                     Bundles linked to a program service auto-instantiate on any Communication Log entry tagged with that service.
                 </p>
             </div>
@@ -51,7 +51,7 @@
                 <div>
                     <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-200">Requirement items</h2>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                        The master library. Items link directly to fund codes and housing services (managed on the Fund Codes page).
+                        The master library. Items link directly to fund codes and counties (managed on the Fund Codes page).
                     </p>
                 </div>
             </div>

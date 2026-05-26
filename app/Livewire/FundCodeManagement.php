@@ -508,11 +508,11 @@ class FundCodeManagement extends Component
 
         if ($this->serviceFormId) {
             HousingService::findOrFail($this->serviceFormId)->update($payload);
-            session()->flash('success', 'Service updated.');
+            session()->flash('success', 'County updated.');
         } else {
             $payload['created_by_user_id'] = Auth::id();
             $svc = HousingService::create($payload);
-            session()->flash('success', 'Service created.');
+            session()->flash('success', 'County created.');
             $this->editingServiceId = $svc->id;
             $this->loadServiceDetail($svc->id);
         }
@@ -525,7 +525,7 @@ class FundCodeManagement extends Component
     {
         $this->authorizeAction('fund_codes.edit');
         HousingService::findOrFail($id)->delete();
-        session()->flash('success', 'Service moved to trash.');
+        session()->flash('success', 'County moved to trash.');
         if ($this->editingServiceId === $id) {
             $this->editingServiceId = null;
         }
@@ -578,7 +578,7 @@ class FundCodeManagement extends Component
             ->all();
         $svc->fundCodes()->sync($payload($this->serviceLinkedFundCodeIds));
         $svc->requirementDefinitions()->sync($payload($this->serviceLinkedAtomIds));
-        session()->flash('success', 'Service links updated.');
+        session()->flash('success', 'County links updated.');
     }
 
     private function toggleId(array $list, int $id): array
