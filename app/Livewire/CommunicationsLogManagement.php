@@ -379,6 +379,19 @@ class CommunicationsLogManagement extends Component
     {
         $this->authorizeAction('communications_log.view');
 
+        // Phase 12.8: honor the per-user default view-mode preference when
+        // the URL didn't pin a specific viewMode. Order of precedence:
+        //   URL ?viewMode=  >  user pref  >  hardcoded 'table' default.
+        // The queryString config keeps URL persistence so deep-links keep
+        // overriding the pref deterministically.
+        $urlViewMode = request()->query('viewMode');
+        if ($urlViewMode === null || $urlViewMode === '') {
+            $pref = Auth::user()?->comm_log_default_view;
+            if (in_array($pref, ['table', 'card'], true)) {
+                $this->viewMode = $pref;
+            }
+        }
+
         // Phase 12.2: deep-link to a specific log via ?view={id}. Used by
         // the Housing Dashboard intake-pipeline card so clicking a row
         // lands directly in that log's detail viewer.

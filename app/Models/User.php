@@ -30,6 +30,7 @@ class User extends Authenticatable
         'email_verified_at',
         'approval_delegate_id',
         'notification_preferences',
+        'comm_log_default_view',
     ];
 
     /**
