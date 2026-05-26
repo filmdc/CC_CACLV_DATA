@@ -1709,9 +1709,14 @@
                     </div>
 
                     <!-- Contact Email -->
+                    {{-- Phase 12.6: type="text" + inputmode="email" instead of type="email".
+                         Browser native HTML5 email validation can hold a stale :invalid state
+                         after the field is cleared, blocking submit on an optional field.
+                         Server-side Laravel validation is the sole authority for format. --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
-                        <input type="email" wire:model="contact_email" placeholder="contact@example.com"
+                        <input type="text" inputmode="email" autocapitalize="off" autocomplete="email"
+                               wire:model.blur="contact_email" placeholder="contact@example.com"
                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
                         @error('contact_email') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
                     </div>

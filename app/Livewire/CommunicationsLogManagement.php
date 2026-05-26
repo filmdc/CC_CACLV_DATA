@@ -503,6 +503,22 @@ class CommunicationsLogManagement extends Component
     }
 
     /**
+     * Phase 12.6: trim whitespace + treat whitespace-only as empty.
+     *
+     * Kaitlyn hit a UX trap where typing junk in the optional email
+     * field triggered a validation error, but clearing the field
+     * left a stale browser :invalid state (with type="email") or a
+     * single space (from accidental whitespace) that re-failed the
+     * `nullable|email` rule on the next submit. Normalizing here so
+     * Laravel sees a clean empty string makes `nullable` reliable.
+     */
+    public function updatedContactEmail($value): void
+    {
+        $this->contact_email = trim((string) $value);
+        $this->resetErrorBag('contact_email');
+    }
+
+    /**
      * True when the user has overridden the subject this session
      * (just typed it) OR previously (subject_overridden_at is set).
      */
