@@ -179,17 +179,26 @@ it('pinnedLogs returns only the current user pinned logs, newest pin first', fun
     expect($pinned->pluck('id')->all())->toBe([$logB->id, $logA->id]);
 })->group('regression');
 
-it('oldestLogs returns non-converted comm logs sorted oldest-first', function () {
+it('oldestLogs returns non-converted intake comm logs sorted oldest-first', function () {
     \App\Models\CommunicationLog::query()->delete();
 
-    $newer = CommunicationLog::factory()->create(['housing_job_id' => null, 'converted_to_job_id' => null]);
+    $newer = CommunicationLog::factory()->create([
+        'housing_job_id' => null,
+        'converted_to_job_id' => null,
+        'category' => 'intake',
+    ]);
     $newer->forceFill(['created_at' => now()->subDays(3)])->saveQuietly();
 
-    $oldest = CommunicationLog::factory()->create(['housing_job_id' => null, 'converted_to_job_id' => null]);
+    $oldest = CommunicationLog::factory()->create([
+        'housing_job_id' => null,
+        'converted_to_job_id' => null,
+        'category' => 'intake',
+    ]);
     $oldest->forceFill(['created_at' => now()->subDays(30)])->saveQuietly();
 
     $converted = CommunicationLog::factory()->create([
         'housing_job_id' => HousingJob::factory()->create()->id,
+        'category' => 'intake',
     ]);
     $converted->forceFill(['created_at' => now()->subDays(60)])->saveQuietly();
 
@@ -198,8 +207,41 @@ it('oldestLogs returns non-converted comm logs sorted oldest-first', function ()
         ->instance()
         ->oldestLogs();
 
-    // Converted log must NOT appear; oldest open one comes first.
+    // Converted log must NOT appear; oldest open intake comes first.
     expect($rows->pluck('id')->all())->toBe([$oldest->id, $newer->id]);
+})->group('regression');
+
+it('oldestLogs filters out non-intake categories (general, scheduling, complaint, etc.)', function () {
+    \App\Models\CommunicationLog::query()->delete();
+
+    $intake = CommunicationLog::factory()->create([
+        'housing_job_id' => null,
+        'converted_to_job_id' => null,
+        'category' => 'intake',
+    ]);
+    // Same age as intake — would tie-break by id if all categories were allowed.
+    $general = CommunicationLog::factory()->create([
+        'housing_job_id' => null,
+        'converted_to_job_id' => null,
+        'category' => 'general',
+    ]);
+    $scheduling = CommunicationLog::factory()->create([
+        'housing_job_id' => null,
+        'converted_to_job_id' => null,
+        'category' => 'scheduling',
+    ]);
+    $complaint = CommunicationLog::factory()->create([
+        'housing_job_id' => null,
+        'converted_to_job_id' => null,
+        'category' => 'complaint',
+    ]);
+
+    $rows = Livewire::actingAs($this->admin)
+        ->test(HousingDashboard::class)
+        ->instance()
+        ->oldestLogs();
+
+    expect($rows->pluck('id')->all())->toBe([$intake->id]);
 })->group('regression');
 
 it('dashboard renders the pinned-card row when the user has pins', function () {
@@ -215,11 +257,12 @@ it('dashboard renders the pinned-card row when the user has pins', function () {
         ->assertSee('Sandra Doe');
 })->group('regression');
 
-it('dashboard renders the oldest-open card when there are open comm logs', function () {
+it('dashboard renders the oldest-open card when there are open intake comm logs', function () {
     \App\Models\CommunicationLog::query()->delete();
     CommunicationLog::factory()->create([
         'housing_job_id' => null,
         'converted_to_job_id' => null,
+        'category' => 'intake',
         'contact_first_name' => 'Stale',
         'contact_last_name' => 'Case',
     ]);

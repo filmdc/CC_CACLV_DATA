@@ -259,6 +259,21 @@ class CommunicationsLogManagement extends Component
 
     public $category = 'general';
 
+    /**
+     * Phase 12.4: sticky-override timestamp for category. Mirrors the
+     * subject_overridden_at pattern — once the user picks a value from
+     * the dropdown, the auto-category state machine stops touching this
+     * row.
+     */
+    public ?string $category_overridden_at = null;
+
+    /**
+     * Transient companion to category_overridden_at. Set true by
+     * updatedCategory() when the user changes the dropdown; triggers
+     * category_overridden_at = now() on save.
+     */
+    public bool $categoryTouched = false;
+
     public $priority = 'normal';
 
     public $follow_up_date = '';
@@ -476,6 +491,15 @@ class CommunicationsLogManagement extends Component
     public function updatedSubject($value): void
     {
         $this->subjectTouched = true;
+    }
+
+    /**
+     * Phase 12.4: user-picked category locks the auto-category state
+     * machine off for this row.
+     */
+    public function updatedCategory($value): void
+    {
+        $this->categoryTouched = true;
     }
 
     /**
@@ -905,6 +929,8 @@ class CommunicationsLogManagement extends Component
         $this->notes = $log->notes ?? '';
         $this->outcome = $log->outcome ?? '';
         $this->category = $log->category;
+        $this->category_overridden_at = $log->category_overridden_at?->toDateTimeString();
+        $this->categoryTouched = false;
         $this->priority = $log->priority;
         $this->follow_up_date = $log->follow_up_date?->format('Y-m-d') ?? '';
         $this->follow_up_action = $log->follow_up_action ?? '';
@@ -1088,6 +1114,10 @@ class CommunicationsLogManagement extends Component
             $req->markReceived(Auth::user());
         }
 
+        // Phase 12.4: upload+mark-received may have closed the last
+        // outstanding Phase 1 requirement; re-evaluate the auto-category.
+        $req->fresh()->communicationLog?->applyAutoCategory();
+
         $this->closeRequirementActionModal();
         session()->flash('success', 'File(s) uploaded and requirement marked received.');
     }
@@ -1169,6 +1199,10 @@ class CommunicationsLogManagement extends Component
                 abort(422, 'Unknown requirement action.');
         }
 
+        // Phase 12.4: a status transition may have flipped the Phase-1
+        // gate. Re-evaluate the auto-category state machine.
+        $req->fresh()->communicationLog?->applyAutoCategory();
+
         $this->closeRequirementActionModal();
         session()->flash('success', 'Requirement updated.');
     }
@@ -1235,6 +1269,12 @@ class CommunicationsLogManagement extends Component
 
             session()->flash('success', 'Added "'.$svc->name.'" — fund codes and requirements have been attached.');
         }
+
+        // Phase 12.4: attach/detach changes the "has any service?" answer,
+        // which can flip the auto-category between 'general' and 'intake'
+        // (and possibly straight to 'scheduling' if no requirements got
+        // stamped, e.g. service with zero defined atoms).
+        $log->fresh()->applyAutoCategory();
     }
 
     public function closeDetailModal()
@@ -2324,6 +2364,11 @@ class CommunicationsLogManagement extends Component
             'notes' => $this->notes !== '' ? $this->notes : null,
             'outcome' => $this->outcome !== '' ? $this->outcome : null,
             'category' => $this->category,
+            // Phase 12.4: sticky-override stamp once the user picks a value.
+            // Mirrors subject_overridden_at handling.
+            'category_overridden_at' => $this->categoryTouched
+                ? now()
+                : ($this->category_overridden_at ?: null),
             'priority' => $this->priority,
             'follow_up_date' => $this->follow_up_date !== '' ? $this->follow_up_date : null,
             'follow_up_action' => $this->follow_up_action !== '' ? $this->follow_up_action : null,
@@ -2368,6 +2413,11 @@ class CommunicationsLogManagement extends Component
 
             session()->flash('success', 'Communication log created successfully.');
         }
+
+        // Phase 12.4: now that services + requirements are synced, run the
+        // auto-category state machine. No-op when the user manually set a
+        // category this session (categoryTouched flips override_at).
+        $log->refresh()->applyAutoCategory();
 
         $this->showForm = false;
         $this->resetForm();
@@ -2612,6 +2662,8 @@ class CommunicationsLogManagement extends Component
         $this->notes = '';
         $this->outcome = '';
         $this->category = 'general';
+        $this->category_overridden_at = null;
+        $this->categoryTouched = false;
         $this->priority = 'normal';
         $this->follow_up_date = '';
         $this->follow_up_action = '';

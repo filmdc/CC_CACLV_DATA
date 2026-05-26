@@ -254,6 +254,12 @@ class HousingDashboard extends Component
      * Surfaces cases that have been languishing so they don't get
      * forgotten under newer activity. Capped at 8 — same count as
      * the intake-pipeline list for visual parity.
+     *
+     * Phase 12.4 refinement: filtered strictly to category='intake'.
+     * 'general' entries are just contact notes with no service attached
+     * yet — not a follow-up obligation. 'scheduling' entries are Phase 1
+     * done and waiting for service delivery — they're tracked on the
+     * Closest-to-convert card.
      */
     public function oldestLogs(int $limit = 8): \Illuminate\Support\Collection
     {
@@ -264,6 +270,7 @@ class HousingDashboard extends Component
         return CommunicationLog::query()
             ->whereNull('housing_job_id')
             ->whereNull('converted_to_job_id')
+            ->where('category', 'intake')
             ->orderBy('created_at', 'asc')
             ->with('participant')
             ->limit($limit)

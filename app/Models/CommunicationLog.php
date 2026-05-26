@@ -38,6 +38,7 @@ class CommunicationLog extends Model
         'notes',
         'outcome',
         'category',
+        'category_overridden_at',
         'priority',
         'follow_up_date',
         'follow_up_action',
@@ -58,6 +59,7 @@ class CommunicationLog extends Model
         'follow_up_completed_at' => 'datetime',
         'converted_at' => 'datetime',
         'subject_overridden_at' => 'datetime',
+        'category_overridden_at' => 'datetime',
     ];
 
     protected $appends = [
@@ -171,6 +173,72 @@ class CommunicationLog extends Model
         return $this->belongsToMany(User::class, 'communication_log_user_pins')
             ->withPivot('pinned_at')
             ->withTimestamps();
+    }
+
+    /**
+     * Phase 12.4: auto-category state machine.
+     *
+     *   - converted_to_job_id set      → no auto-bump (project page owns
+     *                                    the category from here)
+     *   - no service / housing-service → 'general'
+     *   - service attached, Phase 1
+     *     not 100% met                 → 'intake'
+     *   - service attached, Phase 1
+     *     100% met                     → 'scheduling'
+     *
+     * Returns null when no auto-bump is appropriate (already converted).
+     */
+    public function computeAutoCategory(): ?string
+    {
+        if ($this->converted_to_job_id !== null) {
+            return null;
+        }
+
+        $hasService = $this->services()->exists()
+            || $this->housingServices()->exists();
+
+        if (! $hasService) {
+            return 'general';
+        }
+
+        $phase1 = $this->intakeRequirements()
+            ->where('is_orphaned', false)
+            ->with('definition')
+            ->get()
+            ->filter(fn ($r) => in_array(
+                $r->definition?->category ?? RequirementDefinition::CATEGORY_ELIGIBILITY,
+                RequirementDefinition::PHASE_1_CATEGORIES,
+                true
+            ));
+
+        $total = $phase1->count();
+        $met = $phase1->filter(fn ($r) => in_array($r->status, IntakeRequirement::MET_STATUSES, true))->count();
+
+        return ($total > 0 && $met === $total) ? 'scheduling' : 'intake';
+    }
+
+    /**
+     * Apply the auto-category if the user hasn't manually overridden it.
+     * Idempotent — does nothing when category_overridden_at is set or
+     * when the computed value matches the current value. Returns the
+     * resolved category (or current, unchanged) for callers that want
+     * to log the transition.
+     */
+    public function applyAutoCategory(): ?string
+    {
+        if ($this->category_overridden_at !== null) {
+            return $this->category;
+        }
+
+        $next = $this->computeAutoCategory();
+        if ($next === null || $next === $this->category) {
+            return $this->category;
+        }
+
+        $this->category = $next;
+        $this->saveQuietly();
+
+        return $next;
     }
 
     public function isPinnedBy(?User $user): bool
