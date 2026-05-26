@@ -1723,22 +1723,11 @@
                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md"></textarea>
                     </div>
 
-                    <!-- Create Project and Enrollment Checkbox -->
-                    <div class="md:col-span-2 border-t border-gray-200 dark:border-zinc-600 pt-4 mt-2">
-                        @if(!$editingId)
-                        <label class="flex items-center gap-3 cursor-pointer p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors">
-                            <input type="checkbox" wire:model.live="create_project_enrollment"
-                                   class="rounded border-gray-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500 w-5 h-5">
-                            <div>
-                                <span class="text-sm font-semibold text-indigo-700 dark:text-indigo-300">Create Project and Enrollment</span>
-                                <p class="text-xs text-indigo-600 dark:text-indigo-400 mt-0.5">
-                                    Automatically create property (with duplicate check), participant + household with address, and housing job from this communication log
-                                </p>
-                            </div>
-                        </label>
-                        @error('create_project_enrollment') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
-                        @endif
-                    </div>
+                    {{-- Phase 12.5: "Create Project and Enrollment" checkbox removed.
+                         Project creation now flows through the viewer: attach a housing
+                         service, satisfy Phase 1 requirements, then use Convert to
+                         Project from the gated bottom action bar. The auto-create
+                         shortcut bypassed that lifecycle and is no longer needed. --}}
 
                     <!-- Contact Address Section -->
                     <div class="md:col-span-2 border-t border-gray-200 dark:border-zinc-600 pt-4 mt-2">

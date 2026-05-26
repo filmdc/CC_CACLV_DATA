@@ -108,6 +108,18 @@ it('selectProject(null) detaches and returns to intake', function () {
         ->assertSet('housing_job_id', '');
 })->group('regression');
 
+it('the create form does NOT render the legacy Create Project and Enrollment checkbox', function () {
+    // Phase 12.5: this shortcut was removed because conversion now flows
+    // through the viewer (attach service → satisfy Phase 1 → gated bottom
+    // bar Convert button). The component property still exists for
+    // back-compat with save() and tests but the UI affordance is gone.
+    Livewire::actingAs($this->user)
+        ->test(CommunicationsLogManagement::class)
+        ->call('showCreateForm')
+        ->assertDontSee('Create Project and Enrollment')
+        ->assertDontSee('Automatically create property');
+})->group('regression');
+
 it('the edit form never renders the fund-codes section (managed from the viewer Focus 2)', function () {
     // UX shift: fund codes + housing services are managed from the
     // detail viewer's Focus 2 section, not from the edit form. The
