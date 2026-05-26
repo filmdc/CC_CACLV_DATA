@@ -99,7 +99,11 @@ it('card view surfaces fund-code badges that the table view omits', function () 
     expect($cardHtml)->toContain('FC-FIX-002');
 })->group('regression');
 
-it('card view surfaces contact metadata that the table view omits', function () {
+it('card view surfaces extra contact metadata (email/phone) that the columnar table omits', function () {
+    // Phase 12.7: the table view now puts the contact's name + organization
+    // into the Contact column, but still omits email/phone — those are too
+    // bulky for a dense table. Card view keeps the full contact metadata
+    // block as before.
     $cl3 = CommunicationLog::where('subject', 'CL-3: Multiple fund codes, not converted')->firstOrFail();
     $cl3->update([
         'contact_organization' => 'ACME Roofing Co.',
@@ -111,7 +115,9 @@ it('card view surfaces contact metadata that the table view omits', function () 
         ->test(CommunicationsLogManagement::class)
         ->html();
     expect($tableHtml)->not->toContain('data-card-contact-metadata');
-    expect($tableHtml)->not->toContain('ACME Roofing Co.');
+    // Email + phone stay card-only — too dense for the columnar layout.
+    expect($tableHtml)->not->toContain('tony@acme.example');
+    expect($tableHtml)->not->toContain('555-0123');
 
     $cardHtml = Livewire::actingAs($this->user)
         ->test(CommunicationsLogManagement::class)
@@ -121,6 +127,36 @@ it('card view surfaces contact metadata that the table view omits', function () 
     expect($cardHtml)->toContain('ACME Roofing Co.');
     expect($cardHtml)->toContain('tony@acme.example');
     expect($cardHtml)->toContain('555-0123');
+})->group('regression');
+
+it('table view renders a real <table> element with column headers', function () {
+    $html = Livewire::actingAs($this->user)
+        ->test(CommunicationsLogManagement::class)
+        ->assertSet('viewMode', 'table')
+        ->html();
+
+    expect($html)->toContain('<table')
+        ->and($html)->toContain('<thead')
+        ->and($html)->toContain('<tbody');
+
+    // Column headers Kaitlyn should see.
+    expect($html)->toContain('Date')
+        ->and($html)->toContain('Type')
+        ->and($html)->toContain('Contact')
+        ->and($html)->toContain('Subject')
+        ->and($html)->toContain('Category')
+        ->and($html)->toContain('Priority')
+        ->and($html)->toContain('Fund codes')
+        ->and($html)->toContain('Status');
+})->group('regression');
+
+it('card view does NOT render a <table> element', function () {
+    $html = Livewire::actingAs($this->user)
+        ->test(CommunicationsLogManagement::class)
+        ->set('viewMode', 'card')
+        ->html();
+
+    expect($html)->not->toContain('<table');
 })->group('regression');
 
 it('card view renders the full notes body (when set) in its own block', function () {

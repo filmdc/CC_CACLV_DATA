@@ -242,7 +242,153 @@
             </div>
 
             <!-- Communications List — table or card view per viewMode -->
-            <div class="divide-y divide-gray-200 dark:divide-zinc-700" data-view-mode="{{ $viewMode }}">
+            <div class="{{ $viewMode === 'card' ? 'divide-y divide-gray-200 dark:divide-zinc-700' : '' }}" data-view-mode="{{ $viewMode }}">
+            @if($viewMode === 'table')
+                {{-- Phase 12.7: real columnar table view. Each data point gets its
+                     own cell so dense scanning works. Card view (below, in the @else
+                     branch) is the long-form layout for users who prefer it. --}}
+                @if($logs->isEmpty())
+                    <div class="p-12 text-center">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        </svg>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No communications logged</h3>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Get started by creating a new communication entry.</p>
+                        @can('communications_log.create')
+                        <button wire:click="showCreateForm" class="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                            + New Communication
+                        </button>
+                        @endcan
+                    </div>
+                @else
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700 text-sm">
+                            <thead class="bg-gray-50 dark:bg-zinc-700/60">
+                                <tr class="text-left text-[11px] font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300">
+                                    <th class="px-3 py-2 whitespace-nowrap">Date</th>
+                                    <th class="px-3 py-2 whitespace-nowrap">Type</th>
+                                    <th class="px-3 py-2">Contact</th>
+                                    <th class="px-3 py-2">Subject</th>
+                                    <th class="px-3 py-2 whitespace-nowrap">Category</th>
+                                    <th class="px-3 py-2 whitespace-nowrap">Priority</th>
+                                    <th class="px-3 py-2">Fund codes</th>
+                                    <th class="px-3 py-2 whitespace-nowrap">Status</th>
+                                    <th class="px-3 py-2 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 dark:divide-zinc-700">
+                                @foreach($logs as $log)
+                                    @php
+                                        $isPinned = $log->pinnedByUsers->where('id', auth()->id())->isNotEmpty();
+                                    @endphp
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-zinc-700/40 cursor-pointer" wire:click="viewDetail({{ $log->id }})">
+                                        <td class="px-3 py-2 whitespace-nowrap align-top">
+                                            <div class="text-gray-900 dark:text-white tabular-nums">{{ $log->communication_date->format('M d, Y') }}</div>
+                                            <div class="text-[11px] text-gray-500 dark:text-gray-400">{{ $log->communication_date->format('D') }}</div>
+                                        </td>
+                                        <td class="px-3 py-2 whitespace-nowrap align-top">
+                                            <div class="flex items-center gap-2">
+                                                <span class="inline-flex items-center justify-center w-6 h-6 rounded-full
+                                                    @if($log->communication_type === 'phone_call') bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-300
+                                                    @elseif($log->communication_type === 'email') bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300
+                                                    @elseif($log->communication_type === 'in_person') bg-purple-100 text-purple-600 dark:bg-purple-900 dark:text-purple-300
+                                                    @elseif($log->communication_type === 'site_visit') bg-orange-100 text-orange-600 dark:bg-orange-900 dark:text-orange-300
+                                                    @else bg-gray-100 text-gray-600 dark:bg-zinc-700 dark:text-gray-300
+                                                    @endif">
+                                                    @if($log->communication_type === 'phone_call')
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                                                    @elseif($log->communication_type === 'email')
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                                    @elseif($log->communication_type === 'in_person')
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                                    @else
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                                                    @endif
+                                                </span>
+                                                <div>
+                                                    <div class="text-gray-900 dark:text-white text-xs">{{ $log->communication_type_display }}</div>
+                                                    <div class="text-[10px] text-gray-500 dark:text-gray-400">{{ $log->direction_display }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-3 py-2 align-top">
+                                            <div class="text-gray-900 dark:text-white font-medium">{{ $log->contact_full_name ?: '—' }}</div>
+                                            @if($log->contact_organization)
+                                                <div class="text-[11px] text-gray-500 dark:text-gray-400 truncate max-w-[180px]">{{ $log->contact_organization }}</div>
+                                            @endif
+                                        </td>
+                                        <td class="px-3 py-2 align-top">
+                                            <div class="text-gray-900 dark:text-white max-w-[280px] truncate">{{ $log->subject }}</div>
+                                            @if($log->summary)
+                                                {{-- No title-attr leak of the full summary — the table cell shows the clipped form; the viewer modal has the full body. --}}
+                                                <div class="text-[11px] text-gray-500 dark:text-gray-400 max-w-[280px] truncate">{{ Str::limit($log->summary, 80) }}</div>
+                                            @endif
+                                        </td>
+                                        <td class="px-3 py-2 whitespace-nowrap align-top">
+                                            <span class="inline-flex px-2 py-0.5 rounded-full text-[11px] bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300">{{ $log->category_display }}</span>
+                                        </td>
+                                        <td class="px-3 py-2 whitespace-nowrap align-top">
+                                            @if($log->priority === 'urgent')
+                                                <span class="inline-flex px-2 py-0.5 rounded-full text-[11px] bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">Urgent</span>
+                                            @elseif($log->priority === 'high')
+                                                <span class="inline-flex px-2 py-0.5 rounded-full text-[11px] bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300">High</span>
+                                            @elseif($log->priority === 'low')
+                                                <span class="text-[11px] text-gray-500 dark:text-gray-400">Low</span>
+                                            @else
+                                                <span class="text-[11px] text-gray-400 dark:text-gray-500">—</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-3 py-2 align-top">
+                                            @if($log->anticipatedFundCodes->isNotEmpty())
+                                                <div class="flex flex-wrap gap-1 max-w-[200px]">
+                                                    @foreach($log->anticipatedFundCodes->take(3) as $fc)
+                                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" title="{{ $fc->description }}">{{ $fc->code }}</span>
+                                                    @endforeach
+                                                    @if($log->anticipatedFundCodes->count() > 3)
+                                                        <span class="text-[10px] text-gray-500 dark:text-gray-400">+{{ $log->anticipatedFundCodes->count() - 3 }}</span>
+                                                    @endif
+                                                </div>
+                                            @else
+                                                <span class="text-[11px] text-gray-400 dark:text-gray-500">—</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-3 py-2 whitespace-nowrap align-top">
+                                            @if($log->converted_to_job_id)
+                                                <span class="inline-flex px-2 py-0.5 rounded-full text-[11px] bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300">Converted</span>
+                                            @elseif($log->follow_up_date && ! $log->follow_up_completed)
+                                                <span class="inline-flex px-2 py-0.5 rounded-full text-[11px] bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300">Follow-up</span>
+                                            @else
+                                                <span class="inline-flex px-2 py-0.5 rounded-full text-[11px] bg-gray-100 text-gray-700 dark:bg-zinc-700 dark:text-gray-300">Open</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-3 py-2 whitespace-nowrap align-top text-right" wire:click.stop>
+                                            <div class="inline-flex items-center gap-1.5">
+                                                <button wire:click="togglePin({{ $log->id }})"
+                                                        title="{{ $isPinned ? 'Unpin from dashboard' : 'Pin to dashboard' }}"
+                                                        class="{{ $isPinned ? 'text-amber-500 hover:text-amber-700' : 'text-gray-400 hover:text-amber-600' }}">
+                                                    <svg class="w-4 h-4" {{ $isPinned ? 'fill="currentColor"' : 'fill="none" stroke="currentColor" stroke-width="2"' }} viewBox="0 0 24 24">
+                                                        <path @if(!$isPinned) stroke-linecap="round" stroke-linejoin="round" @endif d="M16 9V4l1 .01V2H7v2l1-.01V9l-2 4v2h5.2v7h1.6v-7H18v-2l-2-4z"/>
+                                                    </svg>
+                                                </button>
+                                                @can('communications_log.edit')
+                                                    <button wire:click="showEditForm({{ $log->id }})" title="Edit" class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                                    </button>
+                                                @endcan
+                                                @can('communications_log.delete')
+                                                    <button wire:click="delete({{ $log->id }})" wire:confirm="Delete this communication log?" title="Delete" class="text-red-600 hover:text-red-800 dark:text-red-400">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                    </button>
+                                                @endcan
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+            @else
                 @forelse($logs as $log)
                     <div class="{{ $viewMode === 'card' ? 'p-6' : 'p-4' }} hover:bg-gray-50 dark:hover:bg-zinc-700/50 cursor-pointer" wire:click="viewDetail({{ $log->id }})">
                         <div class="flex items-start justify-between">
@@ -445,6 +591,7 @@
                         @endcan
                     </div>
                 @endforelse
+            @endif
             </div>
 
             <!-- Pagination -->
