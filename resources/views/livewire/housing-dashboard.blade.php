@@ -22,80 +22,171 @@
             </div>
         </div>
 
-        {{-- Phase 12.2: Intake pipeline card — surfaces non-converted comm
-             logs ranked by Phase 1 requirement completion so the worker
-             can prioritize follow-ups on the cases closest to convertible. --}}
-        @if($intakePipeline->isNotEmpty())
-            <section data-test="intake-pipeline-card" class="mb-6 rounded-lg border border-indigo-200 dark:border-indigo-900/50 bg-indigo-50/50 dark:bg-indigo-900/10 overflow-hidden">
-                <header class="flex items-center justify-between px-4 py-2.5 bg-indigo-100/70 dark:bg-indigo-900/30 border-b border-indigo-200 dark:border-indigo-900/50">
-                    <div>
-                        <h2 class="text-sm font-semibold text-indigo-900 dark:text-indigo-100">Intake pipeline · closest to convert</h2>
-                        <p class="text-[11px] text-indigo-800/70 dark:text-indigo-200/70">Phase 1 (eligibility + compliance). Follow up to push them across the line.</p>
+        {{-- Phase 12.3: Pinned comm logs — compact-card row of the user's
+             manually-pinned entries. Newest-pinned first, capped at 10. --}}
+        @if($pinnedLogs->isNotEmpty())
+            <section data-test="pinned-logs-card" class="mb-6 rounded-lg border border-amber-200 dark:border-amber-900/40 bg-amber-50/40 dark:bg-amber-900/10 overflow-hidden">
+                <header class="flex items-center justify-between px-4 py-2.5 bg-amber-100/70 dark:bg-amber-900/30 border-b border-amber-200 dark:border-amber-900/40">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-amber-700 dark:text-amber-300" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M16 9V4l1 .01V2H7v2l1-.01V9l-2 4v2h5.2v7h1.6v-7H18v-2l-2-4z"/>
+                        </svg>
+                        <h2 class="text-sm font-semibold text-amber-900 dark:text-amber-100">Pinned</h2>
+                        <span class="text-[11px] text-amber-800/70 dark:text-amber-200/70">Front-and-center cases you've pinned.</span>
                     </div>
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-600 text-white">
-                        {{ $intakePipeline->count() }}
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-600 text-white">
+                        {{ $pinnedLogs->count() }}
                     </span>
                 </header>
 
-                <ul class="divide-y divide-indigo-100 dark:divide-indigo-900/40">
-                    @foreach($intakePipeline as $row)
-                        @php
-                            $ready = $row['pct'] >= 100;
-                            $stale = !is_null($row['days_idle']) && $row['days_idle'] >= 7;
-                            $barColor = $ready
-                                ? 'bg-emerald-500'
-                                : ($row['pct'] >= 70 ? 'bg-amber-500' : 'bg-indigo-400');
-                        @endphp
-                        <li class="px-4 py-2.5 hover:bg-white/60 dark:hover:bg-zinc-800/40">
-                            <div class="flex items-center gap-3">
-                                <div class="min-w-0 flex-1">
-                                    <div class="flex items-center gap-2 flex-wrap">
-                                        <a href="{{ route('communications-log.management') }}?view={{ $row['id'] }}"
-                                           class="text-sm font-medium text-gray-900 dark:text-white hover:underline truncate">
-                                            {{ $row['name'] }}
-                                        </a>
-                                        @if(!$row['has_participant'])
-                                            <span class="text-[10px] uppercase tracking-wider text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/40 px-1.5 py-0.5 rounded">not linked</span>
-                                        @endif
-                                        @if($row['priority'] === 'urgent' || $row['priority'] === 'high')
-                                            <span class="text-[10px] uppercase tracking-wider text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900/40 px-1.5 py-0.5 rounded">{{ $row['priority'] }}</span>
-                                        @endif
-                                        @if($ready)
-                                            <span class="text-[10px] uppercase tracking-wider text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/40 px-1.5 py-0.5 rounded">ready</span>
-                                        @elseif($stale)
-                                            <span class="text-[10px] uppercase tracking-wider text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/40 px-1.5 py-0.5 rounded">needs follow-up</span>
-                                        @endif
-                                    </div>
-                                    <div class="mt-1.5 flex items-center gap-3">
-                                        <div class="flex-1 h-1.5 rounded-full bg-indigo-100 dark:bg-indigo-900/40 overflow-hidden max-w-xs">
-                                            <div class="h-full {{ $barColor }} transition-all" style="width: {{ $row['pct'] }}%"></div>
-                                        </div>
-                                        <span class="text-xs tabular-nums text-gray-700 dark:text-gray-200 shrink-0">
-                                            {{ $row['met'] }}/{{ $row['total'] }} · {{ $row['pct'] }}%
-                                        </span>
-                                        <span class="text-xs text-gray-500 dark:text-gray-400 shrink-0">
-                                            @if($row['days_idle'] === null)
-                                                no activity yet
-                                            @elseif($row['days_idle'] === 0)
-                                                today
-                                            @elseif($row['days_idle'] === 1)
-                                                1d ago
-                                            @else
-                                                {{ $row['days_idle'] }}d ago
-                                            @endif
-                                        </span>
-                                    </div>
+                <div class="p-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                    @foreach($pinnedLogs as $pin)
+                        <div class="relative group aspect-square rounded-md border border-amber-200 dark:border-amber-900/40 bg-white dark:bg-zinc-800 hover:shadow-md transition-shadow flex flex-col justify-between p-2.5">
+                            <button type="button"
+                                    wire:click="togglePin({{ $pin['id'] }})"
+                                    title="Unpin"
+                                    class="absolute top-1 right-1 text-amber-500 hover:text-red-600 opacity-60 hover:opacity-100">
+                                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M16 9V4l1 .01V2H7v2l1-.01V9l-2 4v2h5.2v7h1.6v-7H18v-2l-2-4z"/>
+                                </svg>
+                            </button>
+
+                            <a href="{{ route('communications-log.management') }}?view={{ $pin['id'] }}"
+                               class="block min-w-0">
+                                <div class="text-[11px] uppercase tracking-wider text-amber-700 dark:text-amber-300 font-semibold mb-1">
+                                    @if($pin['converted'])
+                                        Converted
+                                    @elseif($pin['priority'] === 'urgent' || $pin['priority'] === 'high')
+                                        {{ ucfirst($pin['priority']) }}
+                                    @else
+                                        Intake
+                                    @endif
                                 </div>
-                                <a href="{{ route('communications-log.management') }}?view={{ $row['id'] }}"
-                                   class="shrink-0 px-2.5 py-1 rounded border border-indigo-300 dark:border-indigo-700 text-xs text-indigo-700 dark:text-indigo-200 hover:bg-indigo-100 dark:hover:bg-indigo-900/30">
-                                    View
-                                </a>
-                            </div>
-                        </li>
+                                <div class="text-sm font-medium text-gray-900 dark:text-white line-clamp-2 leading-snug">
+                                    {{ $pin['name'] ?: 'Unnamed contact' }}
+                                </div>
+                                @if($pin['subject'])
+                                    <div class="text-[11px] text-gray-500 dark:text-gray-400 line-clamp-2 mt-0.5">
+                                        {{ $pin['subject'] }}
+                                    </div>
+                                @endif
+                            </a>
+
+                            <a href="{{ route('communications-log.management') }}?view={{ $pin['id'] }}"
+                               class="self-end text-[11px] text-indigo-600 dark:text-indigo-300 hover:underline">
+                                Open →
+                            </a>
+                        </div>
                     @endforeach
-                </ul>
+                </div>
             </section>
         @endif
+
+        {{-- Phase 12.2/12.3: side-by-side intake-pipeline (closest to convert) +
+             oldest-first non-converted logs. Renders only when at least one
+             column has data. --}}
+        @if($intakePipeline->isNotEmpty() || $oldestLogs->isNotEmpty())
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+                {{-- Closest to convert --}}
+                @if($intakePipeline->isNotEmpty())
+                    <section data-test="intake-pipeline-card" class="rounded-lg border border-indigo-200 dark:border-indigo-900/50 bg-indigo-50/50 dark:bg-indigo-900/10 overflow-hidden">
+                        <header class="px-4 py-2.5 bg-indigo-100/70 dark:bg-indigo-900/30 border-b border-indigo-200 dark:border-indigo-900/50">
+                            <h2 class="text-sm font-semibold text-indigo-900 dark:text-indigo-100">Closest to convert</h2>
+                            <p class="text-[11px] text-indigo-800/70 dark:text-indigo-200/70">Phase 1 most-complete first.</p>
+                        </header>
+                        <ul class="divide-y divide-indigo-100 dark:divide-indigo-900/40">
+                            @foreach($intakePipeline as $row)
+                                @php
+                                    $ready = $row['pct'] >= 100;
+                                    $stale = !is_null($row['days_idle']) && $row['days_idle'] >= 7;
+                                    $barColor = $ready ? 'bg-emerald-500' : ($row['pct'] >= 70 ? 'bg-amber-500' : 'bg-indigo-400');
+                                @endphp
+                                <li class="px-3 py-2 hover:bg-white/60 dark:hover:bg-zinc-800/40 flex items-center gap-2">
+                                    <button type="button" wire:click="togglePin({{ $row['id'] }})"
+                                            title="Pin to top"
+                                            class="text-gray-400 hover:text-amber-600 shrink-0">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 9V4l1 .01V2H7v2l1-.01V9l-2 4v2h5.2v7h1.6v-7H18v-2l-2-4z"/>
+                                        </svg>
+                                    </button>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex items-center gap-2 flex-wrap">
+                                            <a href="{{ route('communications-log.management') }}?view={{ $row['id'] }}"
+                                               class="text-sm font-medium text-gray-900 dark:text-white hover:underline truncate">
+                                                {{ $row['name'] }}
+                                            </a>
+                                            @if($ready)
+                                                <span class="text-[10px] uppercase tracking-wider text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/40 px-1.5 py-0.5 rounded">ready</span>
+                                            @elseif($stale)
+                                                <span class="text-[10px] uppercase tracking-wider text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/40 px-1.5 py-0.5 rounded">follow-up</span>
+                                            @endif
+                                        </div>
+                                        <div class="mt-1 flex items-center gap-2">
+                                            <div class="flex-1 h-1.5 rounded-full bg-indigo-100 dark:bg-indigo-900/40 overflow-hidden">
+                                                <div class="h-full {{ $barColor }}" style="width: {{ $row['pct'] }}%"></div>
+                                            </div>
+                                            <span class="text-[11px] tabular-nums text-gray-700 dark:text-gray-200 shrink-0">{{ $row['met'] }}/{{ $row['total'] }}</span>
+                                            <span class="text-[11px] text-gray-500 dark:text-gray-400 shrink-0">
+                                                @if($row['days_idle'] === null)
+                                                    —
+                                                @elseif($row['days_idle'] === 0)
+                                                    today
+                                                @else
+                                                    {{ $row['days_idle'] }}d
+                                                @endif
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </section>
+                @endif
+
+                {{-- Oldest first (languishing intakes) --}}
+                @if($oldestLogs->isNotEmpty())
+                    <section data-test="oldest-logs-card" class="rounded-lg border border-rose-200 dark:border-rose-900/40 bg-rose-50/40 dark:bg-rose-900/10 overflow-hidden">
+                        <header class="px-4 py-2.5 bg-rose-100/70 dark:bg-rose-900/30 border-b border-rose-200 dark:border-rose-900/40">
+                            <h2 class="text-sm font-semibold text-rose-900 dark:text-rose-100">Oldest open intakes</h2>
+                            <p class="text-[11px] text-rose-800/70 dark:text-rose-200/70">Longest in queue first. Don't let them go stale.</p>
+                        </header>
+                        <ul class="divide-y divide-rose-100 dark:divide-rose-900/40">
+                            @foreach($oldestLogs as $row)
+                                <li class="px-3 py-2 hover:bg-white/60 dark:hover:bg-zinc-800/40 flex items-center gap-2">
+                                    <button type="button" wire:click="togglePin({{ $row['id'] }})"
+                                            title="Pin to top"
+                                            class="text-gray-400 hover:text-amber-600 shrink-0">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 9V4l1 .01V2H7v2l1-.01V9l-2 4v2h5.2v7h1.6v-7H18v-2l-2-4z"/>
+                                        </svg>
+                                    </button>
+                                    <div class="min-w-0 flex-1">
+                                        <a href="{{ route('communications-log.management') }}?view={{ $row['id'] }}"
+                                           class="text-sm font-medium text-gray-900 dark:text-white hover:underline truncate block">
+                                            {{ $row['name'] }}
+                                        </a>
+                                        @if($row['subject'])
+                                            <div class="text-[11px] text-gray-500 dark:text-gray-400 truncate">{{ $row['subject'] }}</div>
+                                        @endif
+                                    </div>
+                                    <div class="text-right shrink-0">
+                                        <div class="text-[11px] font-semibold text-rose-700 dark:text-rose-300 tabular-nums">
+                                            @if($row['days_old'] === null)
+                                                —
+                                            @else
+                                                {{ $row['days_old'] }}d
+                                            @endif
+                                        </div>
+                                        <div class="text-[10px] text-gray-500 dark:text-gray-400">{{ $row['created_at']?->format('M j') }}</div>
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </section>
+                @endif
+            </div>
+        @endif
+
 
         @if($tab === 'projects')
             {{-- Cut A: per-project view --}}

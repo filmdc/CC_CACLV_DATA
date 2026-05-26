@@ -130,15 +130,104 @@ it('housing dashboard view renders the intake-pipeline card when pipeline is non
 
     Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
-        ->assertSee('Intake pipeline')
+        ->assertSee('Closest to convert')
         ->assertSee('Maria Lopez');
 })->group('regression');
 
-it('housing dashboard view omits the card entirely when pipeline is empty', function () {
-    // No comm logs with intake requirements at all.
+it('housing dashboard view omits the card entirely when pipeline + oldest are empty', function () {
+    // Strip any seeded comm logs so the dashboard truly has nothing to surface.
+    \App\Models\IntakeRequirement::query()->delete();
+    \App\Models\CommunicationLog::query()->delete();
+
     Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
-        ->assertDontSee('Intake pipeline');
+        ->assertDontSee('Closest to convert')
+        ->assertDontSee('Oldest open intakes');
+})->group('regression');
+
+it('togglePin attaches a pin row for the current user and detaches on second call', function () {
+    $log = CommunicationLog::factory()->create();
+
+    $component = Livewire::actingAs($this->admin)
+        ->test(HousingDashboard::class);
+
+    $component->call('togglePin', $log->id);
+    expect($log->fresh()->pinnedByUsers()->where('users.id', $this->admin->id)->exists())->toBeTrue();
+
+    $component->call('togglePin', $log->id);
+    expect($log->fresh()->pinnedByUsers()->where('users.id', $this->admin->id)->exists())->toBeFalse();
+})->group('regression');
+
+it('pinnedLogs returns only the current user pinned logs, newest pin first', function () {
+    $logA = CommunicationLog::factory()->create(['contact_first_name' => 'Alice']);
+    $logB = CommunicationLog::factory()->create(['contact_first_name' => 'Bob']);
+
+    // Pin A two days ago, B just now.
+    $logA->pinnedByUsers()->attach($this->admin->id, ['pinned_at' => now()->subDays(2)]);
+    $logB->pinnedByUsers()->attach($this->admin->id, ['pinned_at' => now()]);
+
+    // A second user's pin on logA must not contaminate the admin's list.
+    $other = \App\Models\User::factory()->create();
+    $otherLog = CommunicationLog::factory()->create();
+    $otherLog->pinnedByUsers()->attach($other->id, ['pinned_at' => now()]);
+
+    $pinned = Livewire::actingAs($this->admin)
+        ->test(HousingDashboard::class)
+        ->instance()
+        ->pinnedLogs();
+
+    expect($pinned->pluck('id')->all())->toBe([$logB->id, $logA->id]);
+})->group('regression');
+
+it('oldestLogs returns non-converted comm logs sorted oldest-first', function () {
+    \App\Models\CommunicationLog::query()->delete();
+
+    $newer = CommunicationLog::factory()->create(['housing_job_id' => null, 'converted_to_job_id' => null]);
+    $newer->forceFill(['created_at' => now()->subDays(3)])->saveQuietly();
+
+    $oldest = CommunicationLog::factory()->create(['housing_job_id' => null, 'converted_to_job_id' => null]);
+    $oldest->forceFill(['created_at' => now()->subDays(30)])->saveQuietly();
+
+    $converted = CommunicationLog::factory()->create([
+        'housing_job_id' => HousingJob::factory()->create()->id,
+    ]);
+    $converted->forceFill(['created_at' => now()->subDays(60)])->saveQuietly();
+
+    $rows = Livewire::actingAs($this->admin)
+        ->test(HousingDashboard::class)
+        ->instance()
+        ->oldestLogs();
+
+    // Converted log must NOT appear; oldest open one comes first.
+    expect($rows->pluck('id')->all())->toBe([$oldest->id, $newer->id]);
+})->group('regression');
+
+it('dashboard renders the pinned-card row when the user has pins', function () {
+    $log = CommunicationLog::factory()->create([
+        'contact_first_name' => 'Sandra',
+        'contact_last_name' => 'Doe',
+    ]);
+    $log->pinnedByUsers()->attach($this->admin->id, ['pinned_at' => now()]);
+
+    Livewire::actingAs($this->admin)
+        ->test(HousingDashboard::class)
+        ->assertSee('Pinned')
+        ->assertSee('Sandra Doe');
+})->group('regression');
+
+it('dashboard renders the oldest-open card when there are open comm logs', function () {
+    \App\Models\CommunicationLog::query()->delete();
+    CommunicationLog::factory()->create([
+        'housing_job_id' => null,
+        'converted_to_job_id' => null,
+        'contact_first_name' => 'Stale',
+        'contact_last_name' => 'Case',
+    ]);
+
+    Livewire::actingAs($this->admin)
+        ->test(HousingDashboard::class)
+        ->assertSee('Oldest open intakes')
+        ->assertSee('Stale Case');
 })->group('regression');
 
 it('CommunicationsLogManagement opens the detail viewer when mounted with ?view=N', function () {

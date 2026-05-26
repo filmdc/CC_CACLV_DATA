@@ -401,6 +401,15 @@
                             </div>
 
                             <div class="flex items-start space-x-2 ml-4" wire:click.stop>
+                                {{-- Phase 12.3: pin / unpin for the current user. --}}
+                                @php $isPinned = $log->pinnedByUsers->where('id', auth()->id())->isNotEmpty(); @endphp
+                                <button wire:click="togglePin({{ $log->id }})"
+                                        title="{{ $isPinned ? 'Unpin from dashboard' : 'Pin to dashboard' }}"
+                                        class="{{ $isPinned ? 'text-amber-500 hover:text-amber-700' : 'text-gray-400 hover:text-amber-600' }}">
+                                    <svg class="w-5 h-5" {{ $isPinned ? 'fill="currentColor"' : 'fill="none" stroke="currentColor" stroke-width="2"' }} viewBox="0 0 24 24">
+                                        <path @if(!$isPinned) stroke-linecap="round" stroke-linejoin="round" @endif d="M16 9V4l1 .01V2H7v2l1-.01V9l-2 4v2h5.2v7h1.6v-7H18v-2l-2-4z"/>
+                                    </svg>
+                                </button>
                                 @can('communications_log.edit')
                                 <button wire:click="showEditForm({{ $log->id }})"
                                         class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400">

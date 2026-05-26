@@ -62,6 +62,29 @@ class HousingDashboard extends Component
         $this->tab = in_array($tab, ['projects', 'requirements'], true) ? $tab : 'projects';
     }
 
+    /**
+     * Phase 12.3: toggle the current user's pin on a comm log without
+     * leaving the dashboard. Mirrors CommunicationsLogManagement::togglePin.
+     */
+    public function togglePin(int $logId): void
+    {
+        $user = Auth::user();
+        if ($user === null) {
+            abort(403);
+        }
+
+        $log = CommunicationLog::findOrFail($logId);
+        $existing = $log->pinnedByUsers()->where('users.id', $user->id)->exists();
+
+        if ($existing) {
+            $log->pinnedByUsers()->detach($user->id);
+            session()->flash('success', 'Unpinned.');
+        } else {
+            $log->pinnedByUsers()->attach($user->id, ['pinned_at' => now()]);
+            session()->flash('success', 'Pinned to dashboard.');
+        }
+    }
+
     public function resetFilters(): void
     {
         $this->filter_owner_id = null;
@@ -187,10 +210,86 @@ class HousingDashboard extends Component
             ->values();
     }
 
+    /**
+     * Phase 12.3: comm logs this user has pinned. Compact-card row at
+     * the top of the dashboard. Newest-pinned first; capped at 10.
+     */
+    public function pinnedLogs(int $limit = 10): \Illuminate\Support\Collection
+    {
+        $user = Auth::user();
+        if ($user === null) {
+            return collect();
+        }
+
+        return CommunicationLog::query()
+            ->whereHas('pinnedByUsers', fn ($q) => $q->where('users.id', $user->id))
+            ->with([
+                'participant',
+                'pinnedByUsers' => fn ($q) => $q->where('users.id', $user->id),
+            ])
+            ->get()
+            ->map(function (CommunicationLog $log) use ($user) {
+                $pinnedAt = $log->pinnedByUsers->firstWhere('id', $user->id)?->pivot?->pinned_at;
+
+                $name = $log->participant?->full_name
+                    ?? trim(($log->contact_first_name ?? '').' '.($log->contact_last_name ?? ''))
+                    ?: ($log->subject ?: 'Comm Log #'.$log->id);
+
+                return [
+                    'id' => $log->id,
+                    'name' => trim((string) $name),
+                    'subject' => (string) ($log->subject ?? ''),
+                    'priority' => $log->priority,
+                    'converted' => $log->converted_to_job_id !== null,
+                    'pinned_at' => $pinnedAt,
+                ];
+            })
+            ->sortByDesc('pinned_at')
+            ->take($limit)
+            ->values();
+    }
+
+    /**
+     * Phase 12.3: oldest non-converted intake comm logs (older first).
+     * Surfaces cases that have been languishing so they don't get
+     * forgotten under newer activity. Capped at 8 — same count as
+     * the intake-pipeline list for visual parity.
+     */
+    public function oldestLogs(int $limit = 8): \Illuminate\Support\Collection
+    {
+        if (! Auth::user()?->hasPermission('communications_log.view') && ! Auth::user()?->isAdmin()) {
+            return collect();
+        }
+
+        return CommunicationLog::query()
+            ->whereNull('housing_job_id')
+            ->whereNull('converted_to_job_id')
+            ->orderBy('created_at', 'asc')
+            ->with('participant')
+            ->limit($limit)
+            ->get()
+            ->map(function (CommunicationLog $log) {
+                $name = $log->participant?->full_name
+                    ?? trim(($log->contact_first_name ?? '').' '.($log->contact_last_name ?? ''))
+                    ?: ($log->subject ?: 'Comm Log #'.$log->id);
+
+                return [
+                    'id' => $log->id,
+                    'name' => trim((string) $name),
+                    'subject' => (string) ($log->subject ?? ''),
+                    'priority' => $log->priority,
+                    'created_at' => $log->created_at,
+                    'days_old' => $log->created_at ? (int) $log->created_at->diffInDays(now()) : null,
+                ];
+            });
+    }
+
     public function render()
     {
         $accessibleJobIds = $this->accessibleHousingJobIds();
         $intakePipeline = $this->intakePipeline();
+        $pinnedLogs = $this->pinnedLogs();
+        $oldestLogs = $this->oldestLogs();
 
         $support = app(DashboardIndicatorSupport::class);
         $blockedMilestoneIds = $support->blockedMilestoneIds($accessibleJobIds);
@@ -246,6 +345,8 @@ class HousingDashboard extends Component
                 'userOptions' => $userOptions,
                 'projectOptions' => collect(),
                 'intakePipeline' => $intakePipeline,
+                'pinnedLogs' => $pinnedLogs,
+                'oldestLogs' => $oldestLogs,
             ])->layout('components.layouts.app');
         }
 
@@ -311,6 +412,8 @@ class HousingDashboard extends Component
             'userOptions' => $userOptions,
             'projectOptions' => $projectOptions,
             'intakePipeline' => $intakePipeline,
+            'pinnedLogs' => $pinnedLogs,
+            'oldestLogs' => $oldestLogs,
         ])->layout('components.layouts.app');
     }
 }

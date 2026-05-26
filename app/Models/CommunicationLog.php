@@ -162,6 +162,26 @@ class CommunicationLog extends Model
         return $this->hasMany(IntakeRequirement::class);
     }
 
+    /**
+     * Phase 12.3: users who have pinned this log to their dashboard.
+     * Pivot carries `pinned_at` so we can sort by most-recently-pinned.
+     */
+    public function pinnedByUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'communication_log_user_pins')
+            ->withPivot('pinned_at')
+            ->withTimestamps();
+    }
+
+    public function isPinnedBy(?User $user): bool
+    {
+        if ($user === null) {
+            return false;
+        }
+
+        return $this->pinnedByUsers()->where('users.id', $user->id)->exists();
+    }
+
     // New relationship for updates/follow-ups
     public function updates(): HasMany
     {

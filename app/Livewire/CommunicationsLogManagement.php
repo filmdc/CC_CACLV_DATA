@@ -927,6 +927,28 @@ class CommunicationsLogManagement extends Component
     }
 
     /**
+     * Phase 12.3: toggle this user's pin on a communication log. Used
+     * by the Housing Dashboard pinned-cards row and the per-row pin
+     * affordance in the comm log list/viewer.
+     */
+    public function togglePin(int $logId): void
+    {
+        $this->authorizeAction('communications_log.view');
+
+        $log = CommunicationLog::findOrFail($logId);
+        $userId = Auth::id();
+
+        $existing = $log->pinnedByUsers()->where('users.id', $userId)->exists();
+        if ($existing) {
+            $log->pinnedByUsers()->detach($userId);
+            session()->flash('success', 'Unpinned.');
+        } else {
+            $log->pinnedByUsers()->attach($userId, ['pinned_at' => now()]);
+            session()->flash('success', 'Pinned to dashboard.');
+        }
+    }
+
+    /**
      * Phase 1 (intake) requirements gate for a given log. Returns
      *   ['met' => int, 'total' => int, 'ready' => bool, 'unmet' => int]
      * counting non-orphaned IntakeRequirements whose RequirementDefinition
@@ -2626,8 +2648,12 @@ class CommunicationsLogManagement extends Component
         // so the card view can render fund-code badges per row without N+1.
         // Cheap on table view too (typically 0–3 codes per log).
         // (Relation renamed in P-39b — addendum D-2 — from the legacy tag pivot.)
-        $query = CommunicationLog::with(['participant', 'household', 'property', 'contractor', 'createdBy', 'services', 'tags', 'convertedToJob', 'anticipatedFundCodes'])
-            ->orderBy('communication_date', 'desc');
+        $query = CommunicationLog::with([
+            'participant', 'household', 'property', 'contractor', 'createdBy',
+            'services', 'tags', 'convertedToJob', 'anticipatedFundCodes',
+            // Phase 12.3: per-row pin state for the current user only.
+            'pinnedByUsers' => fn ($q) => $q->where('users.id', Auth::id()),
+        ])->orderBy('communication_date', 'desc');
 
         if ($this->search) {
             $query->search($this->search);

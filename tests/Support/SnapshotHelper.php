@@ -124,6 +124,10 @@ class SnapshotHelper
             '/data-recipient-row="\d+"/' => 'data-recipient-row="__ID__"',
             // URL fragments like #milestone-42, #task-9 used for scroll-to-anchor.
             '/#([a-zA-Z][a-zA-Z_-]*)-\d+\b/' => '#$1-__ID__',
+            // Query-string ID params for known deep-link routes (e.g. the
+            // Comm Log dashboard cards use ?view=N). Database autoincrement
+            // varies across runs and would diff the snapshot otherwise.
+            '/\?view=\d+/' => '?view=__ID__',
         ];
 
         $normalized = preg_replace(array_keys($patterns), array_values($patterns), $html) ?? $html;

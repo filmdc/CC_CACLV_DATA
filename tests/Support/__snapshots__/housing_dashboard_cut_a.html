@@ -20,6 +20,82 @@ Per requirement
 </button>
 </div>
 </div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+<section data-test="oldest-logs-card" class="rounded-lg border border-rose-200 dark:border-rose-900/40 bg-rose-50/40 dark:bg-rose-900/10 overflow-hidden">
+<header class="px-4 py-2.5 bg-rose-100/70 dark:bg-rose-900/30 border-b border-rose-200 dark:border-rose-900/40">
+<h2 class="text-sm font-semibold text-rose-900 dark:text-rose-100">Oldest open intakes</h2>
+<p class="text-[11px] text-rose-800/70 dark:text-rose-200/70">Longest in queue first. Don't let them go stale.</p>
+</header>
+<ul class="divide-y divide-rose-100 dark:divide-rose-900/40">
+<li class="px-3 py-2 hover:bg-white/60 dark:hover:bg-zinc-800/40 flex items-center gap-2">
+<button type="button" wire:click="togglePin(__ID__)"
+title="Pin to top"
+class="text-gray-400 hover:text-amber-600 shrink-0">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path stroke-linecap="round" stroke-linejoin="round" d="M16 9V4l1 .01V2H7v2l1-.01V9l-2 4v2h5.2v7h1.6v-7H18v-2l-2-4z"/>
+</svg>
+</button>
+<div class="min-w-0 flex-1">
+<a href="__APP_URL__/communications-log?view=__ID__"
+class="text-sm font-medium text-gray-900 dark:text-white hover:underline truncate block">
+Ada  Fixture
+</a>
+<div class="text-[11px] text-gray-500 dark:text-gray-400 truncate">CL-1: General inquiry, no fund code, not converted</div>
+</div>
+<div class="text-right shrink-0">
+<div class="text-[11px] font-semibold text-rose-700 dark:text-rose-300 tabular-nums">
+0d
+</div>
+<div class="text-[10px] text-gray-500 dark:text-gray-400">May 1</div>
+</div>
+</li>
+<li class="px-3 py-2 hover:bg-white/60 dark:hover:bg-zinc-800/40 flex items-center gap-2">
+<button type="button" wire:click="togglePin(__ID__)"
+title="Pin to top"
+class="text-gray-400 hover:text-amber-600 shrink-0">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path stroke-linecap="round" stroke-linejoin="round" d="M16 9V4l1 .01V2H7v2l1-.01V9l-2 4v2h5.2v7h1.6v-7H18v-2l-2-4z"/>
+</svg>
+</button>
+<div class="min-w-0 flex-1">
+<a href="__APP_URL__/communications-log?view=__ID__"
+class="text-sm font-medium text-gray-900 dark:text-white hover:underline truncate block">
+Brad  Fixture
+</a>
+<div class="text-[11px] text-gray-500 dark:text-gray-400 truncate">CL-2: Single fund code, not converted</div>
+</div>
+<div class="text-right shrink-0">
+<div class="text-[11px] font-semibold text-rose-700 dark:text-rose-300 tabular-nums">
+0d
+</div>
+<div class="text-[10px] text-gray-500 dark:text-gray-400">May 1</div>
+</div>
+</li>
+<li class="px-3 py-2 hover:bg-white/60 dark:hover:bg-zinc-800/40 flex items-center gap-2">
+<button type="button" wire:click="togglePin(__ID__)"
+title="Pin to top"
+class="text-gray-400 hover:text-amber-600 shrink-0">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path stroke-linecap="round" stroke-linejoin="round" d="M16 9V4l1 .01V2H7v2l1-.01V9l-2 4v2h5.2v7h1.6v-7H18v-2l-2-4z"/>
+</svg>
+</button>
+<div class="min-w-0 flex-1">
+<a href="__APP_URL__/communications-log?view=__ID__"
+class="text-sm font-medium text-gray-900 dark:text-white hover:underline truncate block">
+Carla  Fixture
+</a>
+<div class="text-[11px] text-gray-500 dark:text-gray-400 truncate">CL-3: Multiple fund codes, not converted</div>
+</div>
+<div class="text-right shrink-0">
+<div class="text-[11px] font-semibold text-rose-700 dark:text-rose-300 tabular-nums">
+0d
+</div>
+<div class="text-[10px] text-gray-500 dark:text-gray-400">May 1</div>
+</div>
+</li>
+</ul>
+</section>
+</div>
 <div data-test="dashboard-cut-a">
 <div class="space-y-3">
 <div class="border border-gray-200 dark:border-zinc-700 rounded-lg p-4 bg-gray-50 dark:bg-zinc-900"
