@@ -74,13 +74,12 @@ it('uppercases the code on save (existing behavior, regression-locked)', functio
     expect($stored->code)->toBe('LOWER-CASE');
 })->group('regression');
 
-it('exposes the requirements_count on each row for the Requirements (N) action button (P-06)', function () {
+it('exposes the Fund Requirements management button on each fund-code row (P-06; relabeled in comm-log-v2)', function () {
+    // comm-log-v2 redesign: the old inline "Requirements (N)" count badge
+    // was replaced by a "Fund Requirements" button that opens the library
+    // atom-link modal (openAtomLinkModal). The count is no longer surfaced
+    // on the row by design; assert the management affordance is present.
     $code = FundCode::factory()->create(['code' => 'REQ-COUNT-001']);
-    $code->requirements()->createMany([
-        ['label' => 'R-A', 'is_hard_requirement' => true,  'sort_order' => 1],
-        ['label' => 'R-B', 'is_hard_requirement' => false, 'sort_order' => 2],
-        ['label' => 'R-C', 'is_hard_requirement' => false, 'sort_order' => 3],
-    ]);
 
     $html = Livewire::actingAs($this->user)
         ->test(FundCodeManagement::class)
@@ -88,5 +87,6 @@ it('exposes the requirements_count on each row for the Requirements (N) action b
         ->html();
 
     expect($html)->toContain('REQ-COUNT-001');
-    expect($html)->toContain('Requirements (3)');
+    expect($html)->toContain('Fund Requirements');
+    expect($html)->toContain('openAtomLinkModal('.$code->id.')');
 })->group('regression');
