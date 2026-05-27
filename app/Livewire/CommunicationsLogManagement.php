@@ -1025,11 +1025,22 @@ class CommunicationsLogManagement extends Component
         $total = $reqs->count();
         $met = $reqs->filter(fn ($r) => $r->isMet())->count();
 
+        // A project is born from the county → fund codes → requirements
+        // chain, so there must be something to track: at least one
+        // non-orphaned requirement (county-derived OR ad-hoc, any phase).
+        // Without it the resulting project would be empty.
+        $hasRequirements = $log->intakeRequirements()
+            ->where('is_orphaned', false)
+            ->exists();
+
         return [
             'total' => $total,
             'met' => $met,
             'unmet' => $total - $met,
-            'ready' => $total === 0 || $met === $total,
+            'hasRequirements' => $hasRequirements,
+            // Ready to convert when there is at least one requirement AND
+            // all Phase 1 (eligibility/compliance) requirements are met.
+            'ready' => $hasRequirements && ($total === 0 || $met === $total),
         ];
     }
 
@@ -1571,7 +1582,6 @@ class CommunicationsLogManagement extends Component
         $this->validate([
             'convertJobTitle' => 'required|string|max:255',
             'convertJobDescription' => 'nullable|string',
-            'convertProgramId' => 'required|exists:programs,id',
         ]);
 
         $log = CommunicationLog::findOrFail($this->convertingLogId);
@@ -1760,7 +1770,6 @@ class CommunicationsLogManagement extends Component
         $this->validate([
             'convertJobTitle' => 'required|string|max:255',
             'convertJobDescription' => 'nullable|string',
-            'convertProgramId' => 'required|exists:programs,id',
         ]);
 
         $log = CommunicationLog::findOrFail($this->convertingLogId);
@@ -1784,6 +1793,17 @@ class CommunicationsLogManagement extends Component
             session()->flash('error', "This communication log has already been converted to project {$jobNumber}. Use 'Reset Conversion' option first if you need to re-convert.");
             $this->closeConvertModal();
             \Log::info('convertToProject blocked - already converted', ['job_number' => $jobNumber]);
+
+            return;
+        }
+
+        // Server-side guard for the same condition the disabled button
+        // enforces: a project needs at least one non-orphaned requirement
+        // to track (county-derived or ad-hoc). Defends against stale UI or
+        // a direct call.
+        if (! $this->intakeRequirementsGate($log)['hasRequirements']) {
+            session()->flash('error', 'Cannot convert: this log has no requirements yet. Select a county or add an ad-hoc requirement first.');
+            \Log::info('convertToProject blocked - no requirements', ['log_id' => $log->id]);
 
             return;
         }
@@ -1967,8 +1987,15 @@ class CommunicationsLogManagement extends Component
             $job = HousingJob::create([
                 'job_title' => $this->convertJobTitle,
                 'job_description' => $this->convertJobDescription,
-                'program_id' => $this->convertProgramId,
-                'service_id' => $this->convertServiceId ?: null,
+                // program_id is auto-derived silently (first housing-enabled
+                // program) purely to keep project access control working —
+                // it is no longer surfaced or chosen in the convert UI. The
+                // legacy Service tie-in is dropped: the project's scope now
+                // comes from the carried counties + fund codes + Phase 2
+                // requirements (see IntakeRequirementInstantiator::
+                // carryForwardToProject).
+                'program_id' => $this->convertProgramId ?: null,
+                'service_id' => null,
                 'participant_id' => $participant?->id,
                 'household_id' => $household?->id,
                 'property_id' => $property?->id,

@@ -503,14 +503,35 @@ class IntakeRequirementInstantiator
     }
 
     /**
-     * Stub for the Convert-to-Project carry-forward. Records the override
-     * audit on the new housing_job when applicable. The actual copy-into-
-     * project_requirements behavior is deferred until the project-phase
-     * requirements model is reconciled with the v2 unified shape
-     * (Phase 8 / Convert-to-Project work).
+     * Convert-to-Project carry-forward.
      *
-     * Returns the count of intake requirements that WOULD be copied,
-     * so callers can surface "N requirements carried over" in the UI.
+     * The housing module is now self-contained: a project is born from
+     * the county/counties and fund codes selected during intake, NOT from
+     * the legacy Program/Service tie-in. On promotion we:
+     *
+     *   1. Record the requirement-override audit on the new job (if the
+     *      promoter overrode an unmet Phase 1 gate).
+     *   2. Carry the log's selected counties (HousingService rows) onto
+     *      the job's housing_job_housing_service pivot — historical record
+     *      of which county the project serves.
+     *   3. Carry the log's anticipated fund codes onto the job's
+     *      fund_code_housing_job pivot — these become the project's
+     *      funding sources for the budget tab.
+     *   4. Instantiate the Phase 2 (project-phase / service-delivery-
+     *      compliance) requirements from each carried fund code, via
+     *      RequirementInstantiator::forFundCode. These are the
+     *      requirements the project manager works through on the project
+     *      page; the milestones tab tracks how the fund codes are used to
+     *      deliver services.
+     *
+     * Phase 1 (eligibility/compliance) intake requirements deliberately
+     * stay on the Communication Log as the historical intake record — they
+     * are NOT copied onto the project (see CLAUDE.md "Intake vs. Project
+     * requirements"). All three carry steps are idempotent: fund codes and
+     * counties sync-without-detach, and forFundCode skips definitions that
+     * already have a row on this project.
+     *
+     * @return int the number of Phase 2 project requirements created
      */
     public function carryForwardToProject(
         CommunicationLog $log,
@@ -518,20 +539,44 @@ class IntakeRequirementInstantiator
         User $actor,
         ?string $overrideReason = null
     ): int {
-        if ($overrideReason !== null && trim($overrideReason) !== '') {
-            $job->requirement_override_reason = $overrideReason;
-            $job->requirement_override_by_user_id = $actor->id;
-            $job->requirement_overridden_at = now();
-            $job->save();
-        }
+        return DB::transaction(function () use ($log, $job, $actor, $overrideReason) {
+            if ($overrideReason !== null && trim($overrideReason) !== '') {
+                $job->requirement_override_reason = $overrideReason;
+                $job->requirement_override_by_user_id = $actor->id;
+                $job->requirement_overridden_at = now();
+                $job->save();
+            }
 
-        // TODO(phase-8): copy non-orphaned intake_requirements forward
-        // into project_requirements when that table lands. For now,
-        // count them so the caller can flash a heads-up.
-        return IntakeRequirement::query()
-            ->where('communication_log_id', $log->id)
-            ->where('is_orphaned', false)
-            ->count();
+            // (2) Counties → job. Stamp created_by/created_at on the pivot
+            // (the table carries no updated_at), matching the comm-log side.
+            $countyIds = $log->housingServices()->pluck('housing_services.id')->all();
+            if (! empty($countyIds)) {
+                $pivot = [];
+                foreach ($countyIds as $id) {
+                    $pivot[$id] = [
+                        'created_by_user_id' => $actor->id,
+                        'created_at' => now(),
+                    ];
+                }
+                $job->housingServices()->syncWithoutDetaching($pivot);
+            }
+
+            // (3) Fund codes → job. The fund_code_housing_job pivot uses
+            // standard timestamps, so a plain id sync suffices.
+            $fundCodeIds = $log->anticipatedFundCodes()->pluck('fund_codes.id')->all();
+            if (! empty($fundCodeIds)) {
+                $job->fundCodes()->syncWithoutDetaching($fundCodeIds);
+            }
+
+            // (4) Phase 2 requirements from each carried fund code.
+            $instantiator = app(RequirementInstantiator::class);
+            $created = 0;
+            foreach ($job->fundCodes()->get() as $fundCode) {
+                $created += $instantiator->forFundCode($job, $fundCode, $actor)->count();
+            }
+
+            return $created;
+        });
     }
 
     /**

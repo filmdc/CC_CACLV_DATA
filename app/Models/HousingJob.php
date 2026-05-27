@@ -89,17 +89,30 @@ class HousingJob extends Model
     public static function generateJobNumber(): string
     {
         $year = date('Y');
-        $lastJob = self::whereYear('created_at', $year)
-            ->orderBy('id', 'desc')
-            ->first();
+        $prefix = "JOB-{$year}-";
 
-        if ($lastJob && preg_match('/JOB-'.$year.'-(\d+)/', $lastJob->job_number, $matches)) {
-            $sequence = str_pad((int) $matches[1] + 1, 5, '0', STR_PAD_LEFT);
-        } else {
-            $sequence = '00001';
-        }
+        // Highest existing sequence for the year. Filter to the JOB-YYYY-
+        // pattern (zero-padded, so it sorts lexically) so that templates
+        // ("TEMPLATE-…") or any legacy-format numbers don't slip in as the
+        // "last job" and reset the counter to 00001 — which collides with
+        // the existing JOB-YYYY-00001 and throws a unique-key violation.
+        $lastNumber = self::where('job_number', 'like', $prefix.'%')
+            ->orderBy('job_number', 'desc')
+            ->value('job_number');
 
-        return "JOB-{$year}-{$sequence}";
+        $next = ($lastNumber && preg_match('/^JOB-'.$year.'-(\d+)$/', $lastNumber, $matches))
+            ? (int) $matches[1] + 1
+            : 1;
+
+        // Defensively advance past any already-taken number (gaps from
+        // deletes, non-sequential historical data, or a concurrent insert)
+        // so we never hand back a duplicate.
+        do {
+            $candidate = $prefix.str_pad($next, 5, '0', STR_PAD_LEFT);
+            $next++;
+        } while (self::where('job_number', $candidate)->exists());
+
+        return $candidate;
     }
 
     public function participant(): BelongsTo
@@ -219,6 +232,23 @@ class HousingJob extends Model
     {
         return $this->belongsToMany(FundCode::class, 'fund_code_housing_job')
             ->withTimestamps();
+    }
+
+    /**
+     * Comm Log v2 / Convert-to-Project: the counties (HousingService
+     * catalog entries, relabeled "County" in the UI) this project serves.
+     * Populated at conversion from the originating Communication Log's
+     * selected counties; the same county selection drives the fund codes
+     * and, through them, the Phase 2 project requirements.
+     */
+    public function housingServices(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            HousingService::class,
+            'housing_job_housing_service',
+            'housing_job_id',
+            'housing_service_id'
+        )->withPivot('created_by_user_id', 'created_at');
     }
 
     /**

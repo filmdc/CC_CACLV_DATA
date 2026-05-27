@@ -237,6 +237,8 @@ class ProjectManagement extends Component
             'participant',
             'property',
             'contractor',
+            // Counties carried from the originating comm log at conversion.
+            'housingServices',
             'milestones.tasks.assignedTo',
             'milestones.documents.media',
             'milestones.documents.assignedTo',
@@ -2008,6 +2010,8 @@ class ProjectManagement extends Component
             // the requirements panel (P-07 wants requirements
             // eager-loaded too).
             'fundCodes.requirements',
+            // Counties carried from the originating comm log at conversion.
+            'housingServices',
         ])->findOrFail($this->jobId);
     }
 
