@@ -2,9 +2,9 @@
 
 use App\Livewire\ProjectManagement;
 use App\Models\FundCode;
-use App\Models\FundCodeRequirement;
 use App\Models\HousingJob;
 use App\Models\Requirement;
+use App\Models\RequirementDefinition;
 use App\Models\User;
 use App\Notifications\RequirementAssignedNotification;
 use App\Services\RequirementInstantiator;
@@ -18,13 +18,14 @@ beforeEach(function () {
     $this->admin = RegressionHelpers::adminUser();
 });
 
-it('instantiates one requirement per fund-code-requirement template when a fund code attaches', function () {
+it('instantiates one requirement per project-phase library item linked to the fund code', function () {
     $manager = User::factory()->create();
     $job = HousingJob::factory()->create(['project_manager_id' => $manager->id]);
     $code = FundCode::factory()->create(['code' => 'INSTANTIATE-001']);
 
-    FundCodeRequirement::factory()->create(['fund_code_id' => $code->id, 'label' => 'First template', 'sort_order' => 1]);
-    FundCodeRequirement::factory()->document()->create(['fund_code_id' => $code->id, 'label' => 'Second template', 'sort_order' => 2]);
+    $first = RequirementDefinition::factory()->category('service_delivery_compliance')->kind('verify')->create(['label' => 'First template']);
+    $second = RequirementDefinition::factory()->category('service_delivery_compliance')->kind('doc')->create(['label' => 'Second template']);
+    $code->requirementDefinitions()->attach([$first->id, $second->id], ['created_at' => now()]);
 
     Livewire::actingAs($this->admin)
         ->test(ProjectManagement::class, ['id' => $job->id])
@@ -45,7 +46,8 @@ it('is idempotent — re-attaching the same fund code does not duplicate require
     $manager = User::factory()->create();
     $job = HousingJob::factory()->create(['project_manager_id' => $manager->id]);
     $code = FundCode::factory()->create();
-    FundCodeRequirement::factory()->count(3)->create(['fund_code_id' => $code->id]);
+    $defs = RequirementDefinition::factory()->count(3)->category('service_delivery_compliance')->create();
+    $code->requirementDefinitions()->attach($defs->pluck('id')->all(), ['created_at' => now()]);
 
     $component = Livewire::actingAs($this->admin)->test(ProjectManagement::class, ['id' => $job->id]);
     $component->set('newFundCodeId', $code->id)->call('attachFundCode');
@@ -61,7 +63,8 @@ it('fires RequirementAssignedNotification to the project manager when actor is n
     $assistant = User::factory()->create();
     $job = HousingJob::factory()->create(['project_manager_id' => $manager->id]);
     $code = FundCode::factory()->create();
-    FundCodeRequirement::factory()->count(2)->create(['fund_code_id' => $code->id]);
+    $defs = RequirementDefinition::factory()->count(2)->category('service_delivery_compliance')->create();
+    $code->requirementDefinitions()->attach($defs->pluck('id')->all(), ['created_at' => now()]);
 
     app(RequirementInstantiator::class)->forFundCode($job->fresh(), $code, $assistant);
 
@@ -77,7 +80,8 @@ it('suppresses self-notification when the actor is the project manager', functio
     $manager = User::factory()->create();
     $job = HousingJob::factory()->create(['project_manager_id' => $manager->id]);
     $code = FundCode::factory()->create();
-    FundCodeRequirement::factory()->count(2)->create(['fund_code_id' => $code->id]);
+    $defs = RequirementDefinition::factory()->count(2)->category('service_delivery_compliance')->create();
+    $code->requirementDefinitions()->attach($defs->pluck('id')->all(), ['created_at' => now()]);
 
     app(RequirementInstantiator::class)->forFundCode($job->fresh(), $code, $manager);
 

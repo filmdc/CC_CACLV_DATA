@@ -2,9 +2,9 @@
 
 use App\Livewire\FundCodeManagement;
 use App\Models\FundCode;
-use App\Models\FundCodeRequirement;
 use App\Models\HousingJob;
 use App\Models\Requirement;
+use App\Models\RequirementDefinition;
 use App\Models\User;
 use App\Services\RequirementInstantiator;
 use Database\Seeders\RegressionTestSeeder;
@@ -30,7 +30,7 @@ it('deletes the fund code immediately when no requirements exist anywhere', func
 it('opens the cascade-or-keep modal when at least one project has fund-code-source requirements', function () {
     $manager = User::factory()->create();
     $code = FundCode::factory()->create();
-    FundCodeRequirement::factory()->create(['fund_code_id' => $code->id]);
+    RegressionHelpers::linkProjectRequirements($code, 1);
 
     $jobA = HousingJob::factory()->create(['project_manager_id' => $manager->id]);
     $jobB = HousingJob::factory()->create(['project_manager_id' => $manager->id]);
@@ -55,7 +55,8 @@ it('opens the cascade-or-keep modal when at least one project has fund-code-sour
 it('keep branch: deletes the fund code but preserves audit-quality requirement rows', function () {
     $manager = User::factory()->create();
     $code = FundCode::factory()->create();
-    FundCodeRequirement::factory()->create(['fund_code_id' => $code->id, 'label' => 'Snapshot text survives delete']);
+    $def = RequirementDefinition::factory()->category('service_delivery_compliance')->create(['label' => 'Snapshot text survives delete']);
+    $code->requirementDefinitions()->attach($def->id, ['created_at' => now()]);
     $job = HousingJob::factory()->create(['project_manager_id' => $manager->id]);
     $job->fundCodes()->attach($code->id);
     app(RequirementInstantiator::class)->forFundCode($job->fresh(), $code, $manager);
@@ -77,7 +78,7 @@ it('keep branch: deletes the fund code but preserves audit-quality requirement r
 it('cascade branch: removes the fund code AND every fund-code-source requirement on every project', function () {
     $manager = User::factory()->create();
     $code = FundCode::factory()->create();
-    FundCodeRequirement::factory()->count(2)->create(['fund_code_id' => $code->id]);
+    RegressionHelpers::linkProjectRequirements($code, 2);
     $jobA = HousingJob::factory()->create(['project_manager_id' => $manager->id]);
     $jobB = HousingJob::factory()->create(['project_manager_id' => $manager->id]);
     $jobA->fundCodes()->attach($code->id);
@@ -100,8 +101,8 @@ it('does not affect requirements bound to a different fund code', function () {
     $manager = User::factory()->create();
     $codeA = FundCode::factory()->create();
     $codeB = FundCode::factory()->create();
-    FundCodeRequirement::factory()->create(['fund_code_id' => $codeA->id]);
-    FundCodeRequirement::factory()->create(['fund_code_id' => $codeB->id]);
+    RegressionHelpers::linkProjectRequirements($codeA, 1);
+    RegressionHelpers::linkProjectRequirements($codeB, 1);
 
     $job = HousingJob::factory()->create(['project_manager_id' => $manager->id]);
     $job->fundCodes()->attach([$codeA->id, $codeB->id]);
