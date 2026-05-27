@@ -22,6 +22,8 @@ class SnapshotHelper
      *   - CSRF token fields (<input name="_token">, <meta name="csrf-token">)
      *   - Livewire component checksum markers (data-csrf, x-csrf-token)
      *   - ISO 8601 timestamps down to the second (normalized to a fixed token)
+     *   - Today's human-readable date ("M d, Y") — freshly-seeded created_at
+     *     stamps render as the test-run date, which drifts daily (__TODAY__)
      *   - Database autoincrement IDs in resource URLs (/project/N/, /property/N,
      *     /participant/N, /contract/N, /contractor/N) normalized to __ID__
      *   - <option value="N"> where N is digits-only — typically a FK dropdown
@@ -124,7 +126,19 @@ class SnapshotHelper
             '/data-recipient-row="\d+"/' => 'data-recipient-row="__ID__"',
             // URL fragments like #milestone-42, #task-9 used for scroll-to-anchor.
             '/#([a-zA-Z][a-zA-Z_-]*)-\d+\b/' => '#$1-__ID__',
+            // Query-string ID params for known deep-link routes (e.g. the
+            // Comm Log dashboard cards use ?view=N). Database autoincrement
+            // varies across runs and would diff the snapshot otherwise.
+            '/\?view=\d+/' => '?view=__ID__',
         ];
+
+        // Audit-trail dates ("Created/Added/Last updated by X on <M d, Y>[ time]").
+        // Freshly-seeded rows stamp created_at = now(), so this date is the
+        // test-run day and drifts daily, breaking the snapshot at the date
+        // boundary. Normalize only the date that follows a "by … on" audit
+        // phrase, so fixed/seeded dates (communication_date, fund expiry —
+        // rendered standalone, without that prefix) stay pinned.
+        $patterns['/((?:Created|Added|Last updated) by [^<\n]{0,80}? on )[A-Z][a-z]{2} \d{2}, \d{4}(?: \d{1,2}:\d{2}\s?[AP]M)?/'] = '${1}__DATE__';
 
         $normalized = preg_replace(array_keys($patterns), array_values($patterns), $html) ?? $html;
 

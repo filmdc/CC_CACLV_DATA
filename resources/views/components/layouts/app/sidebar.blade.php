@@ -57,6 +57,9 @@
                     @if(auth()->user()->hasPermission('fund_codes.view'))
                         <flux:navlist.item icon="banknotes" :href="route('fund-codes.management')" :current="request()->routeIs('fund-codes.management')" wire:navigate>{{ __('Fund Codes') }}</flux:navlist.item>
                     @endif
+                    @if(auth()->user()->hasPermission('requirements_library.view'))
+                        <flux:navlist.item icon="clipboard-document-check" :href="route('requirements-library.management')" :current="request()->routeIs('requirements-library.management')" wire:navigate>{{ __('Requirements Library') }}</flux:navlist.item>
+                    @endif
                     @if(auth()->user()->hasPermission('pdf_templates.view'))
                         <flux:navlist.item icon="document-text" :href="route('pdf-templates.index')" :current="request()->routeIs('pdf-templates.*')" wire:navigate>{{ __('PDF Form Templates') }}</flux:navlist.item>
                     @endif

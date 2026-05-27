@@ -239,6 +239,17 @@ class ComponentManagement extends Component
 - `Role` → belongsToMany → `Permission` (via pivot)
 - Program-specific access via `UserProgram`
 
+#### Intake vs. Project requirements (P-39)
+
+Two parallel requirement systems share the `fund_code_requirements` template table but maintain independent lifecycles:
+
+- `intake_requirements` — intake-phase. Rooted on `CommunicationLog`. Templates filtered to `phase='eligibility'`. Tracked while qualifying an applicant; ends at promotion via `convertToProject()`. Statuses: `outstanding` / `received` / `waived`. Lifecycle managed by `App\Services\IntakeRequirementInstantiator`.
+- `requirements` — project-execution-phase. Rooted on `HousingJob`. Templates filtered to `phase='project'`. Tracked while delivering the housing project. Statuses: `outstanding` / `complete` / `not_applicable`. Lifecycle managed by `App\Services\RequirementInstantiator`.
+
+Both consume `fund_code_requirements` as templates. The `phase` column on that table determines which system instantiates which row. Intake requirements stay attached to the Comm Log after promotion as historical record; they do NOT migrate to the new `HousingJob`.
+
+Fund-code association on `CommunicationLog` is via the `anticipatedFundCodes()` relation (table `communication_log_anticipated_fund_codes`). The legacy `communication_log_fund_code` tag pivot was dropped in P-39b.
+
 #### Housing Module
 **Status: UI complete, in daily production use. Work happens on `main`.**
 

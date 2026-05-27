@@ -71,11 +71,13 @@ function makeDashboardFixture(int $requirementCount): void
 
 // Constant query budget — the dashboard render pulls Auth checks +
 // permission lookups + relevant-user dropdown + 3 precompute queries
-// + 1 main query + a handful of eager-loaded relation queries.
-// Empirically lands at ~31 queries; budget = 40 gives comfortable
+// + 1 main query + a handful of eager-loaded relation queries +
+// the Phase 12.2/12.3 intake-pipeline, pinned, and oldest-logs
+// sidecars (each O(1) constant-time, not row-dependent).
+// Empirically lands at ~43 queries; budget = 50 gives comfortable
 // headroom for future innocuous additions while still catching N+1
 // regressions (which would push the 100-req count well above this).
-const DASHBOARD_QUERY_BUDGET = 40;
+const DASHBOARD_QUERY_BUDGET = 50;
 
 it('Cut B render runs in a bounded query count with 10 requirements', function () {
     makeDashboardFixture(10);

@@ -33,10 +33,12 @@ class CommunicationLog extends Model
         'contact_organization',
         'contact_role',
         'subject',
+        'subject_overridden_at',
         'summary',
         'notes',
         'outcome',
         'category',
+        'category_overridden_at',
         'priority',
         'follow_up_date',
         'follow_up_action',
@@ -56,6 +58,8 @@ class CommunicationLog extends Model
         'follow_up_completed' => 'boolean',
         'follow_up_completed_at' => 'datetime',
         'converted_at' => 'datetime',
+        'subject_overridden_at' => 'datetime',
+        'category_overridden_at' => 'datetime',
     ];
 
     protected $appends = [
@@ -117,11 +121,133 @@ class CommunicationLog extends Model
             ->withTimestamps();
     }
 
-    // Fund codes relationship
-    public function fundCodes(): BelongsToMany
+    /**
+     * P-39b (addendum D-2): authoritative fund-code association on a
+     * CommunicationLog. Replaces the legacy `communication_log_fund_code`
+     * tag pivot, which was dropped in the same PR. Drives
+     * IntakeRequirementInstantiator::forFundCode().
+     */
+    public function anticipatedFundCodes(): BelongsToMany
     {
-        return $this->belongsToMany(FundCode::class, 'communication_log_fund_code')
+        // Pivot has only created_at (no updated_at) — see the migration's
+        // rationale. withTimestamps() is intentionally omitted; callers
+        // that care about audit set created_at + created_by_user_id
+        // explicitly (see IntakeRequirementInstantiator::reconcileAnticipatedFundCodes).
+        return $this->belongsToMany(FundCode::class, 'communication_log_anticipated_fund_codes')
+            ->withPivot('created_by_user_id', 'created_at');
+    }
+
+    /**
+     * Comm Log v2 / Phase 9: housing services attached to this log.
+     * Selecting a housing service auto-attaches its fund codes to
+     * anticipatedFundCodes() and auto-stamps its bundled + direct atoms
+     * via IntakeRequirementInstantiator::forHousingService.
+     */
+    public function housingServices(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            HousingService::class,
+            'communication_log_housing_services',
+            'communication_log_id',
+            'housing_service_id'
+        )->withPivot('created_by_user_id', 'created_at');
+    }
+
+    /**
+     * P-39b: intake-phase requirements on this CommunicationLog.
+     * Independent lifecycle from project-execution Requirements; see
+     * IntakeRequirementInstantiator and the "Intake vs. Project
+     * requirements" section of CLAUDE.md.
+     */
+    public function intakeRequirements(): HasMany
+    {
+        return $this->hasMany(IntakeRequirement::class);
+    }
+
+    /**
+     * Phase 12.3: users who have pinned this log to their dashboard.
+     * Pivot carries `pinned_at` so we can sort by most-recently-pinned.
+     */
+    public function pinnedByUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'communication_log_user_pins')
+            ->withPivot('pinned_at')
             ->withTimestamps();
+    }
+
+    /**
+     * Phase 12.4: auto-category state machine.
+     *
+     *   - converted_to_job_id set      → no auto-bump (project page owns
+     *                                    the category from here)
+     *   - no service / housing-service → 'general'
+     *   - service attached, Phase 1
+     *     not 100% met                 → 'intake'
+     *   - service attached, Phase 1
+     *     100% met                     → 'scheduling'
+     *
+     * Returns null when no auto-bump is appropriate (already converted).
+     */
+    public function computeAutoCategory(): ?string
+    {
+        if ($this->converted_to_job_id !== null) {
+            return null;
+        }
+
+        $hasService = $this->services()->exists()
+            || $this->housingServices()->exists();
+
+        if (! $hasService) {
+            return 'general';
+        }
+
+        $phase1 = $this->intakeRequirements()
+            ->where('is_orphaned', false)
+            ->with('definition')
+            ->get()
+            ->filter(fn ($r) => in_array(
+                $r->definition?->category ?? RequirementDefinition::CATEGORY_ELIGIBILITY,
+                RequirementDefinition::PHASE_1_CATEGORIES,
+                true
+            ));
+
+        $total = $phase1->count();
+        $met = $phase1->filter(fn ($r) => in_array($r->status, IntakeRequirement::MET_STATUSES, true))->count();
+
+        return ($total > 0 && $met === $total) ? 'scheduling' : 'intake';
+    }
+
+    /**
+     * Apply the auto-category if the user hasn't manually overridden it.
+     * Idempotent — does nothing when category_overridden_at is set or
+     * when the computed value matches the current value. Returns the
+     * resolved category (or current, unchanged) for callers that want
+     * to log the transition.
+     */
+    public function applyAutoCategory(): ?string
+    {
+        if ($this->category_overridden_at !== null) {
+            return $this->category;
+        }
+
+        $next = $this->computeAutoCategory();
+        if ($next === null || $next === $this->category) {
+            return $this->category;
+        }
+
+        $this->category = $next;
+        $this->saveQuietly();
+
+        return $next;
+    }
+
+    public function isPinnedBy(?User $user): bool
+    {
+        if ($user === null) {
+            return false;
+        }
+
+        return $this->pinnedByUsers()->where('users.id', $user->id)->exists();
     }
 
     // New relationship for updates/follow-ups
@@ -433,8 +559,9 @@ class CommunicationLog extends Model
                 ->orWhere('contact_phone', 'like', "%{$search}%")
                 ->orWhere('contact_address', 'like', "%{$search}%")
                 ->orWhere('contact_city', 'like', "%{$search}%")
-                // P-02: also match logs by their attached fund codes.
-                ->orWhereHas('fundCodes', function ($fq) use ($search) {
+                // P-02: also match logs by their anticipated fund codes.
+                // (Relation renamed in P-39b — see addendum D-2.)
+                ->orWhereHas('anticipatedFundCodes', function ($fq) use ($search) {
                     $fq->where('code', 'like', "%{$search}%")
                         ->orWhere('description', 'like', "%{$search}%");
                 });

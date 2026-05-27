@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Comm Log · Redesign Directions · CACLV Housing</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@300;400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="calv.css" />
+<style>
+  html, body { margin: 0; padding: 0; background: #f0eee9; font-family: var(--font-body); }
+  /* The canvas component injects its own bg; this is for safety. */
+  *, *::before, *::after { box-sizing: border-box; }
+
+  /* Make all native form controls feel on-brand inside artboards */
+  input, select, textarea { font-family: inherit; }
+  input::placeholder, textarea::placeholder { color: var(--calv-slate-65); }
+  button { font-family: inherit; }
+</style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="shared.jsx"></script>
+<script type="text/babel" src="direction-1-power-form.jsx"></script>
+<script type="text/babel" src="direction-2-project-first.jsx"></script>
+<script type="text/babel" src="direction-3-notes-first.jsx"></script>
+<script type="text/babel" src="requirements.jsx"></script>
+<script type="text/babel" src="viewer.jsx"></script>
+<script type="text/babel" src="convert-to-project.jsx"></script>
+<script type="text/babel" src="reasoning.jsx"></script>
+
+<script type="text/babel">
+function App() {
+  return (
+    <DesignCanvas>
+      {/* ─────────────────────────────────────────────────────
+          COVER · the brief in one frame
+          ───────────────────────────────────────────────────── */}
+      <DCSection
+        id="cover"
+        title="Communication Log · Redesign"
+        subtitle="Three directions for CACLV housing — one recommendation. Read the artboards left-to-right; the long-form rationale lives in the last section."
+      >
+        <DCArtboard id="cover-card" label="Brief · current vs proposed" width={1080} height={720}>
+          <div style={{
+            width: "100%", height: "100%",
+            background: "var(--calv-slate)", color: "#fff",
+            padding: "44px 52px", boxSizing: "border-box",
+            display: "flex", flexDirection: "column", gap: 24,
+            fontFamily: "var(--font-body)",
+          }}>
+            <div style={{
+              fontFamily: "var(--font-sub)", fontSize: 11, fontWeight: 700,
+              letterSpacing: ".14em", textTransform: "uppercase",
+              color: "var(--calv-amber)",
+            }}>CACLV · Housing · Internal · for Kaitlyn-as-power-user</div>
+
+            <h1 style={{
+              fontFamily: "var(--font-h1)", fontSize: 80, lineHeight: .92,
+              letterSpacing: ".01em", textTransform: "uppercase",
+              margin: 0, maxWidth: 940,
+            }}>
+              Edit Communication, <span style={{ color: "var(--calv-red)" }}>redesigned.</span>
+            </h1>
+
+            <p style={{
+              fontSize: 18, lineHeight: 1.55, maxWidth: 760,
+              margin: 0, color: "rgba(255,255,255,.85)",
+            }}>
+              The current form does five jobs at once — log meta · contact · address · program tagging · fund
+              allocation — and treats them with equal weight. The three directions below each pick a
+              different organizing principle and follow it through.
+            </p>
+
+            <div style={{
+              display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginTop: 12,
+            }}>
+              <CoverDirection num="01" color="var(--calv-red)" name="The Dense Sheet" line="Everything visible. Keyboard-first." />
+              <CoverDirection num="02" color="var(--calv-teal)" name="Project-First" line="Composition reshapes around the project." pick />
+              <CoverDirection num="03" color="var(--calv-sand)" name="Notes-First" line="Two-pane. Case notes as the artifact." />
+            </div>
+
+            <div style={{
+              marginTop: "auto", display: "flex", alignItems: "center", gap: 18,
+              fontSize: 12, color: "rgba(255,255,255,.6)",
+              flexWrap: "wrap",
+            }}>
+              <span style={{
+                fontFamily: "var(--font-sub)", fontWeight: 700,
+                letterSpacing: ".14em", textTransform: "uppercase",
+                color: "var(--calv-amber)",
+              }}>Fighting for good</span>
+              <span>·</span>
+              <span>Pan + zoom · double-click any artboard to focus · scroll for the rationale</span>
+              <span style={{ flex: 1 }} />
+              <a href="Direction 02 Dev Handoff.html" style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                padding: "8px 14px", background: "var(--calv-red)", color: "#fff",
+                fontFamily: "var(--font-sub)", fontSize: 11, fontWeight: 700,
+                letterSpacing: ".08em", textTransform: "uppercase",
+                borderRadius: 4, textDecoration: "none",
+              }}>
+                Dev handoff for Direction 02 →
+              </a>
+            </div>
+          </div>
+        </DCArtboard>
+
+        <DCArtboard id="cover-current" label="Current form (reference)" width={520} height={720}>
+          <div style={{
+            width: "100%", height: "100%", overflow: "hidden", background: "#fff",
+            position: "relative",
+          }}>
+            <img
+              src="uploads/Screenshot 2026-05-23 193214.png"
+              alt="Current Edit Communication form"
+              style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block" }}
+            />
+            <div style={{
+              position: "absolute", top: 14, left: 14,
+              fontFamily: "var(--font-sub)", fontSize: 10, fontWeight: 700,
+              letterSpacing: ".1em", textTransform: "uppercase",
+              padding: "4px 8px", borderRadius: 3,
+              background: "var(--calv-slate)", color: "#fff",
+            }}>The "before"</div>
+          </div>
+        </DCArtboard>
+
+        <DCPostIt top={56} left={1680} rotate={-3} width={210}>
+          <strong>Subject mystery — solved.</strong><br />
+          Per David: Subject = the address if any, otherwise an auto-numbered title.
+          All three directions surface it in the chrome.
+        </DCPostIt>
+      </DCSection>
+
+      {/* ─────────────────────────────────────────────────────
+          DIRECTION 01 · The Dense Sheet
+          ───────────────────────────────────────────────────── */}
+      <DCSection
+        id="d1"
+        title="01 · The Dense Sheet"
+        subtitle="Single-page · keyboard-first power form. Hierarchy by typography, not by collapsing fields away."
+      >
+        <DCArtboard id="d1-primary" label="Primary · project attached" width={1120} height={1100}>
+          <D1Form mode="primary" />
+        </DCArtboard>
+        <DCArtboard id="d1-error" label="Validation error state" width={1120} height={1100}>
+          <D1Form mode="error" />
+        </DCArtboard>
+        <DCArtboard id="d1-funds" label="Fund-codes · expiry status detail" width={620} height={760}>
+          <D1FundDetail />
+        </DCArtboard>
+
+        <DCPostIt top={120} left={2360} rotate={2} width={210}>
+          <strong>Tab order is the design.</strong><br />
+          Row 1 = the 5 meta fields. Then contact, address, notes.
+          Right rail = optional. ⌘Enter saves; ⌘Enter+N opens a fresh one.
+        </DCPostIt>
+      </DCSection>
+
+      {/* ─────────────────────────────────────────────────────
+          DIRECTION 02 · Project-First
+          ───────────────────────────────────────────────────── */}
+      <DCSection
+        id="d2"
+        title="02 · Project-First"
+        subtitle='"Related to a Project?" stops being a buried dropdown and becomes the architectural anchor. Same fields — wildly different shape.'
+      >
+        <DCArtboard id="d2-none" label="No project · General intake" width={1120} height={1100}>
+          <D2NoProject />
+        </DCArtboard>
+        <DCArtboard id="d2-picker" label="⌘P · project picker" width={680} height={620}>
+          <D2Picker />
+        </DCArtboard>
+        <DCArtboard id="d2-set" label="Project attached · form reshaped" width={1120} height={1100}>
+          <D2WithProject />
+        </DCArtboard>
+
+        <DCPostIt top={120} left={2440} rotate={-2} width={220}>
+          <strong>This is the recommendation.</strong><br />
+          Picking the project narrows fund codes by definition. Wrong-project assignments become
+          structurally impossible — not a discipline problem.
+        </DCPostIt>
+      </DCSection>
+
+      {/* ─────────────────────────────────────────────────────
+          DIRECTION 03 · Notes-First
+          ───────────────────────────────────────────────────── */}
+      <DCSection
+        id="d3"
+        title="03 · Notes-First"
+        subtitle="Two-pane. Left rail is all metadata, compact. Right pane treats case notes like the document they actually are."
+      >
+        <DCArtboard id="d3-blank" label="Fresh entry · empty state" width={1180} height={880}>
+          <D3Form mode="blank" />
+        </DCArtboard>
+        <DCArtboard id="d3-primary" label="In progress · long notes" width={1180} height={880}>
+          <D3Form mode="primary" />
+        </DCArtboard>
+
+        <DCPostIt top={120} left={2440} rotate={2} width={220}>
+          <strong>Cost: a real editor.</strong><br />
+          Worth it only if Kaitlyn's typical entry is &gt; ~300 words.
+          See Q3 on the reasoning page.
+        </DCPostIt>
+      </DCSection>
+
+      {/* ─────────────────────────────────────────────────────
+          REASONING · trade-off matrix, recommendation, open Qs
+          ───────────────────────────────────────────────────── */}
+      <DCSection
+        id="viewer"
+        title="Bonus · the viewer state, redesigned"
+        subtitle="After v1, you shared the read-only viewer modal. Below: that surface in the recommended Direction 02 vocabulary — with Activity Updates / Follow-ups, Linked Records, Priority, and the Convert-to-Project promotion path."
+      >
+        <DCArtboard id="viewer-project" label="Viewer · project attached" width={1180} height={1180}>
+          <ViewerProjectAttached />
+        </DCArtboard>
+        <DCArtboard id="viewer-intake" label="Viewer · general intake · convert-to-project" width={1180} height={1080}>
+          <ViewerGeneralIntake />
+        </DCArtboard>
+
+        <DCPostIt top={120} left={2480} rotate={-2} width={230}>
+          <strong>The update thread is the real follow-up tracker.</strong><br />
+          Keep the edit form lean. The Summary is the opening statement; everything after lands here as
+          typed Notes / Follow-ups / Actions.
+        </DCPostIt>
+      </DCSection>
+
+      {/* APPLICATION REQUIREMENTS — the gate on Convert-to-Project */}
+      <DCSection
+        id="requirements"
+        title="Application requirements"
+        subtitle="Per-service requirement templates instantiated on each intake. Gate Convert-to-Project. Dedup'd across services, with status, kind, ad-hoc support, and audit-logged override."
+      >
+        <DCArtboard id="req-panel" label="Requirements panel · partially met" width={640} height={760}>
+          <div style={{ padding: 20, background: "#fff", minHeight: "100%" }}>
+            <RequirementsPanel
+              items={mergeWithInstances(
+                aggregateTemplates(["HCP-PHFA-HEMAP", "HCP-RentalHousing"]),
+                SAMPLE_REQS_MARIA
+              )}
+              hint="from 2 tagged services · dedup'd"
+            />
+          </div>
+        </DCArtboard>
+        <DCArtboard id="req-gate" label="Convert-to-Project · requirements gate · unmet" width={660} height={760}>
+          <div style={{ padding: 20, background: "#fff", minHeight: "100%" }}>
+            <RequirementsGate
+              items={mergeWithInstances(
+                aggregateTemplates(["HCP-RentalHousing"]),
+                SAMPLE_REQS_ESPERANZA
+              )}
+            />
+          </div>
+        </DCArtboard>
+        <DCArtboard id="req-pill" label="Summary pill (rail-sized)" width={320} height={140}>
+          <div style={{ padding: 16, background: "var(--calv-sand-15)", minHeight: "100%" }}>
+            <RequirementsSummaryPill
+              items={mergeWithInstances(
+                aggregateTemplates(["HCP-PHFA-HEMAP", "HCP-RentalHousing"]),
+                SAMPLE_REQS_MARIA
+              )}
+            />
+          </div>
+        </DCArtboard>
+
+        <DCPostIt top={120} left={2080} rotate={-2} width={230}>
+          <strong>Convert-to-Project is hard-blocked</strong><br />
+          until all <em>required</em> requirements are met (or waived / N/A). Audit-logged override lets
+          Kaitlyn force through with a written reason.
+        </DCPostIt>
+      </DCSection>
+
+      <DCSection
+        id="reasoning"
+        title="Reasoning · trade-offs · recommendation"
+        subtitle="The companion to the artboards. Read top-to-bottom."
+      >
+        <DCArtboard id="reasoning-page" label="Long-form rationale" width={1320} height={2360}>
+          <ReasoningPage />
+        </DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+
+function CoverDirection({ num, color, name, line, pick }) {
+  return (
+    <div style={{
+      padding: "14px 16px",
+      background: pick ? "rgba(255,255,255,.08)" : "rgba(255,255,255,.04)",
+      border: pick ? `1.5px solid ${color}` : "1px solid rgba(255,255,255,.12)",
+      borderLeft: `4px solid ${color}`,
+      borderRadius: 4,
+    }}>
+      <div style={{
+        fontFamily: "var(--font-sub)", fontSize: 10, fontWeight: 700,
+        letterSpacing: ".1em", textTransform: "uppercase",
+        color, marginBottom: 6,
+      }}>
+        Direction {num} {pick && <span style={{ marginLeft: 6, color: "#fff", background: color, padding: "1px 5px", borderRadius: 2 }}>recommended</span>}
+      </div>
+      <div style={{
+        fontFamily: "var(--font-h1)", fontSize: 22, letterSpacing: ".02em",
+        textTransform: "uppercase", color: "#fff", lineHeight: 1.05,
+      }}>{name}</div>
+      <div style={{ fontSize: 13, color: "rgba(255,255,255,.75)", marginTop: 6, lineHeight: 1.4 }}>
+        {line}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+
+</body>
+</html>

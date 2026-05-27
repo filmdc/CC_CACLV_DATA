@@ -1,0 +1,113 @@
+/*
+ * CALV Design System tokens — port of design_handoff_comm_log_v2/calv.css.
+ * Scoped to v2 Comm Log surfaces via the calv- prefix; does NOT replace
+ * the project's zinc/indigo palette.
+ */
+
+@theme {
+    /* Primary palette */
+    --color-calv-red: #D14124;
+    --color-calv-slate: #54585A;
+    --color-calv-teal: #006269;
+
+    /* Supporting palette */
+    --color-calv-sage: #6FA287;
+    --color-calv-amber: #F1B434;
+    --color-calv-sand: #D5CB9F;
+
+    /* 65 / 35 / 15 tints over white */
+    --color-calv-red-65: #DD7461;
+    --color-calv-red-35: #EEAB9E;
+    --color-calv-red-15: #F8DDD6;
+
+    --color-calv-slate-65: #898C8D;
+    --color-calv-slate-35: #B8B9BA;
+    --color-calv-slate-15: #E1E2E2;
+
+    --color-calv-teal-65: #598E93;
+    --color-calv-teal-35: #9EBDC0;
+    --color-calv-teal-15: #D5E0E1;
+
+    --color-calv-sage-65: #9EC1B0;
+    --color-calv-sage-35: #C9DDD3;
+    --color-calv-sage-15: #ECF3EE;
+
+    --color-calv-amber-65: #F6CB75;
+    --color-calv-amber-35: #FAE3B3;
+    --color-calv-amber-15: #FDF4DD;
+
+    --color-calv-sand-65: #E2DBBF;
+    --color-calv-sand-35: #EFECDC;
+    --color-calv-sand-15: #F8F6EE;
+
+    /* Pressed accent (red darkened ~8%) for :active */
+    --color-calv-accent-press: #B73719;
+
+    /* Type families */
+    --font-calv-h1: "DIN Condensed", "Oswald", "Barlow Condensed", sans-serif;
+    --font-calv-sub: "DIN Condensed", "Oswald", "Barlow Condensed", sans-serif;
+    --font-calv-body: "DIN 2014", "Barlow", "Inter", "Helvetica Neue", Arial, sans-serif;
+
+    /* Tracking */
+    --tracking-calv-wide: 0.02em;
+
+    /* Radius — squareness echoes the stamped wordmark */
+    --radius-calv-xs: 2px;
+    --radius-calv-sm: 4px;
+    --radius-calv-md: 6px;
+    --radius-calv-lg: 8px;
+    --radius-calv-pill: 999px;
+
+    /* Shadows — soft, never glowy */
+    --shadow-calv-sm: 0 1px 2px rgba(84, 88, 90, 0.08);
+    --shadow-calv-md: 0 4px 10px rgba(84, 88, 90, 0.10);
+    --shadow-calv-lg: 0 12px 28px rgba(84, 88, 90, 0.14);
+    --shadow-calv-focus: 0 0 0 3px var(--color-calv-red-35);
+}
+
+/*
+ * @font-face — local DIN Condensed when shipped, fallbacks otherwise.
+ * Drop the TTF at /public/fonts/DINCondensed-Bold.ttf to activate;
+ * until then, the stack falls through to Oswald (Google Fonts).
+ */
+@font-face {
+    font-family: "DIN Condensed";
+    src: url("/fonts/DINCondensed-Bold.ttf") format("truetype");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+/*
+ * CALV utility helpers — the equivalents of .calv-h1 / .calv-subhead /
+ * .calv-body, namespaced so they cannot collide with project-wide rules.
+ */
+.calv-h1 {
+    font-family: var(--font-calv-h1);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-calv-wide);
+    line-height: 1;
+    color: var(--color-calv-slate);
+    margin: 0;
+}
+
+.calv-subhead {
+    font-family: var(--font-calv-sub);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-calv-wide);
+    color: var(--color-calv-slate);
+}
+
+.calv-body {
+    font-family: var(--font-calv-body);
+    font-weight: 300;
+    line-height: 1.55;
+    color: var(--color-calv-slate);
+}
+
+.calv-focus-ring:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-calv-focus);
+}

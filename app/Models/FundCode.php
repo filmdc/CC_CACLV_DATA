@@ -29,6 +29,11 @@ class FundCode extends Model
         'expires_at' => 'date',
     ];
 
+    protected $appends = [
+        'expiry_state',
+        'days_to_expiry',
+    ];
+
     // Relationships
 
     public function contract(): BelongsTo
@@ -36,10 +41,16 @@ class FundCode extends Model
         return $this->belongsTo(Contract::class);
     }
 
+    /**
+     * P-39b (addendum D-2): inverse of CommunicationLog::anticipatedFundCodes.
+     * The legacy `communication_log_fund_code` tag pivot was migrated
+     * into `communication_log_anticipated_fund_codes` and then dropped
+     * in the same PR.
+     */
     public function communicationLogs(): BelongsToMany
     {
-        return $this->belongsToMany(CommunicationLog::class, 'communication_log_fund_code')
-            ->withTimestamps();
+        return $this->belongsToMany(CommunicationLog::class, 'communication_log_anticipated_fund_codes')
+            ->withPivot('created_by_user_id', 'created_at');
     }
 
     public function requirements(): HasMany
@@ -47,6 +58,22 @@ class FundCode extends Model
         return $this->hasMany(FundCodeRequirement::class)
             ->orderBy('sort_order')
             ->orderBy('id');
+    }
+
+    /**
+     * Phase 10: atom-library requirements attached directly to this fund
+     * code (the new path that replaces the bundle abstraction). When the
+     * fund code is anticipated on a Comm Log, each linked atom is
+     * stamped as an IntakeRequirement with via:'fund:N'.
+     */
+    public function requirementDefinitions(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            RequirementDefinition::class,
+            'fund_code_requirement_definitions',
+            'fund_code_id',
+            'requirement_definition_id'
+        )->withPivot('created_by_user_id', 'created_at');
     }
 
     public function createdBy(): BelongsTo
@@ -98,6 +125,49 @@ class FundCode extends Model
         }
 
         return null;
+    }
+
+    /**
+     * Comm Log v2 (§5.2): the 5-state expiry taxonomy the fund-chip
+     * component renders. Wraps expirationIndicator() with two extra
+     * buckets that the v2 design distinguishes:
+     *   - 'perpetual' for funds with no expires_at,
+     *   - 'ok'        for funds >90 days from expiry.
+     *
+     * @return 'soon'|'warning'|'ok'|'perpetual'|'expired'
+     */
+    public function getExpiryStateAttribute(): string
+    {
+        if ($this->expires_at === null) {
+            return 'perpetual';
+        }
+
+        return match ($this->expirationIndicator()) {
+            'expired' => 'expired',
+            'urgent' => 'soon',
+            'warning' => 'warning',
+            default => 'ok',
+        };
+    }
+
+    /**
+     * Signed days-to-expiry for the chip label. Positive when in the
+     * future, negative when in the past, null when perpetual.
+     * Today returns 0.
+     */
+    public function getDaysToExpiryAttribute(): ?int
+    {
+        if ($this->expires_at === null) {
+            return null;
+        }
+
+        $today = now()->startOfDay();
+        $expiresAt = $this->expires_at->copy()->startOfDay();
+        $signedDays = (int) $today->diffInDays($expiresAt, false);
+
+        // For 'expired' chip label ("Expired Nd ago") we want the
+        // absolute past-distance, not the signed negative.
+        return abs($signedDays);
     }
 
     /**

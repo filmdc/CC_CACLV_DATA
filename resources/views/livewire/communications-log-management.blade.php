@@ -242,7 +242,153 @@
             </div>
 
             <!-- Communications List — table or card view per viewMode -->
-            <div class="divide-y divide-gray-200 dark:divide-zinc-700" data-view-mode="{{ $viewMode }}">
+            <div class="{{ $viewMode === 'card' ? 'divide-y divide-gray-200 dark:divide-zinc-700' : '' }}" data-view-mode="{{ $viewMode }}">
+            @if($viewMode === 'table')
+                {{-- Phase 12.7: real columnar table view. Each data point gets its
+                     own cell so dense scanning works. Card view (below, in the @else
+                     branch) is the long-form layout for users who prefer it. --}}
+                @if($logs->isEmpty())
+                    <div class="p-12 text-center">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        </svg>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No communications logged</h3>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Get started by creating a new communication entry.</p>
+                        @can('communications_log.create')
+                        <button wire:click="showCreateForm" class="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                            + New Communication
+                        </button>
+                        @endcan
+                    </div>
+                @else
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700 text-sm">
+                            <thead class="bg-gray-50 dark:bg-zinc-700/60">
+                                <tr class="text-left text-[11px] font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300">
+                                    <th class="px-3 py-2 whitespace-nowrap">Date</th>
+                                    <th class="px-3 py-2 whitespace-nowrap">Type</th>
+                                    <th class="px-3 py-2">Contact</th>
+                                    <th class="px-3 py-2">Subject</th>
+                                    <th class="px-3 py-2 whitespace-nowrap">Category</th>
+                                    <th class="px-3 py-2 whitespace-nowrap">Priority</th>
+                                    <th class="px-3 py-2">Fund codes</th>
+                                    <th class="px-3 py-2 whitespace-nowrap">Status</th>
+                                    <th class="px-3 py-2 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 dark:divide-zinc-700">
+                                @foreach($logs as $log)
+                                    @php
+                                        $isPinned = $log->pinnedByUsers->where('id', auth()->id())->isNotEmpty();
+                                    @endphp
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-zinc-700/40 cursor-pointer" wire:click="viewDetail({{ $log->id }})">
+                                        <td class="px-3 py-2 whitespace-nowrap align-top">
+                                            <div class="text-gray-900 dark:text-white tabular-nums">{{ $log->communication_date->format('M d, Y') }}</div>
+                                            <div class="text-[11px] text-gray-500 dark:text-gray-400">{{ $log->communication_date->format('D') }}</div>
+                                        </td>
+                                        <td class="px-3 py-2 whitespace-nowrap align-top">
+                                            <div class="flex items-center gap-2">
+                                                <span class="inline-flex items-center justify-center w-6 h-6 rounded-full
+                                                    @if($log->communication_type === 'phone_call') bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-300
+                                                    @elseif($log->communication_type === 'email') bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300
+                                                    @elseif($log->communication_type === 'in_person') bg-purple-100 text-purple-600 dark:bg-purple-900 dark:text-purple-300
+                                                    @elseif($log->communication_type === 'site_visit') bg-orange-100 text-orange-600 dark:bg-orange-900 dark:text-orange-300
+                                                    @else bg-gray-100 text-gray-600 dark:bg-zinc-700 dark:text-gray-300
+                                                    @endif">
+                                                    @if($log->communication_type === 'phone_call')
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                                                    @elseif($log->communication_type === 'email')
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                                    @elseif($log->communication_type === 'in_person')
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                                    @else
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                                                    @endif
+                                                </span>
+                                                <div>
+                                                    <div class="text-gray-900 dark:text-white text-xs">{{ $log->communication_type_display }}</div>
+                                                    <div class="text-[10px] text-gray-500 dark:text-gray-400">{{ $log->direction_display }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-3 py-2 align-top">
+                                            <div class="text-gray-900 dark:text-white font-medium">{{ $log->contact_full_name ?: '—' }}</div>
+                                            @if($log->contact_organization)
+                                                <div class="text-[11px] text-gray-500 dark:text-gray-400 truncate max-w-[180px]">{{ $log->contact_organization }}</div>
+                                            @endif
+                                        </td>
+                                        <td class="px-3 py-2 align-top">
+                                            <div class="text-gray-900 dark:text-white max-w-[280px] truncate">{{ $log->subject }}</div>
+                                            @if($log->summary)
+                                                {{-- No title-attr leak of the full summary — the table cell shows the clipped form; the viewer modal has the full body. --}}
+                                                <div class="text-[11px] text-gray-500 dark:text-gray-400 max-w-[280px] truncate">{{ Str::limit($log->summary, 80) }}</div>
+                                            @endif
+                                        </td>
+                                        <td class="px-3 py-2 whitespace-nowrap align-top">
+                                            <span class="inline-flex px-2 py-0.5 rounded-full text-[11px] bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300">{{ $log->category_display }}</span>
+                                        </td>
+                                        <td class="px-3 py-2 whitespace-nowrap align-top">
+                                            @if($log->priority === 'urgent')
+                                                <span class="inline-flex px-2 py-0.5 rounded-full text-[11px] bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">Urgent</span>
+                                            @elseif($log->priority === 'high')
+                                                <span class="inline-flex px-2 py-0.5 rounded-full text-[11px] bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300">High</span>
+                                            @elseif($log->priority === 'low')
+                                                <span class="text-[11px] text-gray-500 dark:text-gray-400">Low</span>
+                                            @else
+                                                <span class="text-[11px] text-gray-400 dark:text-gray-500">—</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-3 py-2 align-top">
+                                            @if($log->anticipatedFundCodes->isNotEmpty())
+                                                <div class="flex flex-wrap gap-1 max-w-[200px]">
+                                                    @foreach($log->anticipatedFundCodes->take(3) as $fc)
+                                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" title="{{ $fc->description }}">{{ $fc->code }}</span>
+                                                    @endforeach
+                                                    @if($log->anticipatedFundCodes->count() > 3)
+                                                        <span class="text-[10px] text-gray-500 dark:text-gray-400">+{{ $log->anticipatedFundCodes->count() - 3 }}</span>
+                                                    @endif
+                                                </div>
+                                            @else
+                                                <span class="text-[11px] text-gray-400 dark:text-gray-500">—</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-3 py-2 whitespace-nowrap align-top">
+                                            @if($log->converted_to_job_id)
+                                                <span class="inline-flex px-2 py-0.5 rounded-full text-[11px] bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300">Converted</span>
+                                            @elseif($log->follow_up_date && ! $log->follow_up_completed)
+                                                <span class="inline-flex px-2 py-0.5 rounded-full text-[11px] bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300">Follow-up</span>
+                                            @else
+                                                <span class="inline-flex px-2 py-0.5 rounded-full text-[11px] bg-gray-100 text-gray-700 dark:bg-zinc-700 dark:text-gray-300">Open</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-3 py-2 whitespace-nowrap align-top text-right" wire:click.stop>
+                                            <div class="inline-flex items-center gap-1.5">
+                                                <button wire:click="togglePin({{ $log->id }})"
+                                                        title="{{ $isPinned ? 'Unpin from dashboard' : 'Pin to dashboard' }}"
+                                                        class="{{ $isPinned ? 'text-amber-500 hover:text-amber-700' : 'text-gray-400 hover:text-amber-600' }}">
+                                                    <svg class="w-4 h-4" {{ $isPinned ? 'fill="currentColor"' : 'fill="none" stroke="currentColor" stroke-width="2"' }} viewBox="0 0 24 24">
+                                                        <path @if(!$isPinned) stroke-linecap="round" stroke-linejoin="round" @endif d="M16 9V4l1 .01V2H7v2l1-.01V9l-2 4v2h5.2v7h1.6v-7H18v-2l-2-4z"/>
+                                                    </svg>
+                                                </button>
+                                                @can('communications_log.edit')
+                                                    <button wire:click="showEditForm({{ $log->id }})" title="Edit" class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                                    </button>
+                                                @endcan
+                                                @can('communications_log.delete')
+                                                    <button wire:click="delete({{ $log->id }})" wire:confirm="Delete this communication log?" title="Delete" class="text-red-600 hover:text-red-800 dark:text-red-400">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                    </button>
+                                                @endcan
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+            @else
                 @forelse($logs as $log)
                     <div class="{{ $viewMode === 'card' ? 'p-6' : 'p-4' }} hover:bg-gray-50 dark:hover:bg-zinc-700/50 cursor-pointer" wire:click="viewDetail({{ $log->id }})">
                         <div class="flex items-start justify-between">
@@ -364,10 +510,10 @@
                                     </div>
                                 @endif
 
-                                @if($viewMode === 'card' && $log->fundCodes->isNotEmpty())
+                                @if($viewMode === 'card' && $log->anticipatedFundCodes->isNotEmpty())
                                     <div class="mt-3 flex flex-wrap items-center gap-2 text-xs" data-card-fund-codes>
                                         <span class="font-medium text-gray-600 dark:text-gray-400">Fund codes:</span>
-                                        @foreach($log->fundCodes as $fundCode)
+                                        @foreach($log->anticipatedFundCodes as $fundCode)
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" title="{{ $fundCode->description }}">
                                                 {{ $fundCode->code }}
                                             </span>
@@ -401,6 +547,15 @@
                             </div>
 
                             <div class="flex items-start space-x-2 ml-4" wire:click.stop>
+                                {{-- Phase 12.3: pin / unpin for the current user. --}}
+                                @php $isPinned = $log->pinnedByUsers->where('id', auth()->id())->isNotEmpty(); @endphp
+                                <button wire:click="togglePin({{ $log->id }})"
+                                        title="{{ $isPinned ? 'Unpin from dashboard' : 'Pin to dashboard' }}"
+                                        class="{{ $isPinned ? 'text-amber-500 hover:text-amber-700' : 'text-gray-400 hover:text-amber-600' }}">
+                                    <svg class="w-5 h-5" {{ $isPinned ? 'fill="currentColor"' : 'fill="none" stroke="currentColor" stroke-width="2"' }} viewBox="0 0 24 24">
+                                        <path @if(!$isPinned) stroke-linecap="round" stroke-linejoin="round" @endif d="M16 9V4l1 .01V2H7v2l1-.01V9l-2 4v2h5.2v7h1.6v-7H18v-2l-2-4z"/>
+                                    </svg>
+                                </button>
                                 @can('communications_log.edit')
                                 <button wire:click="showEditForm({{ $log->id }})"
                                         class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400">
@@ -436,6 +591,7 @@
                         @endcan
                     </div>
                 @endforelse
+            @endif
             </div>
 
             <!-- Pagination -->
@@ -449,7 +605,30 @@
 
     <!-- Detail View Modal -->
     @if($showDetailModal && $viewingLog)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="closeDetailModal">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50"
+             wire:click.self="closeDetailModal"
+             x-data="{
+                 handleKey(e) {
+                     const tag = document.activeElement?.tagName;
+                     const inField = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+                     // E — Edit (spec §6). Don't intercept when typing in a field.
+                     if (!inField && (e.key === 'e' || e.key === 'E')) {
+                         e.preventDefault();
+                         $wire.call('editFromViewer');
+                         return;
+                     }
+                     // N — focus the Activity Updates composer.
+                     if (!inField && (e.key === 'n' || e.key === 'N')) {
+                         e.preventDefault();
+                         document.querySelector('[data-comm-composer]')?.focus();
+                         return;
+                     }
+                     if (e.key === 'Escape' && !inField) {
+                         $wire.call('closeDetailModal');
+                     }
+                 },
+             }"
+             x-on:keydown.window="handleKey">
             <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
                 <div class="flex justify-between items-start mb-4">
                     <div>
@@ -462,6 +641,28 @@
                         </svg>
                     </button>
                 </div>
+
+                {{-- Phase 11: three-focus quick-nav. Kaitlyn moves between the three
+                     mental models of a Comm Log entry: logging, services, requirements. --}}
+                <nav class="flex flex-wrap gap-2 mb-4 text-[11px]" aria-label="Sections">
+                    <a href="#focus-logging" class="px-3 py-1.5 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-900/70 font-medium">
+                        1 · Communication logging
+                    </a>
+                    <a href="#focus-services" class="px-3 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-200 hover:bg-emerald-200 dark:hover:bg-emerald-900/70 font-medium">
+                        2 · Service selection
+                    </a>
+                    <a href="#focus-requirements" class="px-3 py-1.5 rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-200 hover:bg-purple-200 dark:hover:bg-purple-900/70 font-medium">
+                        3 · Requirements &amp; compliance
+                    </a>
+                </nav>
+
+                {{-- Focus 1 — Communication logging --}}
+                <section id="focus-logging" class="scroll-mt-4">
+                    <div class="flex items-baseline gap-2 mb-2 border-b border-blue-200 dark:border-blue-800 pb-2">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold bg-blue-600 text-white">Focus 1</span>
+                        <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-200">Communication logging</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">What happened — date, type, contact, summary, activity thread.</p>
+                    </div>
 
                 <!-- Status Tags -->
                 <div class="flex flex-wrap gap-2 mb-4">
@@ -533,7 +734,8 @@
                         </dl>
                     </div>
 
-                    <!-- Linked Records -->
+                    <!-- Linked Records — only render if at least one is linked. -->
+                    @if($viewingLog->participant || $viewingLog->property || $viewingLog->housingJob)
                     <div class="bg-gray-50 dark:bg-zinc-700/50 rounded-lg p-4">
                         <h4 class="font-medium text-gray-900 dark:text-white mb-3">Linked Records</h4>
                         <dl class="space-y-2 text-sm">
@@ -594,16 +796,14 @@
                                 </dd>
                             </div>
                             @endif
-                            @if(!$viewingLog->participant && !$viewingLog->property && !$viewingLog->housingJob)
-                            <p class="text-gray-500 dark:text-gray-400 italic">No linked records</p>
-                            @endif
                         </dl>
-                        @if(auth()->user()->isAdmin() && ($viewingLog->participant || $viewingLog->property || $viewingLog->housingJob))
+                        @if(auth()->user()->isAdmin())
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-3 pt-2 border-t border-gray-200 dark:border-zinc-600">
                             <span class="text-red-600 dark:text-red-400">Admin:</span> Click <svg class="w-3 h-3 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg> to unlink a record
                         </p>
                         @endif
                     </div>
+                    @endif
                 </div>
 
                 <!-- Services -->
@@ -620,20 +820,9 @@
                 </div>
                 @endif
 
-                <!-- Fund Codes -->
-                @if($viewingLog->fundCodes->isNotEmpty())
-                <div class="mb-6">
-                    <h4 class="font-medium text-gray-900 dark:text-white mb-2">Fund Codes</h4>
-                    <div class="flex flex-wrap gap-2">
-                        @foreach($viewingLog->fundCodes as $fundCode)
-                            <span class="px-3 py-1 text-sm rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">
-                                <span class="font-mono font-semibold">{{ $fundCode->code }}</span>
-                                <span class="opacity-75">– {{ $fundCode->description }}</span>
-                            </span>
-                        @endforeach
-                    </div>
-                </div>
-                @endif
+                {{-- v2 / Phase 12.9: standalone Fund Codes pills removed — the Focus 2
+                     "Fund codes" panel below already surfaces them, and they auto-populate
+                     when a county is picked. --}}
 
                 <!-- Tags -->
                 @if($viewingLog->tags->isNotEmpty())
@@ -671,8 +860,255 @@
                 </div>
                 @endif
 
-                <!-- Updates/Activity Log -->
-                <div class="border-t border-gray-200 dark:border-zinc-600 pt-4 mb-4">
+                </section>{{-- /Focus 1 --}}
+
+                {{-- Focus 2 — Service selection --}}
+                <section id="focus-services" class="scroll-mt-4 mt-6">
+                    <div class="flex items-baseline gap-2 mb-3 border-b border-emerald-200 dark:border-emerald-800 pb-2">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold bg-emerald-600 text-white">Focus 2</span>
+                        <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-200">County &amp; fund codes</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Pick the county — fund codes auto-attach.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        {{-- County (the entity formerly known as "housing services") — interactive add/remove from the viewer. --}}
+                        <div class="bg-emerald-50/40 dark:bg-emerald-900/15 rounded-lg p-4 border border-emerald-100 dark:border-emerald-900/40">
+                            <div class="flex items-baseline justify-between mb-2">
+                                <h5 class="text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">County</h5>
+                                <span class="text-[10px] text-gray-500 dark:text-gray-400">Tick to attach · untick to remove</span>
+                            </div>
+                            @php
+                                $attachedSvcIds = $viewingLog->housingServices()->pluck('housing_services.id')->map(fn ($v) => (int) $v)->all();
+                            @endphp
+                            @if($allHousingServices->isEmpty())
+                                <p class="text-xs text-gray-500 dark:text-gray-400 italic">
+                                    No counties configured yet. Create them on
+                                    <a href="{{ route('fund-codes.management', ['tab' => 'housing_services']) }}" class="text-emerald-700 dark:text-emerald-300 underline">/fund-codes</a>.
+                                </p>
+                            @else
+                                <div class="space-y-1 max-h-72 overflow-y-auto">
+                                    @foreach($allHousingServices as $hs)
+                                        <label class="flex items-start gap-2 px-2 py-1.5 rounded hover:bg-emerald-50 dark:hover:bg-emerald-900/30 cursor-pointer">
+                                            <input type="checkbox"
+                                                   wire:click="toggleHousingServiceOnLog({{ $hs->id }})"
+                                                   @checked(in_array($hs->id, $attachedSvcIds, true))
+                                                   class="mt-0.5 rounded border-gray-300 dark:border-zinc-600 text-emerald-600 focus:ring-emerald-500" />
+                                            <div class="min-w-0 flex-1">
+                                                <div class="text-sm text-gray-900 dark:text-white truncate">{{ $hs->name }}</div>
+                                                @if($hs->description)
+                                                    <div class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ $hs->description }}</div>
+                                                @endif
+                                            </div>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
+
+                        {{-- Fund codes (auto-populated from the picked county). --}}
+                        <div class="bg-amber-50/40 dark:bg-amber-900/15 rounded-lg p-4 border border-amber-100 dark:border-amber-900/40">
+                            <h5 class="text-xs font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-300 mb-2">Fund codes</h5>
+                            @php $vfc = $viewingLog->anticipatedFundCodes()->get(); @endphp
+                            @if($vfc->isEmpty())
+                                <p class="text-xs text-gray-500 dark:text-gray-400 italic">None yet — fund codes auto-attach when you pick a county.</p>
+                            @else
+                                <ul class="space-y-1.5">
+                                    @foreach($vfc as $fc)
+                                        <li class="flex items-start gap-2">
+                                            <span class="font-mono text-xs text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/40 px-1.5 py-0.5 rounded">{{ $fc->code }}</span>
+                                            <span class="text-xs text-gray-700 dark:text-gray-200 truncate">{{ $fc->description ?? '' }}</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                        </div>
+                    </div>
+                </section>{{-- /Focus 2 --}}
+
+                {{-- Focus 3 — Requirements & compliance --}}
+                <section id="focus-requirements" class="scroll-mt-4 mt-6">
+                    <div class="flex items-baseline gap-2 mb-3 border-b border-purple-200 dark:border-purple-800 pb-2">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold bg-purple-600 text-white">Focus 3</span>
+                        <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-200">Requirements &amp; compliance</h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">What's needed to satisfy this case — Phase 1 (eligibility + compliance).</p>
+                    </div>
+
+                {{-- v2 §4.4: project chip shown when attached. The "General intake" CTA banner
+                     was removed — promotion is offered by the bottom action bar (gated by
+                     requirements) and on the edit form. --}}
+                @if($viewingLog->housing_job_id)
+                    @php $jb = $viewingLog->convertedToJob ?? \App\Models\HousingJob::find($viewingLog->housing_job_id); @endphp
+                    @if($jb)
+                        <div class="mb-4 flex items-center gap-3 px-4 py-3 rounded-md bg-teal-700 text-white shadow">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-sm bg-white/15 font-mono text-xs">{{ $jb->job_number }}</span>
+                            <div class="min-w-0 flex-1">
+                                <div class="text-[10px] uppercase tracking-wider text-white/70">Project</div>
+                                <div class="text-sm font-medium truncate">{{ $jb->job_title }}</div>
+                            </div>
+                        </div>
+                    @endif
+                @endif
+
+                @php
+                    /* Phase 10: filter the viewer panel to Phase 1 categories (eligibility + compliance).
+                       Service-delivery-compliance items live on the same log but surface on the project page. */
+                    $viewerReqs = $viewingLog->intakeRequirements()
+                        ->where('is_orphaned', false)
+                        ->with('definition')
+                        ->get()
+                        ->filter(fn ($r) => in_array(
+                            $r->definition?->category ?? \App\Models\RequirementDefinition::CATEGORY_ELIGIBILITY,
+                            \App\Models\RequirementDefinition::PHASE_1_CATEGORIES,
+                            true
+                        ))
+                        ->values();
+                @endphp
+                <div class="mb-4">
+                    <x-comm.requirements-panel :items="$viewerReqs" title="Phase 1 · Eligibility &amp; Compliance" />
+                </div>
+
+                {{-- Ad-hoc requirement add-form (inline, toggled by the panel's
+                     "+ ad-hoc requirement" button which dispatches add-ad-hoc-requirement). --}}
+                @if($showAdHocReqForm)
+                    <div class="mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-md">
+                        <div class="flex items-center justify-between mb-2">
+                            <h5 class="text-xs font-semibold uppercase tracking-wider text-amber-800 dark:text-amber-300">New ad-hoc requirement</h5>
+                            <button type="button" wire:click="cancelAdHocRequirement" class="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700">Cancel</button>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-[1fr_auto_auto] gap-2 items-start">
+                            <div>
+                                <input type="text" wire:model.defer="adHocReqLabel" placeholder="e.g. Proof of residency"
+                                       class="w-full px-3 py-2 text-sm rounded border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500" />
+                                @error('adHocReqLabel') <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+                            </div>
+                            <select wire:model.defer="adHocReqType"
+                                    class="px-3 py-2 text-sm rounded border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white">
+                                <option value="document">Document</option>
+                                <option value="task">Task</option>
+                            </select>
+                            <button type="button" wire:click="saveAdHocRequirement"
+                                    class="px-4 py-2 text-sm rounded bg-amber-600 text-white hover:bg-amber-700">
+                                Add
+                            </button>
+                        </div>
+                    </div>
+                @endif
+
+                </section>{{-- /Focus 3 --}}
+
+                {{-- Per-row action modal (opened by panel's act-on-requirement event). --}}
+                @if($actingOnRequirementId)
+                    @php $actingReq = \App\Models\IntakeRequirement::find($actingOnRequirementId); @endphp
+                    @if($actingReq && $actingReq->communication_log_id === (int) $viewingLog->id)
+                        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[60]"
+                             wire:click.self="closeRequirementActionModal">
+                            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">{{ $actingReq->label }}</h3>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                                    Current status: <span class="font-medium">{{ \App\Models\IntakeRequirement::statusDisplay($actingReq->status) }}</span>
+                                    @if($actingReq->type === \App\Models\IntakeRequirement::TYPE_DOCUMENT)
+                                        · <span class="font-medium">Document</span>
+                                    @else
+                                        · <span class="font-medium">Task</span>
+                                    @endif
+                                </p>
+
+                                {{-- Phase 12.1: the Edit modal only handles CHANGES — uploading
+                                     new files + status transitions. Viewing/downloading existing
+                                     attachments happens inline on the requirements panel rows. --}}
+                                @if($actingReq->type === \App\Models\IntakeRequirement::TYPE_DOCUMENT)
+                                    @php $existingCount = $actingReq->getMedia('documents')->count(); @endphp
+                                    @if($existingCount > 0)
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                                            <span class="font-medium">{{ $existingCount }}</span>
+                                            file{{ $existingCount === 1 ? '' : 's' }} already attached — view or download
+                                            them from the requirement row in the panel below.
+                                        </p>
+                                    @endif
+
+                                    <div class="mb-4 p-3 rounded border-2 border-dashed border-indigo-200 dark:border-indigo-800 bg-indigo-50/40 dark:bg-indigo-900/10">
+                                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-indigo-700 dark:text-indigo-300 mb-2">
+                                            Upload supporting document(s)
+                                        </label>
+                                        <input type="file" wire:model="requirementFiles" multiple
+                                               class="block w-full text-sm text-gray-700 dark:text-gray-200 file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700" />
+                                        @error('requirementFiles') <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+                                        @error('requirementFiles.*') <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+
+                                        <div wire:loading wire:target="requirementFiles" class="text-xs text-gray-500 dark:text-gray-400 mt-1">Selecting…</div>
+
+                                        @if(!empty($requirementFiles))
+                                            <button type="button" wire:click="uploadRequirementFiles"
+                                                    wire:loading.attr="disabled" wire:target="uploadRequirementFiles"
+                                                    class="mt-2 px-3 py-1.5 text-sm rounded bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-60">
+                                                <span wire:loading.remove wire:target="uploadRequirementFiles">Upload &amp; mark received</span>
+                                                <span wire:loading wire:target="uploadRequirementFiles">Saving…</span>
+                                            </button>
+                                        @else
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Max 100MB per file. Stored on the secure private_media disk.</p>
+                                        @endif
+                                    </div>
+                                @endif
+
+                                <div class="space-y-2">
+                                    @if($actingReq->status !== \App\Models\IntakeRequirement::STATUS_REQUESTED && $actingReq->status === \App\Models\IntakeRequirement::STATUS_PENDING)
+                                        <button type="button" wire:click="applyRequirementAction('requested')"
+                                                class="w-full text-left px-3 py-2 rounded border border-gray-300 dark:border-zinc-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 text-sm">
+                                            <span class="font-medium">Mark requested</span>
+                                            <span class="block text-xs text-gray-500 dark:text-gray-400">We've asked the client; awaiting return.</span>
+                                        </button>
+                                    @endif
+
+                                    @if($actingReq->status !== \App\Models\IntakeRequirement::STATUS_RECEIVED)
+                                        <button type="button" wire:click="applyRequirementAction('received')"
+                                                class="w-full text-left px-3 py-2 rounded border border-gray-300 dark:border-zinc-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 text-sm">
+                                            <span class="font-medium">Mark received</span>
+                                            <span class="block text-xs text-gray-500 dark:text-gray-400">Client has provided this; counts toward conversion.</span>
+                                        </button>
+                                    @endif
+
+                                    @if($actingReq->status === \App\Models\IntakeRequirement::STATUS_PENDING || $actingReq->status === \App\Models\IntakeRequirement::STATUS_REQUESTED)
+                                        <div class="px-3 py-2 rounded border border-gray-300 dark:border-zinc-600">
+                                            <label class="text-xs font-medium text-gray-700 dark:text-gray-300 block mb-1">Reason (required for waive / N/A)</label>
+                                            <textarea wire:model.defer="reqActionReason" rows="2"
+                                                      class="w-full px-2 py-1 text-sm rounded border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white"
+                                                      placeholder="e.g. Already on file from prior case"></textarea>
+                                            @error('reqActionReason') <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+                                            <div class="flex gap-2 mt-2">
+                                                <button type="button" wire:click="applyRequirementAction('waived')"
+                                                        class="flex-1 px-3 py-1.5 text-sm rounded bg-sand-100 text-amber-900 border border-amber-300 hover:bg-amber-100 dark:text-amber-200 dark:bg-amber-900/30 dark:border-amber-700">
+                                                    Waive
+                                                </button>
+                                                <button type="button" wire:click="applyRequirementAction('na')"
+                                                        class="flex-1 px-3 py-1.5 text-sm rounded bg-gray-100 text-gray-800 border border-gray-300 hover:bg-gray-200 dark:text-gray-200 dark:bg-zinc-700 dark:border-zinc-600">
+                                                    Mark N/A
+                                                </button>
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    @if($actingReq->status !== \App\Models\IntakeRequirement::STATUS_PENDING)
+                                        <button type="button" wire:click="applyRequirementAction('reopen')"
+                                                class="w-full text-left px-3 py-2 rounded border border-gray-300 dark:border-zinc-600 hover:bg-gray-50 dark:hover:bg-zinc-700 text-sm">
+                                            <span class="font-medium">Reopen</span>
+                                            <span class="block text-xs text-gray-500 dark:text-gray-400">Reset to pending.</span>
+                                        </button>
+                                    @endif
+                                </div>
+
+                                <div class="mt-4 flex justify-end">
+                                    <button type="button" wire:click="closeRequirementActionModal"
+                                            class="px-3 py-1.5 text-sm bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded hover:bg-gray-300 dark:hover:bg-zinc-500">
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                @endif
+
+                <!-- Updates/Activity Log — audit trail across all three focuses -->
+                <div class="border-t border-gray-200 dark:border-zinc-600 pt-4 mb-4 mt-6">
                     <h4 class="font-medium text-gray-900 dark:text-white mb-3">Activity Updates & Follow-up History</h4>
 
                     <!-- Add Update Form -->
@@ -682,9 +1118,12 @@
                             <select wire:model.live="newUpdateType" class="px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md text-sm">
                                 <option value="note">Note</option>
                                 <option value="follow_up">Follow-up</option>
-                                <option value="status_change">Status Change</option>
-                                <option value="outcome">Outcome</option>
-                                <option value="other">Other</option>
+                                <option value="action">Action</option>
+                                <option value="email">Email</option>
+                                {{-- status_change is system-only per spec §5.4 — kept here for completeness when an admin needs to log one manually. --}}
+                                <option value="status_change">Status (system)</option>
+                                <option value="outcome">Outcome (legacy)</option>
+                                <option value="other">Other (legacy)</option>
                             </select>
                             @if($newUpdateType === 'follow_up')
                             <input type="date" wire:model="newUpdateDate"
@@ -692,6 +1131,7 @@
                                    title="Follow-up date (when the follow-up occurred)">
                             @endif
                             <input type="text" wire:model="newUpdateContent"
+                                   data-comm-composer
                                    placeholder="{{ $newUpdateType === 'follow_up' ? 'What happened during follow-up...' : 'Add an update or note...' }}"
                                    wire:keydown.enter="addUpdate"
                                    class="flex-1 min-w-[200px] px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md text-sm">
@@ -760,14 +1200,26 @@
                 </div>
 
                 <!-- Action Buttons -->
+                @php $gate = $this->intakeRequirementsGate($viewingLog); @endphp
                 <div class="flex justify-between items-center mt-6 pt-4 border-t border-gray-200 dark:border-zinc-600">
-                    <div class="flex gap-2">
+                    <div class="flex gap-2 items-center">
                         @if(!$viewingLog->converted_to_job_id)
                             @can('projects.create')
-                            <button wire:click="openConvertModal({{ $viewingLog->id }})"
-                                    class="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 text-sm">
-                                Convert to Project
-                            </button>
+                            @if($gate['ready'])
+                                <button wire:click="openConvertModal({{ $viewingLog->id }})"
+                                        class="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 text-sm">
+                                    Convert to Project
+                                </button>
+                            @else
+                                <button type="button" disabled
+                                        title="{{ $gate['unmet'] }} eligibility/compliance requirement(s) still unmet. Mark them received, waived, or N/A first."
+                                        class="px-4 py-2 bg-gray-300 dark:bg-zinc-600 text-gray-500 dark:text-gray-400 rounded-md text-sm cursor-not-allowed">
+                                    Convert to Project
+                                </button>
+                                <span class="text-xs text-amber-700 dark:text-amber-400">
+                                    {{ $gate['met'] }}/{{ $gate['total'] }} requirements met
+                                </span>
+                            @endif
                             @endcan
                         @else
                             @if(auth()->user()->isAdmin())
@@ -821,6 +1273,35 @@
                 <!-- Step 1: Basic Info -->
                 @if($convertStep === 1)
                 <div class="space-y-4">
+                    {{-- v2 (Phase 7): Requirements Gate at the top of step 1.
+                         Phase 10: gate only counts Phase 1 categories — service-delivery-
+                         compliance items don't block promotion (they're evaluated post-conversion). --}}
+                    @if($convertingLog)
+                        @php
+                            $convertReqs = $convertingLog->intakeRequirements()
+                                ->where('is_orphaned', false)
+                                ->with('definition')
+                                ->get()
+                                ->filter(fn ($r) => in_array(
+                                    $r->definition?->category ?? \App\Models\RequirementDefinition::CATEGORY_ELIGIBILITY,
+                                    \App\Models\RequirementDefinition::PHASE_1_CATEGORIES,
+                                    true
+                                ))
+                                ->values();
+                        @endphp
+                        @if($convertReqs->isNotEmpty())
+                            <x-comm.requirements-gate :items="$convertReqs"
+                                                      override-model="requirementOverride"
+                                                      override-reason-model="requirementOverrideReason" />
+                            @error('requirementOverride')
+                                <div class="p-3 rounded-md bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 text-sm text-red-800 dark:text-red-200">{{ $message }}</div>
+                            @enderror
+                            @error('requirementOverrideReason')
+                                <div class="p-3 rounded-md bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 text-sm text-red-800 dark:text-red-200">{{ $message }}</div>
+                            @enderror
+                        @endif
+                    @endif
+
                     <!-- Contact Info Summary -->
                     @if($convertingLog)
                     <div class="p-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-md text-sm">
@@ -1058,11 +1539,93 @@
 
     <!-- Form Modal -->
     @if($showForm)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50"
+             x-data="{
+                 handleKey(e) {
+                     // ⌘/⌃ + Enter: Save
+                     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && !e.shiftKey) {
+                         e.preventDefault();
+                         $wire.call('save');
+                         return;
+                     }
+                     // ⌘/⌃ + Shift + Enter: Save & New (spec §6 calls this ⌘⏎N)
+                     if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 'Enter') {
+                         e.preventDefault();
+                         $wire.call('saveAndNew');
+                         return;
+                     }
+                     // Esc: close modal (unless the picker is currently swallowing it)
+                     if (e.key === 'Escape') {
+                         const tag = document.activeElement?.tagName;
+                         if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') {
+                             return;
+                         }
+                         $wire.set('showForm', false);
+                     }
+                 },
+             }"
+             x-on:keydown.window="handleKey">
             <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                     {{ $editingId ? 'Edit Communication' : 'New Communication Entry' }}
                 </h3>
+
+                {{-- v2 anchor selector / project banner ─────────────────── --}}
+                @if($this->state === 'intake')
+                    {{-- INTAKE: two radio cards at top per spec §4.1 --}}
+                    <div class="grid grid-cols-2 gap-3 mb-5">
+                        <button type="button" wire:click="setAnchor('intake')"
+                                class="text-left p-3 rounded-md border-2 {{ $anchor === 'intake' ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30' : 'border-gray-200 dark:border-zinc-600 bg-white dark:bg-zinc-700' }}">
+                            <div class="flex items-center gap-2">
+                                <input type="radio" @checked($anchor === 'intake') class="text-indigo-600 focus:ring-indigo-500" readonly>
+                                <span class="font-medium text-gray-900 dark:text-white">General intake</span>
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1.5 pl-6">
+                                Log an interaction not (yet) tied to a project — outreach, partner call, exploratory inquiry.
+                            </p>
+                        </button>
+                        <button type="button" wire:click="setAnchor('project')"
+                                class="text-left p-3 rounded-md border-2 border-gray-200 dark:border-zinc-600 bg-white dark:bg-zinc-700 hover:border-teal-500">
+                            <div class="flex items-center gap-2">
+                                <input type="radio" class="text-teal-600 focus:ring-teal-500" readonly>
+                                <span class="font-medium text-gray-900 dark:text-white">Attach to project</span>
+                                <span class="ml-auto text-[10px] uppercase tracking-wider text-gray-500 dark:text-gray-400">⌘P</span>
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1.5 pl-6">
+                                Pick an existing project; fund codes and program services scope to it.
+                            </p>
+                        </button>
+                    </div>
+                @else
+                    {{-- PROJECT: teal sticky banner per spec §4.2 --}}
+                    @php
+                        $linkedJob = $housingJobs->firstWhere('id', (int) $housing_job_id);
+                    @endphp
+                    @if($linkedJob)
+                        <div class="mb-5 flex items-center gap-3 px-4 py-3 rounded-md bg-teal-700 text-white shadow">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-sm bg-white/15 font-mono text-xs">{{ $linkedJob->job_number }}</span>
+                            <div class="min-w-0 flex-1">
+                                <div class="text-[10px] uppercase tracking-wider text-white/70">Project</div>
+                                <div class="text-sm font-medium truncate">{{ $linkedJob->job_title }}</div>
+                            </div>
+                            <button type="button" x-on:click="$dispatch('open-project-picker')"
+                                    class="text-xs underline underline-offset-2 hover:text-white/80">
+                                Change
+                            </button>
+                            <button type="button" wire:click="setAnchor('intake')"
+                                    class="text-xs underline underline-offset-2 hover:text-white/80">
+                                Detach
+                            </button>
+                        </div>
+                    @endif
+                @endif
+
+                {{-- v2 requirements summary pill (visible whenever there are requirements) --}}
+                @if($editingId && $currentRequirements->isNotEmpty())
+                    <div class="mb-5">
+                        <x-comm.requirements-summary-pill :items="$currentRequirements" />
+                    </div>
+                @endif
 
                 <!-- Validation Errors Display -->
                 @if ($errors->any())
@@ -1216,6 +1779,9 @@
                         </select>
                     </div>
 
+                    {{-- v2: legacy dropdown hidden — anchor selector / picker is the new UI.
+                         Kept in the DOM (inside the `@if`) so wire:model binding survives. --}}
+                    @if(false)
                     <!-- Related to a Project? -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Related to a Project?</label>
@@ -1236,6 +1802,7 @@
                             @endforeach
                         </select>
                     </div>
+                    @endif
 
                     <!-- Contact First Name -->
                     <div>
@@ -1278,9 +1845,14 @@
                     </div>
 
                     <!-- Contact Email -->
+                    {{-- Phase 12.6: type="text" + inputmode="email" instead of type="email".
+                         Browser native HTML5 email validation can hold a stale :invalid state
+                         after the field is cleared, blocking submit on an optional field.
+                         Server-side Laravel validation is the sole authority for format. --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
-                        <input type="email" wire:model="contact_email" placeholder="contact@example.com"
+                        <input type="text" inputmode="email" autocapitalize="off" autocomplete="email"
+                               wire:model.blur="contact_email" placeholder="contact@example.com"
                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
                         @error('contact_email') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
                     </div>
@@ -1292,22 +1864,11 @@
                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md"></textarea>
                     </div>
 
-                    <!-- Create Project and Enrollment Checkbox -->
-                    <div class="md:col-span-2 border-t border-gray-200 dark:border-zinc-600 pt-4 mt-2">
-                        @if(!$editingId)
-                        <label class="flex items-center gap-3 cursor-pointer p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors">
-                            <input type="checkbox" wire:model.live="create_project_enrollment"
-                                   class="rounded border-gray-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500 w-5 h-5">
-                            <div>
-                                <span class="text-sm font-semibold text-indigo-700 dark:text-indigo-300">Create Project and Enrollment</span>
-                                <p class="text-xs text-indigo-600 dark:text-indigo-400 mt-0.5">
-                                    Automatically create property (with duplicate check), participant + household with address, and housing job from this communication log
-                                </p>
-                            </div>
-                        </label>
-                        @error('create_project_enrollment') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
-                        @endif
-                    </div>
+                    {{-- Phase 12.5: "Create Project and Enrollment" checkbox removed.
+                         Project creation now flows through the viewer: attach a housing
+                         service, satisfy Phase 1 requirements, then use Convert to
+                         Project from the gated bottom action bar. The auto-create
+                         shortcut bypassed that lifecycle and is no longer needed. --}}
 
                     <!-- Contact Address Section -->
                     <div class="md:col-span-2 border-t border-gray-200 dark:border-zinc-600 pt-4 mt-2">
@@ -1444,8 +2005,13 @@
                         </div>
                     </div>
 
-                    <!-- Service Association Section -->
-                    @if($accessiblePrograms->isNotEmpty())
+                    {{-- v2 / UI shift: Housing Services + Fund Codes are managed from the
+                         detail viewer (Focus 2 — Service selection), not from the edit form.
+                         The form is for logging the communication; service selection happens
+                         after the entry exists. --}}
+
+                    <!-- Service Association Section (v2: hidden by default in INTAKE) -->
+                    @if($accessiblePrograms->isNotEmpty() && ($this->state === 'project' || $showServicesInIntake))
                     <div class="md:col-span-2 border-t border-gray-200 dark:border-zinc-600 pt-4 mt-2">
                         <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Associate with Program Services (Optional)</h4>
                         <div class="space-y-3">
@@ -1518,44 +2084,47 @@
                         </div>
                     </div>
 
-                    <!-- Fund Codes Section -->
-                    @if($allFundCodes->isNotEmpty())
-                    <div class="md:col-span-2 border-t border-gray-200 dark:border-zinc-600 pt-4 mt-2">
-                        <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Fund Codes (Optional)</h4>
-                        <div class="flex flex-wrap gap-2">
-                            @foreach($allFundCodes as $fundCode)
-                                <label class="inline-flex items-center">
-                                    <input type="checkbox" wire:model="selectedFundCodeIds" value="{{ $fundCode->id }}"
-                                           class="rounded border-gray-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500">
-                                    <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                                        <span class="font-mono font-semibold">{{ $fundCode->code }}</span>
-                                        <span class="text-gray-500 dark:text-gray-400">– {{ $fundCode->description }}</span>
-                                    </span>
-                                </label>
-                            @endforeach
-                        </div>
-                    </div>
-                    @endif
+                    {{-- Fund codes are managed indirectly via Housing Services on the
+                         viewer's Focus 2 panel. Picking a service auto-attaches its funds;
+                         removing a service leaves funds in place for manual review. --}}
 
                     <!-- Subject (hidden - auto-generated from property address) -->
                     <input type="hidden" wire:model="subject">
 
                 </div>
 
-                <div class="mt-6 flex justify-end space-x-3">
-                    <button wire:click="$set('showForm', false)"
-                            class="px-4 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
-                        Cancel
-                    </button>
-                    <button wire:click="save"
-                            wire:loading.attr="disabled"
-                            wire:loading.class="opacity-50 cursor-not-allowed"
-                            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
-                        <span wire:loading.remove wire:target="save">{{ $editingId ? 'Update' : 'Save' }}</span>
-                        <span wire:loading wire:target="save">Saving...</span>
-                    </button>
+                <div class="mt-6 flex items-center justify-between gap-3 flex-wrap">
+                    <div class="text-[11px] text-gray-500 dark:text-gray-400 flex items-center gap-2 flex-wrap">
+                        <x-comm.kbd :keys="['⌘', '⏎']" /> Save
+                        <span class="text-gray-300 dark:text-zinc-600">·</span>
+                        <x-comm.kbd :keys="['⌘', '⇧', '⏎']" /> Save &amp; new
+                        <span class="text-gray-300 dark:text-zinc-600">·</span>
+                        <x-comm.kbd :keys="['⌘', 'P']" /> Project picker
+                        <span class="text-gray-300 dark:text-zinc-600">·</span>
+                        <x-comm.kbd>Esc</x-comm.kbd> Cancel
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button wire:click="$set('showForm', false)"
+                                class="px-4 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
+                            Cancel
+                        </button>
+                        <button wire:click="save"
+                                wire:loading.attr="disabled"
+                                wire:loading.class="opacity-50 cursor-not-allowed"
+                                class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                            <span wire:loading.remove wire:target="save">{{ $editingId ? 'Update' : 'Save' }}</span>
+                            <span wire:loading wire:target="save">Saving...</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
+
+        {{-- v2 project picker mount — listens for `open-project-picker` and
+             ⌘P/⌃P globally; calls back to selectProject($id|null). --}}
+        <x-comm.project-picker
+            :projects="$pickerProjects"
+            search-model="projectPickerSearch"
+            select-method="selectProject" />
     @endif
 </div>

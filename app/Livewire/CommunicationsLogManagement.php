@@ -18,12 +18,14 @@ use App\Traits\WithPermissionChecks;
 use App\Traits\WithProgramAccess;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\On;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
 class CommunicationsLogManagement extends Component
 {
-    use WithPagination, WithPermissionChecks, WithProgramAccess;
+    use WithFileUploads, WithPagination, WithPermissionChecks, WithProgramAccess;
 
     // Search and Filters
     public $search = '';
@@ -100,6 +102,33 @@ class CommunicationsLogManagement extends Component
     // Convert to project state
     public $showConvertModal = false;
 
+    /**
+     * v2 (Phase 7): the Requirements Gate on the Convert-to-Project
+     * modal. When the intake has any unmet required application
+     * requirements, the user MUST tick this checkbox AND provide a
+     * written reason to proceed; the values are persisted on the new
+     * housing_job's requirement_override_* audit columns.
+     */
+    public bool $requirementOverride = false;
+
+    public string $requirementOverrideReason = '';
+
+    // Focus 3 — ad-hoc requirement add-form state (viewer panel).
+    public bool $showAdHocReqForm = false;
+
+    public string $adHocReqLabel = '';
+
+    public string $adHocReqType = \App\Models\IntakeRequirement::TYPE_DOCUMENT;
+
+    // Focus 3 — per-row action modal state.
+    public ?int $actingOnRequirementId = null;
+
+    public string $reqActionReason = '';
+
+    // Focus 3 — pending file upload for the acted-on document requirement.
+    // Multiple files allowed (one requirement, many supporting documents).
+    public $requirementFiles = [];
+
     public $convertingLogId = null;
 
     public $convertJobTitle = '';
@@ -133,6 +162,14 @@ class CommunicationsLogManagement extends Component
     // Fund codes
     public $selectedFundCodeIds = [];
 
+    /**
+     * v2 (Phase 4): snapshot of fund-code IDs that were already
+     * attached when the form opened. Used by the save-time validator
+     * to distinguish "already-checked expired fund" (allowed; preserves
+     * historical data) from "newly checking an expired fund" (blocked).
+     */
+    public array $originallySelectedFundCodeIds = [];
+
     // Entity search fields
     public $participantSearch = '';
 
@@ -144,6 +181,22 @@ class CommunicationsLogManagement extends Component
 
     // Form fields
     public $housing_job_id = '';
+
+    // v2 state machine: 'intake' (no project) | 'project' (attached).
+    // Derived from housing_job_id at form-open; explicit user intent via
+    // the anchor radio at the top of the v2 edit form.
+    public string $anchor = 'intake';
+
+    // v2: opt-in reveal of fund codes / services in INTAKE state. Per
+    // spec §4.1, those sections are hidden by default in INTAKE and
+    // accessed via a single "show" link.
+    public bool $showFundCodesInIntake = false;
+
+    public bool $showServicesInIntake = false;
+
+    // v2 project picker (⌘P): search-bound by the parent so the picker
+    // can render filtered results without owning Livewire state itself.
+    public string $projectPickerSearch = '';
 
     public $participant_id = '';
 
@@ -183,6 +236,21 @@ class CommunicationsLogManagement extends Component
 
     public $subject = '';
 
+    /**
+     * v2 (Phase 5): subject is editable; once the user touches it, the
+     * override is sticky. Persisted as subject_overridden_at on the
+     * model. Loaded on showEditForm; flipped to "now" on save when the
+     * subjectTouched transient is set.
+     */
+    public ?string $subject_overridden_at = null;
+
+    /**
+     * Transient. Set true by the updatedSubject() lifecycle hook when
+     * the user types in the Subject input. Not persisted directly —
+     * triggers $subject_overridden_at = now() on save.
+     */
+    public bool $subjectTouched = false;
+
     public $summary = '';
 
     public $notes = '';
@@ -191,14 +259,37 @@ class CommunicationsLogManagement extends Component
 
     public $category = 'general';
 
+    /**
+     * Phase 12.4: sticky-override timestamp for category. Mirrors the
+     * subject_overridden_at pattern — once the user picks a value from
+     * the dropdown, the auto-category state machine stops touching this
+     * row.
+     */
+    public ?string $category_overridden_at = null;
+
+    /**
+     * Transient companion to category_overridden_at. Set true by
+     * updatedCategory() when the user changes the dropdown; triggers
+     * category_overridden_at = now() on save.
+     */
+    public bool $categoryTouched = false;
+
     public $priority = 'normal';
 
     public $follow_up_date = '';
 
     public $follow_up_action = '';
 
-    // Service multi-select
+    // Service multi-select (legacy program services)
     public $selectedServices = [];
+
+    /**
+     * Comm Log v2 / Phase 9: housing services (Kaitlyn's custom catalog,
+     * decoupled from program services). On toggle, the linked fund codes
+     * are merged into $selectedFundCodeIds. On save(), each selected
+     * housing service triggers IntakeRequirementInstantiator::forHousingService.
+     */
+    public array $selectedHousingServiceIds = [];
 
     // Tag management
     public $selectedTagIds = [];
@@ -287,6 +378,29 @@ class CommunicationsLogManagement extends Component
     public function mount()
     {
         $this->authorizeAction('communications_log.view');
+
+        // Phase 12.8: honor the per-user default view-mode preference when
+        // the URL didn't pin a specific viewMode. Order of precedence:
+        //   URL ?viewMode=  >  user pref  >  hardcoded 'table' default.
+        // The queryString config keeps URL persistence so deep-links keep
+        // overriding the pref deterministically.
+        $urlViewMode = request()->query('viewMode');
+        if ($urlViewMode === null || $urlViewMode === '') {
+            $pref = Auth::user()?->comm_log_default_view;
+            if (in_array($pref, ['table', 'card'], true)) {
+                $this->viewMode = $pref;
+            }
+        }
+
+        // Phase 12.2: deep-link to a specific log via ?view={id}. Used by
+        // the Housing Dashboard intake-pipeline card so clicking a row
+        // lands directly in that log's detail viewer.
+        $viewId = (int) request()->query('view', 0);
+        if ($viewId > 0) {
+            if (CommunicationLog::whereKey($viewId)->exists()) {
+                $this->viewDetail($viewId);
+            }
+        }
     }
 
     public function updatedSearch()
@@ -374,13 +488,56 @@ class CommunicationsLogManagement extends Component
     {
         if ($value) {
             $property = Property::find($value);
-            if ($property) {
+            if ($property && ! $this->subjectIsOverridden()) {
                 $this->subject = $property->address_line_1;
                 if ($property->city) {
                     $this->subject .= ', '.$property->city;
                 }
             }
         }
+    }
+
+    /**
+     * v2 (Phase 5): user-typed Subject locks the auto-derivation off.
+     * Set the transient touched flag so save() persists the override.
+     */
+    public function updatedSubject($value): void
+    {
+        $this->subjectTouched = true;
+    }
+
+    /**
+     * Phase 12.4: user-picked category locks the auto-category state
+     * machine off for this row.
+     */
+    public function updatedCategory($value): void
+    {
+        $this->categoryTouched = true;
+    }
+
+    /**
+     * Phase 12.6: trim whitespace + treat whitespace-only as empty.
+     *
+     * Kaitlyn hit a UX trap where typing junk in the optional email
+     * field triggered a validation error, but clearing the field
+     * left a stale browser :invalid state (with type="email") or a
+     * single space (from accidental whitespace) that re-failed the
+     * `nullable|email` rule on the next submit. Normalizing here so
+     * Laravel sees a clean empty string makes `nullable` reliable.
+     */
+    public function updatedContactEmail($value): void
+    {
+        $this->contact_email = trim((string) $value);
+        $this->resetErrorBag('contact_email');
+    }
+
+    /**
+     * True when the user has overridden the subject this session
+     * (just typed it) OR previously (subject_overridden_at is set).
+     */
+    protected function subjectIsOverridden(): bool
+    {
+        return $this->subjectTouched || $this->subject_overridden_at !== null;
     }
 
     public function updatedParticipantId($value)
@@ -421,6 +578,11 @@ class CommunicationsLogManagement extends Component
 
     protected function updateSubjectFromAddress()
     {
+        // v2 (Phase 5): never clobber a user-overridden Subject.
+        if ($this->subjectIsOverridden()) {
+            return;
+        }
+
         if ($this->contact_address && $this->contact_city) {
             $parts = [trim($this->contact_address), trim($this->contact_city)];
 
@@ -675,16 +837,103 @@ class CommunicationsLogManagement extends Component
         $this->authorizeAction('communications_log.create');
         $this->resetForm();
         $this->communication_date = now()->format('Y-m-d');
+        $this->anchor = 'intake'; // new entries default to general intake
         $this->showForm = true;
+    }
+
+    /**
+     * v2 state machine: derive the form's composition state from the
+     * presence of housing_job_id. 'intake' hides fund codes + services
+     * by default (per spec §4.1); 'project' scopes them to the project.
+     */
+    public function getStateProperty(): string
+    {
+        return ! empty($this->housing_job_id) ? 'project' : 'intake';
+    }
+
+    /**
+     * Anchor radio handler. 'intake' clears the project and snaps the
+     * form to INTAKE; 'project' opens the picker so the user can choose.
+     */
+    public function setAnchor(string $value): void
+    {
+        if ($value === 'intake') {
+            $this->housing_job_id = '';
+            $this->anchor = 'intake';
+            $this->showFundCodesInIntake = false;
+            $this->showServicesInIntake = false;
+        } elseif ($value === 'project') {
+            $this->anchor = 'project';
+            // If no project yet, open the picker so the user can choose.
+            if (empty($this->housing_job_id)) {
+                $this->dispatch('open-project-picker');
+            }
+        }
+    }
+
+    /**
+     * Called by the x-comm.project-picker when the user picks a row.
+     * Passing null is the "General intake" sentinel that detaches.
+     */
+    public function selectProject(?int $id): void
+    {
+        $this->housing_job_id = $id ?: '';
+        $this->anchor = $id ? 'project' : 'intake';
+        if (! $id) {
+            $this->showFundCodesInIntake = false;
+            $this->showServicesInIntake = false;
+        }
+    }
+
+    public function revealFundCodes(): void
+    {
+        $this->showFundCodesInIntake = true;
+    }
+
+    public function revealServices(): void
+    {
+        $this->showServicesInIntake = true;
+    }
+
+    /**
+     * Comm Log v2 / Phase 9: toggle a housing service on the entry's
+     * selection. When ADDED, auto-merges the service's linked fund-code
+     * IDs into $selectedFundCodeIds. When REMOVED, leaves fund codes
+     * alone (the user already saw them and may have a reason to keep
+     * them — explicit detach if undesired).
+     */
+    public function toggleHousingService(int $id): void
+    {
+        $current = array_map('intval', $this->selectedHousingServiceIds);
+        if (in_array($id, $current, true)) {
+            $this->selectedHousingServiceIds = array_values(array_filter($current, fn ($v) => $v !== $id));
+
+            return;
+        }
+
+        $this->selectedHousingServiceIds = [...$current, $id];
+
+        // Merge the service's fund codes into the selection so the user
+        // sees the "funds for budgeting" auto-checked in real time.
+        $svc = \App\Models\HousingService::with('fundCodes')->find($id);
+        if ($svc) {
+            $svcFundIds = $svc->fundCodes->pluck('id')->map(fn ($v) => (int) $v)->all();
+            $existingFundIds = array_map('intval', $this->selectedFundCodeIds);
+            $this->selectedFundCodeIds = array_values(array_unique([...$existingFundIds, ...$svcFundIds]));
+        }
     }
 
     public function showEditForm($id)
     {
         $this->authorizeAction('communications_log.edit');
-        $log = CommunicationLog::with(['services', 'tags'])->findOrFail($id);
+        $log = CommunicationLog::with(['services', 'tags', 'housingServices'])->findOrFail($id);
 
         $this->editingId = $id;
         $this->housing_job_id = $log->housing_job_id ?? '';
+        // v2: derive anchor from the loaded log's project linkage.
+        $this->anchor = $log->housing_job_id ? 'project' : 'intake';
+        $this->showFundCodesInIntake = false;
+        $this->showServicesInIntake = false;
         $this->participant_id = $log->participant_id ?? '';
         $this->household_id = $log->household_id ?? '';
         $this->property_id = $log->property_id ?? '';
@@ -703,16 +952,22 @@ class CommunicationsLogManagement extends Component
         $this->contact_organization = $log->contact_organization ?? '';
         $this->contact_role = $log->contact_role ?? '';
         $this->subject = $log->subject;
+        $this->subject_overridden_at = $log->subject_overridden_at?->toDateTimeString();
+        $this->subjectTouched = false;
         $this->summary = $log->summary ?? '';
         $this->notes = $log->notes ?? '';
         $this->outcome = $log->outcome ?? '';
         $this->category = $log->category;
+        $this->category_overridden_at = $log->category_overridden_at?->toDateTimeString();
+        $this->categoryTouched = false;
         $this->priority = $log->priority;
         $this->follow_up_date = $log->follow_up_date?->format('Y-m-d') ?? '';
         $this->follow_up_action = $log->follow_up_action ?? '';
         $this->selectedServices = $log->services->pluck('id')->toArray();
+        $this->selectedHousingServiceIds = $log->housingServices->pluck('id')->toArray();
         $this->selectedTagIds = $log->tags->pluck('id')->toArray();
-        $this->selectedFundCodeIds = $log->fundCodes->pluck('id')->toArray();
+        $this->selectedFundCodeIds = $log->anticipatedFundCodes->pluck('id')->toArray();
+        $this->originallySelectedFundCodeIds = $this->selectedFundCodeIds;
         $this->create_project_enrollment = false; // Always false when editing
 
         $this->showForm = true;
@@ -726,17 +981,375 @@ class CommunicationsLogManagement extends Component
         $this->newUpdateType = 'note';
     }
 
+    /**
+     * Phase 12.3: toggle this user's pin on a communication log. Used
+     * by the Housing Dashboard pinned-cards row and the per-row pin
+     * affordance in the comm log list/viewer.
+     */
+    public function togglePin(int $logId): void
+    {
+        $this->authorizeAction('communications_log.view');
+
+        $log = CommunicationLog::findOrFail($logId);
+        $userId = Auth::id();
+
+        $existing = $log->pinnedByUsers()->where('users.id', $userId)->exists();
+        if ($existing) {
+            $log->pinnedByUsers()->detach($userId);
+            session()->flash('success', 'Unpinned.');
+        } else {
+            $log->pinnedByUsers()->attach($userId, ['pinned_at' => now()]);
+            session()->flash('success', 'Pinned to dashboard.');
+        }
+    }
+
+    /**
+     * Phase 1 (intake) requirements gate for a given log. Returns
+     *   ['met' => int, 'total' => int, 'ready' => bool, 'unmet' => int]
+     * counting non-orphaned IntakeRequirements whose RequirementDefinition
+     * category falls in PHASE_1_CATEGORIES (eligibility + compliance).
+     * Mirrors the server-side gate in confirmConvertToProject().
+     */
+    public function intakeRequirementsGate(CommunicationLog $log): array
+    {
+        $reqs = $log->intakeRequirements()
+            ->where('is_orphaned', false)
+            ->with('definition')
+            ->get()
+            ->filter(fn ($r) => in_array(
+                $r->definition?->category ?? \App\Models\RequirementDefinition::CATEGORY_ELIGIBILITY,
+                \App\Models\RequirementDefinition::PHASE_1_CATEGORIES,
+                true
+            ));
+
+        $total = $reqs->count();
+        $met = $reqs->filter(fn ($r) => $r->isMet())->count();
+
+        return [
+            'total' => $total,
+            'met' => $met,
+            'unmet' => $total - $met,
+            'ready' => $total === 0 || $met === $total,
+        ];
+    }
+
+    // -----------------------------------------------------------------
+    // Focus 3 — ad-hoc requirement add-form
+    // -----------------------------------------------------------------
+
+    #[On('add-ad-hoc-requirement')]
+    public function openAdHocRequirementForm(): void
+    {
+        $this->authorizeAction('communications_log.edit');
+        $this->showAdHocReqForm = true;
+        $this->adHocReqLabel = '';
+        $this->adHocReqType = \App\Models\IntakeRequirement::TYPE_DOCUMENT;
+        $this->resetErrorBag(['adHocReqLabel', 'adHocReqType']);
+    }
+
+    public function cancelAdHocRequirement(): void
+    {
+        $this->showAdHocReqForm = false;
+        $this->adHocReqLabel = '';
+        $this->adHocReqType = \App\Models\IntakeRequirement::TYPE_DOCUMENT;
+        $this->resetErrorBag(['adHocReqLabel', 'adHocReqType']);
+    }
+
+    public function saveAdHocRequirement(): void
+    {
+        $this->authorizeAction('communications_log.edit');
+
+        $this->validate([
+            'adHocReqLabel' => ['required', 'string', 'max:200'],
+            'adHocReqType' => ['required', 'in:'.\App\Models\IntakeRequirement::TYPE_DOCUMENT.','.\App\Models\IntakeRequirement::TYPE_TASK],
+        ]);
+
+        if (! $this->viewingId) {
+            return;
+        }
+
+        $log = CommunicationLog::findOrFail($this->viewingId);
+
+        app(\App\Services\IntakeRequirementInstantiator::class)->adHoc(
+            $log,
+            trim($this->adHocReqLabel),
+            $this->adHocReqType,
+            Auth::user()
+        );
+
+        $this->cancelAdHocRequirement();
+        session()->flash('success', 'Ad-hoc requirement added.');
+    }
+
+    // -----------------------------------------------------------------
+    // Focus 3 — per-row action modal
+    // -----------------------------------------------------------------
+
+    #[On('act-on-requirement')]
+    public function openRequirementActionModal(int $id): void
+    {
+        $this->authorizeAction('communications_log.edit');
+        $this->actingOnRequirementId = $id;
+        $this->reqActionReason = '';
+        $this->resetErrorBag(['reqActionReason']);
+    }
+
+    public function closeRequirementActionModal(): void
+    {
+        $this->actingOnRequirementId = null;
+        $this->reqActionReason = '';
+        $this->requirementFiles = [];
+        $this->resetErrorBag(['reqActionReason', 'requirementFiles', 'requirementFiles.*']);
+    }
+
+    /**
+     * Upload one-or-more files to the acting-on requirement's 'documents'
+     * collection. Marks the requirement received once the upload succeeds
+     * (matches the parallel Requirement model's "upload → complete" UX).
+     * Only valid for type=document requirements.
+     */
+    public function uploadRequirementFiles(): void
+    {
+        $this->authorizeAction('communications_log.edit');
+
+        if (! $this->actingOnRequirementId) {
+            return;
+        }
+
+        $this->validate([
+            'requirementFiles' => ['required', 'array', 'min:1'],
+            'requirementFiles.*' => ['file', 'max:102400'], // 100MB
+        ]);
+
+        $req = \App\Models\IntakeRequirement::findOrFail($this->actingOnRequirementId);
+
+        if ($req->communication_log_id !== (int) $this->viewingId) {
+            abort(403);
+        }
+
+        if ($req->type !== \App\Models\IntakeRequirement::TYPE_DOCUMENT) {
+            abort(422, 'File uploads are only supported for document-type requirements.');
+        }
+
+        foreach ($this->requirementFiles as $file) {
+            $req->addMedia($file->getRealPath())
+                ->usingName($file->getClientOriginalName())
+                ->usingFileName($file->hashName())
+                ->toMediaCollection('documents');
+        }
+
+        // Receiving a file naturally satisfies the requirement.
+        if ($req->status !== \App\Models\IntakeRequirement::STATUS_RECEIVED) {
+            $req->markReceived(Auth::user());
+        }
+
+        // Phase 12.4: upload+mark-received may have closed the last
+        // outstanding Phase 1 requirement; re-evaluate the auto-category.
+        $req->fresh()->communicationLog?->applyAutoCategory();
+
+        $this->closeRequirementActionModal();
+        session()->flash('success', 'File(s) uploaded and requirement marked received.');
+    }
+
+    /**
+     * Delete a media file off a requirement attached to the currently
+     * viewed log. Called inline from the requirements panel (no need
+     * to open the Edit modal). Admin-only — Kaitlyn shouldn't be able
+     * to silently drop attachments, but removing a wrong upload is
+     * necessary.
+     */
+    public function deleteRequirementMedia(int $requirementId, int $mediaId): void
+    {
+        if (! Auth::user()?->isAdmin()) {
+            $this->authorizeAction('communications_log.delete');
+        }
+
+        $req = \App\Models\IntakeRequirement::findOrFail($requirementId);
+
+        if ($req->communication_log_id !== (int) $this->viewingId) {
+            abort(403);
+        }
+
+        $media = $req->getMedia('documents')->firstWhere('id', $mediaId);
+        if ($media) {
+            $media->delete();
+            session()->flash('success', 'Attachment removed.');
+        }
+    }
+
+    /**
+     * Apply a status transition to the acting-on requirement.
+     * action ∈ {requested, received, waived, na, reopen, blocked}.
+     * waived + na require a non-empty reason.
+     */
+    public function applyRequirementAction(string $action): void
+    {
+        $this->authorizeAction('communications_log.edit');
+
+        if (! $this->actingOnRequirementId) {
+            return;
+        }
+
+        $req = \App\Models\IntakeRequirement::findOrFail($this->actingOnRequirementId);
+
+        if ($req->communication_log_id !== (int) $this->viewingId) {
+            abort(403);
+        }
+
+        $actor = Auth::user();
+
+        switch ($action) {
+            case 'requested':
+                $req->markRequested($actor);
+                break;
+            case 'received':
+                $req->markReceived($actor);
+                break;
+            case 'waived':
+                if (trim($this->reqActionReason) === '') {
+                    $this->addError('reqActionReason', 'A reason is required to waive.');
+
+                    return;
+                }
+                $req->markWaived($actor, trim($this->reqActionReason));
+                break;
+            case 'na':
+                if (trim($this->reqActionReason) === '') {
+                    $this->addError('reqActionReason', 'A reason is required to mark N/A.');
+
+                    return;
+                }
+                $req->markNotApplicable($actor, trim($this->reqActionReason));
+                break;
+            case 'reopen':
+                $req->reopen($actor);
+                break;
+            default:
+                abort(422, 'Unknown requirement action.');
+        }
+
+        // Phase 12.4: a status transition may have flipped the Phase-1
+        // gate. Re-evaluate the auto-category state machine.
+        $req->fresh()->communicationLog?->applyAutoCategory();
+
+        $this->closeRequirementActionModal();
+        session()->flash('success', 'Requirement updated.');
+    }
+
+    /**
+     * Viewer / Focus 2 — toggle a housing service on the currently-viewed
+     * log. Attaches or detaches the pivot AND runs the side-effects:
+     *   - on attach: forHousingService() stamps requirements + auto-attaches funds
+     *   - on detach: strips via:'service:N' tags from intake_requirements;
+     *     orphans rows whose via becomes empty AND source is template_set
+     *     / definition. Fund codes are LEFT IN PLACE — Kaitlyn can remove
+     *     them manually if no longer wanted.
+     */
+    public function toggleHousingServiceOnLog(int $svcId): void
+    {
+        $this->authorizeAction('communications_log.edit');
+        if (! $this->viewingId) {
+            return;
+        }
+        $log = CommunicationLog::findOrFail($this->viewingId);
+        $svc = \App\Models\HousingService::findOrFail($svcId);
+
+        $alreadyAttached = $log->housingServices()->where('housing_services.id', $svcId)->exists();
+        $actor = Auth::user();
+        $serviceTag = 'service:'.$svcId;
+
+        if ($alreadyAttached) {
+            $log->housingServices()->detach($svcId);
+
+            // Strip the tag and orphan auto-applied requirements that no
+            // longer have any other source. Manual atom picks (source_type
+            // = definition with definition:N tag) survive.
+            $affected = \App\Models\IntakeRequirement::query()
+                ->where('communication_log_id', $log->id)
+                ->get();
+
+            foreach ($affected as $req) {
+                $via = is_array($req->via) ? $req->via : [];
+                if (! in_array($serviceTag, $via, true)) {
+                    continue;
+                }
+                $remaining = array_values(array_filter($via, fn ($t) => $t !== $serviceTag));
+                $req->via = $remaining;
+                $req->updated_by_user_id = $actor->id;
+                $req->save();
+
+                if (empty($remaining) && in_array(
+                    $req->source_type,
+                    [\App\Models\IntakeRequirement::SOURCE_TEMPLATE_SET, \App\Models\IntakeRequirement::SOURCE_DEFINITION],
+                    true
+                ) && ! $req->is_orphaned) {
+                    $req->markOrphaned($actor);
+                }
+            }
+
+            session()->flash('success', 'Removed "'.$svc->name.'" from this entry.');
+        } else {
+            $log->housingServices()->attach($svcId, [
+                'created_by_user_id' => $actor->id,
+                'created_at' => now(),
+            ]);
+            app(\App\Services\IntakeRequirementInstantiator::class)
+                ->forHousingService($log, $svc, $actor);
+
+            session()->flash('success', 'Added "'.$svc->name.'" — fund codes and requirements have been attached.');
+        }
+
+        // Phase 12.4: attach/detach changes the "has any service?" answer,
+        // which can flip the auto-category between 'general' and 'intake'
+        // (and possibly straight to 'scheduling' if no requirements got
+        // stamped, e.g. service with zero defined atoms).
+        $log->fresh()->applyAutoCategory();
+    }
+
     public function closeDetailModal()
     {
         $this->showDetailModal = false;
         $this->viewingId = null;
+        $this->showAdHocReqForm = false;
+        $this->adHocReqLabel = '';
+        $this->actingOnRequirementId = null;
+        $this->reqActionReason = '';
+    }
+
+    /**
+     * v2 (Phase 8): viewer hotkey "E" — close the viewer and open the
+     * Edit form on the same entry.
+     */
+    public function editFromViewer(): void
+    {
+        if (! $this->viewingId) {
+            return;
+        }
+        $id = $this->viewingId;
+        $this->closeDetailModal();
+        $this->showEditForm($id);
+    }
+
+    /**
+     * v2 (Phase 8): form hotkey ⌘⇧⏎ — save the current entry and
+     * immediately open a blank Create form. Persists nothing on the
+     * second open beyond what showCreateForm() initializes.
+     */
+    public function saveAndNew(): void
+    {
+        $this->save();
+        if ($this->getErrorBag()->isNotEmpty()) {
+            return;
+        }
+        // save() closes the form via $showForm = false; re-open as new.
+        $this->showCreateForm();
     }
 
     public function addUpdate()
     {
         $this->validate([
             'newUpdateContent' => 'required|string|min:1',
-            'newUpdateType' => 'required|in:note,follow_up,status_change,outcome,other',
+            'newUpdateType' => 'required|in:note,follow_up,status_change,outcome,other,action,email',
             'newUpdateDate' => 'nullable|date',
         ]);
 
@@ -1133,6 +1746,9 @@ class CommunicationsLogManagement extends Component
         $this->potentialPropertyMatches = [];
         $this->selectedParticipantAction = 'create_new';
         $this->selectedPropertyAction = 'create_new';
+        // v2 (Phase 7): clear gate state.
+        $this->requirementOverride = false;
+        $this->requirementOverrideReason = '';
     }
 
     public function convertToProject()
@@ -1316,6 +1932,38 @@ class CommunicationsLogManagement extends Component
                 'property_id' => $property?->id,
             ]);
 
+            // v2 (Phase 7): requirements gate — block conversion if any
+            // required-and-non-orphaned intake requirement is unmet AND
+            // the user did not tick the audit-logged override.
+            // Phase 10: only Phase-1 categories block promotion;
+            // service-delivery-compliance items are evaluated on the
+            // project page after conversion.
+            $unmetCount = $log->intakeRequirements()
+                ->where('is_orphaned', false)
+                ->whereNotIn('status', \App\Models\IntakeRequirement::MET_STATUSES)
+                ->with('definition')
+                ->get()
+                ->filter(fn ($r) => in_array(
+                    $r->definition?->category ?? \App\Models\RequirementDefinition::CATEGORY_ELIGIBILITY,
+                    \App\Models\RequirementDefinition::PHASE_1_CATEGORIES,
+                    true
+                ))
+                ->count();
+
+            if ($unmetCount > 0 && ! $this->requirementOverride) {
+                DB::rollBack();
+                $this->addError('requirementOverride', "{$unmetCount} required application requirement(s) are unmet. Tick the override box and provide a reason to proceed.");
+
+                return;
+            }
+
+            if ($this->requirementOverride && trim($this->requirementOverrideReason) === '') {
+                DB::rollBack();
+                $this->addError('requirementOverrideReason', 'A reason is required when overriding unmet requirements.');
+
+                return;
+            }
+
             $job = HousingJob::create([
                 'job_title' => $this->convertJobTitle,
                 'job_description' => $this->convertJobDescription,
@@ -1335,6 +1983,15 @@ class CommunicationsLogManagement extends Component
             \Log::info('convertToProject: HousingJob created', ['job_id' => $job->id, 'job_number' => $job->job_number]);
 
             $log->convertToProject($job, Auth::id());
+
+            // v2 (Phase 7): record the override audit + (eventually) copy
+            // the intake_requirements forward into project_requirements.
+            app(\App\Services\IntakeRequirementInstantiator::class)->carryForwardToProject(
+                $log,
+                $job,
+                Auth::user(),
+                $this->requirementOverride ? $this->requirementOverrideReason : null
+            );
 
             DB::commit();
 
@@ -1676,6 +2333,27 @@ class CommunicationsLogManagement extends Component
             'selectedServices.*' => 'exists:services,id',
         ]);
 
+        // v2 §5.5: cannot NEWLY check an expired fund code. Existing
+        // attachments to expired funds (originallySelectedFundCodeIds)
+        // are preserved untouched so historical data isn't disturbed.
+        $newlyChecked = array_diff(
+            array_map('intval', $this->selectedFundCodeIds),
+            array_map('intval', $this->originallySelectedFundCodeIds)
+        );
+        if (! empty($newlyChecked)) {
+            $expiredNew = \App\Models\FundCode::query()
+                ->whereIn('id', $newlyChecked)
+                ->get()
+                ->filter(fn ($f) => $f->expiry_state === 'expired');
+
+            if ($expiredNew->isNotEmpty()) {
+                $codes = $expiredNew->pluck('code')->implode(', ');
+                $this->addError('selectedFundCodeIds', "Cannot tag expired fund codes ({$codes}). They can no longer accept new attachments.");
+
+                return;
+            }
+        }
+
         // P-01: warn (but never block) on duplicate-address entries. The user
         // can confirm via the "Continue anyway" panel which sets
         // duplicateAcknowledged and re-enters save().
@@ -1706,10 +2384,20 @@ class CommunicationsLogManagement extends Component
             'contact_organization' => $this->contact_organization !== '' ? $this->contact_organization : null,
             'contact_role' => $this->contact_role !== '' ? $this->contact_role : null,
             'subject' => $this->subject,
+            // v2 (Phase 5): persist the override flag if the user typed
+            // in the Subject this session. Once set, the field is sticky.
+            'subject_overridden_at' => $this->subjectTouched
+                ? now()
+                : ($this->subject_overridden_at ?: null),
             'summary' => $this->summary !== '' ? $this->summary : null,
             'notes' => $this->notes !== '' ? $this->notes : null,
             'outcome' => $this->outcome !== '' ? $this->outcome : null,
             'category' => $this->category,
+            // Phase 12.4: sticky-override stamp once the user picks a value.
+            // Mirrors subject_overridden_at handling.
+            'category_overridden_at' => $this->categoryTouched
+                ? now()
+                : ($this->category_overridden_at ?: null),
             'priority' => $this->priority,
             'follow_up_date' => $this->follow_up_date !== '' ? $this->follow_up_date : null,
             'follow_up_action' => $this->follow_up_action !== '' ? $this->follow_up_action : null,
@@ -1727,8 +2415,12 @@ class CommunicationsLogManagement extends Component
             // Sync tags
             $log->syncTags($this->selectedTagIds);
 
-            // Sync fund codes
-            $log->fundCodes()->sync($this->selectedFundCodeIds);
+            // Sync anticipated fund codes (P-39b: legacy tag pivot dropped).
+            $log->anticipatedFundCodes()->sync($this->selectedFundCodeIds);
+
+            // v2 / Phase 9: sync housing services + run the instantiator
+            // for any newly-attached ones so requirements auto-stamp.
+            $this->syncHousingServices($log);
 
             session()->flash('success', 'Communication log updated successfully.');
         } else {
@@ -1742,14 +2434,58 @@ class CommunicationsLogManagement extends Component
             // Attach tags
             $log->syncTags($this->selectedTagIds);
 
-            // Attach fund codes
-            $log->fundCodes()->sync($this->selectedFundCodeIds);
+            // Attach anticipated fund codes (P-39b: legacy tag pivot dropped).
+            $log->anticipatedFundCodes()->sync($this->selectedFundCodeIds);
+
+            // v2 / Phase 9: sync housing services + auto-stamp requirements.
+            $this->syncHousingServices($log);
 
             session()->flash('success', 'Communication log created successfully.');
         }
 
+        // Phase 12.4: now that services + requirements are synced, run the
+        // auto-category state machine. No-op when the user manually set a
+        // category this session (categoryTouched flips override_at).
+        $log->refresh()->applyAutoCategory();
+
         $this->showForm = false;
         $this->resetForm();
+    }
+
+    /**
+     * Comm Log v2 / Phase 9: sync the comm-log ↔ housing-service pivot
+     * AND run IntakeRequirementInstantiator::forHousingService for every
+     * newly-attached service so requirements + fund codes auto-stamp.
+     *
+     * Idempotent — re-running for an already-attached service merges
+     * via tags without creating duplicate IntakeRequirement rows.
+     */
+    protected function syncHousingServices(CommunicationLog $log): void
+    {
+        $currentIds = $log->housingServices()->pluck('housing_services.id')->map(fn ($v) => (int) $v)->all();
+        $targetIds = array_map('intval', $this->selectedHousingServiceIds);
+
+        $toAdd = array_diff($targetIds, $currentIds);
+        $toRemove = array_diff($currentIds, $targetIds);
+
+        if (! empty($toRemove)) {
+            $log->housingServices()->detach($toRemove);
+        }
+
+        $instantiator = app(\App\Services\IntakeRequirementInstantiator::class);
+        $actor = Auth::user();
+
+        foreach ($toAdd as $serviceId) {
+            $log->housingServices()->attach($serviceId, [
+                'created_by_user_id' => $actor->id,
+                'created_at' => now(),
+            ]);
+
+            $svc = \App\Models\HousingService::find($serviceId);
+            if ($svc !== null) {
+                $instantiator->forHousingService($log, $svc, $actor);
+            }
+        }
     }
 
     public function delete($id)
@@ -1921,6 +2657,11 @@ class CommunicationsLogManagement extends Component
     {
         $this->editingId = null;
         $this->housing_job_id = '';
+        // v2 state-machine resets
+        $this->anchor = 'intake';
+        $this->showFundCodesInIntake = false;
+        $this->showServicesInIntake = false;
+        $this->projectPickerSearch = '';
         $this->participant_id = '';
         $this->household_id = '';
         $this->property_id = '';
@@ -1944,16 +2685,22 @@ class CommunicationsLogManagement extends Component
         $this->contact_organization = '';
         $this->contact_role = '';
         $this->subject = '';
+        $this->subject_overridden_at = null;
+        $this->subjectTouched = false;
         $this->summary = '';
         $this->notes = '';
         $this->outcome = '';
         $this->category = 'general';
+        $this->category_overridden_at = null;
+        $this->categoryTouched = false;
         $this->priority = 'normal';
         $this->follow_up_date = '';
         $this->follow_up_action = '';
         $this->selectedServices = [];
+        $this->selectedHousingServiceIds = [];
         $this->selectedTagIds = [];
         $this->selectedFundCodeIds = [];
+        $this->originallySelectedFundCodeIds = [];
         $this->newTagName = '';
         $this->tagSearch = '';
 
@@ -1978,11 +2725,16 @@ class CommunicationsLogManagement extends Component
 
     public function render()
     {
-        // Eager-load fundCodes alongside the existing relations so the
-        // card view can render fund-code badges per row without N+1.
+        // Eager-load anticipatedFundCodes alongside the existing relations
+        // so the card view can render fund-code badges per row without N+1.
         // Cheap on table view too (typically 0–3 codes per log).
-        $query = CommunicationLog::with(['participant', 'household', 'property', 'contractor', 'createdBy', 'services', 'tags', 'convertedToJob', 'fundCodes'])
-            ->orderBy('communication_date', 'desc');
+        // (Relation renamed in P-39b — addendum D-2 — from the legacy tag pivot.)
+        $query = CommunicationLog::with([
+            'participant', 'household', 'property', 'contractor', 'createdBy',
+            'services', 'tags', 'convertedToJob', 'anticipatedFundCodes',
+            // Phase 12.3: per-row pin state for the current user only.
+            'pinnedByUsers' => fn ($q) => $q->where('users.id', Auth::id()),
+        ])->orderBy('communication_date', 'desc');
 
         if ($this->search) {
             $query->search($this->search);
@@ -2055,7 +2807,7 @@ class CommunicationsLogManagement extends Component
 
         // P-03 (Phase 3B): fund code multi-select.
         if (! empty($this->fundCodeFilter)) {
-            $query->whereHas('fundCodes', fn ($q) => $q->whereIn('fund_codes.id', $this->fundCodeFilter));
+            $query->whereHas('anticipatedFundCodes', fn ($q) => $q->whereIn('fund_codes.id', $this->fundCodeFilter));
         }
 
         if ($this->dateFrom) {
@@ -2168,7 +2920,7 @@ class CommunicationsLogManagement extends Component
                 'updatedBy',
                 'services',
                 'tags',
-                'fundCodes',
+                'anticipatedFundCodes',
                 'updates.createdBy',
                 'convertedToJob',
                 'convertedBy',
@@ -2189,6 +2941,47 @@ class CommunicationsLogManagement extends Component
         // Get active fund codes for selection
         $allFundCodes = FundCode::active()->orderBy('code')->get();
 
+        // v2 project picker: filtered + shaped for x-comm.project-picker.
+        $pickerProjects = HousingJob::query()
+            ->select('id', 'job_number', 'job_title', 'status', 'updated_at')
+            ->when($this->projectPickerSearch !== '', function ($q) {
+                $term = '%'.$this->projectPickerSearch.'%';
+                $q->where(function ($qq) use ($term) {
+                    $qq->where('job_number', 'like', $term)
+                        ->orWhere('job_title', 'like', $term);
+                });
+            })
+            ->whereIn('status', ['pending', 'in_progress', 'on_hold'])
+            ->orderByDesc('updated_at')
+            ->limit(20)
+            ->get()
+            ->map(fn ($j) => [
+                'id' => $j->id,
+                'code' => $j->job_number,
+                'name' => $j->job_title,
+                'meta' => 'Status: '.ucwords(str_replace('_', ' ', $j->status)).' · updated '.$j->updated_at->diffForHumans(),
+            ])
+            ->all();
+
+        // v2 requirements pill / panel: load current intake requirements for the
+        // editing entry (or empty when creating). Phase 10: filter to Phase 1
+        // (eligibility + compliance) — intake-phase. Service-delivery-
+        // compliance items still exist on the row but surface on the project
+        // page after Convert-to-Project.
+        $currentRequirements = $this->editingId
+            ? \App\Models\IntakeRequirement::query()
+                ->where('communication_log_id', $this->editingId)
+                ->where('is_orphaned', false)
+                ->with('definition')
+                ->get()
+                ->filter(fn ($r) => in_array(
+                    $r->definition?->category ?? \App\Models\RequirementDefinition::CATEGORY_ELIGIBILITY,
+                    \App\Models\RequirementDefinition::PHASE_1_CATEGORIES,
+                    true
+                ))
+                ->values()
+            : collect();
+
         return view('livewire.communications-log-management', [
             'logs' => $logs,
             'pendingFollowUps' => $pendingFollowUps,
@@ -2206,6 +2999,9 @@ class CommunicationsLogManagement extends Component
             'viewingLog' => $viewingLog,
             'housingJobs' => $housingJobs,
             'allFundCodes' => $allFundCodes,
+            'pickerProjects' => $pickerProjects,
+            'currentRequirements' => $currentRequirements,
+            'allHousingServices' => \App\Models\HousingService::active()->orderBy('name')->get(),
         ]);
     }
 }
