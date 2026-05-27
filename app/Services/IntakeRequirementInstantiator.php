@@ -349,7 +349,7 @@ class IntakeRequirementInstantiator
      * Idempotent on all three axes — re-running with the same service
      * merges via tags rather than creating dupes. Runs in a transaction.
      *
-     * @return Collection<int, IntakeRequirement>  all instances created or merged
+     * @return Collection<int, IntakeRequirement> all instances created or merged
      */
     public function forHousingService(
         CommunicationLog $log,

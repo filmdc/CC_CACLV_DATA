@@ -12,7 +12,6 @@
 use App\Livewire\CommunicationsLogManagement;
 use App\Models\CommunicationLog;
 use App\Models\HousingJob;
-use App\Models\IntakeRequirement;
 use App\Models\Program;
 use App\Models\RequirementDefinition;
 use App\Services\IntakeRequirementInstantiator;

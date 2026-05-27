@@ -550,6 +550,7 @@ class FundCodeManagement extends Component
         $svc = HousingService::with(['fundCodes', 'requirementDefinitions'])->find($id);
         if (! $svc) {
             $this->editingServiceId = null;
+
             return;
         }
         $this->serviceLinkedFundCodeIds = $svc->fundCodes->pluck('id')->all();
@@ -589,6 +590,7 @@ class FundCodeManagement extends Component
             return array_values(array_filter($intList, fn ($v) => $v !== $id));
         }
         $intList[] = $id;
+
         return $intList;
     }
 

@@ -144,9 +144,9 @@ class FundCode extends Model
 
         return match ($this->expirationIndicator()) {
             'expired' => 'expired',
-            'urgent'  => 'soon',
+            'urgent' => 'soon',
             'warning' => 'warning',
-            default   => 'ok',
+            default => 'ok',
         };
     }
 

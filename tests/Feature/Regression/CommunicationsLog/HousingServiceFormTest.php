@@ -12,7 +12,6 @@ use App\Livewire\CommunicationsLogManagement;
 use App\Models\CommunicationLog;
 use App\Models\FundCode;
 use App\Models\HousingService;
-use App\Models\IntakeRequirement;
 use App\Models\RequirementDefinition;
 use Database\Seeders\RegressionTestSeeder;
 use Livewire\Livewire;

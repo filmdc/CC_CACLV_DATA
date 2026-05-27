@@ -16,9 +16,9 @@ return new class extends Migration
     public function up(): void
     {
         DB::statement(
-            "ALTER TABLE communication_log_updates MODIFY COLUMN update_type "
-            . "ENUM('note','follow_up','status_change','outcome','other','action','email') "
-            . "NOT NULL DEFAULT 'note'"
+            'ALTER TABLE communication_log_updates MODIFY COLUMN update_type '
+            ."ENUM('note','follow_up','status_change','outcome','other','action','email') "
+            ."NOT NULL DEFAULT 'note'"
         );
     }
 
@@ -30,9 +30,9 @@ return new class extends Migration
         DB::table('communication_log_updates')->where('update_type', 'email')->update(['update_type' => 'note']);
 
         DB::statement(
-            "ALTER TABLE communication_log_updates MODIFY COLUMN update_type "
-            . "ENUM('note','follow_up','status_change','outcome','other') "
-            . "NOT NULL DEFAULT 'note'"
+            'ALTER TABLE communication_log_updates MODIFY COLUMN update_type '
+            ."ENUM('note','follow_up','status_change','outcome','other') "
+            ."NOT NULL DEFAULT 'note'"
         );
     }
 };

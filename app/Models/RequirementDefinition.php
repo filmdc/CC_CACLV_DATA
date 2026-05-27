@@ -26,9 +26,13 @@ class RequirementDefinition extends Model
     use HasFactory, SoftDeletes;
 
     public const KIND_DOC = 'doc';
+
     public const KIND_FORM = 'form';
+
     public const KIND_DATA = 'data';
+
     public const KIND_VERIFY = 'verify';
+
     public const KIND_EXTERNAL = 'external';
 
     public const KINDS = [
@@ -43,7 +47,9 @@ class RequirementDefinition extends Model
      * compliance on the Comm Log viewer; Phase 2 surfaces
      * service_delivery_compliance on the project page. */
     public const CATEGORY_ELIGIBILITY = 'eligibility';
+
     public const CATEGORY_COMPLIANCE = 'compliance';
+
     public const CATEGORY_SERVICE_DELIVERY = 'service_delivery_compliance';
 
     public const CATEGORIES = [

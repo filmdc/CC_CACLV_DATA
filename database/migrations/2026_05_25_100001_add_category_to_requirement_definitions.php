@@ -41,7 +41,7 @@ return new class extends Migration
 
         // Widen via raw SQL to a proper ENUM with the canonical 3 values.
         DB::statement(
-            "ALTER TABLE requirement_definitions MODIFY COLUMN category "
+            'ALTER TABLE requirement_definitions MODIFY COLUMN category '
             ."ENUM('eligibility','compliance','service_delivery_compliance') "
             ."NOT NULL DEFAULT 'eligibility'"
         );

@@ -40,8 +40,8 @@ class RequirementTemplateSet extends Model
             'template_set_id',
             'requirement_definition_id'
         )->withPivot('required_override', 'position')
-         ->withTimestamps()
-         ->orderBy('requirement_template_set_items.position');
+            ->withTimestamps()
+            ->orderBy('requirement_template_set_items.position');
     }
 
     public function services(): BelongsToMany

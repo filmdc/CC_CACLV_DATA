@@ -177,12 +177,12 @@ class RequirementsLibraryManagement extends Component
         $this->authorizeAction('requirements_library.manage');
 
         $validated = $this->validate([
-            'atomKey'             => 'required|string|max:80|regex:/^[a-z0-9-]+$/',
-            'atomLabel'           => 'required|string|max:255',
-            'atomKind'            => 'required|in:'.implode(',', RequirementDefinition::KINDS),
-            'atomCategory'        => 'required|in:'.implode(',', RequirementDefinition::CATEGORIES),
+            'atomKey' => 'required|string|max:80|regex:/^[a-z0-9-]+$/',
+            'atomLabel' => 'required|string|max:255',
+            'atomKind' => 'required|in:'.implode(',', RequirementDefinition::KINDS),
+            'atomCategory' => 'required|in:'.implode(',', RequirementDefinition::CATEGORIES),
             'atomDefaultRequired' => 'boolean',
-            'atomHint'            => 'nullable|string|max:1000',
+            'atomHint' => 'nullable|string|max:1000',
         ], [
             'atomKey.regex' => 'Key must be lowercase letters, numbers, and hyphens only (e.g. "photo-id").',
         ]);
@@ -194,16 +194,17 @@ class RequirementsLibraryManagement extends Component
             ->exists();
         if ($dupe) {
             $this->addError('atomKey', 'Another active requirement item already uses this key.');
+
             return;
         }
 
         $payload = [
-            'key'              => $validated['atomKey'],
-            'label'            => $validated['atomLabel'],
-            'kind'             => $validated['atomKind'],
-            'category'         => $validated['atomCategory'],
+            'key' => $validated['atomKey'],
+            'label' => $validated['atomLabel'],
+            'kind' => $validated['atomKind'],
+            'category' => $validated['atomCategory'],
             'default_required' => $validated['atomDefaultRequired'],
-            'hint'             => $validated['atomHint'] !== '' ? $validated['atomHint'] : null,
+            'hint' => $validated['atomHint'] !== '' ? $validated['atomHint'] : null,
             'updated_by_user_id' => Auth::id(),
         ];
 
@@ -623,6 +624,7 @@ class RequirementsLibraryManagement extends Component
             return array_values(array_filter($intList, fn ($v) => $v !== $id));
         }
         $intList[] = $id;
+
         return $intList;
     }
 
@@ -645,7 +647,7 @@ class RequirementsLibraryManagement extends Component
             ->when($this->showTrashed, fn ($q) => $q->withTrashed())
             ->when($this->search !== '', fn ($q) => $q->where(function ($q) {
                 $q->where('label', 'like', "%{$this->search}%")
-                  ->orWhere('key', 'like', "%{$this->search}%");
+                    ->orWhere('key', 'like', "%{$this->search}%");
             }))
             ->when($this->kindFilter, fn ($q) => $q->where('kind', $this->kindFilter))
             ->when($this->categoryFilter, fn ($q) => $q->where('category', $this->categoryFilter))
@@ -673,7 +675,7 @@ class RequirementsLibraryManagement extends Component
                     ->whereNotIn('id', $usedAtomIds)
                     ->when($this->itemPickerSearch !== '', fn ($q) => $q->where(function ($q) {
                         $q->where('label', 'like', "%{$this->itemPickerSearch}%")
-                          ->orWhere('key', 'like', "%{$this->itemPickerSearch}%");
+                            ->orWhere('key', 'like', "%{$this->itemPickerSearch}%");
                     }))
                     ->orderBy('label')
                     ->limit(20)

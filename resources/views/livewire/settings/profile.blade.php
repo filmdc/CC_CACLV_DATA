@@ -6,8 +6,10 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Livewire\Volt\Component;
 
-new class extends Component {
+new class extends Component
+{
     public string $name = '';
+
     public string $email = '';
 
     /**
@@ -42,7 +44,7 @@ new class extends Component {
                 'lowercase',
                 'email',
                 'max:255',
-                Rule::unique(User::class)->ignore($user->id)
+                Rule::unique(User::class)->ignore($user->id),
             ],
 
             // Phase 12.8: empty string = no preference (null in DB).

@@ -91,6 +91,7 @@ return new class extends Migration
     private function slugify(string $label, int $fallbackId): string
     {
         $slug = Str::slug($label, '-');
+
         return $slug !== '' ? $slug : 'legacy-req-'.$fallbackId;
     }
 

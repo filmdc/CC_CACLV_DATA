@@ -57,9 +57,9 @@ return new class extends Migration
         // ── 2. Widen status enum ───────────────────────────────────
         // Step 2a: add the 6 new values alongside the existing 3.
         DB::statement(
-            "ALTER TABLE intake_requirements MODIFY COLUMN status "
-            . "ENUM('outstanding','pending','requested','received','waived','na','blocked') "
-            . "NOT NULL DEFAULT 'outstanding'"
+            'ALTER TABLE intake_requirements MODIFY COLUMN status '
+            ."ENUM('outstanding','pending','requested','received','waived','na','blocked') "
+            ."NOT NULL DEFAULT 'outstanding'"
         );
 
         // Step 2b: backfill — every existing 'outstanding' becomes 'pending'.
@@ -69,15 +69,15 @@ return new class extends Migration
 
         // Step 2c: drop the legacy 'outstanding' value; change default.
         DB::statement(
-            "ALTER TABLE intake_requirements MODIFY COLUMN status "
-            . "ENUM('pending','requested','received','waived','na','blocked') "
-            . "NOT NULL DEFAULT 'pending'"
+            'ALTER TABLE intake_requirements MODIFY COLUMN status '
+            ."ENUM('pending','requested','received','waived','na','blocked') "
+            ."NOT NULL DEFAULT 'pending'"
         );
 
         // ── 3. Widen source_type enum ──────────────────────────────
         DB::statement(
-            "ALTER TABLE intake_requirements MODIFY COLUMN source_type "
-            . "ENUM('baseline','fund_code','ad_hoc','template_set','definition') NOT NULL"
+            'ALTER TABLE intake_requirements MODIFY COLUMN source_type '
+            ."ENUM('baseline','fund_code','ad_hoc','template_set','definition') NOT NULL"
         );
 
         // ── 4. Add an index for the new dedupe-by-key lookup ───────
@@ -97,23 +97,23 @@ return new class extends Migration
 
         // Reverse source_type widening.
         DB::statement(
-            "ALTER TABLE intake_requirements MODIFY COLUMN source_type "
-            . "ENUM('baseline','fund_code','ad_hoc') NOT NULL"
+            'ALTER TABLE intake_requirements MODIFY COLUMN source_type '
+            ."ENUM('baseline','fund_code','ad_hoc') NOT NULL"
         );
 
         // Reverse status widening: back to outstanding/received/waived.
         DB::statement(
-            "ALTER TABLE intake_requirements MODIFY COLUMN status "
-            . "ENUM('outstanding','pending','requested','received','waived','na','blocked') "
-            . "NOT NULL DEFAULT 'outstanding'"
+            'ALTER TABLE intake_requirements MODIFY COLUMN status '
+            ."ENUM('outstanding','pending','requested','received','waived','na','blocked') "
+            ."NOT NULL DEFAULT 'outstanding'"
         );
         DB::table('intake_requirements')
             ->whereIn('status', ['pending', 'requested', 'na', 'blocked'])
             ->update(['status' => 'outstanding']);
         DB::statement(
-            "ALTER TABLE intake_requirements MODIFY COLUMN status "
-            . "ENUM('outstanding','received','waived') "
-            . "NOT NULL DEFAULT 'outstanding'"
+            'ALTER TABLE intake_requirements MODIFY COLUMN status '
+            ."ENUM('outstanding','received','waived') "
+            ."NOT NULL DEFAULT 'outstanding'"
         );
 
         Schema::table('intake_requirements', function (Blueprint $table) {
