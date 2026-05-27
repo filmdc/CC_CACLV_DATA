@@ -1210,6 +1210,15 @@
                                         class="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 text-sm">
                                     Convert to Project
                                 </button>
+                            @elseif(!$gate['hasRequirements'])
+                                <button type="button" disabled
+                                        title="Nothing to convert yet. Select a county (to pull in its fund codes and requirements) or add an ad-hoc requirement first."
+                                        class="px-4 py-2 bg-gray-300 dark:bg-zinc-600 text-gray-500 dark:text-gray-400 rounded-md text-sm cursor-not-allowed">
+                                    Convert to Project
+                                </button>
+                                <span class="text-xs text-amber-700 dark:text-amber-400">
+                                    Select a county or add a requirement first
+                                </span>
                             @else
                                 <button type="button" disabled
                                         title="{{ $gate['unmet'] }} eligibility/compliance requirement(s) still unmet. Mark them received, waived, or N/A first."
@@ -1269,6 +1278,15 @@
                         Review Potential Matches
                     @endif
                 </h3>
+
+                {{-- In-modal error banner: the page-level flash (top of page)
+                     sits behind this overlay, so surface conversion failures
+                     here where the user can actually see them. --}}
+                @if (session()->has('error'))
+                    <div class="mb-4 p-3 rounded-md bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500">
+                        <p class="text-sm font-medium text-red-800 dark:text-red-200">{{ session('error') }}</p>
+                    </div>
+                @endif
 
                 <!-- Step 1: Basic Info -->
                 @if($convertStep === 1)
@@ -1342,41 +1360,39 @@
                                   class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md"></textarea>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Program</label>
-                        @if($housingPrograms->count() === 1)
-                            {{-- Only one housing program - show as read-only --}}
-                            <div class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700/50 dark:text-white rounded-md bg-gray-50">
-                                {{ $housingPrograms->first()->name }}
-                            </div>
-                        @elseif($housingPrograms->count() > 1)
-                            {{-- Multiple housing programs - show dropdown --}}
-                            <select wire:model.live="convertProgramId"
-                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                                @foreach($housingPrograms as $program)
-                                    <option value="{{ $program->id }}">{{ $program->name }}</option>
-                                @endforeach
-                            </select>
-                        @else
-                            <div class="w-full px-3 py-2 border border-red-300 dark:border-red-600 rounded-md bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 text-sm">
-                                No housing-enabled programs available. Please enable housing module on a program first.
-                            </div>
-                        @endif
-                        @error('convertProgramId') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
-                    </div>
+                    {{-- Convert-to-Project no longer uses the legacy Program/Service
+                         tie-in. The project's scope carries over from intake: the
+                         selected counties, their fund codes (for the budget tab),
+                         and the Phase 2 requirements those fund codes instantiate. --}}
+                    @php
+                        $carryCounties = $convertingLog?->housingServices()->get() ?? collect();
+                        $carryFundCodes = $convertingLog?->anticipatedFundCodes()->get() ?? collect();
+                    @endphp
+                    <div class="rounded-md border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20 p-3 space-y-2">
+                        <p class="text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">Carries over to the project</p>
 
-                    @if($convertProgramId)
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Service (Optional)</label>
-                        <select wire:model="convertServiceId"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                            <option value="">Select a service...</option>
-                            @foreach($housingPrograms->firstWhere('id', $convertProgramId)?->services ?? [] as $service)
-                                <option value="{{ $service->id }}">{{ $service->name }}</option>
-                            @endforeach
-                        </select>
+                        <div>
+                            <span class="text-xs font-medium text-gray-600 dark:text-gray-300">Counties:</span>
+                            @if($carryCounties->isNotEmpty())
+                                <span class="text-sm text-gray-800 dark:text-gray-100">{{ $carryCounties->pluck('name')->join(', ') }}</span>
+                            @else
+                                <span class="text-sm text-gray-400 italic">none selected</span>
+                            @endif
+                        </div>
+
+                        <div>
+                            <span class="text-xs font-medium text-gray-600 dark:text-gray-300">Fund codes:</span>
+                            @if($carryFundCodes->isNotEmpty())
+                                <span class="text-sm text-gray-800 dark:text-gray-100">{{ $carryFundCodes->pluck('code')->join(', ') }}</span>
+                            @else
+                                <span class="text-sm text-gray-400 italic">none anticipated</span>
+                            @endif
+                        </div>
+
+                        <p class="text-[11px] text-emerald-700/80 dark:text-emerald-300/80">
+                            Phase 2 (service-delivery) requirements for these fund codes will be created on the project. Phase 1 application requirements stay on this log as the intake record.
+                        </p>
                     </div>
-                    @endif
                 </div>
 
                 <div class="mt-6 flex justify-end space-x-3">
@@ -1386,7 +1402,6 @@
                     </button>
                     <button wire:click="checkForDuplicates"
                             wire:loading.attr="disabled"
-                            {{ $housingPrograms->isEmpty() ? 'disabled' : '' }}
                             class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed">
                         <span wire:loading.remove wire:target="checkForDuplicates">Continue</span>
                         <span wire:loading wire:target="checkForDuplicates">Checking...</span>

@@ -86,15 +86,33 @@ it('allows conversion with override + reason and records the audit on housing_jo
     expect($job->requirement_overridden_at)->not->toBeNull();
 })->group('regression');
 
-it('allows conversion with no requirements (clean intake) and no override audit', function () {
+it('blocks conversion when the log has no requirements (county-derived or ad-hoc)', function () {
+    // A project is born from the county → fund codes → requirements chain.
+    // A log with nothing to track must not be convertible (the disabled
+    // button enforces this in the UI; this is the server-side guard).
     $log = CommunicationLog::where('subject', 'like', 'CL-1:%')->firstOrFail();
-    $program = Program::where('name', 'Fixture Housing Program')->firstOrFail();
+    expect($log->intakeRequirements()->where('is_orphaned', false)->exists())->toBeFalse();
 
     Livewire::actingAs($this->user)
         ->test(CommunicationsLogManagement::class)
         ->call('openConvertModal', $log->id)
-        ->set('convertJobTitle', 'Clean convert')
-        ->set('convertProgramId', $program->id)
+        ->set('convertJobTitle', 'No requirements')
+        ->call('convertToProject');
+
+    expect($log->fresh()->converted_to_job_id)->toBeNull();
+})->group('regression');
+
+it('allows conversion once a requirement exists and no override is needed', function () {
+    $log = CommunicationLog::where('subject', 'like', 'CL-1:%')->firstOrFail();
+
+    // A single met requirement satisfies both gates: presence + Phase 1.
+    $atom = RequirementDefinition::factory()->create(['key' => 'photo-id', 'default_required' => true]);
+    $this->service->forDefinition($log, $atom, $this->user)->markReceived($this->user);
+
+    Livewire::actingAs($this->user)
+        ->test(CommunicationsLogManagement::class)
+        ->call('openConvertModal', $log->id)
+        ->set('convertJobTitle', 'Has a requirement')
         ->call('convertToProject')
         ->assertHasNoErrors();
 

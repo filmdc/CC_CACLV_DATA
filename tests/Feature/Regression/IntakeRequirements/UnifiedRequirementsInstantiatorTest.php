@@ -285,7 +285,10 @@ it('carryForwardToProject records the override audit on the housing job when giv
         'Client returning next week with paperwork — promoting now so the case stays in the queue.'
     );
 
-    expect($count)->toBe(1);
+    // New contract: return is the number of Phase 2 project requirements
+    // created. No fund codes are attached here, so none are instantiated.
+    // (Phase 2 instantiation is covered by ConvertCarryForwardTest.)
+    expect($count)->toBe(0);
 
     $job = $job->fresh();
     expect($job->requirement_override_reason)->toContain('Client returning');
@@ -301,7 +304,9 @@ it('carryForwardToProject without override reason leaves the audit columns null'
     $job = HousingJob::factory()->create();
     $count = $this->service->carryForwardToProject($log, $job, $this->actor);
 
-    expect($count)->toBe(1);
+    // New contract: return is Phase 2 project requirements created (none
+    // here — no fund codes attached). The audit columns stay null.
+    expect($count)->toBe(0);
     expect($job->fresh()->requirement_override_reason)->toBeNull();
     expect($job->fresh()->requirement_override_by_user_id)->toBeNull();
 })->group('regression');

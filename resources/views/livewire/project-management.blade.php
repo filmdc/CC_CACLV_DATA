@@ -123,6 +123,24 @@
             </div>
         </div>
 
+        <!-- Counties carried from the originating comm log at conversion.
+             Informational: the same county selection drove the fund codes
+             and Phase 2 requirements below. -->
+        @if($job->housingServices->isNotEmpty())
+            <div class="bg-sky-50 dark:bg-sky-900/10 border-b border-sky-200 dark:border-sky-900/30 px-6 py-3">
+                <div class="flex items-center gap-3 flex-wrap">
+                    <h3 class="text-sm font-semibold text-sky-900 dark:text-sky-200 uppercase tracking-wide">
+                        County
+                    </h3>
+                    @foreach($job->housingServices as $county)
+                        <span class="inline-flex items-center px-3 py-1 bg-white dark:bg-zinc-800 border border-sky-300 dark:border-sky-700 rounded-md text-sm text-gray-900 dark:text-white">
+                            {{ $county->name }}
+                        </span>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
         <!-- P-08: Fund Code assignment — visible above tabs so the manager
              can see + manage funding without clicking into a tab. -->
         <div class="bg-emerald-50 dark:bg-emerald-900/10 border-b border-emerald-200 dark:border-emerald-900/30 px-6 py-4">
