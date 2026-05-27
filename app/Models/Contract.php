@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Contracts\HasMediaAuthorization;
 use App\Traits\Auditable;
 use App\Traits\HasLegacySyncScopes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,9 +16,17 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class Contract extends Model implements HasMedia
+class Contract extends Model implements HasMedia, HasMediaAuthorization
 {
     use Auditable, HasFactory, HasLegacySyncScopes, InteractsWithMedia, SoftDeletes;
+
+    /**
+     * P-39a: matches ContractShow page-level gate (contracts.view).
+     */
+    public function canViewMedia(User $user, Media $media): bool
+    {
+        return $user->hasPermission('contracts.view');
+    }
 
     protected $fillable = [
         'title',

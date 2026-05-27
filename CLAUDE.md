@@ -152,6 +152,14 @@ php artisan contract:send-reminders --test-mode --test-email=test@example.com  #
   Volt::route('/settings/profile', 'settings.profile');
   ```
 
+#### 5. Media authorization (P-39a)
+
+Spatie media downloads route through `App\Http\Controllers\MediaController` (`GET /media/{media}/preview`, `/media/{media}/download`). Every `Media` row's parent — `$media->model` — must answer "can this user view this file?" via the `App\Contracts\HasMediaAuthorization` contract.
+
+Any model that implements `Spatie\MediaLibrary\HasMedia` MUST also implement `HasMediaAuthorization`. The single seam is `canViewMedia(User $user, Media $media): bool`. Admin short-circuit and orphaned-parent default-deny are handled in `MediaPolicy::view`; the method body should encode the per-record rule only — typically a permission check (`$user->hasPermission('xxx.yyy')`) matching whatever gate the parent's UI uses. Models without per-record concepts (e.g., `Requirement`, `Contract`) check a single permission; models with an owner column (`Feedback.user_id`, `ApprovalSubmission.submitted_by`) accept either ownership or the relevant permission.
+
+Models that forget to implement the contract default-deny silently — that is intentional fail-closed posture. A regression test in `tests/Feature/Regression/Media/MediaAuthorizationRuleTest.php` scans `app/Models` and fails if any `HasMedia` model is missing the contract.
+
 ### Livewire Component Standards
 
 All management components follow this pattern:

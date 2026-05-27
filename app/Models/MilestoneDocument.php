@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Services\MediaValidationService;
+use App\Contracts\HasMediaAuthorization;
 use App\Traits\HasStandardMediaCollections;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,9 +13,17 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class MilestoneDocument extends Model implements HasMedia
+class MilestoneDocument extends Model implements HasMedia, HasMediaAuthorization
 {
-    use InteractsWithMedia, HasStandardMediaCollections;
+    use HasStandardMediaCollections, InteractsWithMedia;
+
+    /**
+     * P-39a: matches ProjectManagement page-level gate (projects.view).
+     */
+    public function canViewMedia(User $user, Media $media): bool
+    {
+        return $user->hasPermission('projects.view');
+    }
 
     protected $fillable = [
         'milestone_id',
@@ -160,6 +168,7 @@ class MilestoneDocument extends Model implements HasMedia
         }
 
         $this->uploaded_date = now();
+
         return $this->save();
     }
 
@@ -169,6 +178,7 @@ class MilestoneDocument extends Model implements HasMedia
         $this->approved_by = $user->id;
         $this->approved_at = now();
         $this->reviewed_date = now();
+
         return $this->save();
     }
 
@@ -177,6 +187,7 @@ class MilestoneDocument extends Model implements HasMedia
         $this->status = 'rejected';
         $this->rejection_reason = $reason;
         $this->reviewed_date = now();
+
         return $this->save();
     }
 

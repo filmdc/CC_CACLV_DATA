@@ -2,15 +2,31 @@
 
 namespace App\Models;
 
+use App\Contracts\HasMediaAuthorization;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class Feedback extends Model implements HasMedia
+class Feedback extends Model implements HasMedia, HasMediaAuthorization
 {
     use InteractsWithMedia;
+
+    /**
+     * P-39a: submitter sees own; managers gated by feedback.view_all
+     * or feedback.manage (see FeedbackManagement:61).
+     */
+    public function canViewMedia(User $user, Media $media): bool
+    {
+        if ($this->user_id === $user->id) {
+            return true;
+        }
+
+        return $user->hasPermission('feedback.view_all')
+            || $user->hasPermission('feedback.manage');
+    }
 
     protected $table = 'feedbacks';
 
