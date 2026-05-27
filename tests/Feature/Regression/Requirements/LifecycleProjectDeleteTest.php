@@ -1,13 +1,13 @@
 <?php
 
 use App\Models\FundCode;
-use App\Models\FundCodeRequirement;
 use App\Models\HousingJob;
 use App\Models\ProjectMilestone;
 use App\Models\Requirement;
 use App\Models\User;
 use App\Services\RequirementInstantiator;
 use Database\Seeders\RegressionTestSeeder;
+use Tests\Support\RegressionHelpers;
 
 beforeEach(function () {
     $this->seed(RegressionTestSeeder::class);
@@ -20,7 +20,7 @@ it('cascades requirement rows when the housing_jobs row is deleted (FK constrain
 
     // Cover all three sources so we know the FK doesn't discriminate.
     $code = FundCode::factory()->create();
-    FundCodeRequirement::factory()->create(['fund_code_id' => $code->id]);
+    RegressionHelpers::linkProjectRequirements($code, 1);
     $job->fundCodes()->attach($code->id);
     app(RequirementInstantiator::class)->forFundCode($job->fresh(), $code, $manager);
 

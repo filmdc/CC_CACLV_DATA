@@ -2,7 +2,6 @@
 
 use App\Livewire\ProjectManagement;
 use App\Models\FundCode;
-use App\Models\FundCodeRequirement;
 use App\Models\HousingJob;
 use App\Models\ProjectBudget;
 use App\Models\Requirement;
@@ -35,7 +34,7 @@ it('opens the keep/delete modal when there are fund-code-source requirements', f
     $manager = User::factory()->create();
     $job = HousingJob::factory()->create(['project_manager_id' => $manager->id]);
     $code = FundCode::factory()->create();
-    FundCodeRequirement::factory()->count(2)->create(['fund_code_id' => $code->id]);
+    RegressionHelpers::linkProjectRequirements($code, 2);
     $job->fundCodes()->attach($code->id);
     app(RequirementInstantiator::class)->forFundCode($job->fresh(), $code, $manager);
 
@@ -56,7 +55,7 @@ it('keep branch: detaches the pivot but preserves the requirement rows for audit
     $manager = User::factory()->create();
     $job = HousingJob::factory()->create(['project_manager_id' => $manager->id]);
     $code = FundCode::factory()->create();
-    FundCodeRequirement::factory()->count(2)->create(['fund_code_id' => $code->id]);
+    RegressionHelpers::linkProjectRequirements($code, 2);
     $job->fundCodes()->attach($code->id);
     app(RequirementInstantiator::class)->forFundCode($job->fresh(), $code, $manager);
 
@@ -76,7 +75,7 @@ it('delete branch: detaches the pivot and cascades the requirement rows', functi
     $manager = User::factory()->create();
     $job = HousingJob::factory()->create(['project_manager_id' => $manager->id]);
     $code = FundCode::factory()->create();
-    FundCodeRequirement::factory()->count(3)->create(['fund_code_id' => $code->id]);
+    RegressionHelpers::linkProjectRequirements($code, 3);
     $job->fundCodes()->attach($code->id);
     app(RequirementInstantiator::class)->forFundCode($job->fresh(), $code, $manager);
 
@@ -94,7 +93,7 @@ it('Phase 2.5 budget guard still blocks detach before reaching the requirements 
     $manager = User::factory()->create();
     $job = HousingJob::factory()->create(['project_manager_id' => $manager->id]);
     $code = FundCode::factory()->create();
-    FundCodeRequirement::factory()->create(['fund_code_id' => $code->id]);
+    RegressionHelpers::linkProjectRequirements($code, 1);
     $job->fundCodes()->attach($code->id);
     app(RequirementInstantiator::class)->forFundCode($job->fresh(), $code, $manager);
 
@@ -127,7 +126,7 @@ it('does not surface other projects\' fund-code requirements when counting for t
     $jobA = HousingJob::factory()->create(['project_manager_id' => $manager->id]);
     $jobB = HousingJob::factory()->create(['project_manager_id' => $manager->id]);
     $code = FundCode::factory()->create();
-    FundCodeRequirement::factory()->count(2)->create(['fund_code_id' => $code->id]);
+    RegressionHelpers::linkProjectRequirements($code, 2);
 
     $jobA->fundCodes()->attach($code->id);
     $jobB->fundCodes()->attach($code->id);

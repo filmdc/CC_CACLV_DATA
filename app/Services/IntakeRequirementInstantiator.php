@@ -95,8 +95,16 @@ class IntakeRequirementInstantiator
         // by migration 2026_05_25_140001 — they're now picked up by
         // the loop below. Stamping both paths would double-create
         // IntakeRequirement rows.
+        //
+        // Phase separation: intake stamps only PHASE_1 atoms
+        // (eligibility + compliance). PHASE_2 atoms
+        // (service_delivery_compliance) linked to the same fund code are
+        // project-execution-only and flow through RequirementInstantiator.
+        $atoms = $fundCode->requirementDefinitions()
+            ->whereIn('category', RequirementDefinition::PHASE_1_CATEGORIES)
+            ->get();
 
-        foreach ($fundCode->requirementDefinitions()->get() as $atom) {
+        foreach ($atoms as $atom) {
             $existing = IntakeRequirement::query()
                 ->where('communication_log_id', $log->id)
                 ->where('key', $atom->key)

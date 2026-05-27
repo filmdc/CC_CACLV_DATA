@@ -6,6 +6,7 @@ use App\Models\FundCode;
 use App\Models\HousingJob;
 use App\Models\ProjectMilestone;
 use App\Models\Requirement;
+use App\Models\RequirementDefinition;
 use App\Models\User;
 use App\Notifications\RequirementAssignedNotification;
 use Illuminate\Support\Collection;
@@ -24,9 +25,17 @@ use Illuminate\Support\Collection;
 class RequirementInstantiator
 {
     /**
-     * For every FundCodeRequirement template on the fund code, create
-     * one Requirement on the project. Idempotent: skips templates that
-     * already have a corresponding row on this project.
+     * For every project-phase RequirementDefinition linked to the fund
+     * code, create one Requirement on the project. Idempotent: skips
+     * definitions that already have a corresponding row on this project.
+     *
+     * Comm Log v2: requirements now flow from the unified library
+     * (requirement_definitions, via the fund_code_requirement_definitions
+     * pivot) rather than the legacy fund_code_requirements table. The
+     * project phase draws only the PHASE_2 categories
+     * (service_delivery_compliance); PHASE_1 categories are intake-only
+     * and flow through IntakeRequirementInstantiator. source_template_id
+     * holds the RequirementDefinition id.
      *
      * Owner defaults to the project's project_manager_id. The actor is
      * the user who triggered instantiation (e.g., the admin attaching
@@ -45,22 +54,26 @@ class RequirementInstantiator
 
         $created = collect();
 
-        // P-39b (addendum D-1): project-execution requirements draw only
-        // from project-phase templates. Eligibility-phase templates are
-        // intake-only and flow through IntakeRequirementInstantiator.
-        foreach ($fundCode->requirements()->where('phase', 'project')->ordered()->get() as $template) {
-            if (in_array($template->id, $existingTemplateIds, true)) {
+        $atoms = $fundCode->requirementDefinitions()
+            ->whereIn('category', RequirementDefinition::PHASE_2_CATEGORIES)
+            ->orderBy('requirement_definitions.id')
+            ->get();
+
+        foreach ($atoms as $atom) {
+            if (in_array($atom->id, $existingTemplateIds, true)) {
                 continue;
             }
 
             $req = $this->insert($job, [
-                'type' => $template->type ?? Requirement::TYPE_TASK,
-                'title' => $template->label,
-                'description' => $template->description,
+                'type' => $atom->kind === RequirementDefinition::KIND_DOC
+                    ? Requirement::TYPE_DOCUMENT
+                    : Requirement::TYPE_TASK,
+                'title' => $atom->label,
+                'description' => $atom->hint,
                 'source_type' => Requirement::SOURCE_FUND_CODE,
                 'source_id' => $fundCode->id,
-                'source_template_id' => $template->id,
-                'source_label_snapshot' => $template->label,
+                'source_template_id' => $atom->id,
+                'source_label_snapshot' => $atom->label,
                 'owner_user_id' => $job->project_manager_id,
             ], $actor);
 

@@ -23,7 +23,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * type=task is closed with a click + optional note.
  *
  * source_type points at one of: project_milestones (source_id), fund_codes
- * (source_id, with source_template_id = fund_code_requirements.id), or
+ * (source_id, with source_template_id = requirement_definitions.id), or
  * 'ad_hoc' with both nulled. No FK on source_id because it is a typed
  * polymorphic pointer; lifecycle prompts handle cleanup explicitly.
  */
@@ -122,13 +122,13 @@ class Requirement extends Model implements HasMedia
         };
     }
 
-    public function sourceTemplate(): ?FundCodeRequirement
+    public function sourceTemplate(): ?RequirementDefinition
     {
         if ($this->source_type !== self::SOURCE_FUND_CODE || $this->source_template_id === null) {
             return null;
         }
 
-        return FundCodeRequirement::find($this->source_template_id);
+        return RequirementDefinition::withTrashed()->find($this->source_template_id);
     }
 
     // State helpers
