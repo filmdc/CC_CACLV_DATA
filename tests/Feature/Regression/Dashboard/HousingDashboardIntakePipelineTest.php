@@ -130,6 +130,7 @@ it('housing dashboard view renders the intake-pipeline card when pipeline is non
 
     Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
+        ->call('setSection', 'intakes')
         ->assertSee('Closest to convert')
         ->assertSee('Maria Lopez');
 })->group('regression');
@@ -141,6 +142,7 @@ it('housing dashboard view omits the card entirely when pipeline + oldest are em
 
     Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
+        ->call('setSection', 'intakes')
         ->assertDontSee('Closest to convert')
         ->assertDontSee('Oldest open intakes');
 })->group('regression');
@@ -253,6 +255,7 @@ it('dashboard renders the pinned-card row when the user has pins', function () {
 
     Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
+        ->call('setSection', 'intakes')
         ->assertSee('Pinned')
         ->assertSee('Sandra Doe');
 })->group('regression');
@@ -269,6 +272,7 @@ it('dashboard renders the oldest-open card when there are open intake comm logs'
 
     Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
+        ->call('setSection', 'intakes')
         ->assertSee('Oldest open intakes')
         ->assertSee('Stale Case');
 })->group('regression');

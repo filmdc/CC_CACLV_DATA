@@ -158,6 +158,7 @@ it('matches the committed snapshot for Cut A — per-project view with combined 
 
     $html = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
+        ->call('setSection', 'projects')
         ->html();
 
     SnapshotHelper::assertHtmlMatchesSnapshot('housing_dashboard_cut_a', $html);
@@ -168,7 +169,8 @@ it('matches the committed snapshot for Cut B — per-requirement view with sort-
 
     $html = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
-        ->call('setTab', 'requirements')
+        ->call('setSection', 'projects')
+        ->call('setView', 'requirements')
         ->html();
 
     SnapshotHelper::assertHtmlMatchesSnapshot('housing_dashboard_cut_b', $html);

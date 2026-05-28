@@ -20,6 +20,7 @@ beforeEach(function () {
 it('matches the committed HTML snapshot for HJ-2 milestone display', function () {
     $html = Livewire::actingAs($this->user)
         ->test(ProjectManagement::class, ['id' => $this->job->id])
+        ->set('activeTab', 'milestones')
         ->html();
 
     SnapshotHelper::assertHtmlMatchesSnapshot('milestone_display', $html);

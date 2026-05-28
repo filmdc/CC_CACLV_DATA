@@ -33,6 +33,7 @@ class ProjectBudget extends Model
         'housing_job_id',
         'contract_id',
         'fund_code_id',
+        'milestone_id',
         'category',
         'budgeted_amount',
         'spent_amount',
@@ -101,6 +102,16 @@ class ProjectBudget extends Model
     public function fundCode(): BelongsTo
     {
         return $this->belongsTo(FundCode::class);
+    }
+
+    /**
+     * Milestone revamp: the milestone this budget item is assigned to,
+     * if any. Null = unassigned, shown in the requirements tab's
+     * "Unassigned" section.
+     */
+    public function milestone(): BelongsTo
+    {
+        return $this->belongsTo(ProjectMilestone::class, 'milestone_id');
     }
 
     public function expenses(): HasMany

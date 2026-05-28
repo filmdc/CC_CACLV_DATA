@@ -87,7 +87,8 @@ it('Cut B render runs in a bounded query count with 10 requirements', function (
 
     Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
-        ->call('setTab', 'requirements')
+        ->call('setSection', 'projects')
+        ->call('setView', 'requirements')
         ->html();
 
     $queries = count(DB::getQueryLog());
@@ -104,7 +105,8 @@ it('Cut B render runs in the SAME bounded query count with 100 requirements', fu
 
     Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
-        ->call('setTab', 'requirements')
+        ->call('setSection', 'projects')
+        ->call('setView', 'requirements')
         ->html();
 
     $queries = count(DB::getQueryLog());
@@ -125,6 +127,7 @@ it('Cut A render also runs bounded with 100 requirements across many projects', 
 
     Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
+        ->call('setSection', 'projects')
         ->html();
 
     $queries = count(DB::getQueryLog());

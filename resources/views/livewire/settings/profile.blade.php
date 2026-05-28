@@ -19,6 +19,13 @@ new class extends Component
     public string $comm_log_default_view = '';
 
     /**
+     * Dashboard split: per-user default sub-view for the Housing
+     * Dashboard. '' = no preference (overview); 'requirements' = land on
+     * the per-requirement list on whichever tab is active.
+     */
+    public string $housing_dashboard_default_view = '';
+
+    /**
      * Mount the component.
      */
     public function mount(): void
@@ -26,6 +33,7 @@ new class extends Component
         $this->name = Auth::user()->name;
         $this->email = Auth::user()->email;
         $this->comm_log_default_view = Auth::user()->comm_log_default_view ?? '';
+        $this->housing_dashboard_default_view = Auth::user()->housing_dashboard_default_view ?? '';
     }
 
     /**
@@ -49,12 +57,16 @@ new class extends Component
 
             // Phase 12.8: empty string = no preference (null in DB).
             'comm_log_default_view' => ['nullable', 'in:,table,card'],
+
+            // Dashboard split: empty = no preference (overview).
+            'housing_dashboard_default_view' => ['nullable', 'in:,overview,requirements'],
         ]);
 
         $user->fill([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'comm_log_default_view' => $validated['comm_log_default_view'] !== '' ? $validated['comm_log_default_view'] : null,
+            'housing_dashboard_default_view' => $validated['housing_dashboard_default_view'] !== '' ? $validated['housing_dashboard_default_view'] : null,
         ]);
 
         if ($user->isDirty('email')) {
@@ -129,6 +141,23 @@ new class extends Component
                     {{ __('A ?viewMode= URL parameter overrides this for shared links.') }}
                 </p>
                 @error('comm_log_default_view') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+            </div>
+
+            {{-- Dashboard split: per-user default sub-view for the Housing Dashboard. --}}
+            <div>
+                <label for="housing_dashboard_default_view" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {{ __('Housing Dashboard default view') }}
+                </label>
+                <select wire:model="housing_dashboard_default_view" id="housing_dashboard_default_view"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:border-indigo-500 focus:ring-indigo-500">
+                    <option value="">{{ __('No preference (Overview)') }}</option>
+                    <option value="overview">{{ __('Overview — cards / per-project rollups') }}</option>
+                    <option value="requirements">{{ __('Requirements — flat per-requirement list') }}</option>
+                </select>
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    {{ __('Applies to whichever tab (Intakes or Projects) you open.') }}
+                </p>
+                @error('housing_dashboard_default_view') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
             </div>
 
             <div class="flex items-center gap-4">

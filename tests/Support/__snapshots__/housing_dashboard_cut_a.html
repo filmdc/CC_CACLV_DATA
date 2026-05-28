@@ -1,78 +1,49 @@
-<div wire:snapshot="" wire:effects="" wire:id="" class="max-w-7xl mx-auto p-6">
+<div wire:id="" class="max-w-7xl mx-auto p-6">
 <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl p-6">
-<div class="flex items-center justify-between mb-6">
+<div class="flex items-center justify-between mb-2 flex-wrap gap-3">
 <div>
 <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Housing Dashboard</h1>
-<p class="text-sm text-gray-600 dark:text-gray-400">Outstanding requirements across your projects.</p>
+<p class="text-sm text-gray-600 dark:text-gray-400">
+Outstanding requirements across your projects.
+</p>
 </div>
 <a href="__APP_URL__/communications-log"
 class="text-sm text-indigo-600 dark:text-indigo-300 hover:underline mr-4">
 Open Communications Log →
 </a>
-<div class="inline-flex rounded-md border border-gray-300 dark:border-zinc-600 overflow-hidden" data-test="dashboard-tab-toggle">
-<button wire:click="setTab('projects')"
+<div class="inline-flex rounded-md border border-gray-300 dark:border-zinc-600 overflow-hidden" data-test="dashboard-section-toggle">
+<button wire:click="setSection('intakes')"
+class="px-4 py-2 text-sm bg-white dark:bg-zinc-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50">
+Intakes
+</button>
+<button wire:click="setSection('projects')"
 class="px-4 py-2 text-sm bg-indigo-600 text-white">
+Projects
+</button>
+</div>
+</div>
+<div class="flex items-center justify-end mb-6">
+<div class="inline-flex rounded-md border border-gray-300 dark:border-zinc-600 overflow-hidden text-xs" data-test="dashboard-view-toggle">
+<button wire:click="setView('overview')"
+class="px-3 py-1.5 bg-gray-700 text-white dark:bg-zinc-200 dark:text-zinc-900">
 Per project
 </button>
-<button wire:click="setTab('requirements')"
-class="px-4 py-2 text-sm bg-white dark:bg-zinc-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50">
+<button wire:click="setView('requirements')"
+class="px-3 py-1.5 bg-white dark:bg-zinc-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50">
 Per requirement
 </button>
 </div>
 </div>
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-<section data-test="oldest-logs-card" class="rounded-lg border border-rose-200 dark:border-rose-900/40 bg-rose-50/40 dark:bg-rose-900/10 overflow-hidden">
-<header class="px-4 py-2.5 bg-rose-100/70 dark:bg-rose-900/30 border-b border-rose-200 dark:border-rose-900/40">
-<h2 class="text-sm font-semibold text-rose-900 dark:text-rose-100">Oldest open intakes</h2>
-<p class="text-[11px] text-rose-800/70 dark:text-rose-200/70">Longest in queue first. Don't let them go stale.</p>
-</header>
-<ul class="divide-y divide-rose-100 dark:divide-rose-900/40">
-<li class="px-3 py-2 hover:bg-white/60 dark:hover:bg-zinc-800/40 flex items-center gap-2">
-<button type="button" wire:click="togglePin(__ID__)"
-title="Pin to top"
-class="text-gray-400 hover:text-amber-600 shrink-0">
-<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-<path stroke-linecap="round" stroke-linejoin="round" d="M16 9V4l1 .01V2H7v2l1-.01V9l-2 4v2h5.2v7h1.6v-7H18v-2l-2-4z"/>
-</svg>
-</button>
-<div class="min-w-0 flex-1">
-<a href="__APP_URL__/communications-log?view=__ID__"
-class="text-sm font-medium text-gray-900 dark:text-white hover:underline truncate block">
-Brad  Fixture
-</a>
-<div class="text-[11px] text-gray-500 dark:text-gray-400 truncate">CL-2: Single fund code, not converted</div>
-</div>
-<div class="text-right shrink-0">
-<div class="text-[11px] font-semibold text-rose-700 dark:text-rose-300 tabular-nums">
-0d
-</div>
-<div class="text-[10px] text-gray-500 dark:text-gray-400">May 1</div>
-</div>
-</li>
-<li class="px-3 py-2 hover:bg-white/60 dark:hover:bg-zinc-800/40 flex items-center gap-2">
-<button type="button" wire:click="togglePin(__ID__)"
-title="Pin to top"
-class="text-gray-400 hover:text-amber-600 shrink-0">
-<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-<path stroke-linecap="round" stroke-linejoin="round" d="M16 9V4l1 .01V2H7v2l1-.01V9l-2 4v2h5.2v7h1.6v-7H18v-2l-2-4z"/>
-</svg>
-</button>
-<div class="min-w-0 flex-1">
-<a href="__APP_URL__/communications-log?view=__ID__"
-class="text-sm font-medium text-gray-900 dark:text-white hover:underline truncate block">
-Carla  Fixture
-</a>
-<div class="text-[11px] text-gray-500 dark:text-gray-400 truncate">CL-3: Multiple fund codes, not converted</div>
-</div>
-<div class="text-right shrink-0">
-<div class="text-[11px] font-semibold text-rose-700 dark:text-rose-300 tabular-nums">
-0d
-</div>
-<div class="text-[10px] text-gray-500 dark:text-gray-400">May 1</div>
-</div>
-</li>
-</ul>
-</section>
+<div class="flex items-center justify-end mb-3 gap-2" data-test="project-sort">
+<label class="text-xs font-medium text-gray-700 dark:text-gray-300">Sort</label>
+<select wire:model.live="projectSort" data-test="project-sort-select"
+class="text-sm rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white">
+<option value="address">Address (A–Z)</option>
+<option value="met_desc">Most requirements met</option>
+<option value="met_asc">Fewest requirements met</option>
+<option value="age_oldest">Oldest (by start date)</option>
+<option value="age_newest">Newest (by start date)</option>
+</select>
 </div>
 <div data-test="dashboard-cut-a">
 <div class="space-y-3">
@@ -81,6 +52,14 @@ data-test="dashboard-project-row" data-project-id="__ID__">
 <div class="flex items-start justify-between gap-4 flex-wrap">
 <div class="min-w-0 flex-1">
 <div class="flex items-center gap-2 flex-wrap">
+<button type="button" wire:click="togglePinProject(__ID__)"
+title="Pin project to top"
+data-test="project-pin-button"
+class="shrink-0 text-gray-400 hover:text-amber-600">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path stroke-linecap="round" stroke-linejoin="round" d="M16 9V4l1 .01V2H7v2l1-.01V9l-2 4v2h5.2v7h1.6v-7H18v-2l-2-4z"/>
+</svg>
+</button>
 <a href="__APP_URL__/project/__ID__/manage"
 wire:navigate
 class="font-semibold text-gray-900 dark:text-white hover:text-indigo-600">
@@ -90,6 +69,8 @@ class="font-semibold text-gray-900 dark:text-white hover:text-indigo-600">
 <span class="text-xs font-mono text-gray-500 dark:text-gray-400">JOB-FIX-00001</span>
 </div>
 <p class="text-sm text-gray-700 dark:text-gray-300 mt-1">
+<span data-test="met-count">0 met</span>
+<span class="text-gray-400">·</span>
 <span data-test="outstanding-count">0 outstanding</span>
 <span class="text-gray-400">/ 0 total</span>
 </p>
@@ -103,6 +84,14 @@ data-test="dashboard-project-row" data-project-id="__ID__">
 <div class="flex items-start justify-between gap-4 flex-wrap">
 <div class="min-w-0 flex-1">
 <div class="flex items-center gap-2 flex-wrap">
+<button type="button" wire:click="togglePinProject(__ID__)"
+title="Pin project to top"
+data-test="project-pin-button"
+class="shrink-0 text-gray-400 hover:text-amber-600">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path stroke-linecap="round" stroke-linejoin="round" d="M16 9V4l1 .01V2H7v2l1-.01V9l-2 4v2h5.2v7h1.6v-7H18v-2l-2-4z"/>
+</svg>
+</button>
 <a href="__APP_URL__/project/__ID__/manage"
 wire:navigate
 class="font-semibold text-gray-900 dark:text-white hover:text-indigo-600">
@@ -112,6 +101,8 @@ class="font-semibold text-gray-900 dark:text-white hover:text-indigo-600">
 <span class="text-xs font-mono text-gray-500 dark:text-gray-400">JOB-FIX-00002</span>
 </div>
 <p class="text-sm text-gray-700 dark:text-gray-300 mt-1">
+<span data-test="met-count">0 met</span>
+<span class="text-gray-400">·</span>
 <span data-test="outstanding-count">0 outstanding</span>
 <span class="text-gray-400">/ 0 total</span>
 </p>
@@ -129,6 +120,14 @@ data-test="dashboard-project-row" data-project-id="__ID__">
 <div class="flex items-start justify-between gap-4 flex-wrap">
 <div class="min-w-0 flex-1">
 <div class="flex items-center gap-2 flex-wrap">
+<button type="button" wire:click="togglePinProject(__ID__)"
+title="Pin project to top"
+data-test="project-pin-button"
+class="shrink-0 text-gray-400 hover:text-amber-600">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path stroke-linecap="round" stroke-linejoin="round" d="M16 9V4l1 .01V2H7v2l1-.01V9l-2 4v2h5.2v7h1.6v-7H18v-2l-2-4z"/>
+</svg>
+</button>
 <a href="__APP_URL__/project/__ID__/manage"
 wire:navigate
 class="font-semibold text-gray-900 dark:text-white hover:text-indigo-600">
@@ -138,6 +137,8 @@ class="font-semibold text-gray-900 dark:text-white hover:text-indigo-600">
 <span class="text-xs font-mono text-gray-500 dark:text-gray-400">JOB-SNAP-0001</span>
 </div>
 <p class="text-sm text-gray-700 dark:text-gray-300 mt-1">
+<span data-test="met-count">0 met</span>
+<span class="text-gray-400">·</span>
 <span data-test="outstanding-count">3 outstanding</span>
 <span class="text-gray-400">/ 3 total</span>
 </p>
@@ -157,6 +158,14 @@ data-test="dashboard-project-row" data-project-id="__ID__">
 <div class="flex items-start justify-between gap-4 flex-wrap">
 <div class="min-w-0 flex-1">
 <div class="flex items-center gap-2 flex-wrap">
+<button type="button" wire:click="togglePinProject(__ID__)"
+title="Pin project to top"
+data-test="project-pin-button"
+class="shrink-0 text-gray-400 hover:text-amber-600">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path stroke-linecap="round" stroke-linejoin="round" d="M16 9V4l1 .01V2H7v2l1-.01V9l-2 4v2h5.2v7h1.6v-7H18v-2l-2-4z"/>
+</svg>
+</button>
 <a href="__APP_URL__/project/__ID__/manage"
 wire:navigate
 class="font-semibold text-gray-900 dark:text-white hover:text-indigo-600">
@@ -166,6 +175,8 @@ class="font-semibold text-gray-900 dark:text-white hover:text-indigo-600">
 <span class="text-xs font-mono text-gray-500 dark:text-gray-400">JOB-FIX-00003</span>
 </div>
 <p class="text-sm text-gray-700 dark:text-gray-300 mt-1">
+<span data-test="met-count">0 met</span>
+<span class="text-gray-400">·</span>
 <span data-test="outstanding-count">0 outstanding</span>
 <span class="text-gray-400">/ 0 total</span>
 </p>
@@ -181,6 +192,14 @@ data-test="dashboard-project-row" data-project-id="__ID__">
 <div class="flex items-start justify-between gap-4 flex-wrap">
 <div class="min-w-0 flex-1">
 <div class="flex items-center gap-2 flex-wrap">
+<button type="button" wire:click="togglePinProject(__ID__)"
+title="Pin project to top"
+data-test="project-pin-button"
+class="shrink-0 text-gray-400 hover:text-amber-600">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path stroke-linecap="round" stroke-linejoin="round" d="M16 9V4l1 .01V2H7v2l1-.01V9l-2 4v2h5.2v7h1.6v-7H18v-2l-2-4z"/>
+</svg>
+</button>
 <a href="__APP_URL__/project/__ID__/manage"
 wire:navigate
 class="font-semibold text-gray-900 dark:text-white hover:text-indigo-600">
@@ -190,6 +209,8 @@ class="font-semibold text-gray-900 dark:text-white hover:text-indigo-600">
 <span class="text-xs font-mono text-gray-500 dark:text-gray-400">JOB-FIX-00004</span>
 </div>
 <p class="text-sm text-gray-700 dark:text-gray-300 mt-1">
+<span data-test="met-count">0 met</span>
+<span class="text-gray-400">·</span>
 <span data-test="outstanding-count">0 outstanding</span>
 <span class="text-gray-400">/ 0 total</span>
 </p>
@@ -203,6 +224,14 @@ data-test="dashboard-project-row" data-project-id="__ID__">
 <div class="flex items-start justify-between gap-4 flex-wrap">
 <div class="min-w-0 flex-1">
 <div class="flex items-center gap-2 flex-wrap">
+<button type="button" wire:click="togglePinProject(__ID__)"
+title="Pin project to top"
+data-test="project-pin-button"
+class="shrink-0 text-gray-400 hover:text-amber-600">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path stroke-linecap="round" stroke-linejoin="round" d="M16 9V4l1 .01V2H7v2l1-.01V9l-2 4v2h5.2v7h1.6v-7H18v-2l-2-4z"/>
+</svg>
+</button>
 <a href="__APP_URL__/project/__ID__/manage"
 wire:navigate
 class="font-semibold text-gray-900 dark:text-white hover:text-indigo-600">
@@ -212,6 +241,8 @@ class="font-semibold text-gray-900 dark:text-white hover:text-indigo-600">
 <span class="text-xs font-mono text-gray-500 dark:text-gray-400">JOB-SNAP-0002</span>
 </div>
 <p class="text-sm text-gray-700 dark:text-gray-300 mt-1">
+<span data-test="met-count">0 met</span>
+<span class="text-gray-400">·</span>
 <span data-test="outstanding-count">1 outstanding</span>
 <span class="text-gray-400">/ 1 total</span>
 </p>

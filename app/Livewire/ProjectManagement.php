@@ -31,7 +31,7 @@ class ProjectManagement extends Component
 
     public $job;
 
-    public $activeTab = 'milestones';
+    public $activeTab = 'requirements';
 
     public $selectedMilestone = null;
 
@@ -292,6 +292,20 @@ class ProjectManagement extends Component
     // P-18 / 7.5b: milestone dependencies multi-select.
     public $milestone_dependency_ids = [];
 
+    // Milestone revamp: fund codes (from the project's attached set) the
+    // milestone serves. Functional re-parenting: each fund code's Phase 2
+    // requirements render under this milestone in the Requirements tab.
+    public $milestone_fund_code_ids = [];
+
+    // Milestone revamp: budget rows assigned to this milestone — their
+    // expenses roll up under the milestone in the Requirements tab.
+    public $milestone_budget_ids = [];
+
+    // Milestone revamp: Phase 2 RequirementDefinition atoms picked from
+    // the full library (category=service_delivery_compliance). Each
+    // selected atom instantiates a milestone-source Requirement on save.
+    public $milestone_requirement_definition_ids = [];
+
     public function showEditMilestone($id)
     {
         $milestone = ProjectMilestone::findOrFail($id);
@@ -302,6 +316,14 @@ class ProjectManagement extends Component
         $this->milestone_icon = $milestone->icon;
         $this->milestone_color = $milestone->color;
         $this->milestone_dependency_ids = $milestone->dependencies()->pluck('project_milestones.id')->all();
+        // Milestone revamp: pre-populate the three new selectors so the
+        // edit form mirrors the current assignment state.
+        $this->milestone_fund_code_ids = $milestone->fundCodes()->pluck('fund_codes.id')->all();
+        $this->milestone_budget_ids = $milestone->projectBudgets()->pluck('id')->all();
+        $this->milestone_requirement_definition_ids = $milestone->requirements()
+            ->whereNotNull('source_template_id')
+            ->pluck('source_template_id')
+            ->all();
         $this->showMilestoneForm = true;
     }
 
@@ -315,6 +337,14 @@ class ProjectManagement extends Component
             'milestone_color' => 'required|string',
             'milestone_dependency_ids' => 'array',
             'milestone_dependency_ids.*' => 'integer|exists:project_milestones,id',
+            // Milestone revamp: scoped to the project's attached fund codes,
+            // the project's own budgets, and the Phase 2 atom library.
+            'milestone_fund_code_ids' => 'array',
+            'milestone_fund_code_ids.*' => 'integer|exists:fund_codes,id',
+            'milestone_budget_ids' => 'array',
+            'milestone_budget_ids.*' => 'integer|exists:project_budgets,id',
+            'milestone_requirement_definition_ids' => 'array',
+            'milestone_requirement_definition_ids.*' => 'integer|exists:requirement_definitions,id',
         ]);
 
         if ($this->editingMilestone) {
@@ -338,6 +368,7 @@ class ProjectManagement extends Component
             ]);
 
             $milestone->dependencies()->sync($this->milestone_dependency_ids);
+            $this->syncMilestoneRevampAssignments($milestone);
 
             session()->flash('success', 'Milestone updated successfully');
         } else {
@@ -368,6 +399,8 @@ class ProjectManagement extends Component
                         $depValidator->validate($created, $this->milestone_dependency_ids);
                         $created->dependencies()->sync($this->milestone_dependency_ids);
                     }
+
+                    $this->syncMilestoneRevampAssignments($created);
 
                     return $created;
                 });
@@ -2034,6 +2067,117 @@ class ProjectManagement extends Component
         $this->milestone_icon = 'Circle';
         $this->milestone_color = '#6366f1';
         $this->milestone_dependency_ids = [];
+        $this->milestone_fund_code_ids = [];
+        $this->milestone_budget_ids = [];
+        $this->milestone_requirement_definition_ids = [];
+    }
+
+    /**
+     * Milestone revamp: persist the milestone's fund-code, budget, and
+     * Phase 2 atom selections after the milestone row itself has been
+     * created/updated.
+     *
+     * Fund codes:  fund_code_housing_job.milestone_id is set for codes
+     *              attached to this project AND in the selection list,
+     *              and cleared for codes previously pinned to this
+     *              milestone that are no longer selected.
+     * Budgets:     project_budgets.milestone_id mirrors the same pattern,
+     *              scoped to this project.
+     * Definitions: each selected RequirementDefinition.id is materialised
+     *              as a milestone-source Requirement (idempotent). Atoms
+     *              removed from the selection have their Requirement's
+     *              source_template_id nulled so any progress is preserved
+     *              — the row persists as an ad-hoc-on-milestone item the
+     *              PM can manually delete.
+     */
+    protected function syncMilestoneRevampAssignments(ProjectMilestone $milestone): void
+    {
+        // ---- Fund codes -------------------------------------------------
+        $jobId = $milestone->housing_job_id;
+        $selectedFundCodes = array_values(array_unique(array_map('intval', $this->milestone_fund_code_ids ?? [])));
+
+        // Clear any pivot rows previously pinned to this milestone but no
+        // longer in the selection. Scoped to this project so we never
+        // touch another project's pivot rows.
+        DB::table('fund_code_housing_job')
+            ->where('housing_job_id', $jobId)
+            ->where('milestone_id', $milestone->id)
+            ->when(! empty($selectedFundCodes), fn ($q) => $q->whereNotIn('fund_code_id', $selectedFundCodes))
+            ->update(['milestone_id' => null]);
+
+        // Pin the newly-selected codes (no-op if already pinned, ignores
+        // codes not attached to the project — the validation list is the
+        // form's source, the pivot is the truth).
+        if (! empty($selectedFundCodes)) {
+            DB::table('fund_code_housing_job')
+                ->where('housing_job_id', $jobId)
+                ->whereIn('fund_code_id', $selectedFundCodes)
+                ->update(['milestone_id' => $milestone->id]);
+        }
+
+        // ---- Budgets ----------------------------------------------------
+        $selectedBudgets = array_values(array_unique(array_map('intval', $this->milestone_budget_ids ?? [])));
+
+        ProjectBudget::query()
+            ->where('housing_job_id', $jobId)
+            ->where('milestone_id', $milestone->id)
+            ->when(! empty($selectedBudgets), fn ($q) => $q->whereNotIn('id', $selectedBudgets))
+            ->update(['milestone_id' => null]);
+
+        if (! empty($selectedBudgets)) {
+            ProjectBudget::query()
+                ->where('housing_job_id', $jobId)
+                ->whereIn('id', $selectedBudgets)
+                ->update(['milestone_id' => $milestone->id]);
+        }
+
+        // ---- Phase 2 atom selection -------------------------------------
+        $selectedDefs = array_values(array_unique(array_map('intval', $this->milestone_requirement_definition_ids ?? [])));
+
+        $existing = $milestone->requirements()
+            ->whereNotNull('source_template_id')
+            ->get(['id', 'source_template_id']);
+
+        $existingByDef = $existing->pluck('id', 'source_template_id')->all();
+
+        // Removed atoms: keep the Requirement row but unlink the atom so
+        // any progress is preserved (matches the milestone-delete keep
+        // semantics).
+        foreach ($existingByDef as $defId => $reqId) {
+            if (! in_array((int) $defId, $selectedDefs, true)) {
+                Requirement::where('id', $reqId)->update(['source_template_id' => null]);
+            }
+        }
+
+        // Newly-added atoms: materialise as milestone-source Requirements.
+        $instantiator = app(RequirementInstantiator::class);
+        $actor = Auth::user();
+        foreach ($selectedDefs as $defId) {
+            if (isset($existingByDef[$defId])) {
+                continue;
+            }
+            $def = \App\Models\RequirementDefinition::find($defId);
+            if ($def === null) {
+                continue;
+            }
+
+            $type = $def->kind === \App\Models\RequirementDefinition::KIND_DOC
+                ? Requirement::TYPE_DOCUMENT
+                : Requirement::TYPE_TASK;
+
+            $instantiator->forMilestone(
+                $milestone,
+                $type,
+                (string) ($def->label ?? $def->key),
+                $actor,
+                null,
+                [
+                    'source_template_id' => $def->id,
+                    'source_label_snapshot' => (string) ($def->label ?? $def->key),
+                    'status' => Requirement::STATUS_OUTSTANDING,
+                ]
+            );
+        }
     }
 
     protected function resetTaskForm()
@@ -2218,6 +2362,16 @@ class ProjectManagement extends Component
             ->orderBy('code')
             ->get(['id', 'code', 'description']);
 
+        // Milestone revamp: feeds the milestone form's three new
+        // selectors and the Requirements-tab grouping.
+        $projectFundCodes = $this->job->fundCodes; // already loaded; carries pivot.milestone_id
+        $projectBudgets = $this->job->budgets;     // already re-set above with withCount
+
+        $phase2Atoms = \App\Models\RequirementDefinition::query()
+            ->whereIn('category', \App\Models\RequirementDefinition::PHASE_2_CATEGORIES)
+            ->orderBy('label')
+            ->get(['id', 'key', 'label', 'kind', 'category']);
+
         return view('livewire.project-management', [
             'users' => $users,
             'currentMilestone' => $currentMilestone,
@@ -2227,6 +2381,9 @@ class ProjectManagement extends Component
             'properties' => $properties,
             'contracts' => $contracts,
             'availableFundCodes' => $availableFundCodes,
+            'projectFundCodes' => $projectFundCodes,
+            'projectBudgets' => $projectBudgets,
+            'phase2Atoms' => $phase2Atoms,
         ]);
     }
 }
