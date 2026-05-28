@@ -30,10 +30,10 @@ function dashboardJob(array $overrides = []): HousingJob
     ], $overrides));
 }
 
-it('mounts the housing dashboard with the projects tab and overview sub-view as default', function () {
+it('mounts the housing dashboard with the intakes tab and overview sub-view as default', function () {
     Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
-        ->assertSet('section', 'projects')
+        ->assertSet('section', 'intakes')
         ->assertSet('view', 'overview')
         ->assertSet('filter_status', 'outstanding')
         ->assertSet('filter_owner_id', null)
@@ -60,6 +60,7 @@ it('Cut A renders one row per accessible housing project with outstanding count'
 
     $html = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
+        ->call('setSection', 'projects')
         ->assertSet('section', 'projects')
         ->html();
 
@@ -74,6 +75,7 @@ it('Cut A surfaces fund-expiration urgent indicator when any attached fund expir
 
     $html = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
+        ->call('setSection', 'projects')
         ->html();
 
     expect($html)->toContain('data-test="indicator-fund-urgent"');
@@ -87,6 +89,7 @@ it('Cut A surfaces fund-expired indicator on a project whose fund has already ex
 
     $html = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
+        ->call('setSection', 'projects')
         ->html();
 
     expect($html)->toContain('data-test="indicator-fund-expired"');
@@ -107,6 +110,7 @@ it('Cut A surfaces blocked-milestone count when at least one milestone is blocke
 
     $html = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
+        ->call('setSection', 'projects')
         ->html();
 
     expect($html)->toContain('data-test="indicator-blocked"');
@@ -126,6 +130,7 @@ it('Cut A combines multiple indicators distinctly on a single project row', func
 
     $html = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
+        ->call('setSection', 'projects')
         ->html();
 
     expect($html)->toContain('data-test="indicator-fund-urgent"');
@@ -142,6 +147,7 @@ it('Cut B switches to per-requirement view when toggled', function () {
 
     $html = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
+        ->call('setSection', 'projects')
         ->call('setView', 'requirements')
         ->assertSet('view', 'requirements')
         ->html();
@@ -167,6 +173,7 @@ it('Cut B defaults owner filter to "me" and surfaces only the current user\'s re
 
     $html = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
+        ->call('setSection', 'projects')
         ->call('setView', 'requirements')
         ->html();
 
@@ -191,6 +198,7 @@ it('Cut B "anyone" owner filter shows all owners (chase view)', function () {
 
     $html = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
+        ->call('setSection', 'projects')
         ->call('setView', 'requirements')
         ->set('filter_owner_id', 0) // 'anyone'
         ->html();
@@ -218,6 +226,7 @@ it('Cut B explicit owner filter surfaces a specific user\'s queue (chase Tony)',
 
     $html = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
+        ->call('setSection', 'projects')
         ->call('setView', 'requirements')
         ->set('filter_owner_id', $tony->id)
         ->html();
@@ -241,6 +250,7 @@ it('Cut B status filter narrows to a single status', function () {
 
     $component = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
+        ->call('setSection', 'projects')
         ->call('setView', 'requirements');
 
     // Default = outstanding
@@ -277,6 +287,7 @@ it('Cut B type and source filters compose correctly', function () {
     // type=document AND source=fund_code → only the fund-code doc.
     $html = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
+        ->call('setSection', 'projects')
         ->call('setView', 'requirements')
         ->set('filter_type', 'document')
         ->set('filter_source', 'fund_code')
@@ -309,6 +320,7 @@ it('Cut B fund-source rows show urgent / warning / expired indicators reflecting
 
     $html = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
+        ->call('setSection', 'projects')
         ->call('setView', 'requirements')
         ->html();
 
@@ -338,6 +350,7 @@ it('Cut B blocked indicator fires on requirement rows whose milestone is blocked
 
     $html = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
+        ->call('setSection', 'projects')
         ->call('setView', 'requirements')
         ->html();
 
@@ -357,6 +370,7 @@ it('Cut B sorts fund-source requirements by fund code alphabetically, then by ti
 
     $html = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
+        ->call('setSection', 'projects')
         ->call('setView', 'requirements')
         ->html();
 
@@ -403,6 +417,7 @@ it('a non-admin housing user sees only projects they manage / created / own a re
 
     $html = Livewire::actingAs($userA)
         ->test(HousingDashboard::class)
+        ->call('setSection', 'projects')
         ->html();
 
     expect($html)->toContain($jobMine->job_number);

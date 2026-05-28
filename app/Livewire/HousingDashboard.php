@@ -41,8 +41,10 @@ class HousingDashboard extends Component
 {
     use WithPermissionChecks;
 
-    /** Top-level tab: 'intakes' | 'projects'. */
-    public string $section = 'projects';
+    /** Top-level tab: 'intakes' | 'projects'. Intakes is the landing tab —
+     *  triage on intake-in-flight cases is what Kaitlyn opens the dashboard
+     *  for; once everything's converted she can flip to Projects. */
+    public string $section = 'intakes';
 
     /** Sub-view within the active tab: 'overview' | 'requirements'. */
     public string $view = 'overview';

@@ -106,6 +106,32 @@ class ProjectMilestone extends Model implements HasMedia
             ->where('source_type', Requirement::SOURCE_MILESTONE);
     }
 
+    /**
+     * Milestone revamp: fund codes assigned to this milestone on the
+     * parent project (i.e. fund_code_housing_job rows with
+     * milestone_id = this). Many fund codes may share a milestone; a
+     * fund code can be assigned to at most one milestone per project.
+     */
+    public function fundCodes(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(
+            FundCode::class,
+            'fund_code_housing_job',
+            'milestone_id',
+            'fund_code_id'
+        )->withTimestamps();
+    }
+
+    /**
+     * Milestone revamp: budget rows assigned to this milestone. The
+     * requirements tab nests these under the milestone so per-service
+     * spend is visible.
+     */
+    public function projectBudgets(): HasMany
+    {
+        return $this->hasMany(ProjectBudget::class, 'milestone_id');
+    }
+
     public function requirementTasks(): HasMany
     {
         return $this->requirements()->where('type', Requirement::TYPE_TASK);

@@ -61,10 +61,10 @@ it('keeps intake content off the Projects tab and project content off the Intake
     $job = splitJob(['job_title' => 'SPLIT_PROJECT_ROW', 'property_id' => null]);
     splitOpenIntakeReq('SPLIT_INTAKE_REQ', IntakeRequirement::STATUS_RECEIVED);
 
-    // Projects/overview (default): sees the project, not the intake cards.
+    // Projects/overview: sees the project, not the intake cards.
     $projectsHtml = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
-        ->assertSet('section', 'projects')
+        ->call('setSection', 'projects')
         ->html();
     expect($projectsHtml)->toContain('SPLIT_PROJECT_ROW');
     expect($projectsHtml)->not->toContain('Closest to convert');
@@ -99,6 +99,7 @@ it('floats a pinned project to the top of the per-project list regardless of sor
 
     $html = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
+        ->call('setSection', 'projects')
         ->html();
 
     expect(strpos($html, 'ZZZ_last_alpha'))->toBeLessThan(strpos($html, 'AAA_first_alpha'));
@@ -116,6 +117,7 @@ it('sorts the per-project list by number of met requirements (most first)', func
 
     $html = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
+        ->call('setSection', 'projects')
         ->set('projectSort', 'met_desc')
         ->html();
 
@@ -128,6 +130,7 @@ it('sorts the per-project list by age from start date (oldest first), falling ba
 
     $html = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
+        ->call('setSection', 'projects')
         ->set('projectSort', 'age_oldest')
         ->html();
 

@@ -231,6 +231,7 @@ class HousingJob extends Model
     public function fundCodes(): BelongsToMany
     {
         return $this->belongsToMany(FundCode::class, 'fund_code_housing_job')
+            ->withPivot('milestone_id')
             ->withTimestamps();
     }
 
@@ -623,6 +624,10 @@ class HousingJob extends Model
                 ->orderBy('sequence_order')
                 ->get();
 
+            // Milestone revamp: track old->new milestone id remap so
+            // cloned budgets can rewire their milestone_id reference.
+            $milestoneIdMap = [];
+
             foreach ($milestones as $milestone) {
                 $newMilestone = $milestone->replicate([
                     'housing_job_id', 'status', 'target_date', 'completed_date',
@@ -632,6 +637,7 @@ class HousingJob extends Model
                 $newMilestone->status = $newMilestone->sequence_order == 1 ? 'in_progress' : 'not_started';
                 $newMilestone->created_by = Auth::id();
                 $newMilestone->save();
+                $milestoneIdMap[$milestone->id] = $newMilestone->id;
 
                 // Clone legacy tasks (write-vestigial — kept until the
                 // legacy tables are retired in a later phase).
@@ -685,7 +691,10 @@ class HousingJob extends Model
                         'owner_user_id' => Auth::id(),
                         'source_type' => Requirement::SOURCE_MILESTONE,
                         'source_id' => $newMilestone->id,
-                        'source_template_id' => null,
+                        // Milestone revamp: preserve the atom link so
+                        // atom-driven template requirements remain
+                        // atom-driven on the clone.
+                        'source_template_id' => $tplReq->source_template_id,
                         'source_label_snapshot' => $tplReq->title,
                         'milestone_gate_text' => $tplReq->milestone_gate_text,
                         'completed_at' => null,
@@ -708,6 +717,14 @@ class HousingJob extends Model
                 $newBudget->housing_job_id = $job->id;
                 $newBudget->spent_amount = 0;
                 $newBudget->created_by = Auth::id();
+                // Milestone revamp: remap the budget's milestone_id from
+                // the template milestone to the freshly-cloned milestone.
+                // Templates with unassigned budgets land unassigned too.
+                if ($budget->milestone_id !== null && isset($milestoneIdMap[$budget->milestone_id])) {
+                    $newBudget->milestone_id = $milestoneIdMap[$budget->milestone_id];
+                } else {
+                    $newBudget->milestone_id = null;
+                }
                 $newBudget->save();
             }
 

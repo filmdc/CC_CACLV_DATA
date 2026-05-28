@@ -192,13 +192,22 @@
             @endif
         </div>
 
-        @include('livewire.partials.fund-code-requirements-panel')
-
-        <!-- Tabs -->
+        <!-- Tabs (Milestone revamp: Requirements is the default landing tab) -->
         <div class="border-b border-gray-200 dark:border-zinc-700">
-            <nav class="flex -mb-px">
-                <button wire:click="$set('activeTab', 'milestones')"
+            <nav class="flex -mb-px" data-test="project-tab-nav">
+                <button wire:click="$set('activeTab', 'requirements')"
+                        data-test="tab-requirements"
                         class="py-4 px-6 text-center border-b-2 font-medium text-sm
+                        @if($activeTab === 'requirements')
+                            border-indigo-500 text-indigo-600 dark:text-indigo-400
+                        @else
+                            border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300
+                        @endif">
+                    Requirements
+                </button>
+                <button wire:click="$set('activeTab', 'milestones')"
+                        data-test="tab-milestones"
+                        class="ml-8 py-4 px-6 text-center border-b-2 font-medium text-sm
                         @if($activeTab === 'milestones')
                             border-indigo-500 text-indigo-600 dark:text-indigo-400
                         @else
@@ -207,6 +216,7 @@
                     Milestones & Tasks
                 </button>
                 <button wire:click="$set('activeTab', 'budget')"
+                        data-test="tab-budget"
                         class="ml-8 py-4 px-6 text-center border-b-2 font-medium text-sm
                         @if($activeTab === 'budget')
                             border-indigo-500 text-indigo-600 dark:text-indigo-400
@@ -220,7 +230,129 @@
 
         <!-- Tab Content -->
         <div class="p-6">
-            @if($activeTab === 'milestones')
+            @if($activeTab === 'requirements')
+                {{-- Milestone revamp: requirements tab. Shows the fund-code
+                     requirements panel (template-level overview) plus
+                     a per-milestone grouping (functional re-parenting) so
+                     fund-code Phase 2 requirements and milestone-source
+                     requirements appear under the service they belong to. --}}
+                <div data-test="requirements-tab" class="space-y-6">
+                    @include('livewire.partials.fund-code-requirements-panel')
+
+                    @php
+                        $allReqs = $job->requirements ?? collect();
+                        $milestones = $job->milestones ?? collect();
+                        // Map fund_code_id -> milestone_id from the loaded pivot.
+                        $fundCodeMilestoneMap = collect();
+                        foreach ($job->fundCodes ?? [] as $fc) {
+                            $fundCodeMilestoneMap[$fc->id] = $fc->pivot?->milestone_id;
+                        }
+                        // Map budget rows under milestones.
+                        $budgetsByMilestone = ($job->budgets ?? collect())->groupBy('milestone_id');
+                    @endphp
+
+                    <div data-test="requirements-by-milestone" class="space-y-4">
+                        @foreach($milestones as $ms)
+                            @php
+                                $msMilestoneReqs = $allReqs->where('source_type', 'milestone')->where('source_id', $ms->id)->values();
+                                $msFundReqs = $allReqs->where('source_type', 'fund_code')->filter(function ($r) use ($fundCodeMilestoneMap, $ms) {
+                                    return ($fundCodeMilestoneMap[$r->source_id] ?? null) === $ms->id;
+                                })->values();
+                                $msAllReqs = $msMilestoneReqs->concat($msFundReqs);
+                                $msBudgets = $budgetsByMilestone->get($ms->id, collect());
+                                $msOutstanding = $msAllReqs->where('status', 'outstanding')->count();
+                            @endphp
+                            <div class="border border-gray-200 dark:border-zinc-700 rounded-lg p-4"
+                                 data-test="milestone-requirement-group" data-milestone-id="{{ $ms->id }}">
+                                <div class="flex items-center gap-2 mb-3 flex-wrap">
+                                    <span class="inline-block w-3 h-3 rounded-full" style="background-color: {{ $ms->color }}"></span>
+                                    <h3 class="font-semibold text-gray-900 dark:text-white">{{ $ms->name }}</h3>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">
+                                        {{ $msAllReqs->count() }} requirement{{ $msAllReqs->count() === 1 ? '' : 's' }}
+                                        @if($msOutstanding > 0)
+                                            · <span class="text-amber-700 dark:text-amber-300">{{ $msOutstanding }} outstanding</span>
+                                        @endif
+                                    </span>
+                                </div>
+
+                                @if($msAllReqs->isEmpty() && $msBudgets->isEmpty())
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 italic">No requirements or budget items assigned to this milestone yet.</p>
+                                @else
+                                    @if($msAllReqs->isNotEmpty())
+                                        <ul class="space-y-1 mb-3">
+                                            @foreach($msAllReqs as $r)
+                                                <li class="text-sm flex items-center gap-2" data-test="milestone-requirement-row">
+                                                    @if($r->type === 'document')📄@else✓@endif
+                                                    <span class="text-gray-800 dark:text-gray-200">{{ $r->title }}</span>
+                                                    <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded {{ $r->status === 'complete' ? 'bg-green-100 text-green-800' : ($r->status === 'not_applicable' ? 'bg-gray-200 text-gray-700' : 'bg-yellow-100 text-yellow-800') }}">
+                                                        {{ str_replace('_', ' ', $r->status) }}
+                                                    </span>
+                                                    <span class="text-[10px] text-gray-500">via {{ str_replace('_', ' ', $r->source_type) }}</span>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    @endif
+
+                                    @if($msBudgets->isNotEmpty())
+                                        <div class="mt-2 pt-2 border-t border-gray-100 dark:border-zinc-700">
+                                            <p class="text-[11px] uppercase tracking-wider font-semibold text-gray-600 dark:text-gray-400 mb-1">Budget items</p>
+                                            <ul class="space-y-0.5">
+                                                @foreach($msBudgets as $b)
+                                                    <li class="text-xs text-gray-700 dark:text-gray-300" data-test="milestone-budget-row">
+                                                        {{ $b->category }} —
+                                                        <span class="tabular-nums">${{ number_format((float) $b->spent_amount, 2) }} / ${{ number_format((float) $b->budgeted_amount, 2) }}</span>
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    @endif
+                                @endif
+                            </div>
+                        @endforeach
+
+                        @php
+                            // Unassigned: fund-code reqs whose fund code has no milestone link,
+                            // plus ad-hoc reqs, plus budgets with milestone_id=null.
+                            $unassignedFundReqs = $allReqs->where('source_type', 'fund_code')->filter(function ($r) use ($fundCodeMilestoneMap) {
+                                return empty($fundCodeMilestoneMap[$r->source_id] ?? null);
+                            })->values();
+                            $adHocReqs = $allReqs->where('source_type', 'ad_hoc')->values();
+                            $unassignedBudgets = $budgetsByMilestone->get(null, collect());
+                            $hasUnassigned = $unassignedFundReqs->isNotEmpty() || $adHocReqs->isNotEmpty() || $unassignedBudgets->isNotEmpty();
+                        @endphp
+
+                        @if($hasUnassigned)
+                            <div class="border border-dashed border-gray-300 dark:border-zinc-600 rounded-lg p-4"
+                                 data-test="requirements-unassigned-group">
+                                <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">Unassigned</h3>
+                                @if($unassignedFundReqs->isNotEmpty() || $adHocReqs->isNotEmpty())
+                                    <ul class="space-y-1">
+                                        @foreach($unassignedFundReqs->concat($adHocReqs) as $r)
+                                            <li class="text-sm flex items-center gap-2" data-test="unassigned-requirement-row">
+                                                @if($r->type === 'document')📄@else✓@endif
+                                                <span class="text-gray-800 dark:text-gray-200">{{ $r->title }}</span>
+                                                <span class="text-[10px] text-gray-500">via {{ str_replace('_', ' ', $r->source_type) }}</span>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @endif
+                                @if($unassignedBudgets->isNotEmpty())
+                                    <p class="text-[11px] uppercase tracking-wider font-semibold text-gray-600 dark:text-gray-400 mt-2 mb-1">Unassigned budget items</p>
+                                    <ul class="space-y-0.5">
+                                        @foreach($unassignedBudgets as $b)
+                                            <li class="text-xs text-gray-700 dark:text-gray-300">{{ $b->category }} — ${{ number_format((float) $b->spent_amount, 2) }} / ${{ number_format((float) $b->budgeted_amount, 2) }}</li>
+                                        @endforeach
+                                    </ul>
+                                @endif
+                            </div>
+                        @endif
+
+                        @if($milestones->isEmpty())
+                            <p class="text-sm text-gray-500 dark:text-gray-400">No milestones yet. Add milestones in the Milestones tab; you can then assign fund codes, budget items, and Phase 2 requirements to each.</p>
+                        @endif
+                    </div>
+                </div>
+            @elseif($activeTab === 'milestones')
                 <!-- Milestones Tab -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Left: Milestone List -->
@@ -781,6 +913,62 @@
                             </select>
                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                 Hold Ctrl/Cmd to select multiple. The dashboard marks this milestone "blocked" while any chosen dependency still has outstanding requirements.
+                            </p>
+                        </div>
+                    @endif
+
+                    {{-- Milestone revamp: fund codes the milestone serves.
+                         Scope: the project's already-attached fund codes
+                         (per the no-hierarchy guidance, the project's fund
+                         set is the truth). --}}
+                    @if(($projectFundCodes ?? collect())->isNotEmpty())
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fund codes served</label>
+                            <select wire:model="milestone_fund_code_ids" multiple size="4"
+                                    data-test="milestone-fund-codes-select"
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                @foreach($projectFundCodes->sortBy('code') as $fc)
+                                    <option value="{{ $fc->id }}">{{ $fc->code }} — {{ $fc->description }}</option>
+                                @endforeach
+                            </select>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                Each selected fund code's Phase 2 requirements render under this milestone in the Requirements tab. A fund code can only be assigned to one milestone per project.
+                            </p>
+                        </div>
+                    @endif
+
+                    {{-- Milestone revamp: budget items rolling up under this milestone. --}}
+                    @if(($projectBudgets ?? collect())->isNotEmpty())
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Budget items</label>
+                            <select wire:model="milestone_budget_ids" multiple size="4"
+                                    data-test="milestone-budgets-select"
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                @foreach($projectBudgets->sortBy('category') as $b)
+                                    <option value="{{ $b->id }}">{{ $b->category }} (${{ number_format((float) $b->budgeted_amount, 2) }})</option>
+                                @endforeach
+                            </select>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                A budget item can only be assigned to one milestone per project.
+                            </p>
+                        </div>
+                    @endif
+
+                    {{-- Milestone revamp: Phase 2 requirement atoms drawn
+                         from the full library. Each selected atom creates
+                         a milestone-source requirement on save. --}}
+                    @if(($phase2Atoms ?? collect())->isNotEmpty())
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phase 2 requirements</label>
+                            <select wire:model="milestone_requirement_definition_ids" multiple size="5"
+                                    data-test="milestone-requirement-atoms-select"
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                @foreach($phase2Atoms as $atom)
+                                    <option value="{{ $atom->id }}">{{ $atom->label ?? $atom->key }} ({{ $atom->kind }})</option>
+                                @endforeach
+                            </select>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                Drawn from the unified requirements library (service-delivery compliance). Deselecting later preserves any progress on the row — only the atom link is cleared.
                             </p>
                         </div>
                     @endif

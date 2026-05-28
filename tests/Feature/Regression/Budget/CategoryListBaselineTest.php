@@ -21,6 +21,7 @@ beforeEach(function () {
 it('matches the committed snapshot for HJ-4 budget categories (with contract)', function () {
     $html = Livewire::actingAs($this->user)
         ->test(ProjectManagement::class, ['id' => $this->job->id])
+        ->set('activeTab', 'budget')
         ->html();
 
     SnapshotHelper::assertHtmlMatchesSnapshot('budget_categories_with_contract', $html);
