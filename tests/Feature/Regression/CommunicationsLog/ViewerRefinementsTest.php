@@ -13,6 +13,8 @@ use App\Livewire\CommunicationsLogManagement;
 use App\Models\CommunicationLog;
 use App\Models\IntakeRequirement;
 use App\Models\Participant;
+use App\Models\RequirementDefinition;
+use App\Services\IntakeRequirementInstantiator;
 use Database\Seeders\RegressionTestSeeder;
 use Livewire\Livewire;
 use Tests\Support\RegressionHelpers;
@@ -50,8 +52,13 @@ it('viewer shows the Linked Records card when at least one record is linked', fu
         ->assertSee($participant->full_name);
 })->group('regression');
 
-it('Convert-to-Project button is enabled when no Phase 1 requirements are outstanding', function () {
+it('Convert-to-Project button is enabled when a requirement exists and none are outstanding', function () {
+    // Post-redesign, a log is convertible only once it has at least one
+    // (non-orphaned) requirement AND nothing is outstanding. A single met
+    // requirement satisfies both halves of the gate.
     $log = CommunicationLog::factory()->create(['housing_job_id' => null]);
+    $atom = RequirementDefinition::factory()->create(['key' => 'photo-id', 'default_required' => true]);
+    app(IntakeRequirementInstantiator::class)->forDefinition($log, $atom, $this->user)->markReceived($this->user);
 
     $component = Livewire::actingAs($this->user)
         ->test(CommunicationsLogManagement::class)

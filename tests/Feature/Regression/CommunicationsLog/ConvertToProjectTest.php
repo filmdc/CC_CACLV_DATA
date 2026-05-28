@@ -4,6 +4,8 @@ use App\Livewire\CommunicationsLogManagement;
 use App\Models\CommunicationLog;
 use App\Models\HousingJob;
 use App\Models\Program;
+use App\Models\RequirementDefinition;
+use App\Services\IntakeRequirementInstantiator;
 use Database\Seeders\RegressionTestSeeder;
 use Livewire\Livewire;
 use Tests\Support\RegressionHelpers;
@@ -17,6 +19,11 @@ it('happy path: converts a participant-linked comm log into a housing job', func
     // CL-1 is participant-linked, property-linked, and not yet converted.
     $log = CommunicationLog::where('subject', 'like', 'CL-1:%')->firstOrFail();
     expect($log->converted_to_job_id)->toBeNull();
+
+    // Post-redesign the convert gate requires at least one (non-orphaned)
+    // requirement on the log; a single met one clears it.
+    $atom = RequirementDefinition::factory()->create(['key' => 'photo-id', 'default_required' => true]);
+    app(IntakeRequirementInstantiator::class)->forDefinition($log, $atom, $this->user)->markReceived($this->user);
 
     $program = Program::where('name', 'Fixture Housing Program')->firstOrFail();
     $jobsBefore = HousingJob::count();
