@@ -30,10 +30,11 @@ function dashboardJob(array $overrides = []): HousingJob
     ], $overrides));
 }
 
-it('mounts the housing dashboard with projects tab as default', function () {
+it('mounts the housing dashboard with the projects tab and overview sub-view as default', function () {
     Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
-        ->assertSet('tab', 'projects')
+        ->assertSet('section', 'projects')
+        ->assertSet('view', 'overview')
         ->assertSet('filter_status', 'outstanding')
         ->assertSet('filter_owner_id', null)
         ->assertSet('filter_type', 'all')
@@ -59,7 +60,7 @@ it('Cut A renders one row per accessible housing project with outstanding count'
 
     $html = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
-        ->assertSet('tab', 'projects')
+        ->assertSet('section', 'projects')
         ->html();
 
     expect($html)->toContain('1 outstanding');
@@ -141,8 +142,8 @@ it('Cut B switches to per-requirement view when toggled', function () {
 
     $html = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
-        ->call('setTab', 'requirements')
-        ->assertSet('tab', 'requirements')
+        ->call('setView', 'requirements')
+        ->assertSet('view', 'requirements')
         ->html();
 
     expect($html)->toContain('Inspect the foundation');
@@ -166,7 +167,7 @@ it('Cut B defaults owner filter to "me" and surfaces only the current user\'s re
 
     $html = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
-        ->call('setTab', 'requirements')
+        ->call('setView', 'requirements')
         ->html();
 
     expect($html)->toContain('Mine to do');
@@ -190,7 +191,7 @@ it('Cut B "anyone" owner filter shows all owners (chase view)', function () {
 
     $html = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
-        ->call('setTab', 'requirements')
+        ->call('setView', 'requirements')
         ->set('filter_owner_id', 0) // 'anyone'
         ->html();
 
@@ -217,7 +218,7 @@ it('Cut B explicit owner filter surfaces a specific user\'s queue (chase Tony)',
 
     $html = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
-        ->call('setTab', 'requirements')
+        ->call('setView', 'requirements')
         ->set('filter_owner_id', $tony->id)
         ->html();
 
@@ -240,7 +241,7 @@ it('Cut B status filter narrows to a single status', function () {
 
     $component = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
-        ->call('setTab', 'requirements');
+        ->call('setView', 'requirements');
 
     // Default = outstanding
     $html = $component->html();
@@ -276,7 +277,7 @@ it('Cut B type and source filters compose correctly', function () {
     // type=document AND source=fund_code → only the fund-code doc.
     $html = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
-        ->call('setTab', 'requirements')
+        ->call('setView', 'requirements')
         ->set('filter_type', 'document')
         ->set('filter_source', 'fund_code')
         ->html();
@@ -308,7 +309,7 @@ it('Cut B fund-source rows show urgent / warning / expired indicators reflecting
 
     $html = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
-        ->call('setTab', 'requirements')
+        ->call('setView', 'requirements')
         ->html();
 
     expect($html)->toContain('data-test="row-indicator-fund-urgent"');
@@ -337,7 +338,7 @@ it('Cut B blocked indicator fires on requirement rows whose milestone is blocked
 
     $html = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
-        ->call('setTab', 'requirements')
+        ->call('setView', 'requirements')
         ->html();
 
     expect($html)->toContain('Work on blocked milestone');
@@ -356,7 +357,7 @@ it('Cut B sorts fund-source requirements by fund code alphabetically, then by ti
 
     $html = Livewire::actingAs($this->admin)
         ->test(HousingDashboard::class)
-        ->call('setTab', 'requirements')
+        ->call('setView', 'requirements')
         ->html();
 
     // The A-task (fund=AA0500) should appear BEFORE the M-task (fund=MA1000),

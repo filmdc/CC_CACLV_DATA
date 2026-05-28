@@ -261,6 +261,26 @@ class HousingJob extends Model
     }
 
     /**
+     * Dashboard split: users who have pinned this project to their
+     * Projects dashboard. Parallel to CommunicationLog::pinnedByUsers.
+     */
+    public function pinnedByUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'housing_job_user_pins')
+            ->withPivot('pinned_at')
+            ->withTimestamps();
+    }
+
+    public function isPinnedBy(?User $user): bool
+    {
+        if ($user === null) {
+            return false;
+        }
+
+        return $this->pinnedByUsers()->where('users.id', $user->id)->exists();
+    }
+
+    /**
      * P-2.5: returns the budget category names on this project that
      * reference the given fund code. An empty array means a detach is
      * allowed; a non-empty array enumerates the rows blocking it. The

@@ -31,6 +31,7 @@ class User extends Authenticatable
         'approval_delegate_id',
         'notification_preferences',
         'comm_log_default_view',
+        'housing_dashboard_default_view',
     ];
 
     /**
