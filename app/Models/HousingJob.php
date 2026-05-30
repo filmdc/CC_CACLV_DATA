@@ -543,6 +543,13 @@ class HousingJob extends Model
 
             $template->save();
 
+            // Milestone redesign (Phase 2): track old→new milestone id
+            // remap so we can rewire the milestone_dependencies pivot AND
+            // the budgets' milestone_id reference after cloning. Without
+            // this map the saved template would lose its dependency
+            // graph and its budget↔milestone tethers.
+            $milestoneIdMap = [];
+
             // Clone milestones
             foreach ($this->milestones as $milestone) {
                 $newMilestone = $milestone->replicate([
@@ -552,7 +559,12 @@ class HousingJob extends Model
                 $newMilestone->housing_job_id = $template->id;
                 $newMilestone->status = 'not_started';
                 $newMilestone->created_by = Auth::id();
+                // requirement_definition_id rides along via replicate()
+                // (it's in $fillable and not in the exclusion list), so
+                // a promoted "Environmental Review" milestone stays
+                // promoted on the template.
                 $newMilestone->save();
+                $milestoneIdMap[$milestone->id] = $newMilestone->id;
 
                 // Clone tasks (structure only, no assignments/dates/status)
                 foreach ($milestone->tasks as $task) {
@@ -580,9 +592,87 @@ class HousingJob extends Model
                     $newDoc->save();
                     // Note: Media files are NOT copied
                 }
+
+                // Milestone redesign (Phase 2): clone milestone-source
+                // Requirement rows (the Phase 3A unified model). Resets
+                // status/owner/completion metadata so the template lands
+                // clean. Mirrors createFromTemplate's per-milestone
+                // Requirement clone — keeping save↔restore symmetric so
+                // a round-trip (save-as-template, create-from-template)
+                // preserves the project's full requirement shape.
+                $milestoneRequirements = \App\Models\Requirement::query()
+                    ->where('housing_job_id', $this->id)
+                    ->where('source_type', \App\Models\Requirement::SOURCE_MILESTONE)
+                    ->where('source_id', $milestone->id)
+                    ->get();
+
+                foreach ($milestoneRequirements as $req) {
+                    \App\Models\Requirement::create([
+                        'housing_job_id' => $template->id,
+                        'type' => $req->type,
+                        'title' => $req->title,
+                        'description' => $req->description,
+                        'status' => \App\Models\Requirement::STATUS_OUTSTANDING,
+                        'owner_user_id' => null,
+                        'source_type' => \App\Models\Requirement::SOURCE_MILESTONE,
+                        'source_id' => $newMilestone->id,
+                        'source_template_id' => $req->source_template_id,
+                        'source_label_snapshot' => $req->title,
+                        'milestone_gate_text' => $req->milestone_gate_text,
+                        'created_by' => Auth::id(),
+                        'updated_by' => Auth::id(),
+                    ]);
+                }
             }
 
-            // Clone budget categories (as starting point with $0 spent)
+            // Milestone redesign (Phase 2): clone the milestone_dependencies
+            // pivot with remapped ids. We do this in a second pass so
+            // both ends of every edge exist before insertion. Edges
+            // whose endpoints didn't make it through the milestone copy
+            // (shouldn't happen for save-as-template, but defensively
+            // guard) are skipped silently.
+            foreach ($this->milestones as $milestone) {
+                $newId = $milestoneIdMap[$milestone->id] ?? null;
+                if ($newId === null) {
+                    continue;
+                }
+
+                $depIds = $milestone->dependencies()
+                    ->pluck('depends_on_milestone_id')
+                    ->map(fn ($oldId) => $milestoneIdMap[$oldId] ?? null)
+                    ->filter()
+                    ->values()
+                    ->all();
+
+                if (! empty($depIds)) {
+                    \App\Models\ProjectMilestone::find($newId)
+                        ->dependencies()
+                        ->attach($depIds);
+                }
+            }
+
+            // Milestone redesign (Phase 2): clone the fund-code attachment
+            // pivot to the template, with milestone_id remapped where
+            // the pivot carries a per-milestone tie. Must happen before
+            // budget cloning because ProjectBudget's saving guard
+            // rejects fund_code_id values that aren't attached to the
+            // owning project. Pre-existing gap: without this, any
+            // template saved from a project with fund-code-tagged
+            // budgets would silently be unrestorable.
+            foreach ($this->fundCodes as $fc) {
+                $pivotMilestoneId = $fc->pivot->milestone_id ?? null;
+                $remapped = $pivotMilestoneId !== null
+                    ? ($milestoneIdMap[$pivotMilestoneId] ?? null)
+                    : null;
+
+                $template->fundCodes()->attach($fc->id, [
+                    'milestone_id' => $remapped,
+                ]);
+            }
+
+            // Clone budget categories (as starting point with $0 spent).
+            // milestone_id remaps via $milestoneIdMap; unassigned budgets
+            // stay unassigned. Symmetric with createFromTemplate.
             foreach ($this->budgets as $budget) {
                 $newBudget = $budget->replicate([
                     'housing_job_id', 'spent_amount', 'created_by', 'updated_by',
@@ -590,6 +680,13 @@ class HousingJob extends Model
                 $newBudget->housing_job_id = $template->id;
                 $newBudget->spent_amount = 0;
                 $newBudget->created_by = Auth::id();
+
+                if ($budget->milestone_id !== null && isset($milestoneIdMap[$budget->milestone_id])) {
+                    $newBudget->milestone_id = $milestoneIdMap[$budget->milestone_id];
+                } else {
+                    $newBudget->milestone_id = null;
+                }
+
                 $newBudget->save();
             }
 
@@ -706,6 +803,47 @@ class HousingJob extends Model
                         'updated_by' => Auth::id(),
                     ]);
                 }
+            }
+
+            // Milestone redesign (Phase 2): clone milestone_dependencies
+            // pivot with remapped ids. Second pass so all milestones
+            // exist before attaching edges. Edges whose endpoints fall
+            // off the map (shouldn't happen but defensively guard) are
+            // skipped silently — better a missing dependency than a
+            // dangling-foreign-key insert.
+            foreach ($milestones as $milestone) {
+                $newId = $milestoneIdMap[$milestone->id] ?? null;
+                if ($newId === null) {
+                    continue;
+                }
+
+                $depIds = $milestone->dependencies()
+                    ->pluck('depends_on_milestone_id')
+                    ->map(fn ($oldId) => $milestoneIdMap[$oldId] ?? null)
+                    ->filter()
+                    ->values()
+                    ->all();
+
+                if (! empty($depIds)) {
+                    ProjectMilestone::find($newId)
+                        ->dependencies()
+                        ->attach($depIds);
+                }
+            }
+
+            // Milestone redesign (Phase 2): attach the template's fund
+            // codes (with per-milestone pivot remap) before cloning
+            // budgets. Symmetric with saveAsTemplate; required for the
+            // ProjectBudget saving guard to accept fund_code_id values.
+            foreach ($template->fundCodes as $fc) {
+                $pivotMilestoneId = $fc->pivot->milestone_id ?? null;
+                $remapped = $pivotMilestoneId !== null
+                    ? ($milestoneIdMap[$pivotMilestoneId] ?? null)
+                    : null;
+
+                $job->fundCodes()->attach($fc->id, [
+                    'milestone_id' => $remapped,
+                ]);
             }
 
             // Clone budget categories
