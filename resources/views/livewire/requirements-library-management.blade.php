@@ -147,7 +147,13 @@
                                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs {{ $catLabel[1] }}">{{ $catLabel[0] }}</span>
                                     </td>
                                     <td class="px-3 py-2 text-sm text-gray-700 dark:text-gray-200">
-                                        {{ $atom->default_required ? 'Required' : 'Optional' }}
+                                        <div>{{ $atom->default_required ? 'Required' : 'Optional' }}</div>
+                                        @if($atom->is_default_milestone)
+                                            <span class="inline-flex items-center gap-1 mt-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200"
+                                                  title="Auto-seeded as a milestone on every new project">
+                                                ★ default milestone
+                                            </span>
+                                        @endif
                                     </td>
                                     <td class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 max-w-md truncate">{{ $atom->hint }}</td>
                                     <td class="px-3 py-2 text-sm text-right whitespace-nowrap">
@@ -390,11 +396,23 @@
                         </div>
                     </div>
 
-                    <div>
+                    <div class="space-y-2">
                         <label class="inline-flex items-center gap-2">
                             <input type="checkbox" wire:model="atomDefaultRequired"
                                    class="rounded border-gray-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500" />
                             <span class="text-sm text-gray-700 dark:text-gray-200">Required by default</span>
+                        </label>
+
+                        {{-- Milestone redesign (Phase 1): admin toggle for default-milestone seeding. --}}
+                        <label class="flex items-start gap-2">
+                            <input type="checkbox" wire:model="atomIsDefaultMilestone"
+                                   class="mt-1 rounded border-gray-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500" />
+                            <span class="text-sm text-gray-700 dark:text-gray-200">
+                                Seed as default milestone on every new project
+                                <span class="block text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                    When ticked, every newly converted project gets a milestone for this requirement automatically. Best for universal Phase 2 compliance gates (e.g. Environmental Review, Lead Paint).
+                                </span>
+                            </span>
                         </label>
                     </div>
 

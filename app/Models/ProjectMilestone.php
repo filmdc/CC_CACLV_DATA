@@ -15,6 +15,7 @@ class ProjectMilestone extends Model implements HasMedia
 
     protected $fillable = [
         'housing_job_id',
+        'requirement_definition_id',
         'name',
         'description',
         'sequence_order',
@@ -48,6 +49,22 @@ class ProjectMilestone extends Model implements HasMedia
     public function housingJob(): BelongsTo
     {
         return $this->belongsTo(HousingJob::class);
+    }
+
+    /**
+     * Milestone redesign: when this milestone was auto-seeded from a
+     * library atom (a "promoted" Phase 2 milestone), this points at the
+     * canonical RequirementDefinition. PM-composed milestones leave it
+     * null. Use {@see isPromoted()} for readable intent checks.
+     */
+    public function requirementDefinition(): BelongsTo
+    {
+        return $this->belongsTo(RequirementDefinition::class);
+    }
+
+    public function isPromoted(): bool
+    {
+        return $this->requirement_definition_id !== null;
     }
 
     public function tasks(): HasMany
