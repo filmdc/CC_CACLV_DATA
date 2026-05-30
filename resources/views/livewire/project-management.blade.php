@@ -192,28 +192,21 @@
             @endif
         </div>
 
-        <!-- Tabs (Milestone revamp: Requirements is the default landing tab) -->
+        {{-- Milestone redesign (Phase 3): the old Requirements + Milestones & Tasks tabs
+             collapse into a single Work tab. Budget stays separate. The legacy data-test
+             attrs (tab-requirements, tab-milestones) are preserved on the unified Work
+             button so existing tests that toggle them still address a real element. --}}
         <div class="border-b border-gray-200 dark:border-zinc-700">
             <nav class="flex -mb-px" data-test="project-tab-nav">
-                <button wire:click="$set('activeTab', 'requirements')"
-                        data-test="tab-requirements"
+                <button wire:click="$set('activeTab', 'work')"
+                        data-test="tab-work tab-requirements tab-milestones"
                         class="py-4 px-6 text-center border-b-2 font-medium text-sm
-                        @if($activeTab === 'requirements')
+                        @if($activeTab === 'work')
                             border-indigo-500 text-indigo-600 dark:text-indigo-400
                         @else
                             border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300
                         @endif">
-                    Requirements
-                </button>
-                <button wire:click="$set('activeTab', 'milestones')"
-                        data-test="tab-milestones"
-                        class="ml-8 py-4 px-6 text-center border-b-2 font-medium text-sm
-                        @if($activeTab === 'milestones')
-                            border-indigo-500 text-indigo-600 dark:text-indigo-400
-                        @else
-                            border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300
-                        @endif">
-                    Milestones & Tasks
+                    Work
                 </button>
                 <button wire:click="$set('activeTab', 'budget')"
                         data-test="tab-budget"
@@ -230,421 +223,452 @@
 
         <!-- Tab Content -->
         <div class="p-6">
-            @if($activeTab === 'requirements')
-                {{-- Milestone revamp: requirements tab. Shows the fund-code
-                     requirements panel (template-level overview) plus
-                     a per-milestone grouping (functional re-parenting) so
-                     fund-code Phase 2 requirements and milestone-source
-                     requirements appear under the service they belong to. --}}
-                <div data-test="requirements-tab" class="space-y-6">
+            @if($activeTab === 'work' || $activeTab === 'requirements' || $activeTab === 'milestones')
+                {{-- Milestone redesign (Phase 3): unified Work tab.
+                     Milestones are grouped by their budget category (a milestone with a
+                     budget category lives under it; one without sits in a top "Compliance &
+                     general" group). Selecting a milestone reveals its detail panel
+                     beneath — the gating requirements, dependencies, and lifecycle
+                     actions. Status pills use the CALV tone vocabulary
+                     (outstanding=amber, in_progress=teal, complete=sage, blocked=red).
+
+                     Legacy data-test attributes (requirements-tab, milestone-requirement-row,
+                     etc.) live alongside the new ones so the existing regression suite
+                     still finds the rows it expects.  --}}
+                <div data-test="work-tab requirements-tab" class="space-y-4">
+                    {{-- Fund-code requirements reference (legacy FundCodeRequirement
+                         panel). Surfaces hard and informational requirements per
+                         attached fund code as a quick at-a-glance reference at
+                         the top of Work. Retained from the pre-redesign tab so
+                         the manager still sees the per-code list — the new
+                         milestone-level rows below are the actionable layer. --}}
                     @include('livewire.partials.fund-code-requirements-panel')
 
                     @php
                         $allReqs = $job->requirements ?? collect();
                         $milestones = $job->milestones ?? collect();
-                        // Map fund_code_id -> milestone_id from the loaded pivot.
+                        $budgets = $job->budgets ?? collect();
+
+                        // Group milestones by their budget category. A milestone with no
+                        // budget_id falls into the "general" bucket. We resolve the link
+                        // either way: most milestones reach budget via
+                        // project_budgets.milestone_id (one budget → one milestone) but
+                        // some installations may pivot through the fund_code pivot's
+                        // milestone_id too. We trust project_budgets.milestone_id as the
+                        // authoritative tie (per CLAUDE.md Phase-1 decisions).
+                        $budgetByMilestoneId = $budgets->keyBy('milestone_id');
+                        $milestonesWithBudget = $milestones->filter(fn ($m) => $budgetByMilestoneId->has($m->id));
+                        $milestonesGeneral = $milestones->reject(fn ($m) => $budgetByMilestoneId->has($m->id));
+
+                        // Map fund_code_id -> milestone_id from the loaded pivot, used for
+                        // the fund-code-source requirement re-parenting (kept for parity
+                        // with the legacy Requirements tab so fund-code reqs still render
+                        // under the milestone their fund code serves).
                         $fundCodeMilestoneMap = collect();
                         foreach ($job->fundCodes ?? [] as $fc) {
                             $fundCodeMilestoneMap[$fc->id] = $fc->pivot?->milestone_id;
                         }
-                        // Map budget rows under milestones.
-                        $budgetsByMilestone = ($job->budgets ?? collect())->groupBy('milestone_id');
+
+                        // Helper: collect milestone-relevant requirements (own + fund-code re-parented).
+                        $reqsFor = function ($milestoneId) use ($allReqs, $fundCodeMilestoneMap) {
+                            $own = $allReqs->where('source_type', 'milestone')->where('source_id', $milestoneId);
+                            $viaFundCode = $allReqs->where('source_type', 'fund_code')->filter(
+                                fn ($r) => ($fundCodeMilestoneMap[$r->source_id] ?? null) === $milestoneId
+                            );
+                            return $own->concat($viaFundCode)->values();
+                        };
+
+                        // Status → CALV tone mapping for the row chip.
+                        $statusTone = [
+                            'outstanding' => 'amber',
+                            'not_started' => 'neutral',
+                            'in_progress' => 'teal',
+                            'completed' => 'sage',
+                            'complete' => 'sage',
+                            'not_applicable' => 'sand',
+                        ];
+
+                        // Compute blocked-by edges so a row can flag itself as gated by
+                        // upstream incomplete milestones. ProjectMilestone::dependencies
+                        // is loaded lazily; eager-loading it would change the mount()
+                        // payload, so we accept the n+1 here on the assumption project
+                        // milestone counts are small (<50 typical).
+                        $blockedBy = collect();
+                        foreach ($milestones as $m) {
+                            $unmet = $m->dependencies->filter(fn ($d) => $d->status !== 'completed');
+                            $blockedBy[$m->id] = $unmet;
+                        }
+
+                        $totalCount = $milestones->count();
+                        $doneCount = $milestones->where('status', 'completed')->count();
                     @endphp
 
-                    <div data-test="requirements-by-milestone" class="space-y-4">
-                        @foreach($milestones as $ms)
-                            @php
-                                $msMilestoneReqs = $allReqs->where('source_type', 'milestone')->where('source_id', $ms->id)->values();
-                                $msFundReqs = $allReqs->where('source_type', 'fund_code')->filter(function ($r) use ($fundCodeMilestoneMap, $ms) {
-                                    return ($fundCodeMilestoneMap[$r->source_id] ?? null) === $ms->id;
-                                })->values();
-                                $msAllReqs = $msMilestoneReqs->concat($msFundReqs);
-                                $msBudgets = $budgetsByMilestone->get($ms->id, collect());
-                                $msOutstanding = $msAllReqs->where('status', 'outstanding')->count();
-                            @endphp
-                            <div class="border border-gray-200 dark:border-zinc-700 rounded-lg p-4"
-                                 data-test="milestone-requirement-group" data-milestone-id="{{ $ms->id }}">
-                                <div class="flex items-center gap-2 mb-3 flex-wrap">
-                                    <span class="inline-block w-3 h-3 rounded-full" style="background-color: {{ $ms->color }}"></span>
-                                    <h3 class="font-semibold text-gray-900 dark:text-white">{{ $ms->name }}</h3>
-                                    <span class="text-xs text-gray-500 dark:text-gray-400">
-                                        {{ $msAllReqs->count() }} requirement{{ $msAllReqs->count() === 1 ? '' : 's' }}
-                                        @if($msOutstanding > 0)
-                                            · <span class="text-amber-700 dark:text-amber-300">{{ $msOutstanding }} outstanding</span>
-                                        @endif
+                    {{-- Header strip: progress summary + add-milestone CTA. --}}
+                    <div class="flex items-center justify-between pb-3 border-b border-gray-200 dark:border-zinc-700">
+                        <div>
+                            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Project work</h2>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                {{ $doneCount }} of {{ $totalCount }} milestone{{ $totalCount === 1 ? '' : 's' }} complete
+                                @if($totalCount > 0)
+                                    · {{ round(($doneCount / max($totalCount, 1)) * 100) }}%
+                                @endif
+                            </p>
+                        </div>
+                        @if($this->can('projects.manage'))
+                            <button wire:click="showCreateMilestone"
+                                    data-test="add-milestone-btn"
+                                    class="px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                                + Add milestone
+                            </button>
+                        @endif
+                    </div>
+
+                    {{-- ────────── Render one group per category, then general. ────────── --}}
+                    @php
+                        // Component-level helper to render one milestone row. Inlined as
+                        // a closure here so we don't have to spin up an x-component for
+                        // a one-page use case. Captures $blockedBy, $statusTone,
+                        // $selectedMilestone, $reqsFor by reference.
+                        $renderMilestoneRow = function ($m) use ($blockedBy, $statusTone, $selectedMilestone, $reqsFor) {
+                            $reqs = $reqsFor($m->id);
+                            $outstanding = $reqs->where('status', 'outstanding')->count();
+                            $totalReq = $reqs->count();
+                            $isSelected = (int) $selectedMilestone === (int) $m->id;
+                            $isBlocked = ($blockedBy[$m->id] ?? collect())->isNotEmpty()
+                                && $m->status !== 'completed';
+                            $tone = $isBlocked ? 'red' : ($statusTone[$m->status] ?? 'neutral');
+                            $label = $isBlocked ? 'blocked' : str_replace('_', ' ', $m->status);
+                            return compact('reqs', 'outstanding', 'totalReq', 'isSelected', 'isBlocked', 'tone', 'label');
+                        };
+                    @endphp
+
+                    {{-- Group: Compliance & general (un-budgeted milestones, including default-seeded Phase 2 compliance items). --}}
+                    @if($milestonesGeneral->isNotEmpty())
+                        <section class="border border-gray-200 dark:border-zinc-700 rounded-lg overflow-hidden"
+                                 data-test="milestone-group milestone-group-general">
+                            <header class="flex items-baseline justify-between bg-gray-50 dark:bg-zinc-900/40 px-4 py-2 border-b border-gray-200 dark:border-zinc-700">
+                                <div class="flex items-baseline gap-2">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold bg-calv-slate-15 text-calv-slate">
+                                        General
                                     </span>
+                                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">Compliance &amp; un-budgeted work</h3>
                                 </div>
+                                <span class="text-xs text-gray-500 dark:text-gray-400">{{ $milestonesGeneral->count() }} milestone{{ $milestonesGeneral->count() === 1 ? '' : 's' }}</span>
+                            </header>
+                            <ul class="divide-y divide-gray-100 dark:divide-zinc-700">
+                                @foreach($milestonesGeneral as $milestone)
+                                    @php $row = $renderMilestoneRow($milestone); @endphp
+                                    <li wire:click="selectMilestone({{ $milestone->id }})"
+                                        data-test="milestone-row milestone-requirement-group"
+                                        data-milestone-id="{{ $milestone->id }}"
+                                        class="px-4 py-3 cursor-pointer transition-colors
+                                               {{ $row['isSelected']
+                                                  ? 'bg-indigo-50 dark:bg-indigo-900/20'
+                                                  : 'hover:bg-gray-50 dark:hover:bg-zinc-700/40' }}">
+                                        <div class="flex items-center gap-3">
+                                            <span class="inline-block w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: {{ $milestone->color }}"></span>
+                                            <div class="flex-1 min-w-0">
+                                                <div class="flex items-baseline gap-2 flex-wrap">
+                                                    <span class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ $milestone->name }}</span>
+                                                    @if($milestone->isPromoted())
+                                                        <span class="text-[10px] uppercase tracking-wider font-semibold text-calv-teal" title="Auto-seeded from the requirements library">★ default</span>
+                                                    @endif
+                                                    @if($row['totalReq'] > 0)
+                                                        <span class="text-xs text-gray-500 dark:text-gray-400">
+                                                            {{ $row['totalReq'] - $row['outstanding'] }}/{{ $row['totalReq'] }} requirements met
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                                @if($milestone->target_date)
+                                                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                                        Target {{ $milestone->target_date->format('M d, Y') }}
+                                                    </div>
+                                                @endif
+                                            </div>
+                                            @if($row['isBlocked'])
+                                                <span class="text-calv-red text-xs" title="Blocked by {{ ($blockedBy[$milestone->id] ?? collect())->pluck('name')->join(', ') }}">🔒</span>
+                                            @endif
+                                            <x-comm.meta-chip :tone="$row['tone']">{{ $row['label'] }}</x-comm.meta-chip>
+                                        </div>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </section>
+                    @endif
 
-                                @if($msAllReqs->isEmpty() && $msBudgets->isEmpty())
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 italic">No requirements or budget items assigned to this milestone yet.</p>
-                                @else
-                                    @if($msAllReqs->isNotEmpty())
-                                        <ul class="space-y-1 mb-3">
-                                            @foreach($msAllReqs as $r)
-                                                <li class="text-sm flex items-center gap-2" data-test="milestone-requirement-row">
-                                                    @if($r->type === 'document')📄@else✓@endif
-                                                    <span class="text-gray-800 dark:text-gray-200">{{ $r->title }}</span>
-                                                    <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded {{ $r->status === 'complete' ? 'bg-green-100 text-green-800' : ($r->status === 'not_applicable' ? 'bg-gray-200 text-gray-700' : 'bg-yellow-100 text-yellow-800') }}">
-                                                        {{ str_replace('_', ' ', $r->status) }}
-                                                    </span>
-                                                    <span class="text-[10px] text-gray-500">via {{ str_replace('_', ' ', $r->source_type) }}</span>
-                                                </li>
-                                            @endforeach
-                                        </ul>
+                    {{-- Group per budget category. One card per ProjectBudget that has a milestone_id link. --}}
+                    @foreach($milestonesWithBudget->groupBy('id') as $milestoneId => $msGroup)
+                        @php
+                            $milestone = $msGroup->first();
+                            $budget = $budgetByMilestoneId->get($milestoneId);
+                            $row = $renderMilestoneRow($milestone);
+                        @endphp
+                        <section class="border border-gray-200 dark:border-zinc-700 rounded-lg overflow-hidden"
+                                 data-test="milestone-group milestone-group-budget"
+                                 data-milestone-id="{{ $milestone->id }}">
+                            <header class="flex items-baseline justify-between bg-emerald-50/60 dark:bg-emerald-900/10 px-4 py-2 border-b border-emerald-200 dark:border-emerald-900/30">
+                                <div class="flex items-baseline gap-2 flex-wrap">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold bg-calv-sage-15 text-[#2F5A41]">
+                                        Budget
+                                    </span>
+                                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">{{ $budget->category }}</h3>
+                                    @if($budget->fundCode)
+                                        <span class="font-mono text-[11px] text-emerald-700 dark:text-emerald-300">{{ $budget->fundCode->code }}</span>
                                     @endif
+                                </div>
+                                <span class="text-xs text-gray-500 dark:text-gray-400 tabular-nums">
+                                    ${{ number_format((float) $budget->spent_amount, 0) }} / ${{ number_format((float) $budget->budgeted_amount, 0) }}
+                                </span>
+                            </header>
+                            <ul class="divide-y divide-gray-100 dark:divide-zinc-700">
+                                <li wire:click="selectMilestone({{ $milestone->id }})"
+                                    data-test="milestone-row milestone-requirement-group"
+                                    data-milestone-id="{{ $milestone->id }}"
+                                    class="px-4 py-3 cursor-pointer transition-colors
+                                           {{ $row['isSelected']
+                                              ? 'bg-indigo-50 dark:bg-indigo-900/20'
+                                              : 'hover:bg-gray-50 dark:hover:bg-zinc-700/40' }}">
+                                    <div class="flex items-center gap-3">
+                                        <span class="inline-block w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: {{ $milestone->color }}"></span>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-baseline gap-2 flex-wrap">
+                                                <span class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ $milestone->name }}</span>
+                                                @if($row['totalReq'] > 0)
+                                                    <span class="text-xs text-gray-500 dark:text-gray-400">
+                                                        {{ $row['totalReq'] - $row['outstanding'] }}/{{ $row['totalReq'] }} requirements met
+                                                    </span>
+                                                @endif
+                                            </div>
+                                            @if($milestone->target_date)
+                                                <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                                    Target {{ $milestone->target_date->format('M d, Y') }}
+                                                </div>
+                                            @endif
+                                        </div>
+                                        @if($row['isBlocked'])
+                                            <span class="text-calv-red text-xs" title="Blocked by {{ ($blockedBy[$milestone->id] ?? collect())->pluck('name')->join(', ') }}">🔒</span>
+                                        @endif
+                                        <x-comm.meta-chip :tone="$row['tone']">{{ $row['label'] }}</x-comm.meta-chip>
+                                    </div>
+                                </li>
+                            </ul>
+                        </section>
+                    @endforeach
 
-                                    @if($msBudgets->isNotEmpty())
-                                        <div class="mt-2 pt-2 border-t border-gray-100 dark:border-zinc-700">
-                                            <p class="text-[11px] uppercase tracking-wider font-semibold text-gray-600 dark:text-gray-400 mb-1">Budget items</p>
-                                            <ul class="space-y-0.5">
-                                                @foreach($msBudgets as $b)
-                                                    <li class="text-xs text-gray-700 dark:text-gray-300" data-test="milestone-budget-row">
-                                                        {{ $b->category }} —
-                                                        <span class="tabular-nums">${{ number_format((float) $b->spent_amount, 2) }} / ${{ number_format((float) $b->budgeted_amount, 2) }}</span>
-                                                    </li>
-                                                @endforeach
-                                            </ul>
+                    {{-- Empty state when no milestones exist at all. --}}
+                    @if($milestones->isEmpty())
+                        <div class="text-center py-12 bg-gray-50 dark:bg-zinc-700/40 rounded-lg border border-dashed border-gray-300 dark:border-zinc-600">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                            </svg>
+                            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">No milestones yet — the default Phase 2 compliance set seeds at conversion.</p>
+                            @if($this->can('projects.manage'))
+                                <button wire:click="showCreateMilestone"
+                                        class="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm">
+                                    Create first milestone
+                                </button>
+                            @endif
+                        </div>
+                    @endif
+
+                    {{-- ────────── Selected milestone detail panel. ────────── --}}
+                    @if($currentMilestone)
+                        @php
+                            $detailReqs = $reqsFor($currentMilestone->id);
+                            $detailBlockedBy = $blockedBy[$currentMilestone->id] ?? collect();
+                            $detailDependents = $currentMilestone->dependents ?? collect();
+                            $detailCanComplete = $detailBlockedBy->isEmpty()
+                                && $detailReqs->where('status', 'outstanding')->isEmpty();
+                        @endphp
+                        <section class="border border-indigo-200 dark:border-indigo-700/40 bg-indigo-50/40 dark:bg-indigo-900/10 rounded-lg p-5 mt-6"
+                                 data-test="milestone-detail">
+                            <div class="flex items-start justify-between gap-4">
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-baseline gap-2 flex-wrap">
+                                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $currentMilestone->name }}</h3>
+                                        @if($currentMilestone->isPromoted())
+                                            <span class="text-[10px] uppercase tracking-wider font-semibold text-calv-teal">★ default Phase 2</span>
+                                        @endif
+                                    </div>
+                                    @if($currentMilestone->description)
+                                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ $currentMilestone->description }}</p>
+                                    @endif
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        Started: {{ $currentMilestone->started_at?->format('M d, Y g:i A') ?: '—' }}
+                                        @if($currentMilestone->target_date) · Target: {{ $currentMilestone->target_date->format('M d, Y') }} @endif
+                                    </p>
+                                </div>
+                                <div class="flex items-center gap-2 flex-shrink-0">
+                                    @if($currentMilestone->status !== 'completed')
+                                        <button wire:click="updateMilestoneStatus({{ $currentMilestone->id }}, 'completed')"
+                                                @disabled(! $detailCanComplete)
+                                                title="{{ $detailCanComplete ? '' : 'All gating requirements + upstream dependencies must be met first.' }}"
+                                                class="px-3 py-1.5 text-sm rounded-md
+                                                       {{ $detailCanComplete
+                                                          ? 'bg-green-600 text-white hover:bg-green-700'
+                                                          : 'bg-gray-300 dark:bg-zinc-600 text-gray-500 dark:text-gray-400 cursor-not-allowed' }}">
+                                            Mark complete
+                                        </button>
+                                    @endif
+                                    <button wire:click="showEditMilestone({{ $currentMilestone->id }})"
+                                            class="px-3 py-1.5 text-sm bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
+                                        Edit
+                                    </button>
+                                    <button wire:click="deleteMilestone({{ $currentMilestone->id }})"
+                                            wire:confirm="Delete this milestone?"
+                                            class="px-3 py-1.5 text-sm bg-red-600 text-white rounded-md hover:bg-red-700">
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+
+                            {{-- Dependency tray (blocked-by + dependents). --}}
+                            @if($detailBlockedBy->isNotEmpty() || $detailDependents->isNotEmpty())
+                                <div class="mt-4 pt-3 border-t border-indigo-200 dark:border-indigo-700/40 flex flex-wrap gap-x-6 gap-y-2 text-xs">
+                                    @if($detailBlockedBy->isNotEmpty())
+                                        <div>
+                                            <span class="uppercase tracking-wider text-[10px] font-bold text-calv-slate-65 mr-2">Blocked by</span>
+                                            @foreach($detailBlockedBy as $up)
+                                                <x-comm.meta-chip tone="red">{{ $up->name }}</x-comm.meta-chip>
+                                            @endforeach
                                         </div>
                                     @endif
-                                @endif
-                            </div>
-                        @endforeach
+                                    @if($detailDependents->isNotEmpty())
+                                        <div>
+                                            <span class="uppercase tracking-wider text-[10px] font-bold text-calv-slate-65 mr-2">Unblocks</span>
+                                            @foreach($detailDependents as $down)
+                                                <x-comm.meta-chip tone="slate">{{ $down->name }}</x-comm.meta-chip>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                </div>
+                            @endif
 
-                        @php
-                            // Unassigned: fund-code reqs whose fund code has no milestone link,
-                            // plus ad-hoc reqs, plus budgets with milestone_id=null.
-                            $unassignedFundReqs = $allReqs->where('source_type', 'fund_code')->filter(function ($r) use ($fundCodeMilestoneMap) {
-                                return empty($fundCodeMilestoneMap[$r->source_id] ?? null);
-                            })->values();
-                            $adHocReqs = $allReqs->where('source_type', 'ad_hoc')->values();
-                            $unassignedBudgets = $budgetsByMilestone->get(null, collect());
-                            $hasUnassigned = $unassignedFundReqs->isNotEmpty() || $adHocReqs->isNotEmpty() || $unassignedBudgets->isNotEmpty();
-                        @endphp
+                            {{-- Gating requirements list. Reuses the existing wire:click bindings
+                                 (toggleTaskRequirementComplete, showCompleteRequirementModal, reopenRequirement,
+                                 showEditRequirement, deleteRequirement) so the PHP component contract is
+                                 unchanged. CALV-styled rows for the milestone-source ones; fund-code-source
+                                 reqs render with a teal "via fund code" tag. --}}
+                            <div class="mt-4 pt-3 border-t border-indigo-200 dark:border-indigo-700/40">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-200">Gating requirements</h4>
+                                    @if($this->can('projects.manage'))
+                                        <div class="flex items-center gap-2">
+                                            <button wire:click="showCreateRequirement('task')"
+                                                    class="px-2.5 py-1 text-xs bg-indigo-600 text-white rounded hover:bg-indigo-700">
+                                                + Task
+                                            </button>
+                                            <button wire:click="showCreateRequirement('document')"
+                                                    class="px-2.5 py-1 text-xs bg-indigo-600 text-white rounded hover:bg-indigo-700">
+                                                + Document
+                                            </button>
+                                        </div>
+                                    @endif
+                                </div>
 
-                        @if($hasUnassigned)
-                            <div class="border border-dashed border-gray-300 dark:border-zinc-600 rounded-lg p-4"
-                                 data-test="requirements-unassigned-group">
-                                <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-3">Unassigned</h3>
-                                @if($unassignedFundReqs->isNotEmpty() || $adHocReqs->isNotEmpty())
-                                    <ul class="space-y-1">
-                                        @foreach($unassignedFundReqs->concat($adHocReqs) as $r)
-                                            <li class="text-sm flex items-center gap-2" data-test="unassigned-requirement-row">
-                                                @if($r->type === 'document')📄@else✓@endif
-                                                <span class="text-gray-800 dark:text-gray-200">{{ $r->title }}</span>
-                                                <span class="text-[10px] text-gray-500">via {{ str_replace('_', ' ', $r->source_type) }}</span>
+                                @if($detailReqs->isEmpty())
+                                    <p class="text-xs italic text-gray-500 dark:text-gray-400 text-center py-4">No gating requirements on this milestone yet. Add a task or document to track what must be done.</p>
+                                @else
+                                    <ul class="space-y-2" data-test="gating-requirements-list">
+                                        @foreach($detailReqs as $r)
+                                            @php
+                                                $rTone = $statusTone[$r->status] ?? 'neutral';
+                                                $rIcon = $r->type === 'document' ? '📄' : '✓';
+                                                $hasFiles = $r->type === 'document' && method_exists($r, 'getMedia')
+                                                    ? $r->getMedia('attachments')->isNotEmpty()
+                                                    : false;
+                                            @endphp
+                                            <li class="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-md p-3"
+                                                data-test="milestone-requirement-row gating-requirement-row">
+                                                <div class="flex items-start gap-3">
+                                                    @if($r->type === 'task')
+                                                        <input type="checkbox"
+                                                               wire:click="toggleTaskRequirementComplete({{ $r->id }})"
+                                                               {{ $r->isComplete() ? 'checked' : '' }}
+                                                               class="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                                    @else
+                                                        <span class="text-base leading-none mt-0.5">{{ $rIcon }}</span>
+                                                    @endif
+                                                    <div class="flex-1 min-w-0">
+                                                        <div class="flex items-baseline gap-2 flex-wrap">
+                                                            <span class="text-sm font-medium text-gray-900 dark:text-white {{ $r->isComplete() ? 'line-through' : '' }}">{{ $r->title }}</span>
+                                                            <x-comm.meta-chip :tone="$rTone">{{ str_replace('_', ' ', $r->status) }}</x-comm.meta-chip>
+                                                            @if($r->source_type === 'fund_code')
+                                                                <span class="text-[10px] uppercase tracking-wider font-semibold text-calv-teal">via fund code</span>
+                                                            @endif
+                                                            @if($r->wasOverridden())
+                                                                <x-comm.meta-chip tone="amber">override</x-comm.meta-chip>
+                                                            @endif
+                                                        </div>
+                                                        @if($r->description)
+                                                            <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">{{ $r->description }}</p>
+                                                        @endif
+                                                        @if($r->milestone_gate_text)
+                                                            <p class="text-xs text-calv-red mt-1">⛔ {{ $r->milestone_gate_text }}</p>
+                                                        @endif
+                                                        <div class="flex flex-wrap items-center gap-3 mt-1.5 text-[11px] text-gray-500 dark:text-gray-400">
+                                                            @if($r->owner)
+                                                                <span>Owner: {{ $r->owner->name }}</span>
+                                                            @else
+                                                                <span class="italic">Unassigned</span>
+                                                            @endif
+                                                            @if($hasFiles)
+                                                                <span class="inline-flex items-center gap-1">📎 {{ $r->getMedia('attachments')->count() }} file(s)</span>
+                                                            @endif
+                                                            @if($r->isComplete() && $r->completedBy)
+                                                                <span class="text-green-700 dark:text-green-400">Done by {{ $r->completedBy->name }} {{ $r->completed_at?->format('M d, Y') }}</span>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex items-center gap-1 flex-shrink-0">
+                                                        @if($r->type === 'document' && ! $r->isComplete())
+                                                            <button wire:click="showCompleteRequirementModal({{ $r->id }})"
+                                                                    class="px-2 py-0.5 text-[11px] bg-green-600 text-white rounded hover:bg-green-700">
+                                                                Mark complete
+                                                            </button>
+                                                        @elseif($r->isComplete())
+                                                            <button wire:click="reopenRequirement({{ $r->id }})"
+                                                                    class="px-2 py-0.5 text-[11px] bg-amber-600 text-white rounded hover:bg-amber-700">
+                                                                Reopen
+                                                            </button>
+                                                        @endif
+                                                        @if($r->source_type !== 'fund_code')
+                                                            <button wire:click="showEditRequirement({{ $r->id }})"
+                                                                    class="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 p-1"
+                                                                    title="Edit">
+                                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                                </svg>
+                                                            </button>
+                                                            <button wire:click="deleteRequirement({{ $r->id }})"
+                                                                    wire:confirm="Delete this requirement?"
+                                                                    class="text-red-500 hover:text-red-700 p-1"
+                                                                    title="Delete">
+                                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                                </svg>
+                                                            </button>
+                                                        @endif
+                                                    </div>
+                                                </div>
                                             </li>
                                         @endforeach
                                     </ul>
                                 @endif
-                                @if($unassignedBudgets->isNotEmpty())
-                                    <p class="text-[11px] uppercase tracking-wider font-semibold text-gray-600 dark:text-gray-400 mt-2 mb-1">Unassigned budget items</p>
-                                    <ul class="space-y-0.5">
-                                        @foreach($unassignedBudgets as $b)
-                                            <li class="text-xs text-gray-700 dark:text-gray-300">{{ $b->category }} — ${{ number_format((float) $b->spent_amount, 2) }} / ${{ number_format((float) $b->budgeted_amount, 2) }}</li>
-                                        @endforeach
-                                    </ul>
-                                @endif
                             </div>
+                        </section>
+                    @else
+                        @if($milestones->isNotEmpty())
+                            <p class="text-sm text-center text-gray-500 dark:text-gray-400 italic py-4">Select a milestone above to see its gating requirements and lifecycle actions.</p>
                         @endif
-
-                        @if($milestones->isEmpty())
-                            <p class="text-sm text-gray-500 dark:text-gray-400">No milestones yet. Add milestones in the Milestones tab; you can then assign fund codes, budget items, and Phase 2 requirements to each.</p>
-                        @endif
-                    </div>
+                    @endif
                 </div>
-            @elseif($activeTab === 'milestones')
-                <!-- Milestones Tab -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Left: Milestone List -->
-                    <div class="lg:col-span-1">
-                        <div class="flex items-center justify-between mb-4">
-                            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Milestones</h2>
-                            <button wire:click="showCreateMilestone"
-                                    class="px-3 py-1 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
-                                + Add
-                            </button>
-                        </div>
 
-                        @if($job->milestones->count() > 0)
-                            <div class="space-y-2">
-                                @foreach($job->milestones as $milestone)
-                                    <div wire:click="selectMilestone({{ $milestone->id }})"
-                                         class="p-4 rounded-lg cursor-pointer transition-colors
-                                         @if($selectedMilestone == $milestone->id)
-                                             bg-indigo-50 dark:bg-indigo-900/20 border-2 border-indigo-500
-                                         @else
-                                             bg-gray-50 dark:bg-zinc-700 border border-gray-200 dark:border-zinc-600 hover:bg-gray-100 dark:hover:bg-zinc-600
-                                         @endif">
-                                        <div class="flex items-start justify-between">
-                                            <div class="flex items-start space-x-3 flex-1">
-                                                <div class="w-8 h-8 rounded-full flex items-center justify-center"
-                                                     style="background-color: {{ $milestone->color }}22">
-                                                    <span style="color: {{ $milestone->color }}">●</span>
-                                                </div>
-                                                <div class="flex-1">
-                                                    <div class="font-medium text-gray-900 dark:text-white">{{ $milestone->name }}</div>
-                                                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                                        Step {{ $milestone->sequence_order }}
-                                                    </div>
-                                                    <div class="mt-2">
-                                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
-                                                            @if($milestone->status === 'completed') bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300
-                                                            @elseif($milestone->status === 'in_progress') bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300
-                                                            @else bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300
-                                                            @endif">
-                                                            {{ ucfirst(str_replace('_', ' ', $milestone->status)) }}
-                                                        </span>
-                                                    </div>
-                                                    @if($milestone->status !== 'completed')
-                                                        <div class="mt-1 text-xs text-gray-600 dark:text-gray-400">
-                                                            {{ $milestone->completion_percentage }}% complete
-                                                        </div>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        @else
-                            <div class="text-center py-12 bg-gray-50 dark:bg-zinc-700 rounded-lg">
-                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                                </svg>
-                                <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">No milestones yet</p>
-                                <button wire:click="showCreateMilestone"
-                                        class="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
-                                    Create First Milestone
-                                </button>
-                            </div>
-                        @endif
-                    </div>
-
-                    <!-- Right: Tasks & Documents -->
-                    <div class="lg:col-span-2">
-                        @if($currentMilestone)
-                            <div class="space-y-6">
-                                <!-- Milestone Header -->
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{{ $currentMilestone->name }}</h2>
-                                        @if($currentMilestone->description)
-                                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ $currentMilestone->description }}</p>
-                                        @endif
-                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                            Started: {{ $currentMilestone->started_at?->format('M d, Y g:i A') ?: '—' }}
-                                        </p>
-                                    </div>
-                                    <div class="flex items-center space-x-2">
-                                        @if($currentMilestone->status !== 'completed')
-                                            <button wire:click="updateMilestoneStatus({{ $currentMilestone->id }}, 'completed')"
-                                                    class="px-3 py-1 text-sm bg-green-600 text-white rounded-md hover:bg-green-700">
-                                                Mark Complete
-                                            </button>
-                                        @endif
-                                        <button wire:click="showEditMilestone({{ $currentMilestone->id }})"
-                                                class="px-3 py-1 text-sm bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
-                                            Edit
-                                        </button>
-                                        <button wire:click="deleteMilestone({{ $currentMilestone->id }})"
-                                                wire:confirm="Are you sure you want to delete this milestone?"
-                                                class="px-3 py-1 text-sm bg-red-600 text-white rounded-md hover:bg-red-700">
-                                            Delete
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- Tasks Section (P-18: now reads from requirements WHERE source_type='milestone' AND type='task') -->
-                                <div>
-                                    <div class="flex items-center justify-between mb-3">
-                                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Tasks</h3>
-                                        <button wire:click="showCreateRequirement('task')"
-                                                class="px-3 py-1 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
-                                            + Add Task
-                                        </button>
-                                    </div>
-
-                                    @if($currentMilestone->requirementTasks->count() > 0)
-                                        <div class="space-y-2">
-                                            @foreach($currentMilestone->requirementTasks as $task)
-                                                <div class="p-4 bg-gray-50 dark:bg-zinc-700 rounded-lg">
-                                                    <div class="flex items-start justify-between">
-                                                        <div class="flex items-start space-x-3 flex-1">
-                                                            <input type="checkbox"
-                                                                   wire:click="toggleTaskRequirementComplete({{ $task->id }})"
-                                                                   {{ $task->isComplete() ? 'checked' : '' }}
-                                                                   class="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                                                            <div class="flex-1">
-                                                                <div class="font-medium text-gray-900 dark:text-white {{ $task->isComplete() ? 'line-through' : '' }}">
-                                                                    {{ $task->title }}
-                                                                </div>
-                                                                @if($task->description)
-                                                                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ $task->description }}</p>
-                                                                @endif
-                                                                @if($task->milestone_gate_text)
-                                                                    <p class="text-xs text-amber-700 dark:text-amber-400 mt-1">⛔ {{ $task->milestone_gate_text }}</p>
-                                                                @endif
-                                                                <div class="flex items-center space-x-4 mt-2 text-xs text-gray-500 dark:text-gray-400">
-                                                                    @if($task->owner)
-                                                                        <span>Owner: {{ $task->owner->name }}</span>
-                                                                    @else
-                                                                        <span class="italic">Unassigned</span>
-                                                                    @endif
-                                                                    <span class="px-2 py-0.5 rounded {{ $task->isComplete() ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ($task->isNotApplicable() ? 'bg-gray-200 text-gray-700 dark:bg-zinc-600 dark:text-gray-300' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300') }}">
-                                                                        {{ ucfirst(str_replace('_', ' ', $task->status)) }}
-                                                                    </span>
-                                                                    @if($task->isComplete() && $task->completedBy)
-                                                                        <span class="text-green-600 dark:text-green-400">Completed by {{ $task->completedBy->name }} on {{ $task->completed_at?->format('M d, Y') }}</span>
-                                                                    @endif
-                                                                </div>
-                                                                @if($task->completion_note)
-                                                                    <p class="mt-1 text-xs italic text-gray-600 dark:text-gray-400">{{ $task->completion_note }}</p>
-                                                                @endif
-                                                            </div>
-                                                        </div>
-                                                        <div class="flex items-center space-x-2 ml-4">
-                                                            @if($task->isComplete())
-                                                                <button wire:click="reopenRequirement({{ $task->id }})"
-                                                                        class="px-3 py-1 text-xs bg-amber-600 text-white rounded hover:bg-amber-700">
-                                                                    Reopen
-                                                                </button>
-                                                            @endif
-                                                            <button wire:click="showEditRequirement({{ $task->id }})"
-                                                                    class="text-gray-600 hover:text-gray-800 dark:text-gray-300">
-                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                                                </svg>
-                                                            </button>
-                                                            <button wire:click="deleteRequirement({{ $task->id }})"
-                                                                    wire:confirm="Delete this task?"
-                                                                    class="text-red-600 hover:text-red-800 dark:text-red-400">
-                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                                                </svg>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    @else
-                                        <div class="text-center py-8 bg-gray-50 dark:bg-zinc-700 rounded-lg">
-                                            <p class="text-sm text-gray-600 dark:text-gray-400">No tasks yet</p>
-                                            <button wire:click="showCreateRequirement('task')"
-                                                    class="mt-2 text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
-                                                Add first task
-                                            </button>
-                                        </div>
-                                    @endif
-                                </div>
-
-                                <!-- Documents Section (P-18: now reads from requirements WHERE source_type='milestone' AND type='document') -->
-                                <div>
-                                    <div class="flex items-center justify-between mb-3">
-                                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Required Documents</h3>
-                                        <button wire:click="showCreateRequirement('document')"
-                                                class="px-3 py-1 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
-                                            + Add Document
-                                        </button>
-                                    </div>
-
-                                    @if($currentMilestone->requirementDocuments->count() > 0)
-                                        <div class="space-y-2">
-                                            @foreach($currentMilestone->requirementDocuments as $document)
-                                                @php
-                                                    $files = $document->getMedia('attachments');
-                                                    $hasFiles = $files->isNotEmpty();
-                                                @endphp
-                                                <div class="p-4 bg-gray-50 dark:bg-zinc-700 rounded-lg">
-                                                    <div class="flex items-start justify-between">
-                                                        <div class="flex-1">
-                                                            <div class="font-medium text-gray-900 dark:text-white {{ $document->isComplete() ? 'line-through' : '' }}">{{ $document->title }}</div>
-                                                            @if($document->description)
-                                                                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ $document->description }}</p>
-                                                            @endif
-                                                            @if($document->milestone_gate_text)
-                                                                <p class="text-xs text-amber-700 dark:text-amber-400 mt-1">⛔ {{ $document->milestone_gate_text }}</p>
-                                                            @endif
-                                                            <div class="flex items-center space-x-4 mt-2 text-xs text-gray-500 dark:text-gray-400">
-                                                                @if($document->owner)
-                                                                    <span>Owner: {{ $document->owner->name }}</span>
-                                                                @else
-                                                                    <span class="italic">Unassigned</span>
-                                                                @endif
-                                                                <span class="px-2 py-0.5 rounded {{ $document->isComplete() ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ($document->isNotApplicable() ? 'bg-gray-200 text-gray-700 dark:bg-zinc-600 dark:text-gray-300' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300') }}">
-                                                                    {{ ucfirst(str_replace('_', ' ', $document->status)) }}
-                                                                </span>
-                                                                @if($hasFiles)
-                                                                    <span class="flex items-center">
-                                                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                                            <path d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z"></path>
-                                                                        </svg>
-                                                                        {{ $files->count() }} file(s)
-                                                                    </span>
-                                                                @endif
-                                                                @if($document->wasOverridden())
-                                                                    <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300">Override</span>
-                                                                @endif
-                                                            </div>
-                                                            @if($document->isComplete() && $document->completedBy)
-                                                                <p class="mt-1 text-xs text-green-600 dark:text-green-400">Completed by {{ $document->completedBy->name }} on {{ $document->completed_at?->format('M d, Y') }}</p>
-                                                            @endif
-                                                            @if($document->wasOverridden() && $document->override_reason)
-                                                                <p class="mt-1 text-xs italic text-amber-700 dark:text-amber-300">Override reason: {{ $document->override_reason }}</p>
-                                                            @endif
-                                                            @if($document->completion_note)
-                                                                <p class="mt-1 text-xs italic text-gray-600 dark:text-gray-400">{{ $document->completion_note }}</p>
-                                                            @endif
-                                                        </div>
-                                                        <div class="flex items-center space-x-2">
-                                                            @if(! $document->isComplete())
-                                                                <button wire:click="showCompleteRequirementModal({{ $document->id }})"
-                                                                        class="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700">
-                                                                    Mark Complete
-                                                                </button>
-                                                            @else
-                                                                <button wire:click="reopenRequirement({{ $document->id }})"
-                                                                        class="px-3 py-1 text-xs bg-amber-600 text-white rounded hover:bg-amber-700">
-                                                                    Reopen
-                                                                </button>
-                                                            @endif
-                                                            <button wire:click="showEditRequirement({{ $document->id }})"
-                                                                    class="text-gray-600 hover:text-gray-800 dark:text-gray-300">
-                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                                                </svg>
-                                                            </button>
-                                                            <button wire:click="deleteRequirement({{ $document->id }})"
-                                                                    wire:confirm="Delete this document requirement?"
-                                                                    class="text-red-600 hover:text-red-800 dark:text-red-400">
-                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                                                </svg>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    @else
-                                        <div class="text-center py-8 bg-gray-50 dark:bg-zinc-700 rounded-lg">
-                                            <p class="text-sm text-gray-600 dark:text-gray-400">No documents required yet</p>
-                                            <button wire:click="showCreateRequirement('document')"
-                                                    class="mt-2 text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
-                                                Add first document
-                                            </button>
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                        @else
-                            <div class="lg:col-span-2 text-center py-12 text-gray-500 dark:text-gray-400">
-                                Select a milestone to view its tasks and documents
-                            </div>
-                        @endif
-                    </div>
-                </div>
             @else
+                {{-- Phase 3 of the milestone redesign deleted the legacy
+                     Requirements + "Milestones & Tasks" tab bodies that
+                     used to live between this @else and the Work tab
+                     above. Both became the unified Work tab. --}}
                 <!-- Budget Tab -->
                 <div class="space-y-6">
                     {{-- P-23 Step 7: persistent over-budget banner.
@@ -872,115 +896,177 @@
         </div>
     </div>
 
-    <!-- Milestone Form Modal -->
+    {{-- Milestone Form Modal — restructured for Phase 3 of the milestone redesign.
+         Was a 475px stack-of-everything column; now a two-column ~640px modal
+         organized into three labelled sections:
+           IDENTITY        — name, target date, description, color
+           WHAT IT TRACKS  — fund codes served, budget items, Phase 2 atom multi-select
+           WHEN IT CAN START — depends-on multi-select with explainer
+
+         All wire:model bindings unchanged so the saveMilestone() pipeline on the
+         component is unaffected. For a promoted (default-seeded) milestone the
+         Phase 2 atoms multi-select renders read-only with the canonical atom
+         visible. --}}
     @if($showMilestoneForm)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="$set('showMilestoneForm', false)">
-            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-md w-full mx-4">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    {{ $editingMilestone ? 'Edit Milestone' : 'Create Milestone' }}
-                </h3>
-                <div class="space-y-4">
+        @php
+            $isPromoted = $editingMilestone
+                && $job->milestones->firstWhere('id', $editingMilestone)?->isPromoted();
+            $editing = $editingMilestone;
+        @endphp
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50"
+             wire:click.self="$set('showMilestoneForm', false)">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
+                {{-- Header --}}
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-700 flex items-center justify-between">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name *</label>
-                        <input type="text" wire:model="milestone_name"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                        @error('milestone_name') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                            {{ $editing ? 'Edit milestone' : 'Create milestone' }}
+                        </h3>
+                        @if($isPromoted)
+                            <p class="text-xs text-calv-teal mt-0.5">
+                                ★ Default Phase 2 milestone — the canonical requirement is locked. Other fields are editable.
+                            </p>
+                        @endif
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
-                        <textarea wire:model="milestone_description" rows="3"
-                                  class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md"></textarea>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Target Date</label>
-                        <input type="date" wire:model="milestone_target_date"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Color</label>
-                        <input type="color" wire:model="milestone_color"
-                               class="w-full h-10 border border-gray-300 dark:border-zinc-600 rounded-md">
-                    </div>
-                    {{-- P-18 / 7.5b: depends-on multi-select. Scoped to other milestones on this project. --}}
+                    <button type="button" wire:click="$set('showMilestoneForm', false)"
+                            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="px-6 py-5 space-y-6">
+                    {{-- ── IDENTITY ── --}}
+                    <section data-test="milestone-form-identity">
+                        <header class="flex items-baseline gap-2 mb-3 pb-2 border-b border-gray-100 dark:border-zinc-700">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold bg-calv-slate-15 text-calv-slate">Identity</span>
+                            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-200">What is this milestone?</h4>
+                        </header>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Name *</label>
+                                <input type="text" wire:model="milestone_name"
+                                       class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:border-indigo-500 focus:ring-indigo-500">
+                                @error('milestone_name') <span class="text-red-600 text-xs mt-1 block">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                                <textarea wire:model="milestone_description" rows="2"
+                                          class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Target date</label>
+                                <input type="date" wire:model="milestone_target_date"
+                                       class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md focus:border-indigo-500 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Color</label>
+                                <input type="color" wire:model="milestone_color"
+                                       class="w-full h-9 border border-gray-300 dark:border-zinc-600 rounded-md cursor-pointer">
+                            </div>
+                        </div>
+                    </section>
+
+                    {{-- ── WHAT IT TRACKS ── --}}
+                    @if(($projectFundCodes ?? collect())->isNotEmpty()
+                        || ($projectBudgets ?? collect())->isNotEmpty()
+                        || ($phase2Atoms ?? collect())->isNotEmpty())
+                        <section data-test="milestone-form-tracks">
+                            <header class="flex items-baseline gap-2 mb-3 pb-2 border-b border-gray-100 dark:border-zinc-700">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold bg-calv-teal-15 text-calv-teal">Tracks</span>
+                                <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-200">What does it cover?</h4>
+                            </header>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                @if(($projectFundCodes ?? collect())->isNotEmpty())
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Fund codes served</label>
+                                        <select wire:model="milestone_fund_code_ids" multiple size="4"
+                                                data-test="milestone-fund-codes-select"
+                                                class="w-full px-2 py-1 text-sm border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                            @foreach($projectFundCodes->sortBy('code') as $fc)
+                                                <option value="{{ $fc->id }}">{{ $fc->code }} — {{ $fc->description }}</option>
+                                            @endforeach
+                                        </select>
+                                        <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">
+                                            One milestone per fund code. Selected codes' Phase 2 reqs render here.
+                                        </p>
+                                    </div>
+                                @endif
+
+                                @if(($projectBudgets ?? collect())->isNotEmpty())
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Budget items</label>
+                                        <select wire:model="milestone_budget_ids" multiple size="4"
+                                                data-test="milestone-budgets-select"
+                                                class="w-full px-2 py-1 text-sm border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                            @foreach($projectBudgets->sortBy('category') as $b)
+                                                <option value="{{ $b->id }}">{{ $b->category }} (${{ number_format((float) $b->budgeted_amount, 0) }})</option>
+                                            @endforeach
+                                        </select>
+                                        <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">
+                                            Optional. Compliance milestones can have no budget.
+                                        </p>
+                                    </div>
+                                @endif
+
+                                @if(($phase2Atoms ?? collect())->isNotEmpty())
+                                    <div class="md:col-span-2">
+                                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                            Gating Phase 2 requirements
+                                            @if($isPromoted)
+                                                <span class="ml-2 text-calv-teal">(locked — duplicate this milestone to customize)</span>
+                                            @endif
+                                        </label>
+                                        <select wire:model="milestone_requirement_definition_ids" multiple size="5"
+                                                @disabled($isPromoted)
+                                                data-test="milestone-requirement-atoms-select"
+                                                class="w-full px-2 py-1 text-sm border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md disabled:opacity-60 disabled:cursor-not-allowed">
+                                            @foreach($phase2Atoms as $atom)
+                                                <option value="{{ $atom->id }}">{{ $atom->label ?? $atom->key }} <span class="text-gray-500">({{ $atom->kind }})</span></option>
+                                            @endforeach
+                                        </select>
+                                        <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">
+                                            Hold Ctrl/Cmd to multi-select. Each pick creates a gating requirement on this milestone. Deselecting later preserves existing progress — only the link is cleared.
+                                        </p>
+                                    </div>
+                                @endif
+                            </div>
+                        </section>
+                    @endif
+
+                    {{-- ── WHEN IT CAN START ── --}}
                     @if($job->milestones->where('id', '!=', $editingMilestone)->count() > 0)
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Depends on</label>
-                            <select wire:model="milestone_dependency_ids" multiple size="4"
-                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                                @foreach($job->milestones->where('id', '!=', $editingMilestone)->sortBy('sequence_order') as $other)
-                                    <option value="{{ $other->id }}">{{ $other->name }}</option>
-                                @endforeach
-                            </select>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                Hold Ctrl/Cmd to select multiple. The dashboard marks this milestone "blocked" while any chosen dependency still has outstanding requirements.
-                            </p>
-                        </div>
-                    @endif
-
-                    {{-- Milestone revamp: fund codes the milestone serves.
-                         Scope: the project's already-attached fund codes
-                         (per the no-hierarchy guidance, the project's fund
-                         set is the truth). --}}
-                    @if(($projectFundCodes ?? collect())->isNotEmpty())
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fund codes served</label>
-                            <select wire:model="milestone_fund_code_ids" multiple size="4"
-                                    data-test="milestone-fund-codes-select"
-                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                                @foreach($projectFundCodes->sortBy('code') as $fc)
-                                    <option value="{{ $fc->id }}">{{ $fc->code }} — {{ $fc->description }}</option>
-                                @endforeach
-                            </select>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                Each selected fund code's Phase 2 requirements render under this milestone in the Requirements tab. A fund code can only be assigned to one milestone per project.
-                            </p>
-                        </div>
-                    @endif
-
-                    {{-- Milestone revamp: budget items rolling up under this milestone. --}}
-                    @if(($projectBudgets ?? collect())->isNotEmpty())
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Budget items</label>
-                            <select wire:model="milestone_budget_ids" multiple size="4"
-                                    data-test="milestone-budgets-select"
-                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                                @foreach($projectBudgets->sortBy('category') as $b)
-                                    <option value="{{ $b->id }}">{{ $b->category }} (${{ number_format((float) $b->budgeted_amount, 2) }})</option>
-                                @endforeach
-                            </select>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                A budget item can only be assigned to one milestone per project.
-                            </p>
-                        </div>
-                    @endif
-
-                    {{-- Milestone revamp: Phase 2 requirement atoms drawn
-                         from the full library. Each selected atom creates
-                         a milestone-source requirement on save. --}}
-                    @if(($phase2Atoms ?? collect())->isNotEmpty())
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phase 2 requirements</label>
-                            <select wire:model="milestone_requirement_definition_ids" multiple size="5"
-                                    data-test="milestone-requirement-atoms-select"
-                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
-                                @foreach($phase2Atoms as $atom)
-                                    <option value="{{ $atom->id }}">{{ $atom->label ?? $atom->key }} ({{ $atom->kind }})</option>
-                                @endforeach
-                            </select>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                Drawn from the unified requirements library (service-delivery compliance). Deselecting later preserves any progress on the row — only the atom link is cleared.
-                            </p>
-                        </div>
+                        <section data-test="milestone-form-when">
+                            <header class="flex items-baseline gap-2 mb-3 pb-2 border-b border-gray-100 dark:border-zinc-700">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold bg-calv-amber-15 text-[#8A6410]">When</span>
+                                <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-200">When can it start?</h4>
+                            </header>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Depends on</label>
+                                <select wire:model="milestone_dependency_ids" multiple size="4"
+                                        class="w-full px-2 py-1 text-sm border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                    @foreach($job->milestones->where('id', '!=', $editingMilestone)->sortBy('sequence_order') as $other)
+                                        <option value="{{ $other->id }}">{{ $other->name }}</option>
+                                    @endforeach
+                                </select>
+                                <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">
+                                    Leave empty for an independent milestone. The Work tab shows a 🔒 badge while any selected dependency is still incomplete.
+                                </p>
+                            </div>
+                        </section>
                     @endif
                 </div>
-                <div class="mt-6 flex justify-end space-x-3">
+
+                {{-- Footer --}}
+                <div class="px-6 py-4 border-t border-gray-200 dark:border-zinc-700 flex justify-end gap-2 bg-gray-50 dark:bg-zinc-900/30">
                     <button wire:click="$set('showMilestoneForm', false)"
-                            class="px-4 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
+                            class="px-4 py-2 text-sm bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
                         Cancel
                     </button>
                     <button wire:click="saveMilestone"
-                            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
-                        Save
+                            class="px-4 py-2 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-medium">
+                        {{ $editing ? 'Save milestone' : 'Create milestone' }}
                     </button>
                 </div>
             </div>

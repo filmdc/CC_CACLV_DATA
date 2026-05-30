@@ -31,7 +31,14 @@ class ProjectManagement extends Component
 
     public $job;
 
-    public $activeTab = 'requirements';
+    /**
+     * Milestone redesign (Phase 3): the legacy 'requirements' and
+     * 'milestones' tabs collapsed into a single 'work' tab. Old values
+     * are normalised in mount() so deep links and existing tests that
+     * set activeTab='requirements' or 'milestones' still land somewhere
+     * meaningful instead of a blank panel.
+     */
+    public $activeTab = 'work';
 
     public $selectedMilestone = null;
 
@@ -231,6 +238,14 @@ class ProjectManagement extends Component
 
     public function mount($id)
     {
+        // Milestone redesign (Phase 3): old activeTab values fold into
+        // 'work'. Anything outside the new {work, budget} set lands on
+        // the default tab so deep links + tests that still set the
+        // legacy values render content rather than nothing.
+        if (in_array($this->activeTab, ['requirements', 'milestones'], true)) {
+            $this->activeTab = 'work';
+        }
+
         $this->jobId = $id;
         $this->job = HousingJob::with([
             'program',

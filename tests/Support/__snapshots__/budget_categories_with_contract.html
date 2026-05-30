@@ -97,22 +97,14 @@ class="px-3 py-1 text-sm bg-emerald-600 text-white rounded-md hover:bg-emerald-7
 No fund codes assigned yet. Attach codes to surface their requirements on this project.
 </p>
 </div>
-<!-- Tabs (Milestone revamp: Requirements is the default landing tab) -->
 <div class="border-b border-gray-200 dark:border-zinc-700">
 <nav class="flex -mb-px" data-test="project-tab-nav">
-<button wire:click="$set('activeTab', 'requirements')"
-data-test="tab-requirements"
+<button wire:click="$set('activeTab', 'work')"
+data-test="tab-work tab-requirements tab-milestones"
 class="py-4 px-6 text-center border-b-2 font-medium text-sm
 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300
 ">
-Requirements
-</button>
-<button wire:click="$set('activeTab', 'milestones')"
-data-test="tab-milestones"
-class="ml-8 py-4 px-6 text-center border-b-2 font-medium text-sm
-border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300
-">
-Milestones & Tasks
+Work
 </button>
 <button wire:click="$set('activeTab', 'budget')"
 data-test="tab-budget"
@@ -310,7 +302,6 @@ Delete
 </div>
 </div>
 </div>
-<!-- Milestone Form Modal -->
 <!-- Task Form Modal -->
 <!-- Document Form Modal -->
 <!-- Budget Form Modal -->
