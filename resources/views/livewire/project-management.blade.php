@@ -1403,6 +1403,34 @@
                         @endif
                         @error('budget_fund_code_id') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
                     </div>
+
+                    {{-- Milestone redesign (Phase 4): tie this budget category to a
+                         milestone so it rolls up under that milestone's card on
+                         the Work tab. Optional — leave blank for an unassigned
+                         (general-pool) budget line. --}}
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Attach to milestone <span class="text-xs text-gray-500 font-normal">(optional)</span>
+                        </label>
+                        @if($job->milestones->isEmpty())
+                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                No milestones on this project yet. Budget categories without a milestone live in the General pool.
+                            </p>
+                        @else
+                            <select wire:model="budget_milestone_id"
+                                    data-test="budget-milestone-select"
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
+                                <option value="">— Unassigned (General pool) —</option>
+                                @foreach($job->milestones->sortBy('sequence_order') as $m)
+                                    <option value="{{ $m->id }}">{{ $m->name }}</option>
+                                @endforeach
+                            </select>
+                            <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">
+                                Drives the Work tab grouping. Each milestone can have at most one budget category.
+                            </p>
+                        @endif
+                        @error('budget_milestone_id') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
+                    </div>
                 </div>
                 <div class="mt-6 flex justify-end space-x-3">
                     <button wire:click="$set('showBudgetForm', false)"

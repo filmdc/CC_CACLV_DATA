@@ -43,6 +43,10 @@ class HousingJob extends Model
         'priority',
         'cancellation_reason',
         'internal_notes',
+        'is_archived',
+        'archived_at',
+        'archived_by_user_id',
+        'archived_reason',
         'is_template',
         'template_name',
         'template_description',
@@ -63,6 +67,8 @@ class HousingJob extends Model
         'approved_amount' => 'decimal:2',
         'actual_cost' => 'decimal:2',
         'scope_of_work' => 'array',
+        'is_archived' => 'boolean',
+        'archived_at' => 'datetime',
     ];
 
     protected static function boot()
@@ -894,5 +900,50 @@ class HousingJob extends Model
     public function scopeActiveJobs($query)
     {
         return $query->where('is_template', false);
+    }
+
+    /**
+     * Milestone redesign (Phase 4): the working set is non-template,
+     * non-archived. The /projects list, dashboards, and pipeline use
+     * this scope by default; archived projects are accessible via an
+     * explicit "Show archived" filter chip.
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_template', false)->where('is_archived', false);
+    }
+
+    public function scopeArchived($query)
+    {
+        return $query->where('is_template', false)->where('is_archived', true);
+    }
+
+    public function archivedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'archived_by_user_id');
+    }
+
+    /**
+     * Stamp archival metadata on the project. Idempotent: re-archiving
+     * an already-archived project updates the reason + actor but
+     * preserves the original archived_at to keep audit chronology
+     * accurate.
+     */
+    public function archive(string $reason, ?int $userId = null): void
+    {
+        $this->is_archived = true;
+        $this->archived_at = $this->archived_at ?? now();
+        $this->archived_by_user_id = $userId ?? Auth::id();
+        $this->archived_reason = $reason;
+        $this->save();
+    }
+
+    public function unarchive(): void
+    {
+        $this->is_archived = false;
+        $this->archived_at = null;
+        $this->archived_by_user_id = null;
+        $this->archived_reason = null;
+        $this->save();
     }
 }

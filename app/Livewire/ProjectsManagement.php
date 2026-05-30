@@ -39,6 +39,21 @@ class ProjectsManagement extends Component
 
     public $showTemplates = false; // Toggle to show/hide template jobs
 
+    /**
+     * Milestone redesign (Phase 4): the projects list filters out
+     * archived projects by default. Toggling this swaps the query
+     * scope from active() to archived() so archived projects surface
+     * for unarchive / audit review.
+     */
+    public $showArchived = false;
+
+    /** Phase 4: archive modal state. */
+    public $showArchiveModal = false;
+
+    public $archivingJobId = null;
+
+    public $archiveReason = '';
+
     public $selectedJobs = [];
 
     public $selectAll = false;
@@ -431,11 +446,59 @@ class ProjectsManagement extends Component
         $this->resetForm();
     }
 
-    public function deleteJob($id)
+    /**
+     * Milestone redesign (Phase 4): hard-delete is gone. Projects are
+     * the audit trail for compliance work — losing one means losing the
+     * documents, requirement completions, expenses, and ledger that
+     * lived under it. confirmArchiveJob() opens the reason prompt;
+     * archiveJob() persists the archival metadata.
+     */
+    public function confirmArchiveJob($id): void
     {
+        $this->authorizeAction('projects.delete');
+        $this->archivingJobId = (int) $id;
+        $this->archiveReason = '';
+        $this->showArchiveModal = true;
+    }
+
+    public function archiveJob(): void
+    {
+        $this->authorizeAction('projects.delete');
+
+        $validated = $this->validate([
+            'archiveReason' => 'required|string|min:3|max:1000',
+        ], [
+            'archiveReason.required' => 'A reason is required when archiving a project — this is preserved in the audit trail.',
+            'archiveReason.min' => 'Reason must be at least 3 characters.',
+        ]);
+
+        $job = HousingJob::findOrFail($this->archivingJobId);
+        $job->archive($validated['archiveReason'], Auth::id());
+
+        $this->showArchiveModal = false;
+        $this->archivingJobId = null;
+        $this->archiveReason = '';
+
+        session()->flash('success', "Project {$job->job_number} archived. View archived projects via the filter to unarchive.");
+    }
+
+    public function unarchiveJob($id): void
+    {
+        $this->authorizeAction('projects.delete');
         $job = HousingJob::findOrFail($id);
-        $job->delete();
-        session()->flash('success', 'Project deleted successfully');
+        $job->unarchive();
+        session()->flash('success', "Project {$job->job_number} unarchived.");
+    }
+
+    /**
+     * Legacy entry point retained as a redirect to the archive flow so
+     * any in-flight UI or external automation that still calls deleteJob
+     * lands at the right confirmation modal rather than executing a
+     * hard delete. Hard delete is no longer supported.
+     */
+    public function deleteJob($id): void
+    {
+        $this->confirmArchiveJob($id);
     }
 
     public function showTemplateLibrary()
@@ -529,18 +592,34 @@ class ProjectsManagement extends Component
         $this->selectedJobs = [];
     }
 
-    public function bulkDelete()
+    /**
+     * Milestone redesign (Phase 4): bulk delete is replaced with bulk
+     * archive. Each row is archived with the same reason; per-project
+     * detail can be edited later via the individual archive flow if a
+     * project needs a more specific note.
+     */
+    public function bulkArchive(string $reason = 'Bulk archived from project list')
     {
+        $this->authorizeAction('projects.delete');
+
         if (empty($this->selectedJobs)) {
             session()->flash('error', 'No projects selected');
 
             return;
         }
 
-        HousingJob::whereIn('id', $this->selectedJobs)->delete();
+        foreach (HousingJob::whereIn('id', $this->selectedJobs)->get() as $job) {
+            $job->archive($reason, Auth::id());
+        }
 
-        session()->flash('success', count($this->selectedJobs).' projects deleted');
+        session()->flash('success', count($this->selectedJobs).' projects archived');
         $this->selectedJobs = [];
+    }
+
+    /** Legacy redirect — kept as an alias so old wire:click strings still resolve. */
+    public function bulkDelete(): void
+    {
+        $this->bulkArchive();
     }
 
     protected function resetForm()
@@ -571,8 +650,17 @@ class ProjectsManagement extends Component
 
         $housingProgramIds = Program::where('housing_module_enabled', true)->pluck('id');
 
+        // Milestone redesign (Phase 4): default to the working set
+        // (non-template, non-archived). The "Show archived" toggle
+        // flips this over to archived() so archived projects surface
+        // for unarchive / audit review. Templates are still managed
+        // via the showTemplateLibrary modal — unchanged.
         $projects = HousingJob::query()
-            ->activeJobs() // Exclude templates by default
+            ->when(
+                $this->showArchived,
+                fn ($q) => $q->archived(),
+                fn ($q) => $q->active(),
+            )
             ->whereIn('program_id', $housingProgramIds)
             ->with(['program', 'service', 'participant', 'property', 'contractor', 'milestones.tasks', 'budgets', 'fundCodes'])
             ->when($this->search, function ($query) {
@@ -652,6 +740,13 @@ class ProjectsManagement extends Component
             ];
         })->toArray();
 
+        // Milestone redesign (Phase 4): chip needs an at-a-glance count
+        // independent of the current filter state so the user can see
+        // there are archived items even when looking at active.
+        $archivedCount = HousingJob::archived()
+            ->whereIn('program_id', $housingProgramIds)
+            ->count();
+
         return view('livewire.projects-management', [
             'projects' => $projects,
             'templates' => $templates,
@@ -661,6 +756,7 @@ class ProjectsManagement extends Component
             'properties' => $propertiesSearchable,
             'participants' => $participantsSearchable,
             'contractors' => $contractorsSearchable,
+            'archivedCount' => $archivedCount,
         ]);
     }
 }

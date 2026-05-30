@@ -145,6 +145,14 @@ class ProjectManagement extends Component
     // edited rows; legacy rows can render with NULL until next edit.
     public $budget_fund_code_id = '';
 
+    // Milestone redesign (Phase 4): optional milestone tie. When set, the
+    // budget category groups under the milestone on the Work tab; otherwise
+    // the milestone shows up in the General / Compliance group with no
+    // budget rollup. Stored on project_budgets.milestone_id (already
+    // present from Phase 1 of the redesign — this just exposes it on
+    // the budget form).
+    public $budget_milestone_id = '';
+
     // P-08: Fund-code assignment
     public $newFundCodeId = '';
 
@@ -1378,6 +1386,7 @@ class ProjectManagement extends Component
         $this->budget_category = $budget->category;
         $this->budget_amount = $budget->budgeted_amount;
         $this->budget_fund_code_id = $budget->fund_code_id !== null ? (string) $budget->fund_code_id : '';
+        $this->budget_milestone_id = $budget->milestone_id !== null ? (string) $budget->milestone_id : '';
         $this->showBudgetForm = true;
     }
 
@@ -1398,6 +1407,9 @@ class ProjectManagement extends Component
             // assigned fund codes; this Livewire validation just gates
             // the form against an empty submission.
             'budget_fund_code_id' => 'required|integer|exists:fund_codes,id',
+            // Milestone redesign (Phase 4): optional. Empty = budget
+            // unassigned (rolls up under General on the Work tab).
+            'budget_milestone_id' => 'nullable|integer|exists:project_milestones,id',
         ], [
             'budget_category.unique' => 'A budget category with this name already exists for this project.',
         ]);
@@ -1492,6 +1504,9 @@ class ProjectManagement extends Component
                     'category' => $this->budget_category,
                     'budgeted_amount' => $this->budget_amount,
                     'fund_code_id' => (int) $this->budget_fund_code_id,
+                    'milestone_id' => $this->budget_milestone_id !== ''
+                        ? (int) $this->budget_milestone_id
+                        : null,
                     'updated_by' => Auth::id(),
                 ]);
 
@@ -1515,6 +1530,9 @@ class ProjectManagement extends Component
                     // legacy row + future use.
                     'contract_id' => null,
                     'fund_code_id' => (int) $this->budget_fund_code_id,
+                    'milestone_id' => $this->budget_milestone_id !== ''
+                        ? (int) $this->budget_milestone_id
+                        : null,
                     'category' => $this->budget_category,
                     'budgeted_amount' => $this->budget_amount,
                     'created_by' => Auth::id(),
@@ -2226,6 +2244,7 @@ class ProjectManagement extends Component
         $this->budget_amount = '';
         $this->budget_contract_id = '';
         $this->budget_fund_code_id = '';
+        $this->budget_milestone_id = '';
     }
 
     protected function resetExpenseForm()
