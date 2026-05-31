@@ -1,900 +1,775 @@
-<div class="w-full px-0 py-6">
-    <div class="bg-white dark:bg-zinc-800 shadow-lg rounded-lg overflow-hidden">
-        <!-- Project Header -->
-        <div class="bg-indigo-600 text-white p-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <div class="flex items-center space-x-3">
-                        <a href="{{ route('projects.management') }}" wire:navigate class="text-indigo-100 hover:text-white">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                            </svg>
-                        </a>
-                        <div>
-                            {{-- P-37: three-line header — address + head-of-household (prominent), fund codes (secondary, equal treatment), job number (small subtitle). --}}
-                            <h1 class="text-2xl font-bold leading-tight">
-                                {{ $job->property?->address_line_1 ?? 'No property on file' }}
-                                @if($job->participant)
-                                    <span class="font-semibold">— {{ $job->participant->first_name }} {{ $job->participant->last_name }}</span>
-                                @endif
-                            </h1>
-                            <p class="text-sm text-indigo-100 mt-2">
-                                @if($job->fundCodes->isNotEmpty())
-                                    @foreach($job->fundCodes->sortBy('code') as $fc)
-                                        <span class="font-mono">{{ $fc->code }}</span>@if(!$loop->last), @endif
-                                    @endforeach
-                                @else
-                                    <span class="italic text-indigo-200">No fund codes assigned</span>
-                                @endif
-                            </p>
-                            <p class="text-xs text-indigo-200 mt-1 font-mono">{{ $job->job_number }}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex items-center space-x-4">
-                    @if($this->can('projects.manage'))
-                        <button wire:click="showEditProject"
-                                class="px-3 py-1 text-sm bg-white/20 hover:bg-white/30 text-white rounded-md border border-white/30">
-                            ✏️ Edit Project
-                        </button>
-                    @endif
-                    @if($job->milestones()->count() > 0 && $this->can('projects.manage'))
-                        <button wire:click="showSaveAsTemplate"
-                                class="px-3 py-1 text-sm bg-white/20 hover:bg-white/30 text-white rounded-md border border-white/30">
-                            📋 Save as Template
-                        </button>
-                    @endif
-                    <div class="text-right">
-                        <div class="text-sm text-indigo-100">Program</div>
-                        <div class="text-lg font-semibold">{{ $job->program ? $job->program->name : 'N/A' }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+@php
+    // Project Detail redesign (rev 1 · May 30 2026): unified status vocabulary
+    // mapping ProjectMilestone.status to CALV tones. Same vocab is used for
+    // project.status fallback when it lines up; non-overlapping project
+    // statuses (on_hold, cancelled) fall through to the default tone.
+    $msStatusTone = [
+        'not_started' => ['label' => 'Pending', 'bg' => 'var(--color-calv-slate-15)', 'fg' => 'var(--color-calv-slate-65)', 'dot' => 'var(--color-calv-slate-35)'],
+        'pending' => ['label' => 'Pending', 'bg' => 'var(--color-calv-slate-15)', 'fg' => 'var(--color-calv-slate-65)', 'dot' => 'var(--color-calv-slate-35)'],
+        'in_progress' => ['label' => 'In progress', 'bg' => 'var(--color-calv-teal-15)', 'fg' => 'var(--color-calv-teal)', 'dot' => 'var(--color-calv-teal)'],
+        'completed' => ['label' => 'Completed', 'bg' => 'var(--color-calv-sage-15)', 'fg' => '#2F5A41', 'dot' => 'var(--color-calv-sage)'],
+        'blocked' => ['label' => 'Blocked', 'bg' => 'var(--color-calv-red-15)', 'fg' => 'var(--color-calv-red)', 'dot' => 'var(--color-calv-red)'],
+        'on_hold' => ['label' => 'On hold', 'bg' => 'var(--color-calv-amber-15)', 'fg' => '#8A6410', 'dot' => 'var(--color-calv-amber)'],
+        'cancelled' => ['label' => 'Cancelled', 'bg' => 'var(--color-calv-slate-15)', 'fg' => 'var(--color-calv-slate-65)', 'dot' => 'var(--color-calv-slate-65)'],
+        'approved' => ['label' => 'Approved', 'bg' => 'var(--color-calv-sage-15)', 'fg' => '#2F5A41', 'dot' => 'var(--color-calv-sage)'],
+        'rejected' => ['label' => 'Rejected', 'bg' => 'var(--color-calv-red-15)', 'fg' => 'var(--color-calv-red)', 'dot' => 'var(--color-calv-red)'],
+    ];
+    $priorityTone = [
+        'emergency' => ['label' => 'Urgent', 'dot' => 'var(--color-calv-red)'],
+        'urgent' => ['label' => 'Urgent', 'dot' => 'var(--color-calv-red)'],
+        'high' => ['label' => 'High', 'dot' => 'var(--color-calv-amber)'],
+        'medium' => ['label' => 'Medium', 'dot' => 'var(--color-calv-teal)'],
+        'low' => ['label' => 'Low', 'dot' => 'var(--color-calv-slate-65)'],
+    ];
 
-        <!-- Success/Error Messages -->
-        @if (session()->has('success'))
-            <div class="p-4 bg-green-50 dark:bg-green-900/20 border-l-4 border-green-400">
-                <p class="text-sm text-green-700 dark:text-green-300">{{ session('success') }}</p>
-            </div>
-        @endif
-        @if (session()->has('error'))
-            <div class="p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-400">
-                <p class="text-sm text-red-700 dark:text-red-300">{{ session('error') }}</p>
-            </div>
-        @endif
+    $jobStatusKey = $job->status ?? 'pending';
+    $jobStatus = $msStatusTone[$jobStatusKey] ?? $msStatusTone['pending'];
+    $jobPriority = $priorityTone[$job->priority ?? 'medium'] ?? $priorityTone['medium'];
 
-        <!-- Project Info Summary Bar -->
-        <div class="bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-700 px-6 py-3">
-            <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
-                <div class="flex items-center">
-                    <span class="text-gray-500 dark:text-gray-400 mr-2">Status:</span>
-                    <span class="px-2 py-0.5 rounded text-xs font-medium
-                        @if($job->status === 'completed') bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300
-                        @elseif($job->status === 'in_progress') bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300
-                        @elseif($job->status === 'pending') bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300
-                        @elseif($job->status === 'on_hold') bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300
-                        @elseif($job->status === 'cancelled') bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300
-                        @else bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300
-                        @endif">
-                        {{ ucfirst(str_replace('_', ' ', $job->status)) }}
-                    </span>
-                </div>
-                <div class="flex items-center">
-                    <span class="text-gray-500 dark:text-gray-400 mr-2">Priority:</span>
-                    <span class="px-2 py-0.5 rounded text-xs font-medium
-                        @if($job->priority === 'emergency') bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300
-                        @elseif($job->priority === 'high') bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300
-                        @elseif($job->priority === 'medium') bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300
-                        @else bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300
-                        @endif">
-                        {{ ucfirst($job->priority) }}
-                    </span>
-                </div>
-                @if($job->contractor)
-                    <div class="flex items-center">
-                        <span class="text-gray-500 dark:text-gray-400 mr-2">Contractor:</span>
-                        <span class="text-gray-900 dark:text-white">{{ $job->contractor->company_name }}</span>
-                    </div>
-                @endif
-                @if($job->target_completion_date)
-                    <div class="flex items-center">
-                        <span class="text-gray-500 dark:text-gray-400 mr-2">Target:</span>
-                        <span class="{{ $job->isOverdue() ? 'text-red-600 dark:text-red-400 font-medium' : 'text-gray-900 dark:text-white' }}">
-                            {{ $job->target_completion_date->format('M d, Y') }}
-                            @if($job->isOverdue())
-                                <span class="text-xs">({{ $job->days_overdue }} days overdue)</span>
-                            @endif
+    // Unified-progress numbers (operational + financial).
+    $milestones = $job->milestones ?? collect();
+    $msTotal = $milestones->count();
+    $msDone = $milestones->where('status', 'completed')->count();
+    $msPct = $msTotal > 0 ? (int) round(($msDone / $msTotal) * 100) : 0;
+
+    $budgets = $job->budgets ?? collect();
+    $totalBudget = (float) $budgets->sum('budgeted_amount');
+    $totalSpent = (float) $budgets->sum('spent_amount');
+    $burnPct = $totalBudget > 0 ? (int) round(($totalSpent / $totalBudget) * 100) : 0;
+@endphp
+
+<div class="w-full bg-white" style="font-family: var(--font-calv-body);">
+    {{-- ────────────────────────────────────────────────────────────────
+         Consolidated Header — replaces the legacy indigo-band + gray
+         status row + emerald fund block (Project Detail redesign §4.1).
+         One block: breadcrumb (with optional 'from intake COMM-####'),
+         address + homeowner as H1 (DIN Condensed → Oswald uppercase),
+         status / priority / program / funds in chips on a single row,
+         and primary Edit / ghost Save-as-template on the right.
+         ──────────────────────────────────────────────────────────── --}}
+    <header class="bg-white border-b" style="border-color: var(--color-calv-slate-15);">
+        <div class="px-8 pt-5 pb-4 flex items-start gap-5">
+            {{-- Back button (quiet, slate not indigo) --}}
+            <a href="{{ route('projects.management') }}" wire:navigate
+               aria-label="Back to projects"
+               class="inline-flex items-center justify-center mt-1 shrink-0 rounded-md"
+               style="width: 36px; height: 36px; border: 1px solid var(--color-calv-slate-35); color: var(--color-calv-slate); background: #fff;">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+
+            <div class="flex-1 min-w-0">
+                {{-- Breadcrumb + origin chip --}}
+                <div class="flex items-center gap-2 mb-1.5 flex-wrap"
+                     style="font-family: var(--font-calv-sub); font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-calv-slate-65);">
+                    <span>Housing</span>
+                    <span style="color: var(--color-calv-slate-35);">›</span>
+                    <span>Projects</span>
+                    <span style="color: var(--color-calv-slate-35);">›</span>
+                    <span style="color: var(--color-calv-slate);">{{ $job->job_number }}</span>
+                    @if($originatingCommLog)
+                        <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full"
+                              style="background: var(--color-calv-sand-15); border: 1px solid var(--color-calv-sand-35); text-transform: none; letter-spacing: 0; font-weight: 500; font-size: 10.5px; color: var(--color-calv-slate-65);">
+                            from intake
+                            <a href="{{ route('communications-log.management') }}" wire:navigate
+                               class="ml-1 underline font-bold"
+                               style="color: var(--color-calv-teal);">{{ $originatingCommLog->log_number ?? ('COMM-' . str_pad($originatingCommLog->id, 5, '0', STR_PAD_LEFT)) }}</a>
                         </span>
-                    </div>
-                @endif
-                @if($job->estimated_cost)
-                    <div class="flex items-center">
-                        <span class="text-gray-500 dark:text-gray-400 mr-2">Est. Cost:</span>
-                        <span class="text-gray-900 dark:text-white">${{ number_format($job->estimated_cost, 2) }}</span>
-                    </div>
-                @endif
-                <div class="flex-1"></div>
-                @if($this->can('projects.manage'))
-                    <button wire:click="showEditProject" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 text-sm font-medium">
-                        Edit Details
-                    </button>
-                @endif
-            </div>
-        </div>
-
-        <!-- Counties carried from the originating comm log at conversion.
-             Informational: the same county selection drove the fund codes
-             and Phase 2 requirements below. -->
-        @if($job->housingServices->isNotEmpty())
-            <div class="bg-sky-50 dark:bg-sky-900/10 border-b border-sky-200 dark:border-sky-900/30 px-6 py-3">
-                <div class="flex items-center gap-3 flex-wrap">
-                    <h3 class="text-sm font-semibold text-sky-900 dark:text-sky-200 uppercase tracking-wide">
-                        County
-                    </h3>
-                    @foreach($job->housingServices as $county)
-                        <span class="inline-flex items-center px-3 py-1 bg-white dark:bg-zinc-800 border border-sky-300 dark:border-sky-700 rounded-md text-sm text-gray-900 dark:text-white">
-                            {{ $county->name }}
-                        </span>
-                    @endforeach
+                    @endif
                 </div>
-            </div>
-        @endif
 
-        <!-- P-08: Fund Code assignment — visible above tabs so the manager
-             can see + manage funding without clicking into a tab. -->
-        <div class="bg-emerald-50 dark:bg-emerald-900/10 border-b border-emerald-200 dark:border-emerald-900/30 px-6 py-4">
-            <div class="flex items-center justify-between mb-2">
-                <h3 class="text-sm font-semibold text-emerald-900 dark:text-emerald-200 uppercase tracking-wide">
-                    Fund Codes
-                </h3>
-                @if($this->can('projects.manage') && $availableFundCodes->isNotEmpty())
+                {{-- H1 — address + homeowner --}}
+                <div class="flex items-baseline gap-3 flex-wrap">
+                    <h1 class="m-0"
+                        style="font-family: var(--font-calv-h1); font-weight: 700; font-size: 32px; letter-spacing: 0.01em; text-transform: uppercase; color: var(--color-calv-slate); line-height: 1;">
+                        {{ $job->property?->address_line_1 ?? 'No property on file' }}
+                    </h1>
+                    @if($job->participant)
+                        <span style="font-size: 16px; color: var(--color-calv-slate-65);">{{ $job->participant->first_name }} {{ $job->participant->last_name }}</span>
+                    @endif
+                </div>
+
+                {{-- Status / Priority / Program / Funds row — chips on a single line --}}
+                <div class="flex items-center gap-4 mt-3 flex-wrap">
+                    {{-- Status --}}
                     <div class="flex items-center gap-2">
-                        <select wire:model="newFundCodeId"
-                                class="px-3 py-1 text-sm border border-emerald-300 dark:border-emerald-700 dark:bg-zinc-800 dark:text-white rounded-md">
-                            <option value="">Select a fund code…</option>
-                            @foreach($availableFundCodes as $fc)
-                                <option value="{{ $fc->id }}">{{ $fc->code }} – {{ $fc->description }}</option>
-                            @endforeach
-                        </select>
-                        <button wire:click="attachFundCode"
-                                wire:loading.attr="disabled"
-                                class="px-3 py-1 text-sm bg-emerald-600 text-white rounded-md hover:bg-emerald-700 disabled:opacity-50">
-                            + Attach
-                        </button>
+                        <span style="font-family: var(--font-calv-sub); font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-calv-slate-65);">Status</span>
+                        <span class="inline-flex items-center gap-1.5 rounded-full"
+                              style="padding: 3px 9px; font-family: var(--font-calv-sub); font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; background: {{ $jobStatus['bg'] }}; color: {{ $jobStatus['fg'] }};">
+                            <span class="rounded-full" style="width: 6px; height: 6px; background: {{ $jobStatus['dot'] }};"></span>
+                            {{ $jobStatus['label'] }}
+                        </span>
                     </div>
-                @endif
+                    <span class="block" style="width: 1px; height: 16px; background: var(--color-calv-slate-15);"></span>
+                    {{-- Priority --}}
+                    <div class="flex items-center gap-2">
+                        <span style="font-family: var(--font-calv-sub); font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-calv-slate-65);">Priority</span>
+                        <span class="inline-flex items-center gap-1.5" style="font-family: var(--font-calv-sub); font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--color-calv-slate);">
+                            <span class="rounded-full" style="width: 7px; height: 7px; background: {{ $jobPriority['dot'] }};"></span>
+                            {{ $jobPriority['label'] }}
+                        </span>
+                    </div>
+                    <span class="block" style="width: 1px; height: 16px; background: var(--color-calv-slate-15);"></span>
+                    {{-- Program --}}
+                    <div class="flex items-center gap-2">
+                        <span style="font-family: var(--font-calv-sub); font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-calv-slate-65);">Program</span>
+                        <span style="font-size: 13px; font-weight: 600; color: var(--color-calv-slate);">{{ $job->program?->name ?? 'N/A' }}</span>
+                    </div>
+                    @if($this->canAny(['projects.manage', 'housing_jobs.edit']) || $job->fundCodes->isNotEmpty())
+                        <span class="block" style="width: 1px; height: 16px; background: var(--color-calv-slate-15);"></span>
+                        {{-- Funds — quiet slate pills with expiry dots, inline. Replaces the
+                             bright-green emerald-50 band that pulled focus (issue #5). --}}
+                        <div class="flex items-center gap-2">
+                            <span style="font-family: var(--font-calv-sub); font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-calv-slate-65);">Funds</span>
+                            <div class="flex gap-1.5 flex-wrap items-center">
+                                @foreach($job->fundCodes as $fc)
+                                    @php
+                                        // Expiry dot: red < 30d, amber 30–90d, sage > 90d, slate if no expiry.
+                                        $days = $fc->expires_at ? (int) now()->diffInDays($fc->expires_at, false) : null;
+                                        $dotColor = match (true) {
+                                            $days === null => 'var(--color-calv-slate-35)',
+                                            $days < 30 => 'var(--color-calv-red)',
+                                            $days < 90 => 'var(--color-calv-amber)',
+                                            default => 'var(--color-calv-sage)',
+                                        };
+                                    @endphp
+                                    <span title="{{ $fc->description }}{{ $days !== null ? ' · expires in '.$days.' days' : '' }}"
+                                          class="inline-flex items-center gap-1.5 rounded"
+                                          style="padding: 3px 8px; font-family: ui-monospace, Menlo, monospace; font-size: 11px; font-weight: 600; background: var(--color-calv-slate-15); color: var(--color-calv-slate);">
+                                        <span class="rounded-full" style="width: 6px; height: 6px; background: {{ $dotColor }};"></span>
+                                        {{ $fc->code }}
+                                        @if($this->can('projects.manage'))
+                                            <button wire:click="detachFundCode({{ $fc->id }})"
+                                                    wire:confirm="Detach {{ $fc->code }} from this project?"
+                                                    class="ml-0.5 opacity-60 hover:opacity-100" aria-label="Detach">
+                                                <svg width="9" height="9" viewBox="0 0 16 16" fill="none">
+                                                    <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                                                </svg>
+                                            </button>
+                                        @endif
+                                    </span>
+                                @endforeach
+                                @if($this->can('projects.manage') && $availableFundCodes->isNotEmpty())
+                                    <details class="relative">
+                                        <summary class="cursor-pointer list-none rounded"
+                                                 style="padding: 3px 8px; font-family: var(--font-calv-sub); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: transparent; border: 1px dashed var(--color-calv-slate-35); color: var(--color-calv-slate-65);">+ fund</summary>
+                                        <div class="absolute z-20 mt-1 left-0 bg-white rounded shadow-lg p-2"
+                                             style="min-width: 240px; border: 1px solid var(--color-calv-slate-15);">
+                                            <select wire:model="newFundCodeId"
+                                                    class="w-full px-2 py-1 text-sm rounded mb-1"
+                                                    style="border: 1px solid var(--color-calv-slate-35);">
+                                                <option value="">Select a fund code…</option>
+                                                @foreach($availableFundCodes as $fc)
+                                                    <option value="{{ $fc->id }}">{{ $fc->code }} – {{ $fc->description }}</option>
+                                                @endforeach
+                                            </select>
+                                            <button wire:click="attachFundCode"
+                                                    class="w-full px-2 py-1 text-xs rounded text-white"
+                                                    style="background: var(--color-calv-teal); font-family: var(--font-calv-sub); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;">Attach</button>
+                                        </div>
+                                    </details>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
+                </div>
             </div>
 
-            @if($job->fundCodes->isEmpty())
-                <p class="text-sm text-emerald-700 dark:text-emerald-300 italic">
-                    No fund codes assigned yet. Attach codes to surface their requirements on this project.
-                </p>
-            @else
-                <div class="flex flex-wrap gap-2">
-                    @foreach($job->fundCodes as $fc)
-                        <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-zinc-800 border border-emerald-300 dark:border-emerald-700 rounded-md">
-                            <span class="font-mono text-sm font-semibold text-gray-900 dark:text-white">{{ $fc->code }}</span>
-                            <span class="text-xs text-gray-500 dark:text-gray-400">{{ Str::limit($fc->description, 40) }}</span>
-                            @if($this->can('projects.manage'))
-                                <button wire:click="detachFundCode({{ $fc->id }})"
-                                        wire:confirm="Detach {{ $fc->code }} from this project?"
-                                        class="ml-1 text-gray-400 hover:text-red-600"
-                                        aria-label="Detach">
-                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                    </svg>
-                                </button>
-                            @endif
-                        </div>
-                    @endforeach
+            {{-- Actions — ONE primary, ONE ghost. Resolves issue #4 (competing weights). --}}
+            @if($this->can('projects.manage'))
+                <div class="flex items-center gap-2 shrink-0">
+                    @if($job->milestones()->count() > 0)
+                        <button wire:click="showSaveAsTemplate"
+                                class="rounded-md transition"
+                                style="padding: 7px 14px; background: transparent; color: var(--color-calv-slate); border: 1.5px solid var(--color-calv-slate-35); font-family: var(--font-calv-sub); font-size: 11.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;">
+                            Save as template
+                        </button>
+                    @endif
+                    <button wire:click="showEditProject"
+                            class="rounded-md transition inline-flex items-center gap-1.5"
+                            style="padding: 7px 14px; background: var(--color-calv-slate); color: #fff; border: none; font-family: var(--font-calv-sub); font-size: 11.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;">
+                        <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+                            <path d="M11 2.5l2.5 2.5L5 13.5H2.5V11L11 2.5z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Edit project
+                    </button>
                 </div>
             @endif
         </div>
 
-        {{-- Milestone redesign (Phase 3): the old Requirements + Milestones & Tasks tabs
-             collapse into a single Work tab. Budget stays separate. The legacy data-test
-             attrs (tab-requirements, tab-milestones) are preserved on the unified Work
-             button so existing tests that toggle them still address a real element. --}}
-        <div class="border-b border-gray-200 dark:border-zinc-700">
-            <nav class="flex -mb-px" data-test="project-tab-nav">
-                <button wire:click="$set('activeTab', 'work')"
-                        data-test="tab-work tab-requirements tab-milestones"
-                        class="py-4 px-6 text-center border-b-2 font-medium text-sm
-                        @if($activeTab === 'work')
-                            border-indigo-500 text-indigo-600 dark:text-indigo-400
-                        @else
-                            border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300
-                        @endif">
-                    Work
-                </button>
-                <button wire:click="$set('activeTab', 'budget')"
-                        data-test="tab-budget"
-                        class="ml-8 py-4 px-6 text-center border-b-2 font-medium text-sm
-                        @if($activeTab === 'budget')
-                            border-indigo-500 text-indigo-600 dark:text-indigo-400
-                        @else
-                            border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300
-                        @endif">
-                    Budget & Expenses
-                </button>
-            </nav>
+        {{-- Unified progress strip (resolves issue #9 — two progress notions side by side). --}}
+        <div class="px-8 pb-3.5 grid gap-6" style="grid-template-columns: 1fr 1fr;">
+            <div>
+                <div class="flex items-baseline justify-between mb-1.5">
+                    <span style="font-family: var(--font-calv-sub); font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-calv-slate-65);">Operational</span>
+                    <span style="font-size: 12px; color: var(--color-calv-slate);">
+                        {{ $msDone }} of {{ $msTotal }} milestone{{ $msTotal === 1 ? '' : 's' }} complete
+                        <span style="color: var(--color-calv-slate-65);">· {{ $msPct }}%</span>
+                    </span>
+                </div>
+                <div class="rounded-full overflow-hidden" style="height: 6px; background: var(--color-calv-slate-15);">
+                    <div class="h-full" style="width: {{ $msPct }}%; background: var(--color-calv-teal);"></div>
+                </div>
+            </div>
+            <div>
+                <div class="flex items-baseline justify-between mb-1.5">
+                    <span style="font-family: var(--font-calv-sub); font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-calv-slate-65);">Financial</span>
+                    <span style="font-size: 12px; color: var(--color-calv-slate);">
+                        ${{ number_format($totalSpent, 0) }} of ${{ number_format($totalBudget, 0) }} spent
+                        <span style="color: var(--color-calv-slate-65);">· {{ $burnPct }}%</span>
+                    </span>
+                </div>
+                <div class="rounded-full overflow-hidden" style="height: 6px; background: var(--color-calv-slate-15);">
+                    <div class="h-full" style="width: {{ min($burnPct, 100) }}%; background: var(--color-calv-sage);"></div>
+                </div>
+            </div>
         </div>
 
-        <!-- Tab Content -->
-        <div class="p-6">
-            @if($activeTab === 'work' || $activeTab === 'requirements' || $activeTab === 'milestones')
-                {{-- Milestone redesign (Phase 3): unified Work tab.
-                     Milestones are grouped by their budget category (a milestone with a
-                     budget category lives under it; one without sits in a top "Compliance &
-                     general" group). Selecting a milestone reveals its detail panel
-                     beneath — the gating requirements, dependencies, and lifecycle
-                     actions. Status pills use the CALV tone vocabulary
-                     (outstanding=amber, in_progress=teal, complete=sage, blocked=red).
+        {{-- Tabs — teal underline on active (no more indigo). --}}
+        <div class="px-8 flex gap-1">
+            <button wire:click="$set('activeTab', 'work')"
+                    data-test="tab-work tab-requirements tab-milestones"
+                    class="border-b-2 transition"
+                    style="padding: 12px 14px; background: transparent; border-color: {{ $activeTab === 'work' ? 'var(--color-calv-teal)' : 'transparent' }}; color: {{ $activeTab === 'work' ? 'var(--color-calv-teal)' : 'var(--color-calv-slate-65)' }}; font-family: var(--font-calv-sub); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;">
+                Work
+            </button>
+            <button wire:click="$set('activeTab', 'budget')"
+                    data-test="tab-budget"
+                    class="border-b-2 transition"
+                    style="padding: 12px 14px; background: transparent; border-color: {{ $activeTab === 'budget' ? 'var(--color-calv-teal)' : 'transparent' }}; color: {{ $activeTab === 'budget' ? 'var(--color-calv-teal)' : 'var(--color-calv-slate-65)' }}; font-family: var(--font-calv-sub); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;">
+                Budget & Expenses
+            </button>
+        </div>
+    </header>
 
-                     Legacy data-test attributes (requirements-tab, milestone-requirement-row,
-                     etc.) live alongside the new ones so the existing regression suite
-                     still finds the rows it expects.  --}}
-                <div data-test="work-tab requirements-tab" class="space-y-4">
-                    {{-- Fund-code requirements reference (legacy FundCodeRequirement
-                         panel). Surfaces hard and informational requirements per
-                         attached fund code as a quick at-a-glance reference at
-                         the top of Work. Retained from the pre-redesign tab so
-                         the manager still sees the per-code list — the new
-                         milestone-level rows below are the actionable layer. --}}
-                    @include('livewire.partials.fund-code-requirements-panel')
-
-                    @php
-                        $allReqs = $job->requirements ?? collect();
-                        $milestones = $job->milestones ?? collect();
-                        $budgets = $job->budgets ?? collect();
-
-                        // Group milestones by their budget category. A milestone with no
-                        // budget_id falls into the "general" bucket. We resolve the link
-                        // either way: most milestones reach budget via
-                        // project_budgets.milestone_id (one budget → one milestone) but
-                        // some installations may pivot through the fund_code pivot's
-                        // milestone_id too. We trust project_budgets.milestone_id as the
-                        // authoritative tie (per CLAUDE.md Phase-1 decisions).
-                        $budgetByMilestoneId = $budgets->keyBy('milestone_id');
-                        $milestonesWithBudget = $milestones->filter(fn ($m) => $budgetByMilestoneId->has($m->id));
-                        $milestonesGeneral = $milestones->reject(fn ($m) => $budgetByMilestoneId->has($m->id));
-
-                        // Map fund_code_id -> milestone_id from the loaded pivot, used for
-                        // the fund-code-source requirement re-parenting (kept for parity
-                        // with the legacy Requirements tab so fund-code reqs still render
-                        // under the milestone their fund code serves).
-                        $fundCodeMilestoneMap = collect();
-                        foreach ($job->fundCodes ?? [] as $fc) {
-                            $fundCodeMilestoneMap[$fc->id] = $fc->pivot?->milestone_id;
-                        }
-
-                        // Helper: collect milestone-relevant requirements (own + fund-code re-parented).
-                        $reqsFor = function ($milestoneId) use ($allReqs, $fundCodeMilestoneMap) {
-                            $own = $allReqs->where('source_type', 'milestone')->where('source_id', $milestoneId);
-                            $viaFundCode = $allReqs->where('source_type', 'fund_code')->filter(
-                                fn ($r) => ($fundCodeMilestoneMap[$r->source_id] ?? null) === $milestoneId
-                            );
-                            return $own->concat($viaFundCode)->values();
-                        };
-
-                        // Status → CALV tone mapping for the row chip.
-                        $statusTone = [
-                            'outstanding' => 'amber',
-                            'not_started' => 'neutral',
-                            'in_progress' => 'teal',
-                            'completed' => 'sage',
-                            'complete' => 'sage',
-                            'not_applicable' => 'sand',
-                        ];
-
-                        // Compute blocked-by edges so a row can flag itself as gated by
-                        // upstream incomplete milestones. ProjectMilestone::dependencies
-                        // is loaded lazily; eager-loading it would change the mount()
-                        // payload, so we accept the n+1 here on the assumption project
-                        // milestone counts are small (<50 typical).
-                        $blockedBy = collect();
-                        foreach ($milestones as $m) {
-                            $unmet = $m->dependencies->filter(fn ($d) => $d->status !== 'completed');
-                            $blockedBy[$m->id] = $unmet;
-                        }
-
-                        $totalCount = $milestones->count();
-                        $doneCount = $milestones->where('status', 'completed')->count();
-                    @endphp
-
-                    {{-- Header strip: progress summary + add-milestone CTA. --}}
-                    <div class="flex items-center justify-between pb-3 border-b border-gray-200 dark:border-zinc-700">
-                        <div>
-                            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Project work</h2>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                {{ $doneCount }} of {{ $totalCount }} milestone{{ $totalCount === 1 ? '' : 's' }} complete
-                                @if($totalCount > 0)
-                                    · {{ round(($doneCount / max($totalCount, 1)) * 100) }}%
-                                @endif
-                            </p>
-                        </div>
-                        @if($this->can('projects.manage'))
-                            <button wire:click="showCreateMilestone"
-                                    data-test="add-milestone-btn"
-                                    class="px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
-                                + Add milestone
-                            </button>
-                        @endif
-                    </div>
-
-                    {{-- ────────── Render one group per category, then general. ────────── --}}
-                    @php
-                        // Component-level helper to render one milestone row. Inlined as
-                        // a closure here so we don't have to spin up an x-component for
-                        // a one-page use case. Captures $blockedBy, $statusTone,
-                        // $selectedMilestone, $reqsFor by reference.
-                        $renderMilestoneRow = function ($m) use ($blockedBy, $statusTone, $selectedMilestone, $reqsFor) {
-                            $reqs = $reqsFor($m->id);
-                            $outstanding = $reqs->where('status', 'outstanding')->count();
-                            $totalReq = $reqs->count();
-                            $isSelected = (int) $selectedMilestone === (int) $m->id;
-                            $isBlocked = ($blockedBy[$m->id] ?? collect())->isNotEmpty()
-                                && $m->status !== 'completed';
-                            $tone = $isBlocked ? 'red' : ($statusTone[$m->status] ?? 'neutral');
-                            $label = $isBlocked ? 'blocked' : str_replace('_', ' ', $m->status);
-                            return compact('reqs', 'outstanding', 'totalReq', 'isSelected', 'isBlocked', 'tone', 'label');
-                        };
-                    @endphp
-
-                    {{-- Group: Compliance & general (un-budgeted milestones, including default-seeded Phase 2 compliance items). --}}
-                    @if($milestonesGeneral->isNotEmpty())
-                        <section class="border border-gray-200 dark:border-zinc-700 rounded-lg overflow-hidden"
-                                 data-test="milestone-group milestone-group-general">
-                            <header class="flex items-baseline justify-between bg-gray-50 dark:bg-zinc-900/40 px-4 py-2 border-b border-gray-200 dark:border-zinc-700">
-                                <div class="flex items-baseline gap-2">
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold bg-calv-slate-15 text-calv-slate">
-                                        General
-                                    </span>
-                                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">Compliance &amp; un-budgeted work</h3>
-                                </div>
-                                <span class="text-xs text-gray-500 dark:text-gray-400">{{ $milestonesGeneral->count() }} milestone{{ $milestonesGeneral->count() === 1 ? '' : 's' }}</span>
-                            </header>
-                            <ul class="divide-y divide-gray-100 dark:divide-zinc-700">
-                                @foreach($milestonesGeneral as $milestone)
-                                    @php $row = $renderMilestoneRow($milestone); @endphp
-                                    <li wire:click="selectMilestone({{ $milestone->id }})"
-                                        data-test="milestone-row milestone-requirement-group"
-                                        data-milestone-id="{{ $milestone->id }}"
-                                        class="px-4 py-3 cursor-pointer transition-colors
-                                               {{ $row['isSelected']
-                                                  ? 'bg-indigo-50 dark:bg-indigo-900/20'
-                                                  : 'hover:bg-gray-50 dark:hover:bg-zinc-700/40' }}">
-                                        <div class="flex items-center gap-3">
-                                            <span class="inline-block w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: {{ $milestone->color }}"></span>
-                                            <div class="flex-1 min-w-0">
-                                                <div class="flex items-baseline gap-2 flex-wrap">
-                                                    <span class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ $milestone->name }}</span>
-                                                    @if($milestone->isPromoted())
-                                                        <span class="text-[10px] uppercase tracking-wider font-semibold text-calv-teal" title="Auto-seeded from the requirements library">★ default</span>
-                                                    @endif
-                                                    @if($row['totalReq'] > 0)
-                                                        <span class="text-xs text-gray-500 dark:text-gray-400">
-                                                            {{ $row['totalReq'] - $row['outstanding'] }}/{{ $row['totalReq'] }} requirements met
-                                                        </span>
-                                                    @endif
-                                                </div>
-                                                @if($milestone->target_date)
-                                                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                                        Target {{ $milestone->target_date->format('M d, Y') }}
-                                                    </div>
-                                                @endif
-                                            </div>
-                                            @if($row['isBlocked'])
-                                                <span class="text-calv-red text-xs" title="Blocked by {{ ($blockedBy[$milestone->id] ?? collect())->pluck('name')->join(', ') }}">🔒</span>
-                                            @endif
-                                            <x-comm.meta-chip :tone="$row['tone']">{{ $row['label'] }}</x-comm.meta-chip>
-                                        </div>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </section>
-                    @endif
-
-                    {{-- Group per budget category. One card per ProjectBudget that has a milestone_id link. --}}
-                    @foreach($milestonesWithBudget->groupBy('id') as $milestoneId => $msGroup)
+    {{-- ────────────────────────────────────────────────────────────────
+         Origin tie-back strip (Project Detail redesign §4.5).
+         Surfaces the originating CommunicationLog and the carried-forward
+         intake application requirements (read-only chips). Hidden if the
+         project has no originating comm log (legacy or non-converted jobs).
+         ──────────────────────────────────────────────────────────── --}}
+    @if($originatingCommLog)
+        <div class="px-8 py-2.5 flex items-center gap-4 flex-wrap"
+             style="background: var(--color-calv-sand-15); border-bottom: 1px solid var(--color-calv-sand-35);">
+            <span style="font-family: var(--font-calv-sub); font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-calv-slate-65);">Carried from intake</span>
+            <a href="{{ route('communications-log.management') }}" wire:navigate
+               style="font-size: 12px; color: var(--color-calv-teal); text-decoration: underline; font-weight: 600;">
+                {{ $originatingCommLog->log_number ?? ('COMM-' . str_pad($originatingCommLog->id, 5, '0', STR_PAD_LEFT)) }}
+                · {{ ucfirst(str_replace('_', ' ', $originatingCommLog->type ?? 'intake')) }}
+                · {{ $originatingCommLog->created_at?->format('M d, Y') }}
+            </a>
+            @if($originatingCommLog->intakeRequirements->isNotEmpty())
+                <span class="block" style="width: 1px; height: 16px; background: var(--color-calv-sand-65);"></span>
+                <div class="flex flex-wrap gap-1.5 items-center">
+                    <span style="font-size: 11px; color: var(--color-calv-slate-65);">App. requirements:</span>
+                    @foreach($originatingCommLog->intakeRequirements->sortBy(fn ($r) => $r->definition?->label) as $r)
                         @php
-                            $milestone = $msGroup->first();
-                            $budget = $budgetByMilestoneId->get($milestoneId);
-                            $row = $renderMilestoneRow($milestone);
+                            $met = in_array($r->status, \App\Models\IntakeRequirement::MET_STATUSES, true);
+                            $waived = $r->status === \App\Models\IntakeRequirement::STATUS_WAIVED;
+                            $statusDot = $waived
+                                ? 'var(--color-calv-sand-65)'
+                                : ($met ? 'var(--color-calv-sage)' : 'var(--color-calv-slate-65)');
                         @endphp
-                        <section class="border border-gray-200 dark:border-zinc-700 rounded-lg overflow-hidden"
-                                 data-test="milestone-group milestone-group-budget"
-                                 data-milestone-id="{{ $milestone->id }}">
-                            <header class="flex items-baseline justify-between bg-emerald-50/60 dark:bg-emerald-900/10 px-4 py-2 border-b border-emerald-200 dark:border-emerald-900/30">
-                                <div class="flex items-baseline gap-2 flex-wrap">
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold bg-calv-sage-15 text-[#2F5A41]">
-                                        Budget
-                                    </span>
-                                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">{{ $budget->category }}</h3>
-                                    @if($budget->fundCode)
-                                        <span class="font-mono text-[11px] text-emerald-700 dark:text-emerald-300">{{ $budget->fundCode->code }}</span>
-                                    @endif
-                                </div>
-                                <span class="text-xs text-gray-500 dark:text-gray-400 tabular-nums">
-                                    ${{ number_format((float) $budget->spent_amount, 0) }} / ${{ number_format((float) $budget->budgeted_amount, 0) }}
-                                </span>
-                            </header>
-                            <ul class="divide-y divide-gray-100 dark:divide-zinc-700">
-                                <li wire:click="selectMilestone({{ $milestone->id }})"
-                                    data-test="milestone-row milestone-requirement-group"
-                                    data-milestone-id="{{ $milestone->id }}"
-                                    class="px-4 py-3 cursor-pointer transition-colors
-                                           {{ $row['isSelected']
-                                              ? 'bg-indigo-50 dark:bg-indigo-900/20'
-                                              : 'hover:bg-gray-50 dark:hover:bg-zinc-700/40' }}">
-                                    <div class="flex items-center gap-3">
-                                        <span class="inline-block w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: {{ $milestone->color }}"></span>
-                                        <div class="flex-1 min-w-0">
-                                            <div class="flex items-baseline gap-2 flex-wrap">
-                                                <span class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ $milestone->name }}</span>
-                                                @if($row['totalReq'] > 0)
-                                                    <span class="text-xs text-gray-500 dark:text-gray-400">
-                                                        {{ $row['totalReq'] - $row['outstanding'] }}/{{ $row['totalReq'] }} requirements met
-                                                    </span>
-                                                @endif
-                                            </div>
-                                            @if($milestone->target_date)
-                                                <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                                    Target {{ $milestone->target_date->format('M d, Y') }}
-                                                </div>
-                                            @endif
-                                        </div>
-                                        @if($row['isBlocked'])
-                                            <span class="text-calv-red text-xs" title="Blocked by {{ ($blockedBy[$milestone->id] ?? collect())->pluck('name')->join(', ') }}">🔒</span>
-                                        @endif
-                                        <x-comm.meta-chip :tone="$row['tone']">{{ $row['label'] }}</x-comm.meta-chip>
-                                    </div>
-                                </li>
-                            </ul>
-                        </section>
+                        <span class="inline-flex items-center gap-1.5 rounded-full"
+                              title="Status: {{ str_replace('_', ' ', $r->status) }}"
+                              style="padding: 2px 8px; font-size: 11.5px; color: var(--color-calv-slate); background: #fff; border: 1px solid var(--color-calv-slate-15);">
+                            <span class="rounded-full" style="width: 6px; height: 6px; background: {{ $statusDot }};"></span>
+                            {{ $r->definition?->label ?? $r->source_label_snapshot ?? '—' }}
+                        </span>
                     @endforeach
+                </div>
+            @endif
+        </div>
+    @endif
 
-                    {{-- Empty state when no milestones exist at all. --}}
-                    @if($milestones->isEmpty())
-                        <div class="text-center py-12 bg-gray-50 dark:bg-zinc-700/40 rounded-lg border border-dashed border-gray-300 dark:border-zinc-600">
-                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                            </svg>
-                            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">No milestones yet — the default Phase 2 compliance set seeds at conversion.</p>
+    <!-- Success/Error Messages -->
+    @if (session()->has('success'))
+        <div class="p-4 mx-8 mt-4 rounded" style="background: var(--color-calv-sage-15); border-left: 3px solid var(--color-calv-sage);">
+            <p class="text-sm" style="color: #2F5A41;">{{ session('success') }}</p>
+        </div>
+    @endif
+    @if (session()->has('error'))
+        <div class="p-4 mx-8 mt-4 rounded" style="background: var(--color-calv-red-15); border-left: 3px solid var(--color-calv-red);">
+            <p class="text-sm" style="color: var(--color-calv-red);">{{ session('error') }}</p>
+        </div>
+    @endif
+
+
+        <!-- Tab Content — edge-to-edge for two-pane Work; padded for Budget -->
+        @if($activeTab === 'work' || $activeTab === 'requirements' || $activeTab === 'milestones')
+            @php
+                // Build the two milestone groups the redesign expects:
+                //   GENERAL  — milestones with no budget tie (compliance + un-budgeted)
+                //   BUDGET   — milestones that anchor a budget category
+                $budgetByMilestoneId = $budgets->keyBy('milestone_id');
+                $groupGeneral = $milestones->reject(fn ($m) => $budgetByMilestoneId->has($m->id))->values();
+                $groupBudget  = $milestones->filter(fn ($m) => $budgetByMilestoneId->has($m->id))->values();
+
+                // Map each milestone's requirements + blocked-by status for the row meta.
+                $allReqs = $job->requirements ?? collect();
+                $fundCodeMilestoneMap = collect();
+                foreach ($job->fundCodes ?? [] as $fc) {
+                    $fundCodeMilestoneMap[$fc->id] = $fc->pivot?->milestone_id;
+                }
+                $reqsFor = function ($milestoneId) use ($allReqs, $fundCodeMilestoneMap) {
+                    $own = $allReqs->where('source_type', 'milestone')->where('source_id', $milestoneId);
+                    $viaFundCode = $allReqs->where('source_type', 'fund_code')->filter(
+                        fn ($r) => ($fundCodeMilestoneMap[$r->source_id] ?? null) === $milestoneId
+                    );
+                    return $own->concat($viaFundCode)->values();
+                };
+                $blockedByMap = collect();
+                foreach ($milestones as $m) {
+                    $blockedByMap[$m->id] = $m->dependencies->filter(fn ($d) => $d->status !== 'completed')->values();
+                }
+
+                // Build a tiny array of {id, name, status, lowercaseLabels} for Alpine's filter.
+                // Reduces the per-row x-show JS to a cheap predicate.
+                $milestoneSearchIndex = $milestones->map(function ($m) use ($reqsFor) {
+                    $reqLabels = $reqsFor($m->id)->pluck('title')->map(fn ($t) => strtolower($t))->all();
+                    return [
+                        'id' => $m->id,
+                        'name' => strtolower($m->name),
+                        'labels' => $reqLabels,
+                    ];
+                })->keyBy('id')->all();
+            @endphp
+
+            <div x-data="{
+                    query: '',
+                    filter: 'all',
+                    index: @js($milestoneSearchIndex),
+                    matches(id, status) {
+                        if (this.filter !== 'all' && status !== this.filter) return false;
+                        if (!this.query) return true;
+                        const q = this.query.toLowerCase();
+                        const row = this.index[id];
+                        if (!row) return false;
+                        if (row.name.includes(q)) return true;
+                        return row.labels.some(l => l.includes(q));
+                    },
+                 }"
+                 class="grid"
+                 style="grid-template-columns: 440px 1fr; min-height: 640px;">
+
+                {{-- ─── LEFT PANE — searchable, filterable milestone list ─── --}}
+                <div class="flex flex-col"
+                     style="border-right: 1px solid var(--color-calv-slate-15); background: var(--color-calv-sand-15);">
+                    {{-- Search + filter header --}}
+                    <div style="padding: 14px 18px 12px; border-bottom: 1px solid var(--color-calv-slate-15);">
+                        <div class="flex items-center gap-2 mb-2.5">
+                            <h2 class="m-0"
+                                style="font-family: var(--font-calv-sub); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-calv-slate);">
+                                Milestones
+                            </h2>
+                            <span class="flex-1"></span>
                             @if($this->can('projects.manage'))
                                 <button wire:click="showCreateMilestone"
-                                        class="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm">
-                                    Create first milestone
+                                        data-test="add-milestone-btn"
+                                        class="inline-flex items-center gap-1 rounded text-white"
+                                        style="padding: 5px 11px; background: var(--color-calv-red); font-family: var(--font-calv-sub); font-size: 10.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">
+                                    <svg width="11" height="11" viewBox="0 0 16 16" fill="none">
+                                        <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                                    </svg>
+                                    Milestone
                                 </button>
                             @endif
                         </div>
-                    @endif
+                        {{-- Search --}}
+                        <div class="relative mb-2">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-calv-slate-65);">
+                                <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                                    <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.4"/>
+                                    <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                                </svg>
+                            </span>
+                            <input x-model="query"
+                                   placeholder="Search milestones & requirements…"
+                                   class="w-full rounded-md text-sm"
+                                   style="padding: 7px 10px 7px 32px; border: 1px solid var(--color-calv-slate-35); font-family: var(--font-calv-body); color: var(--color-calv-slate); background: #fff;">
+                        </div>
+                        {{-- Filter pills --}}
+                        <div class="flex gap-1.5">
+                            @foreach(['all' => 'All', 'not_started' => 'Pending', 'in_progress' => 'In progress', 'completed' => 'Completed'] as $key => $label)
+                                <button @click="filter = '{{ $key }}'"
+                                        :class="filter === '{{ $key }}' ? 'is-active' : ''"
+                                        x-bind:style="filter === '{{ $key }}'
+                                            ? 'background: var(--color-calv-slate); color: #fff; border-color: var(--color-calv-slate);'
+                                            : 'background: #fff; color: var(--color-calv-slate-65); border-color: var(--color-calv-slate-35);'"
+                                        class="rounded-full cursor-pointer"
+                                        style="padding: 4px 9px; font-family: var(--font-calv-sub); font-size: 9.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; border-width: 1px; border-style: solid;">
+                                    {{ $label }}
+                                </button>
+                            @endforeach
+                        </div>
+                    </div>
 
-                    {{-- ────────── Selected milestone detail panel. ────────── --}}
-                    @if($currentMilestone)
+                    {{-- Groups + rows --}}
+                    <div class="flex-1 overflow-y-auto" style="padding: 8px 0;">
                         @php
-                            $detailReqs = $reqsFor($currentMilestone->id);
-                            $detailBlockedBy = $blockedBy[$currentMilestone->id] ?? collect();
-                            $detailDependents = $currentMilestone->dependents ?? collect();
-                            $detailCanComplete = $detailBlockedBy->isEmpty()
-                                && $detailReqs->where('status', 'outstanding')->isEmpty();
+                            $renderGroup = function ($kind, $title, $items) use ($reqsFor, $blockedByMap, $msStatusTone, $currentMilestone) {
+                                return compact('kind', 'title', 'items');
+                            };
                         @endphp
-                        <section class="border border-indigo-200 dark:border-indigo-700/40 bg-indigo-50/40 dark:bg-indigo-900/10 rounded-lg p-5 mt-6"
-                                 data-test="milestone-detail">
-                            <div class="flex items-start justify-between gap-4">
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-baseline gap-2 flex-wrap">
-                                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $currentMilestone->name }}</h3>
-                                        @if($currentMilestone->isPromoted())
-                                            <span class="text-[10px] uppercase tracking-wider font-semibold text-calv-teal">★ default Phase 2</span>
-                                        @endif
-                                    </div>
-                                    @if($currentMilestone->description)
-                                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ $currentMilestone->description }}</p>
-                                    @endif
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                        Started: {{ $currentMilestone->started_at?->format('M d, Y g:i A') ?: '—' }}
-                                        @if($currentMilestone->target_date) · Target: {{ $currentMilestone->target_date->format('M d, Y') }} @endif
-                                    </p>
-                                </div>
-                                <div class="flex items-center gap-2 flex-shrink-0">
-                                    @if($currentMilestone->status !== 'completed')
-                                        <button wire:click="updateMilestoneStatus({{ $currentMilestone->id }}, 'completed')"
-                                                @disabled(! $detailCanComplete)
-                                                title="{{ $detailCanComplete ? '' : 'All gating requirements + upstream dependencies must be met first.' }}"
-                                                class="px-3 py-1.5 text-sm rounded-md
-                                                       {{ $detailCanComplete
-                                                          ? 'bg-green-600 text-white hover:bg-green-700'
-                                                          : 'bg-gray-300 dark:bg-zinc-600 text-gray-500 dark:text-gray-400 cursor-not-allowed' }}">
-                                            Mark complete
-                                        </button>
-                                    @endif
-                                    <button wire:click="showEditMilestone({{ $currentMilestone->id }})"
-                                            class="px-3 py-1.5 text-sm bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
-                                        Edit
-                                    </button>
-                                    <button wire:click="deleteMilestone({{ $currentMilestone->id }})"
-                                            wire:confirm="Delete this milestone?"
-                                            class="px-3 py-1.5 text-sm bg-red-600 text-white rounded-md hover:bg-red-700">
-                                        Delete
-                                    </button>
-                                </div>
-                            </div>
 
-                            {{-- Dependency tray (blocked-by + dependents). --}}
-                            @if($detailBlockedBy->isNotEmpty() || $detailDependents->isNotEmpty())
-                                <div class="mt-4 pt-3 border-t border-indigo-200 dark:border-indigo-700/40 flex flex-wrap gap-x-6 gap-y-2 text-xs">
-                                    @if($detailBlockedBy->isNotEmpty())
-                                        <div>
-                                            <span class="uppercase tracking-wider text-[10px] font-bold text-calv-slate-65 mr-2">Blocked by</span>
-                                            @foreach($detailBlockedBy as $up)
-                                                <x-comm.meta-chip tone="red">{{ $up->name }}</x-comm.meta-chip>
-                                            @endforeach
-                                        </div>
-                                    @endif
-                                    @if($detailDependents->isNotEmpty())
-                                        <div>
-                                            <span class="uppercase tracking-wider text-[10px] font-bold text-calv-slate-65 mr-2">Unblocks</span>
-                                            @foreach($detailDependents as $down)
-                                                <x-comm.meta-chip tone="slate">{{ $down->name }}</x-comm.meta-chip>
-                                            @endforeach
-                                        </div>
-                                    @endif
+                        @foreach([
+                            ['kind' => 'GENERAL', 'title' => 'Compliance & un-budgeted work', 'items' => $groupGeneral],
+                            ['kind' => 'BUDGET',  'title' => 'Scopes of work',                'items' => $groupBudget],
+                        ] as $group)
+                            @if($group['items']->isNotEmpty())
+                                @php
+                                    $budgeted = $group['kind'] === 'BUDGET';
+                                    // Hide the whole group if no items match the active filter (Alpine-driven).
+                                    $groupItemIds = $group['items']->pluck('id')->map(fn ($i) => (int) $i)->all();
+                                @endphp
+                                <div x-show="@js($groupItemIds).some(id => matches(id, index[id] ? Object.keys(index).find(k => +k === id) && (@js($group['items']->mapWithKeys(fn ($m) => [$m->id => $m->status])->all())[id]) : null))" style="margin-bottom: 8px;" data-test="milestone-group milestone-group-{{ strtolower($group['kind']) }}">
+                                    <div class="flex items-center gap-2" style="padding: 8px 18px 6px;">
+                                        <span class="rounded"
+                                              style="padding: 2px 7px; font-family: var(--font-calv-sub); font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; background: {{ $budgeted ? 'var(--color-calv-teal-15)' : 'var(--color-calv-slate-15)' }}; color: {{ $budgeted ? 'var(--color-calv-teal)' : 'var(--color-calv-slate-65)' }};">
+                                            {{ $group['kind'] }}
+                                        </span>
+                                        <span style="font-family: var(--font-calv-sub); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-calv-slate);">
+                                            {{ $group['title'] }}
+                                        </span>
+                                    </div>
+                                    @foreach($group['items'] as $m)
+                                        @php
+                                            $reqs = $reqsFor($m->id);
+                                            $reqMet = $reqs->where('status', 'complete')->count();
+                                            $reqTotal = $reqs->count();
+                                            $isBlocked = ($blockedByMap[$m->id] ?? collect())->isNotEmpty() && $m->status !== 'completed';
+                                            $effectiveStatus = $isBlocked ? 'blocked' : $m->status;
+                                            $tone = $msStatusTone[$effectiveStatus] ?? $msStatusTone['pending'];
+                                            $isSelected = $currentMilestone && $currentMilestone->id === $m->id;
+                                            $msBudget = $budgetByMilestoneId->get($m->id);
+                                        @endphp
+                                        <button wire:click="selectMilestone({{ $m->id }})"
+                                                x-show="matches({{ $m->id }}, '{{ $m->status }}')"
+                                                data-test="milestone-row"
+                                                data-milestone-id="{{ $m->id }}"
+                                                class="block w-full text-left cursor-pointer relative transition-colors"
+                                                style="padding: 11px 18px; border-left: 3px solid {{ $isSelected ? 'var(--color-calv-teal)' : 'transparent' }}; background: {{ $isSelected ? '#fff' : 'transparent' }}; box-shadow: {{ $isSelected ? 'var(--shadow-calv-sm)' : 'none' }};">
+                                            <div class="flex items-center gap-2 mb-0.5">
+                                                <span class="flex-1 min-w-0 truncate"
+                                                      style="font-family: var(--font-calv-body); font-size: 14px; font-weight: 600; color: var(--color-calv-slate);">
+                                                    {{ $m->name }}
+                                                </span>
+                                                <span class="inline-flex items-center gap-1 rounded-full whitespace-nowrap"
+                                                      style="padding: 2px 7px; font-family: var(--font-calv-sub); font-size: 9.5px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; background: {{ $tone['bg'] }}; color: {{ $tone['fg'] }};">
+                                                    <span class="rounded-full" style="width: 5px; height: 5px; background: {{ $tone['dot'] }};"></span>
+                                                    {{ $tone['label'] }}
+                                                </span>
+                                            </div>
+                                            <div class="flex items-center gap-2" style="font-size: 11.5px; color: var(--color-calv-slate-65);">
+                                                @if($m->target_date)
+                                                    <span>Target {{ $m->target_date->format('M d, Y') }}</span>
+                                                    <span>·</span>
+                                                @endif
+                                                <span style="color: {{ $reqTotal > 0 && $reqMet === $reqTotal ? 'var(--color-calv-sage)' : 'var(--color-calv-slate-65)' }};">
+                                                    {{ $reqMet }}/{{ $reqTotal }} reqs
+                                                </span>
+                                                @if($msBudget)
+                                                    <span>·</span>
+                                                    <span style="font-family: ui-monospace, Menlo, monospace;">
+                                                        ${{ number_format((float) $msBudget->spent_amount, 0) }}/${{ number_format((float) $msBudget->budgeted_amount, 0) }}
+                                                    </span>
+                                                @endif
+                                                @if($isBlocked)
+                                                    <span class="ml-auto inline-flex items-center gap-0.5"
+                                                          style="color: var(--color-calv-red);"
+                                                          title="Blocked by {{ ($blockedByMap[$m->id])->pluck('name')->join(', ') }}">
+                                                        <svg width="11" height="11" viewBox="0 0 16 16" fill="none">
+                                                            <path d="M5 7V5a3 3 0 0 1 6 0v2M4 7h8v6H4z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                        blocked
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </button>
+                                    @endforeach
                                 </div>
                             @endif
+                        @endforeach
 
-                            {{-- Gating requirements list. Reuses the existing wire:click bindings
-                                 (toggleTaskRequirementComplete, showCompleteRequirementModal, reopenRequirement,
-                                 showEditRequirement, deleteRequirement) so the PHP component contract is
-                                 unchanged. CALV-styled rows for the milestone-source ones; fund-code-source
-                                 reqs render with a teal "via fund code" tag. --}}
-                            <div class="mt-4 pt-3 border-t border-indigo-200 dark:border-indigo-700/40">
-                                <div class="flex items-center justify-between mb-3">
-                                    <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-200">Gating requirements</h4>
-                                    @if($this->can('projects.manage'))
-                                        <div class="flex items-center gap-2">
-                                            <button wire:click="showCreateRequirement('task')"
-                                                    class="px-2.5 py-1 text-xs bg-indigo-600 text-white rounded hover:bg-indigo-700">
-                                                + Task
-                                            </button>
-                                            <button wire:click="showCreateRequirement('document')"
-                                                    class="px-2.5 py-1 text-xs bg-indigo-600 text-white rounded hover:bg-indigo-700">
-                                                + Document
-                                            </button>
-                                        </div>
-                                    @endif
-                                </div>
-
-                                @if($detailReqs->isEmpty())
-                                    <p class="text-xs italic text-gray-500 dark:text-gray-400 text-center py-4">No gating requirements on this milestone yet. Add a task or document to track what must be done.</p>
-                                @else
-                                    <ul class="space-y-2" data-test="gating-requirements-list">
-                                        @foreach($detailReqs as $r)
-                                            @php
-                                                $rTone = $statusTone[$r->status] ?? 'neutral';
-                                                $rIcon = $r->type === 'document' ? '📄' : '✓';
-                                                $hasFiles = $r->type === 'document' && method_exists($r, 'getMedia')
-                                                    ? $r->getMedia('attachments')->isNotEmpty()
-                                                    : false;
-                                            @endphp
-                                            <li class="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-md p-3"
-                                                data-test="milestone-requirement-row gating-requirement-row">
-                                                <div class="flex items-start gap-3">
-                                                    @if($r->type === 'task')
-                                                        <input type="checkbox"
-                                                               wire:click="toggleTaskRequirementComplete({{ $r->id }})"
-                                                               {{ $r->isComplete() ? 'checked' : '' }}
-                                                               class="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                                                    @else
-                                                        <span class="text-base leading-none mt-0.5">{{ $rIcon }}</span>
-                                                    @endif
-                                                    <div class="flex-1 min-w-0">
-                                                        <div class="flex items-baseline gap-2 flex-wrap">
-                                                            <span class="text-sm font-medium text-gray-900 dark:text-white {{ $r->isComplete() ? 'line-through' : '' }}">{{ $r->title }}</span>
-                                                            <x-comm.meta-chip :tone="$rTone">{{ str_replace('_', ' ', $r->status) }}</x-comm.meta-chip>
-                                                            @if($r->source_type === 'fund_code')
-                                                                <span class="text-[10px] uppercase tracking-wider font-semibold text-calv-teal">via fund code</span>
-                                                            @endif
-                                                            @if($r->wasOverridden())
-                                                                <x-comm.meta-chip tone="amber">override</x-comm.meta-chip>
-                                                            @endif
-                                                        </div>
-                                                        @if($r->description)
-                                                            <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">{{ $r->description }}</p>
-                                                        @endif
-                                                        @if($r->milestone_gate_text)
-                                                            <p class="text-xs text-calv-red mt-1">⛔ {{ $r->milestone_gate_text }}</p>
-                                                        @endif
-                                                        <div class="flex flex-wrap items-center gap-3 mt-1.5 text-[11px] text-gray-500 dark:text-gray-400">
-                                                            @if($r->owner)
-                                                                <span>Owner: {{ $r->owner->name }}</span>
-                                                            @else
-                                                                <span class="italic">Unassigned</span>
-                                                            @endif
-                                                            @if($hasFiles)
-                                                                <span class="inline-flex items-center gap-1">📎 {{ $r->getMedia('attachments')->count() }} file(s)</span>
-                                                            @endif
-                                                            @if($r->isComplete() && $r->completedBy)
-                                                                <span class="text-green-700 dark:text-green-400">Done by {{ $r->completedBy->name }} {{ $r->completed_at?->format('M d, Y') }}</span>
-                                                            @endif
-                                                        </div>
-                                                    </div>
-                                                    <div class="flex items-center gap-1 flex-shrink-0">
-                                                        @if($r->type === 'document' && ! $r->isComplete())
-                                                            <button wire:click="showCompleteRequirementModal({{ $r->id }})"
-                                                                    class="px-2 py-0.5 text-[11px] bg-green-600 text-white rounded hover:bg-green-700">
-                                                                Mark complete
-                                                            </button>
-                                                        @elseif($r->isComplete())
-                                                            <button wire:click="reopenRequirement({{ $r->id }})"
-                                                                    class="px-2 py-0.5 text-[11px] bg-amber-600 text-white rounded hover:bg-amber-700">
-                                                                Reopen
-                                                            </button>
-                                                        @endif
-                                                        @if($r->source_type !== 'fund_code')
-                                                            <button wire:click="showEditRequirement({{ $r->id }})"
-                                                                    class="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 p-1"
-                                                                    title="Edit">
-                                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                                                </svg>
-                                                            </button>
-                                                            <button wire:click="deleteRequirement({{ $r->id }})"
-                                                                    wire:confirm="Delete this requirement?"
-                                                                    class="text-red-500 hover:text-red-700 p-1"
-                                                                    title="Delete">
-                                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                                                </svg>
-                                                            </button>
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                            </li>
-                                        @endforeach
-                                    </ul>
+                        @if($milestones->isEmpty())
+                            <div class="text-center" style="padding: 40px 18px;">
+                                <p style="font-size: 13px; color: var(--color-calv-slate-65);">No milestones yet — Phase 2 defaults seed on conversion.</p>
+                                @if($this->can('projects.manage'))
+                                    <button wire:click="showCreateMilestone"
+                                            class="mt-3 rounded text-white"
+                                            style="padding: 6px 12px; background: var(--color-calv-red); font-family: var(--font-calv-sub); font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">
+                                        + Create first milestone
+                                    </button>
                                 @endif
                             </div>
-                        </section>
-                    @else
-                        @if($milestones->isNotEmpty())
-                            <p class="text-sm text-center text-gray-500 dark:text-gray-400 italic py-4">Select a milestone above to see its gating requirements and lifecycle actions.</p>
                         @endif
-                    @endif
+                    </div>
                 </div>
 
-            @else
-                {{-- Phase 3 of the milestone redesign deleted the legacy
-                     Requirements + "Milestones & Tasks" tab bodies that
-                     used to live between this @else and the Work tab
-                     above. Both became the unified Work tab. --}}
-                <!-- Budget Tab -->
-                <div class="space-y-6">
-                    {{-- P-23 Step 7: persistent over-budget banner.
-                         Shown whenever any category on this project is over.
-                         Cannot be dismissed by the user; resolution paths
-                         (reduce expense, reassign expense, modify budget cap)
-                         are the only ways to clear it. --}}
-                    @php
-                        $overBudgetCategories = $job->budgets->filter(fn ($b) => $b->is_over_budget);
-                    @endphp
+                {{-- ─── RIGHT PANE — milestone detail ─── --}}
+                <div class="overflow-y-auto" style="background: #fff;">
+                    @if($currentMilestone)
+                        @include('livewire.partials.project-milestone-detail', [
+                            'm' => $currentMilestone,
+                            'reqs' => $reqsFor($currentMilestone->id),
+                            'blockedBy' => $blockedByMap[$currentMilestone->id] ?? collect(),
+                            'msStatusTone' => $msStatusTone,
+                            'budget' => $budgetByMilestoneId->get($currentMilestone->id),
+                        ])
+                    @else
+                        <div class="text-center" style="padding: 80px 32px;">
+                            <p style="font-size: 13px; color: var(--color-calv-slate-65);">
+                                @if($milestones->isNotEmpty())
+                                    Select a milestone on the left to see its gating requirements and lifecycle actions.
+                                @else
+                                    Add a milestone to begin tracking work on this project.
+                                @endif
+                            </p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+        @else
+            {{-- Project Detail redesign §4.4 — Budget & Expenses tab.
+                 Three summary cards on top, per-scope burn bars middle, expense
+                 ledger bottom. CALV-styled throughout; replaces the legacy
+                 over-budget banner + categories-table + expenses-table stack. --}}
+            <div class="p-6" data-test="budget-tab">
+                @php
+                    $overBudgetCategories = $budgets->filter(fn ($b) => $b->is_over_budget);
+                    $remaining = $totalBudget - $totalSpent;
+                @endphp
+
+                <div style="max-width: 1100px;">
+                    {{-- Persistent over-budget banner (preserves P-23 Step 7 audit contract). --}}
                     @if($overBudgetCategories->isNotEmpty())
-                        <div class="rounded-md border border-red-300 bg-red-50 dark:bg-red-900/30 dark:border-red-700 p-4" role="alert" data-over-budget-banner>
+                        <div class="rounded-md mb-5" role="alert" data-over-budget-banner
+                             style="background: var(--color-calv-red-15); border-left: 3px solid var(--color-calv-red); padding: 12px 16px;">
                             <div class="flex items-start gap-3">
-                                <svg class="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="shrink-0 mt-0.5" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="color: var(--color-calv-red);">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4a2 2 0 00-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z"/>
                                 </svg>
                                 <div class="flex-1">
-                                    <h3 class="text-sm font-semibold text-red-800 dark:text-red-200">Budget exceeded</h3>
-                                    <p class="text-sm text-red-700 dark:text-red-300 mt-1">
-                                        {{ $overBudgetCategories->count() }} {{ Str::plural('category', $overBudgetCategories->count()) }} on this project {{ $overBudgetCategories->count() === 1 ? 'is' : 'are' }} over budget. Reduce or reassign expenses, or modify the budget cap with a comment.
+                                    <div style="font-family: var(--font-calv-sub); font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-calv-red); margin-bottom: 4px;">Budget exceeded</div>
+                                    <p style="font-size: 13.5px; color: var(--color-calv-slate); margin: 0;">
+                                        {{ $overBudgetCategories->count() }} {{ Str::plural('scope', $overBudgetCategories->count()) }} on this project {{ $overBudgetCategories->count() === 1 ? 'is' : 'are' }} over budget. Reduce or reassign expenses, or modify the budget cap with a comment.
                                     </p>
-                                    <details class="mt-2 text-sm text-red-700 dark:text-red-300">
-                                        <summary class="cursor-pointer underline decoration-dotted underline-offset-2 hover:text-red-900 dark:hover:text-red-100">
-                                            How do I modify the budget cap?
-                                        </summary>
-                                        <ol class="list-decimal pl-5 mt-2 space-y-1 text-red-700 dark:text-red-300">
-                                            <li>Find the over-budget category in the <span class="font-medium">Budget Categories</span> table below.</li>
-                                            <li>Click <span class="font-medium">Edit</span> in that row's Actions column.</li>
-                                            <li>Change the <span class="font-medium">Budgeted Amount</span> and click <span class="font-medium">Save</span>.</li>
-                                            <li>A confirmation prompt will ask for a comment (10 characters minimum) explaining the change.</li>
-                                            <li>The change is logged to the budget's modification ledger and emailed to the configured over-budget recipients.</li>
-                                        </ol>
-                                    </details>
-                                    <ul class="mt-2 space-y-1 text-sm text-red-700 dark:text-red-300">
-                                        @foreach($overBudgetCategories as $b)
-                                            @php
-                                                $overage = (float) $b->spent_amount - (float) $b->budgeted_amount;
-                                            @endphp
-                                            <li>
-                                                <span class="font-medium">{{ $b->category }}</span>:
-                                                ${{ number_format($b->spent_amount, 2) }} spent of ${{ number_format($b->budgeted_amount, 2) }} budgeted —
-                                                <span class="font-semibold">${{ number_format($overage, 2) }} over</span>
-                                            </li>
-                                        @endforeach
-                                    </ul>
                                 </div>
                             </div>
                         </div>
                     @endif
 
-                    <!-- Budget Categories -->
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Budget Categories</h2>
-                            <button wire:click="showCreateBudget"
-                                    class="px-3 py-1 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
-                                + Add Category
-                            </button>
+                    {{-- Three summary cards (Total / Spent / Remaining) --}}
+                    <div class="grid gap-3.5 mb-6" style="grid-template-columns: repeat(3, 1fr);">
+                        <div class="rounded-md"
+                             style="border: 1px solid var(--color-calv-slate-15); border-top: 3px solid var(--color-calv-slate); padding: 14px 16px;">
+                            <div style="font-family: var(--font-calv-sub); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-calv-slate-65); margin-bottom: 6px;">Total budget</div>
+                            <div style="font-family: var(--font-calv-h1); font-size: 28px; letter-spacing: 0.01em; color: var(--color-calv-slate); line-height: 1;">${{ number_format($totalBudget, 0) }}</div>
                         </div>
-
-                        @if($job->budgets->count() > 0)
-                            <div class="overflow-x-auto">
-                                <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700">
-                                    <thead class="bg-gray-50 dark:bg-zinc-900">
-                                        <tr>
-                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Category</th>
-                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Fund Code</th>
-                                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Budgeted</th>
-                                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Spent</th>
-                                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Remaining</th>
-                                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">% Used</th>
-                                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-zinc-700">
-                                        @foreach($job->budgets as $budget)
-                                            <tr>
-                                                <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">{{ $budget->category }}</td>
-                                                <td class="px-4 py-3">
-                                                    {{-- P-2.5: prefer the budget row's own fund code (the new
-                                                         per-row column). For legacy contract-bearing rows that
-                                                         pre-date this phase, fall through to the contract
-                                                         grant_code / title chain so the visual is preserved
-                                                         until the operator edits the row. The Phase 2
-                                                         project-wide fundCodes fallback is intentionally NOT in
-                                                         this chain — for legacy NULL+NULL rows, "—" is the
-                                                         honest answer; the row doesn't have a code. --}}
-                                                    @if($budget->fundCode)
-                                                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" title="{{ $budget->fundCode->description }}">
-                                                            {{ $budget->fundCode->code }}
-                                                        </span>
-                                                    @elseif($budget->contract && $budget->contract->grant_code)
-                                                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" title="{{ $budget->contract->title }}">
-                                                            {{ $budget->contract->grant_code }}
-                                                        </span>
-                                                    @elseif($budget->contract)
-                                                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" title="{{ $budget->contract->title }}">
-                                                            {{ Str::limit($budget->contract->title, 20) }}
-                                                        </span>
-                                                    @else
-                                                        <span class="text-sm text-gray-400 dark:text-gray-500">—</span>
-                                                    @endif
-                                                </td>
-                                                <td class="px-4 py-3 text-sm text-right text-gray-900 dark:text-white">${{ number_format($budget->budgeted_amount, 2) }}</td>
-                                                <td class="px-4 py-3 text-sm text-right text-gray-900 dark:text-white">${{ number_format($budget->spent_amount, 2) }}</td>
-                                                <td class="px-4 py-3 text-sm text-right {{ $budget->remaining_amount < 0 ? 'text-red-600 dark:text-red-400 font-semibold' : 'text-gray-900 dark:text-white' }}">
-                                                    ${{ number_format($budget->remaining_amount, 2) }}
-                                                </td>
-                                                <td class="px-4 py-3 text-sm text-right">
-                                                    {{-- P-23 Step 7: 80% soft warning replaces the previous >90% threshold. --}}
-                                                    <span class="px-2 py-1 rounded text-xs {{ $budget->is_over_budget ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ($budget->percentage_spent >= 80 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300') }}">
-                                                        {{ $budget->percentage_spent }}%
-                                                    </span>
-                                                </td>
-                                                <td class="px-4 py-3 text-sm text-right space-x-2">
-                                                    {{-- P-23 Step 7: ledger button only renders when modifications exist for this budget. --}}
-                                                    @if($budget->modifications_count > 0)
-                                                        <button wire:click="showBudgetLedger({{ $budget->id }})"
-                                                                class="text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300"
-                                                                data-budget-modified-indicator
-                                                                title="View modification history">
-                                                            Modified ({{ $budget->modifications_count }})
-                                                        </button>
-                                                    @endif
-                                                    <button wire:click="editBudget({{ $budget->id }})"
-                                                            class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">
-                                                        Edit
-                                                    </button>
-                                                    <button wire:click="deleteBudget({{ $budget->id }})"
-                                                            wire:confirm="Delete this budget category?"
-                                                            class="text-red-600 hover:text-red-800 dark:text-red-400">
-                                                        Delete
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                        <tr class="bg-gray-100 dark:bg-zinc-900 font-semibold">
-                                            <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">TOTAL</td>
-                                            <td class="px-4 py-3"></td>
-                                            <td class="px-4 py-3 text-sm text-right text-gray-900 dark:text-white">${{ number_format($job->getTotalBudget(), 2) }}</td>
-                                            <td class="px-4 py-3 text-sm text-right text-gray-900 dark:text-white">${{ number_format($job->getTotalSpent(), 2) }}</td>
-                                            <td class="px-4 py-3 text-sm text-right text-gray-900 dark:text-white">${{ number_format($job->getTotalBudget() - $job->getTotalSpent(), 2) }}</td>
-                                            <td class="px-4 py-3 text-sm text-right"></td>
-                                            <td class="px-4 py-3"></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        @else
-                            <div class="text-center py-8 bg-gray-50 dark:bg-zinc-700 rounded-lg">
-                                <p class="text-sm text-gray-600 dark:text-gray-400">No budget categories defined</p>
-                                <button wire:click="showCreateBudget"
-                                        class="mt-2 text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
-                                    Add first category
-                                </button>
-                            </div>
-                        @endif
+                        <div class="rounded-md"
+                             style="border: 1px solid var(--color-calv-slate-15); border-top: 3px solid var(--color-calv-sage); padding: 14px 16px;">
+                            <div style="font-family: var(--font-calv-sub); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-calv-slate-65); margin-bottom: 6px;">Spent to date</div>
+                            <div style="font-family: var(--font-calv-h1); font-size: 28px; letter-spacing: 0.01em; color: var(--color-calv-slate); line-height: 1;">${{ number_format($totalSpent, 0) }}</div>
+                        </div>
+                        <div class="rounded-md"
+                             style="border: 1px solid var(--color-calv-slate-15); border-top: 3px solid {{ $remaining < 0 ? 'var(--color-calv-red)' : 'var(--color-calv-teal)' }}; padding: 14px 16px;">
+                            <div style="font-family: var(--font-calv-sub); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-calv-slate-65); margin-bottom: 6px;">Remaining</div>
+                            <div style="font-family: var(--font-calv-h1); font-size: 28px; letter-spacing: 0.01em; color: {{ $remaining < 0 ? 'var(--color-calv-red)' : 'var(--color-calv-slate)' }}; line-height: 1;">${{ number_format($remaining, 0) }}</div>
+                        </div>
                     </div>
 
-                    <!-- Expenses -->
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Expenses</h2>
-                            <button wire:click="showCreateExpense"
-                                    class="px-3 py-1 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
-                                + Record Expense
-                            </button>
+                    {{-- Scopes of work — per-scope burn bars --}}
+                    <section style="margin-bottom: 28px;">
+                        <div class="flex items-center mb-3">
+                            <h3 class="m-0" style="font-family: var(--font-calv-sub); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-calv-slate);">
+                                Scopes of work
+                            </h3>
+                            <span class="flex-1"></span>
+                            @if($this->can('projects.manage'))
+                                <button wire:click="showCreateBudget"
+                                        class="inline-flex items-center gap-1 rounded text-white"
+                                        style="padding: 5px 11px; background: var(--color-calv-red); font-family: var(--font-calv-sub); font-size: 10.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">
+                                    + Budget category
+                                </button>
+                            @endif
                         </div>
 
-                        @if($job->expenses->count() > 0)
-                            <div class="overflow-x-auto">
-                                <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700">
-                                    <thead class="bg-gray-50 dark:bg-zinc-900">
-                                        <tr>
-                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Date</th>
-                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Category</th>
-                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Fund Code</th>
-                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Description</th>
-                                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Amount</th>
-                                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Actions</th>
+                        @if($budgets->isEmpty())
+                            <div class="text-center rounded-md"
+                                 style="padding: 32px 18px; background: var(--color-calv-sand-15); border: 1px dashed var(--color-calv-slate-35);">
+                                <p style="font-size: 13px; color: var(--color-calv-slate-65);">No budget categories yet — add one to start tracking spend per scope.</p>
+                            </div>
+                        @else
+                            <div class="flex flex-col gap-2.5">
+                                @foreach($budgets as $b)
+                                    @php
+                                        $pct = (float) $b->budgeted_amount > 0
+                                            ? (int) round((float) $b->spent_amount / (float) $b->budgeted_amount * 100)
+                                            : 0;
+                                        // CALV bar coloring: under-80 = teal, 80-99 = amber (soft warning,
+                                        // preserves the P-23 Step 7 contract), exactly 100 = sage, over = red.
+                                        if ((float) $b->spent_amount > (float) $b->budgeted_amount) {
+                                            $barColor = 'var(--color-calv-red)';
+                                            $budgetStatus = 'over';
+                                        } elseif ($pct >= 100) {
+                                            $barColor = 'var(--color-calv-sage)';
+                                            $budgetStatus = 'met';
+                                        } elseif ($pct >= 80) {
+                                            $barColor = 'var(--color-calv-amber)';
+                                            $budgetStatus = 'warning';
+                                        } else {
+                                            $barColor = 'var(--color-calv-teal)';
+                                            $budgetStatus = 'on-track';
+                                        }
+                                        $scopeMilestone = $b->milestone_id ? $milestones->firstWhere('id', $b->milestone_id) : null;
+                                        $scopeStatus = $scopeMilestone?->status ?? 'pending';
+                                        $scopeTone = $msStatusTone[$scopeStatus] ?? $msStatusTone['pending'];
+                                        // Fund-code badge text falls through to the legacy contract.grant_code
+                                        // (preserves Phase 1 / P-22 fund-code prominence) and finally to "—".
+                                        $fundLabel = $b->fundCode?->code ?? $b->contract?->grant_code ?? null;
+                                        $fundTitle = $b->fundCode?->description ?? $b->contract?->title ?? '';
+                                    @endphp
+                                    <div class="rounded-md"
+                                         style="border: 1px solid var(--color-calv-slate-15); padding: 14px 16px;"
+                                         data-test="budget-scope-bar"
+                                         data-budget-status="{{ $budgetStatus }}"
+                                         data-budget-pct="{{ $pct }}">
+                                        <div class="flex items-center gap-2.5 mb-2 flex-wrap">
+                                            <span style="font-size: 14px; font-weight: 600; color: var(--color-calv-slate);">{{ $b->category }}</span>
+                                            @if($fundLabel)
+                                                {{-- Tailwind classes (text-sm font-semibold) kept for the
+                                                     legacy Phase 1 prominence regression. CALV-mono spacing
+                                                     stays the visual primitive. --}}
+                                                <span class="rounded text-sm font-semibold" title="{{ $fundTitle }}"
+                                                      data-test="budget-fund-code"
+                                                      style="padding: 2px 7px; font-family: ui-monospace, Menlo, monospace; background: var(--color-calv-slate-15); color: var(--color-calv-slate);">
+                                                    {{ $fundLabel }}
+                                                </span>
+                                            @else
+                                                <span style="font-size: 13px; color: var(--color-calv-slate-35);">—</span>
+                                            @endif
+                                            @if($scopeMilestone)
+                                                <span class="inline-flex items-center gap-1 rounded-full"
+                                                      style="padding: 2px 7px; font-family: var(--font-calv-sub); font-size: 9.5px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; background: {{ $scopeTone['bg'] }}; color: {{ $scopeTone['fg'] }};">
+                                                    <span class="rounded-full" style="width: 5px; height: 5px; background: {{ $scopeTone['dot'] }};"></span>
+                                                    {{ $scopeTone['label'] }}
+                                                </span>
+                                                <span style="font-size: 11px; color: var(--color-calv-slate-65);">→ {{ $scopeMilestone->name }}</span>
+                                            @endif
+                                            <span class="flex-1"></span>
+                                            <span style="font-family: ui-monospace, Menlo, monospace; font-size: 13px; color: var(--color-calv-slate);">
+                                                ${{ number_format((float) $b->spent_amount, 0) }}
+                                                <span style="color: var(--color-calv-slate-65);">/ ${{ number_format((float) $b->budgeted_amount, 0) }}</span>
+                                                <span style="color: var(--color-calv-slate-65); font-size: 11px;">· {{ $pct }}%</span>
+                                            </span>
+                                            @if($b->modifications_count > 0)
+                                                <button wire:click="showBudgetLedger({{ $b->id }})"
+                                                        data-budget-modified-indicator
+                                                        title="View modification history"
+                                                        style="font-family: var(--font-calv-sub); font-size: 9.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--color-calv-amber); background: transparent; border: none; cursor: pointer;">
+                                                    Modified ({{ $b->modifications_count }})
+                                                </button>
+                                            @endif
+                                            @if($this->can('projects.manage'))
+                                                <button wire:click="editBudget({{ $b->id }})"
+                                                        aria-label="Edit"
+                                                        style="width: 24px; height: 24px; background: transparent; border: none; color: var(--color-calv-slate-65); cursor: pointer; display: inline-flex; align-items: center; justify-content: center;">
+                                                    <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+                                                        <path d="M11 2.5l2.5 2.5L5 13.5H2.5V11L11 2.5z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    </svg>
+                                                </button>
+                                                <button wire:click="deleteBudget({{ $b->id }})"
+                                                        wire:confirm="Delete this budget category?"
+                                                        aria-label="Delete"
+                                                        style="width: 24px; height: 24px; background: transparent; border: none; color: var(--color-calv-slate-35); cursor: pointer; display: inline-flex; align-items: center; justify-content: center;">
+                                                    <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+                                                        <path d="M3 4.5h10M6.5 4V3h3v1M5 4.5l.5 8h5l.5-8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    </svg>
+                                                </button>
+                                            @endif
+                                        </div>
+                                        <div class="rounded-full overflow-hidden" style="height: 6px; background: var(--color-calv-slate-15);">
+                                            <div class="h-full" style="width: {{ min($pct, 100) }}%; background: {{ $barColor }};"></div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </section>
+
+                    {{-- Expense ledger --}}
+                    <section data-test="expense-ledger">
+                        <div class="flex items-center mb-3">
+                            <h3 class="m-0" style="font-family: var(--font-calv-sub); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-calv-slate);">
+                                Expenses
+                            </h3>
+                            <span class="flex-1"></span>
+                            @if($this->can('projects.manage') && $budgets->isNotEmpty())
+                                <button wire:click="showCreateExpense"
+                                        class="inline-flex items-center gap-1 rounded text-white"
+                                        style="padding: 5px 11px; background: var(--color-calv-red); font-family: var(--font-calv-sub); font-size: 10.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">
+                                    + Log expense
+                                </button>
+                            @endif
+                        </div>
+
+                        @if($job->expenses->isEmpty())
+                            <div class="text-center rounded-md"
+                                 style="padding: 28px 18px; background: var(--color-calv-sand-15); border: 1px dashed var(--color-calv-slate-35);">
+                                <p style="font-size: 13px; color: var(--color-calv-slate-65);">No expenses logged yet.</p>
+                            </div>
+                        @else
+                            <div class="rounded-md overflow-hidden" style="border: 1px solid var(--color-calv-slate-15);">
+                                <table class="w-full" style="border-collapse: collapse; font-size: 13px;">
+                                    <thead>
+                                        <tr style="background: var(--color-calv-slate); color: #fff;">
+                                            @foreach(['Date', 'Scope', 'Fund', 'Vendor', 'Memo', 'Amount'] as $h)
+                                                <th style="font-family: var(--font-calv-sub); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; text-align: {{ $h === 'Amount' ? 'right' : 'left' }}; padding: 9px 12px;">
+                                                    {{ $h }}
+                                                </th>
+                                            @endforeach
+                                            @if($this->can('projects.manage'))
+                                                <th style="padding: 9px 12px; text-align: right;"></th>
+                                            @endif
                                         </tr>
                                     </thead>
-                                    <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-zinc-700">
+                                    <tbody>
                                         @foreach($job->expenses->sortByDesc('expense_date') as $expense)
                                             <tr>
-                                                <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">{{ $expense->expense_date->format('M d, Y') }}</td>
-                                                <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">{{ $expense->category }}</td>
-                                                <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                                                    @if($expense->contract)
-                                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300" title="{{ $expense->contract->title }}">
-                                                            {{ $expense->contract->grant_code ?: Str::limit($expense->contract->title, 15) }}
-                                                        </span>
-                                                    @else
-                                                        <span class="text-gray-400 dark:text-gray-500">-</span>
-                                                    @endif
+                                                <td style="padding: 9px 12px; border-top: 1px solid var(--color-calv-slate-15); color: var(--color-calv-slate);">{{ $expense->expense_date->format('M d, Y') }}</td>
+                                                <td style="padding: 9px 12px; border-top: 1px solid var(--color-calv-slate-15); color: var(--color-calv-slate);">{{ $expense->category }}</td>
+                                                <td style="padding: 9px 12px; border-top: 1px solid var(--color-calv-slate-15); font-family: ui-monospace, Menlo, monospace; font-size: 11.5px; color: var(--color-calv-slate);">
+                                                    {{ $expense->contract?->grant_code ?? '—' }}
                                                 </td>
-                                                <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{{ $expense->description ?: '-' }}</td>
-                                                <td class="px-4 py-3 text-sm text-right {{ $expense->is_credit ? 'text-green-600 dark:text-green-400' : 'text-gray-900 dark:text-white' }}">
-                                                    {{ $expense->formatted_amount }}
+                                                <td style="padding: 9px 12px; border-top: 1px solid var(--color-calv-slate-15); color: var(--color-calv-slate);">{{ $expense->vendor ?? '—' }}</td>
+                                                <td style="padding: 9px 12px; border-top: 1px solid var(--color-calv-slate-15); color: var(--color-calv-slate-65);">{{ $expense->description ?: '—' }}</td>
+                                                <td style="padding: 9px 12px; border-top: 1px solid var(--color-calv-slate-15); text-align: right; font-family: ui-monospace, Menlo, monospace; font-weight: 600; color: {{ $expense->is_credit ? 'var(--color-calv-sage)' : 'var(--color-calv-slate)' }};">
+                                                    {{ $expense->formatted_amount ?? '$' . number_format((float) $expense->amount, 2) }}
                                                 </td>
-                                                <td class="px-4 py-3 text-sm text-right">
-                                                    <button wire:click="deleteExpense({{ $expense->id }})"
-                                                            wire:confirm="Delete this expense?"
-                                                            class="text-red-600 hover:text-red-800 dark:text-red-400">
-                                                        Delete
-                                                    </button>
-                                                </td>
+                                                @if($this->can('projects.manage'))
+                                                    <td style="padding: 9px 12px; border-top: 1px solid var(--color-calv-slate-15); text-align: right;">
+                                                        <button wire:click="deleteExpense({{ $expense->id }})"
+                                                                wire:confirm="Delete this expense?"
+                                                                aria-label="Delete expense"
+                                                                style="color: var(--color-calv-red); background: transparent; border: none; cursor: pointer;">
+                                                            <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+                                                                <path d="M3 4.5h10M6.5 4V3h3v1M5 4.5l.5 8h5l.5-8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            </svg>
+                                                        </button>
+                                                    </td>
+                                                @endif
                                             </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
                             </div>
-                        @else
-                            <div class="text-center py-8 bg-gray-50 dark:bg-zinc-700 rounded-lg">
-                                <p class="text-sm text-gray-600 dark:text-gray-400">No expenses recorded</p>
-                                <button wire:click="showCreateExpense"
-                                        class="mt-2 text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
-                                    Record first expense
-                                </button>
-                            </div>
                         @endif
-                    </div>
+                    </section>
                 </div>
-            @endif
-        </div>
-    </div>
+            </div>
+        @endif
 
     {{-- Milestone Form Modal — restructured for Phase 3 of the milestone redesign.
          Was a 475px stack-of-everything column; now a two-column ~640px modal

@@ -2406,6 +2406,21 @@ class ProjectManagement extends Component
             ->orderBy('label')
             ->get(['id', 'key', 'label', 'kind', 'category']);
 
+        // Project Detail redesign (rev 1 · May 30 2026): the originating
+        // CommunicationLog (if any) powers the "Carried from intake" strip
+        // beneath the new consolidated header. Pulls the first comm log
+        // that was promoted into this job — typically there's exactly one.
+        // Eager-loads the intake requirements + their library definitions
+        // so the strip can render the application-level chips read-only.
+        $originatingCommLog = \App\Models\CommunicationLog::query()
+            ->where('converted_to_job_id', $this->job->id)
+            ->with([
+                'intakeRequirements' => fn ($q) => $q->where('is_orphaned', false),
+                'intakeRequirements.definition',
+            ])
+            ->orderBy('created_at')
+            ->first();
+
         return view('livewire.project-management', [
             'users' => $users,
             'currentMilestone' => $currentMilestone,
@@ -2418,6 +2433,7 @@ class ProjectManagement extends Component
             'projectFundCodes' => $projectFundCodes,
             'projectBudgets' => $projectBudgets,
             'phase2Atoms' => $phase2Atoms,
+            'originatingCommLog' => $originatingCommLog,
         ]);
     }
 }
