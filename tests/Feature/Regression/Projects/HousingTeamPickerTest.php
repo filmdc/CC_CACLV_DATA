@@ -73,3 +73,35 @@ it('excludes inactive users even when flagged is_housing_team', function () {
     $userIds = $component->viewData('users')->pluck('id')->all();
     expect($userIds)->not->toContain($inactiveHousingMember->id);
 })->group('regression');
+
+it('the milestone gating-requirement owner dropdown only renders housing-team members', function () {
+    // Guards the specific leak that was reported: the requirement owner
+    // <select> inlined User::orderBy()->get() and showed every user in
+    // the system instead of the scoped $users list.
+    $job = HousingJob::factory()->create();
+    $milestone = $job->milestones()->create([
+        'name' => 'Owner-picker probe milestone',
+        'sequence_order' => 1,
+        'status' => 'in_progress',
+    ]);
+
+    $nonHousingUser = User::factory()->create([
+        'name' => 'Zzz Nonhousing Personzzz',
+        'active' => true,
+        'is_housing_team' => false,
+    ]);
+    $housingUser = User::factory()->create([
+        'name' => 'Aaa Housing Personaaa',
+        'active' => true,
+        'is_housing_team' => true,
+    ]);
+
+    $html = Livewire::actingAs($this->user)
+        ->test(ProjectManagement::class, ['id' => $job->id])
+        ->set('selectedMilestone', $milestone->id)
+        ->call('showCreateRequirement', 'task')
+        ->html();
+
+    expect($html)->toContain('Aaa Housing Personaaa');
+    expect($html)->not->toContain('Zzz Nonhousing Personzzz');
+})->group('regression');

@@ -1108,7 +1108,11 @@
                         <select wire:model="requirement_owner_id"
                                 class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500">
                             <option value="">Unassigned</option>
-                            @foreach(\App\Models\User::orderBy('name')->get() as $u)
+                            {{-- Scoped to Housing-team members (users.is_housing_team),
+                                 same list as the task/document assign pickers. Was an
+                                 inline User::orderBy()->get() that leaked every user in
+                                 the system into the milestone owner dropdown. --}}
+                            @foreach($users as $u)
                                 <option value="{{ $u->id }}">{{ $u->name }}</option>
                             @endforeach
                         </select>
