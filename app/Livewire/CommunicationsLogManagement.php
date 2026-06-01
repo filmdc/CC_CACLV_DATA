@@ -2020,6 +2020,15 @@ class CommunicationsLogManagement extends Component
                 $this->requirementOverride ? $this->requirementOverrideReason : null
             );
 
+            // Milestone redesign (Phase 1): materialize the curated
+            // Phase 2 universals (RequirementDefinition rows flagged
+            // is_default_milestone=true) as milestones on this brand-new
+            // project. Same transaction, so a failure rolls the
+            // milestones back with the project. Templates skip this —
+            // they carry their own milestone shape via
+            // HousingJob::createFromTemplate().
+            app(\App\Services\DefaultMilestoneSeeder::class)->seed($job, Auth::user());
+
             DB::commit();
 
             \Log::info('convertToProject: Transaction committed successfully');

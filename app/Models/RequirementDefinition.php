@@ -74,6 +74,7 @@ class RequirementDefinition extends Model
         'kind',
         'category',
         'default_required',
+        'is_default_milestone',
         'hint',
         'created_by_user_id',
         'updated_by_user_id',
@@ -81,7 +82,20 @@ class RequirementDefinition extends Model
 
     protected $casts = [
         'default_required' => 'boolean',
+        'is_default_milestone' => 'boolean',
     ];
+
+    /**
+     * Atoms that auto-seed as a milestone on every newly created
+     * HousingJob. Curated via the Requirements Library admin page;
+     * typically Phase 2 universals (Environmental Review, Lead Paint,
+     * etc.) — items that apply regardless of which fund codes are
+     * eventually attached.
+     */
+    public function scopeDefaultMilestones($query)
+    {
+        return $query->where('is_default_milestone', true);
+    }
 
     public function templateSets(): BelongsToMany
     {

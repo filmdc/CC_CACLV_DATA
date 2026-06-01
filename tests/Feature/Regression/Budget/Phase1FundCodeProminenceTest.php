@@ -40,10 +40,11 @@ it('renders the contract grant_code as a prominent badge when present (P-22)', f
 
 it('row shows its own fund code via the new per-row column (P-22 / P-2.5)', function () {
     // Phase 2.5: each budget row owns its fund code via fund_code_id.
-    // The row cell renders that code regardless of whether the project
-    // has other codes attached. The Phase 2 fallback to the project-wide
-    // code list was removed — for legacy NULL+NULL rows, "—" is the
-    // honest answer.
+    // Project Detail redesign: the budget table became per-scope burn
+    // bar cards. The fund-code badge moved from a tbody cell to a
+    // data-test="budget-fund-code" span inside the bar card; the
+    // contract is the same — the code surfaces, scoped to the budget
+    // row not to the page-wide fund chrome.
     $job = HousingJob::factory()->create();
     $code = FundCode::factory()->create(['code' => 'FC-OWN-001']);
     $job->fundCodes()->attach($code->id);
@@ -61,12 +62,13 @@ it('row shows its own fund code via the new per-row column (P-22 / P-2.5)', func
         ->set('activeTab', 'budget')
         ->html();
 
-    // Carve out the tbody so the assertion is specifically about the
-    // budget row, not the Fund Codes assignment section above the tabs
-    // (which would also surface the same code string).
-    preg_match('#<tbody[^>]*>(.*?)</tbody>#s', $html, $matches);
-    $tbody = $matches[1] ?? '';
-    expect($tbody)->toContain('FC-OWN-001');
+    // Carve out the budget-scope-bar markup so the assertion is about
+    // the per-row badge, not the header fund chips. data-test markers
+    // are durable across visual redesigns.
+    preg_match('#<div[^>]*data-test="budget-scope-bar"[^>]*>(.*?)</div>\s*</div>#s', $html, $matches);
+    $row = $matches[1] ?? '';
+    expect($row)->toContain('FC-OWN-001');
+    expect($row)->toContain('data-test="budget-fund-code"');
 })->group('regression');
 
 it('renders an em-dash when budget has neither contract nor project fund codes (P-22)', function () {
@@ -83,12 +85,15 @@ it('renders an em-dash when budget has neither contract nor project fund codes (
         ->set('activeTab', 'budget')
         ->html();
 
-    // Budget row should show em-dash, not "-" (the older placeholder).
-    // We can't grep for "—" alone (would clash with optional UI labels),
-    // so look for it inside the budget table tbody specifically.
-    preg_match('#<tbody[^>]*>(.*?)</tbody>#s', $html, $matches);
-    $tbody = $matches[1] ?? '';
-    expect($tbody)->toContain('—');
+    // Project Detail redesign: budget rows are bar cards now. Find the
+    // budget-scope-bar containing "Standalone" and assert the em-dash
+    // placeholder renders inside it (the bar omits the
+    // data-test="budget-fund-code" badge when no code is present).
+    preg_match('#<div[^>]*data-test="budget-scope-bar"[^>]*>.*?Standalone.*?</div>\s*</div>#s', $html, $matches);
+    $row = $matches[0] ?? '';
+    expect($row)->toContain('Standalone');
+    expect($row)->not->toContain('data-test="budget-fund-code"');
+    expect($row)->toContain('—');
 })->group('regression');
 
 it('eager-loads budgets.fundCode so a freshly-saved budget shows its code without refresh (P-22 / P-2.5)', function () {

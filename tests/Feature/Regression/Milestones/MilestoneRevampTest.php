@@ -48,12 +48,15 @@ function revampJob(array $overrides = []): HousingJob
     ], $overrides));
 }
 
-it('ProjectManagement lands on the requirements tab by default', function () {
+it('ProjectManagement lands on the unified Work tab by default (formerly Requirements)', function () {
+    // Milestone redesign (Phase 3): the legacy Requirements + Milestones&Tasks
+    // tabs collapsed into a single 'work' tab. mount() normalizes any old
+    // saved activeTab='requirements' to 'work' so deep links keep landing.
     $job = revampJob();
 
     Livewire::actingAs($this->user)
         ->test(ProjectManagement::class, ['id' => $job->id])
-        ->assertSet('activeTab', 'requirements');
+        ->assertSet('activeTab', 'work');
 })->group('regression');
 
 it('saving a milestone with selected fund codes pins milestone_id on the project pivot', function () {

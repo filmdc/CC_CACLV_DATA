@@ -58,10 +58,13 @@ it('80% soft warning indicator fires at exactly 80% spent (was >90% pre-3B)', fu
     expect($budget->fresh()->percentage_spent)->toBe(80);
     expect($budget->fresh()->is_over_budget)->toBeFalse();
 
+    // Project Detail redesign moved the budget table to per-scope burn bars;
+    // the visual at 80% is no longer a yellow Tailwind chip but an amber
+    // burn-bar fill. The durable contract is exposed via data-budget-status.
     Livewire::actingAs($this->admin)
         ->test(ProjectManagement::class, ['id' => $job->id])
         ->set('activeTab', 'budget')
-        ->assertSeeHtml('bg-yellow-100')
+        ->assertSeeHtml('data-budget-status="warning"')
         ->assertDontSeeHtml('data-over-budget-banner');
 })->group('regression');
 
@@ -82,7 +85,7 @@ it('100%+ shows the persistent over-budget banner and the red row indicator', fu
         ->assertSeeHtml('data-over-budget-banner')
         ->assertSeeHtml('Budget exceeded')
         ->assertSeeHtml('Construction labor')
-        ->assertSeeHtml('bg-red-100');
+        ->assertSeeHtml('data-budget-status="over"');
 })->group('regression');
 
 it('reducing expenses back under the cap clears the over-budget banner', function () {

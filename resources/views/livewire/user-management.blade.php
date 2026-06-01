@@ -99,6 +99,22 @@
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Inactive users cannot log in to the system</p>
                     </div>
 
+                    {{-- Community Action Homes designation — gates the owner /
+                         assigned-to picker on the Project Detail page. --}}
+                    <div>
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" wire:model="isHousingTeam"
+                                   data-test="user-is-housing-team"
+                                   class="rounded border-gray-300 dark:border-zinc-600 text-purple-600 focus:ring-purple-500">
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Community Action Homes team member
+                            </span>
+                        </label>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            When checked, this user appears in the owner / assigned-to picker on the Project Detail page (milestone Edit form, gating-requirement add form, task & document assignments).
+                        </p>
+                    </div>
+
                     @if($eligibleDelegates->isNotEmpty())
                     <div>
                         <label for="approvalDelegateId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">

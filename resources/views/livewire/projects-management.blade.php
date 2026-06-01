@@ -7,16 +7,24 @@
                     <h1 class="text-2xl font-bold">Housing Projects</h1>
                     <p class="text-indigo-100 mt-2">Construction, rehabilitation, and weatherization jobs across housing programs</p>
                 </div>
+                {{-- Milestone redesign (Phase 4): project creation is restricted
+                     to the Comm Log convert flow (the only path that establishes
+                     the originating-conversation audit trail). The legacy
+                     "+ Create New Project" affordance was removed. The Template
+                     Library button stays as a read-only browsable reference;
+                     applying a template now happens inside the Comm Log
+                     convert step. --}}
                 @if($this->canAny(['housing_jobs.create', 'projects.create']))
                     <div class="flex items-center space-x-3">
                         <button wire:click="showTemplateLibrary"
+                                title="Browse the template library. Applying a template happens during Comm Log conversion."
                                 class="px-4 py-2 bg-white text-indigo-600 rounded-md hover:bg-indigo-50 font-semibold border-2 border-indigo-600">
-                            📋 From Template
+                            📋 Template Library
                         </button>
-                        <button wire:click="showCreateJob"
+                        <a href="{{ route('communications-log.management') }}" wire:navigate
                                 class="px-4 py-2 bg-white text-indigo-600 rounded-md hover:bg-indigo-50 font-semibold">
-                            + Create New Project
-                        </button>
+                            + New project (via Comm Log)
+                        </a>
                     </div>
                 @endif
             </div>
@@ -86,6 +94,25 @@
                     </select>
                 </div>
 
+                {{-- Milestone redesign (Phase 4): archived filter chip + active/archived
+                     toggle. The chip is hidden when there are no archived projects so
+                     the chrome stays clean in the common case. --}}
+                <div class="md:col-span-1 flex items-center gap-2">
+                    @if($archivedCount > 0 || $showArchived)
+                        <button wire:click="$toggle('showArchived')"
+                                data-test="archive-filter-chip"
+                                class="inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium border transition-colors
+                                       {{ $showArchived
+                                          ? 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-900/40 dark:text-amber-200 dark:border-amber-700'
+                                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 dark:bg-zinc-700 dark:text-gray-200 dark:border-zinc-600' }}">
+                            {{ $showArchived ? '◀ Back to active' : '🗄 Archived' }}
+                            @if(! $showArchived)
+                                <span class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] bg-amber-200 text-amber-900">{{ $archivedCount }}</span>
+                            @endif
+                        </button>
+                    @endif
+                </div>
+
                 <!-- Bulk Actions (show when items selected) -->
                 @if(count($selectedJobs) > 0)
                     <div class="md:col-span-2 flex items-center space-x-3">
@@ -98,9 +125,10 @@
                             <option value="on_hold">Mark On Hold</option>
                             <option value="completed">Mark Completed</option>
                         </select>
-                        <button wire:click="bulkDelete" wire:confirm="Delete {{ count($selectedJobs) }} projects?"
-                                class="px-3 py-1 text-sm bg-red-600 text-white rounded-md hover:bg-red-700">
-                            Delete Selected
+                        <button wire:click="bulkArchive"
+                                wire:confirm="Archive {{ count($selectedJobs) }} projects? Each will be marked archived with a generic note; you can edit reasons individually after."
+                                class="px-3 py-1 text-sm bg-amber-700 text-white rounded-md hover:bg-amber-800">
+                            Archive Selected
                         </button>
                     </div>
                 @endif
@@ -256,12 +284,22 @@
                                             Edit
                                         </button>
                                     @endif
-                                    @if($this->can('housing_jobs.delete'))
-                                        <button wire:click="deleteJob({{ $project->id }})"
-                                                wire:confirm="Delete this project?"
-                                                class="text-red-600 dark:text-red-400 hover:text-red-800">
-                                            Delete
-                                        </button>
+                                    @if($this->canAny(['housing_jobs.delete', 'projects.delete']))
+                                        @if($project->is_archived)
+                                            <button wire:click="unarchiveJob({{ $project->id }})"
+                                                    wire:confirm="Restore this archived project to the active list?"
+                                                    class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800"
+                                                    data-test="unarchive-btn">
+                                                Unarchive
+                                            </button>
+                                        @else
+                                            <button wire:click="confirmArchiveJob({{ $project->id }})"
+                                                    class="text-amber-700 dark:text-amber-400 hover:text-amber-900"
+                                                    data-test="archive-btn"
+                                                    title="Archive — preserves audit history. Hard-delete is no longer supported.">
+                                                Archive
+                                            </button>
+                                        @endif
                                     @endif
                                 </div>
                             </td>
@@ -273,13 +311,21 @@
                                     <svg class="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                                     </svg>
-                                    <p class="text-lg font-medium text-gray-500 dark:text-gray-400">No projects found</p>
-                                    <p class="text-sm text-gray-400 mt-1">Create your first construction project to get started</p>
-                                    @if($this->canAny(['housing_jobs.create', 'projects.create']))
-                                        <button wire:click="showCreateJob"
+                                    <p class="text-lg font-medium text-gray-500 dark:text-gray-400">
+                                        @if($showArchived) No archived projects @else No projects found @endif
+                                    </p>
+                                    <p class="text-sm text-gray-400 mt-1">
+                                        @if($showArchived)
+                                            Archived projects appear here when projects are archived from the active list.
+                                        @else
+                                            Projects are created via the Communications Log. Convert a comm log entry to start a project.
+                                        @endif
+                                    </p>
+                                    @if(! $showArchived && $this->canAny(['housing_jobs.create', 'projects.create']))
+                                        <a href="{{ route('communications-log.management') }}" wire:navigate
                                                 class="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
-                                            Create First Project
-                                        </button>
+                                            Go to Communications Log
+                                        </a>
                                     @endif
                                 </div>
                             </td>
@@ -718,6 +764,46 @@
                     <button type="button" wire:click="saveQuickProperty"
                             class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
                         Create Property
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- Milestone redesign (Phase 4): archive confirmation modal. The reason is
+         mandatory because the row will live in the audit trail forever — a
+         field worker reviewing the history six months from now should be able
+         to tell why a project was archived without asking. --}}
+    @if($showArchiveModal)
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50"
+             wire:click.self="$set('showArchiveModal', false)">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-lg w-full mx-4">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Archive project</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                    Archiving hides the project from the active list but preserves all milestones,
+                    requirements, expenses, documents, and audit ledger entries. You can unarchive
+                    it later from the archived view. Hard-delete is no longer supported on housing
+                    projects.
+                </p>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Reason for archiving *
+                    </label>
+                    <textarea wire:model="archiveReason" rows="3"
+                              data-test="archive-reason-input"
+                              placeholder="e.g. Cancelled by participant; project never started. / Duplicate of JOB-2026-00041."
+                              class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md"></textarea>
+                    @error('archiveReason') <span class="text-red-600 text-xs mt-1 block">{{ $message }}</span> @enderror
+                </div>
+                <div class="mt-5 flex justify-end gap-2">
+                    <button type="button" wire:click="$set('showArchiveModal', false)"
+                            class="px-4 py-2 text-sm bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300">
+                        Cancel
+                    </button>
+                    <button type="button" wire:click="archiveJob"
+                            data-test="archive-confirm-btn"
+                            class="px-4 py-2 text-sm bg-amber-700 text-white rounded-md hover:bg-amber-800 font-medium">
+                        Archive project
                     </button>
                 </div>
             </div>

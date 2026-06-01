@@ -31,7 +31,14 @@ class ProjectManagement extends Component
 
     public $job;
 
-    public $activeTab = 'requirements';
+    /**
+     * Milestone redesign (Phase 3): the legacy 'requirements' and
+     * 'milestones' tabs collapsed into a single 'work' tab. Old values
+     * are normalised in mount() so deep links and existing tests that
+     * set activeTab='requirements' or 'milestones' still land somewhere
+     * meaningful instead of a blank panel.
+     */
+    public $activeTab = 'work';
 
     public $selectedMilestone = null;
 
@@ -138,6 +145,14 @@ class ProjectManagement extends Component
     // edited rows; legacy rows can render with NULL until next edit.
     public $budget_fund_code_id = '';
 
+    // Milestone redesign (Phase 4): optional milestone tie. When set, the
+    // budget category groups under the milestone on the Work tab; otherwise
+    // the milestone shows up in the General / Compliance group with no
+    // budget rollup. Stored on project_budgets.milestone_id (already
+    // present from Phase 1 of the redesign — this just exposes it on
+    // the budget form).
+    public $budget_milestone_id = '';
+
     // P-08: Fund-code assignment
     public $newFundCodeId = '';
 
@@ -231,6 +246,14 @@ class ProjectManagement extends Component
 
     public function mount($id)
     {
+        // Milestone redesign (Phase 3): old activeTab values fold into
+        // 'work'. Anything outside the new {work, budget} set lands on
+        // the default tab so deep links + tests that still set the
+        // legacy values render content rather than nothing.
+        if (in_array($this->activeTab, ['requirements', 'milestones'], true)) {
+            $this->activeTab = 'work';
+        }
+
         $this->jobId = $id;
         $this->job = HousingJob::with([
             'program',
@@ -1363,6 +1386,7 @@ class ProjectManagement extends Component
         $this->budget_category = $budget->category;
         $this->budget_amount = $budget->budgeted_amount;
         $this->budget_fund_code_id = $budget->fund_code_id !== null ? (string) $budget->fund_code_id : '';
+        $this->budget_milestone_id = $budget->milestone_id !== null ? (string) $budget->milestone_id : '';
         $this->showBudgetForm = true;
     }
 
@@ -1383,6 +1407,9 @@ class ProjectManagement extends Component
             // assigned fund codes; this Livewire validation just gates
             // the form against an empty submission.
             'budget_fund_code_id' => 'required|integer|exists:fund_codes,id',
+            // Milestone redesign (Phase 4): optional. Empty = budget
+            // unassigned (rolls up under General on the Work tab).
+            'budget_milestone_id' => 'nullable|integer|exists:project_milestones,id',
         ], [
             'budget_category.unique' => 'A budget category with this name already exists for this project.',
         ]);
@@ -1477,6 +1504,9 @@ class ProjectManagement extends Component
                     'category' => $this->budget_category,
                     'budgeted_amount' => $this->budget_amount,
                     'fund_code_id' => (int) $this->budget_fund_code_id,
+                    'milestone_id' => $this->budget_milestone_id !== ''
+                        ? (int) $this->budget_milestone_id
+                        : null,
                     'updated_by' => Auth::id(),
                 ]);
 
@@ -1500,6 +1530,9 @@ class ProjectManagement extends Component
                     // legacy row + future use.
                     'contract_id' => null,
                     'fund_code_id' => (int) $this->budget_fund_code_id,
+                    'milestone_id' => $this->budget_milestone_id !== ''
+                        ? (int) $this->budget_milestone_id
+                        : null,
                     'category' => $this->budget_category,
                     'budgeted_amount' => $this->budget_amount,
                     'created_by' => Auth::id(),
@@ -2211,6 +2244,7 @@ class ProjectManagement extends Component
         $this->budget_amount = '';
         $this->budget_contract_id = '';
         $this->budget_fund_code_id = '';
+        $this->budget_milestone_id = '';
     }
 
     protected function resetExpenseForm()
@@ -2290,24 +2324,15 @@ class ProjectManagement extends Component
             );
         }
 
-        // Get only users who have access to the CAH program
-        $cahProgram = \App\Models\Program::where('name', 'LIKE', '%CAH%')->first();
-
-        $users = User::where('active', true)
-            ->where(function ($query) use ($cahProgram) {
-                // Include admins and Contract Managers (have access to all programs)
-                $query->whereHas('roles', function ($q) {
-                    $q->whereIn('name', ['Admin', 'Contract Manager']);
-                })
-                // Or users specifically assigned to the CAH program
-                    ->when($cahProgram, function ($q) use ($cahProgram) {
-                        $q->orWhereHas('programs', function ($pq) use ($cahProgram) {
-                            $pq->where('program_id', $cahProgram->id);
-                        });
-                    });
-            })
-            ->orderBy('name')
-            ->get();
+        // Owner / assigned-to picker — scoped by the explicit "Community
+        // Action Homes designation" flag on each user profile. The
+        // legacy LIKE '%CAH%' on the program name fell silently to
+        // empty whenever the program was renamed; the is_housing_team
+        // toggle in user-management is now the single source of truth.
+        // Admins toggle individuals on/off in user-management; the
+        // 2026-06-01 migration backfilled the flag from the old query
+        // so the current population is preserved.
+        $users = User::active()->housingTeam()->orderBy('name')->get();
 
         $currentMilestone = $this->selectedMilestone
             ? $this->job->milestones->firstWhere('id', $this->selectedMilestone)
@@ -2372,6 +2397,21 @@ class ProjectManagement extends Component
             ->orderBy('label')
             ->get(['id', 'key', 'label', 'kind', 'category']);
 
+        // Project Detail redesign (rev 1 · May 30 2026): the originating
+        // CommunicationLog (if any) powers the "Carried from intake" strip
+        // beneath the new consolidated header. Pulls the first comm log
+        // that was promoted into this job — typically there's exactly one.
+        // Eager-loads the intake requirements + their library definitions
+        // so the strip can render the application-level chips read-only.
+        $originatingCommLog = \App\Models\CommunicationLog::query()
+            ->where('converted_to_job_id', $this->job->id)
+            ->with([
+                'intakeRequirements' => fn ($q) => $q->where('is_orphaned', false),
+                'intakeRequirements.definition',
+            ])
+            ->orderBy('created_at')
+            ->first();
+
         return view('livewire.project-management', [
             'users' => $users,
             'currentMilestone' => $currentMilestone,
@@ -2384,6 +2424,7 @@ class ProjectManagement extends Component
             'projectFundCodes' => $projectFundCodes,
             'projectBudgets' => $projectBudgets,
             'phase2Atoms' => $phase2Atoms,
+            'originatingCommLog' => $originatingCommLog,
         ]);
     }
 }

@@ -59,6 +59,14 @@ class RequirementsLibraryManagement extends Component
 
     public bool $atomDefaultRequired = true;
 
+    /**
+     * Milestone redesign (Phase 1): when true, every new HousingJob
+     * auto-seeds a milestone for this atom via DefaultMilestoneSeeder.
+     * Curated by Kaitlyn from the atoms table; meaningful primarily on
+     * Phase 2 (service_delivery_compliance) universals.
+     */
+    public bool $atomIsDefaultMilestone = false;
+
     public string $atomHint = '';
 
     // ── Bundle form state ─────────────────────────────────────────
@@ -168,6 +176,7 @@ class RequirementsLibraryManagement extends Component
         $this->atomKind = $atom->kind;
         $this->atomCategory = $atom->category ?? 'eligibility';
         $this->atomDefaultRequired = (bool) $atom->default_required;
+        $this->atomIsDefaultMilestone = (bool) $atom->is_default_milestone;
         $this->atomHint = $atom->hint ?? '';
         $this->showAtomForm = true;
     }
@@ -182,6 +191,7 @@ class RequirementsLibraryManagement extends Component
             'atomKind' => 'required|in:'.implode(',', RequirementDefinition::KINDS),
             'atomCategory' => 'required|in:'.implode(',', RequirementDefinition::CATEGORIES),
             'atomDefaultRequired' => 'boolean',
+            'atomIsDefaultMilestone' => 'boolean',
             'atomHint' => 'nullable|string|max:1000',
         ], [
             'atomKey.regex' => 'Key must be lowercase letters, numbers, and hyphens only (e.g. "photo-id").',
@@ -204,6 +214,7 @@ class RequirementsLibraryManagement extends Component
             'kind' => $validated['atomKind'],
             'category' => $validated['atomCategory'],
             'default_required' => $validated['atomDefaultRequired'],
+            'is_default_milestone' => $validated['atomIsDefaultMilestone'] ?? false,
             'hint' => $validated['atomHint'] !== '' ? $validated['atomHint'] : null,
             'updated_by_user_id' => Auth::id(),
         ];
@@ -258,6 +269,7 @@ class RequirementsLibraryManagement extends Component
         $this->atomKind = 'doc';
         $this->atomCategory = 'eligibility';
         $this->atomDefaultRequired = true;
+        $this->atomIsDefaultMilestone = false;
         $this->atomHint = '';
         $this->resetErrorBag();
     }
