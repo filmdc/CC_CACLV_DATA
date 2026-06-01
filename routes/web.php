@@ -86,8 +86,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('role-permission-export-import', App\Livewire\RolePermissionExportImport::class)->name('role-permission.export-import');
     Route::get('role/{id}', App\Livewire\RoleShow::class)->name('role.show');
     Route::get('permission/{id}', App\Livewire\PermissionShow::class)->name('permission.show');
-    Route::get('user-management', App\Livewire\UserManagement::class)->name('user.management');
-    Route::get('user/{id}', App\Livewire\UserShow::class)->name('user.show');
+    // User management — split into list / create / edit / bulk pages
+    Route::get('users', App\Livewire\UserManagement::class)->name('users.index');
+    Route::get('users/create', App\Livewire\UserCreate::class)->name('users.create');
+    Route::get('users/bulk', App\Livewire\UserBulkOperations::class)->name('users.bulk');
+    Route::get('users/{id}/edit', App\Livewire\UserEdit::class)->name('users.edit');
+    // Legacy route names kept for backward compatibility
+    Route::get('user-management', fn () => redirect()->route('users.index'))->name('user.management');
+    Route::get('user/{id}', fn ($id) => redirect()->route('users.edit', ['id' => $id]))->name('user.show');
     Route::get('poverty-guideline-management', App\Livewire\PovertyGuidelineManagement::class)->name('poverty-guideline.management');
     Route::get('reference-data-management', App\Livewire\ReferenceDataManagement::class)->name('reference-data.management');
     Route::get('reference-data-set-management', App\Livewire\ReferenceDataSetManagement::class)->name('reference-data-set.management');
