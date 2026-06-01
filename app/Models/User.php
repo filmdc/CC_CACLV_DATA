@@ -27,6 +27,7 @@ class User extends Authenticatable
         'email',
         'password',
         'active',
+        'is_housing_team',
         'email_verified_at',
         'approval_delegate_id',
         'notification_preferences',
@@ -55,6 +56,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'active' => 'boolean',
+            'is_housing_team' => 'boolean',
             'notification_preferences' => AsArrayObject::class,
         ];
     }
@@ -227,6 +229,20 @@ class User extends Authenticatable
     public function scopeInactive($query)
     {
         return $query->where('active', false);
+    }
+
+    /**
+     * Users flagged as Housing team members. Powers the owner /
+     * assigned-to picker on the Project Detail page so the dropdown
+     * only surfaces people who carry the explicit "Community Action
+     * Homes designation" toggle on their user profile.
+     *
+     * Distinct from program access — a user can have access to a
+     * housing program without being in the picker, and vice-versa.
+     */
+    public function scopeHousingTeam($query)
+    {
+        return $query->where('is_housing_team', true);
     }
 
     /**

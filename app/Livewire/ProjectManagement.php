@@ -2324,24 +2324,15 @@ class ProjectManagement extends Component
             );
         }
 
-        // Get only users who have access to the CAH program
-        $cahProgram = \App\Models\Program::where('name', 'LIKE', '%CAH%')->first();
-
-        $users = User::where('active', true)
-            ->where(function ($query) use ($cahProgram) {
-                // Include admins and Contract Managers (have access to all programs)
-                $query->whereHas('roles', function ($q) {
-                    $q->whereIn('name', ['Admin', 'Contract Manager']);
-                })
-                // Or users specifically assigned to the CAH program
-                    ->when($cahProgram, function ($q) use ($cahProgram) {
-                        $q->orWhereHas('programs', function ($pq) use ($cahProgram) {
-                            $pq->where('program_id', $cahProgram->id);
-                        });
-                    });
-            })
-            ->orderBy('name')
-            ->get();
+        // Owner / assigned-to picker — scoped by the explicit "Community
+        // Action Homes designation" flag on each user profile. The
+        // legacy LIKE '%CAH%' on the program name fell silently to
+        // empty whenever the program was renamed; the is_housing_team
+        // toggle in user-management is now the single source of truth.
+        // Admins toggle individuals on/off in user-management; the
+        // 2026-06-01 migration backfilled the flag from the old query
+        // so the current population is preserved.
+        $users = User::active()->housingTeam()->orderBy('name')->get();
 
         $currentMilestone = $this->selectedMilestone
             ? $this->job->milestones->firstWhere('id', $this->selectedMilestone)

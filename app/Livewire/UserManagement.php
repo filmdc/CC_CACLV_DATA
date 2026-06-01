@@ -39,6 +39,15 @@ class UserManagement extends Component
     public $name = '';
     public $email = '';
     public $active = true;
+
+    /**
+     * "Community Action Homes designation" — when true, this user
+     * appears in the owner / assigned-to picker on the Project Detail
+     * page. Defaults to false so new accounts are off the housing
+     * picker until an admin opts them in.
+     */
+    public $isHousingTeam = false;
+
     public $approvalDelegateId = null;
 
     /** @var array<int> */
@@ -79,6 +88,7 @@ class UserManagement extends Component
                 Rule::unique('users', 'email')->ignore($userId),
             ],
             'active' => ['boolean'],
+            'isHousingTeam' => ['boolean'],
             'selectedRoles' => ['array'],
             'selectedRoles.*' => ['integer', 'exists:roles,id'],
             'selectedPrograms' => ['array'],
@@ -115,6 +125,7 @@ class UserManagement extends Component
             $this->name = $this->selectedUser->name;
             $this->email = $this->selectedUser->email;
             $this->active = $this->selectedUser->active;
+            $this->isHousingTeam = (bool) $this->selectedUser->is_housing_team;
             $this->approvalDelegateId = $this->selectedUser->approval_delegate_id;
             $this->selectedRoles = $this->selectedUser->roles->pluck('id')->toArray();
             $this->selectedPrograms = $this->selectedUser->programs->pluck('id')->toArray();
@@ -149,6 +160,7 @@ class UserManagement extends Component
                 'name' => $this->name,
                 'email' => $this->email,
                 'active' => (bool) $this->active,
+                'is_housing_team' => (bool) $this->isHousingTeam,
                 'approval_delegate_id' => $this->approvalDelegateId ?: null,
             ]);
 
@@ -235,6 +247,7 @@ class UserManagement extends Component
         $this->name = '';
         $this->email = '';
         $this->active = true;
+        $this->isHousingTeam = false;
         $this->approvalDelegateId = null;
         $this->selectedRoles = [];
         $this->selectedPrograms = [];
