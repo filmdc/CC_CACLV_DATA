@@ -532,6 +532,27 @@ class CommunicationsLogManagement extends Component
     }
 
     /**
+     * Phase 12.7: same shape as updatedContactEmail above, but for the
+     * required first-name field.
+     *
+     * Kaitlyn's repeat report (2026-06-02): she forgot to type a first
+     * name, hit the "First name is required" error, then filled it in
+     * and pressed Save — and the form kept rejecting it as if the field
+     * were still blank. Same root cause as the email bug: bare
+     * `wire:model` defers the sync until the next action, and the Save
+     * click can race the blur. The blade input is now `wire:model.blur`
+     * (so the value is committed before Save runs) and this hook trims
+     * whitespace + clears the contact_first_name error bag as soon as
+     * the user edits the field, so the stale "required" message goes
+     * away the moment she types.
+     */
+    public function updatedContactFirstName($value): void
+    {
+        $this->contact_first_name = trim((string) $value);
+        $this->resetErrorBag('contact_first_name');
+    }
+
+    /**
      * True when the user has overridden the subject this session
      * (just typed it) OR previously (subject_overridden_at is set).
      */
