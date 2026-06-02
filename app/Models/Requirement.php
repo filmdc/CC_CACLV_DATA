@@ -11,6 +11,8 @@ use App\Traits\HasStandardMediaCollections;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -31,7 +33,29 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  */
 class Requirement extends Model implements HasMedia, HasMediaAuthorization
 {
-    use HasFactory, HasStandardMediaCollections, InteractsWithMedia;
+    use HasFactory, HasStandardMediaCollections, InteractsWithMedia, LogsActivity;
+
+    /**
+     * Audit trail — the compliance-critical one. Captures create / edit /
+     * complete / reopen / override / delete with the causer + before/after.
+     * completed_at, completed_by_user_id, completion_note, override_reason,
+     * overridden_by_user_id are all logged so the "who closed this gate,
+     * when, and on what basis" question has a durable answer.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('housing')
+            ->logOnly([
+                'type', 'title', 'description', 'status', 'owner_user_id',
+                'milestone_gate_text', 'source_type', 'source_id',
+                'completed_at', 'completed_by_user_id', 'completion_note',
+                'override_reason', 'overridden_by_user_id',
+            ])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn (string $event) => "Requirement {$event}");
+    }
 
     /**
      * P-39a: matches the page-level access rule on ProjectManagement

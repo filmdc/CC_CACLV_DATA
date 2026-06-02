@@ -23,6 +23,7 @@
         "phpoffice/phpword": "*",
         "setasign/fpdf": "^1.8",
         "setasign/fpdi": "^2.5",
+        "spatie/laravel-activitylog": "^4.12",
         "spatie/laravel-medialibrary": "^11.13"
     },
     "require-dev": {

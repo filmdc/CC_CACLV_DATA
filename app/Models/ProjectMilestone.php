@@ -7,13 +7,31 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class ProjectMilestone extends Model implements HasMedia, HasMediaAuthorization
 {
-    use HasFactory, InteractsWithMedia;
+    use HasFactory, InteractsWithMedia, LogsActivity;
+
+    /** Audit trail — see HousingJob::getActivitylogOptions(). */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('housing')
+            ->logOnly([
+                'name', 'description', 'status', 'sequence_order',
+                'target_date', 'completed_date', 'started_at',
+                'color', 'icon', 'assigned_to_user_id',
+                'requirement_definition_id',
+            ])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn (string $event) => "Milestone {$event}");
+    }
 
     /**
      * P-39a: rides on the ProjectManagement page-level gate.

@@ -121,7 +121,7 @@
                 </flux:navlist.group>
                 @endif
 
-                @if(auth()->user()->hasAnyPermission(['users.view', 'roles.view', 'poverty_guidelines.view', 'reference_data.view', 'reference_data_sets.view', 'admin.access', 'feedback.view_all', 'audit.login_view', 'documentation.manage', 'contracts.import_legacy']) || auth()->user()->isAdmin())
+                @if(auth()->user()->hasAnyPermission(['users.view', 'roles.view', 'poverty_guidelines.view', 'reference_data.view', 'reference_data_sets.view', 'admin.access', 'feedback.view_all', 'audit.login_view', 'audit.view', 'documentation.manage', 'contracts.import_legacy']) || auth()->user()->isAdmin())
                 <flux:navlist.group :heading="__('Administration')" class="grid">
                     <flux:navlist.item icon="cog-6-tooth" :href="route('admin.panel')" :current="request()->routeIs('admin.panel')" wire:navigate>{{ __('Admin Panel') }}</flux:navlist.item>
                     @if(auth()->user()->hasPermission('users.view'))
@@ -150,6 +150,9 @@
                     @endif
                     @if(auth()->user()->hasPermission('audit.login_view'))
                         <flux:navlist.item icon="clipboard-document-list" :href="route('audit.login')" :current="request()->routeIs('audit.login')" wire:navigate>{{ __('Login Audit Log') }}</flux:navlist.item>
+                    @endif
+                    @if(auth()->user()->hasPermission('audit.view'))
+                        <flux:navlist.item icon="clock" :href="route('audit.activity')" :current="request()->routeIs('audit.activity')" wire:navigate>{{ __('Activity Audit Log') }}</flux:navlist.item>
                     @endif
                 </flux:navlist.group>
                 @endif

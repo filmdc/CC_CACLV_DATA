@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
  * Project Expense — standalone housing project tracker.
@@ -23,7 +25,21 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class ProjectExpense extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
+
+    /** Audit trail — expense create / edit / delete with causer + diff. */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('housing')
+            ->logOnly([
+                'category', 'amount', 'expense_date', 'description',
+                'contract_id', 'document_id',
+            ])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn (string $event) => "Expense {$event}");
+    }
 
     protected $fillable = [
         'housing_job_id',
