@@ -119,6 +119,11 @@ Route::middleware(['auth'])->group(function () {
         ->middleware(['permission:audit.login_view'])
         ->name('audit.login');
 
+    // Activity Audit Log Route (who-changed-what trail across housing + comm logs)
+    Route::get('admin/activity-log', App\Livewire\ActivityAuditLog::class)
+        ->middleware(['permission:audit.view'])
+        ->name('audit.activity');
+
     // Documentation Routes
     Route::get('documentation', App\Livewire\DocumentationViewer::class)
         ->name('documentation.index');

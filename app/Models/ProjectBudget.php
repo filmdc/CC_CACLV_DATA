@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
  * Project Budget — standalone housing project tracker.
@@ -27,7 +29,28 @@ use Illuminate\Support\Facades\DB;
  */
 class ProjectBudget extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
+
+    /**
+     * Audit trail. NOTE: spent_amount is intentionally NOT logged — it's a
+     * derived rollup the ProjectExpense observer recomputes on every
+     * expense write; the real user action is the expense (logged on
+     * ProjectExpense) and the cap change (logged here + in the dedicated
+     * budget_modifications ledger). Logging spent_amount here would spam
+     * the trail with one "budget updated" per expense.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('housing')
+            ->logOnly([
+                'category', 'budgeted_amount', 'fund_code_id',
+                'milestone_id', 'contract_id',
+            ])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn (string $event) => "Budget category {$event}");
+    }
 
     protected $fillable = [
         'housing_job_id',
@@ -171,7 +194,13 @@ class ProjectBudget extends Model
             ->sum('amount');
 
         $this->spent_amount = $total;
-        $this->save();
+        // saveQuietly: spent_amount is a derived rollup recomputed on every
+        // expense write (and once inside this model's own created hook).
+        // Persisting quietly keeps it out of the activity audit log — the
+        // user-facing actions (the expense, the budget-cap edit) are logged
+        // on their own models; the rollup is not a discrete user action and
+        // would otherwise spam the trail with one entry per expense.
+        $this->saveQuietly();
     }
 
     /**

@@ -11,10 +11,35 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class HousingJob extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
+
+    /**
+     * Audit trail — logs create / update / delete with the acting user
+     * (causer) and a before/after diff into the shared activity_log.
+     * logOnlyDirty + dontSubmitEmptyLogs means only fields that actually
+     * changed are recorded, and a no-op save writes nothing. Surfaced on
+     * the admin Audit Log page (audit.view).
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('housing')
+            ->logOnly([
+                'job_title', 'job_description', 'status', 'priority',
+                'program_id', 'participant_id', 'household_id', 'property_id',
+                'contractor_id', 'service_id', 'target_completion_date',
+                'estimated_cost', 'approved_amount', 'is_archived',
+                'archived_reason', 'project_manager_id',
+            ])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn (string $event) => "Project {$event}");
+    }
 
     protected $fillable = [
         'job_number',

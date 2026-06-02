@@ -30,6 +30,15 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Idempotent guard: on some environments the column was applied
+        // before this migration row was recorded (e.g. a DB snapshot that
+        // carried the column but not the migrations entry). Only create —
+        // and only backfill — when the column is genuinely absent, so a
+        // re-run is a no-op and never clobbers admin-edited flags.
+        if (Schema::hasColumn('users', 'is_housing_team')) {
+            return;
+        }
+
         Schema::table('users', function (Blueprint $table) {
             $table->boolean('is_housing_team')
                 ->default(false)

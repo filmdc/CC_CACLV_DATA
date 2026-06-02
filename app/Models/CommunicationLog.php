@@ -8,10 +8,36 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class CommunicationLog extends Model
 {
-    use HasFactory, HasTags;
+    use HasFactory, HasTags, LogsActivity;
+
+    /**
+     * Audit trail for intake comm-log records. Field-level diffs of the
+     * editable content plus the promotion event (converted_to_job_id).
+     * The manual update feed (communication_log_updates) stays as the
+     * human-authored narrative; this captures the silent field edits it
+     * never recorded.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('comm_log')
+            ->logOnly([
+                'communication_type', 'direction', 'subject', 'summary',
+                'notes', 'outcome', 'category', 'priority',
+                'contact_first_name', 'contact_last_name', 'contact_phone',
+                'contact_email', 'contact_organization',
+                'follow_up_date', 'follow_up_action', 'follow_up_completed',
+                'converted_to_job_id', 'participant_id', 'property_id',
+            ])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn (string $event) => "Communication log {$event}");
+    }
 
     protected $fillable = [
         'housing_job_id',
