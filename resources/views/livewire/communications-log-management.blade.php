@@ -1820,9 +1820,15 @@
                     @endif
 
                     <!-- Contact First Name -->
+                    {{-- Phase 12.7: wire:model.blur (not bare wire:model) for the same
+                         reason Phase 12.6 added .blur on contact_email — bare wire:model
+                         defers the sync until the next action, and clicking Save races
+                         the blur event. Without .blur, a user who left the field empty,
+                         got a "required" error, then typed a name and pressed Save could
+                         hit Laravel re-validating the still-empty server-side value. --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">First Name *</label>
-                        <input type="text" wire:model="contact_first_name" placeholder="e.g., John"
+                        <input type="text" wire:model.blur="contact_first_name" placeholder="e.g., John"
                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-md">
                         @error('contact_first_name') <span class="text-red-600 text-xs">{{ $message }}</span> @enderror
                     </div>
