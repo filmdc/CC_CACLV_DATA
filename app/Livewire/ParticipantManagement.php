@@ -3,17 +3,19 @@
 namespace App\Livewire;
 
 use App\Models\Participant;
-use App\Models\Household;
-use App\Models\ReferenceData;
 use App\Models\Program;
-use App\Models\Service;
 use App\Models\ProgramEnrollment;
+use App\Models\ReferenceData;
+use App\Models\Service;
 use App\Models\ServiceEnrollment;
+use App\Services\HouseholdDecisionRequiredException;
+use App\Services\ParticipantDeletionService;
+use App\Services\ParticipantMergeService;
 use App\Traits\WithPermissionChecks;
 use App\Traits\WithProgramAccess;
+use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Carbon\Carbon;
 
 class ParticipantManagement extends Component
 {
@@ -23,7 +25,7 @@ class ParticipantManagement extends Component
     {
         // Check if user has permission to view participants
         $this->authorizeAction('participants.view', 'You do not have permission to view participants.');
-        
+
         // Check if we were redirected here to edit a specific participant
         if (session()->has('selectedParticipant')) {
             $participantId = session()->get('selectedParticipant');
@@ -33,35 +35,92 @@ class ParticipantManagement extends Component
     }
 
     public $search = '';
+
     public $selectedParticipant = null;
+
     public $showEditForm = false;
+
     public $showViewModal = false;
+
+    // Record selection (for merge)
+    public array $selectedIds = [];
+
+    // Merge flow
+    public bool $showMergeModal = false;
+
+    public $mergeSurvivorId = null;
+
+    public $mergeLoserId = null;
+
+    public array $mergeFieldChoices = [];
+
+    public array $mergeConflicts = [];
+
+    // Delete-with-associated-records flow
+    public bool $showDeleteModal = false;
+
+    public $deleteParticipantId = null;
+
+    public ?string $deleteParticipantName = null;
+
+    public array $deletePreview = [];
+
+    public bool $deleteNeedsDecision = false;
+
+    public array $deleteCoMembers = [];
+
+    public string $deleteDecision = '';      // '' | 'promote' | 'force'
+
+    public $promoteToHeadId = null;
+
+    public string $deleteConfirmText = '';
 
     // Participant Form Fields
     public $first_name = '';
+
     public $middle_name = '';
+
     public $last_name = '';
+
     public $suffix = '';
+
     public $date_of_birth = '';
+
     public $gender = '';
+
     public $telephone = '';
+
     public $email = '';
+
     public $education_level = '';
+
     public $disability_status = '';
+
     public $health_insurance_status = '';
+
     public $ethnicity = '';
+
     public $race = [];
+
     public $military_status = '';
+
     public $work_status = '';
 
     // Enrollment Management
     public $showEnrollmentSection = false;
+
     public $program_id = '';
+
     public $enrollment_date = '';
+
     public $enrollment_notes = '';
+
     public $service_id = '';
+
     public $service_enrollment_date = '';
+
     public $service_notes = '';
+
     public $selectedEnrollment = null;
 
     public function updatedSearch()
@@ -74,8 +133,9 @@ class ParticipantManagement extends Component
         $this->selectedParticipant = Participant::with('household')->find($participantId);
         if ($this->selectedParticipant) {
             // Check if user has access to edit this participant
-            if (!auth()->user()->can('update', $this->selectedParticipant)) {
+            if (! auth()->user()->can('update', $this->selectedParticipant)) {
                 session()->flash('error', 'You do not have access to edit this participant. You must be assigned to one of their enrolled programs.');
+
                 return;
             }
 
@@ -110,7 +170,7 @@ class ParticipantManagement extends Component
     public function updateParticipant()
     {
         $this->authorizeAction('participants.edit', 'You do not have permission to edit participants.');
-        
+
         $this->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -130,7 +190,7 @@ class ParticipantManagement extends Component
         try {
             // Get the active reference data set for updated data
             $activeDataSet = \App\Models\ReferenceDataSet::getActive();
-            
+
             $this->selectedParticipant->update([
                 'reference_data_set_id' => $activeDataSet?->id,
                 'first_name' => $this->first_name,
@@ -152,9 +212,9 @@ class ParticipantManagement extends Component
 
             session()->flash('success', 'Participant updated successfully.');
             $this->resetForm();
-            
+
         } catch (\Exception $e) {
-            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+            session()->flash('error', 'An error occurred: '.$e->getMessage());
         }
     }
 
@@ -201,7 +261,7 @@ class ParticipantManagement extends Component
 
     public function toggleEnrollmentSection()
     {
-        $this->showEnrollmentSection = !$this->showEnrollmentSection;
+        $this->showEnrollmentSection = ! $this->showEnrollmentSection;
         if ($this->showEnrollmentSection) {
             $this->resetEnrollmentForm();
         }
@@ -209,8 +269,9 @@ class ParticipantManagement extends Component
 
     public function createProgramEnrollment()
     {
-        if (!$this->selectedParticipant) {
+        if (! $this->selectedParticipant) {
             session()->flash('error', 'No participant selected.');
+
             return;
         }
 
@@ -220,8 +281,9 @@ class ParticipantManagement extends Component
         ]);
 
         // Check if user has access to enroll in this program
-        if (!auth()->user()->hasAccessToProgram($this->program_id)) {
+        if (! auth()->user()->hasAccessToProgram($this->program_id)) {
             session()->flash('error', 'You do not have permission to enroll participants in this program.');
+
             return;
         }
 
@@ -234,6 +296,7 @@ class ParticipantManagement extends Component
 
             if ($existingEnrollment) {
                 session()->flash('error', 'Participant is already actively enrolled in this program.');
+
                 return;
             }
 
@@ -249,14 +312,15 @@ class ParticipantManagement extends Component
             $this->resetEnrollmentForm();
 
         } catch (\Exception $e) {
-            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+            session()->flash('error', 'An error occurred: '.$e->getMessage());
         }
     }
 
     public function createServiceEnrollment()
     {
-        if (!$this->selectedParticipant) {
+        if (! $this->selectedParticipant) {
             session()->flash('error', 'No participant selected.');
+
             return;
         }
 
@@ -273,8 +337,9 @@ class ParticipantManagement extends Component
                 ->where('status', 'active')
                 ->first();
 
-            if (!$programEnrollment) {
+            if (! $programEnrollment) {
                 session()->flash('error', 'Participant must be enrolled in the program first.');
+
                 return;
             }
 
@@ -289,9 +354,9 @@ class ParticipantManagement extends Component
 
             session()->flash('success', 'Service enrollment created successfully.');
             $this->resetEnrollmentForm();
-            
+
         } catch (\Exception $e) {
-            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+            session()->flash('error', 'An error occurred: '.$e->getMessage());
         }
     }
 
@@ -308,13 +373,15 @@ class ParticipantManagement extends Component
             $participant = Participant::find($participantId);
             if ($participant) {
                 // Check if user has access to delete this participant
-                if (!auth()->user()->can('delete', $participant)) {
+                if (! auth()->user()->can('delete', $participant)) {
                     session()->flash('error', 'You do not have access to delete this participant.');
+
                     return;
                 }
 
                 if ($participant->is_head_of_household) {
                     session()->flash('error', 'Cannot delete head of household. Transfer headship first.');
+
                     return;
                 }
 
@@ -322,8 +389,239 @@ class ParticipantManagement extends Component
                 session()->flash('success', 'Participant deleted successfully.');
             }
         } catch (\Exception $e) {
-            session()->flash('error', 'Cannot delete participant: ' . $e->getMessage());
+            session()->flash('error', 'Cannot delete participant: '.$e->getMessage());
         }
+    }
+
+    // ------------------------------------------------------------------
+    // Record merge (select two participants, combine into one)
+    // ------------------------------------------------------------------
+
+    public function openMergeModal(): void
+    {
+        $this->authorizeAction('participants.merge', 'You do not have permission to merge participants.');
+
+        if (count($this->selectedIds) !== 2) {
+            session()->flash('error', 'Select exactly two participants to merge.');
+
+            return;
+        }
+
+        [$first, $second] = array_values($this->selectedIds);
+        $this->mergeSurvivorId = (int) $first;
+        $this->mergeLoserId = (int) $second;
+        $this->mergeFieldChoices = [];
+        $this->computeMergeConflicts();
+        $this->showMergeModal = true;
+    }
+
+    public function swapMergeDirection(): void
+    {
+        [$this->mergeSurvivorId, $this->mergeLoserId] = [$this->mergeLoserId, $this->mergeSurvivorId];
+        $this->mergeFieldChoices = [];
+        $this->computeMergeConflicts();
+    }
+
+    /**
+     * Build the list of fields where both records hold a different non-empty value,
+     * so the admin can choose which to keep. Empty survivor fields are auto-filled
+     * from the loser by the service and need no choice.
+     */
+    protected function computeMergeConflicts(): void
+    {
+        $this->mergeConflicts = [];
+
+        $survivor = Participant::find($this->mergeSurvivorId);
+        $loser = Participant::find($this->mergeLoserId);
+
+        if (! $survivor || ! $loser) {
+            return;
+        }
+
+        $protected = ['id', 'household_id', 'created_at', 'updated_at', 'notes', 'is_head_of_household', 'reference_data_set_id'];
+
+        foreach ($survivor->getFillable() as $field) {
+            if (in_array($field, $protected, true)) {
+                continue;
+            }
+
+            $sv = $survivor->$field;
+            $lv = $loser->$field;
+            $svScalar = is_array($sv) ? json_encode($sv) : $sv;
+            $lvScalar = is_array($lv) ? json_encode($lv) : $lv;
+
+            $bothPresent = ($svScalar !== null && $svScalar !== '') && ($lvScalar !== null && $lvScalar !== '');
+
+            if ($bothPresent && $svScalar !== $lvScalar) {
+                $this->mergeConflicts[] = [
+                    'field' => $field,
+                    'survivor' => is_array($sv) ? implode(', ', $sv) : (string) $sv,
+                    'loser' => is_array($lv) ? implode(', ', $lv) : (string) $lv,
+                ];
+                // Default to keeping the survivor's value.
+                $this->mergeFieldChoices[$field] = $this->mergeFieldChoices[$field] ?? 'use_survivor';
+            }
+        }
+    }
+
+    public function confirmMerge(ParticipantMergeService $mergeService): void
+    {
+        $this->authorizeAction('participants.merge', 'You do not have permission to merge participants.');
+
+        $survivor = Participant::find($this->mergeSurvivorId);
+        $loser = Participant::find($this->mergeLoserId);
+
+        if (! $survivor || ! $loser || $survivor->id === $loser->id) {
+            session()->flash('error', 'Invalid merge selection.');
+            $this->closeMergeModal();
+
+            return;
+        }
+
+        try {
+            $choices = collect($this->mergeFieldChoices)
+                ->filter(fn ($choice) => $choice === 'use_loser')
+                ->map(fn () => 'use_loser')
+                ->toArray();
+
+            $summary = $mergeService->merge($survivor, $loser, $choices, auth()->id());
+
+            session()->flash('success', sprintf(
+                'Merged %s into %s. Reassigned %d enrollment(s), %d housing job(s), %d property(ies), %d communication log(s).',
+                $loser->full_name,
+                $survivor->full_name,
+                $summary['program_enrollments_reassigned'] + $summary['service_enrollments_reassigned'],
+                $summary['housing_jobs_reassigned'],
+                $summary['properties_reassigned'],
+                $summary['communication_logs_reassigned'],
+            ));
+        } catch (\Throwable $e) {
+            session()->flash('error', 'Merge failed: '.$e->getMessage());
+        }
+
+        $this->closeMergeModal();
+    }
+
+    public function closeMergeModal(): void
+    {
+        $this->showMergeModal = false;
+        $this->mergeSurvivorId = null;
+        $this->mergeLoserId = null;
+        $this->mergeFieldChoices = [];
+        $this->mergeConflicts = [];
+        $this->selectedIds = [];
+    }
+
+    // ------------------------------------------------------------------
+    // Delete a participant and all associated records
+    // ------------------------------------------------------------------
+
+    public function startDelete($participantId, ParticipantDeletionService $deletionService): void
+    {
+        $this->authorizeAction('participants.delete', 'You do not have permission to delete participants.');
+
+        $participant = Participant::find($participantId);
+        if (! $participant) {
+            session()->flash('error', 'Participant not found.');
+
+            return;
+        }
+
+        if (! auth()->user()->can('delete', $participant)) {
+            session()->flash('error', 'You do not have access to delete this participant.');
+
+            return;
+        }
+
+        $inspection = $deletionService->inspect($participant);
+
+        $this->deleteParticipantId = $participant->id;
+        $this->deleteParticipantName = $participant->full_name;
+        $this->deletePreview = $deletionService->previewCounts($participant);
+        $this->deleteNeedsDecision = $inspection['needs_decision'];
+        $this->deleteCoMembers = $inspection['other_members']
+            ->map(fn ($m) => ['id' => $m->id, 'name' => $m->full_name])
+            ->values()
+            ->toArray();
+        $this->deleteDecision = '';
+        $this->promoteToHeadId = null;
+        $this->deleteConfirmText = '';
+        $this->showDeleteModal = true;
+    }
+
+    public function confirmDelete(ParticipantDeletionService $deletionService): void
+    {
+        $this->authorizeAction('participants.delete', 'You do not have permission to delete participants.');
+
+        if (strtoupper(trim($this->deleteConfirmText)) !== 'DELETE') {
+            session()->flash('error', 'Type DELETE to confirm.');
+
+            return;
+        }
+
+        $participant = Participant::find($this->deleteParticipantId);
+        if (! $participant) {
+            session()->flash('error', 'Participant not found.');
+            $this->closeDeleteModal();
+
+            return;
+        }
+
+        if (! auth()->user()->can('delete', $participant)) {
+            session()->flash('error', 'You do not have access to delete this participant.');
+            $this->closeDeleteModal();
+
+            return;
+        }
+
+        $options = [];
+        if ($this->deleteNeedsDecision) {
+            if ($this->deleteDecision === 'promote') {
+                if (! $this->promoteToHeadId) {
+                    session()->flash('error', 'Select a household member to promote to head.');
+
+                    return;
+                }
+                $options['promote_to_head_id'] = (int) $this->promoteToHeadId;
+            } elseif ($this->deleteDecision === 'force') {
+                $options['force'] = true;
+            } else {
+                session()->flash('error', 'Choose how to handle the household before deleting.');
+
+                return;
+            }
+        }
+
+        try {
+            $summary = $deletionService->delete($participant, $options, auth()->id());
+
+            session()->flash('success', sprintf(
+                'Deleted %s and all associated records. A recovery snapshot was saved to %s.',
+                $summary['participant_name'],
+                $summary['snapshot_path'],
+            ));
+        } catch (HouseholdDecisionRequiredException $e) {
+            session()->flash('error', $e->getMessage());
+
+            return;
+        } catch (\Throwable $e) {
+            session()->flash('error', 'Delete failed: '.$e->getMessage());
+        }
+
+        $this->closeDeleteModal();
+    }
+
+    public function closeDeleteModal(): void
+    {
+        $this->showDeleteModal = false;
+        $this->deleteParticipantId = null;
+        $this->deleteParticipantName = null;
+        $this->deletePreview = [];
+        $this->deleteNeedsDecision = false;
+        $this->deleteCoMembers = [];
+        $this->deleteDecision = '';
+        $this->promoteToHeadId = null;
+        $this->deleteConfirmText = '';
     }
 
     /**
@@ -332,6 +630,7 @@ class ParticipantManagement extends Component
     public function canEditParticipant($participantId): bool
     {
         $participant = Participant::find($participantId);
+
         return $participant && auth()->user()->can('update', $participant);
     }
 
@@ -349,12 +648,12 @@ class ParticipantManagement extends Component
         // Sensitive data access is controlled at the field/view level
         $participants = Participant::with(['household', 'programEnrollments.program', 'serviceEnrollments.service'])
             ->when($this->search, function ($query) {
-                $query->where('first_name', 'like', '%' . $this->search . '%')
-                      ->orWhere('last_name', 'like', '%' . $this->search . '%')
-                      ->orWhere('email', 'like', '%' . $this->search . '%')
-                      ->orWhereHas('household', function ($q) {
-                          $q->where('household_code', 'like', '%' . $this->search . '%');
-                      });
+                $query->where('first_name', 'like', '%'.$this->search.'%')
+                    ->orWhere('last_name', 'like', '%'.$this->search.'%')
+                    ->orWhere('email', 'like', '%'.$this->search.'%')
+                    ->orWhereHas('household', function ($q) {
+                        $q->where('household_code', 'like', '%'.$this->search.'%');
+                    });
             })
             ->orderBy('created_at', 'desc')
             ->paginate(15);
