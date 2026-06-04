@@ -7,6 +7,7 @@ use App\Models\Participant;
 use App\Models\ServiceEnrollment;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Merges one participant ("loser") into another ("survivor"), reassigning every
@@ -60,10 +61,13 @@ class ParticipantMergeService
                 'tags_moved' => 0,
                 'household_emptied' => false,
                 'head_promoted_participant_id' => null,
+                'snapshot_path' => null,
             ];
 
-            $this->mergeProgramEnrollments($survivor, $loser, $summary);
-            $this->mergeServiceEnrollments($survivor, $loser, $summary);
+            // Snapshot the loser before any destructive change, for recoverability.
+            $summary['snapshot_path'] = $this->writeLoserSnapshot($survivor, $loser, $userId);
+
+            $this->mergeEnrollments($survivor, $loser, $summary);
             $this->reassignHouseholdScopedRecords($survivor, $loser, $loserHouseholdId, $survivorHouseholdId, $summary);
             $this->mergeTags($survivor, $loser, $summary);
 
@@ -76,7 +80,7 @@ class ParticipantMergeService
             $this->appendMergeNote($survivor, $loser);
 
             // Handle the loser's household before deleting the loser row.
-            $this->handleLoserHousehold($loser, $loserHouseholdId, $survivorHouseholdId, $summary);
+            $this->handleLoserHousehold($survivor, $loser, $loserHouseholdId, $survivorHouseholdId, $summary);
 
             $loser->delete();
 
@@ -93,11 +97,14 @@ class ParticipantMergeService
     }
 
     /**
-     * Reassign program enrollments, deduping when the survivor is already enrolled
-     * in the same program (avoids two active rows for one program).
+     * Reassign program enrollments, deduping when the survivor is already enrolled in
+     * the same program (avoids two active rows for one program), then reassign every
+     * service enrollment — in either branch — deduping on service_id so the survivor
+     * never ends up with two enrollments for the same service.
      */
-    private function mergeProgramEnrollments(Participant $survivor, Participant $loser, array &$summary): void
+    private function mergeEnrollments(Participant $survivor, Participant $loser, array &$summary): void
     {
+        $survivorServiceIds = $survivor->serviceEnrollments()->pluck('service_id')->all();
         $survivorByProgram = $survivor->programEnrollments()->get()->keyBy('program_id');
 
         foreach ($loser->programEnrollments()->get() as $pe) {
@@ -105,12 +112,11 @@ class ParticipantMergeService
 
             if ($existing) {
                 // Survivor already enrolled in this program: move the loser's service
-                // enrollments under the survivor's enrollment, then drop the duplicate.
-                ServiceEnrollment::where('program_enrollment_id', $pe->id)
-                    ->update([
-                        'program_enrollment_id' => $existing->id,
-                        'participant_id' => $survivor->id,
-                    ]);
+                // enrollments under the survivor's enrollment (deduping), then drop
+                // the duplicate program enrollment.
+                foreach (ServiceEnrollment::where('program_enrollment_id', $pe->id)->get() as $se) {
+                    $this->placeServiceEnrollment($se, $survivor, $existing->id, $survivorServiceIds, $summary);
+                }
                 $pe->delete();
                 $summary['program_enrollments_deduped']++;
             } else {
@@ -119,25 +125,30 @@ class ParticipantMergeService
                 $summary['program_enrollments_reassigned']++;
             }
         }
+
+        // Any service enrollments still owned by the loser (those under program
+        // enrollments that were reassigned, not deduped) get reassigned too.
+        foreach ($loser->serviceEnrollments()->get() as $se) {
+            $this->placeServiceEnrollment($se, $survivor, $se->program_enrollment_id, $survivorServiceIds, $summary);
+        }
     }
 
     /**
-     * Reassign any remaining service enrollments still pointing at the loser,
-     * deduping on service_id when the survivor already has the same service.
+     * Move one service enrollment to the survivor, or drop it if the survivor already
+     * has an enrollment for that service.
      */
-    private function mergeServiceEnrollments(Participant $survivor, Participant $loser, array &$summary): void
+    private function placeServiceEnrollment(ServiceEnrollment $se, Participant $survivor, $targetProgramEnrollmentId, array &$survivorServiceIds, array &$summary): void
     {
-        $survivorServiceIds = $survivor->serviceEnrollments()->pluck('service_id')->all();
-
-        foreach ($loser->serviceEnrollments()->get() as $se) {
-            if (in_array($se->service_id, $survivorServiceIds, true)) {
-                $se->delete();
-                $summary['service_enrollments_deduped']++;
-            } else {
-                $se->update(['participant_id' => $survivor->id]);
-                $survivorServiceIds[] = $se->service_id;
-                $summary['service_enrollments_reassigned']++;
-            }
+        if (in_array($se->service_id, $survivorServiceIds, true)) {
+            $se->delete();
+            $summary['service_enrollments_deduped']++;
+        } else {
+            $se->update([
+                'participant_id' => $survivor->id,
+                'program_enrollment_id' => $targetProgramEnrollmentId,
+            ]);
+            $survivorServiceIds[] = $se->service_id;
+            $summary['service_enrollments_reassigned']++;
         }
     }
 
@@ -256,13 +267,25 @@ class ParticipantMergeService
     }
 
     /**
-     * After reassigning the loser's records, tidy its household: if the loser was the
-     * head and members remain, promote the longest-standing remaining member; if the
-     * household is left empty, delete it (and its addresses cascade).
+     * After reassigning the loser's records, tidy its household:
+     * - Same household as the survivor: if the loser was the head, the survivor
+     *   inherits headship (the head row must not be left dangling).
+     * - Different household: if the loser was head and members remain, promote the
+     *   longest-standing remaining member; if the household is left empty, delete it
+     *   (its addresses cascade).
      */
-    private function handleLoserHousehold(Participant $loser, ?int $loserHouseholdId, ?int $survivorHouseholdId, array &$summary): void
+    private function handleLoserHousehold(Participant $survivor, Participant $loser, ?int $loserHouseholdId, ?int $survivorHouseholdId, array &$summary): void
     {
-        if (! $loserHouseholdId || $loserHouseholdId === $survivorHouseholdId) {
+        if (! $loserHouseholdId) {
+            return;
+        }
+
+        if ($loserHouseholdId === $survivorHouseholdId) {
+            if ($loser->is_head_of_household && ! $survivor->is_head_of_household) {
+                $survivor->update(['is_head_of_household' => true]);
+                $summary['head_promoted_participant_id'] = $survivor->id;
+            }
+
             return;
         }
 
@@ -283,5 +306,28 @@ class ParticipantMergeService
             $newHead->update(['is_head_of_household' => true]);
             $summary['head_promoted_participant_id'] = $newHead->id;
         }
+    }
+
+    /**
+     * Write a JSON snapshot of the loser (and the merge context) so the merged-away
+     * record's data is recoverable, mirroring the delete-path snapshot.
+     */
+    private function writeLoserSnapshot(Participant $survivor, Participant $loser, ?int $userId): string
+    {
+        $path = sprintf('merge-snapshots/participant-%d-into-%d-%s.json', $loser->id, $survivor->id, now()->format('Ymd-His'));
+
+        Storage::disk('local')->put($path, json_encode([
+            'merged_at' => now()->toISOString(),
+            'merged_by_user_id' => $userId ?? auth()->id(),
+            'survivor_id' => $survivor->id,
+            'loser' => $loser->getAttributes(),
+            'loser_program_enrollments' => DB::table('program_enrollments')->where('participant_id', $loser->id)->get()->toArray(),
+            'loser_service_enrollments' => DB::table('service_enrollments')->where('participant_id', $loser->id)->get()->toArray(),
+            'loser_properties' => DB::table('properties')->where('participant_id', $loser->id)->get()->toArray(),
+            'loser_housing_jobs' => DB::table('housing_jobs')->where('participant_id', $loser->id)->get()->toArray(),
+            'loser_communication_logs' => DB::table('communication_logs')->where('participant_id', $loser->id)->get()->toArray(),
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+        return $path;
     }
 }
