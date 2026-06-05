@@ -24,29 +24,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Merge action bar -->
-            @if($this->can('participants.merge') && count($selectedIds) > 0)
-                <div class="px-4 py-3 bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-700 flex items-center justify-between">
-                    <div class="text-sm text-amber-800 dark:text-amber-200">
-                        {{ count($selectedIds) }} participant(s) selected.
-                        @if(count($selectedIds) !== 2)
-                            <span class="text-amber-600 dark:text-amber-400">Select exactly two to merge.</span>
-                        @endif
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <button type="button" wire:click="$set('selectedIds', [])"
-                                class="px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-600 rounded-md hover:bg-gray-100 dark:hover:bg-zinc-700">
-                            Clear
-                        </button>
-                        <button type="button" wire:click="openMergeModal"
-                                @disabled(count($selectedIds) !== 2)
-                                class="px-3 py-1.5 text-sm font-medium text-white bg-amber-600 border border-transparent rounded-md hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed">
-                            Merge Selected
-                        </button>
-                    </div>
-                </div>
-            @endif
         @endif
 
         <!-- Success/Error Messages -->
@@ -388,11 +365,6 @@
             <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-600">
                 <thead class="bg-gray-50 dark:bg-zinc-700">
                     <tr>
-                        @if($this->can('participants.merge'))
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-10">
-                                <span class="sr-only">Select</span>
-                            </th>
-                        @endif
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Name</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Household</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Age</th>
@@ -405,12 +377,6 @@
                 <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-zinc-600">
                     @forelse($participants as $participant)
                         <tr wire:key="participant-row-{{ $participant->id }}">
-                            @if($this->can('participants.merge'))
-                                <td class="px-4 py-4 whitespace-nowrap">
-                                    <input type="checkbox" wire:model.live="selectedIds" value="{{ $participant->id }}"
-                                           class="rounded border-gray-300 dark:border-zinc-600 text-amber-600 focus:ring-amber-500">
-                                </td>
-                            @endif
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div>
                                     <a href="{{ route('participant.show', $participant->id) }}"
@@ -463,19 +429,6 @@
                                             </span>
                                         @endif
                                     @endif
-                                    @if($this->can('participants.delete'))
-                                        @if($this->canEditParticipant($participant->id))
-                                            <button wire:click="startDelete({{ $participant->id }})"
-                                                    class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
-                                                Delete
-                                            </button>
-                                        @else
-                                            <span class="text-gray-400 dark:text-gray-500 cursor-not-allowed"
-                                                  title="You need program access to delete this participant">
-                                                Delete
-                                            </span>
-                                        @endif
-                                    @endif
                                     @if(!$this->canViewParticipantSensitiveData($participant->id) && !auth()->user()->isAdmin())
                                         <span class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
                                               title="You can view basic contact information only">
@@ -490,7 +443,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="{{ $this->can('participants.merge') ? 8 : 7 }}" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                                 No participants found.
                             </td>
                         </tr>
@@ -676,182 +629,6 @@
                     <button wire:click="$set('showViewModal', false)" 
                             class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-gray-500">
                         Close
-                    </button>
-                </div>
-            </div>
-        </div>
-    @endif
-
-    <!-- Merge Modal -->
-    @if($showMergeModal)
-        @php
-            $survivor = \App\Models\Participant::with('household')->find($mergeSurvivorId);
-            $loser = \App\Models\Participant::with('household')->find($mergeLoserId);
-        @endphp
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 p-4" wire:click.self="closeMergeModal">
-            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">Merge Participants</h3>
-                    <button wire:click="closeMergeModal" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
-                </div>
-
-                @if($survivor && $loser)
-                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
-                        All enrollments, properties, housing jobs, communication logs and tags belonging to the
-                        <strong>record to remove</strong> will be reassigned to the <strong>record to keep</strong>.
-                        The record to remove is then permanently deleted.
-                    </p>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div class="p-4 rounded-lg border-2 border-green-400 dark:border-green-600 bg-green-50 dark:bg-green-900/20">
-                            <div class="text-xs font-semibold uppercase text-green-700 dark:text-green-300 mb-1">Keep (survivor)</div>
-                            <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $survivor->full_name }}</div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400">
-                                Household {{ $survivor->household->household_code ?? 'N/A' }} ·
-                                DOB {{ $survivor->date_of_birth?->format('M j, Y') ?? 'N/A' }}
-                            </div>
-                        </div>
-                        <div class="p-4 rounded-lg border-2 border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20">
-                            <div class="text-xs font-semibold uppercase text-red-700 dark:text-red-300 mb-1">Remove (merged away)</div>
-                            <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $loser->full_name }}</div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400">
-                                Household {{ $loser->household->household_code ?? 'N/A' }} ·
-                                DOB {{ $loser->date_of_birth?->format('M j, Y') ?? 'N/A' }}
-                            </div>
-                        </div>
-                    </div>
-
-                    <button type="button" wire:click="swapMergeDirection"
-                            class="mb-4 text-sm text-blue-600 dark:text-blue-400 hover:underline">
-                        ↔ Swap which record is kept
-                    </button>
-
-                    @if($survivor->household_id !== $loser->household_id)
-                        <div class="mb-4 p-3 rounded-md bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700 text-sm text-yellow-800 dark:text-yellow-200">
-                            <strong>Heads up:</strong> these records are in different households. Records will be
-                            repointed to the kept record's household. If the removed record's household is left empty
-                            it will be deleted; if it had a head, a remaining member is promoted.
-                        </div>
-                    @endif
-
-                    @if(count($mergeConflicts) > 0)
-                        <div class="mb-4">
-                            <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-2">Conflicting fields — choose which value to keep</h4>
-                            <div class="space-y-2">
-                                @foreach($mergeConflicts as $conflict)
-                                    <div class="grid grid-cols-12 gap-2 items-center text-sm border border-gray-200 dark:border-zinc-600 rounded-md p-2">
-                                        <div class="col-span-3 font-medium text-gray-700 dark:text-gray-300">{{ ucwords(str_replace('_', ' ', $conflict['field'])) }}</div>
-                                        <label class="col-span-4 flex items-center space-x-2 cursor-pointer">
-                                            <input type="radio" wire:model="mergeFieldChoices.{{ $conflict['field'] }}" value="use_survivor"
-                                                   class="text-green-600 focus:ring-green-500">
-                                            <span class="text-gray-900 dark:text-white truncate" title="{{ $conflict['survivor'] }}">{{ $conflict['survivor'] }}</span>
-                                        </label>
-                                        <label class="col-span-5 flex items-center space-x-2 cursor-pointer">
-                                            <input type="radio" wire:model="mergeFieldChoices.{{ $conflict['field'] }}" value="use_loser"
-                                                   class="text-red-600 focus:ring-red-500">
-                                            <span class="text-gray-900 dark:text-white truncate" title="{{ $conflict['loser'] }}">{{ $conflict['loser'] }}</span>
-                                        </label>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @else
-                        <p class="mb-4 text-sm text-gray-500 dark:text-gray-400">No conflicting fields. Empty fields on the kept record will be filled from the removed record.</p>
-                    @endif
-
-                    <div class="flex justify-end space-x-3 pt-2 border-t border-gray-200 dark:border-zinc-600">
-                        <button type="button" wire:click="closeMergeModal"
-                                class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600">
-                            Cancel
-                        </button>
-                        <button type="button" wire:click="confirmMerge"
-                                wire:confirm="Permanently merge {{ $loser->full_name }} into {{ $survivor->full_name }}? This cannot be undone."
-                                class="px-4 py-2 text-sm font-medium text-white bg-amber-600 border border-transparent rounded-md hover:bg-amber-700">
-                            Merge Records
-                        </button>
-                    </div>
-                @else
-                    <p class="text-sm text-red-600 dark:text-red-400">One or both selected participants could not be loaded.</p>
-                @endif
-            </div>
-        </div>
-    @endif
-
-    <!-- Delete Modal -->
-    @if($showDeleteModal)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 p-4" wire:click.self="closeDeleteModal">
-            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-xl font-bold text-red-700 dark:text-red-400">Delete Participant &amp; All Data</h3>
-                    <button wire:click="closeDeleteModal" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
-                </div>
-
-                <p class="text-sm text-gray-700 dark:text-gray-300 mb-3">
-                    You are about to permanently delete <strong>{{ $deleteParticipantName }}</strong> and every
-                    associated record. A JSON recovery snapshot and an audit-log entry are written first.
-                </p>
-
-                <div class="mb-4 rounded-md border border-gray-200 dark:border-zinc-600 p-3">
-                    <div class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 mb-2">Records that will be removed</div>
-                    <ul class="text-sm text-gray-800 dark:text-gray-200 space-y-1">
-                        <li>Program enrollments: <strong>{{ $deletePreview['program_enrollments'] ?? 0 }}</strong></li>
-                        <li>Service enrollments: <strong>{{ $deletePreview['service_enrollments'] ?? 0 }}</strong></li>
-                        <li>Properties: <strong>{{ $deletePreview['properties'] ?? 0 }}</strong></li>
-                        <li>Housing jobs (and their milestones/budgets/expenses): <strong>{{ $deletePreview['housing_jobs'] ?? 0 }}</strong></li>
-                        <li>Communication logs: <strong>{{ $deletePreview['communication_logs'] ?? 0 }}</strong></li>
-                        <li>Tags: <strong>{{ $deletePreview['tags'] ?? 0 }}</strong></li>
-                    </ul>
-                </div>
-
-                @if($deleteNeedsDecision)
-                    <div class="mb-4 rounded-md border border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-900/20 p-3">
-                        <p class="text-sm font-medium text-yellow-800 dark:text-yellow-200 mb-2">
-                            This participant is the head of a household with other members. Choose how to proceed:
-                        </p>
-                        <div class="space-y-2 text-sm">
-                            <label class="flex items-start space-x-2 cursor-pointer">
-                                <input type="radio" wire:model.live="deleteDecision" value="promote" class="mt-1 text-blue-600 focus:ring-blue-500">
-                                <span class="text-gray-800 dark:text-gray-200">Promote a member to head of household, then delete</span>
-                            </label>
-                            @if($deleteDecision === 'promote')
-                                <select wire:model="promoteToHeadId"
-                                        class="ml-6 w-[calc(100%-1.5rem)] px-3 py-2 text-sm border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white">
-                                    <option value="">Select member to promote…</option>
-                                    @foreach($deleteCoMembers as $member)
-                                        <option value="{{ $member['id'] }}">{{ $member['name'] }}</option>
-                                    @endforeach
-                                </select>
-                            @endif
-                            <label class="flex items-start space-x-2 cursor-pointer">
-                                <input type="radio" wire:model.live="deleteDecision" value="force" class="mt-1 text-red-600 focus:ring-red-500">
-                                <span class="text-gray-800 dark:text-gray-200">Delete anyway (household left without a head)</span>
-                            </label>
-                        </div>
-                    </div>
-                @endif
-
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type <span class="font-mono font-bold">DELETE</span> to confirm</label>
-                    <input type="text" wire:model="deleteConfirmText"
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500">
-                </div>
-
-                <div class="flex justify-end space-x-3 pt-2 border-t border-gray-200 dark:border-zinc-600">
-                    <button type="button" wire:click="closeDeleteModal"
-                            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600">
-                        Cancel
-                    </button>
-                    <button type="button" wire:click="confirmDelete"
-                            class="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700">
-                        Permanently Delete
                     </button>
                 </div>
             </div>
