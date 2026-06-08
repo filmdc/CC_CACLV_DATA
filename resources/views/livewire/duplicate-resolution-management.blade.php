@@ -321,6 +321,92 @@
                         </div>
                     @endif
 
+                    {{-- Side-by-side full comparison of the two records --}}
+                    <div class="mt-5">
+                        <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-2">Compare records</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            @foreach([['role' => 'keep', 'p' => $mergeSurvivor], ['role' => 'remove', 'p' => $mergeLoser]] as $rec)
+                                @php $p = $rec['p']; @endphp
+                                <div class="rounded-lg border {{ $rec['role'] === 'keep' ? 'border-green-300 dark:border-green-700' : 'border-red-300 dark:border-red-700' }} overflow-hidden">
+                                    <div class="px-4 py-2 text-xs font-semibold uppercase {{ $rec['role'] === 'keep' ? 'bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-200' : 'bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200' }}">
+                                        {{ $rec['role'] === 'keep' ? 'Keep' : 'Merge & remove' }} — {{ $p->full_name }}
+                                    </div>
+                                    <div class="p-4 space-y-4 text-sm max-h-[28rem] overflow-y-auto">
+                                        {{-- Participant --}}
+                                        <div>
+                                            <div class="text-xs font-semibold uppercase text-gray-400 dark:text-gray-500 mb-1">Participant</div>
+                                            <dl class="grid grid-cols-3 gap-x-2 gap-y-1">
+                                                <dt class="text-gray-500 dark:text-gray-400">DOB / Age</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->date_of_birth?->format('M j, Y') ?? '—' }} ({{ $p->age ?? '—' }})</dd>
+                                                <dt class="text-gray-500 dark:text-gray-400">Gender</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->gender ?: '—' }}</dd>
+                                                <dt class="text-gray-500 dark:text-gray-400">Role</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->is_head_of_household ? 'Head of Household' : 'Family Member' }}</dd>
+                                                <dt class="text-gray-500 dark:text-gray-400">Phone</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->telephone ?: '—' }}</dd>
+                                                <dt class="text-gray-500 dark:text-gray-400">Email</dt><dd class="col-span-2 text-gray-900 dark:text-white break-all">{{ $p->email ?: '—' }}</dd>
+                                                <dt class="text-gray-500 dark:text-gray-400">Ethnicity</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->ethnicity ?: '—' }}</dd>
+                                                <dt class="text-gray-500 dark:text-gray-400">Race</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ is_array($p->race) ? (implode(', ', $p->race) ?: '—') : ($p->race ?: '—') }}</dd>
+                                                <dt class="text-gray-500 dark:text-gray-400">Education</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->education_level ?: '—' }}</dd>
+                                                <dt class="text-gray-500 dark:text-gray-400">Work status</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->work_status ?: '—' }}</dd>
+                                                <dt class="text-gray-500 dark:text-gray-400">Intake date</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->intake_date?->format('M j, Y') ?? '—' }}</dd>
+                                            </dl>
+                                        </div>
+
+                                        {{-- Household --}}
+                                        <div class="pt-3 border-t border-gray-200 dark:border-zinc-700">
+                                            <div class="text-xs font-semibold uppercase text-gray-400 dark:text-gray-500 mb-1">Household</div>
+                                            @if($p->household)
+                                                <dl class="grid grid-cols-3 gap-x-2 gap-y-1">
+                                                    <dt class="text-gray-500 dark:text-gray-400">Code</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->household->household_code ?? '—' }}</dd>
+                                                    <dt class="text-gray-500 dark:text-gray-400">Head</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->household->headOfHousehold->full_name ?? '—' }}</dd>
+                                                    <dt class="text-gray-500 dark:text-gray-400">Type</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->household->household_type ?: '—' }}</dd>
+                                                    <dt class="text-gray-500 dark:text-gray-400">Size</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->household->household_size ?? '—' }}</dd>
+                                                    <dt class="text-gray-500 dark:text-gray-400">Housing</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->household->housing_status ?: '—' }}</dd>
+                                                    <dt class="text-gray-500 dark:text-gray-400">Annual income</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->household->annual_income !== null ? '$'.number_format((float) $p->household->annual_income) : '—' }}</dd>
+                                                    <dt class="text-gray-500 dark:text-gray-400">% poverty</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->household->hhs_poverty_percentage !== null ? $p->household->hhs_poverty_percentage.'%' : '—' }}</dd>
+                                                </dl>
+                                            @else
+                                                <p class="text-gray-500 dark:text-gray-400">No household.</p>
+                                            @endif
+                                        </div>
+
+                                        {{-- Program enrollments --}}
+                                        <div class="pt-3 border-t border-gray-200 dark:border-zinc-700">
+                                            <div class="text-xs font-semibold uppercase text-gray-400 dark:text-gray-500 mb-1">Program enrollments ({{ $p->programEnrollments->count() }})</div>
+                                            @forelse($p->programEnrollments as $pe)
+                                                <div class="flex items-center justify-between">
+                                                    <span class="text-gray-900 dark:text-white">{{ $pe->program->name ?? 'Program #'.$pe->program_id }}</span>
+                                                    <span class="text-xs text-gray-500 dark:text-gray-400">{{ ucfirst($pe->status) }} · {{ $pe->enrollment_date?->format('M Y') ?? '—' }}</span>
+                                                </div>
+                                            @empty
+                                                <p class="text-gray-500 dark:text-gray-400">None.</p>
+                                            @endforelse
+                                        </div>
+
+                                        {{-- Service enrollments --}}
+                                        <div class="pt-3 border-t border-gray-200 dark:border-zinc-700">
+                                            <div class="text-xs font-semibold uppercase text-gray-400 dark:text-gray-500 mb-1">Service enrollments ({{ $p->serviceEnrollments->count() }})</div>
+                                            @forelse($p->serviceEnrollments as $se)
+                                                <div class="flex items-center justify-between">
+                                                    <span class="text-gray-900 dark:text-white">{{ $se->service->name ?? 'Service #'.$se->service_id }}</span>
+                                                    <span class="text-xs text-gray-500 dark:text-gray-400">{{ ucfirst(str_replace('_', ' ', $se->status)) }}</span>
+                                                </div>
+                                            @empty
+                                                <p class="text-gray-500 dark:text-gray-400">None.</p>
+                                            @endforelse
+                                        </div>
+
+                                        {{-- Other associated records --}}
+                                        <div class="pt-3 border-t border-gray-200 dark:border-zinc-700">
+                                            <div class="text-xs font-semibold uppercase text-gray-400 dark:text-gray-500 mb-1">Other records</div>
+                                            <dl class="grid grid-cols-3 gap-x-2 gap-y-1">
+                                                <dt class="text-gray-500 dark:text-gray-400">Properties</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->properties_count }}</dd>
+                                                <dt class="text-gray-500 dark:text-gray-400">Housing jobs</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->housing_jobs_count }}</dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
                     @if(count($mergeConflicts) > 0)
                         <div class="mt-4">
                             <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-2">Conflicting fields — choose which value to keep</h4>

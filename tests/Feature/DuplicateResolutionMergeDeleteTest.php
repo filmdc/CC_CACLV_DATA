@@ -52,6 +52,27 @@ it('merges two records selected via the pickers', function () {
     expect(Participant::find($survivor->id))->not->toBeNull();
 });
 
+it('shows a side-by-side detail comparison once both records are selected', function () {
+    $this->actingAs(mergeToolUser(['participants.view', 'participants.merge']));
+
+    $survivor = \App\Models\Participant::factory()->create();
+    $loser = \App\Models\Participant::factory()->create();
+    $program = \App\Models\Program::factory()->create(['name' => 'Weatherization Assistance']);
+    \App\Models\ProgramEnrollment::create([
+        'participant_id' => $loser->id, 'program_id' => $program->id,
+        'enrollment_date' => now(), 'status' => 'active',
+    ]);
+
+    Livewire::test(DuplicateResolutionManagement::class)
+        ->call('setTab', 'merge')
+        ->call('selectMergeSurvivor', $survivor->id)
+        ->call('selectMergeLoser', $loser->id)
+        ->assertSee('Compare records')
+        ->assertSee('Program enrollments')
+        ->assertSee('Weatherization Assistance')
+        ->assertSee('Household');
+});
+
 it('blocks merge without participants.merge', function () {
     $this->actingAs(mergeToolUser(['participants.view']));
 

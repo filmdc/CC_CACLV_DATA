@@ -113,9 +113,9 @@ class DuplicateResolutionManagement extends Component
             'totalCount' => PotentialDuplicate::count(),
             'rescanSummary' => $this->rescanSummary,
 
-            // Merge tab
-            'mergeSurvivor' => $this->mergeSurvivorId ? Participant::with('household')->find($this->mergeSurvivorId) : null,
-            'mergeLoser' => $this->mergeLoserId ? Participant::with('household')->find($this->mergeLoserId) : null,
+            // Merge tab — load full detail for the side-by-side comparison
+            'mergeSurvivor' => $this->mergeSurvivorId ? $this->loadMergeRecord($this->mergeSurvivorId) : null,
+            'mergeLoser' => $this->mergeLoserId ? $this->loadMergeRecord($this->mergeLoserId) : null,
             'mergeSurvivorResults' => $this->activeTab === 'merge'
                 ? $this->searchParticipants($this->mergeSurvivorSearch, array_filter([$this->mergeLoserId]))
                 : collect(),
@@ -617,6 +617,20 @@ class DuplicateResolutionManagement extends Component
         $this->promoteToHeadId = null;
         $this->deleteConfirmText = '';
         $this->deleteSearch = '';
+    }
+
+    /**
+     * Load a participant with the relations needed for the side-by-side merge comparison.
+     */
+    protected function loadMergeRecord($id)
+    {
+        return Participant::with([
+            'household.headOfHousehold',
+            'programEnrollments.program',
+            'serviceEnrollments.service',
+        ])
+            ->withCount(['properties', 'housingJobs'])
+            ->find($id);
     }
 
     /**
