@@ -4,13 +4,13 @@
         <div class="p-6 border-b border-gray-200 dark:border-zinc-700">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Duplicate Resolution</h1>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Participant Merge &amp; Duplicates</h1>
                     <p class="text-gray-600 dark:text-gray-300 mt-1">
-                        Review and resolve potential participant duplicates
+                        Resolve detected duplicates, merge two records, or delete a participant
                     </p>
                 </div>
 
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3" @if($activeTab !== 'duplicates') style="display:none" @endif>
                     @if ($rescanSummary)
                         <div class="text-xs text-gray-500 dark:text-gray-300">
                             Last rescan processed {{ $rescanSummary['evaluated'] }} participants; {{ $rescanSummary['created'] }} duplicates logged.
@@ -30,7 +30,7 @@
                 </div>
 
                 <!-- Summary Stats -->
-                <div class="flex space-x-4">
+                <div class="flex space-x-4" @if($activeTab !== 'duplicates') style="display:none" @endif>
                     <div class="text-center">
                         <div class="text-2xl font-bold text-yellow-600">{{ $pendingCount }}</div>
                         <div class="text-sm text-gray-500">Pending</div>
@@ -43,6 +43,40 @@
             </div>
         </div>
 
+        <!-- Tabs -->
+        <div class="border-b border-gray-200 dark:border-zinc-700 px-6">
+            <nav class="-mb-px flex space-x-6">
+                <button wire:click="setTab('duplicates')"
+                        class="whitespace-nowrap border-b-2 py-3 px-1 text-sm font-medium {{ $activeTab === 'duplicates' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400' }}">
+                    Detected Duplicates
+                    @if($pendingCount > 0)
+                        <span class="ml-1 inline-flex items-center rounded-full bg-yellow-100 dark:bg-yellow-900 px-2 text-xs font-semibold text-yellow-800 dark:text-yellow-200">{{ $pendingCount }}</span>
+                    @endif
+                </button>
+                @if($this->can('participants.merge'))
+                    <button wire:click="setTab('merge')"
+                            class="whitespace-nowrap border-b-2 py-3 px-1 text-sm font-medium {{ $activeTab === 'merge' ? 'border-amber-500 text-amber-600 dark:text-amber-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400' }}">
+                        Merge Two Records
+                    </button>
+                @endif
+                @if($this->can('participants.delete'))
+                    <button wire:click="setTab('delete')"
+                            class="whitespace-nowrap border-b-2 py-3 px-1 text-sm font-medium {{ $activeTab === 'delete' ? 'border-red-500 text-red-600 dark:text-red-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400' }}">
+                        Delete Participant
+                    </button>
+                @endif
+            </nav>
+        </div>
+
+        <!-- Session messages -->
+        @if (session()->has('message'))
+            <div class="m-6 rounded-md bg-green-50 dark:bg-green-900/20 border border-green-300 dark:border-green-700 p-4 text-sm text-green-700 dark:text-green-300">{{ session('message') }}</div>
+        @endif
+        @if (session()->has('error'))
+            <div class="m-6 rounded-md bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-700 p-4 text-sm text-red-700 dark:text-red-300">{{ session('error') }}</div>
+        @endif
+
+        @if($activeTab === 'duplicates')
         <!-- Filters -->
         <div class="p-6 border-b border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-900">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -204,6 +238,290 @@
                 </div>
             @endif
         </div>
+        @endif
+
+        @if($activeTab === 'merge')
+            <div class="p-6">
+                <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                    Combine two participant records that are the same person. All enrollments, properties,
+                    housing jobs, communication logs and tags from the <strong>record to remove</strong> are
+                    reassigned to the <strong>record to keep</strong>, then the removed record is deleted.
+                    A recovery snapshot is written first.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {{-- Survivor picker --}}
+                    <div class="rounded-lg border-2 border-green-400 dark:border-green-600 bg-green-50 dark:bg-green-900/20 p-4">
+                        <div class="text-xs font-semibold uppercase text-green-700 dark:text-green-300 mb-2">Keep this record</div>
+                        @if($mergeSurvivor)
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $mergeSurvivor->full_name }}</div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                                        Household {{ $mergeSurvivor->household->household_code ?? 'N/A' }} ·
+                                        DOB {{ $mergeSurvivor->date_of_birth?->format('M j, Y') ?? 'N/A' }}
+                                        @if($mergeSurvivor->is_head_of_household) · Head of Household @endif
+                                    </div>
+                                </div>
+                                <button wire:click="clearMergeSurvivor" class="text-xs text-blue-600 dark:text-blue-400 hover:underline">Change</button>
+                            </div>
+                        @else
+                            <input type="text" wire:model.live.debounce.300ms="mergeSurvivorSearch" placeholder="Search name or household code…"
+                                   class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white text-sm">
+                            <div class="mt-2 space-y-1">
+                                @foreach($mergeSurvivorResults as $r)
+                                    <button wire:click="selectMergeSurvivor({{ $r->id }})"
+                                            class="w-full text-left px-3 py-2 text-sm rounded-md bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-600 hover:bg-green-100 dark:hover:bg-green-900/40">
+                                        {{ $r->full_name }}
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">— {{ $r->household->household_code ?? 'N/A' }}, DOB {{ $r->date_of_birth?->format('M j, Y') ?? 'N/A' }}</span>
+                                    </button>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+
+                    {{-- Loser picker --}}
+                    <div class="rounded-lg border-2 border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20 p-4">
+                        <div class="text-xs font-semibold uppercase text-red-700 dark:text-red-300 mb-2">Merge &amp; remove this record</div>
+                        @if($mergeLoser)
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $mergeLoser->full_name }}</div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                                        Household {{ $mergeLoser->household->household_code ?? 'N/A' }} ·
+                                        DOB {{ $mergeLoser->date_of_birth?->format('M j, Y') ?? 'N/A' }}
+                                        @if($mergeLoser->is_head_of_household) · Head of Household @endif
+                                    </div>
+                                </div>
+                                <button wire:click="clearMergeLoser" class="text-xs text-blue-600 dark:text-blue-400 hover:underline">Change</button>
+                            </div>
+                        @else
+                            <input type="text" wire:model.live.debounce.300ms="mergeLoserSearch" placeholder="Search name or household code…"
+                                   class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white text-sm">
+                            <div class="mt-2 space-y-1">
+                                @foreach($mergeLoserResults as $r)
+                                    <button wire:click="selectMergeLoser({{ $r->id }})"
+                                            class="w-full text-left px-3 py-2 text-sm rounded-md bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-600 hover:bg-red-100 dark:hover:bg-red-900/40">
+                                        {{ $r->full_name }}
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">— {{ $r->household->household_code ?? 'N/A' }}, DOB {{ $r->date_of_birth?->format('M j, Y') ?? 'N/A' }}</span>
+                                    </button>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                @if($mergeSurvivor && $mergeLoser)
+                    <button wire:click="swapMergeDirection" class="mt-3 text-sm text-blue-600 dark:text-blue-400 hover:underline">↔ Swap which record is kept</button>
+
+                    @if($mergeSurvivor->household_id !== $mergeLoser->household_id)
+                        <div class="mt-3 p-3 rounded-md bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700 text-sm text-yellow-800 dark:text-yellow-200">
+                            <strong>Heads up:</strong> these records are in different households. Records are repointed to the kept
+                            record's household; the removed record's household is deleted if left empty, or a remaining member is promoted.
+                        </div>
+                    @endif
+
+                    {{-- Side-by-side full comparison of the two records --}}
+                    <div class="mt-5">
+                        <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-2">Compare records</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            @foreach([['role' => 'keep', 'p' => $mergeSurvivor], ['role' => 'remove', 'p' => $mergeLoser]] as $rec)
+                                @php $p = $rec['p']; @endphp
+                                <div class="rounded-lg border {{ $rec['role'] === 'keep' ? 'border-green-300 dark:border-green-700' : 'border-red-300 dark:border-red-700' }} overflow-hidden">
+                                    <div class="px-4 py-2 text-xs font-semibold uppercase {{ $rec['role'] === 'keep' ? 'bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-200' : 'bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200' }}">
+                                        {{ $rec['role'] === 'keep' ? 'Keep' : 'Merge & remove' }} — {{ $p->full_name }}
+                                    </div>
+                                    <div class="p-4 space-y-4 text-sm max-h-[28rem] overflow-y-auto">
+                                        {{-- Participant --}}
+                                        <div>
+                                            <div class="text-xs font-semibold uppercase text-gray-400 dark:text-gray-500 mb-1">Participant</div>
+                                            <dl class="grid grid-cols-3 gap-x-2 gap-y-1">
+                                                <dt class="text-gray-500 dark:text-gray-400">DOB / Age</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->date_of_birth?->format('M j, Y') ?? '—' }} ({{ $p->age ?? '—' }})</dd>
+                                                <dt class="text-gray-500 dark:text-gray-400">Gender</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->gender ?: '—' }}</dd>
+                                                <dt class="text-gray-500 dark:text-gray-400">Role</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->is_head_of_household ? 'Head of Household' : 'Family Member' }}</dd>
+                                                <dt class="text-gray-500 dark:text-gray-400">Phone</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->telephone ?: '—' }}</dd>
+                                                <dt class="text-gray-500 dark:text-gray-400">Email</dt><dd class="col-span-2 text-gray-900 dark:text-white break-all">{{ $p->email ?: '—' }}</dd>
+                                                <dt class="text-gray-500 dark:text-gray-400">Ethnicity</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->ethnicity ?: '—' }}</dd>
+                                                <dt class="text-gray-500 dark:text-gray-400">Race</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ is_array($p->race) ? (implode(', ', $p->race) ?: '—') : ($p->race ?: '—') }}</dd>
+                                                <dt class="text-gray-500 dark:text-gray-400">Education</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->education_level ?: '—' }}</dd>
+                                                <dt class="text-gray-500 dark:text-gray-400">Work status</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->work_status ?: '—' }}</dd>
+                                                <dt class="text-gray-500 dark:text-gray-400">Intake date</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->intake_date?->format('M j, Y') ?? '—' }}</dd>
+                                            </dl>
+                                        </div>
+
+                                        {{-- Household --}}
+                                        <div class="pt-3 border-t border-gray-200 dark:border-zinc-700">
+                                            <div class="text-xs font-semibold uppercase text-gray-400 dark:text-gray-500 mb-1">Household</div>
+                                            @if($p->household)
+                                                <dl class="grid grid-cols-3 gap-x-2 gap-y-1">
+                                                    <dt class="text-gray-500 dark:text-gray-400">Code</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->household->household_code ?? '—' }}</dd>
+                                                    <dt class="text-gray-500 dark:text-gray-400">Head</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->household->headOfHousehold->full_name ?? '—' }}</dd>
+                                                    <dt class="text-gray-500 dark:text-gray-400">Type</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->household->household_type ?: '—' }}</dd>
+                                                    <dt class="text-gray-500 dark:text-gray-400">Size</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->household->household_size ?? '—' }}</dd>
+                                                    <dt class="text-gray-500 dark:text-gray-400">Housing</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->household->housing_status ?: '—' }}</dd>
+                                                    <dt class="text-gray-500 dark:text-gray-400">Annual income</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->household->annual_income !== null ? '$'.number_format((float) $p->household->annual_income) : '—' }}</dd>
+                                                    <dt class="text-gray-500 dark:text-gray-400">% poverty</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->household->hhs_poverty_percentage !== null ? $p->household->hhs_poverty_percentage.'%' : '—' }}</dd>
+                                                </dl>
+                                            @else
+                                                <p class="text-gray-500 dark:text-gray-400">No household.</p>
+                                            @endif
+                                        </div>
+
+                                        {{-- Program enrollments --}}
+                                        <div class="pt-3 border-t border-gray-200 dark:border-zinc-700">
+                                            <div class="text-xs font-semibold uppercase text-gray-400 dark:text-gray-500 mb-1">Program enrollments ({{ $p->programEnrollments->count() }})</div>
+                                            @forelse($p->programEnrollments as $pe)
+                                                <div class="flex items-center justify-between">
+                                                    <span class="text-gray-900 dark:text-white">{{ $pe->program->name ?? 'Program #'.$pe->program_id }}</span>
+                                                    <span class="text-xs text-gray-500 dark:text-gray-400">{{ ucfirst($pe->status) }} · {{ $pe->enrollment_date?->format('M Y') ?? '—' }}</span>
+                                                </div>
+                                            @empty
+                                                <p class="text-gray-500 dark:text-gray-400">None.</p>
+                                            @endforelse
+                                        </div>
+
+                                        {{-- Service enrollments --}}
+                                        <div class="pt-3 border-t border-gray-200 dark:border-zinc-700">
+                                            <div class="text-xs font-semibold uppercase text-gray-400 dark:text-gray-500 mb-1">Service enrollments ({{ $p->serviceEnrollments->count() }})</div>
+                                            @forelse($p->serviceEnrollments as $se)
+                                                <div class="flex items-center justify-between">
+                                                    <span class="text-gray-900 dark:text-white">{{ $se->service->name ?? 'Service #'.$se->service_id }}</span>
+                                                    <span class="text-xs text-gray-500 dark:text-gray-400">{{ ucfirst(str_replace('_', ' ', $se->status)) }}</span>
+                                                </div>
+                                            @empty
+                                                <p class="text-gray-500 dark:text-gray-400">None.</p>
+                                            @endforelse
+                                        </div>
+
+                                        {{-- Other associated records --}}
+                                        <div class="pt-3 border-t border-gray-200 dark:border-zinc-700">
+                                            <div class="text-xs font-semibold uppercase text-gray-400 dark:text-gray-500 mb-1">Other records</div>
+                                            <dl class="grid grid-cols-3 gap-x-2 gap-y-1">
+                                                <dt class="text-gray-500 dark:text-gray-400">Properties</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->properties_count }}</dd>
+                                                <dt class="text-gray-500 dark:text-gray-400">Housing jobs</dt><dd class="col-span-2 text-gray-900 dark:text-white">{{ $p->housing_jobs_count }}</dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    @if(count($mergeConflicts) > 0)
+                        <div class="mt-4">
+                            <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-2">Conflicting fields — choose which value to keep</h4>
+                            <div class="space-y-2">
+                                @foreach($mergeConflicts as $conflict)
+                                    <div class="grid grid-cols-12 gap-2 items-center text-sm border border-gray-200 dark:border-zinc-600 rounded-md p-2">
+                                        <div class="col-span-3 font-medium text-gray-700 dark:text-gray-300">{{ ucwords(str_replace('_', ' ', $conflict['field'])) }}</div>
+                                        <label class="col-span-4 flex items-center space-x-2 cursor-pointer">
+                                            <input type="radio" wire:model="mergeFieldChoices.{{ $conflict['field'] }}" value="use_survivor" class="text-green-600 focus:ring-green-500">
+                                            <span class="text-gray-900 dark:text-white truncate" title="{{ $conflict['survivor'] }}">{{ $conflict['survivor'] }}</span>
+                                        </label>
+                                        <label class="col-span-5 flex items-center space-x-2 cursor-pointer">
+                                            <input type="radio" wire:model="mergeFieldChoices.{{ $conflict['field'] }}" value="use_loser" class="text-red-600 focus:ring-red-500">
+                                            <span class="text-gray-900 dark:text-white truncate" title="{{ $conflict['loser'] }}">{{ $conflict['loser'] }}</span>
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @else
+                        <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">No conflicting fields. Empty fields on the kept record will be filled from the removed record.</p>
+                    @endif
+
+                    <div class="mt-5 flex items-center gap-3">
+                        <button wire:click="confirmMerge"
+                                wire:confirm="Permanently merge {{ $mergeLoser->full_name }} into {{ $mergeSurvivor->full_name }}? This cannot be undone."
+                                @disabled($mergeSurvivor->id === $mergeLoser->id)
+                                class="px-4 py-2 text-sm font-medium text-white bg-amber-600 rounded-md hover:bg-amber-700 disabled:opacity-50">
+                            Merge Records
+                        </button>
+                        <button wire:click="resetMergeForm" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-zinc-700 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-600">Reset</button>
+                    </div>
+                @else
+                    <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">Select both records to continue.</p>
+                @endif
+            </div>
+        @endif
+
+        @if($activeTab === 'delete')
+            <div class="p-6">
+                <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                    Permanently delete a participant and <strong>every associated record</strong> (enrollments,
+                    properties, housing jobs, communication logs, tags). A JSON recovery snapshot and an audit-log
+                    entry are written first.
+                </p>
+
+                @if(! $deleteParticipant)
+                    <input type="text" wire:model.live.debounce.300ms="deleteSearch" placeholder="Search participant by name or household code…"
+                           class="w-full max-w-lg rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white text-sm">
+                    <div class="mt-2 space-y-1 max-w-lg">
+                        @foreach($deleteResults as $r)
+                            <button wire:click="selectDeleteParticipant({{ $r->id }})"
+                                    class="w-full text-left px-3 py-2 text-sm rounded-md bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-600 hover:bg-red-100 dark:hover:bg-red-900/40">
+                                {{ $r->full_name }}
+                                <span class="text-xs text-gray-500 dark:text-gray-400">— {{ $r->household->household_code ?? 'N/A' }}, DOB {{ $r->date_of_birth?->format('M j, Y') ?? 'N/A' }}</span>
+                            </button>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="max-w-lg">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="text-base font-semibold text-gray-900 dark:text-white">{{ $deleteParticipantName }}</div>
+                            <button wire:click="resetDeleteForm" class="text-xs text-blue-600 dark:text-blue-400 hover:underline">Choose a different participant</button>
+                        </div>
+
+                        <div class="mb-4 rounded-md border border-gray-200 dark:border-zinc-600 p-3">
+                            <div class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 mb-2">Records that will be removed</div>
+                            <ul class="text-sm text-gray-800 dark:text-gray-200 space-y-1">
+                                <li>Program enrollments: <strong>{{ $deletePreview['program_enrollments'] ?? 0 }}</strong></li>
+                                <li>Service enrollments: <strong>{{ $deletePreview['service_enrollments'] ?? 0 }}</strong></li>
+                                <li>Properties: <strong>{{ $deletePreview['properties'] ?? 0 }}</strong></li>
+                                <li>Housing jobs (and their milestones/budgets/expenses): <strong>{{ $deletePreview['housing_jobs'] ?? 0 }}</strong></li>
+                                <li>Communication logs: <strong>{{ $deletePreview['communication_logs'] ?? 0 }}</strong></li>
+                                <li>Tags: <strong>{{ $deletePreview['tags'] ?? 0 }}</strong></li>
+                            </ul>
+                        </div>
+
+                        @if($deleteNeedsDecision)
+                            <div class="mb-4 rounded-md border border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-900/20 p-3">
+                                <p class="text-sm font-medium text-yellow-800 dark:text-yellow-200 mb-2">
+                                    This participant heads a household with other members. Choose how to proceed:
+                                </p>
+                                <div class="space-y-2 text-sm">
+                                    <label class="flex items-start space-x-2 cursor-pointer">
+                                        <input type="radio" wire:model.live="deleteDecision" value="promote" class="mt-1 text-blue-600 focus:ring-blue-500">
+                                        <span class="text-gray-800 dark:text-gray-200">Promote a member to head of household, then delete</span>
+                                    </label>
+                                    @if($deleteDecision === 'promote')
+                                        <select wire:model="promoteToHeadId" class="ml-6 w-[calc(100%-1.5rem)] rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white text-sm">
+                                            <option value="">Select member to promote…</option>
+                                            @foreach($deleteCoMembers as $member)
+                                                <option value="{{ $member['id'] }}">{{ $member['name'] }}</option>
+                                            @endforeach
+                                        </select>
+                                    @endif
+                                    <label class="flex items-start space-x-2 cursor-pointer">
+                                        <input type="radio" wire:model.live="deleteDecision" value="force" class="mt-1 text-red-600 focus:ring-red-500">
+                                        <span class="text-gray-800 dark:text-gray-200">Delete anyway (household left without a head)</span>
+                                    </label>
+                                </div>
+                            </div>
+                        @endif
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type <span class="font-mono font-bold">DELETE</span> to confirm</label>
+                            <input type="text" wire:model="deleteConfirmText" class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white text-sm focus:ring-red-500">
+                        </div>
+
+                        <button wire:click="confirmDelete" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700">
+                            Permanently Delete
+                        </button>
+                    </div>
+                @endif
+            </div>
+        @endif
     </div>
 
     <!-- Detail Modal -->
@@ -343,19 +661,6 @@
                     @endif
                 </div>
             </div>
-        </div>
-    @endif
-
-    <!-- Success/Error Messages -->
-    @if (session()->has('message'))
-        <div class="fixed top-4 right-4 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-md z-50">
-            {{ session('message') }}
-        </div>
-    @endif
-
-    @if (session()->has('error'))
-        <div class="fixed top-4 right-4 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md z-50">
-            {{ session('error') }}
         </div>
     @endif
 </div>

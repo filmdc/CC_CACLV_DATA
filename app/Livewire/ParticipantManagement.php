@@ -3,17 +3,16 @@
 namespace App\Livewire;
 
 use App\Models\Participant;
-use App\Models\Household;
-use App\Models\ReferenceData;
 use App\Models\Program;
-use App\Models\Service;
 use App\Models\ProgramEnrollment;
+use App\Models\ReferenceData;
+use App\Models\Service;
 use App\Models\ServiceEnrollment;
 use App\Traits\WithPermissionChecks;
 use App\Traits\WithProgramAccess;
+use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Carbon\Carbon;
 
 class ParticipantManagement extends Component
 {
@@ -23,7 +22,7 @@ class ParticipantManagement extends Component
     {
         // Check if user has permission to view participants
         $this->authorizeAction('participants.view', 'You do not have permission to view participants.');
-        
+
         // Check if we were redirected here to edit a specific participant
         if (session()->has('selectedParticipant')) {
             $participantId = session()->get('selectedParticipant');
@@ -33,35 +32,59 @@ class ParticipantManagement extends Component
     }
 
     public $search = '';
+
     public $selectedParticipant = null;
+
     public $showEditForm = false;
+
     public $showViewModal = false;
 
     // Participant Form Fields
     public $first_name = '';
+
     public $middle_name = '';
+
     public $last_name = '';
+
     public $suffix = '';
+
     public $date_of_birth = '';
+
     public $gender = '';
+
     public $telephone = '';
+
     public $email = '';
+
     public $education_level = '';
+
     public $disability_status = '';
+
     public $health_insurance_status = '';
+
     public $ethnicity = '';
+
     public $race = [];
+
     public $military_status = '';
+
     public $work_status = '';
 
     // Enrollment Management
     public $showEnrollmentSection = false;
+
     public $program_id = '';
+
     public $enrollment_date = '';
+
     public $enrollment_notes = '';
+
     public $service_id = '';
+
     public $service_enrollment_date = '';
+
     public $service_notes = '';
+
     public $selectedEnrollment = null;
 
     public function updatedSearch()
@@ -74,8 +97,9 @@ class ParticipantManagement extends Component
         $this->selectedParticipant = Participant::with('household')->find($participantId);
         if ($this->selectedParticipant) {
             // Check if user has access to edit this participant
-            if (!auth()->user()->can('update', $this->selectedParticipant)) {
+            if (! auth()->user()->can('update', $this->selectedParticipant)) {
                 session()->flash('error', 'You do not have access to edit this participant. You must be assigned to one of their enrolled programs.');
+
                 return;
             }
 
@@ -110,7 +134,7 @@ class ParticipantManagement extends Component
     public function updateParticipant()
     {
         $this->authorizeAction('participants.edit', 'You do not have permission to edit participants.');
-        
+
         $this->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -130,7 +154,7 @@ class ParticipantManagement extends Component
         try {
             // Get the active reference data set for updated data
             $activeDataSet = \App\Models\ReferenceDataSet::getActive();
-            
+
             $this->selectedParticipant->update([
                 'reference_data_set_id' => $activeDataSet?->id,
                 'first_name' => $this->first_name,
@@ -152,9 +176,9 @@ class ParticipantManagement extends Component
 
             session()->flash('success', 'Participant updated successfully.');
             $this->resetForm();
-            
+
         } catch (\Exception $e) {
-            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+            session()->flash('error', 'An error occurred: '.$e->getMessage());
         }
     }
 
@@ -201,7 +225,7 @@ class ParticipantManagement extends Component
 
     public function toggleEnrollmentSection()
     {
-        $this->showEnrollmentSection = !$this->showEnrollmentSection;
+        $this->showEnrollmentSection = ! $this->showEnrollmentSection;
         if ($this->showEnrollmentSection) {
             $this->resetEnrollmentForm();
         }
@@ -209,8 +233,9 @@ class ParticipantManagement extends Component
 
     public function createProgramEnrollment()
     {
-        if (!$this->selectedParticipant) {
+        if (! $this->selectedParticipant) {
             session()->flash('error', 'No participant selected.');
+
             return;
         }
 
@@ -220,8 +245,9 @@ class ParticipantManagement extends Component
         ]);
 
         // Check if user has access to enroll in this program
-        if (!auth()->user()->hasAccessToProgram($this->program_id)) {
+        if (! auth()->user()->hasAccessToProgram($this->program_id)) {
             session()->flash('error', 'You do not have permission to enroll participants in this program.');
+
             return;
         }
 
@@ -234,6 +260,7 @@ class ParticipantManagement extends Component
 
             if ($existingEnrollment) {
                 session()->flash('error', 'Participant is already actively enrolled in this program.');
+
                 return;
             }
 
@@ -249,14 +276,15 @@ class ParticipantManagement extends Component
             $this->resetEnrollmentForm();
 
         } catch (\Exception $e) {
-            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+            session()->flash('error', 'An error occurred: '.$e->getMessage());
         }
     }
 
     public function createServiceEnrollment()
     {
-        if (!$this->selectedParticipant) {
+        if (! $this->selectedParticipant) {
             session()->flash('error', 'No participant selected.');
+
             return;
         }
 
@@ -273,8 +301,9 @@ class ParticipantManagement extends Component
                 ->where('status', 'active')
                 ->first();
 
-            if (!$programEnrollment) {
+            if (! $programEnrollment) {
                 session()->flash('error', 'Participant must be enrolled in the program first.');
+
                 return;
             }
 
@@ -289,9 +318,9 @@ class ParticipantManagement extends Component
 
             session()->flash('success', 'Service enrollment created successfully.');
             $this->resetEnrollmentForm();
-            
+
         } catch (\Exception $e) {
-            session()->flash('error', 'An error occurred: ' . $e->getMessage());
+            session()->flash('error', 'An error occurred: '.$e->getMessage());
         }
     }
 
@@ -308,13 +337,15 @@ class ParticipantManagement extends Component
             $participant = Participant::find($participantId);
             if ($participant) {
                 // Check if user has access to delete this participant
-                if (!auth()->user()->can('delete', $participant)) {
+                if (! auth()->user()->can('delete', $participant)) {
                     session()->flash('error', 'You do not have access to delete this participant.');
+
                     return;
                 }
 
                 if ($participant->is_head_of_household) {
                     session()->flash('error', 'Cannot delete head of household. Transfer headship first.');
+
                     return;
                 }
 
@@ -322,7 +353,7 @@ class ParticipantManagement extends Component
                 session()->flash('success', 'Participant deleted successfully.');
             }
         } catch (\Exception $e) {
-            session()->flash('error', 'Cannot delete participant: ' . $e->getMessage());
+            session()->flash('error', 'Cannot delete participant: '.$e->getMessage());
         }
     }
 
@@ -332,6 +363,7 @@ class ParticipantManagement extends Component
     public function canEditParticipant($participantId): bool
     {
         $participant = Participant::find($participantId);
+
         return $participant && auth()->user()->can('update', $participant);
     }
 
@@ -349,12 +381,12 @@ class ParticipantManagement extends Component
         // Sensitive data access is controlled at the field/view level
         $participants = Participant::with(['household', 'programEnrollments.program', 'serviceEnrollments.service'])
             ->when($this->search, function ($query) {
-                $query->where('first_name', 'like', '%' . $this->search . '%')
-                      ->orWhere('last_name', 'like', '%' . $this->search . '%')
-                      ->orWhere('email', 'like', '%' . $this->search . '%')
-                      ->orWhereHas('household', function ($q) {
-                          $q->where('household_code', 'like', '%' . $this->search . '%');
-                      });
+                $query->where('first_name', 'like', '%'.$this->search.'%')
+                    ->orWhere('last_name', 'like', '%'.$this->search.'%')
+                    ->orWhere('email', 'like', '%'.$this->search.'%')
+                    ->orWhereHas('household', function ($q) {
+                        $q->where('household_code', 'like', '%'.$this->search.'%');
+                    });
             })
             ->orderBy('created_at', 'desc')
             ->paginate(15);

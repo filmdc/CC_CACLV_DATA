@@ -457,6 +457,7 @@ class InitialSetupSeeder extends Seeder
             ['name' => 'participants.create', 'display_name' => 'Create Participants', 'category' => 'Participants'],
             ['name' => 'participants.edit', 'display_name' => 'Edit Participants', 'category' => 'Participants'],
             ['name' => 'participants.delete', 'display_name' => 'Delete Participants', 'category' => 'Participants'],
+            ['name' => 'participants.merge', 'display_name' => 'Merge Participants', 'category' => 'Participants'],
             ['name' => 'participants.export', 'display_name' => 'Export Participants', 'category' => 'Participants'],
             ['name' => 'participants.import', 'display_name' => 'Import Participants', 'category' => 'Participants'],
 

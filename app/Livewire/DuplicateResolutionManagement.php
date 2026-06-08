@@ -2,39 +2,85 @@
 
 namespace App\Livewire;
 
-use App\Models\PotentialDuplicate;
 use App\Models\Participant;
+use App\Models\PotentialDuplicate;
 use App\Services\DuplicateDetectionService;
+use App\Services\HouseholdDecisionRequiredException;
+use App\Services\ParticipantDeletionService;
+use App\Services\ParticipantMergeService;
 use App\Traits\WithPermissionChecks;
-use Livewire\Component;
-use Livewire\WithPagination;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class DuplicateResolutionManagement extends Component
 {
     use WithPagination, WithPermissionChecks;
 
+    // Active tab: 'duplicates' | 'merge' | 'delete'
+    public string $activeTab = 'duplicates';
+
     // UI State
     public $showDetailModal = false;
+
     public $selectedDuplicate = null;
+
     public $reviewNotes = '';
+
     public $mergeInstructions = [];
-    
+
+    // Manual record merge (Merge Two Records tab)
+    public string $mergeSurvivorSearch = '';
+
+    public string $mergeLoserSearch = '';
+
+    public $mergeSurvivorId = null;
+
+    public $mergeLoserId = null;
+
+    public array $mergeFieldChoices = [];
+
+    public array $mergeConflicts = [];
+
+    // Delete participant + all data (Delete Participant tab)
+    public string $deleteSearch = '';
+
+    public $deleteParticipantId = null;
+
+    public ?string $deleteParticipantName = null;
+
+    public array $deletePreview = [];
+
+    public bool $deleteNeedsDecision = false;
+
+    public array $deleteCoMembers = [];
+
+    public string $deleteDecision = '';
+
+    public $promoteToHeadId = null;
+
+    public string $deleteConfirmText = '';
+
     // Filters
     public $statusFilter = 'pending';
+
     public $sourceFilter = '';
+
     public $confidenceFilter = '';
+
     public $search = '';
 
     // Sorting
     public $sortField = 'created_at';
+
     public $sortDirection = 'desc';
 
     protected $duplicateDetectionService;
 
     public bool $rescanRunning = false;
+
     public ?array $rescanSummary = null;
 
     public function boot(DuplicateDetectionService $duplicateDetectionService)
@@ -44,18 +90,44 @@ class DuplicateResolutionManagement extends Component
 
     public function mount()
     {
-        // Initialize component
+        // Page is reachable by anyone who can view/manage participants; the Merge and
+        // Delete tabs and their actions are gated individually by their own permissions.
+        $this->authorizeAny(
+            ['participants.view', 'participants.create', 'participants.import', 'participants.merge', 'participants.delete'],
+            'You do not have permission to access participant tools.'
+        );
+    }
+
+    public function setTab(string $tab): void
+    {
+        $this->activeTab = in_array($tab, ['duplicates', 'merge', 'delete'], true) ? $tab : 'duplicates';
     }
 
     public function render()
     {
         $duplicates = $this->getPotentialDuplicates();
-        
+
         return view('livewire.duplicate-resolution-management', [
             'duplicates' => $duplicates,
             'pendingCount' => PotentialDuplicate::pending()->count(),
             'totalCount' => PotentialDuplicate::count(),
             'rescanSummary' => $this->rescanSummary,
+
+            // Merge tab — load full detail for the side-by-side comparison
+            'mergeSurvivor' => $this->mergeSurvivorId ? $this->loadMergeRecord($this->mergeSurvivorId) : null,
+            'mergeLoser' => $this->mergeLoserId ? $this->loadMergeRecord($this->mergeLoserId) : null,
+            'mergeSurvivorResults' => $this->activeTab === 'merge'
+                ? $this->searchParticipants($this->mergeSurvivorSearch, array_filter([$this->mergeLoserId]))
+                : collect(),
+            'mergeLoserResults' => $this->activeTab === 'merge'
+                ? $this->searchParticipants($this->mergeLoserSearch, array_filter([$this->mergeSurvivorId]))
+                : collect(),
+
+            // Delete tab
+            'deleteParticipant' => $this->deleteParticipantId ? Participant::with('household')->find($this->deleteParticipantId) : null,
+            'deleteResults' => $this->activeTab === 'delete'
+                ? $this->searchParticipants($this->deleteSearch)
+                : collect(),
         ]);
     }
 
@@ -77,7 +149,7 @@ class DuplicateResolutionManagement extends Component
             ));
         } catch (\Throwable $e) {
             Log::error('Duplicate rescan failed', ['error' => $e->getMessage()]);
-            session()->flash('error', 'Rescan failed: ' . $e->getMessage());
+            session()->flash('error', 'Rescan failed: '.$e->getMessage());
         } finally {
             $this->rescanRunning = false;
         }
@@ -121,11 +193,11 @@ class DuplicateResolutionManagement extends Component
         if ($this->search) {
             $query->where(function ($q) {
                 $q->whereHas('matchedParticipant', function ($participant) {
-                    $participant->where('first_name', 'like', '%' . $this->search . '%')
-                        ->orWhere('last_name', 'like', '%' . $this->search . '%');
+                    $participant->where('first_name', 'like', '%'.$this->search.'%')
+                        ->orWhere('last_name', 'like', '%'.$this->search.'%');
                 })
-                ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(proposed_data, '$.first_name')) LIKE ?", ['%' . $this->search . '%'])
-                ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(proposed_data, '$.last_name')) LIKE ?", ['%' . $this->search . '%']);
+                    ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(proposed_data, '$.first_name')) LIKE ?", ['%'.$this->search.'%'])
+                    ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(proposed_data, '$.last_name')) LIKE ?", ['%'.$this->search.'%']);
             });
         }
 
@@ -173,7 +245,7 @@ class DuplicateResolutionManagement extends Component
             DB::beginTransaction();
 
             $duplicate = PotentialDuplicate::findOrFail($duplicateId);
-            
+
             if ($duplicate->status !== 'pending') {
                 throw new \Exception('This duplicate has already been reviewed.');
             }
@@ -199,7 +271,7 @@ class DuplicateResolutionManagement extends Component
             DB::commit();
 
             $this->closeDetailModal();
-            
+
             session()->flash('message', 'Duplicate resolution processed successfully.');
 
             // Log the decision
@@ -212,7 +284,7 @@ class DuplicateResolutionManagement extends Component
 
         } catch (\Exception $e) {
             DB::rollBack();
-            session()->flash('error', 'Error processing duplicate resolution: ' . $e->getMessage());
+            session()->flash('error', 'Error processing duplicate resolution: '.$e->getMessage());
             Log::error('Duplicate resolution failed', [
                 'duplicate_id' => $duplicateId,
                 'decision' => $decision,
@@ -230,16 +302,16 @@ class DuplicateResolutionManagement extends Component
         $updateData = [];
 
         foreach ($proposedData as $field => $value) {
-            if (!empty($value) && $field !== 'id') {
+            if (! empty($value) && $field !== 'id') {
                 // Only update if existing field is empty or we have specific merge instructions
-                if (empty($existingParticipant->$field) || 
+                if (empty($existingParticipant->$field) ||
                     isset($this->mergeInstructions[$field]) && $this->mergeInstructions[$field] === 'use_new') {
                     $updateData[$field] = $value;
                 }
             }
         }
 
-        if (!empty($updateData)) {
+        if (! empty($updateData)) {
             $existingParticipant->update($updateData);
         }
 
@@ -251,26 +323,26 @@ class DuplicateResolutionManagement extends Component
             'original_proposed_data' => $proposedData,
             'confidence_score' => $duplicate->confidence_score,
         ];
-        
+
         $existingParticipant->update(['notes' => json_encode($notes)]);
     }
 
     protected function createNewParticipant(PotentialDuplicate $duplicate)
     {
         $proposedData = $duplicate->proposed_data;
-        
+
         // Remove any ID fields and ensure required fields are present
         unset($proposedData['id']);
 
         $householdId = $proposedData['household_id'] ?? $duplicate->matchedParticipant->household_id;
 
-        if (!$householdId) {
+        if (! $householdId) {
             throw new \RuntimeException('Unable to determine household for this participant.');
         }
 
         $proposedData['household_id'] = $householdId;
         $proposedData['is_head_of_household'] = $proposedData['is_head_of_household'] ?? false;
-        
+
         // Create the new participant
         $participant = Participant::create($proposedData);
 
@@ -283,7 +355,7 @@ class DuplicateResolutionManagement extends Component
             'confidence_score' => $duplicate->confidence_score,
             'resolved_at' => now()->toISOString(),
         ];
-        
+
         $participant->update(['notes' => json_encode($notes)]);
 
         return $participant;
@@ -323,8 +395,265 @@ class DuplicateResolutionManagement extends Component
 
         } catch (\Exception $e) {
             DB::rollBack();
-            session()->flash('error', 'Error during bulk processing: ' . $e->getMessage());
+            session()->flash('error', 'Error during bulk processing: '.$e->getMessage());
         }
+    }
+
+    // ------------------------------------------------------------------
+    // Merge Two Records tab — combine two existing participants
+    // ------------------------------------------------------------------
+
+    public function selectMergeSurvivor($id): void
+    {
+        $this->mergeSurvivorId = (int) $id;
+        $this->mergeSurvivorSearch = '';
+        $this->afterMergeSelectionChanged();
+    }
+
+    public function selectMergeLoser($id): void
+    {
+        $this->mergeLoserId = (int) $id;
+        $this->mergeLoserSearch = '';
+        $this->afterMergeSelectionChanged();
+    }
+
+    public function clearMergeSurvivor(): void
+    {
+        $this->mergeSurvivorId = null;
+        $this->afterMergeSelectionChanged();
+    }
+
+    public function clearMergeLoser(): void
+    {
+        $this->mergeLoserId = null;
+        $this->afterMergeSelectionChanged();
+    }
+
+    public function swapMergeDirection(): void
+    {
+        [$this->mergeSurvivorId, $this->mergeLoserId] = [$this->mergeLoserId, $this->mergeSurvivorId];
+        $this->afterMergeSelectionChanged();
+    }
+
+    protected function afterMergeSelectionChanged(): void
+    {
+        $this->mergeFieldChoices = [];
+        $this->mergeConflicts = [];
+
+        if (! $this->mergeSurvivorId || ! $this->mergeLoserId || $this->mergeSurvivorId === $this->mergeLoserId) {
+            return;
+        }
+
+        $survivor = Participant::find($this->mergeSurvivorId);
+        $loser = Participant::find($this->mergeLoserId);
+
+        if (! $survivor || ! $loser) {
+            return;
+        }
+
+        $protected = ['id', 'household_id', 'created_at', 'updated_at', 'notes', 'is_head_of_household', 'reference_data_set_id'];
+
+        foreach ($survivor->getFillable() as $field) {
+            if (in_array($field, $protected, true)) {
+                continue;
+            }
+
+            $sv = $survivor->$field;
+            $lv = $loser->$field;
+            $svScalar = is_array($sv) ? json_encode($sv) : $sv;
+            $lvScalar = is_array($lv) ? json_encode($lv) : $lv;
+
+            $bothPresent = ($svScalar !== null && $svScalar !== '') && ($lvScalar !== null && $lvScalar !== '');
+
+            if ($bothPresent && $svScalar !== $lvScalar) {
+                $this->mergeConflicts[] = [
+                    'field' => $field,
+                    'survivor' => is_array($sv) ? implode(', ', $sv) : (string) $sv,
+                    'loser' => is_array($lv) ? implode(', ', $lv) : (string) $lv,
+                ];
+                $this->mergeFieldChoices[$field] = 'use_survivor';
+            }
+        }
+    }
+
+    public function confirmMerge(ParticipantMergeService $mergeService): void
+    {
+        $this->authorizeAction('participants.merge', 'You do not have permission to merge participants.');
+
+        $survivor = Participant::find($this->mergeSurvivorId);
+        $loser = Participant::find($this->mergeLoserId);
+
+        if (! $survivor || ! $loser || $survivor->id === $loser->id) {
+            session()->flash('error', 'Select two different participants to merge.');
+
+            return;
+        }
+
+        try {
+            $choices = collect($this->mergeFieldChoices)
+                ->filter(fn ($choice) => $choice === 'use_loser')
+                ->map(fn () => 'use_loser')
+                ->toArray();
+
+            $summary = $mergeService->merge($survivor, $loser, $choices, Auth::id());
+
+            session()->flash('message', sprintf(
+                'Merged %s into %s. Reassigned %d enrollment(s), %d housing job(s), %d property(ies), %d communication log(s). Recovery snapshot: %s',
+                $loser->full_name,
+                $survivor->full_name,
+                $summary['program_enrollments_reassigned'] + $summary['service_enrollments_reassigned'],
+                $summary['housing_jobs_reassigned'],
+                $summary['properties_reassigned'],
+                $summary['communication_logs_reassigned'],
+                $summary['snapshot_path'],
+            ));
+
+            $this->resetMergeForm();
+        } catch (\Throwable $e) {
+            session()->flash('error', 'Merge failed: '.$e->getMessage());
+        }
+    }
+
+    public function resetMergeForm(): void
+    {
+        $this->mergeSurvivorId = null;
+        $this->mergeLoserId = null;
+        $this->mergeSurvivorSearch = '';
+        $this->mergeLoserSearch = '';
+        $this->mergeFieldChoices = [];
+        $this->mergeConflicts = [];
+    }
+
+    // ------------------------------------------------------------------
+    // Delete Participant tab — delete a participant and all associated records
+    // ------------------------------------------------------------------
+
+    public function selectDeleteParticipant($id, ParticipantDeletionService $deletionService): void
+    {
+        $participant = Participant::find($id);
+        if (! $participant) {
+            session()->flash('error', 'Participant not found.');
+
+            return;
+        }
+
+        $inspection = $deletionService->inspect($participant);
+
+        $this->deleteParticipantId = $participant->id;
+        $this->deleteParticipantName = $participant->full_name;
+        $this->deletePreview = $deletionService->previewCounts($participant);
+        $this->deleteNeedsDecision = $inspection['needs_decision'];
+        $this->deleteCoMembers = $inspection['other_members']
+            ->map(fn ($m) => ['id' => $m->id, 'name' => $m->full_name])
+            ->values()
+            ->toArray();
+        $this->deleteDecision = '';
+        $this->promoteToHeadId = null;
+        $this->deleteConfirmText = '';
+        $this->deleteSearch = '';
+    }
+
+    public function confirmDelete(ParticipantDeletionService $deletionService): void
+    {
+        $this->authorizeAction('participants.delete', 'You do not have permission to delete participants.');
+
+        if (strtoupper(trim($this->deleteConfirmText)) !== 'DELETE') {
+            session()->flash('error', 'Type DELETE to confirm.');
+
+            return;
+        }
+
+        $participant = Participant::find($this->deleteParticipantId);
+        if (! $participant) {
+            session()->flash('error', 'Participant not found.');
+            $this->resetDeleteForm();
+
+            return;
+        }
+
+        $options = [];
+        if ($this->deleteNeedsDecision) {
+            if ($this->deleteDecision === 'promote') {
+                if (! $this->promoteToHeadId) {
+                    session()->flash('error', 'Select a household member to promote to head.');
+
+                    return;
+                }
+                $options['promote_to_head_id'] = (int) $this->promoteToHeadId;
+            } elseif ($this->deleteDecision === 'force') {
+                $options['force'] = true;
+            } else {
+                session()->flash('error', 'Choose how to handle the household before deleting.');
+
+                return;
+            }
+        }
+
+        try {
+            $summary = $deletionService->delete($participant, $options, Auth::id());
+
+            session()->flash('message', sprintf(
+                'Deleted %s and all associated records. Recovery snapshot: %s',
+                $summary['participant_name'],
+                $summary['snapshot_path'],
+            ));
+
+            $this->resetDeleteForm();
+        } catch (HouseholdDecisionRequiredException $e) {
+            session()->flash('error', $e->getMessage());
+        } catch (\Throwable $e) {
+            session()->flash('error', 'Delete failed: '.$e->getMessage());
+        }
+    }
+
+    public function resetDeleteForm(): void
+    {
+        $this->deleteParticipantId = null;
+        $this->deleteParticipantName = null;
+        $this->deletePreview = [];
+        $this->deleteNeedsDecision = false;
+        $this->deleteCoMembers = [];
+        $this->deleteDecision = '';
+        $this->promoteToHeadId = null;
+        $this->deleteConfirmText = '';
+        $this->deleteSearch = '';
+    }
+
+    /**
+     * Load a participant with the relations needed for the side-by-side merge comparison.
+     */
+    protected function loadMergeRecord($id)
+    {
+        return Participant::with([
+            'household.headOfHousehold',
+            'programEnrollments.program',
+            'serviceEnrollments.service',
+        ])
+            ->withCount(['properties', 'housingJobs'])
+            ->find($id);
+    }
+
+    /**
+     * Search participants by name / household code for the merge & delete pickers.
+     */
+    protected function searchParticipants(string $term, array $excludeIds = [])
+    {
+        $term = trim($term);
+        if (strlen($term) < 2) {
+            return collect();
+        }
+
+        return Participant::with('household')
+            ->where(function ($q) use ($term) {
+                $q->where('first_name', 'like', "%{$term}%")
+                    ->orWhere('last_name', 'like', "%{$term}%")
+                    ->orWhere('email', 'like', "%{$term}%")
+                    ->orWhereHas('household', fn ($h) => $h->where('household_code', 'like', "%{$term}%"));
+            })
+            ->when($excludeIds, fn ($q) => $q->whereNotIn('id', $excludeIds))
+            ->orderBy('last_name')
+            ->limit(8)
+            ->get();
     }
 
     public function sortBy($field)

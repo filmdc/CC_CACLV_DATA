@@ -43,7 +43,8 @@ class SetupAdminPermissions extends Command
             ['name' => 'participants.create', 'display_name' => 'Create Participants', 'category' => 'Participants'],
             ['name' => 'participants.edit', 'display_name' => 'Edit Participants', 'category' => 'Participants'],
             ['name' => 'participants.delete', 'display_name' => 'Delete Participants', 'category' => 'Participants'],
-            
+            ['name' => 'participants.merge', 'display_name' => 'Merge Participants', 'category' => 'Participants'],
+
             // Households
             ['name' => 'households.view', 'display_name' => 'View Households', 'category' => 'Households'],
             ['name' => 'households.create', 'display_name' => 'Create Households', 'category' => 'Households'],

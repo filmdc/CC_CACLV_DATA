@@ -124,6 +124,9 @@
                 @if(auth()->user()->hasAnyPermission(['users.view', 'roles.view', 'poverty_guidelines.view', 'reference_data.view', 'reference_data_sets.view', 'admin.access', 'feedback.view_all', 'audit.login_view', 'audit.view', 'documentation.manage', 'contracts.import_legacy']) || auth()->user()->isAdmin())
                 <flux:navlist.group :heading="__('Administration')" class="grid">
                     <flux:navlist.item icon="cog-6-tooth" :href="route('admin.panel')" :current="request()->routeIs('admin.panel')" wire:navigate>{{ __('Admin Panel') }}</flux:navlist.item>
+                    @if(auth()->user()->hasAnyPermission(['participants.view', 'participants.create', 'participants.import', 'participants.merge', 'participants.delete']) || auth()->user()->isAdmin())
+                        <flux:navlist.item icon="users" :href="route('duplicate.resolution')" :current="request()->routeIs('duplicate.resolution')" wire:navigate>{{ __('Merge & Duplicates') }}</flux:navlist.item>
+                    @endif
                     @if(auth()->user()->hasPermission('users.view'))
                         <flux:navlist.item icon="users" :href="route('users.index')" :current="request()->routeIs('users.*') || request()->routeIs('user.management') || request()->routeIs('user.show')" wire:navigate>{{ __('Users') }}</flux:navlist.item>
                     @endif

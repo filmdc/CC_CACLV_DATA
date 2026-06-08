@@ -19,7 +19,7 @@
             <div class="p-4 bg-gray-50 dark:bg-zinc-700 border-b border-gray-200 dark:border-zinc-600">
                 <div class="flex items-center justify-between">
                     <div class="flex-1 max-w-md">
-                        <input type="text" wire:model.live="search" placeholder="Search participants..." 
+                        <input type="text" wire:model.live="search" placeholder="Search participants..."
                                class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                 </div>
@@ -376,7 +376,7 @@
                 </thead>
                 <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-zinc-600">
                     @forelse($participants as $participant)
-                        <tr>
+                        <tr wire:key="participant-row-{{ $participant->id }}">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div>
                                     <a href="{{ route('participant.show', $participant->id) }}"
@@ -426,20 +426,6 @@
                                             <span class="text-gray-400 dark:text-gray-500 cursor-not-allowed"
                                                   title="You need program access to edit this participant">
                                                 Edit
-                                            </span>
-                                        @endif
-                                    @endif
-                                    @if(!$participant->is_head_of_household && $this->can('participants.delete'))
-                                        @if($this->canEditParticipant($participant->id))
-                                            <button wire:click="deleteParticipant({{ $participant->id }})"
-                                                    onclick="return confirm('Are you sure you want to delete this participant?')"
-                                                    class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
-                                                Delete
-                                            </button>
-                                        @else
-                                            <span class="text-gray-400 dark:text-gray-500 cursor-not-allowed"
-                                                  title="You need program access to delete this participant">
-                                                Delete
                                             </span>
                                         @endif
                                     @endif
