@@ -685,7 +685,18 @@
                     </span>
                     @if($viewingLog->converted_to_job_id)
                         <span class="px-3 py-1 rounded-full text-sm bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300 flex items-center gap-2">
-                            <span>Converted to Project: {{ $viewingLog->convertedToJob->job_number ?? 'N/A' }}</span>
+                            @if($viewingLog->convertedToJob)
+                                <a href="{{ route('project.management', $viewingLog->convertedToJob->id) }}"
+                                   wire:navigate
+                                   class="font-medium underline hover:text-emerald-900 dark:hover:text-emerald-200"
+                                   title="Open project {{ $viewingLog->convertedToJob->job_number }}">
+                                    Converted to Project: {{ $viewingLog->convertedToJob->job_number }}
+                                </a>
+                            @else
+                                {{-- FK is onDelete(set null); if the project was deleted, converted_to_job_id
+                                     is already cleared and this block won't render. This is a defensive fallback. --}}
+                                <span>Converted to Project (project no longer available)</span>
+                            @endif
                             @if(auth()->user()->isAdmin())
                                 <button wire:click="resetConversion({{ $viewingLog->id }})"
                                         wire:confirm="Are you sure you want to reset this conversion? This will allow you to re-convert this communication log with the updated validation and automation. The original project ({{ $viewingLog->convertedToJob->job_number ?? 'N/A' }}) will not be deleted."
@@ -939,13 +950,19 @@
                 @if($viewingLog->housing_job_id)
                     @php $jb = $viewingLog->convertedToJob ?? \App\Models\HousingJob::find($viewingLog->housing_job_id); @endphp
                     @if($jb)
-                        <div class="mb-4 flex items-center gap-3 px-4 py-3 rounded-md bg-teal-700 text-white shadow">
+                        <a href="{{ route('project.management', $jb->id) }}"
+                           wire:navigate
+                           class="mb-4 flex items-center gap-3 px-4 py-3 rounded-md bg-teal-700 hover:bg-teal-600 text-white shadow transition-colors"
+                           title="Open project {{ $jb->job_number }}">
                             <span class="inline-flex items-center px-2 py-0.5 rounded-sm bg-white/15 font-mono text-xs">{{ $jb->job_number }}</span>
                             <div class="min-w-0 flex-1">
                                 <div class="text-[10px] uppercase tracking-wider text-white/70">Project</div>
                                 <div class="text-sm font-medium truncate">{{ $jb->job_title }}</div>
                             </div>
-                        </div>
+                            <svg class="w-4 h-4 text-white/70 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
                     @endif
                 @endif
 
