@@ -235,6 +235,9 @@
                             @if($r->milestone_gate_text)
                                 <p style="font-size: 11px; color: var(--color-calv-red); margin-top: 3px;">⛔ {{ $r->milestone_gate_text }}</p>
                             @endif
+                            @if(filled($r->worker_note))
+                                <p style="font-size: 11px; color: var(--color-calv-slate-65); margin-top: 3px; white-space: pre-line;">📝 {{ \Illuminate\Support\Str::limit($r->worker_note, 280) }}</p>
+                            @endif
                         </div>
 
                         @if(! $done)
@@ -254,6 +257,21 @@
                                     class="rounded text-white"
                                     style="padding: 4px 9px; font-family: var(--font-calv-sub); font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; background: var(--color-calv-amber); color: #5a4109; border: none; cursor: pointer;">
                                 Reopen
+                            </button>
+                        @endif
+
+                        {{-- Note (📝): available for EVERY requirement, including
+                             fund-code-sourced ones whose Edit form is hidden below.
+                             Teal when a note already exists. --}}
+                        @if($this->can('projects.manage'))
+                            <button wire:click="openRequirementNote({{ $r->id }})" aria-label="Note"
+                                    title="{{ filled($r->worker_note) ? 'Edit note' : 'Add note' }}"
+                                    class="inline-flex items-center justify-center rounded"
+                                    style="width: 28px; height: 28px; background: transparent; color: {{ filled($r->worker_note) ? 'var(--color-calv-teal)' : 'var(--color-calv-slate-65)' }}; border: none; cursor: pointer;">
+                                <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                                    <path d="M3 2.5h7l3 3V13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+                                    <path d="M5 7h6M5 9.5h6M5 12h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                                </svg>
                             </button>
                         @endif
 

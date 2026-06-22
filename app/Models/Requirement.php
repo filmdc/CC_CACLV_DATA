@@ -98,6 +98,7 @@ class Requirement extends Model implements HasMedia, HasMediaAuthorization
         'completed_at',
         'completed_by_user_id',
         'completion_note',
+        'worker_note',
         'override_reason',
         'overridden_by_user_id',
         'created_by',
