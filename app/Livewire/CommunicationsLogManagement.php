@@ -125,6 +125,12 @@ class CommunicationsLogManagement extends Component
 
     public string $reqActionReason = '';
 
+    // Focus 3 — free-form, editable per-requirement note (e.g. "only need
+    // paystub covering 4/1–4/13, all others in file"). Distinct from the
+    // append-only `notes` audit trail — this is the standing annotation
+    // the intake worker maintains and the panel surfaces under each item.
+    public string $reqWorkerNote = '';
+
     // Focus 3 — pending file upload for the acted-on document requirement.
     // Multiple files allowed (one requirement, many supporting documents).
     public $requirementFiles = [];
@@ -1123,15 +1129,48 @@ class CommunicationsLogManagement extends Component
         $this->authorizeAction('communications_log.edit');
         $this->actingOnRequirementId = $id;
         $this->reqActionReason = '';
-        $this->resetErrorBag(['reqActionReason']);
+        $this->reqWorkerNote = \App\Models\IntakeRequirement::find($id)?->worker_note ?? '';
+        $this->resetErrorBag(['reqActionReason', 'reqWorkerNote']);
     }
 
     public function closeRequirementActionModal(): void
     {
         $this->actingOnRequirementId = null;
         $this->reqActionReason = '';
+        $this->reqWorkerNote = '';
         $this->requirementFiles = [];
-        $this->resetErrorBag(['reqActionReason', 'requirementFiles', 'requirementFiles.*']);
+        $this->resetErrorBag(['reqActionReason', 'reqWorkerNote', 'requirementFiles', 'requirementFiles.*']);
+    }
+
+    /**
+     * Save the free-form worker note on the acting-on requirement. Unlike
+     * the status-transition actions, this is available in any status and
+     * does not change the lifecycle — it only persists the standing
+     * annotation. Editing replaces the note in full (it is not appended,
+     * unlike the audit-trail `notes` column).
+     */
+    public function saveRequirementNote(): void
+    {
+        $this->authorizeAction('communications_log.edit');
+
+        if (! $this->actingOnRequirementId) {
+            return;
+        }
+
+        $this->validate(['reqWorkerNote' => ['nullable', 'string', 'max:2000']]);
+
+        $req = \App\Models\IntakeRequirement::findOrFail($this->actingOnRequirementId);
+
+        if ($req->communication_log_id !== (int) $this->viewingId) {
+            abort(403);
+        }
+
+        $note = trim($this->reqWorkerNote);
+        $req->worker_note = $note === '' ? null : $note;
+        $req->updated_by_user_id = Auth::id();
+        $req->save();
+
+        session()->flash('success', 'Note saved.');
     }
 
     /**

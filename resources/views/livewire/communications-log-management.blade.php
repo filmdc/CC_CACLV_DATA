@@ -1030,6 +1030,27 @@
                                     @endif
                                 </p>
 
+                                {{-- Free-form note: visible under the item on the panel; editable
+                                     in any status. Used for partial-receipt annotations, e.g.
+                                     "only need paystub covering 4/1–4/13, all others in file". --}}
+                                <div class="mb-4 p-3 rounded border border-gray-200 dark:border-zinc-700 bg-gray-50/60 dark:bg-zinc-900/30">
+                                    <label class="block text-[11px] font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300 mb-2">
+                                        Note
+                                    </label>
+                                    <textarea wire:model.defer="reqWorkerNote" rows="2"
+                                              class="w-full px-2 py-1 text-sm rounded border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500"
+                                              placeholder="e.g. only need paystub covering 4/1–4/13, all others in file"></textarea>
+                                    @error('reqWorkerNote') <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+                                    <div class="flex justify-end mt-2">
+                                        <button type="button" wire:click="saveRequirementNote"
+                                                wire:loading.attr="disabled" wire:target="saveRequirementNote"
+                                                class="px-3 py-1.5 text-sm rounded bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-60">
+                                            <span wire:loading.remove wire:target="saveRequirementNote">Save note</span>
+                                            <span wire:loading wire:target="saveRequirementNote">Saving…</span>
+                                        </button>
+                                    </div>
+                                </div>
+
                                 {{-- Phase 12.1: the Edit modal only handles CHANGES — uploading
                                      new files + status transitions. Viewing/downloading existing
                                      attachments happens inline on the requirements panel rows. --}}

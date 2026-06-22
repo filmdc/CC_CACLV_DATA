@@ -115,11 +115,11 @@
                         @endif
                     </div>
 
-                    @php
-                        $sub = $item->notes ? \Illuminate\Support\Str::limit($item->notes, 80) : null;
-                    @endphp
-                    @if($sub)
-                        <div class="text-[11.5px] text-calv-slate-65 mt-0.5 truncate">{{ $sub }}</div>
+                    {{-- Free-form worker note (partial-receipt annotations etc.).
+                         Wraps and preserves line breaks; the append-only audit
+                         trail (`notes`) surfaces in the Activity feed instead. --}}
+                    @if(filled($item->worker_note))
+                        <div class="text-[11.5px] text-calv-slate-65 mt-0.5 whitespace-pre-line">{{ \Illuminate\Support\Str::limit($item->worker_note, 280) }}</div>
                     @endif
 
                     @if(is_array($item->via) && count($item->via))
