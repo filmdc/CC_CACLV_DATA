@@ -110,6 +110,7 @@ class IntakeRequirement extends Model implements HasMedia
         'source_label_snapshot',
         'is_orphaned',
         'notes',
+        'worker_note',
         'created_by_user_id',
         'updated_by_user_id',
     ];

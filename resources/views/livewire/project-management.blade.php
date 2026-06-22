@@ -1119,6 +1119,14 @@
                                placeholder="e.g., must be done before construction starts"
                                class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500">
                     </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Note (optional)</label>
+                        <textarea wire:model="requirement_worker_note" rows="2"
+                                  placeholder="e.g. only need paystub covering 4/1–4/13, all others in file"
+                                  class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Shows under the requirement; use for partial receipts or follow-up reminders.</p>
+                        @error('requirement_worker_note') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                    </div>
                 </div>
                 <div class="mt-6 flex justify-end space-x-3">
                     <button wire:click="$set('showRequirementForm', false)"
@@ -1128,6 +1136,35 @@
                     <button wire:click="saveRequirement"
                             class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
                         Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if($notingRequirementId)
+        {{-- Note-only editor (per-row 📝). Works for every requirement,
+             including fund-code-sourced ones that have no Edit form. --}}
+        @php $notingReq = \App\Models\Requirement::find($notingRequirementId); @endphp
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click.self="cancelRequirementNote">
+            <div class="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-md w-full mx-4">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">Note</h3>
+                @if($notingReq)
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-3 truncate">{{ $notingReq->title }}</p>
+                @endif
+                <textarea wire:model="requirement_note_text" rows="3"
+                          placeholder="e.g. only need paystub covering 4/1–4/13, all others in file"
+                          class="w-full rounded-md border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Shows under the requirement; use for partial receipts or follow-up reminders.</p>
+                @error('requirement_note_text') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                <div class="mt-5 flex justify-end space-x-3">
+                    <button wire:click="cancelRequirementNote"
+                            class="px-4 py-2 bg-gray-200 dark:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-zinc-500">
+                        Cancel
+                    </button>
+                    <button wire:click="saveRequirementNote"
+                            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                        Save note
                     </button>
                 </div>
             </div>

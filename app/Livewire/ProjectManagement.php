@@ -1127,6 +1127,19 @@ class ProjectManagement extends Component
 
     public $requirement_milestone_gate_text = '';
 
+    // Free-form, editable per-requirement note (partial-receipt
+    // annotations, follow-up reminders). Mirrors the intake-phase
+    // IntakeRequirement worker note; distinct from completion_note,
+    // which is captured only at completion time.
+    public $requirement_worker_note = '';
+
+    // Per-row note editor — a lightweight, note-only modal available for
+    // ALL requirements, including fund-code-sourced ones whose full Edit
+    // form is intentionally hidden. Keeps notes annotatable everywhere.
+    public $notingRequirementId = null;
+
+    public $requirement_note_text = '';
+
     public $showCompleteRequirementModal = false;
 
     public $completingRequirementId = null;
@@ -1161,6 +1174,7 @@ class ProjectManagement extends Component
         $this->requirement_description = $req->description ?? '';
         $this->requirement_owner_id = $req->owner_user_id ?? '';
         $this->requirement_milestone_gate_text = $req->milestone_gate_text ?? '';
+        $this->requirement_worker_note = $req->worker_note ?? '';
         $this->showRequirementForm = true;
     }
 
@@ -1172,6 +1186,7 @@ class ProjectManagement extends Component
             'requirement_description' => 'nullable|string',
             'requirement_owner_id' => 'nullable|exists:users,id',
             'requirement_milestone_gate_text' => 'nullable|string',
+            'requirement_worker_note' => 'nullable|string|max:2000',
         ]);
 
         $owner = $this->requirement_owner_id !== '' ? User::find($this->requirement_owner_id) : null;
@@ -1188,6 +1203,7 @@ class ProjectManagement extends Component
                 'title' => $this->requirement_title,
                 'description' => $this->requirement_description !== '' ? $this->requirement_description : null,
                 'milestone_gate_text' => $this->requirement_milestone_gate_text !== '' ? $this->requirement_milestone_gate_text : null,
+                'worker_note' => trim($this->requirement_worker_note) !== '' ? trim($this->requirement_worker_note) : null,
                 'updated_by' => $actor->id,
             ]);
             $req->save();
@@ -1215,6 +1231,7 @@ class ProjectManagement extends Component
                 [
                     'description' => $this->requirement_description !== '' ? $this->requirement_description : null,
                     'milestone_gate_text' => $this->requirement_milestone_gate_text !== '' ? $this->requirement_milestone_gate_text : null,
+                    'worker_note' => trim($this->requirement_worker_note) !== '' ? trim($this->requirement_worker_note) : null,
                 ]
             );
 
@@ -1224,6 +1241,58 @@ class ProjectManagement extends Component
         $this->showRequirementForm = false;
         $this->resetRequirementForm();
         $this->refreshJob();
+    }
+
+    /**
+     * Open the lightweight, note-only editor for a single requirement.
+     * Available for every requirement regardless of source_type — this is
+     * the entry point for annotating fund-code-sourced requirements, whose
+     * full Edit form is intentionally suppressed in the row UI.
+     */
+    public function openRequirementNote(int $id): void
+    {
+        $this->authorizeAction('projects.manage');
+
+        $req = Requirement::findOrFail($id);
+        $this->authorizeRequirementBelongsToJob($req);
+
+        $this->notingRequirementId = $req->id;
+        $this->requirement_note_text = $req->worker_note ?? '';
+        $this->resetErrorBag(['requirement_note_text']);
+    }
+
+    public function cancelRequirementNote(): void
+    {
+        $this->notingRequirementId = null;
+        $this->requirement_note_text = '';
+        $this->resetErrorBag(['requirement_note_text']);
+    }
+
+    /**
+     * Persist the worker note. Replaces the note in full (not appended);
+     * an empty note clears it. Does not touch the requirement's status.
+     */
+    public function saveRequirementNote(): void
+    {
+        $this->authorizeAction('projects.manage');
+
+        if (! $this->notingRequirementId) {
+            return;
+        }
+
+        $this->validate(['requirement_note_text' => ['nullable', 'string', 'max:2000']]);
+
+        $req = Requirement::findOrFail($this->notingRequirementId);
+        $this->authorizeRequirementBelongsToJob($req);
+
+        $note = trim($this->requirement_note_text);
+        $req->worker_note = $note === '' ? null : $note;
+        $req->updated_by = Auth::id();
+        $req->save();
+
+        $this->cancelRequirementNote();
+        $this->refreshJob();
+        session()->flash('success', 'Note saved.');
     }
 
     public function toggleTaskRequirementComplete(int $id): void
@@ -1352,6 +1421,7 @@ class ProjectManagement extends Component
         $this->requirement_description = '';
         $this->requirement_owner_id = '';
         $this->requirement_milestone_gate_text = '';
+        $this->requirement_worker_note = '';
     }
 
     protected function authorizeRequirementBelongsToJob(Requirement $req): void
