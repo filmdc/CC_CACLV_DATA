@@ -1433,6 +1433,74 @@ class ProjectManagement extends Component
         $this->refreshJob();
     }
 
+    /**
+     * Build the normalized row set for the central Files tab: every
+     * uploaded document on this job, regardless of where it was attached.
+     * Two real upload paths feed a job — project-requirement attachments
+     * ('attachments') and milestone documents incl. generated PDFs
+     * ('documents'). Each row is a flat array consumed by <x-files-table>.
+     * Remove is offered only to projects.manage users and routes back to
+     * the existing per-type delete handlers.
+     */
+    public function fileRows(): array
+    {
+        $previewable = [
+            'application/pdf',
+            'image/jpeg', 'image/jpg', 'image/png', 'image/gif',
+            'image/webp', 'image/svg+xml',
+            'text/plain', 'text/csv',
+        ];
+        $canManage = $this->can('projects.manage');
+        $rows = [];
+
+        $requirements = Requirement::where('housing_job_id', $this->job->id)
+            ->where('type', Requirement::TYPE_DOCUMENT)
+            ->with('media')
+            ->get();
+        foreach ($requirements as $req) {
+            foreach ($req->getMedia('attachments') as $m) {
+                $rows[] = [
+                    'name' => $m->file_name,
+                    'mime' => $m->mime_type,
+                    'size' => $m->human_readable_size,
+                    'source' => 'Requirement · '.$req->title,
+                    'uploaded' => $m->created_at,
+                    'uploaded_ts' => $m->created_at?->getTimestamp() ?? 0,
+                    'preview_url' => route('media.preview', $m->id),
+                    'download_url' => route('media.download', $m->id),
+                    'previewable' => in_array($m->mime_type, $previewable, true),
+                    'remove_call' => $canManage ? "deleteRequirementMedia({$req->id}, {$m->id})" : null,
+                ];
+            }
+        }
+
+        $documents = MilestoneDocument::whereIn('milestone_id', $this->job->milestones->pluck('id'))
+            ->with(['media', 'milestone'])
+            ->get();
+        foreach ($documents as $doc) {
+            $docLabel = ucwords(str_replace('_', ' ', (string) ($doc->document_type ?? 'document')));
+            $milestoneLabel = $doc->milestone?->name ? ' ('.$doc->milestone->name.')' : '';
+            foreach ($doc->getMedia('documents') as $m) {
+                $rows[] = [
+                    'name' => $m->file_name,
+                    'mime' => $m->mime_type,
+                    'size' => $m->human_readable_size,
+                    'source' => 'Milestone doc · '.$docLabel.$milestoneLabel,
+                    'uploaded' => $m->created_at,
+                    'uploaded_ts' => $m->created_at?->getTimestamp() ?? 0,
+                    'preview_url' => route('media.preview', $m->id),
+                    'download_url' => route('media.download', $m->id),
+                    'previewable' => in_array($m->mime_type, $previewable, true),
+                    'remove_call' => $canManage ? "deleteDocumentFile({$doc->id}, {$m->id})" : null,
+                ];
+            }
+        }
+
+        usort($rows, fn ($a, $b) => $b['uploaded_ts'] <=> $a['uploaded_ts']);
+
+        return $rows;
+    }
+
     public function deleteRequirement(int $id): void
     {
         $req = Requirement::findOrFail($id);

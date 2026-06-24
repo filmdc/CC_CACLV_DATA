@@ -240,6 +240,12 @@
                     style="padding: 12px 14px; background: transparent; border-color: {{ $activeTab === 'budget' ? 'var(--color-calv-teal)' : 'transparent' }}; color: {{ $activeTab === 'budget' ? 'var(--color-calv-teal)' : 'var(--color-calv-slate-65)' }}; font-family: var(--font-calv-sub); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;">
                 Budget & Expenses
             </button>
+            <button wire:click="$set('activeTab', 'files')"
+                    data-test="tab-files"
+                    class="border-b-2 transition"
+                    style="padding: 12px 14px; background: transparent; border-color: {{ $activeTab === 'files' ? 'var(--color-calv-teal)' : 'transparent' }}; color: {{ $activeTab === 'files' ? 'var(--color-calv-teal)' : 'var(--color-calv-slate-65)' }}; font-family: var(--font-calv-sub); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;">
+                Files
+            </button>
         </div>
     </header>
 
@@ -531,7 +537,7 @@
                 </div>
             </div>
 
-        @else
+        @elseif($activeTab === 'budget')
             {{-- Project Detail redesign §4.4 — Budget & Expenses tab.
                  Three summary cards on top, per-scope burn bars middle, expense
                  ledger bottom. CALV-styled throughout; replaces the legacy
@@ -767,6 +773,22 @@
                             </div>
                         @endif
                     </section>
+                </div>
+            </div>
+
+        @elseif($activeTab === 'files')
+            {{-- Central Files view: every uploaded document on this job,
+                 aggregated from project requirements and milestone documents,
+                 newest first. View / Download / Remove (Remove gated by
+                 projects.manage). Removing a requirement's last file reopens
+                 it via the shared deleteRequirementMedia handler. --}}
+            <div class="p-6" data-test="files-tab">
+                <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-700">
+                    <div class="px-4 py-3 border-b border-gray-200 dark:border-zinc-700">
+                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Files on this project</h3>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">All documents uploaded to requirements and milestones, newest first.</p>
+                    </div>
+                    <x-files-table :rows="$this->fileRows()" empty="No documents have been uploaded to this project yet." />
                 </div>
             </div>
         @endif
