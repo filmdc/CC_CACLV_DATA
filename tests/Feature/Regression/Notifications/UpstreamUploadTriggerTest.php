@@ -225,7 +225,7 @@ it('fires once per save action even when multiple files land in a single upload'
 
     Livewire::actingAs($this->admin)
         ->test(ProjectManagement::class, ['id' => $job->id])
-        ->call('showCompleteRequirementModal', $upstream->id)
+        ->call('openCompleteRequirementModal', $upstream->id)
         ->set('completionFiles', [
             UploadedFile::fake()->createWithContent('a.pdf', $pdfContent),
             UploadedFile::fake()->createWithContent('b.pdf', $pdfContent),
