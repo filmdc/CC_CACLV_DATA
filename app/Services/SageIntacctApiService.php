@@ -2736,6 +2736,11 @@ XML;
                 $allReceipts = array_merge($allReceipts, $receipts);
             }
 
+            // Replace each receipt's deposit date with the REAL bank deposit date
+            // (DEPOSIT.BATCHDATE on the parent deposit record). Receipts still sitting
+            // in undeposited funds get depositdate=null and deposited=false.
+            $allReceipts = $this->resolveRealDepositDates($allReceipts);
+
             Log::info('Sage Intacct: Other Receipts read completed', [
                 'queried' => count($recordNos),
                 'found' => count($allReceipts),
@@ -2791,7 +2796,7 @@ XML;
 
             $apiUrl = 'https://api.intacct.com/ia/api/v1/companies/'.urlencode($this->userToken->company_id).
                       '/objects/OTHERRECEIPTS?filter='.$filter.
-                      '&fields=RECORDNO,DESCRIPTION2,DOCNUMBER,WHENPAID,WHENCREATED,DEPOSITDATE,BANKACCOUNTID,STATE,TOTALENTERED,PROJECTID,DEPARTMENTID';
+                      '&fields=RECORDNO,DESCRIPTION2,DOCNUMBER,WHENPAID,WHENCREATED,DEPOSITDATE,PARENTPAYMENT,BANKACCOUNTID,STATE,TOTALENTERED,PROJECTID,DEPARTMENTID';
 
             Log::info('Sage Intacct OAuth: Querying Other Receipts', [
                 'record_count' => count($recordNos),
@@ -2832,7 +2837,12 @@ XML;
                     'refid' => $receipt['REFID'] ?? $receipt['refid'] ?? null,
                     'paymentdate' => $receipt['PAYMENTDATE'] ?? $receipt['paymentdate'] ?? null,
                     'receiveddate' => $receipt['RECEIVEDDATE'] ?? $receipt['receiveddate'] ?? null,
-                    'depositdate' => $receipt['DEPOSITDATE'] ?? $receipt['depositdate'] ?? null,
+                    // Receipt's own date (undeposited-funds entry ≈ gift date) — NOT the
+                    // bank deposit date. Real deposit date resolved in resolveRealDepositDates().
+                    'entrydepositdate' => $receipt['DEPOSITDATE'] ?? $receipt['depositdate'] ?? null,
+                    'depositdate' => null,
+                    'parentpayment' => (string) ($receipt['PARENTPAYMENT'] ?? $receipt['parentpayment'] ?? ''),
+                    'deposited' => false,
                     'bankaccountid' => $receipt['BANKACCOUNTID'] ?? $receipt['bankaccountid'] ?? null,
                     'undepglaccountno' => $receipt['UNDEPGLACCOUNTNO'] ?? $receipt['undepglaccountno'] ?? null,
                     'state' => $receipt['STATE'] ?? $receipt['state'] ?? null,
@@ -2841,6 +2851,8 @@ XML;
                     'departmentid' => $receipt['DEPARTMENTID'] ?? $receipt['departmentid'] ?? null,
                 ];
             }
+
+            $normalizedReceipts = $this->resolveRealDepositDates($normalizedReceipts);
 
             Log::info('Sage Intacct OAuth: Other Receipts query completed', [
                 'queried' => count($recordNos),
@@ -2976,7 +2988,14 @@ XML;
                     'refid' => (string) ($node->DOCNUMBER ?? $node->REFID ?? ''),
                     'paymentdate' => (string) ($node->WHENPAID ?? $node->PAYMENTDATE ?? ''),
                     'receiveddate' => (string) ($node->WHENCREATED ?? $node->RECEIVEDDATE ?? ''),
-                    'depositdate' => $rawDepositDate,
+                    // NOTE: OTHERRECEIPTS.DEPOSITDATE is the date the gift was recorded
+                    // INTO undeposited funds (≈ gift/entry date) — NOT the bank deposit
+                    // date. The real deposit date is DEPOSIT.BATCHDATE on the parent
+                    // deposit record (PARENTPAYMENT). It is resolved in resolveRealDepositDates().
+                    'entrydepositdate' => $rawDepositDate,
+                    'depositdate' => null,
+                    'parentpayment' => (string) ($node->PARENTPAYMENT ?? ''),
+                    'deposited' => false,
                     'bankaccountid' => (string) ($node->BANKACCOUNTID ?? ''),
                     'undepglaccountno' => (string) ($node->UNDEPACCTNO ?? $node->UNDEPGLACCOUNTNO ?? ''),
                     'state' => (string) ($node->STATE ?? ''),
@@ -3000,6 +3019,233 @@ XML;
 
             return [];
         }
+    }
+
+    /**
+     * Resolve the REAL bank deposit date for each Other Receipt.
+     *
+     * In the undeposited-funds workflow a gift is first recorded into undeposited
+     * funds (the receipt's own DEPOSITDATE = that entry date, ≈ the gift date) and
+     * is only later deposited via a separate DEPOSIT (bank deposit) transaction.
+     * The actual deposit date lives on that parent deposit's BATCHDATE, reached
+     * through the receipt's PARENTPAYMENT key.
+     *
+     * For each receipt this sets:
+     *   - 'depositdate' => the parent DEPOSIT.BATCHDATE (Y-m-d), or null if not yet deposited
+     *   - 'deposited'   => true only when a real parent deposit date was found
+     *
+     * Receipts with no PARENTPAYMENT are still in undeposited funds and are left
+     * with depositdate=null / deposited=false so callers skip them until a later run.
+     *
+     * @param  array  $receipts  Receipts as built by the XML/OAuth query paths
+     * @return array The same receipts with resolved deposit dates
+     */
+    private function resolveRealDepositDates(array $receipts): array
+    {
+        $parentKeys = [];
+        foreach ($receipts as $receipt) {
+            $parent = $receipt['parentpayment'] ?? '';
+            if ($parent !== '' && $parent !== '0') {
+                $parentKeys[] = (int) $parent;
+            }
+        }
+
+        if (empty($parentKeys)) {
+            return $receipts;
+        }
+
+        $batchDates = $this->readDepositBatchDates(array_values(array_unique($parentKeys)));
+
+        foreach ($receipts as &$receipt) {
+            $parent = (string) ($receipt['parentpayment'] ?? '');
+            if ($parent !== '' && isset($batchDates[$parent]) && ! empty($batchDates[$parent])) {
+                $receipt['depositdate'] = $batchDates[$parent];
+                $receipt['deposited'] = true;
+            }
+        }
+        unset($receipt);
+
+        return $receipts;
+    }
+
+    /**
+     * Read DEPOSIT records by key and return a map of RECORDNO => BATCHDATE (Y-m-d).
+     *
+     * BATCHDATE is the deposit-slip date — the true bank deposit date. Falls back to
+     * the deposit's WHENCREATED if BATCHDATE is absent. Dispatches to the XML or OAuth
+     * transport to match the configured Sage API.
+     *
+     * @param  array  $depositKeys  DEPOSIT RECORDNO values
+     * @return array  Map keyed by RECORDNO (string) => 'Y-m-d'
+     */
+    private function readDepositBatchDates(array $depositKeys): array
+    {
+        if (empty($depositKeys)) {
+            return [];
+        }
+
+        try {
+            if ($this->setting->isXmlApi()) {
+                return $this->readDepositBatchDatesXml($depositKeys);
+            }
+
+            return $this->readDepositBatchDatesOAuth($depositKeys);
+        } catch (\Exception $e) {
+            // Fail closed: an empty map means receipts are treated as not-yet-deposited
+            // and retried on a later run, rather than writing a wrong date to DonorPerfect.
+            Log::error('Sage Intacct: readDepositBatchDates failed', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return [];
+        }
+    }
+
+    /**
+     * Read DEPOSIT.BATCHDATE via XML Web Services (read by keys, max 100 per call).
+     */
+    private function readDepositBatchDatesXml(array $depositKeys): array
+    {
+        if (! $this->sessionId) {
+            $authResult = $this->authenticate();
+            if (! ($authResult['success'] ?? false)) {
+                return [];
+            }
+        }
+
+        $map = [];
+
+        foreach (array_chunk($depositKeys, 100) as $chunk) {
+            $controlId = $this->generateControlId();
+            $functionId = $this->generateControlId();
+            $authSection = $this->sessionId
+                ? "<sessionid>{$this->sessionId}</sessionid>"
+                : "<login>
+                        <userid>{$this->setting->web_services_user_id}</userid>
+                        <companyid>{$this->setting->company_id}</companyid>
+                        <password>{$this->setting->web_services_password}</password>
+                    </login>";
+            $keysList = implode(',', array_map('intval', $chunk));
+
+            $xmlRequest = <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<request>
+    <control>
+        <senderid>{$this->setting->sender_id}</senderid>
+        <password>{$this->setting->sender_password}</password>
+        <controlid>{$controlId}</controlid>
+        <uniqueid>false</uniqueid>
+        <dtdversion>3.0</dtdversion>
+        <includewhitespace>false</includewhitespace>
+    </control>
+    <operation>
+        <authentication>
+            {$authSection}
+        </authentication>
+        <content>
+            <function controlid="{$functionId}">
+                <read>
+                    <object>DEPOSIT</object>
+                    <keys>{$keysList}</keys>
+                    <fields>RECORDNO,BATCHDATE,WHENCREATED</fields>
+                </read>
+            </function>
+        </content>
+    </operation>
+</request>
+XML;
+
+            $response = $this->sendXmlRequest($xmlRequest);
+            if (! ($response['success'] ?? false) || empty($response['xml'])) {
+                continue;
+            }
+
+            $xml = simplexml_load_string($response['xml']);
+            if ($xml === false) {
+                continue;
+            }
+
+            $nodes = $xml->xpath('//result/data/DEPOSIT');
+            if (empty($nodes)) {
+                $nodes = $xml->xpath('//data/DEPOSIT');
+            }
+
+            foreach ($nodes as $node) {
+                $recordNo = (string) ($node->RECORDNO ?? '');
+                if ($recordNo === '') {
+                    continue;
+                }
+                $raw = (string) ($node->BATCHDATE ?? '');
+                if ($raw === '') {
+                    $raw = (string) ($node->WHENCREATED ?? '');
+                }
+                if ($raw === '') {
+                    continue;
+                }
+                $parsed = date_create($raw);
+                $map[$recordNo] = $parsed ? $parsed->format('Y-m-d') : $raw;
+            }
+        }
+
+        return $map;
+    }
+
+    /**
+     * Read DEPOSIT.BATCHDATE via the OAuth REST API.
+     */
+    private function readDepositBatchDatesOAuth(array $depositKeys): array
+    {
+        if (! $this->userToken) {
+            return [];
+        }
+
+        $authResult = $this->authenticateOAuth();
+        if (! ($authResult['success'] ?? false)) {
+            return [];
+        }
+
+        $map = [];
+
+        foreach (array_chunk($depositKeys, 100) as $chunk) {
+            $recordNoList = implode(',', array_map('intval', $chunk));
+            $filter = urlencode("RECORDNO in ({$recordNoList})");
+            $apiUrl = 'https://api.intacct.com/ia/api/v1/companies/'.urlencode($this->userToken->company_id).
+                      '/objects/DEPOSIT?filter='.$filter.
+                      '&fields=RECORDNO,BATCHDATE,WHENCREATED';
+
+            $response = Http::timeout(60)
+                ->withHeaders([
+                    'Authorization' => 'Bearer '.$this->accessToken,
+                    'Accept' => 'application/json',
+                ])
+                ->get($apiUrl);
+
+            if (! $response->successful()) {
+                continue;
+            }
+
+            $result = $response->json();
+            $deposits = $result['data'] ?? $result['items'] ?? $result;
+            if (! is_array($deposits)) {
+                continue;
+            }
+
+            foreach ($deposits as $deposit) {
+                $recordNo = (string) ($deposit['RECORDNO'] ?? $deposit['recordno'] ?? '');
+                if ($recordNo === '') {
+                    continue;
+                }
+                $raw = (string) ($deposit['BATCHDATE'] ?? $deposit['batchdate']
+                    ?? $deposit['WHENCREATED'] ?? $deposit['whencreated'] ?? '');
+                if ($raw === '') {
+                    continue;
+                }
+                $parsed = date_create($raw);
+                $map[$recordNo] = $parsed ? $parsed->format('Y-m-d') : $raw;
+            }
+        }
+
+        return $map;
     }
 
     // ====================================================================

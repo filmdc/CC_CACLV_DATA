@@ -128,17 +128,20 @@ class DepositDateSyncService
      * @param  bool  $dryRun  If true, don't actually write to DonorPerfect
      * @return array Results of the sync operation
      */
-    public function sync(int $batchSize = 100, bool $dryRun = false): array
+    public function sync(int $batchSize = 100, bool $dryRun = false, ?int $afterId = null): array
     {
         $results = [
             'success' => false,
             'total_pending' => 0,
             'sage_queried' => 0,
             'deposited_found' => 0,
+            'skipped_not_deposited' => 0,
+            'skipped_terminal' => 0,
             'fund_codes_found' => 0,
             'service_codes_found' => 0,
             'dp_updated' => 0,
             'dp_failed' => 0,
+            'last_id' => $afterId,
             'errors' => [],
             'dry_run' => $dryRun,
         ];
@@ -152,8 +155,9 @@ class DepositDateSyncService
             }
 
             // Step 1: Get items that need deposit date sync
-            $pendingItems = $this->getPendingItems($batchSize);
+            $pendingItems = $this->getPendingItems($batchSize, $afterId);
             $results['total_pending'] = $pendingItems->count();
+            $results['last_id'] = $pendingItems->max('id') ?? $afterId;
 
             if ($pendingItems->isEmpty()) {
                 $results['success'] = true;
@@ -194,7 +198,41 @@ class DepositDateSyncService
                     continue;
                 }
 
+                // Only sync once Sage shows the receipt as actually deposited. Until then
+                // it sits in undeposited funds and 'depositdate' is null — skip it so a
+                // later run picks up the real deposit date (DEPOSIT.BATCHDATE) when it lands.
+                // Do NOT mark it synced here, or it would drop out of the pending pool forever.
+                $deposited = ! empty($receipt['deposited']);
                 $depositDate = $receipt['depositdate'] ?? null;
+
+                if (! $deposited || empty($depositDate)) {
+                    // A receipt in a terminal state (reversed/voided) will NEVER be deposited.
+                    // Mark it done-without-writing so it leaves the pending pool, otherwise it
+                    // would be re-queried against Sage on every run forever.
+                    if ($this->isTerminalReceiptState($receipt['state'] ?? null)) {
+                        $item->markDepositDateSynced();
+                        $results['skipped_terminal']++;
+
+                        Log::info('DepositDateSync: Receipt in terminal state, marking synced without deposit date', [
+                            'gift_id' => $item->gift_id,
+                            'intacct_record_id' => $item->intacct_record_id,
+                            'state' => $receipt['state'] ?? null,
+                        ]);
+
+                        continue;
+                    }
+
+                    $results['skipped_not_deposited']++;
+
+                    Log::info('DepositDateSync: Receipt not yet deposited in Sage, skipping', [
+                        'gift_id' => $item->gift_id,
+                        'intacct_record_id' => $item->intacct_record_id,
+                        'state' => $receipt['state'] ?? null,
+                    ]);
+
+                    continue;
+                }
+
                 $fundCode = ! empty($receipt['projectid']) ? $receipt['projectid'] : null;
                 $serviceCode = ! empty($receipt['departmentid']) ? $receipt['departmentid'] : null;
 
@@ -255,9 +293,11 @@ class DepositDateSyncService
 
             $results['success'] = true;
             $results['message'] = sprintf(
-                'Processed %d items: %d deposited, %d fund codes, %d service codes, %d updated in DP, %d failed',
+                'Processed %d items: %d deposited, %d skipped (not yet deposited), %d terminal (reversed/voided), %d fund codes, %d service codes, %d updated in DP, %d failed',
                 $results['total_pending'],
                 $results['deposited_found'],
+                $results['skipped_not_deposited'],
+                $results['skipped_terminal'],
                 $results['fund_codes_found'],
                 $results['service_codes_found'],
                 $results['dp_updated'],
@@ -285,10 +325,32 @@ class DepositDateSyncService
      *
      * @param  int  $limit  Maximum number of items to retrieve
      */
-    public function getPendingItems(int $limit = 100): Collection
+    /**
+     * Sage receipt states that are terminal — the receipt has been reversed/voided and
+     * will never be deposited, so it should be retired from the pending pool rather than
+     * polled forever. Matched case-insensitively against the OTHERRECEIPTS STATE field.
+     */
+    private function isTerminalReceiptState(?string $state): bool
     {
-        return SageIntacctSyncItem::needsDepositSync($this->getEnvironment())
-            ->orderBy('synced_at', 'asc')
+        if ($state === null || $state === '') {
+            return false;
+        }
+
+        return in_array(strtolower(trim($state)), ['reversed', 'reversal', 'voided', 'void'], true);
+    }
+
+    public function getPendingItems(int $limit = 100, ?int $afterId = null): Collection
+    {
+        $query = SageIntacctSyncItem::needsDepositSync($this->getEnvironment());
+
+        // Keyset cursor so callers can page forward without re-seeing items that were
+        // examined but left pending (e.g. receipts skipped because they are not yet
+        // deposited in Sage and must NOT be marked synced).
+        if ($afterId !== null) {
+            $query->where('id', '>', $afterId);
+        }
+
+        return $query->orderBy('id')
             ->limit($limit)
             ->get();
     }
@@ -666,6 +728,7 @@ class DepositDateSyncService
         return [
             'success' => true,
             'receipt' => $receipt,
+            'deposited' => ! empty($receipt['deposited']),
             'has_deposit_date' => ! empty($receipt['depositdate']),
             'deposit_date' => $receipt['depositdate'] ?? null,
             'state' => $receipt['state'] ?? null,
