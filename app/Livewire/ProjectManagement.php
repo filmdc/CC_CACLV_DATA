@@ -787,7 +787,7 @@ class ProjectManagement extends Component
         }
     }
 
-    /** @deprecated P-18 — use showCompleteRequirementModal(id) — upload+complete is one step now. */
+    /** @deprecated P-18 — use openCompleteRequirementModal(id) — upload+complete is one step now. */
     public function showUploadDocument($id)
     {
         $this->uploadingDocumentId = $id;
@@ -1317,7 +1317,7 @@ class ProjectManagement extends Component
         $this->refreshJob();
     }
 
-    public function showCompleteRequirementModal(int $id): void
+    public function openCompleteRequirementModal(int $id): void
     {
         $req = Requirement::findOrFail($id);
         $this->authorizeRequirementBelongsToJob($req);

@@ -107,7 +107,7 @@ it('saveRequirementCompletion with an override reason closes a document-type req
 
     Livewire::actingAs($this->admin)
         ->test(ProjectManagement::class, ['id' => $job->id])
-        ->call('showCompleteRequirementModal', $doc->id)
+        ->call('openCompleteRequirementModal', $doc->id)
         ->set('completion_override_reason', 'Hard copy on file in physical archive.')
         ->set('completion_note', 'Reviewed in person.')
         ->call('saveRequirementCompletion');
@@ -129,7 +129,7 @@ it('refuses document completion when neither files nor override reason are provi
 
     Livewire::actingAs($this->admin)
         ->test(ProjectManagement::class, ['id' => $job->id])
-        ->call('showCompleteRequirementModal', $doc->id)
+        ->call('openCompleteRequirementModal', $doc->id)
         ->call('saveRequirementCompletion');
 
     expect($doc->fresh()->isOutstanding())->toBeTrue();

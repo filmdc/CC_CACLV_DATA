@@ -246,7 +246,7 @@
                                 Outstanding
                             </span>
                             @if($r->type === 'document' && $this->can('projects.manage'))
-                                <button wire:click="showCompleteRequirementModal({{ $r->id }})"
+                                <button wire:click="openCompleteRequirementModal({{ $r->id }})"
                                         class="rounded text-white"
                                         style="padding: 4px 9px; font-family: var(--font-calv-sub); font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; background: var(--color-calv-teal); border: none; cursor: pointer;">
                                     Upload
