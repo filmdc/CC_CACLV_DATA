@@ -185,6 +185,8 @@ class SyncDepositDates extends Command
             'total_pending' => 0,
             'sage_queried' => 0,
             'deposited_found' => 0,
+            'skipped_not_deposited' => 0,
+            'skipped_terminal' => 0,
             'fund_codes_found' => 0,
             'service_codes_found' => 0,
             'dp_updated' => 0,
@@ -193,13 +195,20 @@ class SyncDepositDates extends Command
             'batches' => 0,
         ];
         $hasErrors = false;
+        $afterId = null;
 
         while (true) {
-            $result = $service->sync($batchSize, $dryRun);
+            // Keyset cursor: advance past items already examined this run. Receipts that
+            // are not yet deposited are skipped (not marked synced), so without a cursor
+            // the same pending rows would be re-fetched forever.
+            $result = $service->sync($batchSize, $dryRun, $afterId);
+            $afterId = $result['last_id'] ?? $afterId;
             $totals['batches']++;
             $totals['total_pending'] += $result['total_pending'];
             $totals['sage_queried'] += $result['sage_queried'];
             $totals['deposited_found'] += $result['deposited_found'];
+            $totals['skipped_not_deposited'] += $result['skipped_not_deposited'] ?? 0;
+            $totals['skipped_terminal'] += $result['skipped_terminal'] ?? 0;
             $totals['fund_codes_found'] += $result['fund_codes_found'] ?? 0;
             $totals['service_codes_found'] += $result['service_codes_found'] ?? 0;
             $totals['dp_updated'] += $result['dp_updated'];
@@ -241,6 +250,8 @@ class SyncDepositDates extends Command
                 ['Batches run', $totals['batches']],
                 ['Queried from Sage', $totals['sage_queried']],
                 ['Found with deposit date', $totals['deposited_found']],
+                ['Skipped (not yet deposited)', $totals['skipped_not_deposited']],
+                ['Retired (reversed/voided)', $totals['skipped_terminal']],
                 ['Found with fund code', $totals['fund_codes_found']],
                 ['Found with service code', $totals['service_codes_found']],
                 ['Updated in DonorPerfect', $totals['dp_updated']],
