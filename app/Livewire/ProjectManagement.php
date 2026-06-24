@@ -1394,6 +1394,28 @@ class ProjectManagement extends Component
         $this->refreshJob();
     }
 
+    /**
+     * Remove a single attachment from a document requirement, inline from
+     * the milestone detail row. Gated by projects.manage — the same gate
+     * as the Upload / completion controls. Lets the PM correct a wrong
+     * upload or swap a file (remove, then re-upload).
+     */
+    public function deleteRequirementMedia(int $requirementId, int $mediaId): void
+    {
+        $this->authorizeAction('projects.manage');
+
+        $req = Requirement::findOrFail($requirementId);
+        $this->authorizeRequirementBelongsToJob($req);
+
+        $media = $req->getMedia('attachments')->firstWhere('id', $mediaId);
+        if ($media) {
+            $media->delete();
+            session()->flash('success', 'Attachment removed.');
+        }
+
+        $this->refreshJob();
+    }
+
     public function deleteRequirement(int $id): void
     {
         $req = Requirement::findOrFail($id);

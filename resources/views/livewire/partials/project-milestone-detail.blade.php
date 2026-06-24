@@ -238,6 +238,37 @@
                             @if(filled($r->worker_note))
                                 <p style="font-size: 11px; color: var(--color-calv-slate-65); margin-top: 3px; white-space: pre-line;">📝 {{ \Illuminate\Support\Str::limit($r->worker_note, 280) }}</p>
                             @endif
+                            @if($r->type === 'document' && $hasFiles)
+                                <ul class="flex flex-wrap items-center gap-x-3 gap-y-1" style="margin-top: 5px;" data-test="requirement-attachment-list">
+                                    @foreach($r->getMedia('attachments') as $m)
+                                        @php
+                                            $previewable = in_array($m->mime_type, [
+                                                'application/pdf',
+                                                'image/jpeg', 'image/jpg', 'image/png', 'image/gif',
+                                                'image/webp', 'image/svg+xml',
+                                                'text/plain', 'text/csv',
+                                            ], true);
+                                        @endphp
+                                        <li class="inline-flex items-center gap-1.5" style="font-size: 11px;">
+                                            <span style="color: var(--color-calv-slate-65);">📎</span>
+                                            <span class="truncate" style="max-width: 200px; color: var(--color-calv-slate);" title="{{ $m->name }} · {{ $m->mime_type }}">{{ $m->name }}</span>
+                                            @if($previewable)
+                                                <span style="color: var(--color-calv-slate-35);">·</span>
+                                                <a href="{{ route('media.preview', $m->id) }}" target="_blank" rel="noopener" style="color: var(--color-calv-teal); font-weight: 600;">View</a>
+                                            @endif
+                                            <span style="color: var(--color-calv-slate-35);">·</span>
+                                            <a href="{{ route('media.download', $m->id) }}" style="color: var(--color-calv-teal); font-weight: 600;">Download</a>
+                                            @if($this->can('projects.manage'))
+                                                <span style="color: var(--color-calv-slate-35);">·</span>
+                                                <button type="button"
+                                                        wire:click="deleteRequirementMedia({{ $r->id }}, {{ $m->id }})"
+                                                        wire:confirm="Remove this attachment?"
+                                                        style="color: var(--color-calv-red); font-weight: 600; background: transparent; border: none; cursor: pointer; padding: 0;">Remove</button>
+                                            @endif
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @endif
                         </div>
 
                         @if(! $done)

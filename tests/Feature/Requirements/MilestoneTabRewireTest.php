@@ -150,3 +150,51 @@ it('rejects requirement actions on a requirement that does not belong to the loa
         ->call('toggleTaskRequirementComplete', $reqOnB->id)
         ->assertStatus(403);
 });
+
+it('renders view/download/remove controls for an attached document and removes a single attachment', function () {
+    $job = HousingJob::factory()->create(['project_manager_id' => $this->admin->id]);
+    $milestone = ProjectMilestone::factory()->create(['housing_job_id' => $job->id]);
+    $doc = Requirement::factory()->document()->create([
+        'housing_job_id' => $job->id,
+        'source_type' => Requirement::SOURCE_MILESTONE,
+        'source_id' => $milestone->id,
+    ]);
+
+    $pdf = "%PDF-1.4\n".str_repeat('x', 1024);
+
+    $component = Livewire::actingAs($this->admin)
+        ->test(ProjectManagement::class, ['id' => $job->id])
+        ->call('openCompleteRequirementModal', $doc->id)
+        ->set('completionFiles', [
+            \Illuminate\Http\UploadedFile::fake()->createWithContent('proof.pdf', $pdf),
+        ])
+        ->call('saveRequirementCompletion');
+
+    $media = $doc->fresh()->getMedia('attachments');
+    expect($media)->toHaveCount(1);
+
+    // The row exposes View/Download/Remove for the attachment.
+    $html = $component->html();
+    expect($html)->toContain(route('media.preview', $media->first()->id));
+    expect($html)->toContain(route('media.download', $media->first()->id));
+
+    // Removing the only attachment drops it from the collection.
+    $component->call('deleteRequirementMedia', $doc->id, $media->first()->id);
+    expect($doc->fresh()->getMedia('attachments'))->toHaveCount(0);
+});
+
+it('rejects deleteRequirementMedia for a requirement on another project', function () {
+    $jobA = HousingJob::factory()->create(['project_manager_id' => $this->admin->id]);
+    $jobB = HousingJob::factory()->create(['project_manager_id' => $this->admin->id]);
+    $milestoneB = ProjectMilestone::factory()->create(['housing_job_id' => $jobB->id]);
+    $reqOnB = Requirement::factory()->document()->create([
+        'housing_job_id' => $jobB->id,
+        'source_type' => Requirement::SOURCE_MILESTONE,
+        'source_id' => $milestoneB->id,
+    ]);
+
+    Livewire::actingAs($this->admin)
+        ->test(ProjectManagement::class, ['id' => $jobA->id])
+        ->call('deleteRequirementMedia', $reqOnB->id, 1)
+        ->assertStatus(403);
+});
