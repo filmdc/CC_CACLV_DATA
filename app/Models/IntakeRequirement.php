@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Contracts\HasMediaAuthorization;
 use App\Traits\HasStandardMediaCollections;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * P-39b: intake-phase requirement on a CommunicationLog.
@@ -31,7 +33,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * a 'documents' collection (disk: private_media) so document-type intake
  * requirements can hold their actual scanned/uploaded supporting files.
  */
-class IntakeRequirement extends Model implements HasMedia
+class IntakeRequirement extends Model implements HasMedia, HasMediaAuthorization
 {
     use HasFactory, HasStandardMediaCollections, InteractsWithMedia;
 
@@ -40,6 +42,17 @@ class IntakeRequirement extends Model implements HasMedia
         // Phase 12: store uploaded documents for type=document requirements
         // on the 'documents' collection (disk: private_media).
         $this->registerStandardDocumentCollection('documents');
+    }
+
+    /**
+     * P-39a media authorization. Matches the page-level gate on
+     * CommunicationsLogManagement (authorizeAction('communications_log.view')).
+     * Admin short-circuit + orphaned-parent default-deny are handled in
+     * MediaPolicy::view; this encodes only the per-record rule.
+     */
+    public function canViewMedia(User $user, Media $media): bool
+    {
+        return $user->hasPermission('communications_log.view');
     }
 
     public const TYPE_DOCUMENT = 'document';

@@ -984,6 +984,18 @@
                     <x-comm.requirements-panel :items="$viewerReqs" title="Phase 1 · Eligibility &amp; Compliance" />
                 </div>
 
+                {{-- Central "Documents on file" view: every uploaded document
+                     across this log's intake requirements, in one table.
+                     Mirrors the project-side Files tab; rendered as a section
+                     here because the intake viewer has no tab bar. --}}
+                <div class="mb-4 rounded-md border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800">
+                    <div class="px-4 py-3 border-b border-gray-200 dark:border-zinc-700">
+                        <h5 class="text-sm font-semibold text-gray-900 dark:text-white">Documents on file</h5>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">All files uploaded to this case's requirements, newest first.</p>
+                    </div>
+                    <x-files-table :rows="$this->documentFileRows()" empty="No documents have been uploaded for this case yet." />
+                </div>
+
                 {{-- Ad-hoc requirement add-form (inline, toggled by the panel's
                      "+ ad-hoc requirement" button which dispatches add-ad-hoc-requirement). --}}
                 @if($showAdHocReqForm)

@@ -1249,6 +1249,57 @@ class CommunicationsLogManagement extends Component
     }
 
     /**
+     * Build the normalized row set for the viewer's central "Documents on
+     * file" section: every uploaded document across the viewed log's intake
+     * requirements (the only file-bearing entity on a CommunicationLog).
+     * Consumed by <x-files-table>. Remove routes back to
+     * deleteRequirementMedia and is offered only to admins / users with
+     * communications_log.delete (the gate that handler enforces).
+     */
+    public function documentFileRows(): array
+    {
+        if (! $this->viewingId) {
+            return [];
+        }
+
+        $previewable = [
+            'application/pdf',
+            'image/jpeg', 'image/jpg', 'image/png', 'image/gif',
+            'image/webp', 'image/svg+xml',
+            'text/plain', 'text/csv',
+        ];
+        $canRemove = Auth::user()?->isAdmin() || $this->can('communications_log.delete');
+        $rows = [];
+
+        $requirements = \App\Models\IntakeRequirement::where('communication_log_id', $this->viewingId)
+            ->where('is_orphaned', false)
+            ->with('media')
+            ->get();
+
+        foreach ($requirements as $req) {
+            $label = $req->label ?: ($req->source_label_snapshot ?? 'Requirement');
+            foreach ($req->getMedia('documents') as $m) {
+                $rows[] = [
+                    'name' => $m->file_name,
+                    'mime' => $m->mime_type,
+                    'size' => $m->human_readable_size,
+                    'source' => 'Requirement · '.$label,
+                    'uploaded' => $m->created_at,
+                    'uploaded_ts' => $m->created_at?->getTimestamp() ?? 0,
+                    'preview_url' => route('media.preview', $m->id),
+                    'download_url' => route('media.download', $m->id),
+                    'previewable' => in_array($m->mime_type, $previewable, true),
+                    'remove_call' => $canRemove ? "deleteRequirementMedia({$req->id}, {$m->id})" : null,
+                ];
+            }
+        }
+
+        usort($rows, fn ($a, $b) => $b['uploaded_ts'] <=> $a['uploaded_ts']);
+
+        return $rows;
+    }
+
+    /**
      * Apply a status transition to the acting-on requirement.
      * action ∈ {requested, received, waived, na, reopen, blocked}.
      * waived + na require a non-empty reason.
