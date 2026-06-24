@@ -183,6 +183,91 @@ it('renders view/download/remove controls for an attached document and removes a
     expect($doc->fresh()->getMedia('attachments'))->toHaveCount(0);
 });
 
+it('reopens a document requirement when its last uploaded attachment is removed', function () {
+    $job = HousingJob::factory()->create(['project_manager_id' => $this->admin->id]);
+    $milestone = ProjectMilestone::factory()->create(['housing_job_id' => $job->id]);
+    $doc = Requirement::factory()->document()->create([
+        'housing_job_id' => $job->id,
+        'source_type' => Requirement::SOURCE_MILESTONE,
+        'source_id' => $milestone->id,
+    ]);
+
+    $pdf = "%PDF-1.4\n".str_repeat('x', 1024);
+
+    $component = Livewire::actingAs($this->admin)
+        ->test(ProjectManagement::class, ['id' => $job->id])
+        ->call('openCompleteRequirementModal', $doc->id)
+        ->set('completionFiles', [
+            \Illuminate\Http\UploadedFile::fake()->createWithContent('proof.pdf', $pdf),
+        ])
+        ->call('saveRequirementCompletion');
+
+    expect($doc->fresh()->isComplete())->toBeTrue();
+
+    $mediaId = $doc->fresh()->getMedia('attachments')->first()->id;
+    $component->call('deleteRequirementMedia', $doc->id, $mediaId);
+
+    expect($doc->fresh()->isOutstanding())->toBeTrue();
+    expect($doc->fresh()->hasAttachment())->toBeFalse();
+});
+
+it('keeps a document requirement complete when only one of several attachments is removed', function () {
+    $job = HousingJob::factory()->create(['project_manager_id' => $this->admin->id]);
+    $milestone = ProjectMilestone::factory()->create(['housing_job_id' => $job->id]);
+    $doc = Requirement::factory()->document()->create([
+        'housing_job_id' => $job->id,
+        'source_type' => Requirement::SOURCE_MILESTONE,
+        'source_id' => $milestone->id,
+    ]);
+
+    $pdf = "%PDF-1.4\n".str_repeat('x', 1024);
+
+    $component = Livewire::actingAs($this->admin)
+        ->test(ProjectManagement::class, ['id' => $job->id])
+        ->call('openCompleteRequirementModal', $doc->id)
+        ->set('completionFiles', [
+            \Illuminate\Http\UploadedFile::fake()->createWithContent('a.pdf', $pdf),
+            \Illuminate\Http\UploadedFile::fake()->createWithContent('b.pdf', $pdf),
+        ])
+        ->call('saveRequirementCompletion');
+
+    expect($doc->fresh()->getMedia('attachments'))->toHaveCount(2);
+
+    $firstId = $doc->fresh()->getMedia('attachments')->first()->id;
+    $component->call('deleteRequirementMedia', $doc->id, $firstId);
+
+    expect($doc->fresh()->isComplete())->toBeTrue();
+    expect($doc->fresh()->getMedia('attachments'))->toHaveCount(1);
+});
+
+it('leaves an override-completed requirement complete when an attachment is removed', function () {
+    $job = HousingJob::factory()->create(['project_manager_id' => $this->admin->id]);
+    $milestone = ProjectMilestone::factory()->create(['housing_job_id' => $job->id]);
+    $doc = Requirement::factory()->document()->create([
+        'housing_job_id' => $job->id,
+        'source_type' => Requirement::SOURCE_MILESTONE,
+        'source_id' => $milestone->id,
+    ]);
+
+    // Complete via override reason (no file), then attach a file out-of-band.
+    $component = Livewire::actingAs($this->admin)
+        ->test(ProjectManagement::class, ['id' => $job->id])
+        ->call('openCompleteRequirementModal', $doc->id)
+        ->set('completion_override_reason', 'Hard copy on file in physical archive.')
+        ->call('saveRequirementCompletion');
+
+    expect($doc->fresh()->wasOverridden())->toBeTrue();
+
+    $doc->addMediaFromString("%PDF-1.4\nx")
+        ->usingFileName('scan.pdf')
+        ->toMediaCollection('attachments');
+
+    $mediaId = $doc->fresh()->getMedia('attachments')->first()->id;
+    $component->call('deleteRequirementMedia', $doc->id, $mediaId);
+
+    expect($doc->fresh()->isComplete())->toBeTrue();
+});
+
 it('rejects deleteRequirementMedia for a requirement on another project', function () {
     $jobA = HousingJob::factory()->create(['project_manager_id' => $this->admin->id]);
     $jobB = HousingJob::factory()->create(['project_manager_id' => $this->admin->id]);

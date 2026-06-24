@@ -1410,7 +1410,24 @@ class ProjectManagement extends Component
         $media = $req->getMedia('attachments')->firstWhere('id', $mediaId);
         if ($media) {
             $media->delete();
-            session()->flash('success', 'Attachment removed.');
+
+            // A document requirement completed by uploading proof (rather
+            // than an override reason) is no longer satisfied once its last
+            // attachment is gone — reopen it so the missing document is
+            // visible again. Override-completed requirements stand on their
+            // reason, not a file, so they are left as-is.
+            $req = $req->fresh();
+            if (
+                $req->type === Requirement::TYPE_DOCUMENT
+                && $req->isComplete()
+                && ! $req->wasOverridden()
+                && ! $req->hasAttachment()
+            ) {
+                $req->reopen(Auth::user());
+                session()->flash('success', 'Attachment removed — requirement reopened (no document on file).');
+            } else {
+                session()->flash('success', 'Attachment removed.');
+            }
         }
 
         $this->refreshJob();
