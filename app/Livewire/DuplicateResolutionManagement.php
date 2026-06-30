@@ -329,6 +329,23 @@ class DuplicateResolutionManagement extends Component
 
     protected function createNewParticipant(PotentialDuplicate $duplicate)
     {
+        // A `duplicate_rescan` PotentialDuplicate's proposed_data is an EXISTING
+        // participant's own data — rescanExistingParticipants() seeds it from
+        // rows already in the database, not from a new incoming candidate. For
+        // these, "approve as separate" means "these two existing records are
+        // different people, stop flagging them"; it must NOT materialise a
+        // clone. Creating here is what spawned hundreds of duplicate
+        // participants when the review queue was bulk-resolved (every
+        // approve-separate cloned an already-persisted row). The callers have
+        // already marked the flag resolved, so we simply skip the create.
+        //
+        // Only sources whose proposed_data is a genuinely new, not-yet-persisted
+        // record (manual intake holds, rx_office_import / HMIS import holds)
+        // should create a participant here.
+        if ($duplicate->source_type === 'duplicate_rescan') {
+            return null;
+        }
+
         $proposedData = $duplicate->proposed_data;
 
         // Remove any ID fields and ensure required fields are present
