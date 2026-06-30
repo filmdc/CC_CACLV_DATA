@@ -92,6 +92,12 @@ class CommunicationsLogManagement extends Component
     // a warning panel when this is non-empty AND not yet acknowledged.
     public $duplicateMatches = [];
 
+    // Possible duplicate *person* entries already in the comm log, keyed on
+    // name/phone/email rather than address. Same non-blocking machinery as
+    // duplicateMatches — save short-circuits with a warning panel when this is
+    // non-empty AND not yet acknowledged (shares duplicateAcknowledged).
+    public $personMatches = [];
+
     public $duplicateAcknowledged = false;
 
     // Detail view state
@@ -1679,6 +1685,91 @@ class CommunicationsLogManagement extends Component
     }
 
     /**
+     * Surface possible duplicate *person* entries already in the communication
+     * log — the "I logged this gentleman, then logged him again two months
+     * later" case. Warning only — never blocks save. A comm log legitimately
+     * holds repeated contacts with the same person, so this is a soft "you may
+     * already have this person logged" nudge, not a block.
+     *
+     * High-precision match (to avoid false positives on routine follow-ups):
+     *   - exact first + last name (case-insensitive), OR
+     *   - exact email (case-insensitive), OR
+     *   - exact phone compared on digits only (separators normalized away).
+     *
+     * Matches are collapsed to distinct people so re-logging someone with 5
+     * prior entries shows one row ("5 prior entries"), not five. Editing an
+     * existing log excludes itself. Capped at 5 people.
+     */
+    public function checkPersonDuplicates(): void
+    {
+        $this->personMatches = [];
+
+        $first = trim(mb_strtolower((string) $this->contact_first_name));
+        $last = trim(mb_strtolower((string) $this->contact_last_name));
+        $email = trim(mb_strtolower((string) $this->contact_email));
+        $phoneDigits = preg_replace('/\D+/', '', (string) $this->contact_phone);
+
+        $hasName = $first !== '' && $last !== '';
+        $hasEmail = $email !== '';
+        $hasPhone = strlen($phoneDigits) >= 7; // ignore partial/junk fragments
+
+        if (! $hasName && ! $hasEmail && ! $hasPhone) {
+            return;
+        }
+
+        // MySQL: strip common separators from the stored phone so "(702) 555-1234",
+        // "702.555.1234" and "7025551234" all compare equal to our digits.
+        $phoneSql = "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(contact_phone,' ',''),'-',''),'(',''),')',''),'.',''),'+','')";
+
+        $logs = CommunicationLog::query()
+            ->when($this->editingId, fn ($q) => $q->where('id', '!=', $this->editingId))
+            ->where(function ($q) use ($hasName, $first, $last, $hasEmail, $email, $hasPhone, $phoneSql, $phoneDigits) {
+                if ($hasName) {
+                    $q->orWhere(function ($n) use ($first, $last) {
+                        $n->whereRaw('LOWER(contact_first_name) = ?', [$first])
+                            ->whereRaw('LOWER(contact_last_name) = ?', [$last]);
+                    });
+                }
+                if ($hasEmail) {
+                    $q->orWhereRaw('LOWER(contact_email) = ?', [$email]);
+                }
+                if ($hasPhone) {
+                    $q->orWhereRaw("$phoneSql = ?", [$phoneDigits]);
+                }
+            })
+            ->orderByDesc('communication_date')
+            ->limit(200)
+            ->get(['id', 'contact_first_name', 'contact_last_name', 'contact_phone', 'contact_email', 'contact_organization', 'subject', 'communication_date']);
+
+        // Collapse to distinct people. Key on normalized name when present,
+        // otherwise email, otherwise phone — so the same person logged many
+        // times appears once with a count of prior entries.
+        $people = [];
+        foreach ($logs as $log) {
+            $lf = trim(mb_strtolower((string) $log->contact_first_name));
+            $ll = trim(mb_strtolower((string) $log->contact_last_name));
+            $le = trim(mb_strtolower((string) $log->contact_email));
+            $lp = preg_replace('/\D+/', '', (string) $log->contact_phone);
+
+            $key = ($lf !== '' && $ll !== '') ? "n:$lf|$ll" : ($le !== '' ? "e:$le" : "p:$lp");
+
+            if (! isset($people[$key])) {
+                $people[$key] = [
+                    'id' => $log->id, // most recent (logs ordered desc), for linking
+                    'name' => trim($log->contact_first_name.' '.$log->contact_last_name),
+                    'organization' => $log->contact_organization,
+                    'last_date' => optional($log->communication_date)->format('Y-m-d'),
+                    'last_subject' => $log->subject,
+                    'count' => 0,
+                ];
+            }
+            $people[$key]['count']++;
+        }
+
+        $this->personMatches = array_slice(array_values($people), 0, 5);
+    }
+
+    /**
      * P-01: user clicked "Continue anyway" on the duplicate warning.
      * Marks the warning acknowledged and re-runs save.
      */
@@ -2506,7 +2597,8 @@ class CommunicationsLogManagement extends Component
         // duplicateAcknowledged and re-enters save().
         if (! $this->duplicateAcknowledged) {
             $this->checkAddressDuplicates();
-            if (! empty($this->duplicateMatches)) {
+            $this->checkPersonDuplicates();
+            if (! empty($this->duplicateMatches) || ! empty($this->personMatches)) {
                 return;
             }
         }
@@ -2867,6 +2959,7 @@ class CommunicationsLogManagement extends Component
 
         // Reset duplicate-address warning state.
         $this->duplicateMatches = [];
+        $this->personMatches = [];
         $this->duplicateAcknowledged = false;
     }
 

@@ -1869,6 +1869,42 @@
                     </div>
                     @endif
 
+                    <!-- Possible duplicate-person warning panel -->
+                    @if(!empty($personMatches))
+                        <div class="md:col-span-2 rounded-md border border-amber-300 bg-amber-50 dark:border-amber-700 dark:bg-amber-900/30 p-3">
+                            <div class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86a2 2 0 001.74-2.99l-6.93-12a2 2 0 00-3.48 0l-6.93 12A2 2 0 005.07 19z"/>
+                                </svg>
+                                <div class="flex-1">
+                                    <p class="text-sm font-semibold text-amber-900 dark:text-amber-100">
+                                        This person may already be in your communication log
+                                    </p>
+                                    <ul class="mt-1 space-y-1 text-xs text-amber-800 dark:text-amber-200">
+                                        @foreach($personMatches as $match)
+                                            <li>
+                                                <span class="font-medium">{{ $match['name'] }}</span>
+                                                @if($match['organization']) ({{ $match['organization'] }})@endif
+                                                — {{ $match['count'] }} prior {{ $match['count'] === 1 ? 'entry' : 'entries' }}
+                                                @if($match['last_date'])<span class="text-amber-700 dark:text-amber-300">; most recent {{ $match['last_date'] }}</span>@endif
+                                                @if($match['last_subject']) — “{{ \Illuminate\Support\Str::limit($match['last_subject'], 60) }}”@endif
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                    <div class="mt-2 flex items-center gap-3">
+                                        <button type="button" wire:click="acknowledgeDuplicatesAndSave"
+                                                class="text-xs px-3 py-1 rounded bg-amber-600 text-white hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600">
+                                            Save anyway
+                                        </button>
+                                        <span class="text-xs text-amber-700 dark:text-amber-300">
+                                            Check whether this should be added to an existing entry instead.
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                     <!-- Contact First Name -->
                     {{-- Phase 12.7: wire:model.blur (not bare wire:model) for the same
                          reason Phase 12.6 added .blur on contact_email — bare wire:model
