@@ -735,6 +735,12 @@ class SageIntacctSyncService
         $lastName = trim($giftData['last_name'] ?? '');
         $payee = trim($firstName.' '.$lastName) ?: 'Anonymous Donor';
 
+        // Resolve batch ids: manual batch (from DP BATCH UDF or batch_no fallback)
+        // and the regular check-scan batch. The label that carries them into the
+        // description/memo is built below, once the gift date is available.
+        $manualBatch = ! empty($giftData['BATCH']) ? $giftData['BATCH'] : ($giftData['batch_no'] ?? '');
+        $scanBatch = $giftData['DP_CheckScan_Batch'] ?? '';
+
         // Get payment method from mapping table (with gift_type fallback)
         $dpPaymentType = $giftData['PAYMENT_TYPE'] ?? $giftData['payment_type'] ?? null;
 
@@ -888,13 +894,26 @@ class SageIntacctSyncService
             return null;
         }
 
+        // Build the batch label carried into both the receipt description and line memo.
+        // ($location is guaranteed non-empty here — the guard above returns on missing dimensions.)
+        //  - manual batch:      "{batch} - {payee}"
+        //  - regular (scan):    "Batch - {batch} - {payee}"
+        //  - neither:           just the payee
+        if (! empty($manualBatch)) {
+            $batchPayeeLabel = trim($manualBatch).' - '.$payee;
+        } elseif (! empty($scanBatch)) {
+            $batchPayeeLabel = 'Batch - '.trim($scanBatch).' - '.$payee;
+        } else {
+            $batchPayeeLabel = $payee;
+        }
+
         // Build line item with dimensions
         // CRITICAL: Field order matters! departmentid must come before projectid in XML
         // CRITICAL: GL account 40100 requires BOTH departmentid (Service) AND classid (Restriction)
         $lineItem = [
             'glaccountno' => $glAccount,
             'amount' => $giftData['amount'] ?? '0.00',
-            'memo' => $payee,
+            'memo' => $batchPayeeLabel,
             'locationid' => $location,       // Location dimension → "Program" in UI
             'departmentid' => $class,        // Department dimension → "Service" in UI
             'projectid' => $project,         // Project dimension → "Fund" in UI
@@ -908,7 +927,9 @@ class SageIntacctSyncService
             'receiveddate' => $giftDate,
             'paymentmethod' => $paymentMethod,
             'refid' => (string) $giftData['gift_id'],
-            'description' => $giftData['gift_narrative'] ?? "Gift from DonorPerfect #{$giftData['gift_id']}",
+            'description' => (! empty($manualBatch) || ! empty($scanBatch))
+                ? $batchPayeeLabel
+                : ($giftData['gift_narrative'] ?? "Gift from DonorPerfect #{$giftData['gift_id']}"),
             'receiptitems' => [$lineItem],
         ], $accountData);
 
@@ -920,8 +941,7 @@ class SageIntacctSyncService
             $customFields['CHECK_SCAN_BATCH_ID'] = $giftData['DP_CheckScan_Batch'];
         }
 
-        // Add Manual Batch custom field if present (from DP BATCH UDF or batch_no)
-        $manualBatch = ! empty($giftData['BATCH']) ? $giftData['BATCH'] : ($giftData['batch_no'] ?? '');
+        // Add Manual Batch custom field if present (resolved above from DP BATCH UDF or batch_no)
         if (! empty($manualBatch)) {
             $customFields['MANUAL_BATCH'] = $manualBatch;
         }
