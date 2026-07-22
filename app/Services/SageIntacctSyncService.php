@@ -897,12 +897,12 @@ class SageIntacctSyncService
         // Build the batch label carried into both the receipt description and line memo.
         // ($location is guaranteed non-empty here — the guard above returns on missing dimensions.)
         //  - manual batch:      "{batch} - {payee}"
-        //  - regular (scan):    "Batch - {batch} - {payee}"
+        //  - regular (scan):    "{gift date} - {payee}"
         //  - neither:           just the payee
         if (! empty($manualBatch)) {
             $batchPayeeLabel = trim($manualBatch).' - '.$payee;
         } elseif (! empty($scanBatch)) {
-            $batchPayeeLabel = 'Batch - '.trim($scanBatch).' - '.$payee;
+            $batchPayeeLabel = $giftDate.' - '.$payee;
         } else {
             $batchPayeeLabel = $payee;
         }
