@@ -897,12 +897,14 @@ class SageIntacctSyncService
         // Build the batch label carried into both the receipt description and line memo.
         // ($location is guaranteed non-empty here — the guard above returns on missing dimensions.)
         //  - manual batch:      "{batch} - {payee}"
-        //  - regular (scan):    "{gift date} - {payee}"
+        //  - regular (scan):    "{gift date w/ periods} - {payee}" (e.g. "2026.07.22 - Jane Smith")
         //  - neither:           just the payee
+        // Note: the scan label uses a period-separated date (Y.m.d) and does NOT
+        // reuse $giftDate, which stays Y-m-d for the real paymentdate/receiveddate fields.
         if (! empty($manualBatch)) {
             $batchPayeeLabel = trim($manualBatch).' - '.$payee;
         } elseif (! empty($scanBatch)) {
-            $batchPayeeLabel = $giftDate.' - '.$payee;
+            $batchPayeeLabel = \Carbon\Carbon::parse($giftData['gift_date'] ?? now())->format('Y.m.d').' - '.$payee;
         } else {
             $batchPayeeLabel = $payee;
         }
