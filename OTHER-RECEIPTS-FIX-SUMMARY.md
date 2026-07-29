@@ -52,7 +52,7 @@ $lineItem = [
     'locationid' => $location,       // Location → Program (from campaign)
     'departmentid' => $class,        // Department → Service (from sub_solicit_code) ✅
     'projectid' => $project,         // Project → Fund (from solicit_code)
-    'classid' => '0',                // Class → Restriction (0 = Unrestricted) ✅
+    'classid' => '4',                // Class → Restriction (4 = Donor Restricted) ✅
 ];
 ```
 
@@ -105,11 +105,11 @@ The Other Receipt was created successfully in Sage Intacct sandbox with all 4 di
 campaign         → locationid (Program)
 sub_solicit_code → departmentid (Service)
 solicit_code     → projectid (Fund)
-(hardcoded)      → classid = '0' (Restriction: Unrestricted)
+(hardcoded)      → classid = '4' (Restriction: Donor Restricted)
 gl_code          → glaccountno
 ```
 
-**Note:** `classid` is hardcoded to '0' (Unrestricted) for all donations. Update this if you need to support restricted funds.
+**Note:** `classid` is hardcoded to '4' (Donor Restricted) for all donations, per Accounting (2026-07-29). It applies to both manual batches and regular check-scan batches, since both flow through `transformGiftToOtherReceipt()`.
 
 ### Code Mappings in Database:
 

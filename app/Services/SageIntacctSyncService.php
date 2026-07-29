@@ -919,7 +919,7 @@ class SageIntacctSyncService
             'locationid' => $location,       // Location dimension → "Program" in UI
             'departmentid' => $class,        // Department dimension → "Service" in UI
             'projectid' => $project,         // Project dimension → "Fund" in UI
-            'classid' => '0',                // Class dimension → "Restriction" in UI (0 = Unrestricted)
+            'classid' => '4',                // Class dimension → "Restriction" in UI (4 = Donor Restricted)
         ];
 
         // Build receipt data

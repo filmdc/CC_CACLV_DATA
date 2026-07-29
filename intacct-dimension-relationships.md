@@ -14,7 +14,7 @@ DonorPerfect Field    →  Sage Intacct Dimension  →  API Field
 campaign              →  Location (Program)      →  locationid
 sub_solicit_code      →  Department (Service)    →  departmentid
 solicit_code          →  Project (Fund)          →  projectid
-(hardcoded)           →  Class (Restriction)     →  classid = '0'
+(hardcoded)           →  Class (Restriction)     →  classid = '4'
 gl_code               →  GL Account              →  glaccountno
 ```
 
@@ -279,22 +279,32 @@ VALUES
 
 ## Class (Restriction) Dimension
 
-**Hardcoded Value:** `classid = '0'` (Unrestricted)
+**Hardcoded Value:** `classid = '4'` (Donor Restricted) — set per Accounting, 2026-07-29
 
-All donations default to Unrestricted class. Available class codes:
+All synced gifts use the Donor Restricted class, for both manual batches and regular
+check-scan batches (both go through `transformGiftToOtherReceipt()`). Available class codes:
 
 | ID | Name | Use Case |
 |---|---|---|
-| `0` | Unrestricted | General donations (default) |
+| `0` | Unrestricted | General donations |
 | `1` | Temporarily Restricted | Grant funds with time restrictions |
 | `2` | Board Designated | Board-allocated funds |
 | `3` | Permanently Restricted | Endowments |
-| `4` | Donor Restricted | Donor-specified use |
+| `4` | Donor Restricted | Donor-specified use (current default) |
 
-**To support restricted donations:**
-- Add logic to determine restriction based on campaign or fund type
-- Map certain DonorPerfect fields to appropriate class ID
-- Update line 770 in SageIntacctSyncService.php
+**Deliberately hardcoded, not configurable.** Accounting confirmed (2026-07-29) they will only
+ever need the single value. The unused `class_id` column on `sage_intacct_settings` (exposed as
+"Class ID (Optional)" in the Sage config UI) was considered as a global setting and rejected: a
+single settable value adds a way to break the sync without buying anything accounting asked for.
+
+**If the restriction ever needs to vary,** the requirement will be per-record — certain DP coding
+maps to a specific class — not a global toggle. That means:
+- A mapping layer keyed on DP fields (campaign / solicit / sub-solicit), in the spirit of the
+  existing `DonorPerfectCodeMapping` + `campaign_service_overrides` pattern
+- Resolve the class per gift inside `transformGiftToOtherReceipt()` in
+  `app/Services/SageIntacctSyncService.php`, replacing the hardcoded `classid` line
+- Confirm each new Location + Service + Fund + Class combination is valid in Intacct's
+  dimension relationships before syncing real gifts — GL 40100 rejects incompatible combos
 
 ---
 
@@ -310,7 +320,7 @@ All donations default to Unrestricted class. Available class codes:
 
 ✅ **Default Dimensions:**
 - Fund: F8000 (most donations)
-- Class: 0 (Unrestricted)
+- Class: 4 (Donor Restricted)
 
 ✅ **Service Distribution:**
 - S10999 (Admin): 12 sub-solicits
