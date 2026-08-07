@@ -360,7 +360,7 @@ class TestOtherReceipt extends Command
             'locationid' => $giftData['campaign'],           // Program
             'departmentid' => $giftData['sub_solicit_code'], // Service
             'projectid' => $giftData['solicit_code'],        // Fund
-            'classid' => '0',                                 // Restriction (Unrestricted)
+            'classid' => '4',                                 // Restriction (Donor Restricted)
         ];
 
         // Build receipt data
