@@ -22,7 +22,7 @@ return [
     */
     'import_files' => [
         'users' => 'users.json',
-        'programs' => 'programs.json', 
+        'programs' => 'programs.json',
         'funders' => 'funders.json',
         'contracts' => 'contracts.json',
         'contract_programs' => 'contract_programs.json',
@@ -43,7 +43,7 @@ return [
     'csv_files' => [
         'users' => 'users.csv',
         'programs' => 'programs.csv',
-        'funders' => 'funders.csv', 
+        'funders' => 'funders.csv',
         'contracts' => 'contracts.csv',
         'contract_programs' => 'contract_programs.csv',
         'report_due_dates' => 'report_due_dates.csv',
@@ -71,10 +71,10 @@ return [
     'program_mapping' => [
         // Add your program mappings here
         // 'Old Program Name' => new_program_id,
-        
+
         // Common examples (update with your actual mappings):
         'CALV' => 5,
-        'CADB' => 11, 
+        'CADB' => 11,
         'CADA' => 3,
         'SSS' => 4,
         'HCP' => 1,
@@ -84,7 +84,7 @@ return [
         'SHFB' => 8,
         'REJ' => 9,
         'WX' => 10,
-        'Multi' => 12, 
+        'Multi' => 12,
     ],
 
     /*
@@ -260,5 +260,138 @@ return [
         'log_level' => 'info',
         'detailed_errors' => true,
         'save_failed_records' => true, // Save failed records to separate file for review
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Automatic Sync
+    |--------------------------------------------------------------------------
+    |
+    | Settings for the scheduled `contracts:sync-legacy` command, which polls
+    | the legacy contract database for new and changed contracts and brings
+    | them into CAP TRACK without manual intervention.
+    |
+    */
+    'auto_sync' => [
+        // Master switch. When false the scheduled run is skipped entirely.
+        'enabled' => env('LEGACY_AUTO_SYNC_ENABLED', true),
+
+        // Import contracts that exist in legacy but have never been imported.
+        'import_new' => env('LEGACY_AUTO_SYNC_IMPORT_NEW', true),
+
+        // Re-sync contracts whose legacy record changed since our last sync.
+        'update_existing' => env('LEGACY_AUTO_SYNC_UPDATE_EXISTING', true),
+
+        // Download attachments for newly imported / changed contracts.
+        'sync_media' => env('LEGACY_AUTO_SYNC_MEDIA', true),
+
+        // Safety valve: refuse to touch more than this many contracts in one
+        // run. A larger drift than this signals something unusual and should
+        // be reviewed by hand rather than applied automatically.
+        'max_per_run' => env('LEGACY_AUTO_SYNC_MAX_PER_RUN', 250),
+
+        /*
+        | The two clocks (this server and 10.55.0.10) are not guaranteed to be
+        | in step. When comparing legacy `updated_at` against our
+        | `last_synced_at` we subtract this many seconds from our timestamp so a
+        | slightly-fast legacy clock cannot cause an edit to be missed forever.
+        */
+        'clock_skew_seconds' => env('LEGACY_AUTO_SYNC_CLOCK_SKEW', 120),
+
+        /*
+        |----------------------------------------------------------------------
+        | Locally Owned Fields
+        |----------------------------------------------------------------------
+        |
+        | Columns that CAP TRACK owns once a record exists here. The legacy
+        | system has no equivalent concept, or ours has diverged deliberately,
+        | so a re-sync must never write over them.
+        |
+        | `archived` / `date_archived` — archiving is a CAP TRACK-only workflow;
+        |   the legacy `archived` column is unused (0 rows set).
+        | `program_id` — resolved through fuzzy name matching on first import
+        |   and frequently corrected by hand afterwards. Preserved when already
+        |   set; still populated on update if it is NULL.
+        | `service_code` — CAP TRACK / Sage Intacct concept with no legacy source.
+        |
+        */
+        'locally_owned' => [
+            'contract' => [
+                'archived',
+                'date_archived',
+                'service_code',
+                'program_id',
+            ],
+
+            /*
+            | Due-date fields CAP TRACK owns. `status` is the important one:
+            | legacy only tracks incomplete/completed, while CAP TRACK derives
+            | pending/overdue/cancelled and links ContractReport submissions.
+            | `reminder_intervals` is customised per due date here.
+            */
+            'due_date' => [
+                'status',
+                'reminder_intervals',
+                'report_name',
+                'report_type',
+                'active',
+                'reminder_sent',
+                'reminder_sent_at',
+            ],
+        ],
+
+        /*
+        | Fields that should be filled on update only when the local value is
+        | still empty. Lets a first-import gap get backfilled later without
+        | overwriting a hand-entered correction.
+        */
+        'fill_if_empty' => [
+            'contract' => [
+                'program_id',
+            ],
+            'due_date' => [],
+        ],
+
+        /*
+        |----------------------------------------------------------------------
+        | Deleted-in-Legacy Handling
+        |----------------------------------------------------------------------
+        |
+        | What to do when a contract we imported is later soft-deleted in the
+        | legacy system. Supported: 'report' (flag it in the run summary and
+        | change nothing) or 'archive' (set archived = true locally).
+        | 'report' is the default: local ContractReports and attachments may
+        | hang off those contracts and a legacy delete is often just cleanup.
+        |
+        */
+        'deleted_in_legacy' => env('LEGACY_AUTO_SYNC_DELETED_STRATEGY', 'report'),
+
+        /*
+        |----------------------------------------------------------------------
+        | Attribution
+        |----------------------------------------------------------------------
+        |
+        | Scheduled runs have no authenticated user. Records touched by the
+        | sync are attributed to the user with this email when one exists,
+        | otherwise created_by / updated_by are left null.
+        |
+        */
+        'system_user_email' => env('LEGACY_AUTO_SYNC_USER_EMAIL', null),
+
+        /*
+        |----------------------------------------------------------------------
+        | Run Summary Notifications
+        |----------------------------------------------------------------------
+        |
+        | Email addresses that receive a summary after a scheduled run. Set
+        | `only_on_change` to false to receive a mail even on quiet nights.
+        |
+        */
+        'notify' => [
+            'recipients' => array_filter(
+                array_map('trim', explode(',', (string) env('LEGACY_AUTO_SYNC_NOTIFY', '')))
+            ),
+            'only_on_change' => env('LEGACY_AUTO_SYNC_NOTIFY_ONLY_ON_CHANGE', true),
+        ],
     ],
 ];
