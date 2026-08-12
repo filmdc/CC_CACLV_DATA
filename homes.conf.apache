@@ -21,6 +21,10 @@
     CustomLog ${APACHE_LOG_DIR}/homes-access.log combined
 </VirtualHost>
 
+# The TLS vhost is only loaded where mod_ssl is present (production). On the
+# HTTP-only dev/staging box (no mod_ssl, no local cert) this whole block is
+# skipped, so the same file works in both environments.
+<IfModule mod_ssl.c>
 <VirtualHost *:443>
     ServerAdmin webmaster@localhost
     DocumentRoot /var/www/CC_CAP_TRACK
@@ -63,3 +67,4 @@
     ErrorLog ${APACHE_LOG_DIR}/homes-ssl-error.log
     CustomLog ${APACHE_LOG_DIR}/homes-ssl-access.log combined
 </VirtualHost>
+</IfModule>
