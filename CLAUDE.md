@@ -418,6 +418,30 @@ A responsive, mobile-first approval interface served at `approvals.caclv.org`. L
 - All existing approval models, observers, and notifications are reused
 - NO Flux components in mobile views — standard HTML/Tailwind only
 
+## Housing Portal (homes.caclv.org)
+
+A task-first, CALV-branded front-end for the housing project manager, served at `homes.caclv.org`. Same Laravel app, **same database, same models** as CAP TRACK — a separate front door, not a separate application. Built by cloning the Approvals-portal pattern; the underlying UI redesign came from a Claude Design handoff (task-first "Today" home; comm-log reframed as person-first "Calls & Intakes"; 8 modules collapsed to Today / Calls & Intakes / Projects / Reports + Settings).
+
+### Architecture
+- **Domain routing**: `routes/homes.php` scoped to the `HOMES_DOMAIN` env var, loaded before `web.php` in `bootstrap/app.php`; `redirectGuestsTo` is host-aware (homes domain → `homes.login`).
+- **Layouts**: `resources/views/components/layouts/homes.blade.php` (light slate sidebar shell) + `homes-guest.blade.php` (login). **Light CALV brand theme, intentionally NOT the app's dark mode** (approvals is intentionally dark; this is intentionally light).
+- **Asset bundle**: `resources/css/homes.css` (standalone Tailwind v4 entry embedding the CALV design tokens + `.calv-*` component classes) + `resources/js/homes.js`. Registered in `vite.config.js`. Fonts via bunny.net (Anton/Oswald/Barlow — CALV's licensed faces aren't shipped).
+- **Shared auth**: same `.caclv.org` session cookie as the main app (`SESSION_DOMAIN`), own login page (`App\Livewire\Homes\Login`).
+- **Components** (`app/Livewire/Homes/`): `Login`, `Today`, `CallsIntakes`, `QuickLog` (modal, embedded in the layout, opened via the `homes-open-quick-log` browser event), `Stub` (Projects/Reports/Settings placeholders).
+- **Read model**: `App\Services\Homes\HousingPortalData` centralizes the "stage" and "N of M docs" logic and the Today-card queries — thin wrappers over the SAME scopes/constants the main app uses (`CommunicationLog::pendingFollowUp`/`overdueFollowUp`, `IntakeRequirement::MET_STATUSES`, `RequirementDefinition::PHASE_1_CATEGORIES`, `FundCode` `expiry_state`, `HousingJob::active`).
+
+### Status / phasing
+- **Phase 1 (shipped on `feat/homes-portal`)**: portal shell + login + Today home + Calls & Intakes list (person-language pills + Expanded-view toggle restoring the full table) + quick-log. Additive — the existing in-app housing UI stays live and unchanged.
+- **Convert-to-project is deferred**: its gate + orchestration still live inside `CommunicationsLogManagement` (not a service). Today's "Ready to become projects" card is **read-only** for now (links to the main app to convert). Extracting that into a shared service is Phase 2, alongside the redesigned Projects + Project Detail screens.
+- Tests: `tests/Feature/Homes/HousingPortalTest.php`.
+
+### Setup after pull
+1. `.env`: add `HOMES_DOMAIN=homes.caclv.org` (ensure `SESSION_DOMAIN=.caclv.org` in production for shared SSO).
+2. `sudo cp homes.conf.apache /etc/apache2/sites-available/homes.conf && sudo a2ensite homes.conf && sudo systemctl reload apache2`.
+3. DNS: `homes.caclv.org` A record → this server; confirm the TLS cert covers the host (add SAN if needed).
+4. `npx vite build`.
+5. `php artisan config:clear && php artisan route:clear && php artisan view:clear`.
+
 ## Memories
 
 - Do not try to run bash mysql commands that require a password, as the terminal prevents that approach

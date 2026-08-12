@@ -4,13 +4,18 @@
     "name": "livewire-helpers"
   },
   "resources/css/app.css": {
-    "file": "assets/app-DxjqpKE3.css",
+    "file": "assets/app-CHC-lLAR.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/css/approvals.css": {
-    "file": "assets/approvals-4x-Qmh7q.css",
+    "file": "assets/approvals-BIa95lcS.css",
     "src": "resources/css/approvals.css",
+    "isEntry": true
+  },
+  "resources/css/homes.css": {
+    "file": "assets/homes-YIOoApcR.css",
+    "src": "resources/css/homes.css",
     "isEntry": true
   },
   "resources/js/app.js": {
@@ -26,6 +31,15 @@
     "file": "assets/approvals-SlgHVHm0.js",
     "name": "approvals",
     "src": "resources/js/approvals.js",
+    "isEntry": true,
+    "imports": [
+      "_livewire-helpers-zyXmJdh1.js"
+    ]
+  },
+  "resources/js/homes.js": {
+    "file": "assets/homes-BKMQBsT3.js",
+    "name": "homes",
+    "src": "resources/js/homes.js",
     "isEntry": true,
     "imports": [
       "_livewire-helpers-zyXmJdh1.js"
