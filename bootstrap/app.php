@@ -31,6 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->getHost() === $approvalsDomain) {
                 return route('mobile.login');
             }
+
             return route('login');
         });
     })
@@ -99,6 +100,15 @@ return Application::configure(basePath: dirname(__DIR__))
                 return $setting && $setting->isConfigured() && $setting->isXmlApi();
             })
             ->description('Pull posted GL expense totals from Sage Intacct into fund utilization');
+
+        // Pull new and changed contracts from the legacy contract database
+        // (contracts.caclv.org) nightly at 4:00 AM ET, before staff are working.
+        $schedule->command('contracts:sync-legacy --trigger=scheduled')
+            ->dailyAt('04:00')
+            ->timezone('America/New_York')
+            ->withoutOverlapping(30)
+            ->when(fn () => config('legacy-import.auto_sync.enabled', true))
+            ->description('Import new and changed contracts from the legacy contract database');
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

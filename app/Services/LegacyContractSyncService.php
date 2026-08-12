@@ -25,6 +25,93 @@ class LegacyContractSyncService
     protected array $warnings = [];
 
     /**
+     * Whether attachments should be downloaded during this sync.
+     */
+    protected bool $syncMedia = true;
+
+    /**
+     * User id to attribute created_by / updated_by to. Resolved lazily because
+     * scheduled runs have no authenticated user.
+     */
+    protected ?int $actorId = null;
+
+    protected bool $actorResolved = false;
+
+    /**
+     * Toggle attachment downloading for this sync (scheduled runs may skip it).
+     */
+    public function withMedia(bool $syncMedia): static
+    {
+        $this->syncMedia = $syncMedia;
+
+        return $this;
+    }
+
+    /**
+     * Resolve the user to credit for records this sync touches.
+     *
+     * Interactive imports use the logged-in user. Scheduled runs fall back to
+     * the configured system user, or null when none is configured.
+     */
+    protected function actorId(): ?int
+    {
+        if ($this->actorResolved) {
+            return $this->actorId;
+        }
+
+        $this->actorResolved = true;
+
+        if ($id = auth()->id()) {
+            return $this->actorId = $id;
+        }
+
+        if ($email = config('legacy-import.auto_sync.system_user_email')) {
+            $this->actorId = User::where('email', $email)->value('id');
+        }
+
+        return $this->actorId;
+    }
+
+    /**
+     * Remove fields CAP TRACK owns from an update payload.
+     *
+     * Applied only when updating a record that already exists here. On first
+     * import every field comes from legacy, so nothing is stripped.
+     *
+     * @param  array<string, mixed>  $payload
+     * @param  'contract'|'due_date'  $entity
+     * @param  object|null  $existing  Current local record, for fill-if-empty checks
+     * @return array<string, mixed>
+     */
+    protected function stripLocallyOwned(array $payload, string $entity, $existing = null): array
+    {
+        // No local record yet means there is nothing to protect: a first import
+        // takes every field from legacy.
+        if (! $existing) {
+            return $payload;
+        }
+
+        $owned = config("legacy-import.auto_sync.locally_owned.{$entity}", []);
+        $fillIfEmpty = config("legacy-import.auto_sync.fill_if_empty.{$entity}", []);
+
+        foreach ($owned as $field) {
+            if (! array_key_exists($field, $payload)) {
+                continue;
+            }
+
+            // A locally-owned field may still be backfilled while it is empty,
+            // e.g. a contract imported before program mapping was configured.
+            if (in_array($field, $fillIfEmpty, true) && blank($existing->{$field})) {
+                continue;
+            }
+
+            unset($payload[$field]);
+        }
+
+        return $payload;
+    }
+
+    /**
      * Preview contracts from legacy database with filters
      */
     public function previewContracts(
@@ -34,7 +121,11 @@ class LegacyContractSyncService
         int $limit = 100
     ): Collection {
         $query = DB::connection($this->connection)
-            ->table('contracts');
+            ->table('contracts')
+            // Contracts deleted in the legacy system are never candidates for
+            // import. Records already imported before deletion are reported by
+            // detectChanges() instead of being silently re-imported.
+            ->whereNull('deleted_at');
 
         // Apply legacy ID filter
         if ($legacyIdFilter) {
@@ -139,46 +230,41 @@ class LegacyContractSyncService
     {
         $this->initializeStats();
 
-        try {
-            DB::beginTransaction();
+        foreach ($legacyIds as $legacyId) {
+            // One transaction per contract. A bad record rolls back only its
+            // own changes, and no lock is held across the HTTP attachment
+            // downloads that follow.
+            try {
+                $contract = DB::transaction(fn () => $this->syncSingleContract($legacyId, $updateExisting));
 
-            foreach ($legacyIds as $legacyId) {
-                try {
-                    $this->syncSingleContract($legacyId, $updateExisting);
-                } catch (Exception $e) {
-                    $this->errors[] = "Contract ID {$legacyId}: ".$e->getMessage();
-                    Log::error("Failed to sync contract {$legacyId}", [
-                        'error' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString(),
-                    ]);
+                if ($contract && $this->syncMedia) {
+                    $this->syncContractMedia($legacyId, $contract);
                 }
+            } catch (Exception $e) {
+                $this->errors[] = "Contract ID {$legacyId}: ".$e->getMessage();
+                Log::error("Failed to sync contract {$legacyId}", [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
             }
-
-            DB::commit();
-
-            return [
-                'success' => true,
-                'stats' => $this->syncStats,
-                'errors' => $this->errors,
-                'warnings' => $this->warnings,
-            ];
-        } catch (Exception $e) {
-            DB::rollBack();
-
-            return [
-                'success' => false,
-                'error' => $e->getMessage(),
-                'stats' => $this->syncStats,
-                'errors' => $this->errors,
-                'warnings' => $this->warnings,
-            ];
         }
+
+        return [
+            'success' => empty($this->errors) || $this->syncStats['created'] + $this->syncStats['updated'] > 0,
+            'stats' => $this->syncStats,
+            'errors' => $this->errors,
+            'warnings' => $this->warnings,
+        ];
     }
 
     /**
-     * Sync a single contract with all related data
+     * Sync a single contract and its due dates.
+     *
+     * Attachments are handled by the caller, outside the transaction.
+     *
+     * @return Contract|null The synced contract, or null when skipped
      */
-    protected function syncSingleContract(int $legacyId, bool $updateExisting = false): void
+    protected function syncSingleContract(int $legacyId, bool $updateExisting = false): ?Contract
     {
         // Get contract from legacy database
         $legacyContract = DB::connection($this->connection)
@@ -193,11 +279,18 @@ class LegacyContractSyncService
         // Check if already exists
         $existingContract = Contract::where('legacy_id', $legacyId)->first();
 
+        if ($legacyContract->deleted_at && ! $existingContract) {
+            $this->syncStats['skipped']++;
+            $this->warnings[] = "Contract ID {$legacyId} is deleted in the legacy system (skipped)";
+
+            return null;
+        }
+
         if ($existingContract && ! $updateExisting) {
             $this->syncStats['skipped']++;
             $this->warnings[] = "Contract ID {$legacyId} already exists (skipped)";
 
-            return;
+            return null;
         }
 
         // Get program IDs from pivot table
@@ -226,35 +319,40 @@ class LegacyContractSyncService
             'start_date' => $legacyContract->start_date,
             'end_date' => $legacyContract->end_date,
             'grant_code' => $legacyContract->grant_code,
-            'archived' => false, // Ensure imported contracts are active
+            'archived' => false, // New imports start active
             'last_synced_at' => now(),
-            'created_by' => auth()->id(),
-            'updated_by' => auth()->id(),
+            'updated_by' => $this->actorId(),
         ];
 
         // Create or update contract
         if ($existingContract) {
-            $existingContract->update($contractData);
+            // Fields CAP TRACK owns (archived state, hand-corrected program)
+            // must survive a re-sync from legacy.
+            $existingContract->update(
+                $this->stripLocallyOwned($contractData, 'contract', $existingContract)
+            );
             $contract = $existingContract;
             $this->syncStats['updated']++;
         } else {
             // Preserve original timestamps
             $contractData['created_at'] = $legacyContract->created_at;
             $contractData['updated_at'] = $legacyContract->updated_at;
+            $contractData['created_by'] = $this->actorId();
 
             $contract = Contract::create($contractData);
             $this->syncStats['created']++;
         }
 
-        // Sync related data
+        // Sync related data (attachments are handled by the caller)
         $this->syncContractDueDates($legacyId, $contract->id);
-        $this->syncContractMedia($legacyId, $contract);
 
         Log::info('Successfully synced contract', [
             'legacy_id' => $legacyId,
             'contract_id' => $contract->id,
             'title' => $contract->title,
         ]);
+
+        return $contract;
     }
 
     /**
@@ -265,6 +363,9 @@ class LegacyContractSyncService
         $legacyDueDates = DB::connection($this->connection)
             ->table('report_due_dates')
             ->where('contract_id', $legacyContractId)
+            // Due dates deleted upstream are not imported. Ones imported before
+            // deletion stay as historical record, matching the contract policy.
+            ->whereNull('deleted_at')
             ->get();
 
         foreach ($legacyDueDates as $legacyDueDate) {
@@ -284,26 +385,58 @@ class LegacyContractSyncService
                 'report_name' => $reportName,
                 'due_date' => $legacyDueDate->due_date,
                 'description' => $legacyDueDate->description,
-                'reminder_intervals' => [30, 15, 7, 3, 1], // Use default intervals
+                'reminder_intervals' => config('legacy-import.default_reminder_intervals', [30, 15, 7, 3, 1]),
                 'active' => true,
-                'status' => $legacyDueDate->status ?? 'pending',
+                'status' => $this->mapDueDateStatus($legacyDueDate->status ?? null),
                 'last_synced_at' => now(),
-                'created_by' => auth()->id(),
-                'updated_by' => auth()->id(),
+                'updated_by' => $this->actorId(),
             ];
 
             if ($existing) {
-                $existing->update($dueDateData);
+                // Preserve the CAP TRACK-side workflow: derived statuses
+                // (pending/overdue/cancelled), customised reminder intervals
+                // and any locally renamed report. Only the legacy-authoritative
+                // due date and description are refreshed.
+                $existing->update(
+                    $this->stripLocallyOwned($dueDateData, 'due_date', $existing)
+                );
                 $dueDate = $existing;
+                $this->syncStats['due_dates_updated']++;
             } else {
                 $dueDateData['created_at'] = $legacyDueDate->created_at;
                 $dueDateData['updated_at'] = $legacyDueDate->updated_at;
+                $dueDateData['created_by'] = $this->actorId();
                 $dueDate = ContractReportDueDate::create($dueDateData);
+                $this->syncStats['due_dates_created']++;
             }
 
             // Sync assigned users for this due date
             $this->syncDueDateAssignments($legacyDueDate->id, $dueDate->id);
         }
+    }
+
+    /**
+     * Translate a legacy due-date status into a CAP TRACK status.
+     *
+     * Legacy only distinguishes incomplete/completed. CAP TRACK's vocabulary is
+     * pending/completed/overdue/cancelled, and derives overdue itself, so an
+     * incomplete legacy report lands as pending.
+     */
+    protected function mapDueDateStatus(?string $legacyStatus): string
+    {
+        $map = config('legacy-import.status_mapping.report_due_dates', []);
+
+        if ($legacyStatus && isset($map[$legacyStatus])) {
+            return $map[$legacyStatus];
+        }
+
+        // Not in the configured map — accept it if CAP TRACK knows the value,
+        // otherwise fall back to pending.
+        if ($legacyStatus && array_key_exists($legacyStatus, ContractReportDueDate::STATUS_OPTIONS)) {
+            return $legacyStatus;
+        }
+
+        return 'pending';
     }
 
     /**
@@ -333,14 +466,21 @@ class LegacyContractSyncService
             // Find or create user by email
             $user = User::where('email', $legacyEmail->email)->first();
 
+            // The legacy due_date_emails table carries only an email address —
+            // no name or active column — so fall back to the matched CAP TRACK
+            // user, then to the local part of the address.
+            $legacyName = $legacyEmail->name
+                ?? $user?->name
+                ?? ucwords(str_replace(['.', '_', '-'], ' ', strstr($legacyEmail->email, '@', true) ?: $legacyEmail->email));
+
             if (! $user) {
                 // Create DueDateEmail without user
                 $dueDateEmail = DueDateEmail::firstOrCreate([
                     'email' => $legacyEmail->email,
                 ], [
-                    'name' => $legacyEmail->name,
+                    'name' => $legacyName,
                     'active' => $legacyEmail->active ?? true,
-                    'created_by' => auth()->id(),
+                    'created_by' => $this->actorId(),
                 ]);
             } else {
                 // Create DueDateEmail with user
@@ -348,9 +488,9 @@ class LegacyContractSyncService
                     'user_id' => $user->id,
                     'email' => $legacyEmail->email,
                 ], [
-                    'name' => $legacyEmail->name ?? $user->name,
+                    'name' => $legacyName,
                     'active' => $legacyEmail->active ?? true,
-                    'created_by' => auth()->id(),
+                    'created_by' => $this->actorId(),
                 ]);
             }
 
@@ -386,6 +526,15 @@ class LegacyContractSyncService
                     continue;
                 }
 
+                // A handful of legacy rows point at zero-byte files. There is
+                // nothing to carry over, and attempting it produces a confusing
+                // mime-type rejection instead of a clear reason.
+                if ((int) $mediaRecord->size === 0) {
+                    $this->warnings[] = "Skipped empty legacy file (0 bytes): {$mediaRecord->file_name}";
+
+                    continue;
+                }
+
                 // Download file from legacy server
                 $baseUrl = config('legacy-import.media_migration.remote_server.base_url');
                 $storagePath = config('legacy-import.media_migration.remote_server.storage_path', '/storage');
@@ -395,10 +544,27 @@ class LegacyContractSyncService
                     ->withOptions(['verify' => false]) // Skip SSL verification for internal server
                     ->get($fileUrl);
 
-                if ($response->successful()) {
-                    // Save file temporarily
-                    $tempPath = storage_path('app/temp/'.$mediaRecord->file_name);
-                    file_put_contents($tempPath, $response->body());
+                if (! $response->successful()) {
+                    $this->warnings[] = "Failed to download media file: {$mediaRecord->file_name} (HTTP {$response->status()})";
+
+                    continue;
+                }
+
+                // Stage the download in a per-media directory. Writing straight
+                // into a shared temp folder collided with stale files left by
+                // earlier runs under a different user, which the current
+                // process then could not overwrite.
+                $tempDir = storage_path('app/temp/legacy-'.$mediaRecord->id);
+                if (! is_dir($tempDir)) {
+                    mkdir($tempDir, 0775, true);
+                }
+
+                $tempPath = $tempDir.'/'.basename($mediaRecord->file_name);
+
+                try {
+                    if (file_put_contents($tempPath, $response->body()) === false) {
+                        throw new Exception('could not stage the download at '.$tempPath);
+                    }
 
                     // Add to media library
                     $contract->addMedia($tempPath)
@@ -410,12 +576,13 @@ class LegacyContractSyncService
                         ])
                         ->toMediaCollection('documents');
 
-                    // Clean up temp file
-                    @unlink($tempPath);
-
                     $this->syncStats['media_synced']++;
-                } else {
-                    $this->warnings[] = "Failed to download media file: {$mediaRecord->file_name} (HTTP {$response->status()})";
+                } finally {
+                    // Always clear the staging area, including on failure —
+                    // otherwise a rejected file is left behind to collide with
+                    // the next run.
+                    @unlink($tempPath);
+                    @rmdir($tempDir);
                 }
             } catch (Exception $e) {
                 $this->warnings[] = "Failed to sync media {$mediaRecord->file_name}: ".$e->getMessage();
@@ -492,12 +659,17 @@ class LegacyContractSyncService
     }
 
     /**
-     * Map legacy funder ID to new funder ID
+     * Map legacy funder ID to new funder ID.
+     *
+     * A contract with no funder is legitimate in both systems — letters of
+     * support and pre-award records often have none — so this returns null
+     * rather than blocking the import. A dangling reference is warned about
+     * for the run report but likewise does not stop the contract landing.
      */
-    protected function mapFunder(?int $legacyFunderId): int
+    protected function mapFunder(?int $legacyFunderId): ?int
     {
         if (! $legacyFunderId) {
-            throw new Exception('Funder ID is required');
+            return null;
         }
 
         // Get legacy funder
@@ -507,7 +679,9 @@ class LegacyContractSyncService
             ->first();
 
         if (! $legacyFunder) {
-            throw new Exception("Legacy funder not found: {$legacyFunderId}");
+            $this->warnings[] = "Legacy funder {$legacyFunderId} not found; contract imported without a funder.";
+
+            return null;
         }
 
         // Check if funder with same legacy_id exists
@@ -554,9 +728,272 @@ class LegacyContractSyncService
             'skipped' => 0,
             'funders_created' => 0,
             'media_synced' => 0,
+            'due_dates_created' => 0,
+            'due_dates_updated' => 0,
         ];
         $this->errors = [];
         $this->warnings = [];
+    }
+
+    /**
+     * Download any legacy attachments missing from already-synced contracts.
+     *
+     * The normal sync only fetches attachments for contracts it touches, so a
+     * file that failed once — rejected by a mime or size rule since relaxed —
+     * would never be retried while the contract itself stays in step. This
+     * walks every synced contract and fills the gaps. Idempotent: attachments
+     * already present are matched on uuid and skipped.
+     */
+    public function backfillMedia(?int $limit = null): array
+    {
+        $this->initializeStats();
+        $this->withMedia(true);
+
+        $checked = 0;
+
+        Contract::whereNotNull('legacy_id')
+            ->orderBy('legacy_id')
+            ->when($limit, fn ($q) => $q->limit($limit))
+            ->chunkById(50, function ($contracts) use (&$checked) {
+                foreach ($contracts as $contract) {
+                    try {
+                        $this->syncContractMedia($contract->legacy_id, $contract);
+                        $checked++;
+                    } catch (Exception $e) {
+                        $this->errors[] = "Contract {$contract->id} (legacy {$contract->legacy_id}): ".$e->getMessage();
+                    }
+                }
+            });
+
+        return [
+            'success' => true,
+            'contracts_checked' => $checked,
+            'stats' => $this->syncStats,
+            'errors' => $this->errors,
+            'warnings' => $this->warnings,
+        ];
+    }
+
+    /**
+     * Compare the legacy contract database against CAP TRACK.
+     *
+     * Classifies every legacy contract into one of four buckets without
+     * writing anything, so both the scheduled command and the UI can report
+     * pending drift before it is applied.
+     *
+     * @return array{
+     *     new: array<int, array<string, mixed>>,
+     *     updated: array<int, array<string, mixed>>,
+     *     deleted_in_legacy: array<int, array<string, mixed>>,
+     *     unchanged: int,
+     *     legacy_total: int,
+     *     checked_at: \Carbon\Carbon
+     * }
+     */
+    public function detectChanges(): array
+    {
+        $skew = (int) config('legacy-import.auto_sync.clock_skew_seconds', 120);
+
+        // Everything we already hold, keyed by legacy id.
+        $local = Contract::whereNotNull('legacy_id')
+            ->get(['id', 'legacy_id', 'title', 'last_synced_at', 'archived'])
+            ->keyBy('legacy_id');
+
+        $legacyRows = DB::connection($this->connection)
+            ->table('contracts')
+            ->select(['id', 'title', 'contract_number', 'amount', 'updated_at', 'deleted_at'])
+            ->orderBy('id')
+            ->get();
+
+        $new = [];
+        $updated = [];
+        $deletedInLegacy = [];
+        $unchanged = 0;
+
+        foreach ($legacyRows as $row) {
+            $existing = $local->get($row->id);
+
+            if ($row->deleted_at) {
+                // Only interesting if we imported it before it was deleted.
+                if ($existing) {
+                    $deletedInLegacy[] = [
+                        'legacy_id' => $row->id,
+                        'contract_id' => $existing->id,
+                        'title' => $existing->title ?: $row->title,
+                        'deleted_at' => $row->deleted_at,
+                        'archived' => (bool) $existing->archived,
+                    ];
+                }
+
+                continue;
+            }
+
+            if (! $existing) {
+                $new[] = [
+                    'legacy_id' => $row->id,
+                    'title' => $row->title,
+                    'contract_number' => $row->contract_number,
+                    'amount' => $row->amount,
+                    'updated_at' => $row->updated_at,
+                ];
+
+                continue;
+            }
+
+            // Never synced, or legacy changed after our last sync. The skew
+            // allowance stops a slightly-fast legacy clock from hiding an edit.
+            $threshold = $existing->last_synced_at?->copy()->addSeconds($skew);
+
+            if (! $threshold || ($row->updated_at && $row->updated_at > $threshold->format('Y-m-d H:i:s'))) {
+                $updated[] = [
+                    'legacy_id' => $row->id,
+                    'contract_id' => $existing->id,
+                    'title' => $existing->title ?: $row->title,
+                    'legacy_updated_at' => $row->updated_at,
+                    'last_synced_at' => $existing->last_synced_at?->format('Y-m-d H:i:s'),
+                    'archived' => (bool) $existing->archived,
+                ];
+
+                continue;
+            }
+
+            $unchanged++;
+        }
+
+        return [
+            'new' => $new,
+            'updated' => $updated,
+            'deleted_in_legacy' => $deletedInLegacy,
+            'unchanged' => $unchanged,
+            'legacy_total' => $legacyRows->count(),
+            'checked_at' => now(),
+        ];
+    }
+
+    /**
+     * Detect drift and apply it.
+     *
+     * This is the entry point for the scheduled sync. Honours the auto_sync
+     * config for what to import, how much to touch in one run, and what to do
+     * about contracts deleted upstream.
+     *
+     * @param  array{import_new?: bool, update_existing?: bool, sync_media?: bool, limit?: int|null, dry_run?: bool}  $options
+     */
+    public function autoSync(array $options = []): array
+    {
+        $config = config('legacy-import.auto_sync');
+
+        $importNew = $options['import_new'] ?? $config['import_new'] ?? true;
+        $updateExisting = $options['update_existing'] ?? $config['update_existing'] ?? true;
+        $syncMedia = $options['sync_media'] ?? $config['sync_media'] ?? true;
+        $limit = $options['limit'] ?? $config['max_per_run'] ?? 250;
+        $dryRun = $options['dry_run'] ?? false;
+
+        $this->withMedia($syncMedia);
+        $this->initializeStats();
+
+        $changes = $this->detectChanges();
+
+        $targets = [];
+        if ($importNew) {
+            $targets = array_column($changes['new'], 'legacy_id');
+        }
+        if ($updateExisting) {
+            $targets = array_merge($targets, array_column($changes['updated'], 'legacy_id'));
+        }
+
+        $detected = count($targets);
+        $deferred = 0;
+
+        // Safety valve: an unexpectedly large drift is reported, not applied.
+        if ($limit && $detected > $limit) {
+            $deferred = $detected - $limit;
+            $targets = array_slice($targets, 0, $limit);
+            $this->warnings[] = "Drift of {$detected} contracts exceeds the {$limit}-per-run limit; ".
+                "{$deferred} deferred to the next run.";
+        }
+
+        if ($dryRun) {
+            return [
+                'success' => true,
+                'dry_run' => true,
+                'detected' => [
+                    'new' => count($changes['new']),
+                    'updated' => count($changes['updated']),
+                    'deleted_in_legacy' => count($changes['deleted_in_legacy']),
+                    'unchanged' => $changes['unchanged'],
+                ],
+                'would_sync' => $targets,
+                'deferred' => $deferred,
+                'changes' => $changes,
+                'stats' => $this->syncStats,
+                'errors' => [],
+                'warnings' => $this->warnings,
+            ];
+        }
+
+        // Captured before syncContracts(), which resets warnings via initializeStats().
+        $preSyncWarnings = $this->warnings;
+
+        $result = empty($targets)
+            ? ['success' => true, 'stats' => $this->syncStats, 'errors' => [], 'warnings' => $preSyncWarnings]
+            : $this->syncContracts($targets, true);
+
+        $result['warnings'] = array_values(array_unique(array_merge($preSyncWarnings, $result['warnings'] ?? [])));
+
+        $result['detected'] = [
+            'new' => count($changes['new']),
+            'updated' => count($changes['updated']),
+            'deleted_in_legacy' => count($changes['deleted_in_legacy']),
+            'unchanged' => $changes['unchanged'],
+        ];
+        $result['changes'] = $changes;
+        $result['deferred'] = $deferred;
+        $result['dry_run'] = false;
+        $result['deleted_handling'] = $this->handleDeletedInLegacy($changes['deleted_in_legacy']);
+
+        return $result;
+    }
+
+    /**
+     * Act on contracts that were soft-deleted upstream.
+     *
+     * Default strategy is 'report': the run summary names them and nothing
+     * local is touched, because CAP TRACK reports and attachments may hang off
+     * those contracts. 'archive' hides them locally but keeps all data.
+     *
+     * @param  array<int, array<string, mixed>>  $deleted
+     */
+    protected function handleDeletedInLegacy(array $deleted): array
+    {
+        $strategy = config('legacy-import.auto_sync.deleted_in_legacy', 'report');
+
+        if ($strategy !== 'archive' || empty($deleted)) {
+            return ['strategy' => $strategy, 'archived' => 0, 'legacy_ids' => array_column($deleted, 'legacy_id')];
+        }
+
+        $archived = 0;
+
+        foreach ($deleted as $row) {
+            if ($row['archived']) {
+                continue;
+            }
+
+            $contract = Contract::find($row['contract_id']);
+
+            if (! $contract) {
+                continue;
+            }
+
+            $contract->update([
+                'archived' => true,
+                'date_archived' => now(),
+                'updated_by' => $this->actorId(),
+            ]);
+            $archived++;
+        }
+
+        return ['strategy' => $strategy, 'archived' => $archived, 'legacy_ids' => array_column($deleted, 'legacy_id')];
     }
 
     /**

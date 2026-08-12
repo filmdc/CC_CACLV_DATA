@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\LegacyContractSyncRun;
 use App\Services\LegacyContractSyncService;
 use App\Traits\WithPermissionChecks;
 use Livewire\Component;
@@ -10,6 +11,19 @@ use Livewire\WithPagination;
 class LegacyContractImport extends Component
 {
     use WithPagination, WithPermissionChecks;
+
+    // Automatic sync status panel
+    public $driftSummary = null;
+
+    public $driftCheckedAt = null;
+
+    public $deletedInLegacy = [];
+
+    public $isCheckingDrift = false;
+
+    public $isRunningSync = false;
+
+    public $showDeletedDetail = false;
 
     // Filter properties
     public $legacyIdFilter = '';
@@ -241,6 +255,114 @@ class LegacyContractImport extends Component
     }
 
     /**
+     * Compare the legacy database against CAP TRACK without changing anything.
+     */
+    public function checkDrift()
+    {
+        $this->isCheckingDrift = true;
+
+        try {
+            $changes = app(LegacyContractSyncService::class)->detectChanges();
+
+            $this->driftSummary = [
+                'new' => count($changes['new']),
+                'updated' => count($changes['updated']),
+                'deleted_in_legacy' => count($changes['deleted_in_legacy']),
+                'unchanged' => $changes['unchanged'],
+                'legacy_total' => $changes['legacy_total'],
+            ];
+            $this->deletedInLegacy = $changes['deleted_in_legacy'];
+            $this->driftCheckedAt = $changes['checked_at']->format('M j, Y g:i A');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Could not check the legacy database: '.$e->getMessage());
+            \Log::error('Legacy drift check failed', ['error' => $e->getMessage()]);
+        } finally {
+            $this->isCheckingDrift = false;
+        }
+    }
+
+    /**
+     * Apply everything the nightly job would apply, on demand.
+     */
+    public function runAutoSyncNow()
+    {
+        $this->authorizeAction('contracts.import_legacy');
+
+        $this->isRunningSync = true;
+
+        $run = LegacyContractSyncRun::create([
+            'status' => 'running',
+            'triggered_by' => 'manual',
+            'started_at' => now(),
+            'executed_by_user_id' => auth()->id(),
+        ]);
+
+        $started = microtime(true);
+
+        try {
+            $result = app(LegacyContractSyncService::class)->autoSync();
+
+            $stats = $result['stats'] ?? [];
+            $detected = $result['detected'] ?? [];
+            $errors = $result['errors'] ?? [];
+            $applied = ($stats['created'] ?? 0) + ($stats['updated'] ?? 0);
+
+            $run->update([
+                'status' => match (true) {
+                    ! ($result['success'] ?? false) => 'failed',
+                    ! empty($errors) && $applied > 0 => 'partial',
+                    ! empty($errors) => 'failed',
+                    default => 'success',
+                },
+                'completed_at' => now(),
+                'duration_ms' => (int) round((microtime(true) - $started) * 1000),
+                'detected_new' => $detected['new'] ?? 0,
+                'detected_updated' => $detected['updated'] ?? 0,
+                'detected_deleted' => $detected['deleted_in_legacy'] ?? 0,
+                'unchanged_count' => $detected['unchanged'] ?? 0,
+                'created_count' => $stats['created'] ?? 0,
+                'updated_count' => $stats['updated'] ?? 0,
+                'skipped_count' => $stats['skipped'] ?? 0,
+                'due_dates_created' => $stats['due_dates_created'] ?? 0,
+                'due_dates_updated' => $stats['due_dates_updated'] ?? 0,
+                'media_synced' => $stats['media_synced'] ?? 0,
+                'funders_created' => $stats['funders_created'] ?? 0,
+                'deferred_count' => $result['deferred'] ?? 0,
+                'errors' => $errors ?: null,
+                'warnings' => ($result['warnings'] ?? []) ?: null,
+                'deleted_legacy_ids' => array_column($result['changes']['deleted_in_legacy'] ?? [], 'legacy_id') ?: null,
+            ]);
+
+            $this->lastImportStats = $stats;
+            $this->lastImportErrors = $errors;
+            $this->lastImportWarnings = $result['warnings'] ?? [];
+            $this->importResults = $result;
+            $this->showSuccessSummary = true;
+
+            session()->flash('success', 'Sync complete — '.$run->fresh()->summaryLine());
+
+            $this->checkDrift();
+        } catch (\Exception $e) {
+            $run->update([
+                'status' => 'failed',
+                'completed_at' => now(),
+                'duration_ms' => (int) round((microtime(true) - $started) * 1000),
+                'error_message' => $e->getMessage(),
+            ]);
+
+            session()->flash('error', 'Sync failed: '.$e->getMessage());
+            \Log::error('Manual legacy auto-sync failed', ['error' => $e->getMessage()]);
+        } finally {
+            $this->isRunningSync = false;
+        }
+    }
+
+    public function toggleDeletedDetail()
+    {
+        $this->showDeletedDetail = ! $this->showDeletedDetail;
+    }
+
+    /**
      * Reset filters
      */
     public function resetFilters()
@@ -254,6 +376,9 @@ class LegacyContractImport extends Component
 
     public function render()
     {
-        return view('livewire.legacy-contract-import')->layout('components.layouts.app');
+        return view('livewire.legacy-contract-import', [
+            'lastRun' => LegacyContractSyncRun::latestRun(),
+            'autoSyncEnabled' => (bool) config('legacy-import.auto_sync.enabled', true),
+        ])->layout('components.layouts.app');
     }
 }

@@ -101,6 +101,141 @@
         @endif
 
         <div class="p-6">
+            <!-- Automatic Sync Section -->
+            <div class="mb-6 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                            Automatic Sync
+                            @if($autoSyncEnabled)
+                                <span class="px-2 py-0.5 text-xs font-medium rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Nightly at 4:00 AM</span>
+                            @else
+                                <span class="px-2 py-0.5 text-xs font-medium rounded-full bg-gray-200 text-gray-700 dark:bg-zinc-700 dark:text-gray-300">Disabled</span>
+                            @endif
+                        </h3>
+                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                            New and changed contracts are pulled from the legacy system automatically. Archived state,
+                            report statuses and reminder settings you set here are never overwritten.
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button wire:click="checkDrift" wire:loading.attr="disabled" wire:target="checkDrift"
+                                class="px-4 py-2 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-600 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-200 rounded-md text-sm font-medium transition-colors disabled:opacity-50">
+                            <span wire:loading.remove wire:target="checkDrift">Check for Changes</span>
+                            <span wire:loading wire:target="checkDrift">Checking…</span>
+                        </button>
+                        <button wire:click="runAutoSyncNow" wire:loading.attr="disabled" wire:target="runAutoSyncNow"
+                                wire:confirm="Import all new contracts and refresh all changed contracts from the legacy system now?"
+                                class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md text-sm font-medium transition-colors disabled:opacity-50">
+                            <span wire:loading.remove wire:target="runAutoSyncNow">Sync Now</span>
+                            <span wire:loading wire:target="runAutoSyncNow">Syncing…</span>
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Pending drift --}}
+                @if($driftSummary)
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
+                        <div class="p-3 bg-white dark:bg-zinc-800 rounded-md border border-gray-200 dark:border-zinc-700">
+                            <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ number_format($driftSummary['new']) }}</div>
+                            <div class="text-xs text-gray-600 dark:text-gray-400 mt-0.5">New in legacy</div>
+                        </div>
+                        <div class="p-3 bg-white dark:bg-zinc-800 rounded-md border border-gray-200 dark:border-zinc-700">
+                            <div class="text-2xl font-bold text-amber-600 dark:text-amber-400">{{ number_format($driftSummary['updated']) }}</div>
+                            <div class="text-xs text-gray-600 dark:text-gray-400 mt-0.5">Changed since last sync</div>
+                        </div>
+                        <div class="p-3 bg-white dark:bg-zinc-800 rounded-md border border-gray-200 dark:border-zinc-700">
+                            <div class="text-2xl font-bold text-red-600 dark:text-red-400">{{ number_format($driftSummary['deleted_in_legacy']) }}</div>
+                            <div class="text-xs text-gray-600 dark:text-gray-400 mt-0.5">Deleted in legacy</div>
+                        </div>
+                        <div class="p-3 bg-white dark:bg-zinc-800 rounded-md border border-gray-200 dark:border-zinc-700">
+                            <div class="text-2xl font-bold text-gray-700 dark:text-gray-300">{{ number_format($driftSummary['unchanged']) }}</div>
+                            <div class="text-xs text-gray-600 dark:text-gray-400 mt-0.5">In step</div>
+                        </div>
+                    </div>
+
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                        Compared {{ number_format($driftSummary['legacy_total']) }} legacy contracts at {{ $driftCheckedAt }}.
+                    </p>
+
+                    @if($driftSummary['deleted_in_legacy'] > 0)
+                        <div class="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
+                            <div class="flex items-start justify-between gap-3">
+                                <p class="text-sm text-red-800 dark:text-red-200">
+                                    <strong>{{ $driftSummary['deleted_in_legacy'] }} contract(s)</strong> exist here but were
+                                    deleted in the legacy system. Nothing is changed automatically &mdash; review and decide
+                                    whether to archive them.
+                                </p>
+                                <button wire:click="toggleDeletedDetail"
+                                        class="flex-shrink-0 text-sm font-medium text-red-700 dark:text-red-300 hover:underline">
+                                    {{ $showDeletedDetail ? 'Hide' : 'Show' }}
+                                </button>
+                            </div>
+
+                            @if($showDeletedDetail)
+                                <div class="mt-3 max-h-64 overflow-y-auto">
+                                    <table class="min-w-full text-sm divide-y divide-red-200 dark:divide-red-800">
+                                        <thead>
+                                            <tr class="text-left text-xs uppercase text-red-700 dark:text-red-300">
+                                                <th class="py-1 pr-3">Legacy ID</th>
+                                                <th class="py-1 pr-3">Contract</th>
+                                                <th class="py-1 pr-3">Deleted</th>
+                                                <th class="py-1">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-red-100 dark:divide-red-900">
+                                            @foreach($deletedInLegacy as $row)
+                                                <tr class="text-gray-800 dark:text-gray-200">
+                                                    <td class="py-1 pr-3 font-mono text-xs">#{{ $row['legacy_id'] }}</td>
+                                                    <td class="py-1 pr-3">
+                                                        <a href="{{ route('contract.show', $row['contract_id']) }}"
+                                                           class="text-indigo-600 dark:text-indigo-400 hover:underline">
+                                                            {{ \Illuminate\Support\Str::limit($row['title'] ?: '(untitled)', 60) }}
+                                                        </a>
+                                                    </td>
+                                                    <td class="py-1 pr-3 text-xs">{{ $row['deleted_at'] }}</td>
+                                                    <td class="py-1 text-xs">{{ $row['archived'] ? 'Archived here' : 'Active here' }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @endif
+                        </div>
+                    @endif
+                @else
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        Use <strong>Check for Changes</strong> to compare against the legacy system without importing anything.
+                    </p>
+                @endif
+
+                {{-- Last run --}}
+                @if($lastRun)
+                    <div class="mt-4 pt-3 border-t border-indigo-200 dark:border-indigo-800 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+                        <span class="text-gray-600 dark:text-gray-400">Last run:</span>
+                        @php
+                            $color = $lastRun->statusColor();
+                            $badge = [
+                                'green' => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+                                'yellow' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+                                'red' => 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+                                'gray' => 'bg-gray-100 text-gray-800 dark:bg-zinc-700 dark:text-gray-200',
+                                'blue' => 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+                            ][$color];
+                        @endphp
+                        <span class="px-2 py-0.5 text-xs font-medium rounded-full {{ $badge }}">{{ ucfirst($lastRun->status) }}</span>
+                        <span class="text-gray-800 dark:text-gray-200">{{ $lastRun->summaryLine() }}</span>
+                        <span class="text-gray-500 dark:text-gray-400 text-xs">
+                            {{ $lastRun->started_at?->diffForHumans() }}
+                            &middot; {{ ucfirst($lastRun->triggered_by) }}
+                            @if($lastRun->duration_ms)
+                                &middot; {{ number_format($lastRun->duration_ms / 1000, 1) }}s
+                            @endif
+                        </span>
+                    </div>
+                @endif
+            </div>
+
             <!-- Connection Test Section -->
             <div class="mb-6 p-4 bg-gray-50 dark:bg-zinc-900 rounded-lg border border-gray-200 dark:border-zinc-700">
                 <div class="flex items-center justify-between mb-4">

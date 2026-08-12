@@ -11,8 +11,17 @@ return [
     /*
      * The maximum file size of an item in bytes.
      * Adding a larger file will result in an exception.
+     *
+     * Raised from 10MB so the legacy contract sync can carry over every
+     * attachment: 13 of the 1,746 legacy contract documents exceed 10MB and the
+     * largest is 24.45MB (measured 2026-08-12). 32MB leaves headroom.
+     *
+     * NOTE: this governs server-side additions such as the legacy sync. Browser
+     * uploads are separately capped by PHP's upload_max_filesize / post_max_size
+     * (currently 2M / 8M), which are lower and must be raised in php.ini for
+     * users to upload files this large through the UI.
      */
-    'max_file_size' => 1024 * 1024 * 10, // 10MB
+    'max_file_size' => 1024 * 1024 * 32, // 32MB
 
     /*
      * This queue connection will be used to generate derived and responsive images.

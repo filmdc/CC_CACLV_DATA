@@ -102,6 +102,15 @@ class Contract extends Model implements HasMedia, HasMediaAuthorization
                 'image/png',
                 'image/gif',
                 'image/jpg',
+
+                // Formats present in the legacy contract database that the
+                // sync must be able to carry over. Counts as of 2026-08-12.
+                'message/rfc822',                // .eml saved email (3 files)
+                'application/vnd.ms-office',     // generic MS Office (3 files)
+                'application/zip',               // zipped submissions (4 files)
+                'text/rtf',                      // (1 file)
+                'image/tiff',                    // scanned pages (2 files)
+                'image/x-eps',                   // (1 file)
             ])
             ->useDisk('public');
     }
