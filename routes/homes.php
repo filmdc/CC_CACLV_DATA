@@ -31,12 +31,21 @@ Route::domain(env('HOMES_DOMAIN', 'homes.caclv.org'))->group(function () {
             ->middleware('permission:communications_log.view')
             ->name('homes.calls');
 
-        // Placeholder destinations (built in later phases)
-        Route::get('/projects', App\Livewire\Homes\Stub::class)
+        Route::get('/calls/{log}', App\Livewire\Homes\CallDetail::class)
+            ->middleware('permission:communications_log.view')
+            ->name('homes.call');
+
+        // Projects (active rehab jobs)
+        Route::get('/projects', App\Livewire\Homes\Projects::class)
             ->middleware('permission:projects.view')
             ->name('homes.projects');
 
-        Route::get('/reports', App\Livewire\Homes\Stub::class)
+        Route::get('/projects/{job}', App\Livewire\Homes\ProjectDetail::class)
+            ->middleware('permission:projects.view')
+            ->name('homes.project');
+
+        // Reports (canned, read-only)
+        Route::get('/reports', App\Livewire\Homes\Reports::class)
             ->middleware('permission:housing.reports.view')
             ->name('homes.reports');
 

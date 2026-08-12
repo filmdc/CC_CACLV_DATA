@@ -55,7 +55,7 @@
                             <div class="calv-subhead" style="font-size: 10px; color: {{ $dueColor }};">{{ $row['due_label'] }}</div>
                         </div>
                         <div class="flex items-center gap-1.5 shrink-0">
-                            <a href="{{ route('homes.calls') }}?open={{ $row['id'] }}" wire:navigate class="calv-btn calv-btn--quiet calv-btn--sm">Open</a>
+                            <a href="{{ route('homes.call', $row['id']) }}" wire:navigate class="calv-btn calv-btn--quiet calv-btn--sm">Open</a>
                             <button type="button" wire:click="completeFollowUp({{ $row['id'] }})" class="calv-btn calv-btn--quiet calv-btn--sm" title="Mark follow-up done">Done</button>
                         </div>
                     </div>
@@ -79,7 +79,7 @@
                                 {{ $row['missing'] }}@if($row['total']) — {{ $row['met'] }} of {{ $row['total'] }} requirements met @endif
                             </div>
                         </div>
-                        <a href="{{ route('homes.calls') }}?open={{ $row['id'] }}" wire:navigate class="calv-btn calv-btn--quiet calv-btn--sm shrink-0">Open</a>
+                        <a href="{{ route('homes.call', $row['id']) }}" wire:navigate class="calv-btn calv-btn--quiet calv-btn--sm shrink-0">Open</a>
                     </div>
                 @empty
                     <div class="px-4 py-6 text-center text-sm" style="color: var(--calv-slate-65);">Nothing outstanding right now.</div>
@@ -100,7 +100,10 @@
                     <div class="px-4 py-3.5" style="border-bottom: 1px solid var(--calv-slate-15);">
                         <div class="text-sm font-semibold" style="color: var(--calv-slate);">{{ $row['who'] }}@if($row['where'])<span style="color: var(--calv-slate-65); font-weight: 400;"> · {{ $row['where'] }}</span>@endif</div>
                         @if($row['summary'])<div class="text-[12.5px] mt-1 mb-2.5 leading-snug" style="color: var(--calv-slate-65);">{{ Str::limit($row['summary'], 120) }}</div>@endif
-                        <div class="text-[11.5px]" style="color: var(--calv-slate-65);">All {{ $row['total'] }} requirements met · convert in the main app for now.</div>
+                        <div class="flex items-center gap-2.5">
+                            <a href="{{ route('homes.call', $row['id']) }}" wire:navigate class="calv-btn calv-btn--secondary calv-btn--sm">Convert to project →</a>
+                            <span class="text-[11.5px]" style="color: var(--calv-slate-65);">All {{ $row['total'] }} requirements met</span>
+                        </div>
                     </div>
                 @empty
                     <div class="px-4 py-6 text-center text-sm" style="color: var(--calv-slate-65);">No intakes ready to convert yet.</div>

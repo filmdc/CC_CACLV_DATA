@@ -90,7 +90,7 @@
                             <td class="px-3 py-2.5 text-[12.5px]" style="color: {{ $row['overdue'] ? 'var(--calv-red)' : 'var(--calv-slate)' }};">{{ $row['next'] }}</td>
                             <td class="px-3 py-2.5 text-[12.5px]" style="color: var(--calv-slate);">{{ $row['type'] }}</td>
                             <td class="px-3 py-2.5 text-[12.5px]" style="color: var(--calv-slate);">{{ $row['direction'] }}</td>
-                            <td class="px-3 py-2.5"><a href="{{ env('MAIN_APP_URL', 'https://caclv-data.caclv.org') }}/communications-log" class="calv-btn calv-btn--quiet calv-btn--sm">Open</a></td>
+                            <td class="px-3 py-2.5"><a href="{{ route('homes.call', $row['id']) }}" wire:navigate class="calv-btn calv-btn--quiet calv-btn--sm">Open</a></td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -114,7 +114,7 @@
                         <div class="text-[12.5px] font-semibold" style="color: {{ $row['overdue'] ? 'var(--calv-red)' : 'var(--calv-slate)' }};">{{ $row['next'] }}</div>
                         <div class="text-[11px] mt-0.5" style="color: var(--calv-slate-65);">last touched {{ $row['last'] }}</div>
                     </div>
-                    <a href="{{ env('MAIN_APP_URL', 'https://caclv-data.caclv.org') }}/communications-log" class="calv-btn calv-btn--quiet calv-btn--sm shrink-0">Open</a>
+                    <a href="{{ route('homes.call', $row['id']) }}" wire:navigate class="calv-btn calv-btn--quiet calv-btn--sm shrink-0">Open</a>
                 </div>
             @endforeach
         </div>
