@@ -129,3 +129,107 @@ it('edits and completes the follow-up', function () {
     expect($fresh->follow_up_completed)->toBeTrue();
     expect($fresh->follow_up_completed_by)->toBe($user->id);
 });
+
+it('edits the log fields from the portal', function () {
+    $user = callDetailUser(['communications_log.view', 'communications_log.edit']);
+    $this->actingAs($user);
+
+    $log = CommunicationLog::factory()->create();
+
+    Livewire::test(CallDetail::class, ['log' => $log])
+        ->call('openEdit')
+        ->set('edit.contact_first_name', 'Evelyn')
+        ->set('edit.contact_last_name', 'Lapenna')
+        ->set('edit.contact_phone', '610-863-4471')
+        ->set('edit.subject', 'Roof failing over back bedroom')
+        ->set('edit.summary', 'Updated after site visit.')
+        ->call('saveEdit')
+        ->assertHasNoErrors();
+
+    $fresh = $log->fresh();
+    expect($fresh->contact_first_name)->toBe('Evelyn');
+    expect($fresh->contact_last_name)->toBe('Lapenna');
+    expect($fresh->subject)->toBe('Roof failing over back bedroom');
+    expect($fresh->summary)->toBe('Updated after site visit.');
+    expect($fresh->updated_by)->toBe($user->id);
+});
+
+it('blocks log editing without communications_log.edit', function () {
+    $this->actingAs(callDetailUser(['communications_log.view']));
+
+    $log = CommunicationLog::factory()->create();
+
+    Livewire::test(CallDetail::class, ['log' => $log])
+        ->call('openEdit')
+        ->assertForbidden();
+});
+
+it('adds an ad-hoc requirement', function () {
+    $this->actingAs(callDetailUser(['communications_log.view', 'communications_log.edit']));
+
+    $log = CommunicationLog::factory()->create();
+
+    Livewire::test(CallDetail::class, ['log' => $log])
+        ->set('adHocLabel', 'Benefit letter (SS)')
+        ->set('adHocType', 'document')
+        ->call('saveAdHocRequirement')
+        ->assertHasNoErrors();
+
+    $req = $log->intakeRequirements()->first();
+    expect($req)->not->toBeNull();
+    expect($req->label)->toBe('Benefit letter (SS)');
+    expect($req->source_type)->toBe(IntakeRequirement::SOURCE_AD_HOC);
+});
+
+it('attaches and detaches a county with requirement side effects', function () {
+    $this->actingAs(callDetailUser(['communications_log.view', 'communications_log.edit']));
+
+    $log = CommunicationLog::factory()->create();
+    $county = \App\Models\HousingService::create(['name' => 'Fixture County', 'is_active' => true]);
+
+    $component = Livewire::test(CallDetail::class, ['log' => $log]);
+
+    $component->call('toggleCounty', $county->id)->assertHasNoErrors();
+    expect($log->housingServices()->count())->toBe(1);
+
+    $component->call('toggleCounty', $county->id)->assertHasNoErrors();
+    expect($log->housingServices()->count())->toBe(0);
+});
+
+it('uploading a file marks the document requirement received', function () {
+    \Illuminate\Support\Facades\Storage::fake('private_media');
+    $user = callDetailUser(['communications_log.view', 'communications_log.edit']);
+    $this->actingAs($user);
+
+    $log = CommunicationLog::factory()->create();
+    $req = IntakeRequirement::factory()->create([
+        'communication_log_id' => $log->id,
+        'type' => IntakeRequirement::TYPE_DOCUMENT,
+        'status' => IntakeRequirement::STATUS_PENDING,
+    ]);
+
+    // A fake image carries a real image mime, which the 'documents'
+    // collection accepts (scanned IDs are photos in practice).
+    Livewire::test(CallDetail::class, ['log' => $log])
+        ->call('openUpload', $req->id)
+        ->set('requirementFiles', [\Illuminate\Http\UploadedFile::fake()->image('photo-id.jpg')])
+        ->call('uploadRequirementFiles')
+        ->assertHasNoErrors();
+
+    $fresh = $req->fresh();
+    expect($fresh->status)->toBe(IntakeRequirement::STATUS_RECEIVED);
+    expect($fresh->getMedia('documents'))->toHaveCount(1);
+});
+
+it('offers convert on a non-ready entry (gate lives in the modal)', function () {
+    $this->actingAs(callDetailUser(['communications_log.view', 'communications_log.edit', 'projects.create']));
+
+    $log = CommunicationLog::factory()->create();
+    IntakeRequirement::factory()->create([
+        'communication_log_id' => $log->id,
+        'status' => IntakeRequirement::STATUS_PENDING, // unmet — NOT ready
+    ]);
+
+    Livewire::test(CallDetail::class, ['log' => $log])
+        ->assertViewHas('canConvert', true);
+});

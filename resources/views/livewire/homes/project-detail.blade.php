@@ -50,6 +50,7 @@
             </div>
         </div>
         <div class="flex gap-2 shrink-0">
+            <button type="button" wire:click="openEditJob" class="calv-btn calv-btn--ghost">Edit</button>
             @can('communications_log.create')
                 <button type="button" x-on:click="Livewire.dispatch('homes-open-quick-log')" class="calv-btn calv-btn--ghost">Log a call</button>
             @endcan
@@ -66,6 +67,7 @@
             <header class="flex items-center gap-2.5 px-4 py-3" style="border-bottom: 1px solid var(--calv-slate-15);">
                 <h3 class="calv-subhead flex-1" style="font-size: 12px;">Milestones</h3>
                 <span class="text-[11.5px]" style="color: var(--calv-slate-65);">{{ $msDone }} of {{ $msTotal }} done · click a row for its requirements</span>
+                <button type="button" wire:click="openMilestoneForm" class="calv-btn calv-btn--quiet calv-btn--sm">+ Milestone</button>
             </header>
             @forelse($milestones as $m)
                 @php $open = $openMilestone === $m['id']; @endphp
@@ -115,6 +117,32 @@
                             @empty
                                 <div class="text-[12px]" style="color: var(--calv-slate-65);">No requirements on this milestone.</div>
                             @endforelse
+
+                            {{-- Add a requirement to this milestone --}}
+                            @if($addingReqMilestoneId === $m['id'])
+                                <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                                    <input wire:model="newReqTitle" type="text" class="calv-input" style="max-width: 260px;" placeholder="What's required? e.g. Roofing permit">
+                                    <select wire:model="newReqType" class="calv-input" style="width: auto;">
+                                        <option value="document">Document</option>
+                                        <option value="task">Task</option>
+                                    </select>
+                                    <button type="button" wire:click="saveNewRequirement" class="calv-btn calv-btn--primary calv-btn--sm">Add</button>
+                                    <button type="button" wire:click="$set('addingReqMilestoneId', null)" class="calv-btn calv-btn--ghost calv-btn--sm">Cancel</button>
+                                </div>
+                                @error('newReqTitle')<p class="text-xs mt-1" style="color: var(--calv-red);">{{ $message }}</p>@enderror
+                            @else
+                                <button type="button" wire:click="openAddRequirement({{ $m['id'] }})" class="calv-link text-left mt-1" style="background:none;border:none;cursor:pointer;font-size:12px;">+ add a requirement</button>
+                            @endif
+
+                            {{-- Milestone status actions --}}
+                            <div class="flex items-center gap-2 mt-2 pt-2" style="border-top: 1px dashed var(--calv-slate-15);">
+                                @if($m['status'] === 'not_started')
+                                    <button type="button" wire:click="updateMilestoneStatus({{ $m['id'] }}, 'in_progress')" class="calv-btn calv-btn--quiet calv-btn--sm">Start milestone</button>
+                                @elseif($m['status'] === 'in_progress')
+                                    <button type="button" wire:click="updateMilestoneStatus({{ $m['id'] }}, 'completed')" class="calv-btn calv-btn--secondary calv-btn--sm">Mark milestone done</button>
+                                @endif
+                                @if($m['target'])<span class="text-[11px]" style="color: var(--calv-slate-65);">target {{ $m['target'] }}</span>@endif
+                            </div>
                         </div>
                     @endif
                 </div>
@@ -147,11 +175,18 @@
                             </div>
                         </div>
                     @empty
-                        <div class="text-[12.5px]" style="color: var(--calv-slate-65);">No budget lines yet — add them on the main app's project page.</div>
+                        <div class="text-[12.5px]" style="color: var(--calv-slate-65);">No budget lines yet.</div>
                     @endforelse
-                    @if($budgets->count() > 0)
-                        <button type="button" wire:click="openExpense" class="calv-link text-left" style="background: none; border: none; cursor: pointer; font-size: 12px;">+ Add an expense</button>
-                    @endif
+                    <div class="flex items-center gap-3">
+                        @if($job->fundCodes->count() > 0)
+                            <button type="button" wire:click="openBudgetForm" class="calv-link text-left" style="background: none; border: none; cursor: pointer; font-size: 12px;">+ Add a budget line</button>
+                        @else
+                            <span class="text-[11.5px]" style="color: var(--calv-slate-65);">Attach a fund code to this project (main app) before adding budget lines.</span>
+                        @endif
+                        @if($budgets->count() > 0)
+                            <button type="button" wire:click="openExpense" class="calv-link text-left" style="background: none; border: none; cursor: pointer; font-size: 12px;">+ Add an expense</button>
+                        @endif
+                    </div>
                 </div>
             </section>
 
@@ -267,6 +302,149 @@
                     <button type="button" wire:click="saveExpense" class="calv-btn calv-btn--primary" wire:loading.attr="disabled" wire:target="saveExpense">
                         <span wire:loading.remove wire:target="saveExpense">Save expense</span>
                         <span wire:loading wire:target="saveExpense">Saving…</span>
+                    </button>
+                </footer>
+            </div>
+        </div>
+    @endif
+
+    {{-- Edit project modal --}}
+    @if($showEditJob)
+        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 56px 16px;"
+             x-data x-on:keydown.escape.window="$wire.closeEditJob()" wire:click.self="closeEditJob">
+            <div class="w-full" style="max-width: 540px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+                <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
+                    <h2 class="calv-h1" style="font-size: 20px;">Edit project</h2>
+                    <div class="text-xs mt-1" style="color: var(--calv-slate-65);">{{ $job->job_number }}</div>
+                </header>
+                <div class="px-6 py-5 flex flex-col gap-3.5">
+                    <div>
+                        <label class="calv-label">Project name</label>
+                        <input wire:model="editJob.job_title" type="text" class="calv-input">
+                        @error('editJob.job_title')<p class="mt-1 text-xs" style="color: var(--calv-red);">{{ $message }}</p>@enderror
+                    </div>
+                    <div>
+                        <label class="calv-label">Scope of work</label>
+                        <textarea wire:model="editJob.job_description" rows="3" class="calv-input" style="resize: vertical;"></textarea>
+                    </div>
+                    <div class="grid gap-3" style="grid-template-columns: 1fr 1fr;">
+                        <div>
+                            <label class="calv-label">Status</label>
+                            <select wire:model="editJob.status" class="calv-input">
+                                @foreach(['pending' => 'Pending', 'approved' => 'Approved', 'in_progress' => 'In progress', 'on_hold' => 'On hold', 'completed' => 'Completed', 'cancelled' => 'Cancelled', 'rejected' => 'Rejected'] as $v => $l)
+                                    <option value="{{ $v }}">{{ $l }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="calv-label">Priority</label>
+                            <select wire:model="editJob.priority" class="calv-input">
+                                @foreach(['low' => 'Low', 'medium' => 'Medium', 'high' => 'High', 'emergency' => 'Emergency'] as $v => $l)
+                                    <option value="{{ $v }}">{{ $l }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="calv-label">Start date</label>
+                            <input wire:model="editJob.start_date" type="date" class="calv-input">
+                        </div>
+                        <div>
+                            <label class="calv-label">Target completion</label>
+                            <input wire:model="editJob.target_completion_date" type="date" class="calv-input">
+                        </div>
+                    </div>
+                </div>
+                <footer class="flex items-center gap-2.5 px-6 py-3.5 justify-end" style="border-top: 1px solid var(--calv-slate-15); background: var(--calv-sand-15);">
+                    <button type="button" wire:click="closeEditJob" class="calv-btn calv-btn--ghost">Cancel</button>
+                    <button type="button" wire:click="saveEditJob" class="calv-btn calv-btn--primary" wire:loading.attr="disabled" wire:target="saveEditJob">
+                        <span wire:loading.remove wire:target="saveEditJob">Save changes</span>
+                        <span wire:loading wire:target="saveEditJob">Saving…</span>
+                    </button>
+                </footer>
+            </div>
+        </div>
+    @endif
+
+    {{-- Add milestone modal --}}
+    @if($showMilestoneForm)
+        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 64px 16px;"
+             x-data x-on:keydown.escape.window="$wire.set('showMilestoneForm', false)" wire:click.self="$set('showMilestoneForm', false)">
+            <div class="w-full" style="max-width: 460px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+                <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
+                    <h2 class="calv-h1" style="font-size: 20px;">Add milestone</h2>
+                </header>
+                <div class="px-6 py-5 flex flex-col gap-3.5">
+                    <div>
+                        <label class="calv-label">Name</label>
+                        <input wire:model="milestoneName" type="text" class="calv-input" placeholder="e.g. Final inspection">
+                        @error('milestoneName')<p class="mt-1 text-xs" style="color: var(--calv-red);">{{ $message }}</p>@enderror
+                    </div>
+                    <div>
+                        <label class="calv-label">Description <span style="font-weight:400; text-transform:none; letter-spacing:0; color: var(--calv-slate-65);">— optional</span></label>
+                        <textarea wire:model="milestoneDescription" rows="2" class="calv-input" style="resize: vertical;"></textarea>
+                    </div>
+                    <div>
+                        <label class="calv-label">Target date <span style="font-weight:400; text-transform:none; letter-spacing:0; color: var(--calv-slate-65);">— optional</span></label>
+                        <input wire:model="milestoneTargetDate" type="date" class="calv-input" style="max-width: 200px;">
+                    </div>
+                </div>
+                <footer class="flex items-center gap-2.5 px-6 py-3.5 justify-end" style="border-top: 1px solid var(--calv-slate-15); background: var(--calv-sand-15);">
+                    <button type="button" wire:click="$set('showMilestoneForm', false)" class="calv-btn calv-btn--ghost">Cancel</button>
+                    <button type="button" wire:click="saveMilestone" class="calv-btn calv-btn--primary" wire:loading.attr="disabled" wire:target="saveMilestone">
+                        <span wire:loading.remove wire:target="saveMilestone">Add milestone</span>
+                        <span wire:loading wire:target="saveMilestone">Saving…</span>
+                    </button>
+                </footer>
+            </div>
+        </div>
+    @endif
+
+    {{-- Add budget line modal --}}
+    @if($showBudgetForm)
+        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 64px 16px;"
+             x-data x-on:keydown.escape.window="$wire.set('showBudgetForm', false)" wire:click.self="$set('showBudgetForm', false)">
+            <div class="w-full" style="max-width: 460px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+                <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
+                    <h2 class="calv-h1" style="font-size: 20px;">Add budget line</h2>
+                    <div class="text-xs mt-1" style="color: var(--calv-slate-65);">A category of work funded from one of this project's funds.</div>
+                </header>
+                <div class="px-6 py-5 flex flex-col gap-3.5">
+                    <div>
+                        <label class="calv-label">Category</label>
+                        <input wire:model="budgetCategory" type="text" class="calv-input" placeholder="e.g. Roofing">
+                        @error('budgetCategory')<p class="mt-1 text-xs" style="color: var(--calv-red);">{{ $message }}</p>@enderror
+                    </div>
+                    <div class="grid gap-3" style="grid-template-columns: 1fr 1fr;">
+                        <div>
+                            <label class="calv-label">Amount</label>
+                            <input wire:model="budgetAmount" type="number" step="0.01" min="0" class="calv-input" placeholder="0.00">
+                            @error('budgetAmount')<p class="mt-1 text-xs" style="color: var(--calv-red);">{{ $message }}</p>@enderror
+                        </div>
+                        <div>
+                            <label class="calv-label">Fund</label>
+                            <select wire:model="budgetFundCodeId" class="calv-input">
+                                @foreach($job->fundCodes as $fund)
+                                    <option value="{{ $fund->id }}">{{ $fund->code }}</option>
+                                @endforeach
+                            </select>
+                            @error('budgetFundCodeId')<p class="mt-1 text-xs" style="color: var(--calv-red);">{{ $message }}</p>@enderror
+                        </div>
+                    </div>
+                    <div>
+                        <label class="calv-label">Milestone <span style="font-weight:400; text-transform:none; letter-spacing:0; color: var(--calv-slate-65);">— optional anchor</span></label>
+                        <select wire:model="budgetMilestoneId" class="calv-input">
+                            <option value="">—</option>
+                            @foreach($milestones as $m)
+                                <option value="{{ $m['id'] }}">{{ $m['name'] }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <footer class="flex items-center gap-2.5 px-6 py-3.5 justify-end" style="border-top: 1px solid var(--calv-slate-15); background: var(--calv-sand-15);">
+                    <button type="button" wire:click="$set('showBudgetForm', false)" class="calv-btn calv-btn--ghost">Cancel</button>
+                    <button type="button" wire:click="saveBudgetLine" class="calv-btn calv-btn--primary" wire:loading.attr="disabled" wire:target="saveBudgetLine">
+                        <span wire:loading.remove wire:target="saveBudgetLine">Add budget line</span>
+                        <span wire:loading wire:target="saveBudgetLine">Saving…</span>
                     </button>
                 </footer>
             </div>

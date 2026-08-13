@@ -3,11 +3,15 @@
 namespace App\Livewire\Homes;
 
 use App\Models\HousingJob;
+use App\Models\ProjectBudget;
 use App\Models\ProjectExpense;
+use App\Models\ProjectMilestone;
 use App\Models\Requirement;
 use App\Services\MediaValidationService;
+use App\Services\RequirementInstantiator;
 use App\Traits\WithPermissionChecks;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -36,6 +40,39 @@ class ProjectDetail extends Component
     public array $completionFiles = [];
 
     public string $completionNote = '';
+
+    // ── Edit-job modal ────────────────────────────────────────────
+    public bool $showEditJob = false;
+
+    public array $editJob = [];
+
+    // ── Add-milestone modal ───────────────────────────────────────
+    public bool $showMilestoneForm = false;
+
+    public string $milestoneName = '';
+
+    public string $milestoneDescription = '';
+
+    public string $milestoneTargetDate = '';
+
+    // ── Per-milestone requirement add ─────────────────────────────
+    public ?int $addingReqMilestoneId = null;
+
+    public string $newReqTitle = '';
+
+    public string $newReqType = Requirement::TYPE_DOCUMENT;
+
+    // ── Add-budget-line modal ─────────────────────────────────────
+    public bool $showBudgetForm = false;
+
+    public string $budgetCategory = '';
+
+    public string $budgetAmount = '';
+
+    /** Untyped: the <select> round-trips '' for the empty option. */
+    public $budgetFundCodeId = null;
+
+    public $budgetMilestoneId = null;
 
     // ── Add-expense modal ─────────────────────────────────────────
     public bool $showExpense = false;
@@ -72,6 +109,222 @@ class ProjectDetail extends Component
     public function toggleMilestone(int $milestoneId): void
     {
         $this->openMilestone = $this->openMilestone === $milestoneId ? null : $milestoneId;
+    }
+
+    // ── Edit the project itself ───────────────────────────────────
+
+    public function openEditJob(): void
+    {
+        $this->authorizeAction('projects.view');
+
+        $this->editJob = [
+            'job_title' => (string) $this->job->job_title,
+            'job_description' => (string) ($this->job->job_description ?? ''),
+            'status' => (string) $this->job->status,
+            'priority' => (string) ($this->job->priority ?? 'medium'),
+            'start_date' => $this->job->start_date?->toDateString() ?? '',
+            'target_completion_date' => $this->job->target_completion_date?->toDateString() ?? '',
+        ];
+        $this->showEditJob = true;
+    }
+
+    public function closeEditJob(): void
+    {
+        $this->showEditJob = false;
+        $this->resetErrorBag();
+    }
+
+    public function saveEditJob(): void
+    {
+        $this->authorizeAction('projects.view');
+
+        $validated = $this->validate([
+            'editJob.job_title' => 'required|string|max:255',
+            'editJob.job_description' => 'nullable|string',
+            'editJob.status' => 'required|in:pending,approved,in_progress,on_hold,completed,cancelled,rejected',
+            'editJob.priority' => 'required|in:low,medium,high,emergency',
+            'editJob.start_date' => 'nullable|date',
+            'editJob.target_completion_date' => 'nullable|date',
+        ])['editJob'];
+
+        $this->job->update([
+            'job_title' => $validated['job_title'],
+            'job_description' => $validated['job_description'] ?: null,
+            'status' => $validated['status'],
+            'priority' => $validated['priority'],
+            'start_date' => $validated['start_date'] ?: null,
+            'target_completion_date' => $validated['target_completion_date'] ?: null,
+            'updated_by' => Auth::id(),
+        ]);
+
+        $this->showEditJob = false;
+        $this->job->refresh();
+        session()->flash('homes_message', 'Project updated.');
+    }
+
+    // ── Milestones: add + status ──────────────────────────────────
+
+    public function openMilestoneForm(): void
+    {
+        $this->authorizeAction('projects.view');
+
+        $this->milestoneName = '';
+        $this->milestoneDescription = '';
+        $this->milestoneTargetDate = '';
+        $this->showMilestoneForm = true;
+    }
+
+    public function saveMilestone(): void
+    {
+        $this->authorizeAction('projects.view');
+
+        $this->validate([
+            'milestoneName' => 'required|string|max:255',
+            'milestoneDescription' => 'nullable|string',
+            'milestoneTargetDate' => 'nullable|date',
+        ]);
+
+        $sequenceOrder = ((int) $this->job->milestones()->max('sequence_order')) + 1;
+
+        $milestone = ProjectMilestone::create([
+            'housing_job_id' => $this->job->id,
+            'name' => $this->milestoneName,
+            'description' => $this->milestoneDescription !== '' ? $this->milestoneDescription : null,
+            'target_date' => $this->milestoneTargetDate !== '' ? $this->milestoneTargetDate : null,
+            'icon' => 'Circle',
+            'color' => '#6366f1',
+            'sequence_order' => $sequenceOrder,
+            'status' => $sequenceOrder === 1 ? 'in_progress' : 'not_started',
+            'created_by' => Auth::id(),
+        ]);
+
+        $this->showMilestoneForm = false;
+        $this->openMilestone = $milestone->id;
+        $this->job->refresh();
+        session()->flash('homes_message', 'Milestone added.');
+    }
+
+    /** Start / complete a milestone — same guard as the main app. */
+    public function updateMilestoneStatus(int $milestoneId, string $status): void
+    {
+        $this->authorizeAction('projects.view');
+
+        $milestone = $this->job->milestones()->findOrFail($milestoneId);
+
+        if (! in_array($status, ['in_progress', 'completed'], true)) {
+            abort(422, 'Unknown milestone status.');
+        }
+
+        if ($status === 'completed') {
+            if (! $milestone->canBeCompleted()) {
+                session()->flash('homes_message', 'Cannot complete this milestone yet — its tasks and documents must be completed first.');
+
+                return;
+            }
+            $milestone->markAsCompleted();
+        } else {
+            $milestone->markAsInProgress();
+        }
+
+        $this->job->refresh();
+        session()->flash('homes_message', 'Milestone updated.');
+    }
+
+    // ── Per-milestone requirement add ─────────────────────────────
+
+    public function openAddRequirement(int $milestoneId): void
+    {
+        $this->authorizeAction('projects.view');
+
+        $this->job->milestones()->findOrFail($milestoneId);
+        $this->addingReqMilestoneId = $milestoneId;
+        $this->newReqTitle = '';
+        $this->newReqType = Requirement::TYPE_DOCUMENT;
+        $this->openMilestone = $milestoneId;
+    }
+
+    public function saveNewRequirement(RequirementInstantiator $instantiator): void
+    {
+        $this->authorizeAction('projects.view');
+
+        if (! $this->addingReqMilestoneId) {
+            return;
+        }
+
+        $this->validate([
+            'newReqTitle' => 'required|string|max:255',
+            'newReqType' => 'required|in:'.Requirement::TYPE_DOCUMENT.','.Requirement::TYPE_TASK,
+        ]);
+
+        $milestone = $this->job->milestones()->findOrFail($this->addingReqMilestoneId);
+
+        $instantiator->forMilestone($milestone, $this->newReqType, trim($this->newReqTitle), Auth::user());
+
+        $this->addingReqMilestoneId = null;
+        $this->newReqTitle = '';
+        $this->job->refresh();
+        session()->flash('homes_message', 'Requirement added.');
+    }
+
+    // ── Add a budget line ─────────────────────────────────────────
+
+    public function openBudgetForm(): void
+    {
+        $this->authorizeAction('projects.view');
+
+        $this->budgetCategory = '';
+        $this->budgetAmount = '';
+        $this->budgetFundCodeId = $this->job->fundCodes()->first()?->id;
+        $this->budgetMilestoneId = null;
+        $this->showBudgetForm = true;
+    }
+
+    public function saveBudgetLine(): void
+    {
+        $this->authorizeAction('projects.view');
+
+        // The empty <select> option round-trips ''.
+        $this->budgetMilestoneId = $this->budgetMilestoneId === '' ? null : $this->budgetMilestoneId;
+
+        $this->validate([
+            'budgetCategory' => [
+                'required', 'string', 'max:255',
+                Rule::unique('project_budgets', 'category')
+                    ->where(fn ($q) => $q->where('housing_job_id', $this->job->id)),
+            ],
+            'budgetAmount' => 'required|numeric|min:0',
+            // Same rule as the main app: a fund is required, and the model's
+            // saving-event guard verifies it is attached to this project.
+            'budgetFundCodeId' => 'required|integer|exists:fund_codes,id',
+            'budgetMilestoneId' => 'nullable|integer|exists:project_milestones,id',
+        ], [
+            'budgetCategory.unique' => 'A budget category with this name already exists for this project.',
+        ]);
+
+        // The optional milestone anchor must belong to this project.
+        if ($this->budgetMilestoneId !== null) {
+            $this->job->milestones()->findOrFail((int) $this->budgetMilestoneId);
+        }
+
+        try {
+            ProjectBudget::create([
+                'housing_job_id' => $this->job->id,
+                'category' => trim($this->budgetCategory),
+                'budgeted_amount' => $this->budgetAmount,
+                'fund_code_id' => (int) $this->budgetFundCodeId,
+                'milestone_id' => $this->budgetMilestoneId !== null ? (int) $this->budgetMilestoneId : null,
+                'created_by' => Auth::id(),
+            ]);
+        } catch (\InvalidArgumentException $e) {
+            // Model saving-guard: fund not attached to this project.
+            $this->addError('budgetFundCodeId', $e->getMessage());
+
+            return;
+        }
+
+        $this->showBudgetForm = false;
+        $this->job->refresh();
+        session()->flash('homes_message', 'Budget line added.');
     }
 
     // ── Requirement completion ────────────────────────────────────

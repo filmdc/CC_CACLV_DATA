@@ -45,6 +45,9 @@
             </div>
         </div>
         <div class="flex gap-2 shrink-0">
+            @if($canEdit)
+                <button type="button" wire:click="openEdit" class="calv-btn calv-btn--ghost">Edit</button>
+            @endif
             @can('communications_log.create')
                 <button type="button" x-on:click="Livewire.dispatch('homes-open-quick-log')" class="calv-btn calv-btn--ghost">Log a call</button>
             @endcan
@@ -108,6 +111,9 @@
                                     <span class="text-[11px] shrink-0" style="color: var(--calv-slate-65);">{{ $r['received_on'] ?? $r['status_display'] }}</span>
                                 @elseif($canEdit)
                                     <span class="inline-flex gap-1.5 shrink-0">
+                                        @if($r['type'] === 'document')
+                                            <button type="button" wire:click="openUpload({{ $r['id'] }})" class="calv-btn calv-btn--secondary calv-btn--sm">Upload</button>
+                                        @endif
                                         <button type="button" wire:click="markReceived({{ $r['id'] }})" class="calv-btn calv-btn--quiet calv-btn--sm">Received</button>
                                         <button type="button" wire:click="nudge({{ $r['id'] }})" class="calv-btn calv-btn--ghost calv-btn--sm">Nudge</button>
                                     </span>
@@ -118,6 +124,26 @@
                             @endif
                         @endforeach
                     </div>
+                    @if($canEdit)
+                        <div class="px-4 py-3" style="border-top: 1px solid var(--calv-slate-15);">
+                            @if($showAddReq)
+                                <div class="flex flex-col gap-2">
+                                    <input wire:model="adHocLabel" type="text" class="calv-input" placeholder="What's needed? e.g. Benefit letter (SS)">
+                                    @error('adHocLabel')<p class="text-xs" style="color: var(--calv-red);">{{ $message }}</p>@enderror
+                                    <div class="flex items-center gap-2">
+                                        <select wire:model="adHocType" class="calv-input" style="width: auto;">
+                                            <option value="document">Document</option>
+                                            <option value="task">Task</option>
+                                        </select>
+                                        <button type="button" wire:click="saveAdHocRequirement" class="calv-btn calv-btn--primary calv-btn--sm">Add</button>
+                                        <button type="button" wire:click="$set('showAddReq', false)" class="calv-btn calv-btn--ghost calv-btn--sm">Cancel</button>
+                                    </div>
+                                </div>
+                            @else
+                                <button type="button" wire:click="$set('showAddReq', true)" class="calv-link" style="background:none;border:none;cursor:pointer;font-size:12.5px;">+ add a document or task</button>
+                            @endif
+                        </div>
+                    @endif
                     @if($gate['ready'] && !$log->is_converted)
                         <div class="px-4 py-3" style="border-top: 1px solid var(--calv-slate-15); background: var(--calv-sage-15);">
                             <div class="text-[12.5px] font-semibold mb-2" style="color: #2F5A41;">Everything's in. This intake is ready.</div>
@@ -129,8 +155,50 @@
                 </section>
             @else
                 <div class="px-4 py-3.5 text-[12.5px] leading-relaxed" style="background: #fff; border: 1px dashed var(--calv-slate-35); border-radius: 8px; color: var(--calv-slate-65);">
-                    <strong style="color: var(--calv-slate);">Just a call.</strong> No documents needed — this never became an intake. It stays searchable forever.
+                    <strong style="color: var(--calv-slate);">Just a call.</strong> No documents needed yet — pick a county below or add a document to start an intake. It stays searchable forever.
+                    @if($canEdit)
+                        <div class="mt-2.5">
+                            @if($showAddReq)
+                                <div class="flex flex-col gap-2">
+                                    <input wire:model="adHocLabel" type="text" class="calv-input" placeholder="What's needed? e.g. Photo ID">
+                                    @error('adHocLabel')<p class="text-xs" style="color: var(--calv-red);">{{ $message }}</p>@enderror
+                                    <div class="flex items-center gap-2">
+                                        <select wire:model="adHocType" class="calv-input" style="width: auto;">
+                                            <option value="document">Document</option>
+                                            <option value="task">Task</option>
+                                        </select>
+                                        <button type="button" wire:click="saveAdHocRequirement" class="calv-btn calv-btn--primary calv-btn--sm">Add</button>
+                                        <button type="button" wire:click="$set('showAddReq', false)" class="calv-btn calv-btn--ghost calv-btn--sm">Cancel</button>
+                                    </div>
+                                </div>
+                            @else
+                                <button type="button" wire:click="$set('showAddReq', true)" class="calv-link" style="background:none;border:none;cursor:pointer;font-size:12.5px;">+ add a document or task</button>
+                            @endif
+                        </div>
+                    @endif
                 </div>
+            @endif
+
+            {{-- Counties — attaching one stamps its fund codes + requirements --}}
+            @if($canEdit && $counties->count() > 0)
+                <section class="calv-card overflow-hidden">
+                    <header class="flex items-center px-4 py-3" style="border-bottom: 1px solid var(--calv-slate-15);">
+                        <h3 class="calv-subhead flex-1" style="font-size: 12px;">Counties</h3>
+                        <span class="text-[11px]" style="color: var(--calv-slate-65);">attaching one adds its funds &amp; requirements</span>
+                    </header>
+                    <div class="px-4 py-3 flex flex-wrap gap-1.5">
+                        @foreach($counties as $county)
+                            @php $attached = in_array($county->id, $attachedCountyIds); @endphp
+                            <button type="button" wire:click="toggleCounty({{ $county->id }})"
+                                    wire:loading.attr="disabled"
+                                    style="font-family: var(--font-body); font-size: 12.5px; padding: 6px 12px; border-radius: 999px; cursor: pointer;
+                                           background: {{ $attached ? 'var(--calv-teal)' : '#fff' }}; color: {{ $attached ? '#fff' : 'var(--calv-slate)' }};
+                                           border: 1px solid {{ $attached ? 'var(--calv-teal)' : 'var(--calv-slate-35)' }};">
+                                {{ $attached ? '✓ ' : '' }}{{ $county->name }}
+                            </button>
+                        @endforeach
+                    </div>
+                </section>
             @endif
 
             {{-- Next --}}
@@ -185,7 +253,11 @@
                 <div class="px-6 py-5 flex flex-col gap-4">
                     @if($convertStep === 1)
                         {{-- Requirements gate --}}
-                        @if($gate['ready'])
+                        @if(!$gate['hasRequirements'])
+                            <div class="rounded-lg px-3.5 py-3 text-[12.5px]" style="background: var(--calv-amber-15); border-left: 3px solid var(--calv-amber); color: var(--calv-slate);">
+                                <strong>This entry has nothing to track yet.</strong> A project needs at least one requirement — close this and pick a county or add a document first.
+                            </div>
+                        @elseif($gate['ready'])
                             <div class="flex items-center gap-2.5 rounded-lg px-3.5 py-2.5 text-[12.5px]" style="background: var(--calv-sage-15); color: #2F5A41;">
                                 ✓ All requirements met. Calls and documents come along automatically.
                             </div>
@@ -295,6 +367,146 @@
                             <span wire:loading wire:target="doConvert">Creating…</span>
                         </button>
                     @endif
+                </footer>
+            </div>
+        </div>
+    @endif
+
+    {{-- Edit entry modal --}}
+    @if($showEdit)
+        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 48px 16px;"
+             x-data x-on:keydown.escape.window="$wire.closeEdit()" wire:click.self="closeEdit">
+            <div class="w-full" style="max-width: 620px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+                <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
+                    <h2 class="calv-h1" style="font-size: 20px;">Edit entry</h2>
+                    <div class="text-xs mt-1" style="color: var(--calv-slate-65);">COMM-{{ $log->id }}</div>
+                </header>
+                <div class="px-6 py-5 grid gap-3.5" style="grid-template-columns: 1fr 1fr;">
+                    <div>
+                        <label class="calv-label">First name</label>
+                        <input wire:model="edit.contact_first_name" type="text" class="calv-input">
+                    </div>
+                    <div>
+                        <label class="calv-label">Last name</label>
+                        <input wire:model="edit.contact_last_name" type="text" class="calv-input">
+                    </div>
+                    <div>
+                        <label class="calv-label">Phone</label>
+                        <input wire:model="edit.contact_phone" type="text" class="calv-input">
+                    </div>
+                    <div>
+                        <label class="calv-label">Email</label>
+                        <input wire:model="edit.contact_email" type="email" class="calv-input">
+                        @error('edit.contact_email')<p class="mt-1 text-xs" style="color: var(--calv-red);">{{ $message }}</p>@enderror
+                    </div>
+                    <div style="grid-column: 1 / -1;">
+                        <label class="calv-label">Street address</label>
+                        <input wire:model="edit.contact_address" type="text" class="calv-input">
+                    </div>
+                    <div>
+                        <label class="calv-label">City</label>
+                        <input wire:model="edit.contact_city" type="text" class="calv-input">
+                    </div>
+                    <div class="grid gap-3" style="grid-template-columns: 1fr 1fr;">
+                        <div>
+                            <label class="calv-label">State</label>
+                            <input wire:model="edit.contact_state" type="text" maxlength="2" class="calv-input">
+                        </div>
+                        <div>
+                            <label class="calv-label">Zip</label>
+                            <input wire:model="edit.contact_zip" type="text" class="calv-input">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="calv-label">Role</label>
+                        <select wire:model="edit.contact_role" class="calv-input">
+                            <option value="">—</option>
+                            <option value="homeowner">Homeowner</option>
+                            <option value="contractor">Contractor</option>
+                            <option value="inspector">Inspector</option>
+                            <option value="vendor">Vendor</option>
+                            <option value="agency">Agency</option>
+                            <option value="applicant">Applicant</option>
+                            <option value="family_member">Family member</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="calv-label">Priority</label>
+                        <select wire:model="edit.priority" class="calv-input">
+                            <option value="low">Low</option>
+                            <option value="normal">Normal</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="calv-label">Type</label>
+                        <select wire:model="edit.communication_type" class="calv-input">
+                            @foreach(['phone_call' => 'Phone call', 'email' => 'Email', 'in_person' => 'In person', 'site_visit' => 'Site visit', 'video_call' => 'Video call', 'text' => 'Text', 'mail' => 'Mail', 'voicemail' => 'Voicemail', 'fax' => 'Fax', 'other' => 'Other'] as $v => $l)
+                                <option value="{{ $v }}">{{ $l }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="calv-label">Direction</label>
+                        <select wire:model="edit.direction" class="calv-input">
+                            <option value="incoming">Incoming</option>
+                            <option value="outgoing">Outgoing</option>
+                        </select>
+                    </div>
+                    <div style="grid-column: 1 / -1;">
+                        <label class="calv-label">When</label>
+                        <input wire:model="edit.communication_date" type="datetime-local" class="calv-input" style="max-width: 240px;">
+                        @error('edit.communication_date')<p class="mt-1 text-xs" style="color: var(--calv-red);">{{ $message }}</p>@enderror
+                    </div>
+                    <div style="grid-column: 1 / -1;">
+                        <label class="calv-label">Subject</label>
+                        <input wire:model="edit.subject" type="text" class="calv-input">
+                        @error('edit.subject')<p class="mt-1 text-xs" style="color: var(--calv-red);">{{ $message }}</p>@enderror
+                    </div>
+                    <div style="grid-column: 1 / -1;">
+                        <label class="calv-label">What happened?</label>
+                        <textarea wire:model="edit.summary" rows="3" class="calv-input" style="resize: vertical;"></textarea>
+                    </div>
+                    <div style="grid-column: 1 / -1;">
+                        <label class="calv-label">Notes <span style="font-weight:400; text-transform:none; letter-spacing:0; color: var(--calv-slate-65);">— internal</span></label>
+                        <textarea wire:model="edit.notes" rows="2" class="calv-input" style="resize: vertical;"></textarea>
+                    </div>
+                </div>
+                <footer class="flex items-center gap-2.5 px-6 py-3.5 justify-end" style="border-top: 1px solid var(--calv-slate-15); background: var(--calv-sand-15);">
+                    <button type="button" wire:click="closeEdit" class="calv-btn calv-btn--ghost">Cancel</button>
+                    <button type="button" wire:click="saveEdit" class="calv-btn calv-btn--primary" wire:loading.attr="disabled" wire:target="saveEdit">
+                        <span wire:loading.remove wire:target="saveEdit">Save changes</span>
+                        <span wire:loading wire:target="saveEdit">Saving…</span>
+                    </button>
+                </footer>
+            </div>
+        </div>
+    @endif
+
+    {{-- Upload files onto a document requirement --}}
+    @if($uploadingRequirementId)
+        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 64px 16px;"
+             x-data x-on:keydown.escape.window="$wire.closeUpload()" wire:click.self="closeUpload">
+            <div class="w-full" style="max-width: 440px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+                <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
+                    <h2 class="calv-h1" style="font-size: 20px;">Upload document</h2>
+                    <div class="text-xs mt-1" style="color: var(--calv-slate-65);">Uploading marks the requirement received automatically.</div>
+                </header>
+                <div class="px-6 py-5">
+                    <label class="calv-label">Files</label>
+                    <input type="file" wire:model="requirementFiles" multiple class="calv-input">
+                    <div wire:loading wire:target="requirementFiles" class="text-xs mt-1" style="color: var(--calv-slate-65);">Uploading…</div>
+                    @error('requirementFiles')<p class="mt-1 text-xs" style="color: var(--calv-red);">{{ $message }}</p>@enderror
+                    @error('requirementFiles.*')<p class="mt-1 text-xs" style="color: var(--calv-red);">{{ $message }}</p>@enderror
+                </div>
+                <footer class="flex items-center gap-2.5 px-6 py-3.5 justify-end" style="border-top: 1px solid var(--calv-slate-15); background: var(--calv-sand-15);">
+                    <button type="button" wire:click="closeUpload" class="calv-btn calv-btn--ghost">Cancel</button>
+                    <button type="button" wire:click="uploadRequirementFiles" class="calv-btn calv-btn--primary" wire:loading.attr="disabled" wire:target="uploadRequirementFiles,requirementFiles">
+                        <span wire:loading.remove wire:target="uploadRequirementFiles">Save</span>
+                        <span wire:loading wire:target="uploadRequirementFiles">Saving…</span>
+                    </button>
                 </footer>
             </div>
         </div>

@@ -3,17 +3,20 @@
 namespace App\Livewire\Homes;
 
 use App\Models\CommunicationLog;
+use App\Models\HousingService;
 use App\Models\IntakeRequirement;
 use App\Services\Homes\HousingPortalData;
 use App\Services\IntakeConversion\ConversionBlocked;
 use App\Services\IntakeConversion\ConversionInput;
 use App\Services\IntakeConversion\ConvertIntakeToProject;
+use App\Services\IntakeRequirementInstantiator;
 use App\Traits\WithPermissionChecks;
 use App\Traits\WithProgramAccess;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 /**
  * One call/intake opened (homes.caclv.org): "Every touch" timeline,
@@ -23,10 +26,28 @@ use Livewire\Component;
 #[Layout('components.layouts.homes')]
 class CallDetail extends Component
 {
+    use WithFileUploads;
     use WithPermissionChecks;
     use WithProgramAccess;
 
     public CommunicationLog $log;
+
+    // ── Edit-log modal state ──────────────────────────────────────
+    public bool $showEdit = false;
+
+    public array $edit = [];
+
+    // ── Ad-hoc requirement form ───────────────────────────────────
+    public bool $showAddReq = false;
+
+    public string $adHocLabel = '';
+
+    public string $adHocType = IntakeRequirement::TYPE_DOCUMENT;
+
+    // ── Per-requirement file upload ───────────────────────────────
+    public ?int $uploadingRequirementId = null;
+
+    public array $requirementFiles = [];
 
     // ── Convert modal state ───────────────────────────────────────
     public bool $showConvert = false;
@@ -113,6 +134,215 @@ class CallDetail extends Component
         }
 
         return $req;
+    }
+
+    // ── Edit the log itself ───────────────────────────────────────
+
+    public function openEdit(): void
+    {
+        $this->authorizeAction('communications_log.edit');
+
+        $this->edit = [
+            'contact_first_name' => (string) ($this->log->contact_first_name ?? ''),
+            'contact_last_name' => (string) ($this->log->contact_last_name ?? ''),
+            'contact_phone' => (string) ($this->log->contact_phone ?? ''),
+            'contact_email' => (string) ($this->log->contact_email ?? ''),
+            'contact_address' => (string) ($this->log->contact_address ?? ''),
+            'contact_city' => (string) ($this->log->contact_city ?? ''),
+            'contact_state' => (string) ($this->log->contact_state ?? 'PA'),
+            'contact_zip' => (string) ($this->log->contact_zip ?? ''),
+            'contact_role' => (string) ($this->log->contact_role ?? ''),
+            'subject' => (string) ($this->log->subject ?? ''),
+            'summary' => (string) ($this->log->summary ?? ''),
+            'notes' => (string) ($this->log->notes ?? ''),
+            'priority' => (string) ($this->log->priority ?? 'normal'),
+            'communication_type' => (string) ($this->log->communication_type ?? 'phone_call'),
+            'direction' => (string) ($this->log->direction ?? 'outgoing'),
+            'communication_date' => $this->log->communication_date?->format('Y-m-d\TH:i') ?? now()->format('Y-m-d\TH:i'),
+        ];
+        $this->showEdit = true;
+    }
+
+    public function closeEdit(): void
+    {
+        $this->showEdit = false;
+        $this->resetErrorBag();
+    }
+
+    public function saveEdit(): void
+    {
+        $this->authorizeAction('communications_log.edit');
+
+        $validated = $this->validate([
+            'edit.contact_first_name' => 'nullable|string|max:255',
+            'edit.contact_last_name' => 'nullable|string|max:255',
+            'edit.contact_phone' => 'nullable|string|max:50',
+            'edit.contact_email' => 'nullable|email|max:255',
+            'edit.contact_address' => 'nullable|string|max:255',
+            'edit.contact_city' => 'nullable|string|max:100',
+            'edit.contact_state' => 'nullable|string|max:2',
+            'edit.contact_zip' => 'nullable|string|max:10',
+            'edit.contact_role' => 'nullable|in:homeowner,contractor,inspector,vendor,agency,applicant,family_member,other',
+            'edit.subject' => 'required|string|max:255',
+            'edit.summary' => 'nullable|string',
+            'edit.notes' => 'nullable|string',
+            'edit.priority' => 'required|in:low,normal,high,urgent',
+            'edit.communication_type' => 'required|in:phone_call,email,in_person,site_visit,video_call,text,mail,voicemail,fax,other',
+            'edit.direction' => 'required|in:incoming,outgoing',
+            'edit.communication_date' => 'required|date',
+        ])['edit'];
+
+        // Blank optional strings persist as null, matching the main app.
+        $payload = collect($validated)
+            ->map(fn ($v) => is_string($v) && trim($v) === '' ? null : $v)
+            ->all();
+        $payload['subject'] = $validated['subject'];
+        $payload['updated_by'] = Auth::id();
+
+        $this->log->update($payload);
+
+        $this->showEdit = false;
+        $this->log->refresh();
+        session()->flash('homes_message', 'Entry updated.');
+    }
+
+    // ── Counties (housing services) — attach/detach with requirement
+    //    side effects, mirroring the main app's toggleHousingServiceOnLog ──
+
+    public function toggleCounty(int $serviceId): void
+    {
+        $this->authorizeAction('communications_log.edit');
+
+        $log = $this->log;
+        $svc = HousingService::findOrFail($serviceId);
+        $actor = Auth::user();
+
+        $alreadyAttached = $log->housingServices()->where('housing_services.id', $serviceId)->exists();
+        $serviceTag = 'service:'.$serviceId;
+
+        if ($alreadyAttached) {
+            $log->housingServices()->detach($serviceId);
+
+            // Strip the tag and orphan auto-applied requirements that no
+            // longer have any other source. Manual atom picks survive.
+            $affected = IntakeRequirement::query()
+                ->where('communication_log_id', $log->id)
+                ->get();
+
+            foreach ($affected as $req) {
+                $via = is_array($req->via) ? $req->via : [];
+                if (! in_array($serviceTag, $via, true)) {
+                    continue;
+                }
+
+                $remaining = array_values(array_diff($via, [$serviceTag]));
+                $req->via = $remaining;
+                $req->updated_by_user_id = $actor->id;
+                $req->save();
+
+                if (empty($remaining) && in_array(
+                    $req->source_type,
+                    [IntakeRequirement::SOURCE_TEMPLATE_SET, IntakeRequirement::SOURCE_DEFINITION],
+                    true
+                ) && ! $req->is_orphaned) {
+                    $req->markOrphaned($actor);
+                }
+            }
+
+            session()->flash('homes_message', 'Removed "'.$svc->name.'" from this entry.');
+        } else {
+            $log->housingServices()->attach($serviceId, [
+                'created_by_user_id' => $actor->id,
+                'created_at' => now(),
+            ]);
+            app(IntakeRequirementInstantiator::class)->forHousingService($log, $svc, $actor);
+
+            session()->flash('homes_message', 'Added "'.$svc->name.'" — fund codes and requirements have been attached.');
+        }
+
+        $log->fresh()->applyAutoCategory();
+        $this->log->refresh();
+    }
+
+    // ── Ad-hoc requirement add ────────────────────────────────────
+
+    public function saveAdHocRequirement(): void
+    {
+        $this->authorizeAction('communications_log.edit');
+
+        $this->validate([
+            'adHocLabel' => ['required', 'string', 'max:200'],
+            'adHocType' => ['required', 'in:'.IntakeRequirement::TYPE_DOCUMENT.','.IntakeRequirement::TYPE_TASK],
+        ]);
+
+        app(IntakeRequirementInstantiator::class)->adHoc(
+            $this->log,
+            trim($this->adHocLabel),
+            $this->adHocType,
+            Auth::user()
+        );
+
+        $this->showAddReq = false;
+        $this->adHocLabel = '';
+        $this->adHocType = IntakeRequirement::TYPE_DOCUMENT;
+        $this->log->refresh();
+        session()->flash('homes_message', 'Requirement added.');
+    }
+
+    // ── File upload onto a document requirement ───────────────────
+
+    public function openUpload(int $requirementId): void
+    {
+        $req = $this->ownRequirement($requirementId);
+
+        if ($req->type !== IntakeRequirement::TYPE_DOCUMENT) {
+            abort(422, 'File uploads are only supported for document-type requirements.');
+        }
+
+        $this->uploadingRequirementId = $req->id;
+        $this->requirementFiles = [];
+    }
+
+    public function closeUpload(): void
+    {
+        $this->uploadingRequirementId = null;
+        $this->requirementFiles = [];
+    }
+
+    public function uploadRequirementFiles(): void
+    {
+        if (! $this->uploadingRequirementId) {
+            return;
+        }
+
+        $req = $this->ownRequirement($this->uploadingRequirementId);
+
+        $this->validate([
+            'requirementFiles' => ['required', 'array', 'min:1'],
+            'requirementFiles.*' => ['file', 'max:102400'], // 100MB, matching the main app
+        ]);
+
+        if ($req->type !== IntakeRequirement::TYPE_DOCUMENT) {
+            abort(422, 'File uploads are only supported for document-type requirements.');
+        }
+
+        foreach ($this->requirementFiles as $file) {
+            $req->addMedia($file->getRealPath())
+                ->usingName($file->getClientOriginalName())
+                ->usingFileName($file->hashName())
+                ->toMediaCollection('documents');
+        }
+
+        // Receiving a file naturally satisfies the requirement.
+        if ($req->status !== IntakeRequirement::STATUS_RECEIVED) {
+            $req->markReceived(Auth::user());
+        }
+
+        $req->fresh()->communicationLog?->applyAutoCategory();
+
+        $this->closeUpload();
+        $this->log->refresh();
+        session()->flash('homes_message', 'File(s) uploaded and requirement marked received.');
     }
 
     // ── Follow-up ─────────────────────────────────────────────────
@@ -310,6 +540,8 @@ class CallDetail extends Component
         $progress = $data->phase1Progress($log);
         $stage = $data->stage($log);
 
+        $attachedCountyIds = $log->housingServices()->pluck('housing_services.id')->all();
+
         return view('livewire.homes.call-detail', [
             'who' => $data->personName($log),
             'where' => $data->personWhere($log),
@@ -318,8 +550,12 @@ class CallDetail extends Component
             'requirements' => $requirements,
             'gate' => $gate,
             'progress' => $progress,
-            'canConvert' => $gate['ready'] && ! $log->is_converted && $this->can('projects.create'),
+            // Convert is available on ANY non-converted entry (the modal
+            // carries the requirements gate + override), matching the main app.
+            'canConvert' => ! $log->is_converted && $this->can('projects.create'),
             'canEdit' => $this->can('communications_log.edit'),
+            'counties' => HousingService::query()->where('is_active', true)->orderBy('name')->get(['id', 'name']),
+            'attachedCountyIds' => $attachedCountyIds,
         ]);
     }
 }

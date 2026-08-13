@@ -191,3 +191,123 @@ it('blocks expense actions on requirements of another job', function () {
         ->call('completeTaskRequirement', $foreignReq->id)
         ->assertForbidden();
 });
+
+it('edits the project fields from the portal', function () {
+    $user = projectsPortalUser(['projects.view']);
+    $this->actingAs($user);
+
+    $job = HousingJob::factory()->create(['status' => 'pending']);
+
+    Livewire::test(ProjectDetail::class, ['job' => $job])
+        ->call('openEditJob')
+        ->set('editJob.job_title', 'Roof + kitchen ceiling')
+        ->set('editJob.status', 'in_progress')
+        ->set('editJob.priority', 'high')
+        ->set('editJob.target_completion_date', now()->addMonths(2)->toDateString())
+        ->call('saveEditJob')
+        ->assertHasNoErrors();
+
+    $fresh = $job->fresh();
+    expect($fresh->job_title)->toBe('Roof + kitchen ceiling');
+    expect($fresh->status)->toBe('in_progress');
+    expect($fresh->priority)->toBe('high');
+    expect($fresh->updated_by)->toBe($user->id);
+});
+
+it('adds a milestone with appended sequence order', function () {
+    $this->actingAs(projectsPortalUser(['projects.view']));
+
+    $job = HousingJob::factory()->create(['status' => 'in_progress']);
+    ProjectMilestone::factory()->create(['housing_job_id' => $job->id, 'sequence_order' => 1, 'status' => 'in_progress']);
+
+    Livewire::test(ProjectDetail::class, ['job' => $job])
+        ->call('openMilestoneForm')
+        ->set('milestoneName', 'Final inspection')
+        ->set('milestoneTargetDate', now()->addMonth()->toDateString())
+        ->call('saveMilestone')
+        ->assertHasNoErrors();
+
+    $milestone = $job->milestones()->where('name', 'Final inspection')->first();
+    expect($milestone)->not->toBeNull();
+    expect($milestone->sequence_order)->toBe(2);
+    expect($milestone->status)->toBe('not_started');
+});
+
+it('starts and completes a milestone', function () {
+    $this->actingAs(projectsPortalUser(['projects.view']));
+
+    $job = HousingJob::factory()->create(['status' => 'in_progress']);
+    $milestone = ProjectMilestone::factory()->create([
+        'housing_job_id' => $job->id,
+        'sequence_order' => 1,
+        'status' => 'not_started',
+    ]);
+
+    $component = Livewire::test(ProjectDetail::class, ['job' => $job]);
+
+    $component->call('updateMilestoneStatus', $milestone->id, 'in_progress');
+    expect($milestone->fresh()->status)->toBe('in_progress');
+
+    $component->call('updateMilestoneStatus', $milestone->id, 'completed');
+    expect($milestone->fresh()->status)->toBe('completed');
+});
+
+it('adds a requirement to a milestone via the instantiator', function () {
+    $user = projectsPortalUser(['projects.view']);
+    $this->actingAs($user);
+
+    $job = HousingJob::factory()->create(['status' => 'in_progress', 'project_manager_id' => $user->id]);
+    $milestone = ProjectMilestone::factory()->create(['housing_job_id' => $job->id, 'sequence_order' => 1]);
+
+    Livewire::test(ProjectDetail::class, ['job' => $job])
+        ->call('openAddRequirement', $milestone->id)
+        ->set('newReqTitle', 'Roofing permit')
+        ->set('newReqType', 'document')
+        ->call('saveNewRequirement')
+        ->assertHasNoErrors();
+
+    $req = Requirement::where('housing_job_id', $job->id)->where('title', 'Roofing permit')->first();
+    expect($req)->not->toBeNull();
+    expect($req->source_type)->toBe(Requirement::SOURCE_MILESTONE);
+    expect($req->source_id)->toBe($milestone->id);
+});
+
+it('adds a budget line tied to an attached fund code', function () {
+    $this->actingAs(projectsPortalUser(['projects.view']));
+
+    $fund = \App\Models\FundCode::factory()->create();
+    $job = HousingJob::factory()->create(['status' => 'in_progress']);
+    $job->fundCodes()->attach($fund->id);
+
+    Livewire::test(ProjectDetail::class, ['job' => $job])
+        ->call('openBudgetForm')
+        ->set('budgetCategory', 'Roofing')
+        ->set('budgetAmount', '5000')
+        ->set('budgetFundCodeId', $fund->id)
+        ->call('saveBudgetLine')
+        ->assertHasNoErrors();
+
+    $budget = ProjectBudget::where('housing_job_id', $job->id)->where('category', 'Roofing')->first();
+    expect($budget)->not->toBeNull();
+    expect((float) $budget->budgeted_amount)->toBe(5000.0);
+    expect($budget->fund_code_id)->toBe($fund->id);
+});
+
+it('rejects a budget line whose fund is not attached to the project', function () {
+    $this->actingAs(projectsPortalUser(['projects.view']));
+
+    $unattached = \App\Models\FundCode::factory()->create();
+    $attached = \App\Models\FundCode::factory()->create();
+    $job = HousingJob::factory()->create(['status' => 'in_progress']);
+    $job->fundCodes()->attach($attached->id);
+
+    Livewire::test(ProjectDetail::class, ['job' => $job])
+        ->call('openBudgetForm')
+        ->set('budgetCategory', 'Plumbing')
+        ->set('budgetAmount', '2000')
+        ->set('budgetFundCodeId', $unattached->id)
+        ->call('saveBudgetLine')
+        ->assertHasErrors(['budgetFundCodeId']);
+
+    expect(ProjectBudget::where('housing_job_id', $job->id)->count())->toBe(0);
+});
