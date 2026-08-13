@@ -49,7 +49,28 @@ Route::domain(env('HOMES_DOMAIN', 'homes.caclv.org'))->group(function () {
             ->middleware('permission:housing.reports.view')
             ->name('homes.reports');
 
-        Route::get('/settings', App\Livewire\Homes\Settings::class)
+        // Settings — hub + the five portal-native admin surfaces
+        Route::get('/settings', App\Livewire\Homes\SettingsHub::class)
             ->name('homes.settings');
+
+        Route::get('/settings/fund-codes', App\Livewire\Homes\Settings\FundCodes::class)
+            ->middleware('permission:fund_codes.view')
+            ->name('homes.settings.fund-codes');
+
+        Route::get('/settings/requirements', App\Livewire\Homes\Settings\RequirementsLibrary::class)
+            ->middleware('permission:requirements_library.view')
+            ->name('homes.settings.requirements');
+
+        Route::get('/settings/contractors', App\Livewire\Homes\Settings\Contractors::class)
+            ->middleware('permission:contractors.view')
+            ->name('homes.settings.contractors');
+
+        Route::get('/settings/properties', App\Livewire\Homes\Settings\Properties::class)
+            ->middleware('permission:properties.view')
+            ->name('homes.settings.properties');
+
+        Route::get('/settings/pdf-templates', App\Livewire\Homes\Settings\PdfTemplates::class)
+            ->middleware('permission:pdf_templates.view')
+            ->name('homes.settings.pdf-templates');
     });
 });
