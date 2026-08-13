@@ -49,7 +49,7 @@ Route::domain(env('HOMES_DOMAIN', 'homes.caclv.org'))->group(function () {
             ->middleware('permission:housing.reports.view')
             ->name('homes.reports');
 
-        Route::get('/settings', App\Livewire\Homes\Stub::class)
+        Route::get('/settings', App\Livewire\Homes\Settings::class)
             ->name('homes.settings');
     });
 });

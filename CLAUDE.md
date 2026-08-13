@@ -427,7 +427,7 @@ A task-first, CALV-branded front-end for the housing project manager, served at 
 - **Layouts**: `resources/views/components/layouts/homes.blade.php` (light slate sidebar shell) + `homes-guest.blade.php` (login). **Light CALV brand theme, intentionally NOT the app's dark mode** (approvals is intentionally dark; this is intentionally light).
 - **Asset bundle**: `resources/css/homes.css` (standalone Tailwind v4 entry embedding the CALV design tokens + `.calv-*` component classes) + `resources/js/homes.js`. Registered in `vite.config.js`. Fonts via bunny.net (Anton/Oswald/Barlow — CALV's licensed faces aren't shipped).
 - **Shared auth**: same `.caclv.org` session cookie as the main app (`SESSION_DOMAIN`), own login page (`App\Livewire\Homes\Login`).
-- **Components** (`app/Livewire/Homes/`): `Login`, `Today`, `CallsIntakes`, `QuickLog` (modal, embedded in the layout, opened via the `homes-open-quick-log` browser event), `Stub` (Projects/Reports/Settings placeholders).
+- **Components** (`app/Livewire/Homes/`): `Login`, `Today`, `CallsIntakes`, `CallDetail`, `Projects`, `ProjectDetail`, `Reports`, `Settings` (launcher linking the five quarterly-touched admin surfaces in the main app), and `QuickLog` (modal, embedded in the layout, opened via the `homes-open-quick-log` browser event).
 - **Read model**: `App\Services\Homes\HousingPortalData` centralizes the "stage" and "N of M docs" logic and the Today-card queries — thin wrappers over the SAME scopes/constants the main app uses (`CommunicationLog::pendingFollowUp`/`overdueFollowUp`, `IntakeRequirement::MET_STATUSES`, `RequirementDefinition::PHASE_1_CATEGORIES`, `FundCode` `expiry_state`, `HousingJob::active`).
 
 ### Status / phasing
