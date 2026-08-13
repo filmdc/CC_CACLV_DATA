@@ -74,7 +74,7 @@
 
     <div class="mt-4">{{ $funds->links() }}</div>
 
-    <div class="mt-3 text-[11.5px]" style="color: var(--calv-slate-65);">Counties (housing services) and their fund links are managed in the main app — day-to-day, counties attach right from a call's detail page.</div>
+    <div class="mt-3 text-[11.5px]" style="color: var(--calv-slate-65);">Counties and their fund/requirement links live under <a href="{{ route('homes.settings.counties') }}" wire:navigate class="calv-link">Settings → Counties</a> — day-to-day, counties attach right from a call's detail page.</div>
 
     {{-- Create/edit modal --}}
     @if($showForm)

@@ -57,6 +57,10 @@ Route::domain(env('HOMES_DOMAIN', 'homes.caclv.org'))->group(function () {
             ->middleware('permission:fund_codes.view')
             ->name('homes.settings.fund-codes');
 
+        Route::get('/settings/counties', App\Livewire\Homes\Settings\Counties::class)
+            ->middleware('permission:fund_codes.view')
+            ->name('homes.settings.counties');
+
         Route::get('/settings/requirements', App\Livewire\Homes\Settings\RequirementsLibrary::class)
             ->middleware('permission:requirements_library.view')
             ->name('homes.settings.requirements');

@@ -241,3 +241,87 @@ it('edits template metadata and guards delete for used templates', function () {
     Livewire::test(\App\Livewire\Homes\Settings\PdfTemplates::class)->call('delete', $template->id);
     expect(PdfFormTemplate::find($template->id))->not->toBeNull();
 });
+
+// ── Counties (housing services) ───────────────────────────────────
+
+it('creates, links, and retires a county', function () {
+    $this->actingAs(settingsPortalUser(['fund_codes.view', 'fund_codes.edit']));
+
+    // Create.
+    Livewire::test(\App\Livewire\Homes\Settings\Counties::class)
+        ->call('openCreate')
+        ->set('serviceName', 'Northampton County')
+        ->set('serviceDescription', 'Northampton rehab pipeline')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $county = \App\Models\HousingService::where('name', 'Northampton County')->first();
+    expect($county)->not->toBeNull();
+
+    // Link a fund + an atom (mirrors the main app's saveServiceLinks pivots).
+    $fund = FundCode::factory()->create();
+    $atom = RequirementDefinition::factory()->create();
+
+    Livewire::test(\App\Livewire\Homes\Settings\Counties::class)
+        ->call('openLinks', $county->id)
+        ->call('toggleFund', $fund->id)
+        ->call('toggleAtom', $atom->id)
+        ->call('saveLinks')
+        ->assertHasNoErrors();
+
+    expect($county->fundCodes()->pluck('fund_codes.id')->all())->toContain($fund->id);
+    expect($county->requirementDefinitions()->pluck('requirement_definitions.id')->all())->toContain($atom->id);
+
+    // Unlink the atom — sync removes it.
+    Livewire::test(\App\Livewire\Homes\Settings\Counties::class)
+        ->call('openLinks', $county->id)
+        ->call('toggleAtom', $atom->id)
+        ->call('saveLinks');
+
+    expect($county->requirementDefinitions()->count())->toBe(0);
+    expect($county->fundCodes()->count())->toBe(1);
+
+    // Retire (soft) + restore.
+    Livewire::test(\App\Livewire\Homes\Settings\Counties::class)->call('delete', $county->id);
+    expect(\App\Models\HousingService::withTrashed()->find($county->id)->trashed())->toBeTrue();
+
+    Livewire::test(\App\Livewire\Homes\Settings\Counties::class)->call('restore', $county->id);
+    expect(\App\Models\HousingService::find($county->id))->not->toBeNull();
+});
+
+it('county links drive what a new intake receives when the county is attached', function () {
+    $this->actingAs(settingsPortalUser([
+        'fund_codes.view', 'fund_codes.edit',
+        'communications_log.view', 'communications_log.edit',
+    ]));
+
+    $county = \App\Models\HousingService::create(['name' => 'Lehigh County', 'is_active' => true]);
+    $fund = FundCode::factory()->create();
+    $atom = RequirementDefinition::factory()->create(['category' => RequirementDefinition::CATEGORY_ELIGIBILITY]);
+
+    // Configure the county in Settings.
+    Livewire::test(\App\Livewire\Homes\Settings\Counties::class)
+        ->call('openLinks', $county->id)
+        ->call('toggleFund', $fund->id)
+        ->call('toggleAtom', $atom->id)
+        ->call('saveLinks')
+        ->assertHasNoErrors();
+
+    // Attach the county to a call — the configured set stamps through.
+    $log = \App\Models\CommunicationLog::factory()->create();
+
+    Livewire::test(\App\Livewire\Homes\CallDetail::class, ['log' => $log])
+        ->call('toggleCounty', $county->id)
+        ->assertHasNoErrors();
+
+    expect($log->anticipatedFundCodes()->pluck('fund_codes.id')->all())->toContain($fund->id);
+    expect($log->intakeRequirements()->where('is_orphaned', false)->count())->toBeGreaterThanOrEqual(1);
+});
+
+it('blocks county writes without fund_codes.edit', function () {
+    $this->actingAs(settingsPortalUser(['fund_codes.view']));
+
+    Livewire::test(\App\Livewire\Homes\Settings\Counties::class)
+        ->call('openCreate')
+        ->assertForbidden();
+});

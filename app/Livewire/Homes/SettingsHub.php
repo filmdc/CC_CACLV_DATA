@@ -25,6 +25,12 @@ class SettingsHub extends Component
                 'permission' => 'fund_codes.view',
             ],
             [
+                'label' => 'Counties',
+                'sub' => 'What picking a county attaches: its funds and required documents.',
+                'route' => 'homes.settings.counties',
+                'permission' => 'fund_codes.view',
+            ],
+            [
                 'label' => 'Requirements library',
                 'sub' => 'The reusable checklist items behind intakes and projects.',
                 'route' => 'homes.settings.requirements',
