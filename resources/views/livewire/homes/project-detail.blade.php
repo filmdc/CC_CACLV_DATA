@@ -39,7 +39,14 @@
                 {{ $job->job_title }} ·
                 <span class="calv-subhead" style="font-size: 11px; letter-spacing: .05em;">{{ $job->job_number }}</span>
             </div>
-            <div class="flex gap-1.5 mt-2.5 flex-wrap">
+            <div class="flex gap-1.5 mt-2.5 flex-wrap items-center">
+                @foreach($job->housingServices as $county)
+                    <span class="inline-flex items-center gap-1.5 text-[11.5px] font-semibold rounded px-2 py-1"
+                          style="color: var(--calv-teal); background: var(--calv-teal-15); border: 1px solid var(--calv-teal-35);"
+                          title="County{{ $county->trashed() ? ' (retired from the pick list)' : '' }}">
+                        {{ $county->name }}
+                    </span>
+                @endforeach
                 @foreach($job->fundCodes as $fund)
                     <span class="inline-flex items-center gap-1.5 text-[11.5px] font-semibold rounded px-2 py-1" style="color: var(--calv-slate); background: var(--calv-sand-15); border: 1px solid var(--calv-slate-15);" title="{{ $fund->description }}">
                         <span style="width: 8px; height: 8px; border-radius: 999px; background: {{ $fundDot[$fund->expiry_state] ?? 'var(--calv-sage)' }};"></span>

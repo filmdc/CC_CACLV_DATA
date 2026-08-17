@@ -311,3 +311,20 @@ it('rejects a budget line whose fund is not attached to the project', function (
 
     expect(ProjectBudget::where('housing_job_id', $job->id)->count())->toBe(0);
 });
+
+it('shows the carried counties in the project header, even after retirement', function () {
+    $this->actingAs(projectsPortalUser(['projects.view']));
+
+    $job = HousingJob::factory()->create(['status' => 'in_progress']);
+    $county = \App\Models\HousingService::create(['name' => 'Northampton County', 'is_active' => true]);
+    $job->housingServices()->attach($county->id, ['created_by_user_id' => auth()->id(), 'created_at' => now()]);
+
+    Livewire::test(ProjectDetail::class, ['job' => $job])
+        ->assertSee('Northampton County');
+
+    // Retiring the county from the pick list must not erase it from history.
+    $county->delete();
+
+    Livewire::test(ProjectDetail::class, ['job' => $job])
+        ->assertSee('Northampton County');
+});

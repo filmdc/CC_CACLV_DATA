@@ -471,6 +471,9 @@ class ProjectDetail extends Component
             'requirements.owner',
             'budgets.fundCode',
             'fundCodes',
+            // withTrashed: a project converted under a since-retired county
+            // should still show where it came from.
+            'housingServices' => fn ($q) => $q->withTrashed(),
             'originatingCommunicationLogs',
         ]);
 
