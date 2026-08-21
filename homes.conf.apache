@@ -1,0 +1,70 @@
+<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/CC_CAP_TRACK
+    ServerName homes.caclv.org
+
+    <Directory /var/www/CC_CAP_TRACK>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    <Directory /var/www/CC_CAP_TRACK/public/build>
+        Options -Indexes
+        AllowOverride None
+        Require all granted
+    </Directory>
+
+    Alias /build /var/www/CC_CAP_TRACK/public/build
+
+    ErrorLog ${APACHE_LOG_DIR}/homes-error.log
+    CustomLog ${APACHE_LOG_DIR}/homes-access.log combined
+</VirtualHost>
+
+# The TLS vhost is only loaded where mod_ssl is present (production). On the
+# HTTP-only dev/staging box (no mod_ssl, no local cert) this whole block is
+# skipped, so the same file works in both environments.
+<IfModule mod_ssl.c>
+<VirtualHost *:443>
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/CC_CAP_TRACK
+    ServerName homes.caclv.org
+
+    SSLEngine on
+    SSLCertificateFile /etc/ssl/certs/calvdata-chain.crt
+    SSLCertificateKeyFile /etc/ssl/private/calvdata.key
+
+    <Directory /var/www/CC_CAP_TRACK>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    <Directory /var/www/CC_CAP_TRACK/public/build>
+        Options -Indexes
+        AllowOverride None
+        Require all granted
+    </Directory>
+
+    <Directory /var/www/CC_CAP_TRACK/vendor>
+        Require all denied
+    </Directory>
+
+    <Directory /var/www/CC_CAP_TRACK/database>
+        Require all denied
+    </Directory>
+
+    <Directory /var/www/CC_CAP_TRACK/storage/logs>
+        Require all denied
+    </Directory>
+
+    <Directory /var/www/CC_CAP_TRACK/storage/framework>
+        Require all denied
+    </Directory>
+
+    Alias /build /var/www/CC_CAP_TRACK/public/build
+
+    ErrorLog ${APACHE_LOG_DIR}/homes-ssl-error.log
+    CustomLog ${APACHE_LOG_DIR}/homes-ssl-access.log combined
+</VirtualHost>
+</IfModule>

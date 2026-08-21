@@ -11,9 +11,13 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         using: function () {
-            // Load approvals routes FIRST so domain-scoped routes take priority
+            // Load domain-scoped portal routes FIRST so host matches win over
+            // the catch-all web routes.
             Route::middleware('web')
                 ->group(base_path('routes/approvals.php'));
+
+            Route::middleware('web')
+                ->group(base_path('routes/homes.php'));
 
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
@@ -30,6 +34,11 @@ return Application::configure(basePath: dirname(__DIR__))
             $approvalsDomain = env('APPROVALS_DOMAIN', 'approvals.caclv.org');
             if ($request->getHost() === $approvalsDomain) {
                 return route('mobile.login');
+            }
+
+            $homesDomain = env('HOMES_DOMAIN', 'homes.caclv.org');
+            if ($request->getHost() === $homesDomain) {
+                return route('homes.login');
             }
 
             return route('login');
