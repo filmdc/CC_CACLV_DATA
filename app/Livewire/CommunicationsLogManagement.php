@@ -1045,36 +1045,9 @@ class CommunicationsLogManagement extends Component
      */
     public function intakeRequirementsGate(CommunicationLog $log): array
     {
-        $reqs = $log->intakeRequirements()
-            ->where('is_orphaned', false)
-            ->with('definition')
-            ->get()
-            ->filter(fn ($r) => in_array(
-                $r->definition?->category ?? \App\Models\RequirementDefinition::CATEGORY_ELIGIBILITY,
-                \App\Models\RequirementDefinition::PHASE_1_CATEGORIES,
-                true
-            ));
-
-        $total = $reqs->count();
-        $met = $reqs->filter(fn ($r) => $r->isMet())->count();
-
-        // A project is born from the county → fund codes → requirements
-        // chain, so there must be something to track: at least one
-        // non-orphaned requirement (county-derived OR ad-hoc, any phase).
-        // Without it the resulting project would be empty.
-        $hasRequirements = $log->intakeRequirements()
-            ->where('is_orphaned', false)
-            ->exists();
-
-        return [
-            'total' => $total,
-            'met' => $met,
-            'unmet' => $total - $met,
-            'hasRequirements' => $hasRequirements,
-            // Ready to convert when there is at least one requirement AND
-            // all Phase 1 (eligibility/compliance) requirements are met.
-            'ready' => $hasRequirements && ($total === 0 || $met === $total),
-        ];
+        // Delegates to the shared conversion service so the main app and the
+        // housing portal (homes.caclv.org) evaluate the identical gate.
+        return app(\App\Services\IntakeConversion\ConvertIntakeToProject::class)->gate($log);
     }
 
     // -----------------------------------------------------------------
@@ -1789,104 +1762,15 @@ class CommunicationsLogManagement extends Component
         $log = CommunicationLog::findOrFail($this->convertingLogId);
         $this->convertingLog = $log;
 
-        // Reset matches
-        $this->potentialParticipantMatches = [];
-        $this->potentialPropertyMatches = [];
+        // Shared scan (name/phone/email + AddressNormalizer) so the main app
+        // and the housing portal review the same duplicate candidates.
+        $duplicates = app(\App\Services\IntakeConversion\ConvertIntakeToProject::class)
+            ->findDuplicates($log);
 
-        $needsReview = false;
+        $this->potentialParticipantMatches = $duplicates['participants'];
+        $this->potentialPropertyMatches = $duplicates['properties'];
 
-        // Check for participant duplicates if no participant is linked
-        if (! $log->participant_id && $log->contact_first_name && $log->contact_last_name) {
-            // Search for similar participants (case-insensitive, partial match)
-            $matches = Participant::with('household')
-                ->where(function ($query) use ($log) {
-                    // Exact name match (case-insensitive)
-                    $query->whereRaw('LOWER(first_name) = ?', [strtolower($log->contact_first_name)])
-                        ->whereRaw('LOWER(last_name) = ?', [strtolower($log->contact_last_name)]);
-                })
-                ->orWhere(function ($query) use ($log) {
-                    // Partial match - same last name and similar first name
-                    $query->whereRaw('LOWER(last_name) = ?', [strtolower($log->contact_last_name)])
-                        ->where(function ($q) use ($log) {
-                            $q->whereRaw('LOWER(first_name) LIKE ?', [strtolower($log->contact_first_name).'%'])
-                                ->orWhereRaw('? LIKE CONCAT(LOWER(first_name), "%")', [strtolower($log->contact_first_name)]);
-                        });
-                })
-                ->limit(10)
-                ->get();
-
-            // Also check by phone or email if available
-            if ($log->contact_phone || $log->contact_email) {
-                $contactMatches = Participant::with('household')
-                    ->where(function ($query) use ($log) {
-                        if ($log->contact_phone) {
-                            $query->orWhere('telephone', 'LIKE', '%'.preg_replace('/[^0-9]/', '', $log->contact_phone).'%');
-                        }
-                        if ($log->contact_email) {
-                            $query->orWhereRaw('LOWER(email) = ?', [strtolower($log->contact_email)]);
-                        }
-                    })
-                    ->limit(5)
-                    ->get();
-
-                $matches = $matches->merge($contactMatches)->unique('id');
-            }
-
-            if ($matches->isNotEmpty()) {
-                $this->potentialParticipantMatches = $matches->map(function ($p) {
-                    return [
-                        'id' => $p->id,
-                        'name' => $p->full_name,
-                        'phone' => $p->telephone,
-                        'email' => $p->email,
-                        'household_code' => $p->household?->household_code,
-                        'household_id' => $p->household_id,
-                    ];
-                })->toArray();
-                $needsReview = true;
-            }
-        }
-
-        // Check for property duplicates if no property is linked but address is provided.
-        // Routed through App\Support\AddressNormalizer so the conversion-flow
-        // and the P-01 save-time warning use the same matching rules.
-        if (! $log->property_id && $log->contact_address && $log->contact_city) {
-            $logNorm = AddressNormalizer::normalize($log->contact_address, $log->contact_city);
-            $logNumWord = AddressNormalizer::streetNumberAndFirstWord($log->contact_address);
-
-            $matches = Property::query()
-                ->whereNotNull('address_line_1')
-                ->whereNotNull('city')
-                ->limit(50)
-                ->get()
-                ->filter(function ($property) use ($logNorm, $logNumWord) {
-                    $cand = AddressNormalizer::normalize($property->address_line_1, $property->city);
-                    $candNumWord = AddressNormalizer::streetNumberAndFirstWord($property->address_line_1);
-
-                    return $cand['fingerprint'] === $logNorm['fingerprint']
-                        || ($logNumWord !== null
-                            && $candNumWord !== null
-                            && $cand['city'] === $logNorm['city']
-                            && $candNumWord === $logNumWord);
-                })
-                ->take(10);
-
-            if ($matches->isNotEmpty()) {
-                $this->potentialPropertyMatches = $matches->map(function ($p) {
-                    return [
-                        'id' => $p->id,
-                        'address' => $p->address_line_1,
-                        'city' => $p->city,
-                        'state' => $p->state,
-                        'zip' => $p->zip_code,
-                        'full_address' => $p->address_line_1.', '.$p->city.', '.$p->state.' '.$p->zip_code,
-                    ];
-                })->values()->toArray();
-                $needsReview = true;
-            }
-        }
-
-        if ($needsReview) {
+        if (! empty($this->potentialParticipantMatches) || ! empty($this->potentialPropertyMatches)) {
             $this->convertStep = 2;
         } else {
             // No duplicates found, go straight to conversion
@@ -1965,8 +1849,6 @@ class CommunicationsLogManagement extends Component
 
     public function convertToProject()
     {
-        \Log::info('convertToProject started', ['convertingLogId' => $this->convertingLogId]);
-
         $this->authorizeAction('projects.create');
 
         $this->validate([
@@ -1976,280 +1858,61 @@ class CommunicationsLogManagement extends Component
 
         $log = CommunicationLog::findOrFail($this->convertingLogId);
 
-        \Log::info('convertToProject log loaded', [
-            'log_id' => $log->id,
-            'already_converted' => $log->converted_to_job_id ? 'yes' : 'no',
-            'converted_to_job_id' => $log->converted_to_job_id,
-            'participant_id' => $log->participant_id,
-            'property_id' => $log->property_id,
-            'contact_first_name' => $log->contact_first_name,
-            'contact_last_name' => $log->contact_last_name,
-            'contact_address' => $log->contact_address,
-            'contact_city' => $log->contact_city,
-        ]);
-
-        // Check if already converted and block (user must use resetConversion first)
-        if ($log->converted_to_job_id) {
-            $existingJob = HousingJob::find($log->converted_to_job_id);
-            $jobNumber = $existingJob?->job_number ?? "ID: {$log->converted_to_job_id}";
-            session()->flash('error', "This communication log has already been converted to project {$jobNumber}. Use 'Reset Conversion' option first if you need to re-convert.");
-            $this->closeConvertModal();
-            \Log::info('convertToProject blocked - already converted', ['job_number' => $jobNumber]);
-
-            return;
-        }
-
-        // Server-side guard for the same condition the disabled button
-        // enforces: a project needs at least one non-orphaned requirement
-        // to track (county-derived or ad-hoc). Defends against stale UI or
-        // a direct call.
-        if (! $this->intakeRequirementsGate($log)['hasRequirements']) {
-            session()->flash('error', 'Cannot convert: this log has no requirements yet. Select a county or add an ad-hoc requirement first.');
-            \Log::info('convertToProject blocked - no requirements', ['log_id' => $log->id]);
-
-            return;
-        }
-
-        DB::beginTransaction();
+        // The conversion itself lives in the shared service so the main app
+        // and the housing portal (homes.caclv.org) run the identical flow
+        // (guards → participant/property resolution → Phase-1 gate with
+        // audited override → job creation → carry-forward → milestones).
+        // This wrapper only maps component state in and refusals back onto
+        // the same error surfaces as before.
         try {
-            $participant = null;
-            $household = null;
-            $property = null;
-            $createdResources = [];
-
-            \Log::info('convertToProject: User selections', [
-                'selectedParticipantAction' => $this->selectedParticipantAction,
-                'selectedPropertyAction' => $this->selectedPropertyAction,
-            ]);
-
-            // Handle participant based on user selection or existing link
-            if ($log->participant_id) {
-                // Already has a participant linked
-                \Log::info('convertToProject: Using already-linked participant', ['participant_id' => $log->participant_id]);
-                $participant = Participant::find($log->participant_id);
-                $household = $participant?->household;
-            } elseif (is_numeric($this->selectedParticipantAction)) {
-                // User selected an existing participant from duplicates
-                \Log::info('convertToProject: User selected existing participant', ['participant_id' => $this->selectedParticipantAction]);
-                $participant = Participant::find($this->selectedParticipantAction);
-                $household = $participant?->household;
-                $createdResources[] = "linked to existing participant: {$participant->full_name}";
-
-                // Update the communication log with the participant
-                $log->update([
-                    'participant_id' => $participant->id,
-                    'household_id' => $household?->id,
-                ]);
-            } elseif ($this->selectedParticipantAction === 'create_new') {
-                // User chose to create a new participant
-                if ($log->contact_first_name && $log->contact_last_name) {
-                    \Log::info('convertToProject: Creating new participant per user selection');
-
-                    // Create new household
-                    $household = Household::create([
-                        'household_type' => 'Single Person',
-                        'household_size' => 1,
-                        'housing_status' => 'Unknown/not reported',
-                    ]);
-
-                    // Add household address if available
-                    if ($log->contact_address && $log->contact_city) {
-                        $household->addresses()->create([
-                            'address' => $log->contact_address,
-                            'city' => $log->contact_city,
-                            'state' => strtoupper($log->contact_state ?? 'PA'),
-                            'zip_code' => $log->contact_zip ?? '',
-                            'is_current' => true,
-                        ]);
-                    }
-
-                    // Create new participant
-                    $participant = Participant::create([
-                        'household_id' => $household->id,
-                        'first_name' => $log->contact_first_name,
-                        'last_name' => $log->contact_last_name,
-                        'telephone' => $log->contact_phone ?: null,
-                        'email' => $log->contact_email ?: null,
-                        'relationship_to_head' => 'self',
-                        'is_head_of_household' => true,
-                    ]);
-
-                    $createdResources[] = "created participant: {$participant->full_name}";
-
-                    // Update the communication log with the participant
-                    $log->update([
-                        'participant_id' => $participant->id,
-                        'household_id' => $household->id,
-                    ]);
-                } else {
-                    \Log::info('convertToProject: No contact name, cannot create participant');
-                    DB::rollBack();
-                    session()->flash('error', 'Cannot convert to project: No participant is linked and contact name is incomplete. Please edit the communication log and add contact first/last name or select a participant.');
-                    $this->closeConvertModal();
-
-                    return;
-                }
-            }
-
-            // Handle property based on user selection or existing link
-            if ($log->property_id) {
-                // Already has a property linked
-                \Log::info('convertToProject: Using already-linked property', ['property_id' => $log->property_id]);
-                $property = Property::find($log->property_id);
-            } elseif (is_numeric($this->selectedPropertyAction)) {
-                // User selected an existing property from duplicates
-                \Log::info('convertToProject: User selected existing property', ['property_id' => $this->selectedPropertyAction]);
-                $property = Property::find($this->selectedPropertyAction);
-                $createdResources[] = "linked to existing property: {$property->address_line_1}";
-
-                // Update the communication log with the property
-                $log->update(['property_id' => $property->id]);
-            } elseif ($this->selectedPropertyAction === 'create_new' && $log->contact_address && $log->contact_city) {
-                // User chose to create a new property
-                \Log::info('convertToProject: Creating new property per user selection');
-                $property = Property::create([
-                    'address_line_1' => $log->contact_address,
-                    'city' => $log->contact_city,
-                    'state' => strtoupper($log->contact_state ?? 'PA'),
-                    'zip_code' => $log->contact_zip ?? '',
-                    'participant_id' => $participant?->id,
-                    'household_id' => $household?->id,
-                    'status' => 'active',
-                    'created_by' => Auth::id(),
-                ]);
-
-                $createdResources[] = "created property: {$property->address_line_1}";
-
-                // Update the communication log with the property
-                $log->update(['property_id' => $property->id]);
-            } elseif ($this->selectedPropertyAction === 'skip') {
-                // User chose to skip property creation
-                \Log::info('convertToProject: User chose to skip property creation');
-                $property = null;
-            } else {
-                // No property linked and no address to create from
-                \Log::info('convertToProject: No property available', [
-                    'has_contact_address' => (bool) $log->contact_address,
-                    'has_contact_city' => (bool) $log->contact_city,
-                ]);
-                $property = null;
-            }
-
-            // Check for duplicate property assignment if property exists
-            if ($property) {
-                $existingJob = HousingJob::where('property_id', $property->id)
-                    ->whereIn('status', ['pending', 'approved', 'in_progress', 'on_hold'])
-                    ->first();
-
-                if ($existingJob) {
-                    $createdResources[] = "Note: Active project already exists for this property (Job #{$existingJob->job_number})";
-                }
-            }
-
-            \Log::info('convertToProject: Creating HousingJob', [
-                'job_title' => $this->convertJobTitle,
-                'program_id' => $this->convertProgramId,
-                'participant_id' => $participant?->id,
-                'household_id' => $household?->id,
-                'property_id' => $property?->id,
-            ]);
-
-            // v2 (Phase 7): requirements gate — block conversion if any
-            // required-and-non-orphaned intake requirement is unmet AND
-            // the user did not tick the audit-logged override.
-            // Phase 10: only Phase-1 categories block promotion;
-            // service-delivery-compliance items are evaluated on the
-            // project page after conversion.
-            $unmetCount = $log->intakeRequirements()
-                ->where('is_orphaned', false)
-                ->whereNotIn('status', \App\Models\IntakeRequirement::MET_STATUSES)
-                ->with('definition')
-                ->get()
-                ->filter(fn ($r) => in_array(
-                    $r->definition?->category ?? \App\Models\RequirementDefinition::CATEGORY_ELIGIBILITY,
-                    \App\Models\RequirementDefinition::PHASE_1_CATEGORIES,
-                    true
-                ))
-                ->count();
-
-            if ($unmetCount > 0 && ! $this->requirementOverride) {
-                DB::rollBack();
-                $this->addError('requirementOverride', "{$unmetCount} required application requirement(s) are unmet. Tick the override box and provide a reason to proceed.");
-
-                return;
-            }
-
-            if ($this->requirementOverride && trim($this->requirementOverrideReason) === '') {
-                DB::rollBack();
-                $this->addError('requirementOverrideReason', 'A reason is required when overriding unmet requirements.');
-
-                return;
-            }
-
-            $job = HousingJob::create([
-                'job_title' => $this->convertJobTitle,
-                'job_description' => $this->convertJobDescription,
-                // program_id is auto-derived silently (first housing-enabled
-                // program) purely to keep project access control working —
-                // it is no longer surfaced or chosen in the convert UI. The
-                // legacy Service tie-in is dropped: the project's scope now
-                // comes from the carried counties + fund codes + Phase 2
-                // requirements (see IntakeRequirementInstantiator::
-                // carryForwardToProject).
-                'program_id' => $this->convertProgramId ?: null,
-                'service_id' => null,
-                'participant_id' => $participant?->id,
-                'household_id' => $household?->id,
-                'property_id' => $property?->id,
-                'contractor_id' => $log->contractor_id,
-                'status' => 'pending',
-                'priority' => $log->priority === 'urgent' ? 'emergency' : ($log->priority === 'high' ? 'high' : 'medium'),
-                'request_date' => now(),
-                'created_by' => Auth::id(),
-                'project_manager_id' => Auth::id(),
-            ]);
-
-            \Log::info('convertToProject: HousingJob created', ['job_id' => $job->id, 'job_number' => $job->job_number]);
-
-            $log->convertToProject($job, Auth::id());
-
-            // v2 (Phase 7): record the override audit + (eventually) copy
-            // the intake_requirements forward into project_requirements.
-            app(\App\Services\IntakeRequirementInstantiator::class)->carryForwardToProject(
+            $result = app(\App\Services\IntakeConversion\ConvertIntakeToProject::class)->convert(
                 $log,
-                $job,
+                new \App\Services\IntakeConversion\ConversionInput(
+                    jobTitle: $this->convertJobTitle,
+                    jobDescription: $this->convertJobDescription,
+                    programId: $this->convertProgramId ?: null,
+                    participantAction: $this->selectedParticipantAction,
+                    propertyAction: $this->selectedPropertyAction,
+                    requirementOverride: (bool) $this->requirementOverride,
+                    overrideReason: $this->requirementOverrideReason,
+                ),
                 Auth::user(),
-                $this->requirementOverride ? $this->requirementOverrideReason : null
             );
-
-            // Milestone redesign (Phase 1): materialize the curated
-            // Phase 2 universals (RequirementDefinition rows flagged
-            // is_default_milestone=true) as milestones on this brand-new
-            // project. Same transaction, so a failure rolls the
-            // milestones back with the project. Templates skip this —
-            // they carry their own milestone shape via
-            // HousingJob::createFromTemplate().
-            app(\App\Services\DefaultMilestoneSeeder::class)->seed($job, Auth::user());
-
-            DB::commit();
-
-            \Log::info('convertToProject: Transaction committed successfully');
-
-            $this->closeConvertModal();
-
-            $message = "Communication converted to project: {$job->job_number}";
-            if (! empty($createdResources)) {
-                $message .= ' ('.implode(', ', $createdResources).')';
+        } catch (\App\Services\IntakeConversion\ConversionBlocked $e) {
+            switch ($e->reasonCode) {
+                case \App\Services\IntakeConversion\ConversionBlocked::UNMET_REQUIREMENTS:
+                    $this->addError('requirementOverride', $e->getMessage());
+                    break;
+                case \App\Services\IntakeConversion\ConversionBlocked::OVERRIDE_REASON_REQUIRED:
+                    $this->addError('requirementOverrideReason', $e->getMessage());
+                    break;
+                case \App\Services\IntakeConversion\ConversionBlocked::ALREADY_CONVERTED:
+                case \App\Services\IntakeConversion\ConversionBlocked::MISSING_CONTACT_NAME:
+                    session()->flash('error', $e->getMessage());
+                    $this->closeConvertModal();
+                    break;
+                default: // NOTHING_TO_TRACK
+                    session()->flash('error', $e->getMessage());
+                    break;
             }
-            if (! $property) {
-                $message .= ' (Note: No property assigned - you can add one by editing the project)';
-            }
-            session()->flash('success', $message);
+
+            return;
         } catch (\Exception $e) {
-            DB::rollBack();
-            \Log::error('Convert to project failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             session()->flash('error', 'Failed to convert to project: '.$e->getMessage());
+
+            return;
         }
+
+        $this->closeConvertModal();
+
+        $message = "Communication converted to project: {$result->job->job_number}";
+        if (! empty($result->createdResources)) {
+            $message .= ' ('.implode(', ', $result->createdResources).')';
+        }
+        if (! $result->propertyAssigned) {
+            $message .= ' (Note: No property assigned - you can add one by editing the project)';
+        }
+        session()->flash('success', $message);
     }
 
     /**

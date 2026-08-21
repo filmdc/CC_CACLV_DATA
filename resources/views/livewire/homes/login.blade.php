@@ -64,7 +64,7 @@
 
     <div class="mt-6 text-center space-y-2">
         <p class="text-sm" style="color: var(--calv-slate-65);">Need an account? Contact your administrator.</p>
-        <a href="{{ env('MAIN_APP_URL', 'https://caclv-data.caclv.org') }}" class="calv-link inline-flex items-center gap-1 text-sm">
+        <a href="{{ config('app.main_app_url') }}" class="calv-link inline-flex items-center gap-1 text-sm">
             Go to main application
         </a>
     </div>
