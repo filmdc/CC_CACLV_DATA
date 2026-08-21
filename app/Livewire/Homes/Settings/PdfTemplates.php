@@ -182,7 +182,7 @@ class PdfTemplates extends Component
 
         return view('livewire.homes.settings.pdf-templates', [
             'templates' => $templates,
-            'mainApp' => rtrim(env('MAIN_APP_URL', 'https://caclv-data.caclv.org'), '/'),
+            'mainApp' => rtrim(config('app.main_app_url'), '/'),
             'canManage' => $this->canAny(['pdf_templates.create', 'pdf_templates.edit']),
             'canDelete' => $this->can('pdf_templates.delete'),
         ]);

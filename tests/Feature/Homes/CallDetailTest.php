@@ -233,3 +233,12 @@ it('offers convert on a non-ready entry (gate lives in the modal)', function () 
     Livewire::test(CallDetail::class, ['log' => $log])
         ->assertViewHas('canConvert', true);
 });
+
+it('redirects legacy /calls?open=N links to the call detail route', function () {
+    $this->actingAs(callDetailUser(['communications_log.view']));
+
+    $log = CommunicationLog::factory()->create();
+
+    $this->get(route('homes.calls').'?open='.$log->id)
+        ->assertRedirect(route('homes.call', $log->id));
+});

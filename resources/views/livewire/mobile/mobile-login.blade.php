@@ -74,7 +74,7 @@
     <div class="mt-6 text-center space-y-2">
         <p class="text-sm text-zinc-500">Need an account? Contact your administrator.</p>
         <a
-            href="{{ env('MAIN_APP_URL', 'https://caclv-data.caclv.org') }}"
+            href="{{ config('app.main_app_url') }}"
             class="inline-flex items-center gap-1 text-sm text-indigo-400 hover:text-indigo-300"
         >
             Go to main application

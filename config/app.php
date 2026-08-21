@@ -17,6 +17,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Main App URL (for the subdomain portals)
+    |--------------------------------------------------------------------------
+    |
+    | Where the approvals and homes portals link when pointing users back at
+    | the main CAP TRACK app. Lives in config (not env() in Blade) so it
+    | survives `config:cache`. Production serves the main app at
+    | data.caclv.org.
+    |
+    */
+
+    'main_app_url' => env('MAIN_APP_URL', 'https://data.caclv.org'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Environment
     |--------------------------------------------------------------------------
     |

@@ -29,9 +29,16 @@ class CallsIntakes extends Component
     #[Url]
     public bool $expanded = false;
 
-    public function mount(): void
+    public function mount()
     {
         $this->authorizeAction('communications_log.view');
+
+        // Back-compat: the Phase-1 Today page emitted /calls?open={id} links.
+        // The detail now lives at its own route — send stale links there.
+        $openId = request()->query('open');
+        if (is_numeric($openId)) {
+            return redirect()->route('homes.call', (int) $openId);
+        }
     }
 
     public function updatedSearch(): void

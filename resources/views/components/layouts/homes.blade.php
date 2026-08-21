@@ -70,8 +70,12 @@
 
                     {{-- Log a call CTA --}}
                     @if($user && $user->hasPermission('communications_log.create'))
+                        {{-- x-data makes this its own Alpine root: the sidebar lives outside
+                             every Livewire component, so without it Alpine never compiles
+                             the x-on directive and the click is silently ignored. --}}
                         <button
                             type="button"
+                            x-data
                             x-on:click="Livewire.dispatch('homes-open-quick-log')"
                             class="calv-btn calv-btn--primary mt-4 mx-2.5"
                         >
@@ -121,7 +125,7 @@
                                 <p class="text-sm font-semibold truncate">{{ $user?->name }}</p>
                                 <p class="text-xs truncate" style="color: var(--calv-slate-65);">{{ $user?->email }}</p>
                             </div>
-                            <a href="{{ env('MAIN_APP_URL', 'https://caclv-data.caclv.org') }}" class="block px-3 py-2 text-sm hover:bg-[var(--calv-sand-15)]">Open main app</a>
+                            <a href="{{ config('app.main_app_url') }}" class="block px-3 py-2 text-sm hover:bg-[var(--calv-sand-15)]">Open main app</a>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit" class="block w-full text-left px-3 py-2 text-sm hover:bg-[var(--calv-sand-15)]">Log out</button>
