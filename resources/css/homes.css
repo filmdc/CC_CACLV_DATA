@@ -17,6 +17,10 @@
     --font-sans: 'Barlow', 'Inter', ui-sans-serif, system-ui, sans-serif;
 }
 
+[x-cloak] {
+    display: none !important;
+}
+
 :root {
     /* ---------- PRIMARY PALETTE ---------- */
     --calv-red:    #D14124;

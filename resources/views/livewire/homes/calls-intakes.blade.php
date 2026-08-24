@@ -61,6 +61,8 @@
         >
             ⇥ Expanded view {{ $expanded ? 'on' : '' }}
         </button>
+
+        @include('livewire.homes.partials.saved-views', ['supportsExpanded' => true])
     </div>
 
     {{-- List --}}
@@ -69,27 +71,52 @@
             No calls match — try "Everything" or clear the search.
         </div>
     @elseif($expanded)
-        {{-- Expanded power table --}}
+        {{-- Expanded power table (columns follow the active view) --}}
+        @php $visible = collect($this->columnOptions())->only($columns); @endphp
         <div class="calv-card overflow-auto">
-            <table class="w-full border-collapse" style="min-width: 900px;">
+            <table class="w-full border-collapse" style="min-width: {{ 120 + $visible->count() * 100 }}px;">
                 <thead>
                     <tr style="background: var(--calv-slate); color: #fff;">
-                        @foreach(['Contact', 'Address', 'Stage', 'Docs', 'Last touched', 'Next action', 'Type', 'Direction', ''] as $h)
+                        @foreach($visible as $h)
                             <th class="text-left px-3 py-2.5 whitespace-nowrap" style="font-family: var(--font-sub); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;">{{ $h }}</th>
                         @endforeach
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($logs as $row)
                         <tr style="background: {{ $row['overdue'] ? 'var(--calv-red-15)' : '#fff' }}; border-top: 1px solid var(--calv-slate-15);">
-                            <td class="px-3 py-2.5 text-[12.5px] font-semibold" style="color: var(--calv-slate);">{{ $row['who'] }}</td>
-                            <td class="px-3 py-2.5 text-[12.5px]" style="color: var(--calv-slate);">{{ $row['where'] ?: '—' }}</td>
-                            <td class="px-3 py-2.5"><span class="{{ $badgeFor[$row['stage_key']] ?? 'calv-badge' }}">{{ $row['stage_label'] }}</span></td>
-                            <td class="px-3 py-2.5 text-[12.5px]" style="color: var(--calv-slate);">{{ $row['reqs'] ?: '—' }}</td>
-                            <td class="px-3 py-2.5 text-[12.5px]" style="color: var(--calv-slate);">{{ $row['last'] }}</td>
-                            <td class="px-3 py-2.5 text-[12.5px]" style="color: {{ $row['overdue'] ? 'var(--calv-red)' : 'var(--calv-slate)' }};">{{ $row['next'] }}</td>
-                            <td class="px-3 py-2.5 text-[12.5px]" style="color: var(--calv-slate);">{{ $row['type'] }}</td>
-                            <td class="px-3 py-2.5 text-[12.5px]" style="color: var(--calv-slate);">{{ $row['direction'] }}</td>
+                            @foreach($visible as $key => $h)
+                                @switch($key)
+                                    @case('who')
+                                        <td class="px-3 py-2.5 text-[12.5px] font-semibold" style="color: var(--calv-slate);">{{ $row['who'] }}</td>
+                                        @break
+                                    @case('where')
+                                        <td class="px-3 py-2.5 text-[12.5px]" style="color: var(--calv-slate);">{{ $row['where'] ?: '—' }}</td>
+                                        @break
+                                    @case('note')
+                                        <td class="px-3 py-2.5 text-[12.5px]" style="color: var(--calv-slate-65); min-width: 200px;">{{ Str::limit($row['note'], 90) ?: '—' }}</td>
+                                        @break
+                                    @case('stage')
+                                        <td class="px-3 py-2.5"><span class="{{ $badgeFor[$row['stage_key']] ?? 'calv-badge' }}">{{ $row['stage_label'] }}</span></td>
+                                        @break
+                                    @case('docs')
+                                        <td class="px-3 py-2.5 text-[12.5px]" style="color: var(--calv-slate);">{{ $row['reqs'] ?: '—' }}</td>
+                                        @break
+                                    @case('last')
+                                        <td class="px-3 py-2.5 text-[12.5px]" style="color: var(--calv-slate);">{{ $row['last'] }}</td>
+                                        @break
+                                    @case('next')
+                                        <td class="px-3 py-2.5 text-[12.5px]" style="color: {{ $row['overdue'] ? 'var(--calv-red)' : 'var(--calv-slate)' }};">{{ $row['next'] }}</td>
+                                        @break
+                                    @case('type')
+                                        <td class="px-3 py-2.5 text-[12.5px]" style="color: var(--calv-slate);">{{ $row['type'] }}</td>
+                                        @break
+                                    @case('direction')
+                                        <td class="px-3 py-2.5 text-[12.5px]" style="color: var(--calv-slate);">{{ $row['direction'] }}</td>
+                                        @break
+                                @endswitch
+                            @endforeach
                             <td class="px-3 py-2.5"><a href="{{ route('homes.call', $row['id']) }}" wire:navigate class="calv-btn calv-btn--quiet calv-btn--sm">Open</a></td>
                         </tr>
                     @endforeach

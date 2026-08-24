@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Homes;
 
+use App\Livewire\Homes\Concerns\HasSavedViews;
 use App\Models\HousingJob;
 use App\Traits\WithPermissionChecks;
 use Livewire\Attributes\Layout;
@@ -19,6 +20,7 @@ use Livewire\Component;
 #[Layout('components.layouts.homes')]
 class Projects extends Component
 {
+    use HasSavedViews;
     use WithPermissionChecks;
 
     #[Url]
@@ -33,6 +35,58 @@ class Projects extends Component
     public function mount(): void
     {
         $this->authorizeAction('projects.view');
+
+        $this->initSavedViews();
+    }
+
+    // ── Saved-view contract (HasSavedViews) ─────────────────────────
+
+    protected function screenKey(): string
+    {
+        return 'projects';
+    }
+
+    /** Row segments that can be shown/hidden, in display order. */
+    public function columnOptions(): array
+    {
+        return [
+            'who' => 'Homeowner & address',
+            'status' => 'Status & program',
+            'progress' => 'Milestones & budget',
+            'next' => 'Next action',
+        ];
+    }
+
+    public function lockedColumns(): array
+    {
+        return ['who'];
+    }
+
+    public function pillOptions(): array
+    {
+        return [
+            'open' => 'Open',
+            'attention' => 'Needs attention',
+            'all' => 'Everything',
+        ];
+    }
+
+    protected function builtInDefaults(): array
+    {
+        return [
+            'columns' => ['who', 'status', 'progress', 'next'],
+            'filters' => ['pill' => 'open'],
+        ];
+    }
+
+    protected function applyViewState(array $columns, array $filters): void
+    {
+        $this->pill = $filters['pill'];
+    }
+
+    protected function currentFilters(): array
+    {
+        return ['pill' => $this->pill];
     }
 
     public function setPill(string $pill): void
