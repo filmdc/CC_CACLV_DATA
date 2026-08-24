@@ -113,6 +113,53 @@ it('filters the Calls list by the "needs something" pill', function () {
         ->assertSee('Quiet Record');
 });
 
+it('filters the Calls list by city', function () {
+    $this->actingAs(homesUser(['communications_log.view']));
+
+    CommunicationLog::factory()->create([
+        'contact_first_name' => 'Alma',
+        'contact_last_name' => 'Allentowner',
+        'contact_city' => 'Allentown',
+    ]);
+    CommunicationLog::factory()->create([
+        'contact_first_name' => 'Wes',
+        'contact_last_name' => 'Whitehaller',
+        // Legacy rows were saved with stray whitespace — the filter must still catch them.
+        'contact_city' => 'Whitehall ',
+    ]);
+
+    Livewire::test(CallsIntakes::class)
+        ->set('city', 'Allentown')
+        ->assertSee('Alma Allentowner')
+        ->assertDontSee('Wes Whitehaller')
+        ->set('city', 'Whitehall')
+        ->assertSee('Wes Whitehaller')
+        ->assertDontSee('Alma Allentowner')
+        ->set('city', '')
+        ->assertSee('Alma Allentowner')
+        ->assertSee('Wes Whitehaller');
+});
+
+it('remembers the city filter in a saved view', function () {
+    $this->actingAs(homesUser(['communications_log.view']));
+
+    CommunicationLog::factory()->create([
+        'contact_first_name' => 'Alma',
+        'contact_last_name' => 'Allentowner',
+        'contact_city' => 'Allentown',
+    ]);
+
+    Livewire::test(CallsIntakes::class)
+        ->set('city', 'Allentown')
+        ->call('openCreateView')
+        ->set('viewName', 'Allentown intakes')
+        ->call('saveView')
+        ->assertHasNoErrors()
+        ->set('city', '')
+        ->call('applyView', \App\Models\HomesSavedView::where('name', 'Allentown intakes')->value('id'))
+        ->assertSet('city', 'Allentown');
+});
+
 it('persists a real CommunicationLog from the quick-log modal', function () {
     $user = homesUser(['communications_log.create']);
     $this->actingAs($user);
@@ -137,6 +184,28 @@ it('persists a real CommunicationLog from the quick-log modal', function () {
     expect($log->follow_up_action)->toBe('Call back');
     expect($log->follow_up_date->toDateString())->toBe(now()->addDays(7)->toDateString());
     expect($log->created_by)->toBe($user->id);
+});
+
+it('saves the address in separate parts from the quick-log modal', function () {
+    $this->actingAs(homesUser(['communications_log.create']));
+
+    Livewire::test(QuickLog::class)
+        ->call('open')
+        ->set('who', 'Pat Splitfield')
+        ->set('showDetails', true)
+        ->set('address', ' 123 Main St ')
+        ->set('city', ' Allentown ')
+        ->set('state', 'pa')
+        ->set('zip', '18101')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $log = CommunicationLog::where('subject', 'Call with Pat Splitfield')->first();
+
+    expect($log->contact_address)->toBe('123 Main St');
+    expect($log->contact_city)->toBe('Allentown');
+    expect($log->contact_state)->toBe('PA');
+    expect($log->contact_zip)->toBe('18101');
 });
 
 it('requires a name in the quick-log modal', function () {

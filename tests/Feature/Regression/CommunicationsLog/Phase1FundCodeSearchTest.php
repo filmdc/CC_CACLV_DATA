@@ -28,18 +28,50 @@ it('search by fund code surfaces logs that have that code attached (P-02)', func
     expect($subjects)->not->toContain('CL-1: Initial intake call');
 })->group('regression');
 
-it('search by fund code description matches by partial term (P-02)', function () {
+it('search does NOT match fund code descriptions (2026-08 city-search fix)', function () {
+    // Deliberate reversal of the original P-02 description matching:
+    // fund codes named after places ("Allentown Better Homes") made every
+    // log tagged with that fund hit a search for the city, regardless of
+    // where the caller actually lives. Fund codes now match on the short
+    // code only; the description is ignored.
     $matches = Livewire::actingAs($this->user)
         ->test(CommunicationsLogManagement::class)
         ->set('search', 'Roofing')
         ->viewData('logs');
 
-    // Both CL-2 and CL-3 have FC-FIX-001 (Roofing) attached.
+    // CL-2 and CL-3 carry FC-FIX-001 (description "Roofing") but nothing
+    // else about them mentions roofing — they must no longer match.
     $subjects = $matches->pluck('subject')->all();
     $hasFc001Log = collect($subjects)->contains(
         fn ($s) => str_contains($s, 'CL-2') || str_contains($s, 'CL-3')
     );
-    expect($hasFc001Log)->toBeTrue('Expected at least one CL-2/CL-3 log via fund code description');
+    expect($hasFc001Log)->toBeFalse('Fund code descriptions must not leak into free-text search');
+})->group('regression');
+
+it('a place-named fund code does not pollute a city search (2026-08 city-search fix)', function () {
+    $fund = \App\Models\FundCode::factory()->create([
+        'code' => 'F-PLACE',
+        'description' => 'Allentown Better Homes',
+    ]);
+
+    $inAllentown = CommunicationLog::factory()->create([
+        'subject' => 'Caller in Allentown',
+        'contact_city' => 'Allentown',
+    ]);
+    $inWhitehall = CommunicationLog::factory()->create([
+        'subject' => 'Caller in Whitehall',
+        'contact_city' => 'Whitehall',
+    ]);
+    $inWhitehall->anticipatedFundCodes()->attach($fund->id);
+
+    $subjects = Livewire::actingAs($this->user)
+        ->test(CommunicationsLogManagement::class)
+        ->set('search', 'Allentown')
+        ->viewData('logs')
+        ->pluck('subject')->all();
+
+    expect($subjects)->toContain('Caller in Allentown');
+    expect($subjects)->not->toContain('Caller in Whitehall');
 })->group('regression');
 
 it('search by name still works (P-02 is additive, does not regress existing search)', function () {

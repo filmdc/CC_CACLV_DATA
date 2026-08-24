@@ -78,7 +78,21 @@
                         <div class="grid gap-3" style="grid-template-columns: 1fr 1fr; padding: 14px; background: var(--calv-sand-15); border-radius: 8px;">
                             <div style="grid-column: 1 / -1;">
                                 <label class="calv-label" style="font-size: 10px;">Street address</label>
-                                <input wire:model="address" type="text" class="calv-input" placeholder="">
+                                <input wire:model="address" type="text" class="calv-input" placeholder="123 Main St">
+                            </div>
+                            <div style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 64px 110px; gap: 12px;">
+                                <div>
+                                    <label class="calv-label" style="font-size: 10px;">City</label>
+                                    <input wire:model="city" type="text" class="calv-input">
+                                </div>
+                                <div>
+                                    <label class="calv-label" style="font-size: 10px;">State</label>
+                                    <input wire:model="state" type="text" maxlength="2" class="calv-input">
+                                </div>
+                                <div>
+                                    <label class="calv-label" style="font-size: 10px;">Zip</label>
+                                    <input wire:model="zip" type="text" maxlength="10" class="calv-input">
+                                </div>
                             </div>
                             <div>
                                 <label class="calv-label" style="font-size: 10px;">Phone</label>

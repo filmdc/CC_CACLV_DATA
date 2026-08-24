@@ -27,6 +27,10 @@ class CallsIntakes extends Component
     #[Url]
     public string $pill = 'all';
 
+    /** City filter — exact match on contact_city ('' = any city). */
+    #[Url]
+    public string $city = '';
+
     /** Expanded view restores the full power table. */
     #[Url]
     public bool $expanded = true;
@@ -46,6 +50,11 @@ class CallsIntakes extends Component
     }
 
     public function updatedSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedCity(): void
     {
         $this->resetPage();
     }
@@ -102,7 +111,7 @@ class CallsIntakes extends Component
     {
         return [
             'columns' => ['who', 'where', 'stage', 'docs', 'last', 'next', 'type', 'direction'],
-            'filters' => ['pill' => 'all', 'expanded' => true],
+            'filters' => ['pill' => 'all', 'expanded' => true, 'city' => ''],
         ];
     }
 
@@ -110,11 +119,12 @@ class CallsIntakes extends Component
     {
         $this->pill = $filters['pill'];
         $this->expanded = $filters['expanded'];
+        $this->city = (string) $filters['city'];
     }
 
     protected function currentFilters(): array
     {
-        return ['pill' => $this->pill, 'expanded' => $this->expanded];
+        return ['pill' => $this->pill, 'expanded' => $this->expanded, 'city' => $this->city];
     }
 
     protected function afterViewApplied(): void
@@ -146,7 +156,8 @@ class CallsIntakes extends Component
     public function render(HousingPortalData $data)
     {
         $base = fn () => CommunicationLog::query()
-            ->when($this->search !== '', fn ($q) => $q->search($this->search));
+            ->when($this->search !== '', fn ($q) => $q->search($this->search))
+            ->when(trim($this->city) !== '', fn ($q) => $q->whereRaw('TRIM(contact_city) = ?', [trim($this->city)]));
 
         $query = $this->applyPill($base())
             ->with(['participant', 'property', 'intakeRequirements.definition'])
@@ -193,10 +204,20 @@ class CallsIntakes extends Component
                 ->whereNotIn('status', IntakeRequirement::MET_STATUSES))
             ->count();
 
+        // Distinct cities for the filter dropdown (TRIM guards legacy entries
+        // saved with stray whitespace before the address-cleanup migration).
+        $cities = CommunicationLog::query()
+            ->whereNotNull('contact_city')
+            ->where('contact_city', '!=', '')
+            ->selectRaw('DISTINCT TRIM(contact_city) AS city')
+            ->orderBy('city')
+            ->pluck('city');
+
         return view('livewire.homes.calls-intakes', [
             'logs' => $logs,
             'needsCount' => $needsCount,
             'collectingCount' => $collectingCount,
+            'cities' => $cities,
         ]);
     }
 }
