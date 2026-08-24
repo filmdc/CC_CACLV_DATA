@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Homes;
 
+use App\Livewire\Homes\Concerns\HasSavedViews;
 use App\Models\CommunicationLog;
 use App\Models\IntakeRequirement;
 use App\Services\Homes\HousingPortalData;
@@ -15,6 +16,7 @@ use Livewire\WithPagination;
 #[Layout('components.layouts.homes')]
 class CallsIntakes extends Component
 {
+    use HasSavedViews;
     use WithPagination;
     use WithPermissionChecks;
 
@@ -23,15 +25,17 @@ class CallsIntakes extends Component
 
     /** Person-language filter: needs | collecting | all. */
     #[Url]
-    public string $pill = 'needs';
+    public string $pill = 'all';
 
     /** Expanded view restores the full power table. */
     #[Url]
-    public bool $expanded = false;
+    public bool $expanded = true;
 
     public function mount()
     {
         $this->authorizeAction('communications_log.view');
+
+        $this->initSavedViews();
 
         // Back-compat: the Phase-1 Today page emitted /calls?open={id} links.
         // The detail now lives at its own route — send stale links there.
@@ -55,6 +59,67 @@ class CallsIntakes extends Component
     public function toggleExpanded(): void
     {
         $this->expanded = ! $this->expanded;
+    }
+
+    // ── Saved-view contract (HasSavedViews) ─────────────────────────
+
+    protected function screenKey(): string
+    {
+        return 'calls';
+    }
+
+    /** Column registry for the expanded table, in display order. */
+    public function columnOptions(): array
+    {
+        return [
+            'who' => 'Contact',
+            'where' => 'Address',
+            'note' => 'Summary',
+            'stage' => 'Stage',
+            'docs' => 'Docs',
+            'last' => 'Last touched',
+            'next' => 'Next action',
+            'type' => 'Type',
+            'direction' => 'Direction',
+        ];
+    }
+
+    public function lockedColumns(): array
+    {
+        return ['who'];
+    }
+
+    public function pillOptions(): array
+    {
+        return [
+            'needs' => 'Needs something',
+            'collecting' => 'Collecting docs',
+            'all' => 'Everything',
+        ];
+    }
+
+    protected function builtInDefaults(): array
+    {
+        return [
+            'columns' => ['who', 'where', 'stage', 'docs', 'last', 'next', 'type', 'direction'],
+            'filters' => ['pill' => 'all', 'expanded' => true],
+        ];
+    }
+
+    protected function applyViewState(array $columns, array $filters): void
+    {
+        $this->pill = $filters['pill'];
+        $this->expanded = $filters['expanded'];
+    }
+
+    protected function currentFilters(): array
+    {
+        return ['pill' => $this->pill, 'expanded' => $this->expanded];
+    }
+
+    protected function afterViewApplied(): void
+    {
+        $this->resetPage();
     }
 
     #[On('homes-call-logged')]
