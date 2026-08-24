@@ -23,8 +23,15 @@
     {{-- Search + pills + expanded toggle --}}
     <div class="flex flex-wrap gap-2.5 items-center mb-4">
         <div class="relative flex-1" style="min-width: 260px; max-width: 380px;">
-            <input wire:model.live.debounce.300ms="search" type="search" placeholder="Search a name or address…" class="calv-input" style="border-radius: 8px;">
+            <input wire:model.live.debounce.300ms="search" type="search" placeholder="Search a name, address, or zip…" class="calv-input" style="border-radius: 8px;">
         </div>
+
+        <select wire:model.live="city" class="calv-input" style="width: auto; min-width: 130px; border-radius: 8px; color: {{ $city !== '' ? 'var(--calv-slate)' : 'var(--calv-slate-65)' }};">
+            <option value="">Any city</option>
+            @foreach($cities as $c)
+                <option value="{{ $c }}">{{ $c }}</option>
+            @endforeach
+        </select>
 
         @php
             $pills = [

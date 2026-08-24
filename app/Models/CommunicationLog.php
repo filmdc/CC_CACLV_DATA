@@ -585,11 +585,14 @@ class CommunicationLog extends Model
                 ->orWhere('contact_phone', 'like', "%{$search}%")
                 ->orWhere('contact_address', 'like', "%{$search}%")
                 ->orWhere('contact_city', 'like', "%{$search}%")
-                // P-02: also match logs by their anticipated fund codes.
+                ->orWhere('contact_zip', 'like', "%{$search}%")
+                // P-02: also match logs by their anticipated fund codes —
+                // the short code only. Matching descriptions made every log
+                // tagged "Allentown Better Homes" hit a search for the city
+                // of Allentown regardless of where the caller lives.
                 // (Relation renamed in P-39b — see addendum D-2.)
                 ->orWhereHas('anticipatedFundCodes', function ($fq) use ($search) {
-                    $fq->where('code', 'like', "%{$search}%")
-                        ->orWhere('description', 'like', "%{$search}%");
+                    $fq->where('code', 'like', "%{$search}%");
                 });
         });
     }

@@ -37,6 +37,12 @@ class QuickLog extends Component
 
     public string $address = '';
 
+    public string $city = '';
+
+    public string $state = 'PA';
+
+    public string $zip = '';
+
     public string $phone = '';
 
     public string $email = '';
@@ -70,9 +76,10 @@ class QuickLog extends Component
 
     public function resetForm(): void
     {
-        $this->reset(['who', 'what', 'followUp', 'followUpWhen', 'showDetails', 'address', 'phone', 'email', 'role', 'matchedParticipantId']);
+        $this->reset(['who', 'what', 'followUp', 'followUpWhen', 'showDetails', 'address', 'city', 'state', 'zip', 'phone', 'email', 'role', 'matchedParticipantId']);
         $this->followUp = 'No follow-up';
         $this->followUpWhen = '1 week';
+        $this->state = 'PA';
     }
 
     public function setFollowUp(string $option): void
@@ -104,6 +111,10 @@ class QuickLog extends Component
             'who' => 'required|string|max:255',
             'what' => 'nullable|string',
             'email' => 'nullable|email',
+            'address' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:100',
+            'state' => 'nullable|string|max:2',
+            'zip' => 'nullable|string|max:10',
         ], [], ['who' => 'name']);
 
         // Split the typed name into first / last.
@@ -127,7 +138,10 @@ class QuickLog extends Component
             'contact_last_name' => $last ?: null,
             'contact_phone' => $this->phone ?: null,
             'contact_email' => $this->email ?: null,
-            'contact_address' => $this->address ?: null,
+            'contact_address' => trim($this->address) ?: null,
+            'contact_city' => trim($this->city) ?: null,
+            'contact_state' => strtoupper(trim($this->state)) ?: null,
+            'contact_zip' => trim($this->zip) ?: null,
             'contact_role' => $this->normalizeRole($this->role),
             'subject' => 'Call with '.trim($this->who),
             'summary' => $this->what ?: null,
