@@ -158,6 +158,7 @@ class RegressionTestSeeder extends Seeder
 
         $cl1 = CommunicationLog::factory()->create([
             'communication_date' => '2026-03-01 09:00:00',
+            'created_at' => '2026-03-01 09:00:00',
             'subject' => 'CL-1: General inquiry, no fund code, not converted',
             'communication_type' => 'phone_call',
             'direction' => 'incoming',
@@ -173,6 +174,7 @@ class RegressionTestSeeder extends Seeder
 
         $cl2 = CommunicationLog::factory()->create([
             'communication_date' => '2026-03-02 09:00:00',
+            'created_at' => '2026-03-02 09:00:00',
             'subject' => 'CL-2: Single fund code, not converted',
             'communication_type' => 'email',
             'direction' => 'incoming',
@@ -189,6 +191,7 @@ class RegressionTestSeeder extends Seeder
 
         $cl3 = CommunicationLog::factory()->create([
             'communication_date' => '2026-03-03 09:00:00',
+            'created_at' => '2026-03-03 09:00:00',
             'subject' => 'CL-3: Multiple fund codes, not converted',
             'communication_type' => 'in_person',
             'direction' => 'incoming',
@@ -223,6 +226,7 @@ class RegressionTestSeeder extends Seeder
 
         $cl4 = CommunicationLog::factory()->create([
             'communication_date' => '2026-03-04 09:00:00',
+            'created_at' => '2026-03-04 09:00:00',
             'subject' => 'CL-4: Converted to project (HJ-1), single fund code',
             'communication_type' => 'phone_call',
             'direction' => 'incoming',
@@ -295,6 +299,7 @@ class RegressionTestSeeder extends Seeder
         // CL-5 — converted to HJ-2, no fund code.
         CommunicationLog::factory()->create([
             'communication_date' => '2026-01-15 11:00:00',
+            'created_at' => '2026-01-15 11:00:00',
             'subject' => 'CL-5: Converted to project (HJ-2), no fund code',
             'communication_type' => 'phone_call',
             'direction' => 'incoming',

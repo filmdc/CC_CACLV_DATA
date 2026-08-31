@@ -22,7 +22,7 @@ style="background: var(--color-calv-sand-15); border: 1px solid var(--color-calv
 from intake
 <a href="__APP_URL__/communications-log" wire:navigate
 class="ml-1 underline font-bold"
-style="color: var(--color-calv-teal);">COMM-00150</a>
+style="color: var(--color-calv-teal);">COMM-__ID__</a>
 </span>
 </div>
 <div class="flex items-baseline gap-3 flex-wrap">
@@ -135,6 +135,12 @@ class="border-b-2 transition"
 style="padding: 12px 14px; background: transparent; border-color: transparent; color: var(--color-calv-slate-65); font-family: var(--font-calv-sub); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;">
 Budget & Expenses
 </button>
+<button wire:click="$set('activeTab', 'files')"
+data-test="tab-files"
+class="border-b-2 transition"
+style="padding: 12px 14px; background: transparent; border-color: transparent; color: var(--color-calv-slate-65); font-family: var(--font-calv-sub); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;">
+Files
+</button>
 </div>
 </header>
 <div class="px-8 py-2.5 flex items-center gap-4 flex-wrap"
@@ -142,9 +148,9 @@ style="background: var(--color-calv-sand-15); border-bottom: 1px solid var(--col
 <span style="font-family: var(--font-calv-sub); font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-calv-slate-65);">Carried from intake</span>
 <a href="__APP_URL__/communications-log" wire:navigate
 style="font-size: 12px; color: var(--color-calv-teal); text-decoration: underline; font-weight: 600;">
-COMM-00150
+COMM-__ID__
 · Intake
-· Jun 01, 2026
+· Jan 15, 2026
 </a>
 </div>
 <!-- Success/Error Messages -->
@@ -152,7 +158,7 @@ COMM-00150
 <div x-data="{
 query: '',
 filter: 'all',
-index: JSON.parse('{\u0022182\u0022:{\u0022id\u0022:182,\u0022name\u0022:\u0022initial inspection\u0022,\u0022labels\u0022:[]},\u0022183\u0022:{\u0022id\u0022:183,\u0022name\u0022:\u0022estimate approval\u0022,\u0022labels\u0022:[]},\u0022184\u0022:{\u0022id\u0022:184,\u0022name\u0022:\u0022construction\u0022,\u0022labels\u0022:[]}}'),
+index: JSON.parse('{\u0022__ID__\u0022:{\u0022id\u0022:__ID__,\u0022name\u0022:\u0022initial inspection\u0022,\u0022labels\u0022:[]},\u0022__ID__\u0022:{\u0022id\u0022:__ID__,\u0022name\u0022:\u0022estimate approval\u0022,\u0022labels\u0022:[]},\u0022__ID__\u0022:{\u0022id\u0022:__ID__,\u0022name\u0022:\u0022construction\u0022,\u0022labels\u0022:[]}}'),
 matches(id, status) {
 if (this.filter !== 'all' && status !== this.filter) return false;
 if (!this.query) return true;
@@ -236,7 +242,7 @@ Completed
 </div>
 </div>
 <div class="flex-1 overflow-y-auto" style="padding: 8px 0;">
-<div x-show="JSON.parse('[182,183,184]').some(id => matches(id, index[id] ? Object.keys(index).find(k => +k === id) && (JSON.parse('{\u0022182\u0022:\u0022completed\u0022,\u0022183\u0022:\u0022in_progress\u0022,\u0022184\u0022:\u0022not_started\u0022}')[id]) : null))" style="margin-bottom: 8px;" data-test="milestone-group milestone-group-general">
+<div x-show="JSON.parse('[__IDS__]').some(id => matches(id, index[id] ? Object.keys(index).find(k => +k === id) && (JSON.parse('{\u0022__ID__\u0022:\u0022completed\u0022,\u0022__ID__\u0022:\u0022in_progress\u0022,\u0022__ID__\u0022:\u0022not_started\u0022}')[id]) : null))" style="margin-bottom: 8px;" data-test="milestone-group milestone-group-general">
 <div class="flex items-center gap-2" style="padding: 8px 18px 6px;">
 <span class="rounded"
 style="padding: 2px 7px; font-family: var(--font-calv-sub); font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; background: var(--color-calv-slate-15); color: var(--color-calv-slate-65);">
@@ -247,7 +253,7 @@ Compliance &amp; un-budgeted work
 </span>
 </div>
 <button wire:click="selectMilestone(__ID__)"
-x-show="matches(182, 'completed')"
+x-show="matches(__ID__, 'completed')"
 data-test="milestone-row"
 data-milestone-id="__ID__"
 class="block w-full text-left cursor-pointer relative transition-colors"
@@ -272,7 +278,7 @@ Completed
 </div>
 </button>
 <button wire:click="selectMilestone(__ID__)"
-x-show="matches(183, 'in_progress')"
+x-show="matches(__ID__, 'in_progress')"
 data-test="milestone-row"
 data-milestone-id="__ID__"
 class="block w-full text-left cursor-pointer relative transition-colors"
@@ -297,7 +303,7 @@ In progress
 </div>
 </button>
 <button wire:click="selectMilestone(__ID__)"
-x-show="matches(184, 'not_started')"
+x-show="matches(__ID__, 'not_started')"
 data-test="milestone-row"
 data-milestone-id="__ID__"
 class="block w-full text-left cursor-pointer relative transition-colors"
