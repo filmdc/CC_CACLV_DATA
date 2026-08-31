@@ -2,21 +2,16 @@
 
 namespace App\Livewire;
 
-use App\Jobs\SyncFundExpensesJob;
 use App\Models\Contract;
 use App\Models\Funder;
 use App\Models\IntacctFundBudget;
 use App\Models\IntacctFundExpense;
 use App\Models\Program;
-use App\Models\ProjectBudget;
-use App\Models\ProjectExpense;
 use App\Models\SageIntacctSetting;
 use App\Models\SiteSetting;
 use App\Services\ContractUtilizationService;
 use App\Services\FiscalYearService;
 use App\Traits\WithPermissionChecks;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -508,6 +503,7 @@ class ContractUtilizationDashboard extends Component
 
         if (! $payload['contract']) {
             session()->flash('error', 'No contract selected for export.');
+
             return;
         }
 
@@ -663,8 +659,8 @@ class ContractUtilizationDashboard extends Component
         $lines = $q->orderByDesc('posting_date')->orderBy('id')->get();
 
         $projectName = IntacctFundBudget::where('intacct_project_id', $projectId)
-                ->where('intacct_department_id', $departmentId)
-                ->value('intacct_project_name')
+            ->where('intacct_department_id', $departmentId)
+            ->value('intacct_project_name')
             ?? IntacctFundBudget::where('intacct_project_id', $projectId)->value('intacct_project_name')
             ?? $lines->first()?->intacct_project_name;
 
@@ -821,8 +817,11 @@ class ContractUtilizationDashboard extends Component
         // Utilization-level filter (only applies to tuples with tuple-level budget)
         if ($this->filterUtilization) {
             $rows = $rows->filter(function ($r) {
-                if ($r->budget <= 0) return false;
+                if ($r->budget <= 0) {
+                    return false;
+                }
                 $remPct = ($r->remaining / $r->budget) * 100;
+
                 return match ($this->filterUtilization) {
                     'critical' => $remPct > 0 && $remPct <= 10,
                     'warning' => $remPct > 10 && $remPct <= 25,
@@ -914,6 +913,12 @@ class ContractUtilizationDashboard extends Component
                 'start_date_asc' => 'Start Date (Oldest First)',
             ],
         ];
+
+        // Surfaced so the dashboard can say plainly when overspend alerts are
+        // switched off -- otherwise a quiet inbox reads as "nothing is wrong".
+        $data['alertsEnabled'] = ContractUtilizationService::notificationsEnabled();
+        $data['alertsTestMode'] = ContractUtilizationService::testModeEnabled();
+        $data['alertsTestEmail'] = ContractUtilizationService::testEmail();
 
         if ($this->viewMode === 'funds') {
             $data['funds'] = $this->getFundsWithUtilization();

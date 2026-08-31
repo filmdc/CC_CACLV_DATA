@@ -1116,6 +1116,13 @@
                                 </svg>
                                 Test Dashboard
                             </a>
+                            <a href="{{ route('contract.utilization-settings') }}" wire:navigate
+                               class="inline-flex items-center px-4 py-2 border border-purple-600 text-purple-600 text-sm font-medium rounded-md hover:bg-purple-50 dark:hover:bg-purple-900/20 ml-2">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5 19h14a2 2 0 001.84-2.75L13.74 4a2 2 0 00-3.48 0l-7.1 12.25A2 2 0 005 19z"></path>
+                                </svg>
+                                Utilization Alerts
+                            </a>
                             <button type="submit" 
                                     class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition duration-150 ease-in-out">
                                 Update Contract Settings

@@ -72,6 +72,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('media/{media}/download', [App\Http\Controllers\MediaController::class, 'download'])->name('media.download');
     Route::get('admin/contract-notification-test', App\Livewire\ContractNotificationTest::class)->name('contract.notification-test')->middleware(['permission:contracts.manage']);
     Route::get('admin/notification-recipients', App\Livewire\NotificationRecipientsManagement::class)->name('notification-recipients.management')->middleware(['permission:contracts.view']);
+    Route::get('admin/contract-utilization-settings', App\Livewire\ContractUtilizationSettings::class)->name('contract.utilization-settings')->middleware(['permission:contracts.manage']);
     Route::get('admin/over-budget-recipients', App\Livewire\OverBudgetRecipientsManagement::class)->name('over-budget-recipients.management')->middleware(['permission:over_budget_recipients.manage']);
     Route::get('admin/legacy-contract-import', App\Livewire\LegacyContractImport::class)->name('legacy.contract.import')->middleware(['permission:contracts.import_legacy']);
     Route::get('funder-management', App\Livewire\FunderManagement::class)->name('funder.management');

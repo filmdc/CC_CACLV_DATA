@@ -103,7 +103,7 @@ class ContractUtilizationThresholdNotification extends Notification implements S
         }
 
         // Add test mode prefix if applicable
-        if (SiteSetting::get('utilization_test_mode', '0') === '1') {
+        if ($this->isTestSend()) {
             $subject = '[TEST] '.$subject;
         }
 
@@ -134,10 +134,10 @@ class ContractUtilizationThresholdNotification extends Notification implements S
             ->line('')
             ->line('**Contract Details:**')
             ->line("• **Contract:** {$this->contract->title}")
-            ->line("• **Contract Number:** ".($this->contract->contract_number ?? 'N/A'))
-            ->line("• **Grant Code:** ".($this->contract->grant_code ?? 'N/A'))
-            ->line("• **Program:** ".($this->contract->program->name ?? 'N/A'))
-            ->line("• **Funder:** ".($this->contract->funder->name ?? 'N/A'))
+            ->line('• **Contract Number:** '.($this->contract->contract_number ?? 'N/A'))
+            ->line('• **Grant Code:** '.($this->contract->grant_code ?? 'N/A'))
+            ->line('• **Program:** '.($this->contract->program->name ?? 'N/A'))
+            ->line('• **Funder:** '.($this->contract->funder->name ?? 'N/A'))
             ->line('')
             ->line('**Budget Status:**')
             ->line('• **Total Budget:** $'.number_format($this->contract->amount, 2))
@@ -227,12 +227,24 @@ class ContractUtilizationThresholdNotification extends Notification implements S
     }
 
     /**
+     * Whether this particular message was dispatched as a test redirect.
+     *
+     * Read from the notification itself rather than from the live setting:
+     * the mail body is rendered later, in the queue worker, by which time a
+     * one-off test run has already switched the global flag back off.
+     */
+    private function isTestSend(): bool
+    {
+        return $this->originalRecipient !== null;
+    }
+
+    /**
      * Get the subject line for the email
      */
     private function getSubject(): string
     {
         $urgency = $this->getUrgencyIndicator();
-        $testPrefix = SiteSetting::get('utilization_test_mode', '0') === '1' ? '[TEST] ' : '';
+        $testPrefix = $this->isTestSend() ? '[TEST] ' : '';
 
         if ($this->threshold <= 0) {
             return "{$testPrefix}{$urgency}DEPLETED: Contract Budget - {$this->contract->title}";
