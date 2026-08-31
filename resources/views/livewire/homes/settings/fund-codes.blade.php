@@ -78,8 +78,7 @@
 
     {{-- Create/edit modal --}}
     @if($showForm)
-        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 56px 16px;"
-             x-data x-on:keydown.escape.window="$wire.closeForm()" wire:click.self="closeForm">
+        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 56px 16px;">
             <div class="w-full" style="max-width: 480px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">{{ $editingId ? 'Edit fund code' : 'New fund code' }}</h2>
@@ -133,8 +132,7 @@
 
     {{-- Atom-link modal --}}
     @if($linkingFundId)
-        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 56px 16px;"
-             x-data x-on:keydown.escape.window="$wire.set('linkingFundId', null)" wire:click.self="$set('linkingFundId', null)">
+        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 56px 16px;">
             <div class="w-full" style="max-width: 520px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Required items for this fund</h2>

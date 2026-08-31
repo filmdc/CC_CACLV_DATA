@@ -242,8 +242,7 @@
 
     {{-- Convert modal --}}
     @if($showConvert)
-        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 56px 16px;"
-             x-data x-on:keydown.escape.window="$wire.closeConvert()" wire:click.self="closeConvert">
+        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 56px 16px;">
             <div class="w-full" style="max-width: 560px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Convert to project</h2>
@@ -374,8 +373,7 @@
 
     {{-- Edit entry modal --}}
     @if($showEdit)
-        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 48px 16px;"
-             x-data x-on:keydown.escape.window="$wire.closeEdit()" wire:click.self="closeEdit">
+        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 48px 16px;">
             <div class="w-full" style="max-width: 620px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Edit entry</h2>
@@ -487,8 +485,7 @@
 
     {{-- Upload files onto a document requirement --}}
     @if($uploadingRequirementId)
-        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 64px 16px;"
-             x-data x-on:keydown.escape.window="$wire.closeUpload()" wire:click.self="closeUpload">
+        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 64px 16px;">
             <div class="w-full" style="max-width: 440px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Upload document</h2>

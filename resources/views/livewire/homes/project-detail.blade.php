@@ -220,8 +220,7 @@
 
     {{-- Document completion modal --}}
     @if($completingRequirementId)
-        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 64px 16px;"
-             x-data x-on:keydown.escape.window="$wire.closeCompletionModal()" wire:click.self="closeCompletionModal">
+        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 64px 16px;">
             <div class="w-full" style="max-width: 460px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Mark received</h2>
@@ -253,8 +252,7 @@
 
     {{-- Add expense modal --}}
     @if($showExpense)
-        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 64px 16px;"
-             x-data x-on:keydown.escape.window="$wire.closeExpense()" wire:click.self="closeExpense">
+        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 64px 16px;">
             <div class="w-full" style="max-width: 480px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Add expense</h2>
@@ -317,8 +315,7 @@
 
     {{-- Edit project modal --}}
     @if($showEditJob)
-        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 56px 16px;"
-             x-data x-on:keydown.escape.window="$wire.closeEditJob()" wire:click.self="closeEditJob">
+        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 56px 16px;">
             <div class="w-full" style="max-width: 540px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Edit project</h2>
@@ -374,8 +371,7 @@
 
     {{-- Add milestone modal --}}
     @if($showMilestoneForm)
-        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 64px 16px;"
-             x-data x-on:keydown.escape.window="$wire.set('showMilestoneForm', false)" wire:click.self="$set('showMilestoneForm', false)">
+        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 64px 16px;">
             <div class="w-full" style="max-width: 460px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Add milestone</h2>
@@ -408,8 +404,7 @@
 
     {{-- Add budget line modal --}}
     @if($showBudgetForm)
-        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 64px 16px;"
-             x-data x-on:keydown.escape.window="$wire.set('showBudgetForm', false)" wire:click.self="$set('showBudgetForm', false)">
+        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 64px 16px;">
             <div class="w-full" style="max-width: 460px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Add budget line</h2>

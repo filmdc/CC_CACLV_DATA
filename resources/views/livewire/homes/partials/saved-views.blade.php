@@ -17,8 +17,7 @@
         class="inline-flex items-center gap-1.5"
         style="font-family: var(--font-sub); font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: 8px 14px; border-radius: 8px; cursor: pointer;
                background: {{ $activeView ? 'var(--calv-slate)' : '#fff' }}; color: {{ $activeView ? '#fff' : 'var(--calv-slate)' }};
-               border: 1px solid var(--calv-slate-35);"
-    >
+               border: 1px solid var(--calv-slate-35);">
         ☰ View: {{ $activeView?->name ?? 'Standard' }}
         <span aria-hidden="true" style="font-size: 9px;">▾</span>
     </button>
@@ -29,15 +28,13 @@
         x-transition.opacity.duration.100ms
         x-cloak
         class="absolute right-0 mt-1.5 z-30"
-        style="min-width: 260px; background: #fff; border: 1px solid var(--calv-slate-15); border-radius: 10px; box-shadow: 0 12px 28px rgba(30,41,59,.16); padding: 6px;"
-    >
+        style="min-width: 260px; background: #fff; border: 1px solid var(--calv-slate-15); border-radius: 10px; box-shadow: 0 12px 28px rgba(30,41,59,.16); padding: 6px;">
         <button
             type="button"
             wire:click="applyStandardView"
             x-on:click="open = false"
             class="w-full flex items-center justify-between gap-2 text-left px-3 py-2 rounded-md text-[12.5px]"
-            style="color: var(--calv-slate); background: {{ $activeView === null ? 'var(--calv-slate-15)' : 'transparent' }}; cursor: pointer; border: 0;"
-        >
+            style="color: var(--calv-slate); background: {{ $activeView === null ? 'var(--calv-slate-15)' : 'transparent' }}; cursor: pointer; border: 0;">
             <span class="font-semibold">Standard view</span>
             @if($activeView === null)<span style="color: var(--calv-teal);">✓</span>@endif
         </button>
@@ -51,8 +48,7 @@
                         wire:click="applyView({{ $view->id }})"
                         x-on:click="open = false"
                         class="flex-1 min-w-0 flex items-center gap-1.5 text-left px-3 py-2 text-[12.5px]"
-                        style="color: var(--calv-slate); cursor: pointer; border: 0; background: transparent;"
-                    >
+                        style="color: var(--calv-slate); cursor: pointer; border: 0; background: transparent;">
                         <span class="font-semibold truncate">{{ $view->name }}</span>
                         @if($view->is_default)
                             <span class="calv-badge calv-badge--teal" style="font-size: 9px;">Default</span>
@@ -80,8 +76,7 @@
             wire:click="openCreateView"
             x-on:click="open = false"
             class="w-full text-left px-3 py-2 rounded-md text-[12.5px] font-semibold"
-            style="color: var(--calv-teal); cursor: pointer; border: 0; background: transparent;"
-        >
+            style="color: var(--calv-teal); cursor: pointer; border: 0; background: transparent;">
             + New custom view…
         </button>
     </div>
@@ -89,7 +84,7 @@
 
 {{-- View editor modal --}}
 @if($showViewModal)
-    <div class="fixed inset-0 z-40 flex items-center justify-center p-4" style="background: rgba(30,41,59,.45);" wire:click.self="closeViewModal">
+    <div class="fixed inset-0 z-40 flex items-center justify-center p-4" style="background: rgba(30,41,59,.45);">
         <div class="calv-card w-full overflow-auto" style="max-width: 460px; max-height: 90vh; padding: 22px;">
             <h2 class="calv-h1" style="font-size: 19px;">{{ $editingViewId ? 'Edit view' : 'New custom view' }}</h2>
             <div class="text-xs mt-1 mb-4" style="color: var(--calv-slate-65);">Pick the columns you want, the filter it starts on, and give it a name.</div>
@@ -110,8 +105,7 @@
                                 type="checkbox"
                                 @if($locked) checked disabled @else wire:click="toggleViewColumn('{{ $key }}')" @checked(in_array($key, $viewColumns, true)) @endif
                                 class="rounded"
-                                style="accent-color: var(--calv-teal);"
-                            >
+                                style="accent-color: var(--calv-teal);">
                             {{ $label }}@if($locked)<span class="text-[10px]" style="color: var(--calv-slate-65);">(always)</span>@endif
                         </label>
                     @endforeach
@@ -129,8 +123,7 @@
                             wire:click="$set('viewFilters.pill', '{{ $key }}')"
                             style="font-family: var(--font-sub); font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: 6px 12px; border-radius: 999px; cursor: pointer;
                                    background: {{ $activePill ? 'var(--calv-slate)' : '#fff' }}; color: {{ $activePill ? '#fff' : 'var(--calv-slate)' }};
-                                   border: 1px solid {{ $activePill ? 'var(--calv-slate)' : 'var(--calv-slate-35)' }};"
-                        >
+                                   border: 1px solid {{ $activePill ? 'var(--calv-slate)' : 'var(--calv-slate-35)' }};">
                             {{ $label }}
                         </button>
                     @endforeach

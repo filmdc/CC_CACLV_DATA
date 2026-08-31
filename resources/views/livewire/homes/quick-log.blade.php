@@ -3,9 +3,6 @@
         <div
             class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto"
             style="background: rgba(40,42,44,.55); padding: 48px 16px;"
-            x-data
-            x-on:keydown.escape.window="$wire.close()"
-            wire:click.self="close"
         >
             <div class="w-full" style="max-width: 560px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
                 {{-- Header --}}
@@ -24,8 +21,7 @@
                             autofocus
                             placeholder="Name — or start typing to find someone you've logged before"
                             class="calv-input"
-                            style="border: 1.5px solid var(--calv-teal); box-shadow: 0 0 0 3px var(--calv-teal-15);"
-                        >
+                            style="border: 1.5px solid var(--calv-teal); box-shadow: 0 0 0 3px var(--calv-teal-15);">
                         @error('who') <p class="mt-1.5 text-sm" style="color: var(--calv-red);">{{ $message }}</p> @enderror
                         @if($matchedParticipantId)
                             <div class="text-[11.5px] mt-1.5" style="color: var(--calv-teal);">Matches an existing participant — we'll link them automatically.</div>
@@ -40,8 +36,7 @@
                             rows="4"
                             placeholder="Plain words are fine. 'Roof leaking over kitchen, 80 years old, needs help with the application.'"
                             class="calv-input"
-                            style="resize: vertical; line-height: 1.55;"
-                        ></textarea>
+                            style="resize: vertical; line-height: 1.55;"></textarea>
                     </div>
 
                     {{-- FOLLOW-UP --}}
@@ -55,8 +50,7 @@
                                     wire:click="setFollowUp(@js($opt))"
                                     style="font-family: var(--font-body); font-size: 13px; padding: 8px 14px; border-radius: 999px; cursor: pointer;
                                            background: {{ $active ? 'var(--calv-teal)' : '#fff' }}; color: {{ $active ? '#fff' : 'var(--calv-slate)' }};
-                                           border: 1px solid {{ $active ? 'var(--calv-teal)' : 'var(--calv-slate-35)' }};"
-                                >{{ $opt }}</button>
+                                           border: 1px solid {{ $active ? 'var(--calv-teal)' : 'var(--calv-slate-35)' }};">{{ $opt }}</button>
                             @endforeach
 
                             @if($followUp !== 'No follow-up')
