@@ -26,6 +26,8 @@ class SnapshotHelper
      *     stamps render as the test-run date, which drifts daily (__TODAY__)
      *   - Database autoincrement IDs in resource URLs (/project/N/, /property/N,
      *     /participant/N, /contract/N, /contractor/N) normalized to __ID__
+     *   - Alpine milestone-group id encodings: matches(N, …), JSON id
+     *     arrays/keys, and COMM-N (str_pad of a comm-log id)
      *   - <option value="N"> where N is digits-only — typically a FK dropdown
      *     (e.g. program_id filter). Non-numeric option values (enum strings
      *     like "pending") are preserved.
@@ -130,6 +132,18 @@ class SnapshotHelper
             // Comm Log dashboard cards use ?view=N). Database autoincrement
             // varies across runs and would diff the snapshot otherwise.
             '/\?view=\d+/' => '?view=__ID__',
+            // Alpine milestone-group expressions embed raw milestone ids in
+            // three encodings the rules above don't reach: a bare first arg,
+            // a JSON id array, and JSON object keys / inner "id" values.
+            // Autoincrement values shift whenever a test that creates rows is
+            // added earlier in the run, so mask them like wire:click ids.
+            '/matches\(\d+,/' => 'matches(__ID__,',
+            '/JSON\.parse\(\'\[[\d,]*\]\'\)/' => 'JSON.parse(\'[__IDS__]\')',
+            '/\\\\u0022\\d+\\\\u0022:/' => '\\\\u0022__ID__\\\\u0022:',
+            '/\\\\u0022id\\\\u0022:\\d+/' => '\\\\u0022id\\\\u0022:__ID__',
+            // COMM-00042 is str_pad($commLog->id) when a log has no explicit
+            // log_number — an autoincrement id wearing a prefix.
+            '/COMM-\\d+/' => 'COMM-__ID__',
         ];
 
         // Audit-trail dates ("Created/Added/Last updated by X on <M d, Y>[ time]").
