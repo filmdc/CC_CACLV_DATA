@@ -9,6 +9,7 @@ use App\Models\SiteSetting;
 use App\Notifications\ContractUtilizationThresholdNotification;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 
 class ContractUtilizationService
 {
@@ -29,6 +30,34 @@ class ContractUtilizationService
         }
 
         return self::$defaultThresholds;
+    }
+
+    /**
+     * Master switch for utilization notifications.
+     *
+     * When this is off the overspend evaluation still runs and still records
+     * which thresholds were crossed -- only the email is withheld.
+     */
+    public static function notificationsEnabled(): bool
+    {
+        return SiteSetting::get('utilization_notification_enabled', '1') === '1';
+    }
+
+    /**
+     * Global test mode: every utilization email is redirected to a single
+     * address instead of the real recipients.
+     */
+    public static function testModeEnabled(): bool
+    {
+        return SiteSetting::get('utilization_test_mode', '0') === '1';
+    }
+
+    /**
+     * Address that receives redirected mail while test mode is on.
+     */
+    public static function testEmail(): string
+    {
+        return trim((string) SiteSetting::get('utilization_test_email', ''));
     }
 
     /**
@@ -102,14 +131,9 @@ class ContractUtilizationService
      */
     public static function checkAndNotifyThresholds(Contract $contract, string $notificationType = 'realtime'): array
     {
-        // Skip if notifications are disabled
-        if (SiteSetting::get('utilization_notification_enabled', '1') !== '1') {
-            return ['sent' => 0, 'thresholds' => []];
-        }
-
         // Skip if contract has no budget
         if ($contract->amount <= 0) {
-            return ['sent' => 0, 'thresholds' => []];
+            return ['sent' => 0, 'thresholds' => [], 'suppressed' => []];
         }
 
         $thresholds = self::getThresholds();
@@ -123,14 +147,27 @@ class ContractUtilizationService
         );
 
         if (empty($crossedThresholds)) {
-            return ['sent' => 0, 'thresholds' => []];
+            return ['sent' => 0, 'thresholds' => [], 'suppressed' => []];
         }
 
+        // Mirrors sendThresholdNotification(): a test redirect still delivers
+        // while the master switch is off, so it must not be counted as suppressed.
+        $delivering = self::notificationsEnabled() || (self::testModeEnabled() && self::testEmail() !== '');
         $notificationsSent = 0;
         $notifiedThresholds = [];
+        $suppressedThresholds = [];
 
         foreach ($crossedThresholds as $threshold) {
             $sent = self::sendThresholdNotification($contract, $threshold, $notificationType);
+
+            // With the master switch off the crossing is still recorded, so
+            // report it as suppressed rather than as sent.
+            if (! $delivering) {
+                $suppressedThresholds[] = $threshold;
+
+                continue;
+            }
+
             if ($sent > 0) {
                 $notificationsSent += $sent;
                 $notifiedThresholds[] = $threshold;
@@ -140,6 +177,7 @@ class ContractUtilizationService
         return [
             'sent' => $notificationsSent,
             'thresholds' => $notifiedThresholds,
+            'suppressed' => $suppressedThresholds,
         ];
     }
 
@@ -148,23 +186,49 @@ class ContractUtilizationService
      */
     public static function sendThresholdNotification(Contract $contract, int $threshold, string $notificationType = 'scheduled'): int
     {
+        $recentExpenses = $contract->getRecentExpenses(5);
+        $testMode = self::testModeEnabled();
+        $testEmail = self::testEmail();
+
+        // A test redirect deliberately outranks the master switch: "off for
+        // everyone, but still let me see one" is the whole point of pairing
+        // the two settings.
+        $redirectToTester = $testMode && $testEmail !== '';
+
+        // Master switch off and nowhere to redirect: record the crossing so it
+        // is not replayed in a burst the moment notifications are switched back
+        // on, and send nothing. The overspend evaluation itself still ran.
+        if (! self::notificationsEnabled() && ! $redirectToTester) {
+            $contract->markThresholdNotified(
+                $threshold,
+                $recentExpenses->pluck('id')->toArray(),
+                'suppressed'
+            );
+
+            Log::info("Utilization notifications are disabled; recorded contract #{$contract->id} crossing {$threshold}% without sending");
+
+            return 0;
+        }
+
         $recipients = $contract->getUtilizationNotificationRecipients();
 
         if ($recipients->isEmpty()) {
             Log::info("Contract #{$contract->id} has no notification recipients for threshold {$threshold}%");
+
+            // Under a test redirect, leave the threshold outstanding.
+            if ($redirectToTester) {
+                return 0;
+            }
+
             // Still record the threshold as notified to prevent repeated attempts
             $contract->markThresholdNotified(
                 $threshold,
-                $contract->getRecentExpenses(5)->pluck('id')->toArray(),
+                $recentExpenses->pluck('id')->toArray(),
                 $notificationType
             );
 
             return 0;
         }
-
-        $recentExpenses = $contract->getRecentExpenses(5);
-        $testMode = SiteSetting::get('utilization_test_mode', '0') === '1';
-        $testEmail = SiteSetting::get('utilization_test_email', '');
 
         $sent = 0;
 
@@ -178,25 +242,32 @@ class ContractUtilizationService
                 );
 
                 if ($testMode && $testEmail) {
-                    // Create a temporary user object for test mode
-                    $testUser = new \App\Models\User([
-                        'email' => $testEmail,
-                        'name' => "Test ({$recipient->name})",
-                    ]);
-                    $testUser->notify($notification);
+                    // Route to the test address. An on-the-fly User model is
+                    // deliberately NOT used here: this notification is queued,
+                    // and an unsaved model cannot survive job serialization.
+                    Notification::route('mail', $testEmail)->notify($notification);
                 } else {
                     $recipient->notify($notification);
                 }
 
                 $sent++;
             } catch (\Exception $e) {
-                Log::error("Failed to send utilization notification", [
+                Log::error('Failed to send utilization notification', [
                     'contract_id' => $contract->id,
                     'threshold' => $threshold,
                     'recipient_id' => $recipient->id,
                     'error' => $e->getMessage(),
                 ]);
             }
+        }
+
+        // A test redirect is a rehearsal, not the real alert: recording here
+        // would mark the threshold as already handled and the actual recipients
+        // would never be told once alerts are switched back on.
+        if ($redirectToTester) {
+            Log::info("Test send: {$sent} utilization notification(s) for contract #{$contract->id} at {$threshold}% routed to {$testEmail}; threshold left outstanding");
+
+            return $sent;
         }
 
         // Record that this threshold was notified

@@ -25,8 +25,41 @@
                 <option value="table">Contract Table</option>
                 <option value="funds">Fund View</option>
             </select>
+            @if (auth()->user()?->hasPermission('contracts.manage'))
+                <a href="{{ route('contract.utilization-settings') }}" wire:navigate
+                   class="inline-flex items-center gap-2 px-3 py-1.5 border border-gray-300 dark:border-zinc-600 text-gray-700 dark:text-gray-200 text-sm rounded-md hover:bg-gray-50 dark:hover:bg-zinc-700">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    Alert Settings
+                </a>
+            @endif
         </div>
     </div>
+
+    {{-- Alert delivery state --}}
+    @if (! $alertsEnabled)
+        <div class="rounded-md bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 p-3 mb-4 text-sm text-amber-800 dark:text-amber-200">
+            <span class="font-semibold">Overspend alert emails are turned off.</span>
+            Thresholds are still evaluated and recorded, but no one is being emailed
+            @if ($alertsTestMode && $alertsTestEmail)
+                except <span class="font-mono">{{ $alertsTestEmail }}</span>
+            @endif
+            .
+            @if (auth()->user()?->hasPermission('contracts.manage'))
+                <a href="{{ route('contract.utilization-settings') }}" wire:navigate class="underline font-medium">Alert settings</a>
+            @endif
+        </div>
+    @elseif ($alertsTestMode && $alertsTestEmail)
+        <div class="rounded-md bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 p-3 mb-4 text-sm text-blue-800 dark:text-blue-200">
+            <span class="font-semibold">Alert test mode is on.</span>
+            Every overspend alert is going to <span class="font-mono">{{ $alertsTestEmail }}</span> instead of the real recipients.
+            @if (auth()->user()?->hasPermission('contracts.manage'))
+                <a href="{{ route('contract.utilization-settings') }}" wire:navigate class="underline font-medium">Alert settings</a>
+            @endif
+        </div>
+    @endif
 
     {{-- Flash messages --}}
     @if (session()->has('message'))

@@ -39,11 +39,13 @@ class CheckContractUtilizationCommand extends Command
         $testMode = $this->option('test-mode');
         $testEmail = $this->option('test-email');
 
-        // Check if notifications are enabled
-        if (SiteSetting::get('utilization_notification_enabled', '1') !== '1') {
-            $this->warn('Utilization notifications are disabled in settings.');
+        // Master switch off: keep evaluating overspend and keep recording which
+        // thresholds were crossed, but withhold the email. Recording as we go
+        // is what stops a backlog burst when the switch is turned back on.
+        $notificationsEnabled = ContractUtilizationService::notificationsEnabled();
 
-            return Command::SUCCESS;
+        if (! $notificationsEnabled) {
+            $this->warn('Utilization notifications are DISABLED. Thresholds will be evaluated and recorded, but no email will be sent.');
         }
 
         // Check for global test mode
@@ -75,6 +77,10 @@ class CheckContractUtilizationCommand extends Command
             SiteSetting::set('utilization_test_email', $testEmail, 'text');
         }
 
+        // A test redirect still delivers while the master switch is off, so
+        // reporting keys off this rather than the switch alone.
+        $deliveringMail = $notificationsEnabled || ($testMode && $testEmail);
+
         // Get thresholds from settings
         $thresholds = ContractUtilizationService::getThresholds();
         $this->info('Checking thresholds: '.implode('%, ', $thresholds).'%');
@@ -93,65 +99,80 @@ class CheckContractUtilizationCommand extends Command
         $this->info("Found {$contracts->count()} contracts to check");
 
         $totalNotifications = 0;
+        $totalSuppressed = 0;
         $contractsProcessed = 0;
 
-        foreach ($contracts as $contract) {
-            $remainingPercent = $contract->remaining_percentage;
-            $utilizationPercent = $contract->utilization_percentage;
+        try {
+            foreach ($contracts as $contract) {
+                $remainingPercent = $contract->remaining_percentage;
+                $utilizationPercent = $contract->utilization_percentage;
 
-            // Get thresholds that need notification
-            $crossedThresholds = ContractUtilizationNotification::getAllCrossedThresholds(
-                $contract->id,
-                $remainingPercent,
-                $thresholds
-            );
+                // Get thresholds that need notification
+                $crossedThresholds = ContractUtilizationNotification::getAllCrossedThresholds(
+                    $contract->id,
+                    $remainingPercent,
+                    $thresholds
+                );
 
-            if (empty($crossedThresholds)) {
-                continue;
-            }
+                if (empty($crossedThresholds)) {
+                    continue;
+                }
 
-            $contractsProcessed++;
+                $contractsProcessed++;
 
-            foreach ($crossedThresholds as $threshold) {
-                $this->line(sprintf(
-                    'Contract: %s | Utilization: %.1f%% | Threshold: %d%% remaining',
-                    $contract->title,
-                    $utilizationPercent,
-                    $threshold
-                ));
+                foreach ($crossedThresholds as $threshold) {
+                    $this->line(sprintf(
+                        'Contract: %s | Utilization: %.1f%% | Threshold: %d%% remaining',
+                        $contract->title,
+                        $utilizationPercent,
+                        $threshold
+                    ));
 
-                if (! $dryRun) {
-                    $sent = ContractUtilizationService::sendThresholdNotification(
-                        $contract,
-                        $threshold,
-                        'scheduled'
-                    );
-                    $totalNotifications += $sent;
+                    if (! $dryRun) {
+                        $sent = ContractUtilizationService::sendThresholdNotification(
+                            $contract,
+                            $threshold,
+                            'scheduled'
+                        );
 
-                    $this->line("  → Sent {$sent} notification(s)");
-                } else {
-                    $recipients = $contract->getUtilizationNotificationRecipients();
-                    $this->line("  → Would send to {$recipients->count()} recipient(s)");
-                    $totalNotifications += $recipients->count();
+                        if ($deliveringMail) {
+                            $totalNotifications += $sent;
+                            $this->line("  → Sent {$sent} notification(s)");
+                        } else {
+                            $totalSuppressed++;
+                            $this->line('  → Recorded without sending (notifications disabled)');
+                        }
+                    } elseif (! $deliveringMail) {
+                        $totalSuppressed++;
+                        $this->line('  → Would record without sending (notifications disabled)');
+                    } else {
+                        $recipients = $contract->getUtilizationNotificationRecipients();
+                        $this->line("  → Would send to {$recipients->count()} recipient(s)");
+                        $totalNotifications += $recipients->count();
+                    }
                 }
             }
-        }
-
-        // Reset test mode if we set it
-        if ($testMode && ! $globalTestMode) {
-            SiteSetting::set('utilization_test_mode', '0', 'boolean');
+        } finally {
+            // Always released, even if a contract blows up mid-run: a latched
+            // test-mode flag would silently divert every later alert.
+            if ($testMode && ! $globalTestMode) {
+                SiteSetting::set('utilization_test_mode', '0', 'boolean');
+            }
         }
 
         $this->newLine();
         $this->info(sprintf(
-            'Utilization check completed. Contracts processed: %d | Notifications sent: %d',
+            'Utilization check completed. Contracts processed: %d | Notifications sent: %d | Suppressed: %d',
             $contractsProcessed,
-            $totalNotifications
+            $totalNotifications,
+            $totalSuppressed
         ));
 
         Log::info('Contract utilization check completed', [
             'contracts_processed' => $contractsProcessed,
             'notifications_sent' => $totalNotifications,
+            'suppressed' => $totalSuppressed,
+            'notifications_enabled' => $notificationsEnabled,
             'dry_run' => $dryRun,
             'contract_id' => $contractId,
             'test_mode' => $testMode,
