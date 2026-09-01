@@ -22,23 +22,46 @@ beforeEach(function () {
     $this->seed(RegressionTestSeeder::class);
 });
 
-it('cascade-deletes intake_requirements when the parent CommunicationLog is deleted', function () {
+/*
+ * CommunicationLog soft-deletes as of 2026_08_31_110000, so ->delete() no
+ * longer issues a SQL DELETE. forceDelete() is what exercises the FK now;
+ * the ON DELETE CASCADE constraint itself is unchanged. The soft-delete
+ * path is pinned below — it must NOT cascade, or an admin restore would
+ * bring the call back without its document checklist.
+ */
+it('cascade-deletes intake_requirements when the parent CommunicationLog is hard-deleted', function () {
+    $log = CommunicationLog::factory()->create();
+    $req = IntakeRequirement::factory()->create(['communication_log_id' => $log->id]);
+
+    $log->forceDelete();
+
+    expect(IntakeRequirement::find($req->id))->toBeNull();
+})->group('regression');
+
+it('keeps intake_requirements when the parent CommunicationLog is soft-deleted', function () {
     $log = CommunicationLog::factory()->create();
     $req = IntakeRequirement::factory()->create(['communication_log_id' => $log->id]);
 
     $log->delete();
 
-    expect(IntakeRequirement::find($req->id))->toBeNull();
+    expect(CommunicationLog::find($log->id))->toBeNull();
+    expect(CommunicationLog::withTrashed()->find($log->id)->trashed())->toBeTrue();
+    expect(IntakeRequirement::find($req->id))->not->toBeNull();
+
+    $log->restore();
+
+    expect(CommunicationLog::find($log->id))->not->toBeNull();
+    expect(IntakeRequirement::find($req->id))->not->toBeNull();
 })->group('regression');
 
-it('cascade-deletes anticipated-fund-codes pivot rows when the parent CommunicationLog is deleted', function () {
+it('cascade-deletes anticipated-fund-codes pivot rows when the parent CommunicationLog is hard-deleted', function () {
     $log = CommunicationLog::factory()->create();
     $fc = FundCode::factory()->create();
     $log->anticipatedFundCodes()->attach($fc->id, ['created_at' => now()]);
 
     expect(DB::table('communication_log_anticipated_fund_codes')->where('communication_log_id', $log->id)->count())->toBe(1);
 
-    $log->delete();
+    $log->forceDelete();
 
     expect(DB::table('communication_log_anticipated_fund_codes')->where('communication_log_id', $log->id)->count())->toBe(0);
 })->group('regression');

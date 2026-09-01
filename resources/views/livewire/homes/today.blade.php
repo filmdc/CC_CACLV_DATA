@@ -12,8 +12,11 @@
             <div class="calv-lead-in">{{ $today }}</div>
             <h1 class="calv-h1" style="font-size: 34px; margin-top: 4px;">Good {{ (int) now()->format('H') < 12 ? 'morning' : ((int) now()->format('H') < 18 ? 'afternoon' : 'evening') }}, {{ $greetingName }}</h1>
             <div class="text-sm mt-2" style="color: var(--calv-slate-65);">
-                @if($followUps->count())
-                    {{ $followUps->count() }} {{ Str::plural('follow-up', $followUps->count()) }} need you today. Everything else can wait.
+                @if($openFollowUps)
+                    {{ $openFollowUps }} {{ Str::plural('follow-up', $openFollowUps) }} need you today. Everything else can wait.
+                    @unless($show['follow_ups'])
+                        <a href="{{ route('homes.calls') }}?pill=needs" wire:navigate class="calv-link">See them →</a>
+                    @endunless
                 @else
                     Nothing needs you right now. Nicely done.
                 @endif
@@ -26,17 +29,41 @@
         @endcan
     </div>
 
+    {{-- Pinned — whatever the project manager asked to keep in front of her --}}
+    @if($show['pinned'])
+        @include('livewire.homes.partials.pinned-board', [
+            'pinnedCalls' => $pinnedCalls,
+            'pinnedProjects' => $pinnedProjects,
+        ])
+    @endif
+
     @unless($canViewIntakes)
         <div class="calv-card p-6 text-sm" style="color: var(--calv-slate-65);">
             You don't have access to the communications log. Contact your administrator if you need it.
         </div>
     @else
-    <div class="grid gap-4 items-start" style="grid-template-columns: minmax(0,1.5fr) minmax(0,1fr);">
+    @php
+        $leftHas = $show['follow_ups'] || $show['waiting'];
+        $rightHas = $show['ready'] || $show['glance'];
+        $columns = ($leftHas && $rightHas)
+            ? 'minmax(0,1.5fr) minmax(0,1fr)'
+            : 'minmax(0,1fr)';
+    @endphp
+
+    @unless($leftHas || $rightHas)
+        <div class="calv-card p-6 text-sm" style="color: var(--calv-slate-65);">
+            Every dashboard card is switched off. An admin can turn them back on under
+            <a href="{{ route('homes.settings.dashboard') }}" wire:navigate class="calv-link">Settings → Dashboard widgets</a>.
+        </div>
+    @else
+    <div class="grid gap-4 items-start" style="grid-template-columns: {{ $columns }};">
 
         {{-- LEFT — the work queue --}}
+        @if($leftHas)
         <div class="flex flex-col gap-4">
 
-            {{-- Follow-ups due --}}
+            {{-- Follow-ups due (off by default; Settings → Dashboard widgets) --}}
+            @if($show['follow_ups'])
             <section class="calv-card overflow-hidden">
                 <header class="flex items-center gap-2.5 px-4 py-3" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <span class="inline-flex items-center justify-center h-6 w-6 rounded-md text-sm calv-h1" style="background: var(--calv-red-15); color: var(--calv-red);">{{ $followUps->count() }}</span>
@@ -63,8 +90,10 @@
                     <div class="px-4 py-6 text-center text-sm" style="color: var(--calv-slate-65);">No follow-ups due. You're all caught up.</div>
                 @endforelse
             </section>
+            @endif
 
             {{-- Waiting on documents --}}
+            @if($show['waiting'])
             <section class="calv-card overflow-hidden">
                 <header class="flex items-center gap-2.5 px-4 py-3" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <span class="inline-flex items-center justify-center h-6 w-6 rounded-md text-sm calv-h1" style="background: var(--calv-amber-15); color: #8A6410;">{{ $waiting->count() }}</span>
@@ -85,12 +114,16 @@
                     <div class="px-4 py-6 text-center text-sm" style="color: var(--calv-slate-65);">Nothing outstanding right now.</div>
                 @endforelse
             </section>
+            @endif
         </div>
+        @endif
 
         {{-- RIGHT — glanceable --}}
+        @if($rightHas)
         <div class="flex flex-col gap-4">
 
             {{-- Ready to become projects --}}
+            @if($show['ready'])
             <section class="calv-card overflow-hidden">
                 <header class="flex items-center gap-2.5 px-4 py-3" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <span class="inline-flex items-center justify-center h-6 w-6 rounded-md text-sm calv-h1" style="background: var(--calv-sage-15); color: #2F5A41;">{{ $ready->count() }}</span>
@@ -109,8 +142,10 @@
                     <div class="px-4 py-6 text-center text-sm" style="color: var(--calv-slate-65);">No intakes ready to convert yet.</div>
                 @endforelse
             </section>
+            @endif
 
             {{-- This week at a glance --}}
+            @if($show['glance'])
             <section class="calv-card overflow-hidden">
                 <header class="flex items-center gap-2.5 px-4 py-3" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <span class="inline-flex items-center justify-center h-6 w-6 rounded-md text-sm calv-h1" style="background: var(--calv-teal-15); color: var(--calv-teal);">·</span>
@@ -140,11 +175,14 @@
                     </div>
                 </div>
             </section>
+            @endif
 
             <div class="px-4 py-3.5 text-[12.5px] leading-relaxed" style="background: #fff; border: 1px dashed var(--calv-slate-35); border-radius: 8px; color: var(--calv-slate-65);">
                 <strong style="color: var(--calv-slate);">Nothing else needs you.</strong> Reports, fund codes, and setup live under Settings — out of the way until you want them.
             </div>
         </div>
+        @endif
     </div>
+    @endunless
     @endunless
 </div>

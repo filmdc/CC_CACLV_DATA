@@ -157,6 +157,9 @@
                     @if(auth()->user()->hasPermission('audit.view'))
                         <flux:navlist.item icon="clock" :href="route('audit.activity')" :current="request()->routeIs('audit.activity')" wire:navigate>{{ __('Activity Audit Log') }}</flux:navlist.item>
                     @endif
+                    @if(auth()->user()->hasPermission('recycle_bin.manage'))
+                        <flux:navlist.item icon="trash" :href="route('admin.recycle-bin')" :current="request()->routeIs('admin.recycle-bin')" wire:navigate>{{ __('Recycle Bin') }}</flux:navlist.item>
+                    @endif
                 </flux:navlist.group>
                 @endif
             </flux:navlist>

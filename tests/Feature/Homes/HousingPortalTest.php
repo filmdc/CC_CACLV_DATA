@@ -8,6 +8,7 @@ use App\Models\CommunicationLog;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
+use App\Services\Homes\DashboardWidgets;
 use App\Services\Homes\HousingPortalData;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
@@ -61,6 +62,12 @@ it('rejects bad credentials on the housing login', function () {
 });
 
 it('shows due follow-ups on the Today home', function () {
+    // The Follow-ups card is opt-in as of the dashboard-widget settings
+    // (Settings -> Dashboard widgets); switch it on to exercise the queue.
+    app(DashboardWidgets::class)->save([
+        'pinned' => true, 'follow_ups' => true, 'waiting' => true, 'ready' => true, 'glance' => true,
+    ]);
+
     $this->actingAs(homesUser(['communications_log.view']));
 
     CommunicationLog::factory()->create([

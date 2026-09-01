@@ -6,6 +6,12 @@
         </div>
     @endif
 
+    @if (session('homes_error'))
+        <div class="mb-4 rounded-md px-4 py-3 text-sm" style="background: var(--calv-red-15); color: var(--calv-red); border: 1px solid var(--calv-red);">
+            {{ session('homes_error') }}
+        </div>
+    @endif
+
     @php
         $statusBadge = [
             'attention' => ['label' => 'Needs attention', 'class' => 'calv-badge calv-badge--red'],
@@ -57,12 +63,31 @@
             </div>
         </div>
         <div class="flex gap-2 shrink-0">
+            @php $isPinned = $this->isProjectPinned(); @endphp
+            <button
+                type="button"
+                wire:click="toggleProjectPin"
+                class="calv-btn calv-btn--ghost"
+                aria-pressed="{{ $isPinned ? 'true' : 'false' }}"
+                title="{{ $isPinned ? 'Take this project off your dashboard' : 'Keep this project on your dashboard and at the top of Projects' }}"
+                @style([
+                    'background: var(--calv-amber-15); border-color: var(--calv-amber-35); color: #8A6410' => $isPinned,
+                ])>
+                <span aria-hidden="true">📌</span> {{ $isPinned ? 'Pinned' : 'Pin' }}
+            </button>
             <button type="button" wire:click="openEditJob" class="calv-btn calv-btn--ghost">Edit</button>
             @can('communications_log.create')
                 <button type="button" x-on:click="Livewire.dispatch('homes-open-quick-log')" class="calv-btn calv-btn--ghost">Log a call</button>
             @endcan
             @if($budgets->count() > 0)
                 <button type="button" wire:click="openExpense" class="calv-btn calv-btn--secondary">$ Add expense</button>
+            @endif
+            @if($canDelete)
+                <button type="button" wire:click="confirmDelete" class="calv-btn calv-btn--ghost"
+                        title="Delete this project — an admin can restore it if this is a mistake"
+                        style="color: var(--calv-red); border-color: var(--calv-red);">
+                    Delete
+                </button>
             @endif
         </div>
     </div>
@@ -448,6 +473,26 @@
                         <span wire:loading.remove wire:target="saveBudgetLine">Add budget line</span>
                         <span wire:loading wire:target="saveBudgetLine">Saving…</span>
                     </button>
+                </footer>
+            </div>
+        </div>
+    @endif
+
+    {{-- Delete confirmation. Explicit Cancel only — no backdrop/Escape close. --}}
+    @if($showDelete)
+        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 48px 16px;">
+            <div class="w-full" style="max-width: 480px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+                <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
+                    <h2 class="calv-h1" style="font-size: 20px;">Delete this project?</h2>
+                    <div class="text-xs mt-1" style="color: var(--calv-slate-65);">{{ $who }} · {{ $job->job_number }}</div>
+                </header>
+                <div class="px-6 py-5 text-[13.5px] leading-relaxed" style="color: var(--calv-slate);">
+                    <p>It disappears from Projects along with its milestones, budget lines, expenses and documents.</p>
+                    <p class="mt-2.5" style="color: var(--calv-slate-65);">Nothing is destroyed — if this is a mistake, ask an admin and they can restore the whole project from the recycle bin.</p>
+                </div>
+                <footer class="px-6 py-4 flex justify-end gap-2" style="border-top: 1px solid var(--calv-slate-15); background: var(--calv-sand-15);">
+                    <button type="button" wire:click="cancelDelete" class="calv-btn calv-btn--quiet">Cancel</button>
+                    <button type="button" wire:click="deleteProject" class="calv-btn calv-btn--primary">Yes, delete it</button>
                 </footer>
             </div>
         </div>

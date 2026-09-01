@@ -2,11 +2,14 @@
 
 namespace App\Livewire\Homes;
 
+use App\Livewire\Homes\Concerns\HasPins;
+use App\Models\HomesPin;
 use App\Models\HousingJob;
 use App\Models\ProjectBudget;
 use App\Models\ProjectExpense;
 use App\Models\ProjectMilestone;
 use App\Models\Requirement;
+use App\Services\Homes\HousingRecordDeleter;
 use App\Services\MediaValidationService;
 use App\Services\RequirementInstantiator;
 use App\Traits\WithPermissionChecks;
@@ -26,6 +29,7 @@ use Livewire\WithFileUploads;
 #[Layout('components.layouts.homes')]
 class ProjectDetail extends Component
 {
+    use HasPins;
     use WithFileUploads;
     use WithPermissionChecks;
 
@@ -98,6 +102,46 @@ class ProjectDetail extends Component
             ->where('status', 'in_progress')
             ->orderBy('sequence_order')
             ->first()?->id;
+    }
+
+    // ── Delete (recoverable — admin can restore from the recycle bin) ──
+
+    public bool $showDelete = false;
+
+    public function confirmDelete(): void
+    {
+        $this->authorizeAction('projects.delete');
+        $this->showDelete = true;
+    }
+
+    /** Explicit Cancel is the only close path (portal modal convention). */
+    public function cancelDelete(): void
+    {
+        $this->showDelete = false;
+    }
+
+    public function deleteProject(HousingRecordDeleter $deleter)
+    {
+        $this->authorizeAction('projects.delete');
+
+        $number = $this->job->job_number;
+        $deleter->deleteProject($this->job);
+
+        session()->flash('homes_message', "Deleted project {$number}. If that was a mistake, an admin can restore it.");
+
+        return redirect()->route('homes.projects');
+    }
+
+    // ── Pin (HasPins) ──────────────────────────────────────────────
+
+    public function isProjectPinned(): bool
+    {
+        return $this->isPinned(HomesPin::TYPE_PROJECT, $this->job->id);
+    }
+
+    public function toggleProjectPin(): void
+    {
+        $this->togglePin(HomesPin::TYPE_PROJECT, $this->job->id);
     }
 
     #[On('homes-call-logged')]
@@ -532,6 +576,7 @@ class ProjectDetail extends Component
             'totalSpent' => (float) $job->getTotalSpent(),
             'origin' => $origin,
             'canEdit' => $this->can('projects.view'),
+            'canDelete' => $this->can('projects.delete'),
         ]);
     }
 }

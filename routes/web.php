@@ -125,6 +125,11 @@ Route::middleware(['auth'])->group(function () {
         ->middleware(['permission:audit.view'])
         ->name('audit.activity');
 
+    // Recycle Bin — restore call logs / projects the housing PM deleted
+    Route::get('admin/recycle-bin', App\Livewire\RecycleBin::class)
+        ->middleware(['permission:recycle_bin.manage'])
+        ->name('admin.recycle-bin');
+
     // Documentation Routes
     Route::get('documentation', App\Livewire\DocumentationViewer::class)
         ->name('documentation.index');

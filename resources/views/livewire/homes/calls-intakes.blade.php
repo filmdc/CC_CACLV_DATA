@@ -7,7 +7,14 @@
             'ready' => 'calv-badge calv-badge--sage',
             'converted' => 'calv-badge calv-badge--teal',
         ];
+        $hasPinned = $pinnedRows->isNotEmpty();
     @endphp
+
+    @if (session('homes_message'))
+        <div class="mb-4 rounded-md px-4 py-3 text-sm" style="background: var(--calv-sage-15); color: #2F5A41; border: 1px solid var(--calv-sage-35);">
+            {{ session('homes_message') }}
+        </div>
+    @endif
 
     {{-- Header --}}
     <div class="flex items-end gap-4 mb-5">
@@ -72,8 +79,12 @@
         @include('livewire.homes.partials.saved-views', ['supportsExpanded' => true])
     </div>
 
-    {{-- List --}}
-    @if($logs->count() === 0)
+    @if(! $this->showsPinnedSection() && $this->pinnedIds['call'] !== [])
+        <div class="mb-3 text-[11.5px]" style="color: var(--calv-slate-65);">Pinned calls are hidden while you're searching, so the results below are complete.</div>
+    @endif
+
+    {{-- List — pinned rows ride at the top, ahead of the active filter --}}
+    @if($logs->count() === 0 && ! $hasPinned)
         <div class="calv-card px-6 py-8 text-center text-sm" style="color: var(--calv-slate-65);">
             No calls match — try "Everything" or clear the search.
         </div>
@@ -81,76 +92,75 @@
         {{-- Expanded power table (columns follow the active view) --}}
         @php $visible = collect($this->columnOptions())->only($columns); @endphp
         <div class="calv-card overflow-auto">
-            <table class="w-full border-collapse" style="min-width: {{ 120 + $visible->count() * 100 }}px;">
+            <table class="w-full border-collapse" style="min-width: {{ 160 + $visible->count() * 100 }}px;">
                 <thead>
                     <tr style="background: var(--calv-slate); color: #fff;">
+                        <th style="width: 1%;"><span class="sr-only">Pin</span></th>
                         @foreach($visible as $h)
                             <th class="text-left px-3 py-2.5 whitespace-nowrap" style="font-family: var(--font-sub); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;">{{ $h }}</th>
                         @endforeach
                         <th></th>
                     </tr>
                 </thead>
+                @if($hasPinned)
+                    <tbody>
+                        <tr>
+                            <td colspan="{{ $visible->count() + 2 }}" style="padding: 0;">
+                                @include('livewire.homes.partials.pinned-band', ['count' => $pinnedRows->count()])
+                            </td>
+                        </tr>
+                        @foreach($pinnedRows as $row)
+                            @include('livewire.homes.partials.call-table-row', [
+                                'row' => $row,
+                                'visible' => $visible,
+                                'badgeFor' => $badgeFor,
+                                'pinned' => true,
+                                'tint' => $row['overdue'] ? 'var(--calv-red-15)' : 'var(--calv-sand-15)',
+                            ])
+                        @endforeach
+                    </tbody>
+                @endif
                 <tbody>
                     @foreach($logs as $row)
-                        <tr style="background: {{ $row['overdue'] ? 'var(--calv-red-15)' : '#fff' }}; border-top: 1px solid var(--calv-slate-15);">
-                            @foreach($visible as $key => $h)
-                                @switch($key)
-                                    @case('who')
-                                        <td class="px-3 py-2.5 text-[12.5px] font-semibold" style="color: var(--calv-slate);">{{ $row['who'] }}</td>
-                                        @break
-                                    @case('where')
-                                        <td class="px-3 py-2.5 text-[12.5px]" style="color: var(--calv-slate);">{{ $row['where'] ?: '—' }}</td>
-                                        @break
-                                    @case('note')
-                                        <td class="px-3 py-2.5 text-[12.5px]" style="color: var(--calv-slate-65); min-width: 200px;">{{ Str::limit($row['note'], 90) ?: '—' }}</td>
-                                        @break
-                                    @case('stage')
-                                        <td class="px-3 py-2.5"><span class="{{ $badgeFor[$row['stage_key']] ?? 'calv-badge' }}">{{ $row['stage_label'] }}</span></td>
-                                        @break
-                                    @case('docs')
-                                        <td class="px-3 py-2.5 text-[12.5px]" style="color: var(--calv-slate);">{{ $row['reqs'] ?: '—' }}</td>
-                                        @break
-                                    @case('last')
-                                        <td class="px-3 py-2.5 text-[12.5px]" style="color: var(--calv-slate);">{{ $row['last'] }}</td>
-                                        @break
-                                    @case('next')
-                                        <td class="px-3 py-2.5 text-[12.5px]" style="color: {{ $row['overdue'] ? 'var(--calv-red)' : 'var(--calv-slate)' }};">{{ $row['next'] }}</td>
-                                        @break
-                                    @case('type')
-                                        <td class="px-3 py-2.5 text-[12.5px]" style="color: var(--calv-slate);">{{ $row['type'] }}</td>
-                                        @break
-                                    @case('direction')
-                                        <td class="px-3 py-2.5 text-[12.5px]" style="color: var(--calv-slate);">{{ $row['direction'] }}</td>
-                                        @break
-                                @endswitch
-                            @endforeach
-                            <td class="px-3 py-2.5"><a href="{{ route('homes.call', $row['id']) }}" wire:navigate class="calv-btn calv-btn--quiet calv-btn--sm">Open</a></td>
-                        </tr>
+                        @include('livewire.homes.partials.call-table-row', [
+                            'row' => $row,
+                            'visible' => $visible,
+                            'badgeFor' => $badgeFor,
+                            'pinned' => $this->isCallPinned($row['id']),
+                            'tint' => null,
+                        ])
                     @endforeach
+                    @if($logs->count() === 0)
+                        <tr><td colspan="{{ $visible->count() + 2 }}" class="px-6 py-8 text-center text-sm" style="color: var(--calv-slate-65);">Nothing else matches — try "Everything" or clear the search.</td></tr>
+                    @endif
                 </tbody>
             </table>
         </div>
     @else
         {{-- Simple person-first rows --}}
         <div class="calv-card overflow-hidden">
+            @if($hasPinned)
+                @include('livewire.homes.partials.pinned-band', ['count' => $pinnedRows->count()])
+                @foreach($pinnedRows as $row)
+                    @include('livewire.homes.partials.call-row', [
+                        'row' => $row,
+                        'badgeFor' => $badgeFor,
+                        'pinned' => true,
+                        'tint' => $row['overdue'] ? 'var(--calv-red-15)' : 'var(--calv-sand-15)',
+                    ])
+                @endforeach
+            @endif
             @foreach($logs as $row)
-                <div class="flex items-center gap-4 px-4 py-3.5" style="border-bottom: 1px solid var(--calv-slate-15); background: {{ $row['overdue'] ? 'var(--calv-red-15)' : '#fff' }};">
-                    <div class="min-w-0" style="flex: 1 1 30%;">
-                        <div class="text-[14.5px] font-semibold" style="color: var(--calv-slate);">{{ $row['who'] }}</div>
-                        <div class="text-xs mt-0.5" style="color: var(--calv-slate-65);">{{ $row['where'] ?: '—' }}</div>
-                    </div>
-                    <div class="min-w-0 text-[12.5px] leading-snug" style="flex: 1 1 34%; color: var(--calv-slate-65);">{{ Str::limit($row['note'], 130) }}</div>
-                    <div class="flex flex-col gap-1 items-start" style="flex: 0 0 150px;">
-                        <span class="{{ $badgeFor[$row['stage_key']] ?? 'calv-badge' }}">{{ $row['stage_label'] }}</span>
-                        @if($row['reqs'])<span class="text-[11px]" style="color: var(--calv-slate-65);">{{ $row['reqs'] }}</span>@endif
-                    </div>
-                    <div class="min-w-0 text-right" style="flex: 1 1 24%;">
-                        <div class="text-[12.5px] font-semibold" style="color: {{ $row['overdue'] ? 'var(--calv-red)' : 'var(--calv-slate)' }};">{{ $row['next'] }}</div>
-                        <div class="text-[11px] mt-0.5" style="color: var(--calv-slate-65);">last touched {{ $row['last'] }}</div>
-                    </div>
-                    <a href="{{ route('homes.call', $row['id']) }}" wire:navigate class="calv-btn calv-btn--quiet calv-btn--sm shrink-0">Open</a>
-                </div>
+                @include('livewire.homes.partials.call-row', [
+                    'row' => $row,
+                    'badgeFor' => $badgeFor,
+                    'pinned' => $this->isCallPinned($row['id']),
+                    'tint' => null,
+                ])
             @endforeach
+            @if($logs->count() === 0)
+                <div class="px-6 py-8 text-center text-sm" style="color: var(--calv-slate-65);">Nothing else matches — try "Everything" or clear the search.</div>
+            @endif
         </div>
     @endif
 

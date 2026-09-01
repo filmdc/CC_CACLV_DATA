@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="CACLV Housing">
+  <!--
+    CACLV Housing portal mark. Three shapes only — badge, roof, wall — so it
+    still reads as a house at 16px in a browser tab. CALV primary palette.
+    Generated alongside the PNG/ICO set; edit the geometry in the build
+    script rather than here so the raster versions stay in step.
+  -->
+  <rect width="64" height="64" rx="14" fill="#006269"/>
+  <path d="M32 11 L57 34 H7 Z" fill="#D14124"/>
+  <rect x="15" y="34" width="34" height="17" fill="#FFFFFF"/>
+  <rect x="28" y="40" width="8" height="11" rx="1" fill="#006269"/>
+</svg>

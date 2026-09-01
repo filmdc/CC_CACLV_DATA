@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Homes;
 
+use App\Livewire\Homes\Settings\DashboardWidgets;
 use App\Traits\WithPermissionChecks;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -18,6 +19,13 @@ class SettingsHub extends Component
     public function render()
     {
         $surfaces = collect([
+            [
+                'label' => 'Dashboard widgets',
+                'sub' => 'Which cards the Today home shows.',
+                'route' => 'homes.settings.dashboard',
+                'permission' => DashboardWidgets::PERMISSION,
+                'admin_ok' => true,
+            ],
             [
                 'label' => 'Fund codes',
                 'sub' => 'Funding sources, expiry dates, and their required documents.',
@@ -54,7 +62,8 @@ class SettingsHub extends Component
                 'route' => 'homes.settings.properties',
                 'permission' => 'properties.view',
             ],
-        ])->filter(fn ($s) => $this->can($s['permission']))->values();
+        ])->filter(fn ($s) => $this->can($s['permission'])
+            || (($s['admin_ok'] ?? false) && $this->isAdmin()))->values();
 
         return view('livewire.homes.settings-hub', [
             'surfaces' => $surfaces,
