@@ -28,6 +28,8 @@ class DatabaseSeeder extends Seeder
             RequirementsLibraryPermissionsSeeder::class, // Comm Log v2 (Option A): library curation perms
             RequirementDefinitionSeeder::class, // Comm Log v2 (Option A): default Requirements Library items
             AuditLogPermissionsSeeder::class, // Activity audit log viewer (audit.view)
+            RecycleBinPermissionsSeeder::class, // Admin restore of PM-deleted call logs / projects
+            HomesDashboardPermissionsSeeder::class, // Housing portal Today-dashboard widget toggles
             HousingModuleSeeder::class,
             ApprovalPermissionsSeeder::class, // Now just a stub for backwards compatibility
             ApprovalTypesSeeder::class,

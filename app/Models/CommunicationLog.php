@@ -2,18 +2,20 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\TracksSoftDeleter;
 use App\Traits\HasTags;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class CommunicationLog extends Model
 {
-    use HasFactory, HasTags, LogsActivity;
+    use HasFactory, HasTags, LogsActivity, SoftDeletes, TracksSoftDeleter;
 
     /**
      * Audit trail for intake comm-log records. Field-level diffs of the

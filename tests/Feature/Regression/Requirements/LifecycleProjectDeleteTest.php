@@ -13,7 +13,14 @@ beforeEach(function () {
     $this->seed(RegressionTestSeeder::class);
 });
 
-it('cascades requirement rows when the housing_jobs row is deleted (FK constraint)', function () {
+/*
+ * These pin the DATABASE-level ON DELETE CASCADE on requirements.housing_job_id.
+ * HousingJob soft-deletes as of 2026_08_31_110000, so ->delete() no longer
+ * issues a SQL DELETE — forceDelete() is what exercises the FK now. The
+ * constraint itself is unchanged. The soft-delete path is pinned separately
+ * below: it must NOT cascade, or an admin restore would come back gutted.
+ */
+it('cascades requirement rows when the housing_jobs row is hard-deleted (FK constraint)', function () {
     $manager = User::factory()->create();
     $job = HousingJob::factory()->create(['project_manager_id' => $manager->id]);
     $milestone = ProjectMilestone::factory()->create(['housing_job_id' => $job->id]);
@@ -37,13 +44,13 @@ it('cascades requirement rows when the housing_jobs row is deleted (FK constrain
     $jobId = $job->id;
     expect(Requirement::where('housing_job_id', $jobId)->count())->toBeGreaterThanOrEqual(3);
 
-    $job->delete();
+    $job->forceDelete();
 
-    expect(HousingJob::find($jobId))->toBeNull();
+    expect(HousingJob::withTrashed()->find($jobId))->toBeNull();
     expect(Requirement::where('housing_job_id', $jobId)->count())->toBe(0);
 })->group('regression');
 
-it('does not cascade requirements on a different project when one is deleted', function () {
+it('does not cascade requirements on a different project when one is hard-deleted', function () {
     $manager = User::factory()->create();
 
     $jobA = HousingJob::factory()->create(['project_manager_id' => $manager->id]);
@@ -52,7 +59,7 @@ it('does not cascade requirements on a different project when one is deleted', f
     Requirement::factory()->task()->count(2)->create(['housing_job_id' => $jobA->id, 'source_type' => 'ad_hoc']);
     $reqsB = Requirement::factory()->task()->count(3)->create(['housing_job_id' => $jobB->id, 'source_type' => 'ad_hoc']);
 
-    $jobA->delete();
+    $jobA->forceDelete();
 
     expect(Requirement::where('housing_job_id', $jobA->id)->count())->toBe(0);
     expect(Requirement::where('housing_job_id', $jobB->id)->count())->toBe(3);
@@ -60,4 +67,21 @@ it('does not cascade requirements on a different project when one is deleted', f
     foreach ($reqsB as $r) {
         expect(Requirement::find($r->id))->not->toBeNull();
     }
+})->group('regression');
+
+it('keeps requirement rows when a project is soft-deleted, so a restore is whole', function () {
+    $manager = User::factory()->create();
+    $job = HousingJob::factory()->create(['project_manager_id' => $manager->id]);
+    Requirement::factory()->task()->count(2)->create(['housing_job_id' => $job->id, 'source_type' => 'ad_hoc']);
+
+    $job->delete();
+
+    expect(HousingJob::find($job->id))->toBeNull();
+    expect(HousingJob::withTrashed()->find($job->id)->trashed())->toBeTrue();
+    expect(Requirement::where('housing_job_id', $job->id)->count())->toBe(2);
+
+    $job->restore();
+
+    expect(HousingJob::find($job->id))->not->toBeNull();
+    expect(Requirement::where('housing_job_id', $job->id)->count())->toBe(2);
 })->group('regression');

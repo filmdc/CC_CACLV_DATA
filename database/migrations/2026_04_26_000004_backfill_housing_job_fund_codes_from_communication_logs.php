@@ -36,10 +36,17 @@ return new class extends Migration
     {
         $now = now();
 
-        HousingJob::where('is_template', false)
+        // withoutGlobalScopes: HousingJob and CommunicationLog gained
+        // SoftDeletes later (2026_08_31_110000). Replaying history on a
+        // fresh database reaches this migration before deleted_at exists,
+        // so the scope's WHERE would reference a missing column. No row
+        // could be soft-deleted at this point in history anyway, so
+        // dropping the scope preserves the original result exactly.
+        HousingJob::withoutGlobalScopes()
+            ->where('is_template', false)
             ->with([
-                'communicationLogs.fundCodes',
-                'originatingCommunicationLogs.fundCodes',
+                'communicationLogs' => fn ($q) => $q->withoutGlobalScopes()->with('fundCodes'),
+                'originatingCommunicationLogs' => fn ($q) => $q->withoutGlobalScopes()->with('fundCodes'),
             ])
             ->each(function (HousingJob $job) use ($now) {
                 $allLogs = $job->communicationLogs

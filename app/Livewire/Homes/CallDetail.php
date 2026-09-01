@@ -2,10 +2,13 @@
 
 namespace App\Livewire\Homes;
 
+use App\Livewire\Homes\Concerns\HasPins;
 use App\Models\CommunicationLog;
+use App\Models\HomesPin;
 use App\Models\HousingService;
 use App\Models\IntakeRequirement;
 use App\Services\Homes\HousingPortalData;
+use App\Services\Homes\HousingRecordDeleter;
 use App\Services\IntakeConversion\ConversionBlocked;
 use App\Services\IntakeConversion\ConversionInput;
 use App\Services\IntakeConversion\ConvertIntakeToProject;
@@ -20,12 +23,13 @@ use Livewire\WithFileUploads;
 
 /**
  * One call/intake opened (homes.caclv.org): "Every touch" timeline,
- * document checklist with Received / Nudge, follow-up card, and the
+ * document checklist with Received / waive / undo, follow-up card, and the
  * convert-to-project modal running the SAME shared service as the main app.
  */
 #[Layout('components.layouts.homes')]
 class CallDetail extends Component
 {
+    use HasPins;
     use WithFileUploads;
     use WithPermissionChecks;
     use WithProgramAccess;
@@ -48,6 +52,16 @@ class CallDetail extends Component
     public ?int $uploadingRequirementId = null;
 
     public array $requirementFiles = [];
+
+    // ── Per-requirement action modal ──────────────────────────────
+    // Parity with the main app's requirement modal: waive / N/A / reopen
+    // and the standing worker note, all of which the fast-path Received
+    // button on the row deliberately leaves out.
+    public ?int $actingOnRequirementId = null;
+
+    public string $reqActionReason = '';
+
+    public string $reqWorkerNote = '';
 
     // ── Convert modal state ───────────────────────────────────────
     public bool $showConvert = false;
@@ -89,6 +103,62 @@ class CallDetail extends Component
         $this->log->refresh();
     }
 
+    // ── Delete (recoverable — admin can restore from the recycle bin) ──
+
+    public bool $showDelete = false;
+
+    public function confirmDelete(HousingRecordDeleter $deleter): void
+    {
+        $this->authorizeAction('communications_log.delete');
+
+        $blocked = $deleter->callBlockedReason($this->log);
+        if ($blocked !== null) {
+            session()->flash('homes_error', $blocked);
+
+            return;
+        }
+
+        $this->showDelete = true;
+    }
+
+    /** Explicit Cancel is the only close path (portal modal convention). */
+    public function cancelDelete(): void
+    {
+        $this->showDelete = false;
+    }
+
+    public function deleteCall(HousingRecordDeleter $deleter)
+    {
+        $this->authorizeAction('communications_log.delete');
+
+        $blocked = $deleter->callBlockedReason($this->log);
+        if ($blocked !== null) {
+            $this->showDelete = false;
+            session()->flash('homes_error', $blocked);
+
+            return null;
+        }
+
+        $who = $this->log->contact_full_name ?: ('COMM-'.$this->log->id);
+        $deleter->deleteCall($this->log);
+
+        session()->flash('homes_message', "Deleted the call for {$who}. If that was a mistake, an admin can restore it.");
+
+        return redirect()->route('homes.calls');
+    }
+
+    // ── Pin (HasPins) ──────────────────────────────────────────────
+
+    public function isCallPinned(): bool
+    {
+        return $this->isPinned(HomesPin::TYPE_CALL, $this->log->id);
+    }
+
+    public function toggleCallPin(): void
+    {
+        $this->togglePin(HomesPin::TYPE_CALL, $this->log->id);
+    }
+
     // ── Requirement actions (mirror the main app's gating exactly) ──
 
     public function markReceived(int $requirementId): void
@@ -103,6 +173,13 @@ class CallDetail extends Component
         session()->flash('homes_message', 'Marked received.');
     }
 
+    /**
+     * DORMANT — not surfaced in the UI. The project manager chases
+     * homeowners and contractors herself, so the portal deliberately
+     * offers no system nudge (decision 2026-09-01). Kept, with its tests,
+     * so re-enabling is a one-line change in the checklist row; the
+     * modal's "Asked for it" covers recording that she made contact.
+     */
     public function nudge(int $requirementId): void
     {
         $req = $this->ownRequirement($requirementId);
@@ -134,6 +211,164 @@ class CallDetail extends Component
         }
 
         return $req;
+    }
+
+    // ── Waive / N/A / reopen / note (main-app parity) ─────────────
+
+    public function openRequirementActions(int $requirementId): void
+    {
+        $req = $this->ownRequirement($requirementId);
+
+        $this->actingOnRequirementId = $req->id;
+        $this->reqActionReason = '';
+        $this->reqWorkerNote = (string) ($req->worker_note ?? '');
+        $this->resetErrorBag(['reqActionReason', 'reqWorkerNote']);
+    }
+
+    /** Explicit Cancel is the only close path (portal modal convention). */
+    public function closeRequirementActions(): void
+    {
+        $this->actingOnRequirementId = null;
+        $this->reqActionReason = '';
+        $this->reqWorkerNote = '';
+        $this->resetErrorBag(['reqActionReason', 'reqWorkerNote']);
+    }
+
+    /**
+     * The standing annotation on a requirement. Available in any status and
+     * never changes the lifecycle — editing replaces it outright, unlike the
+     * append-only `notes` audit column.
+     */
+    public function saveRequirementNote(): void
+    {
+        if (! $this->actingOnRequirementId) {
+            return;
+        }
+
+        $req = $this->ownRequirement($this->actingOnRequirementId);
+
+        $this->validate(['reqWorkerNote' => ['nullable', 'string', 'max:2000']]);
+
+        $note = trim($this->reqWorkerNote);
+        $req->worker_note = $note === '' ? null : $note;
+        $req->updated_by_user_id = Auth::id();
+        $req->save();
+
+        $this->log->refresh();
+        session()->flash('homes_message', 'Note saved.');
+    }
+
+    /**
+     * Apply a status transition. action ∈ {requested, received, waived, na,
+     * reopen}; waived and na require a reason, and reopen is the undo for a
+     * requirement checked off by mistake.
+     */
+    public function applyRequirementAction(string $action): void
+    {
+        if (! $this->actingOnRequirementId) {
+            return;
+        }
+
+        $req = $this->ownRequirement($this->actingOnRequirementId);
+        $actor = Auth::user();
+
+        switch ($action) {
+            case 'requested':
+                $req->markRequested($actor);
+                break;
+
+            case 'received':
+                $req->markReceived($actor);
+                break;
+
+            case 'waived':
+                if (trim($this->reqActionReason) === '') {
+                    $this->addError('reqActionReason', 'A reason is required to waive this.');
+
+                    return;
+                }
+                $req->markWaived($actor, trim($this->reqActionReason));
+                break;
+
+            case 'na':
+                if (trim($this->reqActionReason) === '') {
+                    $this->addError('reqActionReason', "A reason is required to mark this doesn't apply.");
+
+                    return;
+                }
+                $req->markNotApplicable($actor, trim($this->reqActionReason));
+                break;
+
+            case 'reopen':
+                $req->reopen($actor);
+                break;
+
+            default:
+                abort(422, 'Unknown requirement action.');
+        }
+
+        // A transition may flip the Phase-1 gate — same as the main app.
+        $req->fresh()->communicationLog?->applyAutoCategory();
+
+        $this->closeRequirementActions();
+        $this->log->refresh();
+        session()->flash('homes_message', 'Requirement updated.');
+    }
+
+    // ── Attachments ───────────────────────────────────────────────
+
+    /**
+     * Same gate as the main app: removing an attachment is not part of the
+     * project manager's day-to-day, so it needs delete rights or admin.
+     */
+    public function canRemoveFiles(): bool
+    {
+        return $this->isAdmin() || $this->can('communications_log.delete');
+    }
+
+    public function deleteRequirementMedia(int $requirementId, int $mediaId): void
+    {
+        if (! $this->canRemoveFiles()) {
+            abort(403, 'You do not have permission to remove attachments.');
+        }
+
+        $req = IntakeRequirement::findOrFail($requirementId);
+
+        if ($req->communication_log_id !== (int) $this->log->id) {
+            abort(403);
+        }
+
+        $media = $req->getMedia('documents')->firstWhere('id', $mediaId);
+
+        if ($media) {
+            $media->delete();
+            $this->log->refresh();
+            session()->flash('homes_message', 'Attachment removed.');
+        }
+    }
+
+    /** Mime types the media preview route can render inline. */
+    protected const PREVIEWABLE_MIMES = [
+        'application/pdf',
+        'image/jpeg', 'image/jpg', 'image/png', 'image/gif',
+        'image/webp', 'image/svg+xml',
+        'text/plain', 'text/csv',
+    ];
+
+    /** Normalized attachment rows for one requirement. */
+    protected function fileRowsFor(IntakeRequirement $req): array
+    {
+        return $req->getMedia('documents')->map(fn ($m) => [
+            'id' => $m->id,
+            'requirement_id' => $req->id,
+            'name' => $m->file_name,
+            'mime' => $m->mime_type,
+            'size' => $m->human_readable_size,
+            'uploaded' => $m->created_at,
+            'preview_url' => route('media.preview', $m->id),
+            'download_url' => route('media.download', $m->id),
+            'previewable' => in_array($m->mime_type, self::PREVIEWABLE_MIMES, true),
+        ])->values()->all();
     }
 
     // ── Edit the log itself ───────────────────────────────────────
@@ -298,6 +533,10 @@ class CallDetail extends Component
         if ($req->type !== IntakeRequirement::TYPE_DOCUMENT) {
             abort(422, 'File uploads are only supported for document-type requirements.');
         }
+
+        // Only one modal at a time — the upload dialog replaces the
+        // actions dialog it can be launched from.
+        $this->closeRequirementActions();
 
         $this->uploadingRequirementId = $req->id;
         $this->requirementFiles = [];
@@ -495,13 +734,14 @@ class CallDetail extends Component
 
     // ── Render ────────────────────────────────────────────────────
 
-    public function render(HousingPortalData $data, ConvertIntakeToProject $convert)
+    public function render(HousingPortalData $data, ConvertIntakeToProject $convert, HousingRecordDeleter $deleter)
     {
         $log = $this->log->load([
             'participant', 'property',
             'updates.createdBy',
             'intakeRequirements' => fn ($q) => $q->where('is_orphaned', false),
             'intakeRequirements.definition',
+            'intakeRequirements.media',
         ]);
 
         // "Every touch" — updates plus a synthesized root entry for the
@@ -534,7 +774,18 @@ class CallDetail extends Component
             'met' => $r->isMet(),
             'received_on' => $r->received_at?->isoFormat('MMM D'),
             'worker_note' => $r->worker_note,
+            'files' => $this->fileRowsFor($r),
         ])->values();
+
+        // Every attachment on the entry, newest first — the portal's answer
+        // to the main app's "Documents on file" table.
+        $documentRows = $requirements
+            ->flatMap(fn (array $r) => array_map(
+                fn (array $f) => $f + ['source' => $r['label']],
+                $r['files']
+            ))
+            ->sortByDesc(fn (array $f) => $f['uploaded']?->getTimestamp() ?? 0)
+            ->values();
 
         $gate = $convert->gate($log);
         $progress = $data->phase1Progress($log);
@@ -554,6 +805,15 @@ class CallDetail extends Component
             // carries the requirements gate + override), matching the main app.
             'canConvert' => ! $log->is_converted && $this->can('projects.create'),
             'canEdit' => $this->can('communications_log.edit'),
+            'canDelete' => $this->can('communications_log.delete'),
+            'documentRows' => $documentRows,
+            'canRemoveFiles' => $this->canRemoveFiles(),
+            'actingOn' => $this->actingOnRequirementId
+                ? $requirements->firstWhere('id', $this->actingOnRequirementId)
+                : null,
+            // Non-null when a live project still hangs off this call — the
+            // button stays visible but explains what has to happen first.
+            'deleteBlocked' => $deleter->callBlockedReason($log),
             'counties' => HousingService::query()->where('is_active', true)->orderBy('name')->get(['id', 'name']),
             'attachedCountyIds' => $attachedCountyIds,
         ]);

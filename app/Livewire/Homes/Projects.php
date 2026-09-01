@@ -2,8 +2,11 @@
 
 namespace App\Livewire\Homes;
 
+use App\Livewire\Homes\Concerns\HasPins;
 use App\Livewire\Homes\Concerns\HasSavedViews;
+use App\Models\HomesPin;
 use App\Models\HousingJob;
+use App\Services\Homes\HousingPortalData;
 use App\Traits\WithPermissionChecks;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
@@ -20,6 +23,7 @@ use Livewire\Component;
 #[Layout('components.layouts.homes')]
 class Projects extends Component
 {
+    use HasPins;
     use HasSavedViews;
     use WithPermissionChecks;
 
@@ -94,6 +98,18 @@ class Projects extends Component
         $this->pill = in_array($pill, ['open', 'attention', 'all'], true) ? $pill : 'open';
     }
 
+    /** Pins are held back while searching so results stay complete. */
+    public function showsPinnedSection(): bool
+    {
+        return trim($this->search) === '';
+    }
+
+    /** Convenience for the Blade pin button — this screen only pins projects. */
+    public function isProjectPinned(int $id): bool
+    {
+        return $this->isPinned(HomesPin::TYPE_PROJECT, $id);
+    }
+
     /**
      * Plain-language status for a job (relations already eager-loaded):
      * finished | attention (overdue milestone or over-budget line) | active.
@@ -134,40 +150,29 @@ class Projects extends Component
         ];
     }
 
-    public function render()
+    public function render(HousingPortalData $data)
     {
         $all = HousingJob::active()
             ->with(['participant', 'property', 'program', 'milestones', 'budgets'])
             ->orderByDesc('created_at')
             ->get();
 
-        $rows = $all->map(function (HousingJob $job) {
-            $next = self::nextAction($job);
-
-            return [
-                'id' => $job->id,
-                'who' => $job->participant?->full_name ?: $job->job_title,
-                'where' => $job->property
-                    ? trim($job->property->address_line_1.', '.$job->property->city, ', ')
-                    : '—',
-                'status' => self::plainStatus($job),
-                'program' => $job->program?->name,
-                'title' => $job->job_title,
-                'ms_done' => $job->milestones->where('status', 'completed')->count(),
-                'ms_total' => $job->milestones->count(),
-                'budget' => (float) $job->getTotalBudget(),
-                'spent' => (float) $job->getTotalSpent(),
-                'next' => $next['text'],
-                'next_due' => $next['due'],
-            ];
-        });
+        $rows = $all->map(fn (HousingJob $job) => $data->projectRow($job));
 
         $counts = [
             'open' => $rows->filter(fn ($r) => $r['status'] !== 'finished')->count(),
             'attention' => $rows->where('status', 'attention')->count(),
         ];
 
+        // Pins ride above the list and ignore the pills, so the same project
+        // is dropped from the list below rather than shown twice. Pinned
+        // projects are read through the service (not $rows) so a pin still
+        // resolves after the job is archived or finished.
+        $pinned = $this->showsPinnedSection() ? $data->pinnedProjects((int) auth()->id()) : collect();
+        $pinnedIds = $pinned->pluck('id')->all();
+
         $filtered = $rows
+            ->when($pinnedIds !== [], fn ($c) => $c->reject(fn ($r) => in_array($r['id'], $pinnedIds, true)))
             ->when($this->pill === 'open', fn ($c) => $c->filter(fn ($r) => $r['status'] !== 'finished'))
             ->when($this->pill === 'attention', fn ($c) => $c->where('status', 'attention'))
             ->when($this->search !== '', function ($c) {
@@ -179,6 +184,7 @@ class Projects extends Component
 
         return view('livewire.homes.projects', [
             'rows' => $filtered,
+            'pinnedRows' => $pinned,
             'counts' => $counts,
         ]);
     }

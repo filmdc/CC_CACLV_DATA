@@ -53,6 +53,11 @@ Route::domain(env('HOMES_DOMAIN', 'homes.caclv.org'))->group(function () {
         Route::get('/settings', App\Livewire\Homes\SettingsHub::class)
             ->name('homes.settings');
 
+        // No permission middleware: CheckPermission has no admin bypass, and
+        // this surface authorizes admin-OR-permission inside mount().
+        Route::get('/settings/dashboard', App\Livewire\Homes\Settings\DashboardWidgets::class)
+            ->name('homes.settings.dashboard');
+
         Route::get('/settings/fund-codes', App\Livewire\Homes\Settings\FundCodes::class)
             ->middleware('permission:fund_codes.view')
             ->name('homes.settings.fund-codes');

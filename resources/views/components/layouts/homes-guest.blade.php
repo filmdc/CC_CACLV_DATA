@@ -12,11 +12,16 @@
 
         <title>{{ $title ?? 'Sign In - CACLV Housing' }}</title>
 
+        {{-- Housing-portal mark: a house in the CALV palette. The main app and
+             the approvals portal keep the generic CAP TRACK favicon. ?v= is a
+             cache-buster — browsers hold on to favicons hard. --}}
         @if($siteFavicon)
             <link rel="icon" href="{{ Storage::url($siteFavicon) }}" sizes="any">
         @else
-            <link rel="icon" href="/favicon.ico" sizes="any">
+            <link rel="icon" href="/favicon-homes.ico?v=1" sizes="any">
+            <link rel="icon" href="/favicon-homes.svg?v=1" type="image/svg+xml">
         @endif
+        <link rel="apple-touch-icon" href="/favicon-homes-180.png?v=1">
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=anton:400|barlow:300,400,500,600,700|oswald:500,600,700" rel="stylesheet" />

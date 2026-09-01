@@ -2,8 +2,10 @@
 
 namespace App\Services\Homes;
 
+use App\Livewire\Homes\Projects;
 use App\Models\CommunicationLog;
 use App\Models\FundCode;
+use App\Models\HomesPin;
 use App\Models\HousingJob;
 use App\Models\IntakeRequirement;
 use App\Models\RequirementDefinition;
@@ -203,6 +205,120 @@ class HousingPortalData
             })
             ->filter(fn ($row) => $row['total'] > 0 && $row['pct'] === 100)
             ->take($limit)
+            ->values();
+    }
+
+    /**
+     * One call/intake shaped for a portal list row. Shared by the paginated
+     * Calls & Intakes list and by the pinned sections on Calls and Today, so
+     * a pinned row reads exactly like the row it was lifted out of.
+     *
+     * Expects participant, property and intakeRequirements.definition loaded.
+     */
+    public function callRow(CommunicationLog $log): array
+    {
+        $stage = $this->stage($log);
+        $progress = $this->phase1Progress($log);
+
+        $next = $log->follow_up_completed
+            ? null
+            : ($log->follow_up_action ?: null);
+        if ($next === null) {
+            $next = match ($stage['key']) {
+                'ready' => 'Ready to convert',
+                'collecting' => 'Collecting documents',
+                'converted' => 'Converted to project',
+                default => 'No action needed',
+            };
+        }
+
+        return [
+            'id' => $log->id,
+            'who' => $this->personName($log),
+            'where' => $this->personWhere($log),
+            'note' => (string) ($log->summary ?? ''),
+            'stage_key' => $stage['key'],
+            'stage_label' => $stage['label'],
+            'reqs' => $progress['total'] > 0 ? "{$progress['met']} of {$progress['total']} docs" : null,
+            'next' => $next,
+            'overdue' => $log->is_follow_up_overdue,
+            'last' => $log->communication_date?->isoFormat('MMM D') ?? $log->updated_at?->isoFormat('MMM D'),
+            'type' => ucfirst(str_replace('_', ' ', (string) $log->communication_type)),
+            'direction' => ucfirst((string) $log->direction),
+        ];
+    }
+
+    /**
+     * One project shaped for a portal list row. Shared by the Projects list
+     * and by the pinned sections on Projects and Today.
+     *
+     * Expects participant, property, program, milestones and budgets loaded.
+     */
+    public function projectRow(HousingJob $job): array
+    {
+        $next = Projects::nextAction($job);
+
+        return [
+            'id' => $job->id,
+            'who' => $job->participant?->full_name ?: $job->job_title,
+            'where' => $job->property
+                ? trim($job->property->address_line_1.', '.$job->property->city, ', ')
+                : '—',
+            'status' => Projects::plainStatus($job),
+            'program' => $job->program?->name,
+            'title' => $job->job_title,
+            'ms_done' => $job->milestones->where('status', 'completed')->count(),
+            'ms_total' => $job->milestones->count(),
+            'budget' => (float) $job->getTotalBudget(),
+            'spent' => (float) $job->getTotalSpent(),
+            'next' => $next['text'],
+            'next_due' => $next['due'],
+        ];
+    }
+
+    /**
+     * A user's pinned calls, in the order they were pinned. Pins are never
+     * filtered by the screen's pills — the point of a pin is that it stays
+     * visible — and pins whose record has since been deleted just drop out.
+     */
+    public function pinnedCalls(int $userId): Collection
+    {
+        $ids = HomesPin::idsFor($userId, HomesPin::TYPE_CALL);
+        if ($ids === []) {
+            return collect();
+        }
+
+        $logs = CommunicationLog::query()
+            ->whereIn('id', $ids)
+            ->with(['participant', 'property', 'intakeRequirements.definition'])
+            ->get()
+            ->keyBy('id');
+
+        return collect($ids)
+            ->map(fn (int $id) => $logs->get($id))
+            ->filter()
+            ->map(fn (CommunicationLog $log) => $this->callRow($log))
+            ->values();
+    }
+
+    /** A user's pinned projects, in the order they were pinned. */
+    public function pinnedProjects(int $userId): Collection
+    {
+        $ids = HomesPin::idsFor($userId, HomesPin::TYPE_PROJECT);
+        if ($ids === []) {
+            return collect();
+        }
+
+        $jobs = HousingJob::query()
+            ->whereIn('id', $ids)
+            ->with(['participant', 'property', 'program', 'milestones', 'budgets'])
+            ->get()
+            ->keyBy('id');
+
+        return collect($ids)
+            ->map(fn (int $id) => $jobs->get($id))
+            ->filter()
+            ->map(fn (HousingJob $job) => $this->projectRow($job))
             ->values();
     }
 

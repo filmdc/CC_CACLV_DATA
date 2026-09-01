@@ -6,7 +6,14 @@
             'active' => ['label' => 'Moving along', 'class' => 'calv-badge calv-badge--teal'],
             'finished' => ['label' => 'Finished', 'class' => 'calv-badge calv-badge--sage'],
         ];
+        $hasPinned = $pinnedRows->isNotEmpty();
     @endphp
+
+    @if (session('homes_message'))
+        <div class="mb-4 rounded-md px-4 py-3 text-sm" style="background: var(--calv-sage-15); color: #2F5A41; border: 1px solid var(--calv-sage-35);">
+            {{ session('homes_message') }}
+        </div>
+    @endif
 
     {{-- Header --}}
     <div class="flex items-end gap-4 mb-5">
@@ -50,45 +57,34 @@
         @include('livewire.homes.partials.saved-views', ['supportsExpanded' => false])
     </div>
 
-    {{-- Rows --}}
+    @if(! $this->showsPinnedSection() && $this->pinnedIds['project'] !== [])
+        <div class="mb-3 text-[11.5px]" style="color: var(--calv-slate-65);">Pinned projects are hidden while you're searching, so the results below are complete.</div>
+    @endif
+
+    {{-- Rows — pinned projects ride at the top, ahead of the active filter --}}
     <div class="calv-card overflow-hidden">
+        @if($hasPinned)
+            @include('livewire.homes.partials.pinned-band', ['count' => $pinnedRows->count()])
+            @foreach($pinnedRows as $r)
+                @include('livewire.homes.partials.project-row', [
+                    'r' => $r,
+                    'statusBadge' => $statusBadge,
+                    'pinned' => true,
+                    'tint' => $r['status'] === 'attention' ? 'var(--calv-red-15)' : 'var(--calv-sand-15)',
+                ])
+            @endforeach
+        @endif
+
         @forelse($rows as $r)
-            <a href="{{ route('homes.project', $r['id']) }}" wire:navigate
-               class="flex items-center gap-4 px-4 py-3.5"
-               style="border-bottom: 1px solid var(--calv-slate-15); background: {{ $r['status'] === 'attention' ? 'var(--calv-red-15)' : '#fff' }}; text-decoration: none;">
-                <div class="min-w-0" style="flex: 1 1 26%;">
-                    <div class="text-[14.5px] font-semibold" style="color: var(--calv-slate);">{{ $r['who'] }}</div>
-                    <div class="text-xs mt-0.5" style="color: var(--calv-slate-65);">{{ $r['where'] }}</div>
-                </div>
-                @if($this->showsColumn('status'))
-                    <div class="flex flex-col gap-1 items-start" style="flex: 0 0 160px;">
-                        <span class="{{ $statusBadge[$r['status']]['class'] }}">{{ $statusBadge[$r['status']]['label'] }}</span>
-                        <span class="text-[11px]" style="color: var(--calv-slate-65);">{{ $r['program'] ? $r['program'].' · ' : '' }}{{ Str::limit($r['title'], 34) }}</span>
-                    </div>
-                @endif
-                @if($this->showsColumn('progress'))
-                    <div style="flex: 0 0 180px;">
-                        <div class="flex justify-between text-[11px] mb-1" style="color: var(--calv-slate-65);">
-                            <span>{{ $r['ms_done'] }} of {{ $r['ms_total'] }} milestones</span>
-                            <span>${{ number_format($r['spent']) }} / ${{ number_format($r['budget']) }}</span>
-                        </div>
-                        @php $pct = $r['budget'] > 0 ? min(100, (int) round($r['spent'] / $r['budget'] * 100)) : 0; @endphp
-                        <div style="background: var(--calv-slate-15); border-radius: 999px; height: 6px; overflow: hidden;">
-                            <div style="width: {{ $pct }}%; height: 100%; background: {{ $pct >= 100 ? 'var(--calv-sage)' : 'var(--calv-teal)' }}; border-radius: 999px;"></div>
-                        </div>
-                    </div>
-                @endif
-                @if($this->showsColumn('next'))
-                    <div class="min-w-0 text-right" style="flex: 1 1 26%;">
-                        <div class="text-[12.5px] font-semibold leading-snug" style="color: {{ $r['status'] === 'attention' ? 'var(--calv-red)' : 'var(--calv-slate)' }};">{{ Str::limit($r['next'], 70) }}</div>
-                        <div class="text-[11px] mt-0.5" style="color: var(--calv-slate-65);">{{ $r['next_due'] }}</div>
-                    </div>
-                @endif
-                <span class="calv-btn calv-btn--quiet calv-btn--sm shrink-0">Open</span>
-            </a>
+            @include('livewire.homes.partials.project-row', [
+                'r' => $r,
+                'statusBadge' => $statusBadge,
+                'pinned' => $this->isProjectPinned($r['id']),
+                'tint' => null,
+            ])
         @empty
             <div class="px-6 py-8 text-center text-sm" style="color: var(--calv-slate-65);">
-                No projects match — try "Everything" or clear the search.
+                {{ $hasPinned ? 'Nothing else matches — try "Everything" or clear the search.' : 'No projects match — try "Everything" or clear the search.' }}
             </div>
         @endforelse
     </div>

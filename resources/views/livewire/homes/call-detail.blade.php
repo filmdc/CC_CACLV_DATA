@@ -6,6 +6,12 @@
         </div>
     @endif
 
+    @if (session('homes_error'))
+        <div class="mb-4 rounded-md px-4 py-3 text-sm" style="background: var(--calv-red-15); color: var(--calv-red); border: 1px solid var(--calv-red);">
+            {{ session('homes_error') }}
+        </div>
+    @endif
+
     <a href="{{ route('homes.calls') }}" wire:navigate class="calv-link inline-block mb-3" style="font-size: 12.5px;">← Calls &amp; Intakes</a>
 
     @php
@@ -45,6 +51,18 @@
             </div>
         </div>
         <div class="flex gap-2 shrink-0">
+            @php $isPinned = $this->isCallPinned(); @endphp
+            <button
+                type="button"
+                wire:click="toggleCallPin"
+                class="calv-btn calv-btn--ghost"
+                aria-pressed="{{ $isPinned ? 'true' : 'false' }}"
+                title="{{ $isPinned ? 'Take this call off your dashboard' : 'Keep this call on your dashboard and at the top of Calls & Intakes' }}"
+                @style([
+                    'background: var(--calv-amber-15); border-color: var(--calv-amber-35); color: #8A6410' => $isPinned,
+                ])>
+                <span aria-hidden="true">📌</span> {{ $isPinned ? 'Pinned' : 'Pin' }}
+            </button>
             @if($canEdit)
                 <button type="button" wire:click="openEdit" class="calv-btn calv-btn--ghost">Edit</button>
             @endif
@@ -56,6 +74,19 @@
             @endif
             @if($log->is_converted && $log->convertedToJob)
                 <a href="{{ route('homes.project', $log->converted_to_job_id) }}" wire:navigate class="calv-btn calv-btn--secondary">Open project {{ $log->convertedToJob->job_number }}</a>
+            @endif
+            @if($canDelete)
+                <button
+                    type="button"
+                    wire:click="confirmDelete"
+                    class="calv-btn calv-btn--ghost"
+                    title="{{ $deleteBlocked ?? 'Delete this call — an admin can restore it if this is a mistake' }}"
+                    @style([
+                        'color: var(--calv-red); border-color: var(--calv-red)' => ! $deleteBlocked,
+                        'color: var(--calv-slate-65); border-color: var(--calv-slate-35)' => (bool) $deleteBlocked,
+                    ])>
+                    Delete
+                </button>
             @endif
         </div>
     </div>
@@ -108,19 +139,41 @@
                                     @if(!$r['met'] && $r['status'] === 'requested')<span class="text-[10.5px]" style="color: #8A6410;"> · asked</span>@endif
                                 </span>
                                 @if($r['met'])
-                                    <span class="text-[11px] shrink-0" style="color: var(--calv-slate-65);">{{ $r['received_on'] ?? $r['status_display'] }}</span>
-                                @elseif($canEdit)
+                                    <span class="text-[11px] shrink-0" style="color: var(--calv-slate-65);">{{ $r['status_display'] }}{{ $r['received_on'] ? ' · '.$r['received_on'] : '' }}</span>
+                                @endif
+                                @if($canEdit)
                                     <span class="inline-flex gap-1.5 shrink-0">
-                                        @if($r['type'] === 'document')
-                                            <button type="button" wire:click="openUpload({{ $r['id'] }})" class="calv-btn calv-btn--secondary calv-btn--sm">Upload</button>
-                                        @endif
-                                        <button type="button" wire:click="markReceived({{ $r['id'] }})" class="calv-btn calv-btn--quiet calv-btn--sm">Received</button>
-                                        <button type="button" wire:click="nudge({{ $r['id'] }})" class="calv-btn calv-btn--ghost calv-btn--sm">Nudge</button>
+                                        @unless($r['met'])
+                                            @if($r['type'] === 'document')
+                                                <button type="button" wire:click="openUpload({{ $r['id'] }})" class="calv-btn calv-btn--secondary calv-btn--sm">Upload</button>
+                                            @endif
+                                            <button type="button" wire:click="markReceived({{ $r['id'] }})" class="calv-btn calv-btn--quiet calv-btn--sm">Received</button>
+                                            {{-- Nudge is intentionally not surfaced: the PM chases people
+                                                 herself, so the portal does not offer a system nudge. The
+                                                 handler is kept dormant (CallDetail::nudge) — re-enable by
+                                                 restoring a button here. --}}
+                                        @endunless
+                                        {{-- Everything else — waive, doesn't apply, undo, note, files --}}
+                                        <button type="button" wire:click="openRequirementActions({{ $r['id'] }})"
+                                                class="calv-btn calv-btn--ghost calv-btn--sm"
+                                                title="Waive, mark not applicable, undo, add a note, or manage files">⋯</button>
                                     </span>
                                 @endif
                             </div>
                             @if($r['worker_note'])
                                 <div class="text-[11px] -mt-1" style="color: var(--calv-slate-65); padding-left: 24px;">{{ Str::limit($r['worker_note'], 140) }}</div>
+                            @endif
+                            @if(count($r['files']))
+                                <div class="flex flex-wrap gap-1.5 -mt-1" style="padding-left: 24px;">
+                                    @foreach($r['files'] as $f)
+                                        <a href="{{ $f['previewable'] ? $f['preview_url'] : $f['download_url'] }}" target="_blank" rel="noopener"
+                                           class="inline-flex items-center gap-1 text-[11px]"
+                                           style="color: var(--calv-teal); background: var(--calv-teal-15); border: 1px solid var(--calv-teal-35); border-radius: 999px; padding: 2px 8px; text-decoration: none;"
+                                           title="{{ $f['name'] }} · {{ $f['size'] }}">
+                                            <span aria-hidden="true">📎</span>{{ Str::limit($f['name'], 28) }}
+                                        </a>
+                                    @endforeach
+                                </div>
                             @endif
                         @endforeach
                     </div>
@@ -177,6 +230,39 @@
                         </div>
                     @endif
                 </div>
+            @endif
+
+            {{-- Documents on file — every attachment across the checklist --}}
+            @if($documentRows->count() > 0)
+                <section class="calv-card overflow-hidden">
+                    <header class="flex items-center px-4 py-3" style="border-bottom: 1px solid var(--calv-slate-15);">
+                        <h3 class="calv-subhead flex-1" style="font-size: 12px;">Documents on file</h3>
+                        <span class="text-[11.5px]" style="color: var(--calv-slate-65);">{{ $documentRows->count() }} {{ Str::plural('file', $documentRows->count()) }}</span>
+                    </header>
+                    @foreach($documentRows as $f)
+                        <div class="flex items-center gap-3 px-4 py-2.5" style="border-bottom: 1px solid var(--calv-slate-15);">
+                            <span aria-hidden="true" class="shrink-0" style="color: var(--calv-slate-35);">📎</span>
+                            <span class="flex-1 min-w-0">
+                                <span class="block text-[12.5px] font-semibold truncate" style="color: var(--calv-slate);" title="{{ $f['name'] }}">{{ $f['name'] }}</span>
+                                <span class="block text-[11px] mt-0.5" style="color: var(--calv-slate-65);">
+                                    {{ $f['source'] }} · {{ $f['size'] }}{{ $f['uploaded'] ? ' · '.$f['uploaded']->isoFormat('MMM D, YYYY') : '' }}
+                                </span>
+                            </span>
+                            <span class="inline-flex items-center gap-2.5 shrink-0 text-[11.5px]">
+                                @if($f['previewable'])
+                                    <a href="{{ $f['preview_url'] }}" target="_blank" rel="noopener" class="calv-link">View</a>
+                                @endif
+                                <a href="{{ $f['download_url'] }}" class="calv-link">Download</a>
+                                @if($canRemoveFiles)
+                                    <button type="button"
+                                            wire:click="deleteRequirementMedia({{ $f['requirement_id'] }}, {{ $f['id'] }})"
+                                            wire:confirm="Remove &quot;{{ $f['name'] }}&quot;? This deletes the file for good."
+                                            style="color: var(--calv-red); background: none; border: 0; cursor: pointer; font-size: 11.5px;">Remove</button>
+                                @endif
+                            </span>
+                        </div>
+                    @endforeach
+                </section>
             @endif
 
             {{-- Counties — attaching one stamps its fund codes + requirements --}}
@@ -483,6 +569,95 @@
         </div>
     @endif
 
+    {{-- Requirement actions: waive / doesn't apply / undo / note / files.
+         Explicit Cancel is the only close path (portal modal convention). --}}
+    @if($actingOnRequirementId && $actingOn)
+        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 48px 16px;">
+            <div class="w-full" style="max-width: 520px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+                <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
+                    <h2 class="calv-h1" style="font-size: 19px;">{{ $actingOn['label'] }}</h2>
+                    <div class="text-xs mt-1" style="color: var(--calv-slate-65);">
+                        Currently <strong style="color: var(--calv-slate);">{{ $actingOn['status_display'] }}</strong>{{ $actingOn['received_on'] ? ' · '.$actingOn['received_on'] : '' }}
+                    </div>
+                </header>
+
+                <div class="px-6 py-5">
+                    {{-- Status actions --}}
+                    <label class="calv-label">Change status</label>
+                    <div class="flex flex-wrap gap-2 mt-1.5">
+                        @unless($actingOn['status'] === 'received')
+                            <button type="button" wire:click="applyRequirementAction('received')" class="calv-btn calv-btn--secondary calv-btn--sm">Mark received</button>
+                        @endunless
+                        @unless($actingOn['status'] === 'requested')
+                            <button type="button" wire:click="applyRequirementAction('requested')" class="calv-btn calv-btn--quiet calv-btn--sm">Asked for it</button>
+                        @endunless
+                        @unless($actingOn['status'] === 'waived')
+                            <button type="button" wire:click="applyRequirementAction('waived')" class="calv-btn calv-btn--quiet calv-btn--sm">Waive</button>
+                        @endunless
+                        @unless($actingOn['status'] === 'na')
+                            <button type="button" wire:click="applyRequirementAction('na')" class="calv-btn calv-btn--quiet calv-btn--sm">Doesn't apply</button>
+                        @endunless
+                        @unless($actingOn['status'] === 'pending')
+                            <button type="button" wire:click="applyRequirementAction('reopen')" class="calv-btn calv-btn--ghost calv-btn--sm"
+                                    title="Put this back to outstanding — use it if it was checked off by mistake">↩ Undo</button>
+                        @endunless
+                    </div>
+
+                    {{-- Reason: required by Waive and Doesn't apply --}}
+                    <div class="mt-3.5">
+                        <label class="calv-label">Reason <span style="font-weight: 400; color: var(--calv-slate-65);">— required to waive or mark it doesn't apply</span></label>
+                        <input type="text" wire:model="reqActionReason" maxlength="500" class="calv-input"
+                               placeholder="e.g. Homeowner is exempt — over 65 and on fixed income">
+                        @error('reqActionReason')<p class="mt-1 text-xs" style="color: var(--calv-red);">{{ $message }}</p>@enderror
+                    </div>
+
+                    {{-- Standing note --}}
+                    <div class="mt-4" style="border-top: 1px solid var(--calv-slate-15); padding-top: 16px;">
+                        <label class="calv-label">Note</label>
+                        <textarea wire:model="reqWorkerNote" rows="2" maxlength="2000" class="calv-input"
+                                  placeholder="Anything worth remembering about this one."></textarea>
+                        @error('reqWorkerNote')<p class="mt-1 text-xs" style="color: var(--calv-red);">{{ $message }}</p>@enderror
+                        <button type="button" wire:click="saveRequirementNote" class="calv-btn calv-btn--quiet calv-btn--sm mt-2">Save note</button>
+                    </div>
+
+                    {{-- Files --}}
+                    @if($actingOn['type'] === 'document')
+                        <div class="mt-4" style="border-top: 1px solid var(--calv-slate-15); padding-top: 16px;">
+                            <label class="calv-label">Files</label>
+                            @if(count($actingOn['files']))
+                                <div class="flex flex-col gap-1.5 mt-1.5">
+                                    @foreach($actingOn['files'] as $f)
+                                        <div class="flex items-center gap-2 text-[12px]">
+                                            <span class="flex-1 min-w-0 truncate" style="color: var(--calv-slate);" title="{{ $f['name'] }}">📎 {{ $f['name'] }}</span>
+                                            <span class="shrink-0" style="color: var(--calv-slate-65);">{{ $f['size'] }}</span>
+                                            @if($f['previewable'])
+                                                <a href="{{ $f['preview_url'] }}" target="_blank" rel="noopener" class="calv-link shrink-0">View</a>
+                                            @endif
+                                            <a href="{{ $f['download_url'] }}" class="calv-link shrink-0">Download</a>
+                                            @if($canRemoveFiles)
+                                                <button type="button"
+                                                        wire:click="deleteRequirementMedia({{ $f['requirement_id'] }}, {{ $f['id'] }})"
+                                                        wire:confirm="Remove &quot;{{ $f['name'] }}&quot;? This deletes the file for good."
+                                                        style="color: var(--calv-red); background: none; border: 0; cursor: pointer; font-size: 12px;">Remove</button>
+                                            @endif
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <div class="text-[12px] mt-1" style="color: var(--calv-slate-65);">Nothing uploaded yet.</div>
+                            @endif
+                            <button type="button" wire:click="openUpload({{ $actingOn['id'] }})" class="calv-btn calv-btn--secondary calv-btn--sm mt-2.5">+ Upload a file</button>
+                        </div>
+                    @endif
+                </div>
+
+                <footer class="flex items-center gap-2.5 px-6 py-3.5 justify-end" style="border-top: 1px solid var(--calv-slate-15); background: var(--calv-sand-15);">
+                    <button type="button" wire:click="closeRequirementActions" class="calv-btn calv-btn--ghost">Done</button>
+                </footer>
+            </div>
+        </div>
+    @endif
+
     {{-- Upload files onto a document requirement --}}
     @if($uploadingRequirementId)
         <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 64px 16px;">
@@ -504,6 +679,26 @@
                         <span wire:loading.remove wire:target="uploadRequirementFiles">Save</span>
                         <span wire:loading wire:target="uploadRequirementFiles">Saving…</span>
                     </button>
+                </footer>
+            </div>
+        </div>
+    @endif
+
+    {{-- Delete confirmation. Explicit Cancel only — no backdrop/Escape close. --}}
+    @if($showDelete)
+        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 48px 16px;">
+            <div class="w-full" style="max-width: 480px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+                <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
+                    <h2 class="calv-h1" style="font-size: 20px;">Delete this call?</h2>
+                    <div class="text-xs mt-1" style="color: var(--calv-slate-65);">{{ $who }} · COMM-{{ $log->id }}</div>
+                </header>
+                <div class="px-6 py-5 text-[13.5px] leading-relaxed" style="color: var(--calv-slate);">
+                    <p>It disappears from Calls &amp; Intakes along with its timeline and document checklist.</p>
+                    <p class="mt-2.5" style="color: var(--calv-slate-65);">Nothing is destroyed — if this is a mistake, ask an admin and they can restore it from the recycle bin.</p>
+                </div>
+                <footer class="px-6 py-4 flex justify-end gap-2" style="border-top: 1px solid var(--calv-slate-15); background: var(--calv-sand-15);">
+                    <button type="button" wire:click="cancelDelete" class="calv-btn calv-btn--quiet">Cancel</button>
+                    <button type="button" wire:click="deleteCall" class="calv-btn calv-btn--primary">Yes, delete it</button>
                 </footer>
             </div>
         </div>

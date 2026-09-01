@@ -2,8 +2,10 @@
 
 namespace App\Livewire\Homes;
 
+use App\Livewire\Homes\Concerns\HasPins;
 use App\Livewire\Homes\Concerns\HasSavedViews;
 use App\Models\CommunicationLog;
+use App\Models\HomesPin;
 use App\Models\IntakeRequirement;
 use App\Services\Homes\HousingPortalData;
 use App\Traits\WithPermissionChecks;
@@ -16,6 +18,7 @@ use Livewire\WithPagination;
 #[Layout('components.layouts.homes')]
 class CallsIntakes extends Component
 {
+    use HasPins;
     use HasSavedViews;
     use WithPagination;
     use WithPermissionChecks;
@@ -68,6 +71,18 @@ class CallsIntakes extends Component
     public function toggleExpanded(): void
     {
         $this->expanded = ! $this->expanded;
+    }
+
+    /** Pins are held back while searching so results stay complete. */
+    public function showsPinnedSection(): bool
+    {
+        return trim($this->search) === '';
+    }
+
+    /** Convenience for the Blade pin button — this screen only pins calls. */
+    public function isCallPinned(int $id): bool
+    {
+        return $this->isPinned(HomesPin::TYPE_CALL, $id);
     }
 
     // ── Saved-view contract (HasSavedViews) ─────────────────────────
@@ -155,7 +170,15 @@ class CallsIntakes extends Component
 
     public function render(HousingPortalData $data)
     {
+        // Pins ride above the list and ignore the pills, so the same record
+        // is dropped from the list below rather than shown twice. While a
+        // search is running the pinned section steps aside (see the view)
+        // and the list stays complete.
+        $pinned = $this->showsPinnedSection() ? $data->pinnedCalls((int) auth()->id()) : collect();
+        $pinnedIds = $pinned->pluck('id')->all();
+
         $base = fn () => CommunicationLog::query()
+            ->when($pinnedIds !== [], fn ($q) => $q->whereNotIn('id', $pinnedIds))
             ->when($this->search !== '', fn ($q) => $q->search($this->search))
             ->when(trim($this->city) !== '', fn ($q) => $q->whereRaw('TRIM(contact_city) = ?', [trim($this->city)]));
 
@@ -164,37 +187,7 @@ class CallsIntakes extends Component
             ->orderByRaw('CASE WHEN follow_up_completed = 0 AND follow_up_date IS NOT NULL AND follow_up_date < ? THEN 0 ELSE 1 END', [now()->startOfDay()])
             ->orderBy('communication_date', 'desc');
 
-        $logs = $query->paginate(20)->through(function (CommunicationLog $log) use ($data) {
-            $stage = $data->stage($log);
-            $progress = $data->phase1Progress($log);
-
-            $next = $log->follow_up_completed
-                ? null
-                : ($log->follow_up_action ?: null);
-            if ($next === null) {
-                $next = match ($stage['key']) {
-                    'ready' => 'Ready to convert',
-                    'collecting' => 'Collecting documents',
-                    'converted' => 'Converted to project',
-                    default => 'No action needed',
-                };
-            }
-
-            return [
-                'id' => $log->id,
-                'who' => $data->personName($log),
-                'where' => $data->personWhere($log),
-                'note' => (string) ($log->summary ?? ''),
-                'stage_key' => $stage['key'],
-                'stage_label' => $stage['label'],
-                'reqs' => $progress['total'] > 0 ? "{$progress['met']} of {$progress['total']} docs" : null,
-                'next' => $next,
-                'overdue' => $log->is_follow_up_overdue,
-                'last' => $log->communication_date?->isoFormat('MMM D') ?? $log->updated_at?->isoFormat('MMM D'),
-                'type' => ucfirst(str_replace('_', ' ', (string) $log->communication_type)),
-                'direction' => ucfirst((string) $log->direction),
-            ];
-        });
+        $logs = $query->paginate(20)->through(fn (CommunicationLog $log) => $data->callRow($log));
 
         // Pill counts.
         $needsCount = CommunicationLog::pendingFollowUp()->count();
@@ -215,6 +208,7 @@ class CallsIntakes extends Component
 
         return view('livewire.homes.calls-intakes', [
             'logs' => $logs,
+            'pinnedRows' => $pinned,
             'needsCount' => $needsCount,
             'collectingCount' => $collectingCount,
             'cities' => $cities,
