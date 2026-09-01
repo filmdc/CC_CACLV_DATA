@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Builds the CACLV Housing favicon set: the SVG, the PNG sizes, and a
  * PNG-in-ICO container. Geometry is declared once here and the SVG is
@@ -17,15 +18,15 @@
  * policy on this box refuses to rasterize SVG.
  */
 const DESIGN = 64;   // design/viewBox units
-const SS     = 1024; // supersample canvas
+const SS = 1024; // supersample canvas
 
 // ── Geometry (design units) ──────────────────────────────────────────
-const RADIUS     = 14;                    // badge corner
-const ROOF       = [32, 11, 57, 34, 7, 34]; // apex, right eave, left eave
-const WALL       = [15, 34, 49, 51];      // x1 y1 x2 y2
-const DOOR       = [28, 40, 36, 51];
+const RADIUS = 14;                    // badge corner
+const ROOF = [32, 11, 57, 34, 7, 34]; // apex, right eave, left eave
+const WALL = [15, 34, 49, 51];      // x1 y1 x2 y2
+const DOOR = [28, 40, 36, 51];
 const TEAL = '#006269';
-const RED  = '#D14124';
+const RED = '#D14124';
 const WHITE = '#FFFFFF';
 
 /** Every location the built files are written to. */
@@ -45,7 +46,10 @@ function putBoth(string $name, string $data): void
     }
 }
 
-function px(float $u): int { return (int) round($u / DESIGN * SS); }
+function px(float $u): int
+{
+    return (int) round($u / DESIGN * SS);
+}
 
 function roundedRect($im, int $x1, int $y1, int $x2, int $y2, int $r, int $color): void
 {
@@ -129,4 +133,4 @@ foreach ($icoSizes as $s) {
 }
 putBoth('favicon-homes.ico', $ico);
 
-echo "Built favicon-homes.{svg,ico}, favicon-homes-{32,180}.png in: ".implode(', ', array_filter(outDirs(), 'is_dir')).PHP_EOL;
+echo 'Built favicon-homes.{svg,ico}, favicon-homes-{32,180}.png in: '.implode(', ', array_filter(outDirs(), 'is_dir')).PHP_EOL;
