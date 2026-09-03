@@ -66,7 +66,8 @@ it('forHousingService no longer stamps via bundles (only direct atoms + fund cod
     $atom = RequirementDefinition::factory()->create(['key' => 'photo-id']);
     $svc->requirementDefinitions()->attach($atom->id, ['created_at' => now()]);
 
-    $result = $this->service->forHousingService($log, $svc, $this->actor);
+    $result = $this->service->forHousingService($log, $svc, $this->actor)
+        ->reject(fn ($r) => $r->key === IntakeRequirement::KEY_INCOME_ELIGIBILITY);
 
     expect($result)->toHaveCount(1);
     expect($result->first()->key)->toBe('photo-id');

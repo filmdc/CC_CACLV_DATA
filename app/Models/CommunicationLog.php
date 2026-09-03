@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -190,6 +191,17 @@ class CommunicationLog extends Model
     public function intakeRequirements(): HasMany
     {
         return $this->hasMany(IntakeRequirement::class);
+    }
+
+    /**
+     * Income eligibility: the household's income figures and the
+     * percent-of-poverty determination taken from them. One per intake;
+     * the checklist row that surfaces it is the `income-eligibility`
+     * IntakeRequirement.
+     */
+    public function incomeAssessment(): HasOne
+    {
+        return $this->hasOne(IntakeIncomeAssessment::class);
     }
 
     /**

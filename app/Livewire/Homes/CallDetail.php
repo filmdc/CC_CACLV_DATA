@@ -2,10 +2,12 @@
 
 namespace App\Livewire\Homes;
 
+use App\Livewire\Concerns\ManagesIncomeEligibility;
 use App\Livewire\Homes\Concerns\HasPins;
 use App\Models\CommunicationLog;
 use App\Models\HomesPin;
 use App\Models\HousingService;
+use App\Models\IntakeIncomeAssessment;
 use App\Models\IntakeRequirement;
 use App\Services\Homes\HousingPortalData;
 use App\Services\Homes\HousingRecordDeleter;
@@ -30,6 +32,7 @@ use Livewire\WithFileUploads;
 class CallDetail extends Component
 {
     use HasPins;
+    use ManagesIncomeEligibility;
     use WithFileUploads;
     use WithPermissionChecks;
     use WithProgramAccess;
@@ -157,6 +160,23 @@ class CallDetail extends Component
     public function toggleCallPin(): void
     {
         $this->togglePin(HomesPin::TYPE_CALL, $this->log->id);
+    }
+
+    // ── Income eligibility (shared trait hooks) ───────────────────
+
+    protected function incomeEligibilityLog(): ?CommunicationLog
+    {
+        return $this->log;
+    }
+
+    protected function incomeFlashKey(): string
+    {
+        return 'homes_message';
+    }
+
+    protected function afterIncomeEligibilitySaved(): void
+    {
+        $this->log->refresh();
     }
 
     // ── Requirement actions (mirror the main app's gating exactly) ──
@@ -774,6 +794,9 @@ class CallDetail extends Component
             'met' => $r->isMet(),
             'received_on' => $r->received_at?->isoFormat('MMM D'),
             'worker_note' => $r->worker_note,
+            // The income row opens the calculator instead of a plain
+            // "Received" — the figures are the substance of it.
+            'is_income' => $r->isIncomeEligibility(),
             'files' => $this->fileRowsFor($r),
         ])->values();
 
@@ -816,6 +839,10 @@ class CallDetail extends Component
             'deleteBlocked' => $deleter->callBlockedReason($log),
             'counties' => HousingService::query()->where('is_active', true)->orderBy('name')->get(['id', 'name']),
             'attachedCountyIds' => $attachedCountyIds,
+            'incomeAssessment' => $log->incomeAssessment()->first(),
+            'incomeDocGroups' => $this->showIncomeModal ? $this->incomeDocumentGroups() : [],
+            'incomeSourceTypes' => IntakeIncomeAssessment::SOURCE_TYPES,
+            'incomeDocTypes' => IntakeIncomeAssessment::DOC_TYPES,
         ]);
     }
 }

@@ -122,6 +122,25 @@
                         <div class="text-[11.5px] text-calv-slate-65 mt-0.5 whitespace-pre-line">{{ \Illuminate\Support\Str::limit($item->worker_note, 280) }}</div>
                     @endif
 
+                    {{-- Income eligibility carries figures rather than just a
+                         receipt, so the determination reads on the row itself. --}}
+                    @if($item->key === IntakeRequirement::KEY_INCOME_ELIGIBILITY)
+                        @php $assessment = $item->incomeAssessment; @endphp
+                        <div class="text-[11.5px] text-calv-slate-65 mt-0.5">
+                            @if($assessment && $assessment->annual_income !== null)
+                                ${{ number_format((float) $assessment->annual_income, 0) }}/yr ·
+                                household of {{ $assessment->household_size }}
+                                @if($assessment->poverty_percentage !== null)
+                                    · <span class="font-semibold text-calv-slate">{{ $assessment->determination_label }}</span>
+                                @else
+                                    · no poverty guideline loaded for this household size
+                                @endif
+                            @else
+                                Annual income, household size, and proof — pay stubs, tax return, benefit letters.
+                            @endif
+                        </div>
+                    @endif
+
                     @if(is_array($item->via) && count($item->via))
                         <div class="flex flex-wrap gap-1 mt-1">
                             @foreach($item->via as $tag)
@@ -177,11 +196,20 @@
                     {{ IntakeRequirement::statusDisplay($item->status) }}
                 </x-comm.meta-chip>
 
-                <button type="button"
-                        wire:click="$dispatch('act-on-requirement', { id: {{ $item->id }} })"
-                        class="px-2.5 py-1 rounded-calv-sm border border-calv-slate-35 calv-subhead text-[10px] text-calv-slate hover:bg-calv-sand-15">
-                    {{ $primaryActionLabel }}
-                </button>
+                <div class="flex items-center gap-1.5">
+                    @if($item->key === IntakeRequirement::KEY_INCOME_ELIGIBILITY)
+                        <button type="button"
+                                wire:click="openIncomeEligibility"
+                                class="px-2.5 py-1 rounded-calv-sm border border-calv-teal bg-calv-teal-15 calv-subhead text-[10px] text-calv-teal hover:bg-calv-teal-35">
+                            {{ $item->isMet() ? 'Review income' : 'Enter income' }}
+                        </button>
+                    @endif
+                    <button type="button"
+                            wire:click="$dispatch('act-on-requirement', { id: {{ $item->id }} })"
+                            class="px-2.5 py-1 rounded-calv-sm border border-calv-slate-35 calv-subhead text-[10px] text-calv-slate hover:bg-calv-sand-15">
+                        {{ $primaryActionLabel }}
+                    </button>
+                </div>
             </div>
         @empty
             <div class="px-3 py-8 text-center text-[13px] text-calv-slate-65">

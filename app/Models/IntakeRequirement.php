@@ -7,6 +7,7 @@ use App\Traits\HasStandardMediaCollections;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -54,6 +55,13 @@ class IntakeRequirement extends Model implements HasMedia, HasMediaAuthorization
     {
         return $user->hasPermission('communications_log.view');
     }
+
+    /**
+     * The standing income-eligibility requirement stamped on every
+     * intake. Its figures live in IntakeIncomeAssessment; its proof
+     * documents live on this row's 'documents' media collection.
+     */
+    public const KEY_INCOME_ELIGIBILITY = 'income-eligibility';
 
     public const TYPE_DOCUMENT = 'document';
 
@@ -170,6 +178,18 @@ class IntakeRequirement extends Model implements HasMedia, HasMediaAuthorization
     public function definition(): BelongsTo
     {
         return $this->belongsTo(RequirementDefinition::class, 'source_definition_id');
+    }
+
+    /** The income figures behind the standing income-eligibility row. */
+    public function incomeAssessment(): HasOne
+    {
+        return $this->hasOne(IntakeIncomeAssessment::class, 'intake_requirement_id');
+    }
+
+    /** True for the standing income-eligibility requirement. */
+    public function isIncomeEligibility(): bool
+    {
+        return $this->key === self::KEY_INCOME_ELIGIBILITY;
     }
 
     // Scopes

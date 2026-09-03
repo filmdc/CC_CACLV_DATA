@@ -64,6 +64,68 @@ class IntakeRequirementInstantiator
     }
 
     /**
+     * The standing income-eligibility requirement.
+     *
+     * Every log that graduates to an intake gets one: household income
+     * has to be captured and placed against the HHS poverty guidelines
+     * before any fund can be committed, regardless of which county or
+     * fund codes are in play. Called from forHousingService() and
+     * reconcileTaggedServices() — attaching a service is exactly what
+     * CommunicationLog::computeAutoCategory() treats as graduation.
+     *
+     * Idempotent on (communication_log_id, key). The atom is
+     * self-healing via firstOrCreate so environments that predate this
+     * feature pick it up without a data migration; withTrashed() keeps
+     * a deliberately-retired library entry from being duplicated.
+     *
+     * via[] is tagged 'standard' rather than 'service:N' on purpose:
+     * income eligibility is not owned by any one service, so detaching
+     * the service that first triggered it must not orphan it.
+     */
+    public function incomeEligibility(CommunicationLog $log, User $actor): IntakeRequirement
+    {
+        $atom = RequirementDefinition::withTrashed()->firstOrCreate(
+            ['key' => IntakeRequirement::KEY_INCOME_ELIGIBILITY],
+            [
+                'label' => 'Income Eligibility',
+                'kind' => RequirementDefinition::KIND_DOC,
+                'category' => RequirementDefinition::CATEGORY_ELIGIBILITY,
+                'default_required' => true,
+                'hint' => 'Annual household income, household size, and proof: pay stubs, tax return, benefit letters.',
+                'created_by_user_id' => $actor->id,
+            ]
+        );
+
+        $existing = IntakeRequirement::query()
+            ->where('communication_log_id', $log->id)
+            ->where('key', IntakeRequirement::KEY_INCOME_ELIGIBILITY)
+            ->first();
+
+        if ($existing !== null) {
+            $this->mergeViaTags($existing, ['standard'], $actor);
+            if ($existing->is_orphaned) {
+                $existing->unmarkOrphaned($actor);
+            }
+
+            return $existing;
+        }
+
+        return $this->insert($log, [
+            // Document type so the existing upload plumbing carries the
+            // pay stubs / tax return / benefit letters this collects.
+            'type' => IntakeRequirement::TYPE_DOCUMENT,
+            'label' => $atom->label,
+            'key' => $atom->key,
+            'kind' => $atom->kind,
+            'via' => ['standard'],
+            'source_type' => IntakeRequirement::SOURCE_DEFINITION,
+            'source_template_id' => null,
+            'source_definition_id' => $atom->id,
+            'source_label_snapshot' => $atom->label,
+        ], $actor);
+    }
+
+    /**
      * For every FundCodeRequirement template on the fund code WHERE
      * phase='eligibility', create one IntakeRequirement on the log.
      *
@@ -369,6 +431,11 @@ class IntakeRequirementInstantiator
         return DB::transaction(function () use ($log, $service, $actor, $serviceTag) {
             $result = collect();
 
+            // Graduation to an intake: income eligibility is standing,
+            // not service-specific, so it is stamped before anything the
+            // service itself contributes.
+            $result->push($this->incomeEligibility($log, $actor));
+
             // Phase 10 — bundle path removed. Atoms link directly to
             // services now via housing_service_definitions (and to fund
             // codes via fund_code_requirement_definitions, picked up
@@ -481,6 +548,12 @@ class IntakeRequirementInstantiator
                         $req->markOrphaned($actor);
                     }
                 }
+            }
+
+            if (! empty($toAdd)) {
+                // Attaching a service is what makes this an intake; the
+                // standing income-eligibility requirement comes with it.
+                $this->incomeEligibility($log, $actor);
             }
 
             foreach ($toAdd as $serviceId) {

@@ -124,7 +124,10 @@ it('reconcileTaggedServices on add applies every bundle linked to the service', 
 
     $this->service->reconcileTaggedServices($log, [$service->id], $this->actor);
 
-    $instances = IntakeRequirement::where('communication_log_id', $log->id)->get();
+    // Excludes the standing income-eligibility row, which every
+    // graduation stamps regardless of which service triggered it.
+    $instances = IntakeRequirement::where('communication_log_id', $log->id)
+        ->where('key', '!=', IntakeRequirement::KEY_INCOME_ELIGIBILITY)->get();
     expect($instances)->toHaveCount(1);
     // Service-triggered instances are tagged with the SERVICE only (not the
     // bundle) so that detaching the service correctly orphans them when
@@ -145,7 +148,8 @@ it('reconcileTaggedServices on remove orphans template_set-sourced instances wit
     $this->service->reconcileTaggedServices($log, [$service->id], $this->actor);
     $this->service->reconcileTaggedServices($log, [], $this->actor);
 
-    $instance = IntakeRequirement::where('communication_log_id', $log->id)->firstOrFail();
+    $instance = IntakeRequirement::where('communication_log_id', $log->id)
+        ->where('key', '!=', IntakeRequirement::KEY_INCOME_ELIGIBILITY)->firstOrFail();
     expect($instance->is_orphaned)->toBeTrue();
     expect($instance->via)->toBeEmpty();
 })->group('regression');
@@ -167,7 +171,8 @@ it('reconcileTaggedServices on remove keeps definition-sourced (manually picked)
     // Detach the service.
     $this->service->reconcileTaggedServices($log, [], $this->actor);
 
-    $instance = IntakeRequirement::where('communication_log_id', $log->id)->firstOrFail();
+    $instance = IntakeRequirement::where('communication_log_id', $log->id)
+        ->where('key', '!=', IntakeRequirement::KEY_INCOME_ELIGIBILITY)->firstOrFail();
     expect($instance->is_orphaned)->toBeFalse();
     expect($instance->source_type)->toBe(IntakeRequirement::SOURCE_DEFINITION);
     expect($instance->via)->toContain('definition:'.$atom->id);

@@ -1025,6 +1025,20 @@
 
                 </section>{{-- /Focus 3 --}}
 
+                {{-- Income eligibility calculator (opened from the income row
+                     in the requirements panel). Shares its logic with the homes
+                     portal via App\Livewire\Concerns\ManagesIncomeEligibility. --}}
+                @if($showIncomeModal)
+                    <x-comm.income-eligibility-modal
+                        :log="$viewingLog"
+                        :preview="$this->incomePreview"
+                        :sources="$incomeSources"
+                        :source-types="\App\Models\IntakeIncomeAssessment::SOURCE_TYPES"
+                        :doc-types="\App\Models\IntakeIncomeAssessment::DOC_TYPES"
+                        :doc-groups="$this->incomeDocumentGroups()"
+                        :period="$incomeForm['entry_period']" />
+                @endif
+
                 {{-- Per-row action modal (opened by panel's act-on-requirement event). --}}
                 @if($actingOnRequirementId)
                     @php $actingReq = \App\Models\IntakeRequirement::find($actingOnRequirementId); @endphp
