@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Concerns\ManagesIncomeEligibility;
 use App\Models\CommunicationLog;
 use App\Models\CommunicationLogUpdate;
 use App\Models\Contractor;
@@ -25,7 +26,7 @@ use Livewire\WithPagination;
 
 class CommunicationsLogManagement extends Component
 {
-    use WithFileUploads, WithPagination, WithPermissionChecks, WithProgramAccess;
+    use ManagesIncomeEligibility, WithFileUploads, WithPagination, WithPermissionChecks, WithProgramAccess;
 
     // Search and Filters
     public $search = '';
@@ -1062,6 +1063,19 @@ class CommunicationsLogManagement extends Component
         $this->adHocReqLabel = '';
         $this->adHocReqType = \App\Models\IntakeRequirement::TYPE_DOCUMENT;
         $this->resetErrorBag(['adHocReqLabel', 'adHocReqType']);
+    }
+
+    // ── Income eligibility (shared trait hooks) ───────────────────
+
+    /**
+     * The intake the calculator operates on: whichever log the viewer
+     * panel currently has open.
+     */
+    protected function incomeEligibilityLog(): ?CommunicationLog
+    {
+        return $this->viewingId
+            ? CommunicationLog::find($this->viewingId)
+            : null;
     }
 
     public function cancelAdHocRequirement(): void

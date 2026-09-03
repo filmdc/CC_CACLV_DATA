@@ -27,11 +27,16 @@ it('forHousingService stamps atoms attached directly to the service (Phase 10: b
     // Phase 10: atoms link directly to the service, no bundle wrapper.
     $svc->requirementDefinitions()->attach($atom->id, ['created_at' => now()]);
 
-    $result = $this->service->forHousingService($log, $svc, $this->actor);
+    // The standing income-eligibility row rides along on every graduation;
+    // it is not service-sourced, so it is excluded from what this pins.
+    $result = $this->service->forHousingService($log, $svc, $this->actor)
+        ->reject(fn ($r) => $r->key === IntakeRequirement::KEY_INCOME_ELIGIBILITY);
 
     expect($result)->toHaveCount(1);
-    expect(IntakeRequirement::where('communication_log_id', $log->id)->count())->toBe(1);
-    $req = IntakeRequirement::where('communication_log_id', $log->id)->first();
+    expect(IntakeRequirement::where('communication_log_id', $log->id)
+        ->where('key', '!=', IntakeRequirement::KEY_INCOME_ELIGIBILITY)->count())->toBe(1);
+    $req = IntakeRequirement::where('communication_log_id', $log->id)
+        ->where('key', '!=', IntakeRequirement::KEY_INCOME_ELIGIBILITY)->first();
     expect($req->via)->toBe(['service:'.$svc->id]);
 })->group('regression');
 
@@ -41,7 +46,8 @@ it('forHousingService stamps directly-linked atoms (no bundle)', function () {
     $atom = RequirementDefinition::factory()->create(['key' => 'hmis-consent', 'kind' => 'form']);
     $svc->requirementDefinitions()->attach($atom->id, ['created_at' => now()]);
 
-    $result = $this->service->forHousingService($log, $svc, $this->actor);
+    $result = $this->service->forHousingService($log, $svc, $this->actor)
+        ->reject(fn ($r) => $r->key === IntakeRequirement::KEY_INCOME_ELIGIBILITY);
 
     expect($result)->toHaveCount(1);
     $req = $result->first();
@@ -72,7 +78,11 @@ it('forHousingService is idempotent — re-running merges via tags', function ()
     $this->service->forHousingService($log, $svc, $this->actor);
     $this->service->forHousingService($log, $svc, $this->actor);
 
-    expect(IntakeRequirement::where('communication_log_id', $log->id)->count())->toBe(1);
+    expect(IntakeRequirement::where('communication_log_id', $log->id)
+        ->where('key', '!=', IntakeRequirement::KEY_INCOME_ELIGIBILITY)->count())->toBe(1);
+    // ...and the standing row is stamped exactly once too.
+    expect(IntakeRequirement::where('communication_log_id', $log->id)
+        ->where('key', IntakeRequirement::KEY_INCOME_ELIGIBILITY)->count())->toBe(1);
 })->group('regression');
 
 it('forHousingService preserves fund codes already on the log', function () {

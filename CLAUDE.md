@@ -248,6 +248,16 @@ Two parallel requirement systems share the `fund_code_requirements` template tab
 
 Both consume `fund_code_requirements` as templates. The `phase` column on that table determines which system instantiates which row. Intake requirements stay attached to the Comm Log after promotion as historical record; they do NOT migrate to the new `HousingJob`.
 
+#### Income eligibility (standing intake requirement)
+
+Every Comm Log that graduates to an intake — i.e. gets a service or housing service attached, the same condition `CommunicationLog::computeAutoCategory()` uses — is stamped with a standing `income-eligibility` IntakeRequirement by `IntakeRequirementInstantiator::incomeEligibility()`. It is called from `forHousingService()` and `reconcileTaggedServices()`, is idempotent on `(communication_log_id, key)`, and is tagged `via: ['standard']` so detaching the service that triggered it never orphans it. The library atom is self-healing (`firstOrCreate` on the key), so no data migration is needed to adopt it; `2026_09_01_120100_backfill_income_eligibility_requirements` stamps the row onto already-open, unconverted intakes.
+
+The figures live in `intake_income_assessments` (`App\Models\IntakeIncomeAssessment`), one row per log. Income can be entered as a lump total or itemized by source, in monthly or annual dollars — `App\Services\Intake\IncomeEligibilityCalculator` annualizes and places the household against the app's existing `poverty_guidelines` table. `guideline_year` / `poverty_threshold` / `poverty_percentage` / `poverty_bracket` are a **snapshot**, not a live view: HHS republishes every January and a determination must keep reading the way it read the year it was made. `PovertyGuideline::thresholdFor()` / `bracketFor()` carry the >4-person extrapolation the old `calculatePovertyPercentage()` had inline.
+
+Proof documents (pay stubs, tax return, benefit letters) hang off the requirement's existing Spatie `documents` collection, tagged with an `income_doc_type` custom property, so media authorization and downloads are unchanged.
+
+Both front doors share `App\Livewire\Concerns\ManagesIncomeEligibility` — only the modal markup differs (`resources/views/components/comm/income-eligibility-modal.blade.php` for the main app, `resources/views/livewire/homes/partials/income-eligibility.blade.php` for the portal). Saving a complete assessment marks the requirement received, which feeds the Phase-1 conversion gate. Tests: `tests/Feature/Regression/IntakeRequirements/IncomeEligibilityTest.php`.
+
 Fund-code association on `CommunicationLog` is via the `anticipatedFundCodes()` relation (table `communication_log_anticipated_fund_codes`). The legacy `communication_log_fund_code` tag pivot was dropped in P-39b.
 
 #### Housing Module

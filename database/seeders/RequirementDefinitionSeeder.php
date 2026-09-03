@@ -29,6 +29,7 @@ class RequirementDefinitionSeeder extends Seeder
         // ── Phase 1: intake / eligibility ──────────────────────────
         ['key' => 'application', 'label' => 'Application', 'kind' => 'doc', 'category' => 'eligibility', 'default_required' => true, 'hint' => null],
         ['key' => 'benefit-letter', 'label' => 'Benefit Letter', 'kind' => 'doc', 'category' => 'eligibility', 'default_required' => true, 'hint' => null],
+        ['key' => 'income-eligibility', 'label' => 'Income Eligibility', 'kind' => 'doc', 'category' => 'eligibility', 'default_required' => true, 'hint' => 'Annual household income, household size, and proof: pay stubs, tax return, benefit letters.'],
         ['key' => 'homeowners-insurance', 'label' => 'Homeowners Insurance', 'kind' => 'doc', 'category' => 'eligibility', 'default_required' => true, 'hint' => null],
         ['key' => 'pay-stubs', 'label' => 'Pay Stubs', 'kind' => 'doc', 'category' => 'eligibility', 'default_required' => true, 'hint' => null],
         ['key' => 'photo-id', 'label' => 'Photo ID', 'kind' => 'doc', 'category' => 'eligibility', 'default_required' => true, 'hint' => "Driver's license"],

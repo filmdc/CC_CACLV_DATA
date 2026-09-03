@@ -80,8 +80,11 @@ it('save persists the housing-service pivot AND stamps requirements via the inst
     // Fund codes persisted (toggle pre-merged them into selection).
     expect($log->anticipatedFundCodes->pluck('id')->all())->toContain($fund->id);
 
-    // Requirement instantiated from the service's atom.
-    $req = $log->intakeRequirements()->first();
+    // Requirement instantiated from the service's atom (the standing
+    // income-eligibility row is stamped alongside it, not by the service).
+    $req = $log->intakeRequirements()
+        ->where('key', '!=', \App\Models\IntakeRequirement::KEY_INCOME_ELIGIBILITY)
+        ->first();
     expect($req)->not->toBeNull();
     expect($req->key)->toBe('photo-id');
     expect($req->via)->toContain('service:'.$svc->id);

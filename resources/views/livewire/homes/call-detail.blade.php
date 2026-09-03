@@ -143,16 +143,25 @@
                                 @endif
                                 @if($canEdit)
                                     <span class="inline-flex gap-1.5 shrink-0">
-                                        @unless($r['met'])
-                                            @if($r['type'] === 'document')
-                                                <button type="button" wire:click="openUpload({{ $r['id'] }})" class="calv-btn calv-btn--secondary calv-btn--sm">Upload</button>
-                                            @endif
-                                            <button type="button" wire:click="markReceived({{ $r['id'] }})" class="calv-btn calv-btn--quiet calv-btn--sm">Received</button>
-                                            {{-- Nudge is intentionally not surfaced: the PM chases people
-                                                 herself, so the portal does not offer a system nudge. The
-                                                 handler is kept dormant (CallDetail::nudge) — re-enable by
-                                                 restoring a button here. --}}
-                                        @endunless
+                                        @if($r['is_income'])
+                                            {{-- The income row is satisfied by the figures, not by a
+                                                 file, so it opens the calculator instead of Upload/Received.
+                                                 It stays available after it's met so she can revise. --}}
+                                            <button type="button" wire:click="openIncomeEligibility" class="calv-btn calv-btn--secondary calv-btn--sm">
+                                                {{ $r['met'] ? 'Review income' : 'Enter income' }}
+                                            </button>
+                                        @else
+                                            @unless($r['met'])
+                                                @if($r['type'] === 'document')
+                                                    <button type="button" wire:click="openUpload({{ $r['id'] }})" class="calv-btn calv-btn--secondary calv-btn--sm">Upload</button>
+                                                @endif
+                                                <button type="button" wire:click="markReceived({{ $r['id'] }})" class="calv-btn calv-btn--quiet calv-btn--sm">Received</button>
+                                                {{-- Nudge is intentionally not surfaced: the PM chases people
+                                                     herself, so the portal does not offer a system nudge. The
+                                                     handler is kept dormant (CallDetail::nudge) — re-enable by
+                                                     restoring a button here. --}}
+                                            @endunless
+                                        @endif
                                         {{-- Everything else — waive, doesn't apply, undo, note, files --}}
                                         <button type="button" wire:click="openRequirementActions({{ $r['id'] }})"
                                                 class="calv-btn calv-btn--ghost calv-btn--sm"
@@ -160,6 +169,20 @@
                                     </span>
                                 @endif
                             </div>
+                            @if($r['is_income'])
+                                <div class="text-[11px] -mt-1" style="color: var(--calv-slate-65); padding-left: 24px;">
+                                    @if($incomeAssessment && $incomeAssessment->annual_income !== null)
+                                        ${{ number_format((float) $incomeAssessment->annual_income, 0) }}/yr · household of {{ $incomeAssessment->household_size }}
+                                        @if($incomeAssessment->poverty_percentage !== null)
+                                            · <strong style="color: var(--calv-slate);">{{ $incomeAssessment->determination_label }}</strong>
+                                        @else
+                                            · no poverty guideline loaded for this household size
+                                        @endif
+                                    @else
+                                        Annual income, household size, and proof — pay stubs, tax return, benefit letters.
+                                    @endif
+                                </div>
+                            @endif
                             @if($r['worker_note'])
                                 <div class="text-[11px] -mt-1" style="color: var(--calv-slate-65); padding-left: 24px;">{{ Str::limit($r['worker_note'], 140) }}</div>
                             @endif
@@ -682,6 +705,11 @@
                 </footer>
             </div>
         </div>
+    @endif
+
+    {{-- Income eligibility calculator --}}
+    @if($showIncomeModal)
+        @include('livewire.homes.partials.income-eligibility')
     @endif
 
     {{-- Delete confirmation. Explicit Cancel only — no backdrop/Escape close. --}}
