@@ -21,7 +21,7 @@
         <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-700">
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Income eligibility</h3>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                Household income and percent of poverty for this intake
+                Household income and eligibility percentage for this intake
                 @if($log) · COMM-{{ $log->id }} @endif
             </p>
         </div>
@@ -98,7 +98,7 @@
                 @if($preview['available'] ?? false)
                     <div class="text-3xl font-bold text-emerald-700 dark:text-emerald-300 leading-none">
                         {{ rtrim(rtrim(number_format($preview['percentage'], 1, '.', ''), '0'), '.') }}%
-                        <span class="text-sm font-normal text-gray-600 dark:text-gray-300">of the federal poverty level</span>
+                        <span class="text-sm font-normal text-gray-600 dark:text-gray-300">of {{ $preview['basis'] }}</span>
                     </div>
                     <div class="mt-2 text-xs text-gray-700 dark:text-gray-300">
                         ${{ number_format($preview['annual_income'], 2) }} a year
@@ -106,17 +106,17 @@
                         · household of {{ $preview['household_size'] }}
                         · {{ $preview['guideline_year'] }} guideline for that size is ${{ number_format($preview['threshold'], 2) }}
                         @if($preview['bracket'])
-                            · at or under {{ $preview['bracket'] }}% FPL
+                            · at or under {{ $preview['bracket'] }}% {{ $preview['bracket_unit'] }}
                         @else
-                            · above the highest published bracket (500% FPL)
+                            · above the highest published bracket (500% {{ $preview['bracket_unit'] }})
                         @endif
                     </div>
                 @else
                     <div class="text-sm text-gray-700 dark:text-gray-300">
                         @if(($preview['annual_income'] ?? null) === null || empty($preview['household_size']))
-                            <strong>Enter a household size and an income</strong> to see the percent of poverty.
+                            <strong>Enter a household size and an income</strong> to see the eligibility percentage.
                         @else
-                            <strong>No poverty guidelines are loaded</strong> for a household of {{ $preview['household_size'] }}.
+                            <strong>No income guidelines are loaded</strong> for a household of {{ $preview['household_size'] }}.
                             The income still saves; the percentage stays blank until the guideline year is added under Poverty Guidelines.
                         @endif
                     </div>
