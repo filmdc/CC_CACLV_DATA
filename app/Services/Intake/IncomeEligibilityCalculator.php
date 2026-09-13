@@ -20,6 +20,12 @@ use App\Models\PovertyGuideline;
  * table. Monthly entry is annualized first (×12) rather than compared
  * to the monthly table, because the monthly rows are rounded to whole
  * dollars and comparing against them drifts by a percent or two.
+ *
+ * The $region picks the dataset: the default is the HHS federal
+ * poverty guidelines; housing intakes pass
+ * PovertyGuideline::REGION_HOME_ABE to read the HUD HOME income limits
+ * instead (same table, same arithmetic — only the rows and the label
+ * change). See ManagesIncomeEligibility::incomeGuidelineRegion().
  */
 class IncomeEligibilityCalculator
 {
@@ -63,7 +69,7 @@ class IncomeEligibilityCalculator
      * false when no guideline covers the requested year/region/size, so
      * callers can say "no guidelines loaded" instead of showing 0%.
      *
-     * @return array{annual_income: float|null, monthly_income: float|null, household_size: int|null, guideline_year: int|null, guideline_region: string, threshold: float|null, percentage: float|null, bracket: int|null, label: string|null, available: bool}
+     * @return array{annual_income: float|null, monthly_income: float|null, household_size: int|null, guideline_year: int|null, guideline_region: string, threshold: float|null, percentage: float|null, bracket: int|null, basis: string, bracket_unit: string, label: string|null, available: bool}
      */
     public function assess($annualIncome, $householdSize, ?int $year = null, string $region = self::REGION_DEFAULT): array
     {
@@ -82,6 +88,8 @@ class IncomeEligibilityCalculator
             'threshold' => null,
             'percentage' => null,
             'bracket' => null,
+            'basis' => $this->basisFor($resolvedYear, $region),
+            'bracket_unit' => $region === PovertyGuideline::REGION_HOME_ABE ? 'of the HOME limit' : 'FPL',
             'label' => null,
             'available' => false,
         ];
@@ -103,9 +111,27 @@ class IncomeEligibilityCalculator
             'threshold' => $threshold,
             'percentage' => $percentage,
             'bracket' => $bracket,
-            'label' => $this->format($percentage).'% of the '.$resolvedYear.' federal poverty level',
+            'label' => $this->format($percentage).'% of '.$base['basis'],
             'available' => true,
         ]);
+    }
+
+    /**
+     * What the percentage is a percentage OF, worded for the dataset:
+     * "the 2025 federal poverty level" or, for housing intakes,
+     * "the FY2026 HOME income limit (80% AMI)".
+     */
+    public function basisFor(?int $year, string $region): string
+    {
+        if ($region === PovertyGuideline::REGION_HOME_ABE) {
+            return $year === null
+                ? 'the HOME income limit (80% AMI)'
+                : 'the FY'.$year.' HOME income limit (80% AMI)';
+        }
+
+        return $year === null
+            ? 'the federal poverty level'
+            : 'the '.$year.' federal poverty level';
     }
 
     /**
