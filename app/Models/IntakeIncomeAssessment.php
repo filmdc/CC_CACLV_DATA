@@ -119,16 +119,28 @@ class IntakeIncomeAssessment extends Model
         return self::DOC_TYPES[$type] ?? self::DOC_TYPES['other'];
     }
 
-    /** e.g. "143% of the 2025 federal poverty level". */
+    /**
+     * e.g. "143% of the 2025 federal poverty level", or — for housing
+     * intakes snapshotted against the HUD HOME limits — "64% of the
+     * FY2026 HOME income limit (80% AMI)". Reads guideline_region so a
+     * determination keeps describing the table it was measured against.
+     */
     public function getDeterminationLabelAttribute(): ?string
     {
         if ($this->poverty_percentage === null) {
             return null;
         }
 
+        $percentage = rtrim(rtrim(number_format((float) $this->poverty_percentage, 1), '0'), '.');
+
+        if ($this->guideline_region === PovertyGuideline::REGION_HOME_ABE) {
+            $year = $this->guideline_year ? 'FY'.$this->guideline_year.' ' : '';
+
+            return $percentage.'% of the '.$year.'HOME income limit (80% AMI)';
+        }
+
         $year = $this->guideline_year ? $this->guideline_year.' ' : '';
 
-        return rtrim(rtrim(number_format((float) $this->poverty_percentage, 1), '0'), '.')
-            .'% of the '.$year.'federal poverty level';
+        return $percentage.'% of the '.$year.'federal poverty level';
     }
 }

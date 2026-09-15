@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             InitialSetupSeeder::class,
             PovertyGuidelinesSeeder::class,
+            HomeIncomeLimitsSeeder::class, // HUD HOME income limits — housing projects module income qualification
             ReferenceDataSeeder::class,
             ProjectHousingPermissionsSeeder::class, // Consolidated permissions seeder - must run before HousingModuleSeeder
             IntakeRequirementsPermissionsSeeder::class, // P-39b (addendum D-4): intake-phase permissions

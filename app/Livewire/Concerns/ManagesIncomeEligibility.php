@@ -5,6 +5,7 @@ namespace App\Livewire\Concerns;
 use App\Models\CommunicationLog;
 use App\Models\IntakeIncomeAssessment;
 use App\Models\IntakeRequirement;
+use App\Models\PovertyGuideline;
 use App\Services\Intake\IncomeEligibilityCalculator;
 use Illuminate\Support\Facades\Auth;
 
@@ -49,6 +50,24 @@ trait ManagesIncomeEligibility
     protected function incomeFlashKey(): string
     {
         return 'success';
+    }
+
+    /**
+     * Which guideline dataset this intake qualifies against. Housing
+     * intakes — any log with a housing service attached — are measured
+     * against the HUD HOME income limits; everything else reads the
+     * HHS federal poverty guidelines. Derived from the intake itself
+     * (not the surface), so both front doors can never disagree.
+     */
+    protected function incomeGuidelineRegion(): string
+    {
+        $log = $this->incomeEligibilityLog();
+
+        if ($log !== null && $log->housingServices()->exists()) {
+            return PovertyGuideline::REGION_HOME_ABE;
+        }
+
+        return IncomeEligibilityCalculator::REGION_DEFAULT;
     }
 
     // ── Opening / closing ─────────────────────────────────────────
@@ -143,7 +162,7 @@ trait ManagesIncomeEligibility
             $this->incomeForm['entry_period'] ?? 'annual'
         );
 
-        return $calc->assess($annual, $this->incomeForm['household_size'] ?? null);
+        return $calc->assess($annual, $this->incomeForm['household_size'] ?? null, null, $this->incomeGuidelineRegion());
     }
 
     // ── Persistence ───────────────────────────────────────────────
@@ -187,7 +206,7 @@ trait ManagesIncomeEligibility
             return;
         }
 
-        $assessed = $calc->assess($annual, $this->incomeForm['household_size']);
+        $assessed = $calc->assess($annual, $this->incomeForm['household_size'], null, $this->incomeGuidelineRegion());
         $requirement = $this->incomeRequirement();
         $actor = Auth::user();
 
@@ -234,7 +253,7 @@ trait ManagesIncomeEligibility
             $this->incomeFlashKey(),
             $assessed['available']
                 ? 'Income eligibility saved — '.$assessed['label'].'.'
-                : 'Income eligibility saved. No poverty guidelines are loaded for this household size yet, so no percentage was calculated.'
+                : 'Income eligibility saved. No income guidelines are loaded for this household size yet, so no percentage was calculated.'
         );
     }
 

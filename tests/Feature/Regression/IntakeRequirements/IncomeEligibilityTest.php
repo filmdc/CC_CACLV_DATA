@@ -10,6 +10,11 @@
 | service detach, the calculator's arithmetic (lump total, itemized,
 | monthly annualization, >4-person extrapolation), the persisted
 | determination snapshot, and the requirement transition on save.
+|
+| Housing intakes (any log with a housing service attached) are
+| measured against the HUD HOME income limits instead of the HHS
+| guidelines — region routing, the HOME dataset itself, and HUD's
+| over-8 extrapolation are covered here too.
 |----------------------------------------------------------------------
 */
 
@@ -25,6 +30,7 @@ use App\Models\Role;
 use App\Models\User;
 use App\Services\Intake\IncomeEligibilityCalculator;
 use App\Services\IntakeRequirementInstantiator;
+use Database\Seeders\HomeIncomeLimitsSeeder;
 use Database\Seeders\RegressionTestSeeder;
 use Livewire\Livewire;
 use Tests\Support\RegressionHelpers;
@@ -49,6 +55,10 @@ beforeEach(function () {
             ]
         );
     }
+
+    // FY2026 HOME income limits (housing intakes) — the real seeder,
+    // so its figures are pinned by these tests too.
+    $this->seed(HomeIncomeLimitsSeeder::class);
 });
 
 // -----------------------------------------------------------------
@@ -175,6 +185,37 @@ it('reports unavailable rather than 0% when no guideline year is loaded', functi
 })->group('regression');
 
 // -----------------------------------------------------------------
+// HOME income limits (housing intakes)
+// -----------------------------------------------------------------
+
+it('places a household against the HOME income limits when asked for that region', function () {
+    // FY2026 LOW INCOME (80% AMI) ceiling for a household of 4 is $83,500.
+    $result = $this->calc->assess(83500, 4, 2026, PovertyGuideline::REGION_HOME_ABE);
+
+    expect($result['available'])->toBeTrue()
+        ->and($result['threshold'])->toBe(83500.0)
+        ->and($result['percentage'])->toBe(100.0)
+        ->and($result['bracket'])->toBe(100)
+        ->and($result['guideline_region'])->toBe(PovertyGuideline::REGION_HOME_ABE)
+        ->and($result['label'])->toBe('100% of the FY2026 HOME income limit (80% AMI)');
+})->group('regression');
+
+it('extrapolates HOME limits above eight people by HUD\'s +8%-of-the-4-person-limit rule', function () {
+    // Size 8 ($110,250) + 2 × 8% × $83,500 = $123,610 — NOT the HHS increment.
+    $threshold = PovertyGuideline::thresholdFor(10, 'annual', 2026, PovertyGuideline::REGION_HOME_ABE);
+
+    expect($threshold)->toBe(123610.0);
+})->group('regression');
+
+it('falls back to the newest HOME year loaded when the requested year is not seeded', function () {
+    $result = $this->calc->assess(50000, 6, 1999, PovertyGuideline::REGION_HOME_ABE);
+
+    expect($result['guideline_year'])->toBe(2026)
+        ->and($result['available'])->toBeTrue()
+        ->and($result['threshold'])->toBe(96900.0);
+})->group('regression');
+
+// -----------------------------------------------------------------
 // Capture through the portal
 // -----------------------------------------------------------------
 
@@ -195,6 +236,9 @@ it('saves the figures, snapshots the determination, and marks the requirement re
     $log = CommunicationLog::factory()->create();
     $svc = HousingService::factory()->create();
     $this->service->forHousingService($log, $svc, $this->actor);
+    // forHousingService() stamps the requirements; attaching the pivot is
+    // what toggleCounty does — and what incomeGuidelineRegion() reads.
+    $log->housingServices()->attach($svc->id, ['created_by_user_id' => $this->actor->id, 'created_at' => now()]);
 
     Livewire::actingAs(incomeUser())
         ->test(CallDetail::class, ['log' => $log])
@@ -207,14 +251,17 @@ it('saves the figures, snapshots the determination, and marks the requirement re
 
     $assessment = IntakeIncomeAssessment::where('communication_log_id', $log->id)->first();
 
+    // A housing service is attached, so the snapshot reads against the
+    // FY2026 HOME limits (4-person ceiling $83,500), not the HHS table.
     expect($assessment)->not->toBeNull()
         ->and((float) $assessment->annual_income)->toBe(24000.0)
         ->and((float) $assessment->monthly_income)->toBe(2000.0)
         ->and($assessment->household_size)->toBe(4)
-        ->and($assessment->guideline_year)->toBe(2025)
-        ->and((float) $assessment->poverty_threshold)->toBe(32150.0)
-        ->and((float) $assessment->poverty_percentage)->toBe(74.65)
-        ->and($assessment->poverty_bracket)->toBe(75)
+        ->and($assessment->guideline_year)->toBe(2026)
+        ->and($assessment->guideline_region)->toBe(PovertyGuideline::REGION_HOME_ABE)
+        ->and((float) $assessment->poverty_threshold)->toBe(83500.0)
+        ->and((float) $assessment->poverty_percentage)->toBe(28.74)
+        ->and($assessment->poverty_bracket)->toBe(50)
         ->and($assessment->income_sources)->toHaveCount(1);
 
     $req = IntakeRequirement::where('communication_log_id', $log->id)
@@ -287,6 +334,7 @@ it('renders and saves the same calculator from the main app comm log viewer', fu
     $log = CommunicationLog::factory()->create();
     $svc = HousingService::factory()->create();
     $this->service->forHousingService($log, $svc, $this->actor);
+    $log->housingServices()->attach($svc->id, ['created_by_user_id' => $this->actor->id, 'created_at' => now()]);
 
     Livewire::actingAs(RegressionHelpers::adminUser())
         ->test(\App\Livewire\CommunicationsLogManagement::class)
@@ -303,8 +351,32 @@ it('renders and saves the same calculator from the main app comm log viewer', fu
 
     $assessment = IntakeIncomeAssessment::where('communication_log_id', $log->id)->firstOrFail();
 
-    expect((float) $assessment->poverty_percentage)->toBe(100.0)
+    // Same intake, same dataset as the portal: the housing service
+    // routes the main app's viewer to the HOME limits too
+    // ($26,650 against the 3-person ceiling of $75,150).
+    expect((float) $assessment->poverty_percentage)->toBe(35.46)
+        ->and($assessment->guideline_region)->toBe(PovertyGuideline::REGION_HOME_ABE)
         ->and((float) $assessment->entered_amount)->toBe(26650.0);
+})->group('regression');
+
+it('keeps non-housing intakes on the HHS poverty guidelines', function () {
+    $log = CommunicationLog::factory()->create(); // no housing service attached
+
+    Livewire::actingAs(incomeUser())
+        ->test(CallDetail::class, ['log' => $log])
+        ->call('openIncomeEligibility')
+        ->set('incomeForm.household_size', 4)
+        ->set('incomeSources', [])
+        ->set('incomeForm.entered_amount', '32150')
+        ->call('saveIncomeEligibility')
+        ->assertHasNoErrors();
+
+    $assessment = IntakeIncomeAssessment::where('communication_log_id', $log->id)->firstOrFail();
+
+    expect($assessment->guideline_region)->toBe(IncomeEligibilityCalculator::REGION_DEFAULT)
+        ->and($assessment->guideline_year)->toBe(2025)
+        ->and((float) $assessment->poverty_threshold)->toBe(32150.0)
+        ->and((float) $assessment->poverty_percentage)->toBe(100.0);
 })->group('regression');
 
 it('keeps the income requirement when the service that triggered it is detached', function () {
