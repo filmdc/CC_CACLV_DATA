@@ -236,6 +236,9 @@ it('saves the figures, snapshots the determination, and marks the requirement re
     $log = CommunicationLog::factory()->create();
     $svc = HousingService::factory()->create();
     $this->service->forHousingService($log, $svc, $this->actor);
+    // forHousingService() stamps the requirements; attaching the pivot is
+    // what toggleCounty does — and what incomeGuidelineRegion() reads.
+    $log->housingServices()->attach($svc->id, ['created_by_user_id' => $this->actor->id, 'created_at' => now()]);
 
     Livewire::actingAs(incomeUser())
         ->test(CallDetail::class, ['log' => $log])
@@ -331,6 +334,7 @@ it('renders and saves the same calculator from the main app comm log viewer', fu
     $log = CommunicationLog::factory()->create();
     $svc = HousingService::factory()->create();
     $this->service->forHousingService($log, $svc, $this->actor);
+    $log->housingServices()->attach($svc->id, ['created_by_user_id' => $this->actor->id, 'created_at' => now()]);
 
     Livewire::actingAs(RegressionHelpers::adminUser())
         ->test(\App\Livewire\CommunicationsLogManagement::class)
