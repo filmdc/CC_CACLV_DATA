@@ -54,6 +54,8 @@
 
         <span class="flex-1"></span>
 
+        @include('livewire.homes.partials.sort-control')
+
         @include('livewire.homes.partials.saved-views', ['supportsExpanded' => false])
     </div>
 
@@ -63,6 +65,8 @@
 
     {{-- Rows — pinned projects ride at the top, ahead of the active filter --}}
     <div class="calv-card overflow-hidden">
+        @include('livewire.homes.partials.project-sort-header')
+
         @if($hasPinned)
             @include('livewire.homes.partials.pinned-band', ['count' => $pinnedRows->count()])
             @foreach($pinnedRows as $r)

@@ -76,6 +76,8 @@
             ⇥ Expanded view {{ $expanded ? 'on' : '' }}
         </button>
 
+        @include('livewire.homes.partials.sort-control')
+
         @include('livewire.homes.partials.saved-views', ['supportsExpanded' => true])
     </div>
 
@@ -96,8 +98,27 @@
                 <thead>
                     <tr style="background: var(--calv-slate); color: #fff;">
                         <th style="width: 1%;"><span class="sr-only">Pin</span></th>
-                        @foreach($visible as $h)
-                            <th class="text-left px-3 py-2.5 whitespace-nowrap" style="font-family: var(--font-sub); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;">{{ $h }}</th>
+                        @foreach($visible as $key => $h)
+                            @php $sorted = $this->isSortedBy($key); @endphp
+                            <th
+                                class="text-left whitespace-nowrap"
+                                aria-sort="{{ $sorted ? ($this->sortDir === 'asc' ? 'ascending' : 'descending') : 'none' }}"
+                                style="font-family: var(--font-sub); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 0;">
+                                @if($this->isSortable($key))
+                                    <button
+                                        type="button"
+                                        wire:click="sortBy('{{ $key }}')"
+                                        title="Sort by {{ $h }}"
+                                        class="w-full inline-flex items-center gap-1.5 text-left px-3 py-2.5"
+                                        style="font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; cursor: pointer; border: 0;
+                                               background: {{ $sorted ? 'rgba(255,255,255,.16)' : 'transparent' }};">
+                                        {{ $h }}
+                                        <span aria-hidden="true" style="font-size: 8px; opacity: {{ $sorted ? '1' : '.4' }};">{{ $this->sortArrow($key) ?? '⇅' }}</span>
+                                    </button>
+                                @else
+                                    <span class="block px-3 py-2.5">{{ $h }}</span>
+                                @endif
+                            </th>
                         @endforeach
                         <th></th>
                     </tr>
