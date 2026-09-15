@@ -170,17 +170,48 @@
                                 @endif
                             </div>
                             @if($r['is_income'])
-                                <div class="text-[11px] -mt-1" style="color: var(--calv-slate-65); padding-left: 24px;">
-                                    @if($incomeAssessment && $incomeAssessment->annual_income !== null)
-                                        ${{ number_format((float) $incomeAssessment->annual_income, 0) }}/yr · household of {{ $incomeAssessment->household_size }}
-                                        @if($incomeAssessment->poverty_percentage !== null)
-                                            · <strong style="color: var(--calv-slate);">{{ $incomeAssessment->determination_label }}</strong>
-                                        @else
-                                            · no poverty guideline loaded for this household size
-                                        @endif
-                                    @else
-                                        Annual income, household size, and proof — pay stubs, tax return, benefit letters.
+                                @php
+                                    $hasFigures = $incomeAssessment && $incomeAssessment->annual_income !== null;
+                                    $pct = $hasFigures && $incomeAssessment->poverty_percentage !== null
+                                        ? rtrim(rtrim(number_format((float) $incomeAssessment->poverty_percentage, 1), '0'), '.')
+                                        : null;
+                                @endphp
+                                <div class="-mt-1" style="padding-left: 24px;">
+                                    @if($hasFigures && $pct !== null)
+                                        {{-- The qualification itself, as chips — this is what
+                                             the PM opens the file to find, so it does not sit
+                                             buried in a grey sentence. --}}
+                                        <div class="flex flex-wrap items-center gap-1.5 mb-1">
+                                            <span class="calv-badge calv-badge--teal">
+                                                {{ $pct }}% {{ $incomeAssessment->isHomeDetermination() ? 'of AMI' : 'FPL' }}
+                                            </span>
+                                            @if($incomeAssessment->tier_label)
+                                                <span class="calv-badge">{{ $incomeAssessment->tier_label }}</span>
+                                            @endif
+                                            @if($incomeAssessment->is_income_eligible === true)
+                                                <span class="calv-badge calv-badge--sage">Income eligible</span>
+                                            @elseif($incomeAssessment->is_income_eligible === false)
+                                                <span class="calv-badge calv-badge--amber">Over income</span>
+                                            @endif
+                                        </div>
                                     @endif
+                                    <div class="text-[11px]" style="color: var(--calv-slate-65);">
+                                        @if($hasFigures)
+                                            ${{ number_format((float) $incomeAssessment->annual_income, 0) }}/yr · household of {{ $incomeAssessment->household_size }}
+                                            @if($pct === null)
+                                                · no income guideline loaded for this household size
+                                            @elseif($incomeAssessment->isHomeDetermination() && $incomeAssessment->poverty_threshold !== null)
+                                                · FY{{ $incomeAssessment->guideline_year }} limit ${{ number_format((float) $incomeAssessment->poverty_threshold, 0) }}
+                                                @if($incomeAssessment->area_median_income !== null)
+                                                    · area median ${{ number_format((float) $incomeAssessment->area_median_income, 0) }}
+                                                @endif
+                                            @elseif(! $incomeAssessment->isHomeDetermination())
+                                                · {{ $incomeAssessment->determination_label }}
+                                            @endif
+                                        @else
+                                            Annual income, household size, and proof — pay stubs, tax return, benefit letters.
+                                        @endif
+                                    </div>
                                 </div>
                             @endif
                             @if($r['worker_note'])

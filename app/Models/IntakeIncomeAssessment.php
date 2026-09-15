@@ -12,9 +12,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * One per CommunicationLog. The determination columns
  * (guideline_year / guideline_region / poverty_threshold /
- * poverty_percentage / poverty_bracket) are a snapshot taken at save
- * time — HHS republishes the guidelines every January, and a 2025
+ * area_median_income / poverty_percentage / poverty_bracket) are a
+ * snapshot taken at save time — HHS republishes the guidelines every
+ * January and HUD reissues the HOME limits every year, and a 2025
  * intake has to keep reading the way it read in 2025.
+ *
+ * For housing (HOME) determinations the two money columns mean
+ * different things and both matter: poverty_threshold is the 80%-AMI
+ * ceiling the household was judged ELIGIBLE against, while
+ * area_median_income is what poverty_percentage is a percentage OF.
+ * poverty_bracket then holds HUD's band (30/50/60/80) rather than an
+ * FPL bracket.
  *
  * Supporting documents live on the parent IntakeRequirement's Spatie
  * 'documents' collection, tagged with an `income_doc_type` custom
@@ -62,6 +70,7 @@ class IntakeIncomeAssessment extends Model
         'guideline_year',
         'guideline_region',
         'poverty_threshold',
+        'area_median_income',
         'poverty_percentage',
         'poverty_bracket',
         'calculated_at',
@@ -78,6 +87,7 @@ class IntakeIncomeAssessment extends Model
         'annual_income' => 'decimal:2',
         'guideline_year' => 'integer',
         'poverty_threshold' => 'decimal:2',
+        'area_median_income' => 'decimal:2',
         'poverty_percentage' => 'decimal:2',
         'poverty_bracket' => 'integer',
         'calculated_at' => 'datetime',
@@ -109,6 +119,42 @@ class IntakeIncomeAssessment extends Model
         return $this->annual_income !== null && (int) $this->household_size > 0;
     }
 
+    /** True for a determination measured against the HUD HOME limits. */
+    public function isHomeDetermination(): bool
+    {
+        return $this->guideline_region === PovertyGuideline::REGION_HOME_ABE;
+    }
+
+    /**
+     * HUD's income band for a HOME determination ("Extremely low
+     * income"), read off the snapshotted bracket. Null for FPL rows,
+     * whose bracket is a poverty-level multiple and not a HUD band.
+     */
+    public function getTierLabelAttribute(): ?string
+    {
+        if (! $this->isHomeDetermination() || $this->poverty_bracket === null) {
+            return null;
+        }
+
+        return PovertyGuideline::homeTierLabel((int) $this->poverty_bracket);
+    }
+
+    /**
+     * Whether the household cleared the ceiling it was judged against.
+     * Null when there is nothing to judge, or for FPL determinations,
+     * which carry no program ceiling.
+     */
+    public function getIsIncomeEligibleAttribute(): ?bool
+    {
+        if (! $this->isHomeDetermination()
+            || $this->annual_income === null
+            || $this->poverty_threshold === null) {
+            return null;
+        }
+
+        return (float) $this->annual_income <= (float) $this->poverty_threshold;
+    }
+
     public static function sourceTypeLabel(?string $type): string
     {
         return self::SOURCE_TYPES[$type] ?? 'Other';
@@ -121,9 +167,10 @@ class IntakeIncomeAssessment extends Model
 
     /**
      * e.g. "143% of the 2025 federal poverty level", or — for housing
-     * intakes snapshotted against the HUD HOME limits — "64% of the
-     * FY2026 HOME income limit (80% AMI)". Reads guideline_region so a
-     * determination keeps describing the table it was measured against.
+     * intakes snapshotted against the HUD HOME limits — "24.1% of the
+     * FY2026 area median income · Extremely low income". Reads
+     * guideline_region so a determination keeps describing the table it
+     * was measured against.
      */
     public function getDeterminationLabelAttribute(): ?string
     {
@@ -135,8 +182,10 @@ class IntakeIncomeAssessment extends Model
 
         if ($this->guideline_region === PovertyGuideline::REGION_HOME_ABE) {
             $year = $this->guideline_year ? 'FY'.$this->guideline_year.' ' : '';
+            $tier = $this->tier_label;
 
-            return $percentage.'% of the '.$year.'HOME income limit (80% AMI)';
+            return $percentage.'% of the '.$year.'area median income'
+                .($tier === null ? '' : ' · '.$tier);
         }
 
         $year = $this->guideline_year ? $this->guideline_year.' ' : '';

@@ -8,7 +8,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Component;
 
 /**
- * Settings hub (homes.caclv.org) — the five quarterly-touched admin surfaces,
+ * Settings hub (homes.caclv.org) — the quarterly-touched admin surfaces,
  * out of the daily path, each now a portal-native page.
  */
 #[Layout('components.layouts.homes')]
@@ -37,6 +37,12 @@ class SettingsHub extends Component
                 'sub' => 'What picking a county attaches: its funds and required documents.',
                 'route' => 'homes.settings.counties',
                 'permission' => 'fund_codes.view',
+            ],
+            [
+                'label' => 'HOME income limits',
+                'sub' => 'The HUD ceiling a housing intake has to earn under.',
+                'route' => 'homes.settings.income-limits',
+                'permission' => 'poverty-guidelines.view',
             ],
             [
                 'label' => 'Requirements library',

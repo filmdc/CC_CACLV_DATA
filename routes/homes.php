@@ -66,6 +66,14 @@ Route::domain(env('HOMES_DOMAIN', 'homes.caclv.org'))->group(function () {
             ->middleware('permission:fund_codes.view')
             ->name('homes.settings.counties');
 
+        // HUD HOME income limits — the ceiling housing intakes qualify
+        // against. Gated on the poverty-guidelines.* permissions the
+        // main app's guideline admin already uses (note the hyphen:
+        // that is how the permission rows are actually named).
+        Route::get('/settings/income-limits', App\Livewire\Homes\Settings\IncomeLimits::class)
+            ->middleware('permission:poverty-guidelines.view')
+            ->name('homes.settings.income-limits');
+
         Route::get('/settings/requirements', App\Livewire\Homes\Settings\RequirementsLibrary::class)
             ->middleware('permission:requirements_library.view')
             ->name('homes.settings.requirements');

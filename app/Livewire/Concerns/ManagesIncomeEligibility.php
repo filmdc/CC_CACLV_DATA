@@ -225,6 +225,7 @@ trait ManagesIncomeEligibility
                 'guideline_year' => $assessed['guideline_year'],
                 'guideline_region' => $assessed['guideline_region'],
                 'poverty_threshold' => $assessed['threshold'],
+                'area_median_income' => $assessed['ami'],
                 'poverty_percentage' => $assessed['percentage'],
                 'poverty_bracket' => $assessed['bracket'],
                 'calculated_at' => now(),
