@@ -1,7 +1,8 @@
 {{--
     Saved-views control for portal list screens (Calls & Intakes, Projects).
     Include with: @include('livewire.homes.partials.saved-views', ['supportsExpanded' => bool])
-    Relies on the HasSavedViews trait on the host component.
+    Relies on the HasSavedViews + HasSortableColumns traits on the host
+    component — a view captures its sort along with its columns and filters.
 --}}
 @php
     $activeView = $this->activeViewId ? $this->savedViews->firstWhere('id', $this->activeViewId) : null;
@@ -87,7 +88,7 @@
     <div class="fixed inset-0 z-40 flex items-center justify-center p-4" style="background: rgba(30,41,59,.45);">
         <div class="calv-card w-full overflow-auto" style="max-width: 460px; max-height: 90vh; padding: 22px;">
             <h2 class="calv-h1" style="font-size: 19px;">{{ $editingViewId ? 'Edit view' : 'New custom view' }}</h2>
-            <div class="text-xs mt-1 mb-4" style="color: var(--calv-slate-65);">Pick the columns you want, the filter it starts on, and give it a name.</div>
+            <div class="text-xs mt-1 mb-4" style="color: var(--calv-slate-65);">Pick the columns you want, the filter and sort it starts on, and give it a name.</div>
 
             {{-- Name --}}
             <label class="block text-[11px] font-bold uppercase mb-1" style="font-family: var(--font-sub); letter-spacing: .05em; color: var(--calv-slate-65);">View name</label>
@@ -127,6 +128,24 @@
                             {{ $label }}
                         </button>
                     @endforeach
+                </div>
+            </div>
+
+            {{-- Default sort --}}
+            <div class="mt-4">
+                <label class="block text-[11px] font-bold uppercase mb-1.5" style="font-family: var(--font-sub); letter-spacing: .05em; color: var(--calv-slate-65);">Starts sorted by</label>
+                @php $viewSort = (string) ($viewFilters['sort'] ?? ''); @endphp
+                <div class="flex gap-2">
+                    <select wire:model.live="viewFilters.sort" class="calv-input" style="border-radius: 8px;">
+                        <option value="">{{ $this->defaultSortLabel() }} (the usual order)</option>
+                        @foreach($this->sortOptions() as $key => $label)
+                            <option value="{{ $key }}">{{ $label }}</option>
+                        @endforeach
+                    </select>
+                    <select wire:model="viewFilters.sortDir" class="calv-input" style="width: auto; border-radius: 8px;" @disabled($viewSort === '')>
+                        <option value="asc">First to last</option>
+                        <option value="desc">Last to first</option>
+                    </select>
                 </div>
             </div>
 
