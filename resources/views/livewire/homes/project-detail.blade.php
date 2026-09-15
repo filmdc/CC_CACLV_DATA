@@ -236,6 +236,69 @@
                 </section>
             @endif
 
+            {{-- Income qualification — read-only. The determination is made
+                 during intake and frozen there; the project shows it so the
+                 household's qualification travels with the work. --}}
+            @if($origin)
+                @php
+                    $ia = $incomeAssessment;
+                    $iaPct = $ia && $ia->poverty_percentage !== null
+                        ? rtrim(rtrim(number_format((float) $ia->poverty_percentage, 1), '0'), '.')
+                        : null;
+                @endphp
+                <section class="calv-card overflow-hidden">
+                    <header class="px-4 py-3" style="border-bottom: 1px solid var(--calv-slate-15);">
+                        <h3 class="calv-subhead" style="font-size: 12px;">Income qualification</h3>
+                    </header>
+
+                    @if($ia && $iaPct !== null)
+                        <div class="px-4 py-3.5">
+                            <div class="flex flex-wrap items-center gap-1.5 mb-2">
+                                <span class="calv-badge calv-badge--teal">
+                                    {{ $iaPct }}% {{ $ia->isHomeDetermination() ? 'of AMI' : 'FPL' }}
+                                </span>
+                                @if($ia->tier_label)
+                                    <span class="calv-badge">{{ $ia->tier_label }}</span>
+                                @endif
+                                @if($ia->is_income_eligible === true)
+                                    <span class="calv-badge calv-badge--sage">Income eligible</span>
+                                @elseif($ia->is_income_eligible === false)
+                                    <span class="calv-badge calv-badge--amber">Over income</span>
+                                @endif
+                            </div>
+                            <div class="text-[12.5px] leading-relaxed" style="color: var(--calv-slate-65);">
+                                ${{ number_format((float) $ia->annual_income) }}/yr · household of {{ $ia->household_size }}
+                                @if($ia->isHomeDetermination() && $ia->poverty_threshold !== null)
+                                    <br>FY{{ $ia->guideline_year }} limit ${{ number_format((float) $ia->poverty_threshold) }}@if($ia->area_median_income !== null) · area median ${{ number_format((float) $ia->area_median_income) }}@endif
+                                @endif
+                                <br>
+                                <span style="color: var(--calv-slate-35);">
+                                    {{-- NB: a directive glued to a word char (intake@if) is not
+                                         compiled by Blade, so the date sits on its own branch. --}}
+                                    @if($ia->calculated_at)
+                                        Determined at intake on {{ $ia->calculated_at->format('M j, Y') }} ·
+                                    @else
+                                        Determined at intake ·
+                                    @endif
+                                    <a href="{{ route('homes.call', $origin->id) }}" wire:navigate class="calv-link">edit on the intake</a>
+                                </span>
+                            </div>
+                        </div>
+                    @elseif($ia)
+                        <div class="px-4 py-3 text-[12.5px] leading-relaxed" style="color: var(--calv-slate-65);">
+                            ${{ number_format((float) $ia->annual_income) }}/yr · household of {{ $ia->household_size }} —
+                            no income guidelines were loaded for that household size, so no percentage was recorded.
+                        </div>
+                    @else
+                        <div class="px-4 py-3 text-[12.5px] leading-relaxed" style="color: var(--calv-slate-65);">
+                            No income qualification was recorded on this intake.
+                            <a href="{{ route('homes.call', $origin->id) }}" wire:navigate class="calv-link">Record it on the intake</a>
+                            and it will show here.
+                        </div>
+                    @endif
+                </section>
+            @endif
+
             {{-- Next --}}
             <div class="px-4 py-3.5 text-[12.5px] leading-relaxed" style="background: #fff; border: 1px dashed var(--calv-slate-35); border-radius: 8px; color: var(--calv-slate-65);">
                 <strong style="color: var(--calv-slate);">Next:</strong> {{ $next['text'] }} @if($next['due'] !== '—')({{ $next['due'] }})@endif

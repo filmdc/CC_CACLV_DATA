@@ -189,15 +189,74 @@ it('reports unavailable rather than 0% when no guideline year is loaded', functi
 // -----------------------------------------------------------------
 
 it('places a household against the HOME income limits when asked for that region', function () {
-    // FY2026 LOW INCOME (80% AMI) ceiling for a household of 4 is $83,500.
+    // FY2026 LOW INCOME (80% AMI) ceiling for a household of 4 is $83,500,
+    // which is 80% of the $104,375 area median — a household earning
+    // exactly the ceiling sits at 80% of AMI and still qualifies.
     $result = $this->calc->assess(83500, 4, 2026, PovertyGuideline::REGION_HOME_ABE);
 
     expect($result['available'])->toBeTrue()
         ->and($result['threshold'])->toBe(83500.0)
-        ->and($result['percentage'])->toBe(100.0)
-        ->and($result['bracket'])->toBe(100)
+        ->and($result['ami'])->toBe(104375.0)
+        ->and($result['percentage'])->toBe(80.0)
+        ->and($result['bracket'])->toBe(80)
+        ->and($result['tier_label'])->toBe('Low income')
+        ->and($result['eligible'])->toBeTrue()
         ->and($result['guideline_region'])->toBe(PovertyGuideline::REGION_HOME_ABE)
-        ->and($result['label'])->toBe('100% of the FY2026 HOME income limit (80% AMI)');
+        ->and($result['label'])->toBe('80% of the FY2026 area median income');
+})->group('regression');
+
+it('reports a HOME percentage against area median income, not the ceiling', function () {
+    // The case that surfaced this: $20,112 for a household of 2. The
+    // 2-person ceiling is $66,800 and the 2-person median $83,500, so the
+    // figure has to read 24.09% (extremely low income), not 30.11%.
+    $result = $this->calc->assess(20112, 2, 2026, PovertyGuideline::REGION_HOME_ABE);
+
+    expect($result['threshold'])->toBe(66800.0)
+        ->and($result['ami'])->toBe(83500.0)
+        ->and($result['percentage'])->toBe(24.09)
+        ->and($result['bracket'])->toBe(30)
+        ->and($result['tier_label'])->toBe('Extremely low income')
+        ->and($result['eligible'])->toBeTrue();
+})->group('regression');
+
+it('flags a household over the HOME ceiling as over income', function () {
+    // $90,000 for a household of 2: over the $66,800 ceiling, and above
+    // the top 80% band, so there is no tier to report.
+    $result = $this->calc->assess(90000, 2, 2026, PovertyGuideline::REGION_HOME_ABE);
+
+    expect($result['percentage'])->toBe(107.78)
+        ->and($result['bracket'])->toBeNull()
+        ->and($result['tier_label'])->toBeNull()
+        ->and($result['eligible'])->toBeFalse();
+})->group('regression');
+
+it('prefers a published median family income over the derived one', function () {
+    // HUD caps the 80% limit in some areas; when it does, ceiling ÷ 0.8
+    // understates the median and the published figure has to win.
+    PovertyGuideline::setHomeMedianFamilyIncome(2026, 120000);
+
+    $result = $this->calc->assess(30000, 4, 2026, PovertyGuideline::REGION_HOME_ABE);
+
+    expect($result['ami'])->toBe(120000.0)
+        ->and($result['percentage'])->toBe(25.0)
+        // The ceiling is untouched by the median override.
+        ->and($result['threshold'])->toBe(83500.0);
+
+    PovertyGuideline::setHomeMedianFamilyIncome(2026, null);
+
+    expect($this->calc->assess(30000, 4, 2026, PovertyGuideline::REGION_HOME_ABE)['ami'])
+        ->toBe(104375.0);
+})->group('regression');
+
+it('leaves FPL determinations on the poverty level and its bracket ladder', function () {
+    // The HOME rebasing must not leak into non-housing intakes.
+    $result = $this->calc->assess(20112, 2);
+
+    expect($result['ami'])->toBeNull()
+        ->and($result['eligible'])->toBeNull()
+        ->and($result['tier_label'])->toBeNull()
+        ->and($result['bracket_unit'])->toBe('FPL')
+        ->and($result['label'])->toContain('federal poverty level');
 })->group('regression');
 
 it('extrapolates HOME limits above eight people by HUD\'s +8%-of-the-4-person-limit rule', function () {
@@ -260,8 +319,13 @@ it('saves the figures, snapshots the determination, and marks the requirement re
         ->and($assessment->guideline_year)->toBe(2026)
         ->and($assessment->guideline_region)->toBe(PovertyGuideline::REGION_HOME_ABE)
         ->and((float) $assessment->poverty_threshold)->toBe(83500.0)
-        ->and((float) $assessment->poverty_percentage)->toBe(28.74)
-        ->and($assessment->poverty_bracket)->toBe(50)
+        // $24,000 against the $104,375 four-person median — the ceiling
+        // stays in poverty_threshold, the median in area_median_income.
+        ->and((float) $assessment->area_median_income)->toBe(104375.0)
+        ->and((float) $assessment->poverty_percentage)->toBe(22.99)
+        ->and($assessment->poverty_bracket)->toBe(30)
+        ->and($assessment->tier_label)->toBe('Extremely low income')
+        ->and($assessment->is_income_eligible)->toBeTrue()
         ->and($assessment->income_sources)->toHaveCount(1);
 
     $req = IntakeRequirement::where('communication_log_id', $log->id)
@@ -353,9 +417,12 @@ it('renders and saves the same calculator from the main app comm log viewer', fu
 
     // Same intake, same dataset as the portal: the housing service
     // routes the main app's viewer to the HOME limits too
-    // ($26,650 against the 3-person ceiling of $75,150).
-    expect((float) $assessment->poverty_percentage)->toBe(35.46)
+    // ($26,650 against the 3-person median of $93,937.50).
+    expect((float) $assessment->poverty_percentage)->toBe(28.37)
         ->and($assessment->guideline_region)->toBe(PovertyGuideline::REGION_HOME_ABE)
+        ->and((float) $assessment->area_median_income)->toBe(93937.50)
+        ->and((float) $assessment->poverty_threshold)->toBe(75150.0)
+        ->and($assessment->poverty_bracket)->toBe(30)
         ->and((float) $assessment->entered_amount)->toBe(26650.0);
 })->group('regression');
 

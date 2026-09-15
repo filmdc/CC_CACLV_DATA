@@ -125,15 +125,44 @@
                     {{-- Income eligibility carries figures rather than just a
                          receipt, so the determination reads on the row itself. --}}
                     @if($item->key === IntakeRequirement::KEY_INCOME_ELIGIBILITY)
-                        @php $assessment = $item->incomeAssessment; @endphp
+                        @php
+                            $assessment = $item->incomeAssessment;
+                            $hasFigures = $assessment && $assessment->annual_income !== null;
+                            $pct = $hasFigures && $assessment->poverty_percentage !== null
+                                ? rtrim(rtrim(number_format((float) $assessment->poverty_percentage, 1), '0'), '.')
+                                : null;
+                        @endphp
+
+                        @if($hasFigures && $pct !== null)
+                            {{-- The determination reads as chips, not buried prose:
+                                 this is the answer the file is opened to find. --}}
+                            <div class="flex flex-wrap items-center gap-1 mt-1">
+                                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10.5px] font-semibold bg-indigo-600 text-white">
+                                    {{ $pct }}% {{ $assessment->isHomeDetermination() ? 'of AMI' : 'FPL' }}
+                                </span>
+                                @if($assessment->tier_label)
+                                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10.5px] font-semibold bg-gray-100 dark:bg-zinc-700 text-gray-800 dark:text-gray-100 border border-gray-300 dark:border-zinc-600">
+                                        {{ $assessment->tier_label }}
+                                    </span>
+                                @endif
+                                @if($assessment->is_income_eligible === true)
+                                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10.5px] font-semibold bg-emerald-600 text-white">Income eligible</span>
+                                @elseif($assessment->is_income_eligible === false)
+                                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10.5px] font-semibold bg-amber-600 text-white">Over income</span>
+                                @endif
+                            </div>
+                        @endif
+
                         <div class="text-[11.5px] text-calv-slate-65 mt-0.5">
-                            @if($assessment && $assessment->annual_income !== null)
+                            @if($hasFigures)
                                 ${{ number_format((float) $assessment->annual_income, 0) }}/yr ·
                                 household of {{ $assessment->household_size }}
-                                @if($assessment->poverty_percentage !== null)
-                                    · <span class="font-semibold text-calv-slate">{{ $assessment->determination_label }}</span>
-                                @else
-                                    · no poverty guideline loaded for this household size
+                                @if($pct === null)
+                                    · no income guideline loaded for this household size
+                                @elseif($assessment->isHomeDetermination() && $assessment->poverty_threshold !== null)
+                                    · FY{{ $assessment->guideline_year }} limit ${{ number_format((float) $assessment->poverty_threshold, 0) }}
+                                @elseif(! $assessment->isHomeDetermination())
+                                    · {{ $assessment->determination_label }}
                                 @endif
                             @else
                                 Annual income, household size, and proof — pay stubs, tax return, benefit letters.

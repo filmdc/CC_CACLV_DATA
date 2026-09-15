@@ -563,6 +563,17 @@ class ProjectDetail extends Component
 
         $origin = $job->originatingCommunicationLogs->first();
 
+        // The income determination is made during intake and never
+        // re-taken on the project, so the project reads it back from the
+        // intake it was converted from — read-only, as a historical
+        // record. A household that was qualified before the income
+        // feature existed simply has none, which the card says plainly.
+        $incomeAssessment = $job->originatingCommunicationLogs
+            ->map(fn ($log) => $log->incomeAssessment()->first())
+            ->filter()
+            ->sortByDesc('calculated_at')
+            ->first();
+
         return view('livewire.homes.project-detail', [
             'who' => $job->participant?->full_name ?: $job->job_title,
             'where' => $job->property ? trim($job->property->address_line_1.', '.$job->property->city, ', ') : null,
@@ -575,6 +586,7 @@ class ProjectDetail extends Component
             'totalBudget' => (float) $job->getTotalBudget(),
             'totalSpent' => (float) $job->getTotalSpent(),
             'origin' => $origin,
+            'incomeAssessment' => $incomeAssessment,
             'canEdit' => $this->can('projects.view'),
             'canDelete' => $this->can('projects.delete'),
         ]);

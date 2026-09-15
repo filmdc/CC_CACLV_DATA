@@ -68,28 +68,13 @@ class HomeIncomeLimitsSeeder extends Seeder
     {
         foreach (self::ANNUAL_CEILINGS as $year => $ceilings) {
             foreach ($ceilings as $familySize => $annualCeiling) {
-                $this->seedRow($year, $familySize, 'annual', $annualCeiling);
-                $this->seedRow($year, $familySize, 'monthly', round($annualCeiling / 12, 2));
+                // PovertyGuideline::upsertHomeCeiling() is the single
+                // writer for this dataset — it derives the monthly row
+                // and the bracket columns, and the portal's
+                // Settings > HOME income limits editor calls the very
+                // same method, so seeding and hand-editing agree.
+                PovertyGuideline::upsertHomeCeiling($year, $familySize, (float) $annualCeiling);
             }
         }
-    }
-
-    /**
-     * One guideline row: the ceiling lands in poverty_100; every other
-     * bracket column is the ceiling scaled by its percentage.
-     */
-    private function seedRow(int $year, int $familySize, string $period, float $ceiling): void
-    {
-        $values = [];
-        foreach (PovertyGuideline::BRACKETS as $bracket) {
-            $values['poverty_'.$bracket] = round($ceiling * $bracket / 100, 2);
-        }
-
-        PovertyGuideline::updateOrCreate([
-            'year' => $year,
-            'region' => PovertyGuideline::REGION_HOME_ABE,
-            'family_size' => $familySize,
-            'period' => $period,
-        ], $values);
     }
 }
