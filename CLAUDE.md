@@ -266,6 +266,25 @@ Both front doors share `App\Livewire\Concerns\ManagesIncomeEligibility` — only
 
 Fund-code association on `CommunicationLog` is via the `anticipatedFundCodes()` relation (table `communication_log_anticipated_fund_codes`). The legacy `communication_log_fund_code` tag pivot was dropped in P-39b.
 
+#### Duplicate intake merge
+
+The project manager sometimes logs the same homeowner twice — a second call arrives before she finds the first entry — and the person's history ends up split across two Comm Logs. `App\Services\CommunicationLogMergeService` folds one into the other.
+
+It is a true record↔record merge in the same spirit as `ParticipantMergeService`: rows are **re-pointed, not copied**, so attachments, uploaders and timestamps keep their original identity and the survivor reads as one continuous history. Everything happens in one transaction — a half-merged pair is worse than either duplicate.
+
+What moves onto the survivor: `communication_log_updates`; the duplicate's own root call, written as one more timeline entry **backdated to `communication_date`** so the newest-first chronology does not lie; `intake_requirements`; the `intake_income_assessments` row; the services / housing-services / anticipated-fund-code pivots; both pin tables; and `taggables`. The survivor wins every field it already has a value for and its **blanks** are filled from the duplicate.
+
+- **Requirement dedupe** is by `requirementSignature()` — `key`, else `source_definition_id`, else `source_template_id`, else lowercased label. When both sides carry the same requirement the survivor's row is kept and reconciled: a met status beats an unmet one (never the reverse), un-orphaned beats orphaned, `via` sources are **unioned** so later detach reconciliation still knows every reason the row exists, and the duplicate's files are re-pointed onto the kept row. Spatie paths key off media id, not model id, so no files move on disk.
+- **Income determination**: one row per log (unique index), so when both sides have one the survivor's stands and the duplicate's is left in the snapshot rather than silently overwriting a determination.
+- **Open follow-up** is the one piece of forward-looking state a merge could silently drop. It transfers only when the survivor has nothing open of its own; otherwise it becomes a `follow_up` timeline entry so the commitment stays visible.
+- **`activity_log` is deliberately NOT re-pointed** — rewriting it would claim edits were made to a record they were never made to. It stays on the soft-deleted row.
+
+The duplicate is then soft-deleted with a tombstone: `merged_into_id` / `merged_at` / `merged_by` on `communication_logs` (added in `2026_09_15_150000`, kept out of `$fillable` on purpose — only the service writes them). `HousingRecordDeleter::restoreCallNote()` reads it so the recycle bin says "merged into COMM-123 … restoring this one brings back the empty entry, not its contents" instead of looking like an ordinary delete. A JSON snapshot lands in `merge-snapshots/` on the local disk, mirroring the participant-merge and delete paths.
+
+**Ordering rule, mirroring `HousingRecordDeleter`**: a log promoted into a live project cannot be merged away — that project's origin is this record. `blockedReason()` is the single gate and is phrased for the project manager, not a developer; the UI shows it inline rather than hiding the option.
+
+UI is portal-only (`Homes\CallDetail` → "Merge duplicate"): step 1 picks the entry, seeded by `findCandidates()` (last name + first initial, punctuation-insensitive phone, exact email, address + zip) with free search behind it; step 2 previews exactly what will move before she commits. Gated on `communications_log.edit` **and** `communications_log.delete` — a record disappears, so it carries the delete posture. Tests: `tests/Feature/Homes/MergeDuplicateTest.php`.
+
 #### Housing Module
 **Status: UI complete, in daily production use. Work happens on `main`.**
 
@@ -457,7 +476,7 @@ A task-first, CALV-branded front-end for the housing project manager, served at 
 - "Fund spending" report sources ONLY from `ProjectBudget` grouped by `fund_code_id` (standalone-budget contract — no Sage/fiscal paths). It reads empty until budget lines carry fund codes.
 - **Settings are portal-native** (`/settings/*`): fund codes (CRUD + expiry dates + atom links; conservative delete — in-use codes deactivate only), requirements library (atoms-only, soft delete, auto-slugged keys), contractors (CRUD + services chips, delete guarded by jobs), properties (CRUD + notes; `participant_id` NOT NULL — derived from the household head), PDF templates (upload via `PdfFormService`/pdftk + metadata; **field mapping links out to the main app**), and counties/housing-services (`Settings\Counties` — CRUD + per-county fund/atom link syncing, soft delete, gated `fund_codes.*` like the main app's Housing Services tab), and HOME income limits (`Settings\IncomeLimits` — one editable annual ceiling per household size, year copy-forward, gated on the hyphenated `poverty-guidelines.*` permissions; the HHS/FPL guidelines stay in the main app's `PovertyGuidelineManagement`). Still main-app-only by design: contractor/property document approval, PDF field mapping.
 - **Configurable list views**: Calls & Intakes and Projects share the `HasSavedViews` trait (`app/Livewire/Homes/Concerns/`) + `homes_saved_views` table — per-user named views (visible columns + default filter pill + expanded flag on calls), one flagged default applied on mount; explicit URL filter params always win over the saved default. Built-in defaults: Calls = Everything + Expanded on; Projects = Open. Shared UI partial: `resources/views/livewire/homes/partials/saved-views.blade.php`.
-- Tests: `tests/Feature/Homes/` (HousingPortalTest, ConvertServiceTest, CallDetailTest, ProjectsTest, ReportsTest, SavedViewsTest).
+- Tests: `tests/Feature/Homes/` (HousingPortalTest, ConvertServiceTest, CallDetailTest, ProjectsTest, ReportsTest, SavedViewsTest, MergeDuplicateTest).
 
 ### Setup after pull
 1. `.env`: add `HOMES_DOMAIN=homes.caclv.org` (ensure `SESSION_DOMAIN=.caclv.org` in production for shared SSO).

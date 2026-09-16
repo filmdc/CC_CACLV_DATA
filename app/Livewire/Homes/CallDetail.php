@@ -13,6 +13,7 @@ use App\Services\Homes\HousingPortalData;
 use App\Services\Homes\HousingRecordDeleter;
 use App\Services\IntakeConversion\ConversionBlocked;
 use App\Services\IntakeConversion\ConversionInput;
+use App\Services\CommunicationLogMergeService;
 use App\Services\IntakeConversion\ConvertIntakeToProject;
 use App\Services\IntakeRequirementInstantiator;
 use App\Traits\WithPermissionChecks;
@@ -86,6 +87,16 @@ class CallDetail extends Component
     public string|int $participantAction = 'create_new';
 
     public string|int $propertyAction = 'create_new';
+
+    // ── Merge-duplicate modal state ───────────────────────────────
+    // Step 1 picks the duplicate, step 2 shows exactly what will move.
+    public bool $showMerge = false;
+
+    public int $mergeStep = 1;
+
+    public string $mergeSearch = '';
+
+    public ?int $mergeDuplicateId = null;
 
     // ── Follow-up editing ─────────────────────────────────────────
     public bool $editingFollowUp = false;
@@ -645,6 +656,141 @@ class CallDetail extends Component
         session()->flash('homes_message', 'Follow-up updated.');
     }
 
+    // ── Merge a duplicate entry into this one ─────────────────────
+
+    /**
+     * Merging ends with a record disappearing from her list, so it is gated
+     * the same way deleting one is — and it rewrites this entry, so it needs
+     * edit rights too.
+     */
+    public function canMergeDuplicates(): bool
+    {
+        return $this->can('communications_log.edit') && $this->can('communications_log.delete');
+    }
+
+    protected function authorizeMerge(): void
+    {
+        if (! $this->canMergeDuplicates()) {
+            abort(403, 'You do not have permission to merge entries.');
+        }
+    }
+
+    public function openMerge(): void
+    {
+        $this->authorizeMerge();
+
+        $this->mergeStep = 1;
+        $this->mergeSearch = '';
+        $this->mergeDuplicateId = null;
+        $this->resetErrorBag(['merge']);
+        $this->showMerge = true;
+    }
+
+    /** Explicit Cancel is the only close path (portal modal convention). */
+    public function closeMerge(): void
+    {
+        $this->showMerge = false;
+        $this->mergeStep = 1;
+        $this->mergeSearch = '';
+        $this->mergeDuplicateId = null;
+        $this->resetErrorBag(['merge']);
+    }
+
+    public function selectMergeCandidate(int $id, CommunicationLogMergeService $merger): void
+    {
+        $this->authorizeMerge();
+
+        $duplicate = CommunicationLog::find($id);
+
+        if ($duplicate === null) {
+            $this->addError('merge', 'That entry could not be found.');
+
+            return;
+        }
+
+        $blocked = $merger->blockedReason($this->log, $duplicate);
+
+        if ($blocked !== null) {
+            $this->addError('merge', $blocked);
+
+            return;
+        }
+
+        $this->resetErrorBag(['merge']);
+        $this->mergeDuplicateId = $duplicate->id;
+        $this->mergeStep = 2;
+    }
+
+    public function backToMergePick(): void
+    {
+        $this->mergeDuplicateId = null;
+        $this->mergeStep = 1;
+        $this->resetErrorBag(['merge']);
+    }
+
+    public function doMerge(CommunicationLogMergeService $merger): void
+    {
+        $this->authorizeMerge();
+
+        if (! $this->mergeDuplicateId) {
+            return;
+        }
+
+        $duplicate = CommunicationLog::find($this->mergeDuplicateId);
+
+        if ($duplicate === null) {
+            $this->addError('merge', 'That entry could not be found.');
+
+            return;
+        }
+
+        try {
+            $summary = $merger->merge($this->log, $duplicate, Auth::user());
+        } catch (\RuntimeException $e) {
+            $this->addError('merge', $e->getMessage());
+
+            return;
+        }
+
+        $this->closeMerge();
+        $this->log->refresh();
+
+        session()->flash('homes_message', sprintf(
+            'Merged COMM-%d into this entry — %d timeline %s and %d %s moved over.',
+            $summary['duplicate_id'],
+            $summary['timeline_entries_moved'] + 1,
+            $summary['timeline_entries_moved'] + 1 === 1 ? 'entry' : 'entries',
+            $summary['requirements_moved'],
+            $summary['requirements_moved'] === 1 ? 'requirement' : 'requirements',
+        ));
+    }
+
+    /** Suggested duplicates plus anything her search turns up. */
+    protected function mergeCandidateRows(CommunicationLogMergeService $merger, HousingPortalData $data): array
+    {
+        $needle = trim($this->mergeSearch);
+
+        $logs = $needle !== ''
+            ? CommunicationLog::search($needle)
+                ->where('id', '!=', $this->log->id)
+                ->whereNull('merged_into_id')
+                ->with('participant')
+                ->orderByDesc('communication_date')
+                ->limit(15)
+                ->get()
+            : $merger->findCandidates($this->log);
+
+        return $logs->map(fn (CommunicationLog $c) => [
+            'id' => $c->id,
+            'who' => $data->personName($c),
+            'where' => $data->personWhere($c),
+            'when' => $c->communication_date?->isoFormat('MMM D, YYYY'),
+            'subject' => (string) $c->subject,
+            'phone' => (string) $c->contact_phone,
+            'blocked' => $merger->blockedReason($this->log, $c),
+        ])->values()->all();
+    }
+
     // ── Convert to project (shared service, parity semantics) ────────
 
     public function openConvert(): void
@@ -754,7 +900,7 @@ class CallDetail extends Component
 
     // ── Render ────────────────────────────────────────────────────
 
-    public function render(HousingPortalData $data, ConvertIntakeToProject $convert, HousingRecordDeleter $deleter)
+    public function render(HousingPortalData $data, ConvertIntakeToProject $convert, HousingRecordDeleter $deleter, CommunicationLogMergeService $merger)
     {
         $log = $this->log->load([
             'participant', 'property',
@@ -837,6 +983,19 @@ class CallDetail extends Component
             // Non-null when a live project still hangs off this call — the
             // button stays visible but explains what has to happen first.
             'deleteBlocked' => $deleter->callBlockedReason($log),
+            'canMerge' => $this->canMergeDuplicates(),
+            'mergeCandidates' => $this->showMerge && $this->mergeStep === 1
+                ? $this->mergeCandidateRows($merger, $data)
+                : [],
+            'mergeDuplicate' => $this->mergeDuplicateId
+                ? CommunicationLog::find($this->mergeDuplicateId)
+                : null,
+            'mergePreview' => $this->mergeDuplicateId && ($dup = CommunicationLog::find($this->mergeDuplicateId))
+                ? $merger->preview($log, $dup)
+                : null,
+            // Duplicates already folded into this entry — shown so the record
+            // says outright that it is the union of more than one call.
+            'mergedFrom' => $log->mergedFrom()->get(['id', 'contact_first_name', 'contact_last_name', 'merged_at']),
             'counties' => HousingService::query()->where('is_active', true)->orderBy('name')->get(['id', 'name']),
             'attachedCountyIds' => $attachedCountyIds,
             'incomeAssessment' => $log->incomeAssessment()->first(),

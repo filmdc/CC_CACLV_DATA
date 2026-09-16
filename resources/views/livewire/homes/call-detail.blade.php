@@ -45,6 +45,12 @@
                 @if($log->contact_role){{ ucfirst(str_replace('_',' ',$log->contact_role)) }} · @endif
                 <span class="calv-subhead" style="font-size: 11px; letter-spacing: .05em;">COMM-{{ $log->id }}</span>
             </div>
+            @if($mergedFrom->isNotEmpty())
+                <div class="text-[12px] mt-1.5" style="color: var(--calv-slate-65);">
+                    Includes {{ $mergedFrom->count() === 1 ? 'a duplicate entry' : $mergedFrom->count().' duplicate entries' }}
+                    merged in: {{ $mergedFrom->map(fn ($m) => 'COMM-'.$m->id)->join(', ') }}
+                </div>
+            @endif
             <div class="flex gap-4 mt-2 text-[12.5px] flex-wrap" style="color: var(--calv-slate);">
                 @if($log->contact_phone)<span>☏ {{ $log->contact_phone }}</span>@endif
                 @if($log->contact_email)<span>✉ {{ $log->contact_email }}</span>@endif
@@ -69,6 +75,15 @@
             @can('communications_log.create')
                 <button type="button" x-on:click="Livewire.dispatch('homes-open-quick-log')" class="calv-btn calv-btn--ghost">Log a call</button>
             @endcan
+            @if($canMerge)
+                <button
+                    type="button"
+                    wire:click="openMerge"
+                    class="calv-btn calv-btn--ghost"
+                    title="Logged this person twice? Fold the other entry into this one.">
+                    Merge duplicate
+                </button>
+            @endif
             @if($canConvert)
                 <button type="button" wire:click="openConvert" class="calv-btn calv-btn--secondary">Convert to project →</button>
             @endif
@@ -741,6 +756,11 @@
     {{-- Income eligibility calculator --}}
     @if($showIncomeModal)
         @include('livewire.homes.partials.income-eligibility')
+    @endif
+
+    {{-- Merge a duplicate entry into this one --}}
+    @if($showMerge)
+        @include('livewire.homes.partials.merge-duplicate')
     @endif
 
     {{-- Delete confirmation. Explicit Cancel only — no backdrop/Escape close. --}}
