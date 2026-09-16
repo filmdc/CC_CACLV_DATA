@@ -47,6 +47,11 @@ class DashboardWidgets
             'sub' => 'Intakes whose requirements are all met, ready to convert.',
             'default' => true,
         ],
+        'funds' => [
+            'label' => 'Projects by fund',
+            'sub' => 'Every active project regrouped under the fund paying for it.',
+            'default' => true,
+        ],
         'glance' => [
             'label' => 'This week at a glance',
             'sub' => 'Calls logged, new intakes, active projects, fund expiring.',

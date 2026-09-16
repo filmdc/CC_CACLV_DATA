@@ -10,6 +10,7 @@ use App\Models\HousingJob;
 use App\Models\IntakeRequirement;
 use App\Models\RequirementDefinition;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Read-only data helpers for the CACLV Housing portal (homes.caclv.org).
@@ -328,6 +329,108 @@ class HousingPortalData
     }
 
     /** Glanceable weekly counts for the Today sidebar card. */
+    /**
+     * Today card: the active project list regrouped under the funds paying
+     * for it — "what is riding on F7000 right now?".
+     *
+     * Grouped off the fund↔project pivot, NOT off budget dollars. The
+     * standalone budget module only knows what she has typed into it, and
+     * a project can be assigned to a fund long before a single budget line
+     * exists — so grouping on money would show almost nothing while
+     * grouping on the assignment shows the real picture.
+     *
+     * A project on two funds appears under both. That is not double
+     * counting: the question the card answers is per fund, and until the
+     * funding is narrowed to one code the project genuinely rides on both
+     * (see App\Services\ProjectFundingService).
+     *
+     * @return Collection<int, array<string,mixed>>
+     */
+    public function projectsByFund(int $projectsPerFund = 6): Collection
+    {
+        $jobs = HousingJob::active()
+            ->with(['participant', 'property', 'program', 'milestones', 'budgets', 'fundCodes'])
+            ->get();
+
+        $groups = collect();
+
+        foreach ($jobs as $job) {
+            foreach ($job->fundCodes as $fund) {
+                if (! $groups->has($fund->id)) {
+                    $groups[$fund->id] = [
+                        'id' => $fund->id,
+                        'code' => $fund->code,
+                        'name' => (string) ($fund->description ?? ''),
+                        'expiry_state' => $fund->expiry_state,
+                        'days_to_expiry' => $fund->days_to_expiry,
+                        'jobs' => collect(),
+                    ];
+                }
+
+                $group = $groups[$fund->id];
+                $group['jobs'] = $group['jobs']->push($this->projectRow($job));
+                $groups[$fund->id] = $group;
+            }
+        }
+
+        return $groups
+            ->map(function (array $group) use ($projectsPerFund) {
+                /** @var Collection<int, array<string,mixed>> $jobs */
+                $jobs = $group['jobs'];
+
+                // The card reports ONE number per fund — how many projects are
+                // on it. The status split lives on the Projects list, where
+                // she can filter it; repeating it here just made the card
+                // harder to read than the thing it summarises.
+                //
+                // Ordering inside a fund still puts anything needing a hand
+                // at the top, so expanding a fund leads with the problems.
+                $ordered = $jobs->where('status', 'attention')
+                    ->concat($jobs->where('status', 'active')->sortByDesc('created_at'))
+                    ->concat($jobs->where('status', 'finished')->sortByDesc('created_at'))
+                    ->values();
+
+                return [
+                    'id' => $group['id'],
+                    'code' => $group['code'],
+                    'name' => $group['name'],
+                    'expiry_state' => $group['expiry_state'],
+                    'days_to_expiry' => $group['days_to_expiry'],
+                    'total' => $jobs->count(),
+                    'rows' => $ordered->take($projectsPerFund),
+                    'more' => max(0, $ordered->count() - $projectsPerFund),
+                ];
+            })
+            // Busiest fund first, then alphabetically — the same number the
+            // row shows, so the order never looks arbitrary.
+            ->sortBy([
+                fn (array $a, array $b) => $b['total'] <=> $a['total'],
+                fn (array $a, array $b) => strcmp($a['code'], $b['code']),
+            ])
+            ->values();
+    }
+
+    /**
+     * Active fund codes carrying no project at all — said out loud under
+     * the card so an empty fund reads as "nothing on it yet" rather than
+     * looking like the card forgot about it.
+     */
+    public function fundsWithoutProjects(): Collection
+    {
+        $inUse = DB::table('fund_code_housing_job')
+            ->join('housing_jobs', 'housing_jobs.id', '=', 'fund_code_housing_job.housing_job_id')
+            ->where('housing_jobs.is_template', false)
+            ->where('housing_jobs.is_archived', false)
+            ->whereNull('housing_jobs.deleted_at')
+            ->distinct()
+            ->pluck('fund_code_housing_job.fund_code_id');
+
+        return FundCode::active()
+            ->whereNotIn('id', $inUse)
+            ->orderBy('code')
+            ->pluck('code');
+    }
+
     public function weekGlance(): array
     {
         $start = now()->startOfWeek();

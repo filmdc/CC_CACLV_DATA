@@ -266,6 +266,18 @@ Both front doors share `App\Livewire\Concerns\ManagesIncomeEligibility` — only
 
 Fund-code association on `CommunicationLog` is via the `anticipatedFundCodes()` relation (table `communication_log_anticipated_fund_codes`). The legacy `communication_log_fund_code` tag pivot was dropped in P-39b.
 
+#### Today card: Projects by fund
+
+`HousingPortalData::projectsByFund()` regroups the active project list under the funds paying for it, rendered as a collapsible card on Today (widget key `funds`, on by default, toggled at Settings → Dashboard widgets like every other card).
+
+**Grouped off the fund↔project pivot, NOT off budget dollars.** The standalone budget module only knows what she has typed into it — in production *zero* `project_budgets` rows carry a `fund_code_id`, which is why Reports → "Fund spending" renders empty — while 8 funds carry 35 active projects between them on the pivot. Grouping on the assignment shows the real work; grouping on money would show nothing.
+
+The card reports **one number per fund** — how many projects are on it — and sorts busiest-first, then by code, so the ordering is always the number the row shows. An earlier revision split the count into needs-a-hand / active / finished; that was removed as noise (the status split belongs on the Projects list, where it can be filtered). Ordering *inside* a fund still leads with anything needing a hand, so expanding a fund surfaces the problems first. Each group is capped at 6 rows with an "N more" link to the Projects list. The header deliberately spells out "8 funds" rather than using the numeric badge the other cards carry — the badge reads as an item count, and here the items are funds, not projects.
+
+A project on two funds appears under both. That is not double counting: the question is per fund, and until its funding is narrowed the project genuinely rides on both.
+
+Because this is the one Today card needing no intake access, the blade's `@unless($canViewIntakes)` early exit was widened — a `projects.view`-only user now gets this card instead of a dead-end "no access to the communications log" message, and the intake cards carry their own `$canViewIntakes` check. Tests: `tests/Feature/Homes/ProjectsByFundTest.php`.
+
 #### Project funding: narrowing to one fund code
 
 A project inherits its fund codes wholesale — the county decides which codes are in play, ALL anticipated codes carry over at conversion (`IntakeRequirementInstantiator::carryForwardToProject`). That is right at conversion, when nobody knows yet which fund will pay, and wrong once the award lands and the project is restricted to a single code of that county's set.
