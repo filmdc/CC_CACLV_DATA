@@ -3,6 +3,7 @@
 namespace App\Livewire\Homes;
 
 use App\Livewire\Homes\Concerns\HasPins;
+use App\Models\FundCode;
 use App\Models\HomesPin;
 use App\Models\HousingJob;
 use App\Models\ProjectBudget;
@@ -11,6 +12,7 @@ use App\Models\ProjectMilestone;
 use App\Models\Requirement;
 use App\Services\Homes\HousingRecordDeleter;
 use App\Services\MediaValidationService;
+use App\Services\ProjectFundingService;
 use App\Services\RequirementInstantiator;
 use App\Traits\WithPermissionChecks;
 use Illuminate\Support\Facades\Auth;
@@ -25,6 +27,11 @@ use Livewire\WithFileUploads;
  * requirements (the milestone-source + fund-code-mapped union — NOT the
  * legacy completion_percentage), per-category budget bars with add-expense,
  * and the link back to the originating intake.
+ *
+ * Funding: every anticipated fund code carries over at conversion, because
+ * at that point nobody knows which one will pay. Once the award lands she
+ * narrows the project to the code it is actually paid from — see
+ * ProjectFundingService, which owns that change for both front doors.
  */
 #[Layout('components.layouts.homes')]
 class ProjectDetail extends Component
@@ -65,6 +72,17 @@ class ProjectDetail extends Component
     public string $newReqTitle = '';
 
     public string $newReqType = Requirement::TYPE_DOCUMENT;
+
+    // ── Funding modal ─────────────────────────────────────────────
+    // Narrowing a project down to the fund code it is actually paid from.
+    // Step 1 lists what is on the project and what its county still
+    // offers; step 2 shows exactly what dropping the rest would do.
+    public bool $showFunding = false;
+
+    /** Fund code ids staged to survive the narrowing; [] means nothing staged. */
+    public array $fundingKeepIds = [];
+
+    public bool $fundingRemoveUntouched = true;
 
     // ── Add-budget-line modal ─────────────────────────────────────
     public bool $showBudgetForm = false;
@@ -310,6 +328,127 @@ class ProjectDetail extends Component
         session()->flash('homes_message', 'Requirement added.');
     }
 
+    // ── Funding ───────────────────────────────────────────────────
+    //
+    // A project inherits every fund code its intake anticipated, because at
+    // conversion nobody knows yet which one will pay. Once the award lands
+    // she can narrow it to the one that actually does — the case the client
+    // asked for is a project restricted to a single fund code of its county.
+    //
+    // Narrowing only ever removes codes from the project. The pool it may
+    // draw on stays the county's, so adding one back is always possible and
+    // nothing here can widen a project past what its county covers.
+
+    public function openFunding(): void
+    {
+        $this->authorizeAction('projects.manage');
+
+        $this->fundingKeepIds = [];
+        $this->fundingRemoveUntouched = true;
+        $this->showFunding = true;
+        $this->resetErrorBag();
+    }
+
+    /** Explicit Cancel is the only close path (portal modal convention). */
+    public function closeFunding(): void
+    {
+        $this->showFunding = false;
+        $this->fundingKeepIds = [];
+        $this->fundingRemoveUntouched = true;
+        $this->resetErrorBag();
+    }
+
+    /**
+     * Stage "this project is paid from this one code" — the whole point of
+     * the feature. Nothing is committed until confirmFunding().
+     */
+    public function stageOnlyFundCode(int $fundCodeId): void
+    {
+        $this->authorizeAction('projects.manage');
+
+        $this->fundingKeepIds = [$fundCodeId];
+    }
+
+    /** Stage dropping one code while keeping the rest. */
+    public function stageDropFundCode(int $fundCodeId): void
+    {
+        $this->authorizeAction('projects.manage');
+
+        $this->fundingKeepIds = $this->job->fundCodes()
+            ->pluck('fund_codes.id')
+            ->reject(fn ($id) => (int) $id === $fundCodeId)
+            ->map(fn ($id) => (int) $id)
+            ->values()
+            ->all();
+    }
+
+    public function cancelStagedFunding(): void
+    {
+        $this->fundingKeepIds = [];
+        $this->resetErrorBag();
+    }
+
+    public function confirmFunding(ProjectFundingService $funding): void
+    {
+        $this->authorizeAction('projects.manage');
+
+        if (empty($this->fundingKeepIds)) {
+            return;
+        }
+
+        try {
+            $result = $funding->restrictTo(
+                $this->job,
+                $this->fundingKeepIds,
+                Auth::user(),
+                $this->fundingRemoveUntouched,
+            );
+        } catch (\RuntimeException $e) {
+            session()->flash('homes_error', $e->getMessage());
+            $this->fundingKeepIds = [];
+
+            return;
+        }
+
+        $this->fundingKeepIds = [];
+        $this->job->refresh();
+
+        $kept = implode(', ', $result['kept']);
+        $dropped = implode(', ', $result['dropped']);
+        $message = count($result['kept']) === 1
+            ? "This project is now paid from {$kept} only."
+            : "This project now draws on {$kept}.";
+
+        if ($dropped !== '') {
+            $message .= " Dropped {$dropped}.";
+        }
+
+        if ($result['requirements_removed'] > 0) {
+            $message .= ' '.$result['requirements_removed'].' '
+                .\Illuminate\Support\Str::plural('requirement', $result['requirements_removed'])
+                .' that had not been started came off with it.';
+        }
+
+        session()->flash('homes_message', $message);
+    }
+
+    /** Put a fund code back — with the requirements it brings. */
+    public function addFundCode(int $fundCodeId, ProjectFundingService $funding): void
+    {
+        $this->authorizeAction('projects.manage');
+
+        try {
+            $funding->add($this->job, FundCode::findOrFail($fundCodeId), Auth::user());
+        } catch (\RuntimeException $e) {
+            session()->flash('homes_error', $e->getMessage());
+
+            return;
+        }
+
+        $this->job->refresh();
+        session()->flash('homes_message', 'Fund code added back to this project.');
+    }
+
     // ── Add a budget line ─────────────────────────────────────────
 
     public function openBudgetForm(): void
@@ -506,7 +645,7 @@ class ProjectDetail extends Component
 
     // ── Render ────────────────────────────────────────────────────
 
-    public function render()
+    public function render(ProjectFundingService $funding)
     {
         $job = $this->job->load([
             'participant', 'property', 'program',
@@ -574,6 +713,40 @@ class ProjectDetail extends Component
             ->sortByDesc('calculated_at')
             ->first();
 
+        // Funding modal. Built only while it is open — availableFor() walks
+        // the counties and the originating intake, which is wasted work on
+        // every other render of this page.
+        $fundingRows = collect();
+        $fundingAvailable = collect();
+        $fundingPreview = null;
+
+        if ($this->showFunding) {
+            $attachedIds = $job->fundCodes->pluck('id')->all();
+
+            $fundingRows = $job->fundCodes->map(fn ($fc) => [
+                'id' => $fc->id,
+                'code' => $fc->code,
+                'description' => $fc->description,
+                'expiry_state' => $fc->expiry_state,
+                // Named here so the row can explain in advance why "only
+                // this one" is unavailable, instead of failing on confirm.
+                'budget_categories' => $job->budgetCategoriesReferencingFundCode($fc->id),
+            ])->values();
+
+            $fundingAvailable = $funding->availableFor($job)
+                ->reject(fn ($fc) => in_array($fc->id, $attachedIds, true))
+                ->map(fn ($fc) => [
+                    'id' => $fc->id,
+                    'code' => $fc->code,
+                    'description' => $fc->description,
+                ])->values();
+
+            if (! empty($this->fundingKeepIds)) {
+                $fundingPreview = $funding->preview($job, $this->fundingKeepIds)
+                    + ['blocked_reason' => $funding->blockedReason($job, $this->fundingKeepIds)];
+            }
+        }
+
         return view('livewire.homes.project-detail', [
             'who' => $job->participant?->full_name ?: $job->job_title,
             'where' => $job->property ? trim($job->property->address_line_1.', '.$job->property->city, ', ') : null,
@@ -589,6 +762,13 @@ class ProjectDetail extends Component
             'incomeAssessment' => $incomeAssessment,
             'canEdit' => $this->can('projects.view'),
             'canDelete' => $this->can('projects.delete'),
+            // Changing a live project's funding carries the main app's
+            // posture (ProjectManagement::attachFundCode), not the portal's
+            // looser projects.view — it moves money and requirements.
+            'canManageFunding' => $this->can('projects.manage'),
+            'fundingRows' => $fundingRows,
+            'fundingAvailable' => $fundingAvailable,
+            'fundingPreview' => $fundingPreview,
         ]);
     }
 }

@@ -53,6 +53,21 @@ class FundCode extends Model
             ->withPivot('created_by_user_id', 'created_at');
     }
 
+    /**
+     * Inverse of HousingService::fundCodes — the counties that put this
+     * fund code in play. A project may only ever draw on the codes its
+     * county covers (see ProjectFundingService::availableFor).
+     */
+    public function housingServices(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            HousingService::class,
+            'housing_service_fund_codes',
+            'fund_code_id',
+            'housing_service_id'
+        )->withPivot('created_by_user_id', 'created_at');
+    }
+
     public function requirements(): HasMany
     {
         return $this->hasMany(FundCodeRequirement::class)

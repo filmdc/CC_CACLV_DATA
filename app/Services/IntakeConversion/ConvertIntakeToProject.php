@@ -26,7 +26,10 @@ use Illuminate\Support\Facades\Log;
  * Known business refusals throw ConversionBlocked (with the exact user-facing
  * message); unexpected failures roll back and rethrow for the caller to
  * surface. Fund codes/counties intentionally carry over in FULL from the
- * log's anticipated set (parity decision — no single-fund picker).
+ * log's anticipated set: at conversion nobody knows yet which fund will
+ * pay, so CONVERSION never asks her to pick one. Narrowing the project to
+ * the code it turns out to be paid from happens afterwards, on the project
+ * itself — see App\Services\ProjectFundingService.
  */
 class ConvertIntakeToProject
 {

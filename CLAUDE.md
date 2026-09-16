@@ -266,6 +266,19 @@ Both front doors share `App\Livewire\Concerns\ManagesIncomeEligibility` — only
 
 Fund-code association on `CommunicationLog` is via the `anticipatedFundCodes()` relation (table `communication_log_anticipated_fund_codes`). The legacy `communication_log_fund_code` tag pivot was dropped in P-39b.
 
+#### Project funding: narrowing to one fund code
+
+A project inherits its fund codes wholesale — the county decides which codes are in play, ALL anticipated codes carry over at conversion (`IntakeRequirementInstantiator::carryForwardToProject`). That is right at conversion, when nobody knows yet which fund will pay, and wrong once the award lands and the project is restricted to a single code of that county's set.
+
+`App\Services\ProjectFundingService` is the one place a live project's funding changes. It is deliberately **narrowing-shaped**: `availableFor()` is the county's codes (`FundCode::housingServices()`, the new inverse of `HousingService::fundCodes()`) plus whatever the originating intake anticipated — so nothing here can widen a project past what its county covers, and `add()` refuses a code outside that pool. The intake half of the pool exists for projects converted before counties carried fund codes; without it, narrowing one of those would be a one-way door.
+
+Two things hang off a project's fund codes and both are handled:
+
+- **Budget lines** (`project_budgets.fund_code_id`) — a code a budget line spends from cannot be dropped. This is the existing P-2.5 invariant in `HousingJob::detachFundCode()`; `blockedReason()` pre-checks it so the screen names the categories in the way *before* she commits, rather than failing on confirm.
+- **Requirements** (`source_type='fund_code'`) — split by `isUntouched()`. Ones never started (outstanding, no attachment, no note) came from a premise that turned out wrong and are offered for removal, default on. Ones carrying **any** progress — complete, not-applicable, or holding a file — are **never** removed by this path. This is a deliberate divergence from the main app's P-18 keep/delete modal (`ProjectManagement::confirmDetachFundCode`), which will hard-delete a completed requirement: `Requirement` does not soft-delete, so that path can destroy uploaded evidence. Kept requirements stay on the project as-is and come back into view if the fund code is added back — `RequirementInstantiator::forFundCode` skips templates that already have a row, so re-adding never duplicates.
+
+UI is portal-only (`Homes\ProjectDetail` → "Narrow funding" beside the fund chips; the budget empty-state links to it too). Step 1 lists what is on the project and what its county still offers; step 2 previews exactly what dropping the rest does. Gated on **`projects.manage`** — matching the main app's `attachFundCode`/`detachFundCode` posture rather than the portal's looser `projects.view`, because it moves money and requirements. `project_manager` and `Administrator` carry it; `housing_coordinator` deliberately does not. Tests: `tests/Feature/Homes/ProjectFundingTest.php`.
+
 #### Timeline entries ("Every touch")
 
 `communication_log_updates` rows are correctable and removable from the portal (`Homes\CallDetail` — Edit / Remove on each timeline row). Two rules carry it:
