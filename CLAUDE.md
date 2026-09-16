@@ -266,6 +266,17 @@ Both front doors share `App\Livewire\Concerns\ManagesIncomeEligibility` — only
 
 Fund-code association on `CommunicationLog` is via the `anticipatedFundCodes()` relation (table `communication_log_anticipated_fund_codes`). The legacy `communication_log_fund_code` tag pivot was dropped in P-39b.
 
+#### Timeline entries ("Every touch")
+
+`communication_log_updates` rows are correctable and removable from the portal (`Homes\CallDetail` — Edit / Remove on each timeline row). Two rules carry it:
+
+- **What a person typed is hers to fix or remove.** Editing rewrites `update_content` / `update_type` / `update_date` and stamps `edited_at` / `edited_by` — kept deliberately separate from `updated_at`, which moves for writes nobody typed (a merge re-pointing the row, a backfill). `created_at` / `created_by` never move, so the entry keeps its place in the chronology and its author.
+- **What the SYSTEM wrote about the record is never reworded** — requirement transitions, conversions, merges (`update_type = 'status_change'`, `CommunicationLogUpdate::TYPE_SYSTEM`). Rewriting one would make the record claim something that never happened. An admin may remove one; the project manager may not. `AUTHORED_TYPES` is the kind list offered on edit and deliberately excludes `status_change`.
+
+Removal is a **soft delete** (`SoftDeletes` + `TracksSoftDeleter` on the model, migration `2026_09_16_090000`), matching the posture the call log and the project already take. The entry leaves the timeline and every count taken off the `updates()` relation, but stays on the record under "Show N removed entries" — visible to anyone who can read the call, restorable in place by anyone with `communications_log.edit`. It is not a recycle-bin item: it is put back where it was taken from.
+
+Gate is `communications_log.edit` throughout, matching the main app's existing `CommunicationsLogManagement::deleteUpdate` (which now soft-deletes too, for free, via the model trait). The root row of the timeline is the log itself, not a row — its Edit opens the existing `openEdit()` modal, and it has no Remove (deleting it means deleting the call, which carries its own ordering rule in `HousingRecordDeleter`). Tests: `tests/Feature/Homes/TimelineEntryTest.php`.
+
 #### Uploaded file names
 
 Uploads keep the name the file already had. Spatie stores two: `file_name` (on disk) and `name` (the uploader's own). Several paths used to write Livewire's random temp hash into `file_name`, so screens reading that column surfaced `8f2c…c1a9.pdf`. All upload sites now pass `MediaValidationService::sanitizeFileName($file->getClientOriginalName())` — the convention `ProjectManagement` / `Homes\ProjectDetail` / `PdfFormService` already used — and every display path plus `MediaController` preview/download go through **`MediaValidationService::displayName($media)`**, which prefers `name` and carries the extension over from `file_name`. That second half repairs everything already uploaded (those rows all have the real name in `name`) without moving a single file on disk, so no backfill is needed. Tests: `tests/Feature/Homes/UploadedFileNamingTest.php`.

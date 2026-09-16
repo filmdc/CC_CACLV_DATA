@@ -112,18 +112,80 @@
         <section class="calv-card overflow-hidden">
             <header class="flex items-center px-4 py-3" style="border-bottom: 1px solid var(--calv-slate-15);">
                 <h3 class="calv-subhead flex-1" style="font-size: 12px;">Every touch</h3>
-                <span class="text-[11.5px]" style="color: var(--calv-slate-65);">newest first · nothing is ever deleted</span>
+                <span class="text-[11.5px]" style="color: var(--calv-slate-65);">newest first · removed entries are kept</span>
             </header>
             @foreach($timeline as $t)
-                <div class="flex gap-3.5 px-4 py-3" style="border-bottom: 1px solid var(--calv-slate-15);">
+                <div class="group flex gap-3.5 px-4 py-3" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <div class="shrink-0" style="width: 96px;">
                         <div class="calv-subhead" style="font-size: 11px; letter-spacing: .05em;">{{ $t['on']?->isoFormat('MMM D') }}</div>
                         <div class="text-[10.5px] mt-0.5" style="color: var(--calv-slate-65);">{{ $t['kind'] }}</div>
                         @if($t['by'])<div class="text-[10px] mt-0.5" style="color: var(--calv-slate-65);">{{ $t['by'] }}</div>@endif
                     </div>
-                    <div class="flex-1 text-[13px] leading-relaxed" style="color: var(--calv-slate);">{{ $t['note'] }}</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-[13px] leading-relaxed whitespace-pre-wrap" style="color: var(--calv-slate);">{{ $t['note'] }}</div>
+                        @if($t['due'])
+                            <div class="text-[11px] mt-1 calv-subhead" style="color: var(--calv-teal);">Due {{ $t['due']->isoFormat('MMM D, YYYY') }}</div>
+                        @endif
+                        @if($t['edited_by'])
+                            <div class="text-[10.5px] mt-1" style="color: var(--calv-slate-65);">
+                                edited by {{ $t['edited_by'] }}{{ $t['edited_on'] ? ' · '.$t['edited_on']->isoFormat('MMM D') : '' }}
+                            </div>
+                        @endif
+                    </div>
+                    @if($t['can_edit'] || $t['can_remove'])
+                        <div class="shrink-0 inline-flex gap-1.5 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+                            @if($t['can_edit'])
+                                <button type="button"
+                                        wire:click="{{ $t['root'] ? 'openEdit' : 'openEditEntry('.$t['id'].')' }}"
+                                        class="calv-btn calv-btn--ghost calv-btn--sm"
+                                        title="{{ $t['root'] ? 'Correct the original call' : 'Correct this entry' }}">Edit</button>
+                            @endif
+                            @if($t['can_remove'])
+                                <button type="button" wire:click="confirmRemoveEntry({{ $t['id'] }})"
+                                        class="calv-btn calv-btn--ghost calv-btn--sm"
+                                        style="color: var(--calv-red); border-color: var(--calv-slate-35);"
+                                        title="Take this entry off the timeline — it stays on the record and can be put back">Remove</button>
+                            @endif
+                        </div>
+                    @elseif($t['system'])
+                        {{-- Says why there is no Edit here, rather than leaving a silent gap. --}}
+                        <div class="shrink-0 text-[10.5px] self-center opacity-0 group-hover:opacity-100 transition-opacity" style="color: var(--calv-slate-65);" title="The system wrote this when the record changed">system</div>
+                    @endif
                 </div>
             @endforeach
+
+            {{-- Entries taken off the timeline. Shown to anyone who can read the
+                 record — a removal is part of its history, not hidden from it. --}}
+            @if($removedCount > 0)
+                <div class="px-4 py-2.5" style="border-bottom: 1px solid var(--calv-slate-15); background: var(--calv-sand-15);">
+                    <button type="button" wire:click="toggleRemovedEntries" class="calv-link text-left" style="font-size: 11.5px; background: none; border: none; cursor: pointer;">
+                        {{ $showRemovedEntries ? 'Hide' : 'Show' }} {{ $removedCount }} removed {{ Str::plural('entry', $removedCount) }}
+                    </button>
+                </div>
+                @if($showRemovedEntries)
+                    @foreach($removedEntries as $r)
+                        <div class="flex gap-3.5 px-4 py-3" style="border-bottom: 1px solid var(--calv-slate-15); background: var(--calv-sand-15);">
+                            <div class="shrink-0" style="width: 96px;">
+                                <div class="calv-subhead" style="font-size: 11px; letter-spacing: .05em; color: var(--calv-slate-65);">{{ $r['on']?->isoFormat('MMM D') }}</div>
+                                <div class="text-[10.5px] mt-0.5" style="color: var(--calv-slate-65);">{{ $r['kind'] }}</div>
+                                @if($r['by'])<div class="text-[10px] mt-0.5" style="color: var(--calv-slate-65);">{{ $r['by'] }}</div>@endif
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-[13px] leading-relaxed whitespace-pre-wrap" style="color: var(--calv-slate-65); text-decoration: line-through;">{{ $r['note'] }}</div>
+                                <div class="text-[10.5px] mt-1" style="color: var(--calv-slate-65);">
+                                    removed{{ $r['removed_by'] ? ' by '.$r['removed_by'] : '' }}{{ $r['removed_on'] ? ' · '.$r['removed_on']->isoFormat('MMM D') : '' }}
+                                </div>
+                            </div>
+                            @if($canEdit)
+                                <div class="shrink-0">
+                                    <button type="button" wire:click="restoreEntry({{ $r['id'] }})" class="calv-btn calv-btn--quiet calv-btn--sm">Put back</button>
+                                </div>
+                            @endif
+                        </div>
+                    @endforeach
+                @endif
+            @endif
+
             @can('communications_log.create')
                 <div class="px-4 py-3">
                     <button type="button" x-on:click="Livewire.dispatch('homes-open-quick-log')" class="calv-link text-left" style="font-size: 12.5px; background: none; border: none; cursor: pointer;">
@@ -761,6 +823,69 @@
     {{-- Merge a duplicate entry into this one --}}
     @if($showMerge)
         @include('livewire.homes.partials.merge-duplicate')
+    @endif
+
+    {{-- Correct one timeline entry. Explicit Cancel only. --}}
+    @if($editingEntryId)
+        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 48px 16px;">
+            <div class="w-full" style="max-width: 560px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+                <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
+                    <h2 class="calv-h1" style="font-size: 20px;">Correct this entry</h2>
+                    <div class="text-xs mt-1" style="color: var(--calv-slate-65);">{{ $who }} · COMM-{{ $log->id }}</div>
+                </header>
+                <div class="px-6 py-5 grid gap-3.5">
+                    <div>
+                        <label class="calv-label">What happened</label>
+                        <textarea wire:model="entryContent" rows="5" class="calv-input" style="resize: vertical;"></textarea>
+                        @error('entryContent')<p class="mt-1 text-xs" style="color: var(--calv-red);">{{ $message }}</p>@enderror
+                    </div>
+                    <div class="grid gap-3.5" style="grid-template-columns: 1fr 1fr;">
+                        <div>
+                            <label class="calv-label">Kind</label>
+                            <select wire:model="entryType" class="calv-input">
+                                @foreach($entryTypes as $value => $label)
+                                    <option value="{{ $value }}">{{ $label }}</option>
+                                @endforeach
+                            </select>
+                            @error('entryType')<p class="mt-1 text-xs" style="color: var(--calv-red);">{{ $message }}</p>@enderror
+                        </div>
+                        <div>
+                            <label class="calv-label">Due date <span style="color: var(--calv-slate-65); font-weight: 400;">(optional)</span></label>
+                            <input wire:model="entryDate" type="date" class="calv-input">
+                            @error('entryDate')<p class="mt-1 text-xs" style="color: var(--calv-red);">{{ $message }}</p>@enderror
+                        </div>
+                    </div>
+                    <p class="text-[11.5px]" style="color: var(--calv-slate-65);">
+                        The entry keeps its original date and author. It will be marked as edited so the timeline still reads honestly.
+                    </p>
+                </div>
+                <footer class="px-6 py-4 flex justify-end gap-2" style="border-top: 1px solid var(--calv-slate-15); background: var(--calv-sand-15);">
+                    <button type="button" wire:click="closeEditEntry" class="calv-btn calv-btn--quiet">Cancel</button>
+                    <button type="button" wire:click="saveEntry" class="calv-btn calv-btn--primary">Save entry</button>
+                </footer>
+            </div>
+        </div>
+    @endif
+
+    {{-- Remove one timeline entry. Explicit Cancel only. --}}
+    @if($removingEntryId && $removingEntry)
+        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 48px 16px;">
+            <div class="w-full" style="max-width: 480px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+                <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
+                    <h2 class="calv-h1" style="font-size: 20px;">Remove this entry?</h2>
+                    <div class="text-xs mt-1" style="color: var(--calv-slate-65);">{{ $removingEntry['kind'] }}{{ $removingEntry['on'] ? ' · '.$removingEntry['on']->isoFormat('MMM D, YYYY') : '' }}</div>
+                </header>
+                <div class="px-6 py-5 text-[13.5px] leading-relaxed" style="color: var(--calv-slate);">
+                    <blockquote class="px-3 py-2 text-[12.5px] whitespace-pre-wrap" style="border-left: 3px solid var(--calv-slate-35); color: var(--calv-slate-65);">{{ Str::limit($removingEntry['note'], 400) }}</blockquote>
+                    <p class="mt-3">It comes off the timeline right away.</p>
+                    <p class="mt-2.5" style="color: var(--calv-slate-65);">Nothing is destroyed — it stays on this record under &ldquo;removed&rdquo; and you can put it back yourself.</p>
+                </div>
+                <footer class="px-6 py-4 flex justify-end gap-2" style="border-top: 1px solid var(--calv-slate-15); background: var(--calv-sand-15);">
+                    <button type="button" wire:click="cancelRemoveEntry" class="calv-btn calv-btn--quiet">Cancel</button>
+                    <button type="button" wire:click="removeEntry" class="calv-btn calv-btn--primary">Yes, remove it</button>
+                </footer>
+            </div>
+        </div>
     @endif
 
     {{-- Delete confirmation. Explicit Cancel only — no backdrop/Escape close. --}}

@@ -5,6 +5,7 @@ namespace App\Livewire\Homes;
 use App\Livewire\Concerns\ManagesIncomeEligibility;
 use App\Livewire\Homes\Concerns\HasPins;
 use App\Models\CommunicationLog;
+use App\Models\CommunicationLogUpdate;
 use App\Models\HomesPin;
 use App\Models\HousingService;
 use App\Models\IntakeIncomeAssessment;
@@ -98,6 +99,22 @@ class CallDetail extends Component
     public string $mergeSearch = '';
 
     public ?int $mergeDuplicateId = null;
+
+    // ── Timeline entry editing ────────────────────────────────────
+    // One "Every touch" entry opened for correction, and the confirm step
+    // for removing one. Removals are recoverable, so the removed entries
+    // stay reachable from the card itself.
+    public ?int $editingEntryId = null;
+
+    public string $entryContent = '';
+
+    public string $entryType = 'note';
+
+    public string $entryDate = '';
+
+    public ?int $removingEntryId = null;
+
+    public bool $showRemovedEntries = false;
 
     // ── Follow-up editing ─────────────────────────────────────────
     public bool $editingFollowUp = false;
@@ -471,6 +488,162 @@ class CallDetail extends Component
         $this->showEdit = false;
         $this->log->refresh();
         session()->flash('homes_message', 'Entry updated.');
+    }
+
+    // ── Timeline entries ("Every touch") ──────────────────────────
+    //
+    // The timeline used to be append-only, which meant a note typed onto
+    // the wrong record stayed there for good. It is now correctable and
+    // removable, under two rules:
+    //
+    //  * Entries the SYSTEM wrote about itself — requirement transitions,
+    //    conversions, merges — are never reworded by anyone. They are
+    //    statements of what happened; rewriting one would make the record
+    //    claim something that never took place. An admin can remove one
+    //    outright (the recycle-bin posture: it stops showing, it does not
+    //    stop existing), the project manager cannot.
+    //  * Everything a person typed is hers to fix or remove.
+    //
+    // Nothing is destroyed either way: a removal soft-deletes, and the
+    // card offers the entry straight back.
+
+    public function openEditEntry(int $entryId): void
+    {
+        $entry = $this->ownEntry($entryId);
+
+        if ($entry->isSystemWritten()) {
+            session()->flash('homes_error', 'This entry was written by the system when the record changed, so it cannot be reworded. It can be removed instead.');
+
+            return;
+        }
+
+        $this->editingEntryId = $entry->id;
+        $this->entryContent = (string) $entry->update_content;
+        $this->entryType = array_key_exists((string) $entry->update_type, CommunicationLogUpdate::AUTHORED_TYPES)
+            ? (string) $entry->update_type
+            : 'note';
+        $this->entryDate = $entry->update_date?->format('Y-m-d') ?? '';
+        $this->resetErrorBag(['entryContent', 'entryType', 'entryDate']);
+    }
+
+    /** Explicit Cancel is the only close path (portal modal convention). */
+    public function closeEditEntry(): void
+    {
+        $this->editingEntryId = null;
+        $this->entryContent = '';
+        $this->entryType = 'note';
+        $this->entryDate = '';
+        $this->resetErrorBag(['entryContent', 'entryType', 'entryDate']);
+    }
+
+    public function saveEntry(): void
+    {
+        if (! $this->editingEntryId) {
+            return;
+        }
+
+        $entry = $this->ownEntry($this->editingEntryId);
+
+        if ($entry->isSystemWritten()) {
+            abort(403);
+        }
+
+        $this->validate([
+            'entryContent' => ['required', 'string', 'min:1', 'max:10000'],
+            'entryType' => ['required', 'in:'.implode(',', array_keys(CommunicationLogUpdate::AUTHORED_TYPES))],
+            'entryDate' => ['nullable', 'date'],
+        ]);
+
+        $entry->update_content = trim($this->entryContent);
+        $entry->update_type = $this->entryType;
+        $entry->update_date = $this->entryDate ?: null;
+        // Deliberately separate from updated_at, which moves for writes
+        // nobody typed (a merge re-pointing the row, a backfill).
+        $entry->edited_at = now();
+        $entry->edited_by = Auth::id();
+        $entry->save();
+
+        $this->closeEditEntry();
+        $this->log->refresh();
+        session()->flash('homes_message', 'Entry updated.');
+    }
+
+    public function confirmRemoveEntry(int $entryId): void
+    {
+        $entry = $this->ownEntry($entryId);
+
+        if ($entry->isSystemWritten() && ! $this->isAdmin()) {
+            session()->flash('homes_error', 'This entry records something the system did. An admin can remove it.');
+
+            return;
+        }
+
+        // One dialog at a time — removing replaces an open correction.
+        $this->closeEditEntry();
+        $this->removingEntryId = $entry->id;
+    }
+
+    public function cancelRemoveEntry(): void
+    {
+        $this->removingEntryId = null;
+    }
+
+    public function removeEntry(): void
+    {
+        if (! $this->removingEntryId) {
+            return;
+        }
+
+        $entry = $this->ownEntry($this->removingEntryId);
+
+        if ($entry->isSystemWritten() && ! $this->isAdmin()) {
+            abort(403);
+        }
+
+        // deleted_by is stamped by TracksSoftDeleter.
+        $entry->delete();
+
+        $this->removingEntryId = null;
+        $this->log->refresh();
+        session()->flash('homes_message', 'Entry removed. It stays on the record — reopen "removed" below to put it back.');
+    }
+
+    public function restoreEntry(int $entryId): void
+    {
+        $entry = $this->ownEntry($entryId, withTrashed: true);
+
+        if (! $entry->trashed()) {
+            return;
+        }
+
+        $entry->restore();
+
+        $this->log->refresh();
+        session()->flash('homes_message', 'Entry restored to the timeline.');
+    }
+
+    public function toggleRemovedEntries(): void
+    {
+        $this->showRemovedEntries = ! $this->showRemovedEntries;
+    }
+
+    /**
+     * An entry on THIS log, or a 403. Mirrors ownRequirement() — the id
+     * arrives from the browser, so the parent is always re-checked.
+     */
+    protected function ownEntry(int $entryId, bool $withTrashed = false): CommunicationLogUpdate
+    {
+        $this->authorizeAction('communications_log.edit');
+
+        $entry = CommunicationLogUpdate::query()
+            ->when($withTrashed, fn ($q) => $q->withTrashed())
+            ->findOrFail($entryId);
+
+        if ((int) $entry->communication_log_id !== (int) $this->log->id) {
+            abort(403);
+        }
+
+        return $entry;
     }
 
     // ── Counties (housing services) — attach/detach with requirement
@@ -905,31 +1078,70 @@ class CallDetail extends Component
     {
         $log = $this->log->load([
             'participant', 'property',
-            'updates.createdBy',
+            'updates.createdBy', 'updates.editedBy',
             'intakeRequirements' => fn ($q) => $q->where('is_orphaned', false),
             'intakeRequirements.definition',
             'intakeRequirements.media',
         ]);
 
+        $canEditLog = $this->can('communications_log.edit');
+        $isAdmin = $this->isAdmin();
+
         // "Every touch" — updates plus a synthesized root entry for the
         // original call, newest first.
         $timeline = $log->updates->map(fn ($u) => [
+            'id' => $u->id,
+            'root' => false,
             'on' => $u->created_at,
             'kind' => $u->update_type_display,
             'color' => $u->update_type_color,
             'note' => (string) $u->update_content,
             'by' => $u->createdBy?->name,
+            'due' => $u->update_date,
+            // The system's own entries are a record of what happened, so
+            // they are never reworded and only an admin may remove one.
+            'system' => $u->isSystemWritten(),
+            'edited_by' => $u->wasEdited() ? ($u->editedBy?->name ?: 'someone') : null,
+            'edited_on' => $u->edited_at,
+            'can_edit' => $canEditLog && ! $u->isSystemWritten(),
+            'can_remove' => $canEditLog && (! $u->isSystemWritten() || $isAdmin),
         ]);
 
+        // The original call is not a row of its own — it IS the log, so it
+        // is corrected through the entry editor and removed by deleting the
+        // whole record (which has its own ordering rule).
         $timeline->push([
+            'id' => null,
+            'root' => true,
             'on' => $log->communication_date,
             'kind' => ucfirst(str_replace('_', ' ', (string) $log->communication_type)).' · '.ucfirst((string) $log->direction),
             'color' => 'gray',
             'note' => (string) ($log->summary ?: $log->subject),
             'by' => null,
+            'due' => null,
+            'system' => false,
+            'edited_by' => null,
+            'edited_on' => null,
+            'can_edit' => $canEditLog,
+            'can_remove' => false,
         ]);
 
         $timeline = $timeline->sortByDesc('on')->values();
+
+        // Removed entries stay on the record. Everyone who can read the
+        // call can see that something was taken off it; putting it back
+        // needs the same permission that took it off.
+        $removedEntries = $this->showRemovedEntries
+            ? $log->updates()->onlyTrashed()->with(['createdBy', 'deletedBy'])->get()->map(fn ($u) => [
+                'id' => $u->id,
+                'on' => $u->created_at,
+                'kind' => $u->update_type_display,
+                'note' => (string) $u->update_content,
+                'by' => $u->createdBy?->name,
+                'removed_by' => $u->deletedBy?->name,
+                'removed_on' => $u->deleted_at,
+            ])->values()
+            : collect();
 
         // Phase-1 checklist rows.
         $requirements = $log->intakeRequirements->map(fn (IntakeRequirement $r) => [
@@ -974,8 +1186,14 @@ class CallDetail extends Component
             // Convert is available on ANY non-converted entry (the modal
             // carries the requirements gate + override), matching the main app.
             'canConvert' => ! $log->is_converted && $this->can('projects.create'),
-            'canEdit' => $this->can('communications_log.edit'),
+            'canEdit' => $canEditLog,
             'canDelete' => $this->can('communications_log.delete'),
+            'removedEntries' => $removedEntries,
+            'removedCount' => $log->updates()->onlyTrashed()->count(),
+            'entryTypes' => CommunicationLogUpdate::AUTHORED_TYPES,
+            'removingEntry' => $this->removingEntryId
+                ? $timeline->firstWhere('id', $this->removingEntryId)
+                : null,
             'documentRows' => $documentRows,
             'canRemoveFiles' => $this->canRemoveFiles(),
             'actingOn' => $this->actingOnRequirementId
