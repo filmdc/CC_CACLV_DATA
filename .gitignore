@@ -48,3 +48,5 @@ public/test.php
 # Misc
 "│"
 "\342\224\202"
+# Spatie media-library temp/conversion artifacts (runtime only)
+/storage/media-library
