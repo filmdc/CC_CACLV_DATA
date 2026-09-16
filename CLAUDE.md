@@ -266,6 +266,10 @@ Both front doors share `App\Livewire\Concerns\ManagesIncomeEligibility` — only
 
 Fund-code association on `CommunicationLog` is via the `anticipatedFundCodes()` relation (table `communication_log_anticipated_fund_codes`). The legacy `communication_log_fund_code` tag pivot was dropped in P-39b.
 
+#### Uploaded file names
+
+Uploads keep the name the file already had. Spatie stores two: `file_name` (on disk) and `name` (the uploader's own). Several paths used to write Livewire's random temp hash into `file_name`, so screens reading that column surfaced `8f2c…c1a9.pdf`. All upload sites now pass `MediaValidationService::sanitizeFileName($file->getClientOriginalName())` — the convention `ProjectManagement` / `Homes\ProjectDetail` / `PdfFormService` already used — and every display path plus `MediaController` preview/download go through **`MediaValidationService::displayName($media)`**, which prefers `name` and carries the extension over from `file_name`. That second half repairs everything already uploaded (those rows all have the real name in `name`) without moving a single file on disk, so no backfill is needed. Tests: `tests/Feature/Homes/UploadedFileNamingTest.php`.
+
 #### Duplicate intake merge
 
 The project manager sometimes logs the same homeowner twice — a second call arrives before she finds the first entry — and the person's history ends up split across two Comm Logs. `App\Services\CommunicationLogMergeService` folds one into the other.

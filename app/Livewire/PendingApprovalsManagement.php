@@ -6,6 +6,7 @@ use App\Models\ApprovalHistory;
 use App\Models\PendingApproval;
 use App\Models\ApprovalNotification;
 use App\Models\Program;
+use App\Services\MediaValidationService;
 use App\Traits\WithPermissionChecks;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -125,7 +126,7 @@ class PendingApprovalsManagement extends Component
         if ($approval->approvable && $approval->approvable instanceof \App\Models\ApprovalSubmission) {
             $this->detailAttachments = $approval->approvable->getMedia('attachments')->map(function ($media) {
                 return [
-                    'name' => $media->file_name,
+                    'name' => MediaValidationService::displayName($media),
                     'size' => $media->human_readable_size,
                     'url' => $media->getUrl(),
                     'mime' => $media->mime_type,

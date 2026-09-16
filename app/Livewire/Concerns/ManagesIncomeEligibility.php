@@ -7,6 +7,7 @@ use App\Models\IntakeIncomeAssessment;
 use App\Models\IntakeRequirement;
 use App\Models\PovertyGuideline;
 use App\Services\Intake\IncomeEligibilityCalculator;
+use App\Services\MediaValidationService;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -278,7 +279,7 @@ trait ManagesIncomeEligibility
         foreach ($this->incomeDocFiles as $file) {
             $requirement->addMedia($file->getRealPath())
                 ->usingName($file->getClientOriginalName())
-                ->usingFileName($file->hashName())
+                ->usingFileName(MediaValidationService::sanitizeFileName($file->getClientOriginalName()))
                 ->withCustomProperties(['income_doc_type' => $this->incomeDocSlot])
                 ->toMediaCollection('documents');
         }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\MediaValidationService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -21,7 +22,9 @@ class MediaController extends Controller
 
         return response()->file($path, [
             'Content-Type' => $media->mime_type,
-            'Content-Disposition' => 'inline; filename="'.$media->file_name.'"',
+            // The name the uploader's own file had, not the sanitized (or,
+            // on older rows, randomly hashed) name it was stored under.
+            'Content-Disposition' => 'inline; filename="'.MediaValidationService::displayName($media).'"',
         ]);
     }
 
@@ -33,7 +36,7 @@ class MediaController extends Controller
         $this->authorize('view', $media);
         $path = $this->ensureAccessibleMedia($media);
 
-        return response()->download($path, $media->file_name);
+        return response()->download($path, MediaValidationService::displayName($media));
     }
 
     /**

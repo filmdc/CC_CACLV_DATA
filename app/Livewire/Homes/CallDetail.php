@@ -9,13 +9,14 @@ use App\Models\HomesPin;
 use App\Models\HousingService;
 use App\Models\IntakeIncomeAssessment;
 use App\Models\IntakeRequirement;
+use App\Services\CommunicationLogMergeService;
 use App\Services\Homes\HousingPortalData;
 use App\Services\Homes\HousingRecordDeleter;
 use App\Services\IntakeConversion\ConversionBlocked;
 use App\Services\IntakeConversion\ConversionInput;
-use App\Services\CommunicationLogMergeService;
 use App\Services\IntakeConversion\ConvertIntakeToProject;
 use App\Services\IntakeRequirementInstantiator;
+use App\Services\MediaValidationService;
 use App\Traits\WithPermissionChecks;
 use App\Traits\WithProgramAccess;
 use Illuminate\Support\Facades\Auth;
@@ -392,7 +393,7 @@ class CallDetail extends Component
         return $req->getMedia('documents')->map(fn ($m) => [
             'id' => $m->id,
             'requirement_id' => $req->id,
-            'name' => $m->file_name,
+            'name' => MediaValidationService::displayName($m),
             'mime' => $m->mime_type,
             'size' => $m->human_readable_size,
             'uploaded' => $m->created_at,
@@ -599,7 +600,7 @@ class CallDetail extends Component
         foreach ($this->requirementFiles as $file) {
             $req->addMedia($file->getRealPath())
                 ->usingName($file->getClientOriginalName())
-                ->usingFileName($file->hashName())
+                ->usingFileName(MediaValidationService::sanitizeFileName($file->getClientOriginalName()))
                 ->toMediaCollection('documents');
         }
 

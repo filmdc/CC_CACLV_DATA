@@ -1460,7 +1460,7 @@ class ProjectManagement extends Component
         foreach ($requirements as $req) {
             foreach ($req->getMedia('attachments') as $m) {
                 $rows[] = [
-                    'name' => $m->file_name,
+                    'name' => MediaValidationService::displayName($m),
                     'mime' => $m->mime_type,
                     'size' => $m->human_readable_size,
                     'source' => 'Requirement · '.$req->title,
@@ -1482,7 +1482,7 @@ class ProjectManagement extends Component
             $milestoneLabel = $doc->milestone?->name ? ' ('.$doc->milestone->name.')' : '';
             foreach ($doc->getMedia('documents') as $m) {
                 $rows[] = [
-                    'name' => $m->file_name,
+                    'name' => MediaValidationService::displayName($m),
                     'mime' => $m->mime_type,
                     'size' => $m->human_readable_size,
                     'source' => 'Milestone doc · '.$docLabel.$milestoneLabel,

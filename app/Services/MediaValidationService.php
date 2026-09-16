@@ -6,6 +6,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * MediaValidationService
@@ -230,6 +231,41 @@ class MediaValidationService
 
         // Rebuild filename with extension
         return $nameWithoutExtension . '.' . Str::lower($extension);
+    }
+
+    /**
+     * The file name to SHOW a user, and to hand back on download.
+     *
+     * Spatie keeps two names on a media row: `file_name` is what sits on
+     * disk (sanitized - lowercased, hyphenated) and `name` is the name the
+     * uploader's own file had. Several upload paths historically stored a
+     * random Livewire hash as `file_name`, so reading that column surfaced
+     * "8f2c...c1a9.pdf" instead of "Pay Stub March.pdf". Those rows all
+     * carry the real name in `name`, so preferring it repairs the display
+     * of everything already uploaded without touching a single file.
+     *
+     * `name` is stored without an extension when the uploader did not set
+     * one explicitly, so the extension is carried over from `file_name`.
+     *
+     * @param Media $media The media record to label
+     * @return string Human-meaningful file name
+     */
+    public static function displayName(Media $media): string
+    {
+        $stored = (string) $media->file_name;
+        $original = trim((string) $media->name);
+
+        if ($original === '') {
+            return $stored;
+        }
+
+        $extension = pathinfo($stored, PATHINFO_EXTENSION);
+
+        if ($extension !== '' && pathinfo($original, PATHINFO_EXTENSION) === '') {
+            return $original . '.' . $extension;
+        }
+
+        return $original;
     }
 
     /**
