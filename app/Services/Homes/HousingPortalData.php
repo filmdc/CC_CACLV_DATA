@@ -253,6 +253,8 @@ class HousingPortalData
      * and by the pinned sections on Projects and Today.
      *
      * Expects participant, property, program, milestones and budgets loaded.
+     * Carries both the display strings and the raw dates behind them, so
+     * Projects::sortRows() can order on the same values the row shows.
      */
     public function projectRow(HousingJob $job): array
     {
@@ -273,6 +275,9 @@ class HousingPortalData
             'spent' => (float) $job->getTotalSpent(),
             'next' => $next['text'],
             'next_due' => $next['due'],
+            // Raw values behind the formatted ones, for list sorting.
+            'next_due_at' => $next['due_at'],
+            'created_at' => $job->created_at,
         ];
     }
 
