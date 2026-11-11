@@ -1677,12 +1677,10 @@ class DonorPerfectGiftsFeed extends Component
         try {
             // Check if API is configured
             if (! $giftService->isConfigured()) {
-                return view('livewire.donor-perfect-gifts-feed', [
-                    'gifts' => collect(),
+                return view('livewire.donor-perfect-gifts-feed', array_merge($this->emptyViewData(), [
                     'isConfigured' => false,
                     'errorMessage' => 'DonorPerfect API is not configured. Please contact your administrator to configure the connection.',
-                    'intacctConfigured' => false,
-                ])->layout('components.layouts.app');
+                ]))->layout('components.layouts.app');
             }
 
             $startDate = Carbon::parse($this->startDate);
@@ -1695,15 +1693,12 @@ class DonorPerfectGiftsFeed extends Component
             if (! $result['success']) {
                 $isAuthError = $result['auth_error'] ?? false;
 
-                return view('livewire.donor-perfect-gifts-feed', [
-                    'gifts' => collect(),
+                return view('livewire.donor-perfect-gifts-feed', array_merge($this->emptyViewData(), [
                     'isConfigured' => true,
                     'errorMessage' => $result['error'] ?? 'Unknown error occurred',
                     'isAuthError' => $isAuthError,
-                    'totalGifts' => 0,
-                    'totalAmount' => 0,
                     'intacctConfigured' => $this->checkIntacctConfigured(),
-                ])->layout('components.layouts.app');
+                ]))->layout('components.layouts.app');
             }
 
             $gifts = $result['gifts'];
@@ -1864,29 +1859,40 @@ class DonorPerfectGiftsFeed extends Component
                 // Configuration check itself failed
             }
 
-            return view('livewire.donor-perfect-gifts-feed', [
-                'gifts' => collect(),
+            return view('livewire.donor-perfect-gifts-feed', array_merge($this->emptyViewData(), [
                 'isConfigured' => $isActuallyConfigured,
                 'errorMessage' => 'Error fetching gifts: '.$e->getMessage(),
-                'isAuthError' => false,
-                'totalGifts' => 0,
-                'totalAmount' => 0,
-                'intacctConfigured' => false,
-                'selectedCount' => 0,
-                'codeMappingEnabled' => $this->codeMappingEnabled ?? false,
-                'useIntacctCodes' => $this->useIntacctCodes ?? false,
-                'fieldMappings' => collect(),
-                'availableDpFields' => [],
-                'syncHistory' => collect(),
-                'uniqueGiftTypes' => collect(),
-                'uniquePaymentTypes' => collect(),
-                'uniqueGlCodes' => collect(),
-                'uniqueCampaigns' => collect(),
-                'uniqueSolicitCodes' => collect(),
-                'uniqueSubSolicitCodes' => collect(),
-                'uniqueCheckScanBatches' => collect(),
-            ])->layout('components.layouts.app');
+            ]))->layout('components.layouts.app');
         }
+    }
+
+    /**
+     * Every variable the view reads, set to its empty value, so an early
+     * return (API down, not configured) can never leave one undefined.
+     */
+    private function emptyViewData(): array
+    {
+        return [
+            'gifts' => collect(),
+            'isAuthError' => false,
+            'totalGifts' => 0,
+            'totalAmount' => 0,
+            'intacctConfigured' => false,
+            'selectedCount' => 0,
+            'codeMappingEnabled' => $this->codeMappingEnabled ?? false,
+            'useIntacctCodes' => $this->useIntacctCodes ?? false,
+            'fieldMappings' => collect(),
+            'availableDpFields' => [],
+            'syncHistory' => collect(),
+            'uniqueGiftTypes' => collect(),
+            'uniquePaymentTypes' => collect(),
+            'uniqueGlCodes' => collect(),
+            'uniqueCampaigns' => collect(),
+            'uniqueSolicitCodes' => collect(),
+            'uniqueSubSolicitCodes' => collect(),
+            'uniqueCheckScanBatches' => collect(),
+            'uniqueBatches' => collect(),
+        ];
     }
 
     /**

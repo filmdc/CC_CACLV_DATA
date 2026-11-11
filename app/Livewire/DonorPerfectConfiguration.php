@@ -220,7 +220,7 @@ class DonorPerfectConfiguration extends Component
             } else {
                 $this->testConnectionResult = [
                     'success' => false,
-                    'message' => 'Connection failed: ' . ($result['error'] ?? 'Unknown error'),
+                    'message' => 'Connection failed: ' . ($result['error'] ?? $result['message'] ?? 'Unknown error'),
                     'details' => $result['details'] ?? null,
                 ];
             }

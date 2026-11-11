@@ -44,7 +44,7 @@
             <div class="p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-400">
                 <div class="flex">
                     <div class="ml-3">
-                        <p class="text-sm text-red-700 dark:text-red-300">{{ session('error') }}</p>
+                        <p class="text-sm text-red-700 dark:text-red-300">{{ \App\Services\DonorPerfectApiService::linkifyStatusPage(session('error')) }}</p>
                     </div>
                 </div>
             </div>
@@ -65,7 +65,7 @@
                             Authentication Failed
                         </h3>
                         <p class="text-sm text-red-700 dark:text-red-300 mb-4">
-                            {{ $errorMessage }}
+                            {{ \App\Services\DonorPerfectApiService::linkifyStatusPage($errorMessage) }}
                         </p>
                         <div class="bg-white dark:bg-zinc-800 rounded-md p-4 border border-red-200 dark:border-red-800">
                             <p class="text-sm font-medium text-gray-900 dark:text-white mb-2">What to check:</p>
@@ -104,7 +104,7 @@
                     </div>
                     <div class="ml-3">
                         <h3 class="text-sm font-medium text-red-800 dark:text-red-200">Error Loading Gifts</h3>
-                        <p class="text-sm text-red-700 dark:text-red-300 mt-1">{{ $errorMessage }}</p>
+                        <p class="text-sm text-red-700 dark:text-red-300 mt-1">{{ \App\Services\DonorPerfectApiService::linkifyStatusPage($errorMessage) }}</p>
                     </div>
                 </div>
             </div>
@@ -1001,7 +1001,7 @@
     <!-- Sync to Intacct Modal -->
     @if($showSyncModal)
     <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click="toggleSyncModal">
-        <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-md w-full mx-4" wire:click.stop>
+        <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-md w-full mx-4" @click.stop>
             <!-- Modal Header -->
             <div class="bg-purple-600 text-white p-6 rounded-t-lg flex justify-between items-center">
                 <div>
@@ -1099,7 +1099,7 @@
     <!-- Gift Details Modal -->
     @if($showDetailsModal && $selectedGift)
     <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click="closeDetailsModal">
-        <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto" wire:click.stop>
+        <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto" @click.stop>
             <!-- Modal Header -->
             <div class="bg-indigo-600 text-white p-6 rounded-t-lg flex justify-between items-center">
                 <div>
@@ -1157,7 +1157,7 @@
     <!-- Export Modal -->
     @if($showExportModal)
     <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click="toggleExportModal">
-        <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-md w-full mx-4" wire:click.stop>
+        <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-xl max-w-md w-full mx-4" @click.stop>
             <!-- Modal Header -->
             <div class="bg-green-600 text-white p-6 rounded-t-lg flex justify-between items-center">
                 <div>
