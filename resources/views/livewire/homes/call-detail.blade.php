@@ -597,6 +597,12 @@
                     <div class="text-xs mt-1" style="color: var(--calv-slate-65);">COMM-{{ $log->id }}</div>
                 </header>
                 <div class="px-6 py-5 grid gap-3.5" style="grid-template-columns: 1fr 1fr;">
+                    @if($log->participant && ! $log->is_converted)
+                        <div class="rounded-md px-3 py-2.5 text-[12.5px]" style="grid-column: 1 / -1; background: var(--calv-sand-15); color: var(--calv-slate);">
+                            Linked to participant <strong>{{ $log->participant->full_name }}</strong>. Their name is shown for this entry instead of the one typed below.
+                            <button type="button" wire:click="unlinkParticipant" wire:confirm="Unlink {{ $log->participant->full_name }} from this entry?" class="calv-link" style="font-size: 12.5px; background: none; border: none; padding: 0; cursor: pointer;">Not the same person? Unlink</button>
+                        </div>
+                    @endif
                     <div>
                         <label class="calv-label">First name</label>
                         <input wire:model="edit.contact_first_name" type="text" class="calv-input">

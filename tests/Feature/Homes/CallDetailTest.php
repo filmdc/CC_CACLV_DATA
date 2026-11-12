@@ -242,3 +242,23 @@ it('redirects legacy /calls?open=N links to the call detail route', function () 
     $this->get(route('homes.calls').'?open='.$log->id)
         ->assertRedirect(route('homes.call', $log->id));
 });
+
+it('unlinks a wrongly linked participant so the typed name shows again', function () {
+    $this->actingAs(callDetailUser(['communications_log.view', 'communications_log.edit']));
+
+    $participant = \App\Models\Participant::factory()->create(['first_name' => 'Zebulon', 'last_name' => 'Wronglink']);
+    $log = CommunicationLog::factory()->create([
+        'participant_id' => $participant->id,
+        'contact_first_name' => 'Zebulon',
+        'contact_last_name' => 'Kocos',
+    ]);
+
+    $data = app(\App\Services\Homes\HousingPortalData::class);
+    expect($data->personName($log->fresh()))->toBe('Zebulon Wronglink');
+
+    Livewire::test(CallDetail::class, ['log' => $log])
+        ->call('unlinkParticipant');
+
+    expect($log->fresh()->participant_id)->toBeNull();
+    expect($data->personName($log->fresh()))->toBe('Zebulon Kocos');
+});

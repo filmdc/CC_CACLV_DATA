@@ -56,6 +56,17 @@
                         {{ $kindLabel[$atom->kind] ?? $atom->kind }} · <span style="font-family: ui-monospace, Menlo, monospace;">{{ $atom->key }}</span>
                         @if($atom->hint) · {{ Str::limit($atom->hint, 60) }}@endif
                     </div>
+                    @unless($atom->trashed())
+                        @php
+                            $usedBy = $atom->housingServices->pluck('name')
+                                ->merge($atom->fundCodes->pluck('code')->map(fn ($code) => 'fund '.$code));
+                        @endphp
+                        @if($usedBy->isNotEmpty())
+                            <div class="text-[11px] mt-0.5" style="color: var(--calv-slate-65);">Used by: {{ $usedBy->join(', ') }}</div>
+                        @elseif(in_array($atom->category, \App\Models\RequirementDefinition::PHASE_1_CATEGORIES, true))
+                            <div class="text-[11px] mt-0.5" style="color: #8A6100;">Not linked to a county or fund yet, so it is not added to intakes automatically. Link it under Settings → Counties.</div>
+                        @endif
+                    @endunless
                 </div>
                 <span class="{{ $categoryLabel[$atom->category][1] ?? 'calv-badge' }}">{{ $categoryLabel[$atom->category][0] ?? $atom->category }}</span>
                 @if($canManage)

@@ -24,7 +24,15 @@
                             style="border: 1.5px solid var(--calv-teal); box-shadow: 0 0 0 3px var(--calv-teal-15);">
                         @error('who') <p class="mt-1.5 text-sm" style="color: var(--calv-red);">{{ $message }}</p> @enderror
                         @if($matchedParticipantId)
-                            <div class="text-[11.5px] mt-1.5" style="color: var(--calv-teal);">Matches an existing participant — we'll link them automatically.</div>
+                            <div class="text-[11.5px] mt-1.5" style="color: var(--calv-teal);">
+                                Linked to {{ $suggestedParticipantName }}, who is already on file.
+                                <button type="button" wire:click="unlinkParticipant" class="calv-link" style="font-size: 11.5px; background: none; border: none; padding: 0; cursor: pointer;">Undo</button>
+                            </div>
+                        @elseif($suggestedParticipantId)
+                            <div class="text-[11.5px] mt-1.5" style="color: var(--calv-slate-65);">
+                                {{ $suggestedParticipantName }} is already on file.
+                                <button type="button" wire:click="linkSuggestedParticipant" class="calv-link" style="font-size: 11.5px; background: none; border: none; padding: 0; cursor: pointer;">Same person — link this call</button>
+                            </div>
                         @endif
                     </div>
 

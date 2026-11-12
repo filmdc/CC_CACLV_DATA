@@ -646,6 +646,29 @@ class CallDetail extends Component
         return $entry;
     }
 
+    /**
+     * Detach a wrongly linked participant. A linked participant's name is
+     * shown ahead of the contact name typed on the entry, so a bad link
+     * makes name edits look as if they did not save.
+     */
+    public function unlinkParticipant(): void
+    {
+        $this->authorizeAction('communications_log.edit');
+
+        if ($this->log->is_converted || ! $this->log->participant_id) {
+            return;
+        }
+
+        $this->log->update([
+            'participant_id' => null,
+            'household_id' => null,
+            'updated_by' => Auth::id(),
+        ]);
+        $this->log->refresh();
+
+        session()->flash('homes_message', 'Participant unlinked — this entry now shows the name typed on it.');
+    }
+
     // ── Counties (housing services) — attach/detach with requirement
     //    side effects, mirroring the main app's toggleHousingServiceOnLog ──
 

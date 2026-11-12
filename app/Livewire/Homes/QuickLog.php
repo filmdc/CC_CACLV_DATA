@@ -49,7 +49,13 @@ class QuickLog extends Component
 
     public string $role = '';
 
+    /** Participant the worker explicitly chose to link — never set by typing alone. */
     public ?int $matchedParticipantId = null;
+
+    /** Possible existing participant for the typed name. A suggestion only. */
+    public ?int $suggestedParticipantId = null;
+
+    public string $suggestedParticipantName = '';
 
     protected array $followUpOptions = ['No follow-up', 'Call back', "They're sending documents", 'Send application'];
 
@@ -76,7 +82,7 @@ class QuickLog extends Component
 
     public function resetForm(): void
     {
-        $this->reset(['who', 'what', 'followUp', 'followUpWhen', 'showDetails', 'address', 'city', 'state', 'zip', 'phone', 'email', 'role', 'matchedParticipantId']);
+        $this->reset(['who', 'what', 'followUp', 'followUpWhen', 'showDetails', 'address', 'city', 'state', 'zip', 'phone', 'email', 'role', 'matchedParticipantId', 'suggestedParticipantId', 'suggestedParticipantName']);
         $this->followUp = 'No follow-up';
         $this->followUpWhen = '1 week';
         $this->state = 'PA';
@@ -84,23 +90,57 @@ class QuickLog extends Component
 
     public function setFollowUp(string $option): void
     {
-        $this->followUp = in_array($option, $this->followUpOptions, true) ? $option : 'No follow-up';
+        if (! in_array($option, $this->followUpOptions, true)) {
+            $option = 'No follow-up';
+        }
+
+        // Clicking the selected option again clears it, so an accidental
+        // pick can be undone without hunting for "No follow-up".
+        $this->followUp = $this->followUp === $option ? 'No follow-up' : $option;
     }
 
-    /** Suggest an existing participant match as the name is typed. */
+    /**
+     * Suggest an existing participant as the name is typed. This only
+     * offers the match: the call is linked when the worker confirms it via
+     * linkSuggestedParticipant(). Linking on a partial match used to attach
+     * a first-name-only entry ("Michael") to the first "Michael ..." on
+     * file, and the linked participant's name then replaced the typed one.
+     */
     public function updatedWho(): void
     {
         $this->matchedParticipantId = null;
+        $this->suggestedParticipantId = null;
+        $this->suggestedParticipantName = '';
+
         $name = trim($this->who);
         if (strlen($name) < 3) {
             return;
         }
 
+        $fullName = "TRIM(CONCAT(COALESCE(first_name,''), ' ', COALESCE(last_name,'')))";
+
         $match = Participant::query()
-            ->whereRaw("CONCAT(COALESCE(first_name,''), ' ', COALESCE(last_name,'')) LIKE ?", ["%{$name}%"])
+            ->whereRaw("{$fullName} LIKE ?", ["%{$name}%"])
+            // An exact full-name match outranks a partial one.
+            ->orderByRaw("CASE WHEN LOWER({$fullName}) = ? THEN 0 ELSE 1 END", [mb_strtolower($name)])
+            ->orderBy('id')
             ->first();
 
-        $this->matchedParticipantId = $match?->id;
+        if ($match !== null) {
+            $this->suggestedParticipantId = $match->id;
+            $this->suggestedParticipantName = trim((string) $match->full_name);
+        }
+    }
+
+    /** The worker confirmed the suggestion — link this call to that participant. */
+    public function linkSuggestedParticipant(): void
+    {
+        $this->matchedParticipantId = $this->suggestedParticipantId;
+    }
+
+    public function unlinkParticipant(): void
+    {
+        $this->matchedParticipantId = null;
     }
 
     public function save()

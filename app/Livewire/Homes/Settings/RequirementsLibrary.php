@@ -181,6 +181,8 @@ class RequirementsLibrary extends Component
     public function render()
     {
         $atoms = RequirementDefinition::query()
+            // Shown per row so it is obvious which items reach an intake.
+            ->with(['housingServices', 'fundCodes'])
             ->when($this->showTrashed, fn ($q) => $q->onlyTrashed())
             ->when($this->search !== '', fn ($q) => $q->where(fn ($qq) => $qq
                 ->where('label', 'like', "%{$this->search}%")
