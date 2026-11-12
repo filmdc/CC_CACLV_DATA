@@ -981,7 +981,12 @@
                         ->values();
                 @endphp
                 <div class="mb-4">
-                    <x-comm.requirements-panel :items="$viewerReqs" title="Phase 1 · Eligibility &amp; Compliance" />
+                    <x-comm.requirements-panel :items="$viewerReqs" title="Phase 1 · Eligibility &amp; Compliance"
+                        :income-comparison="[
+                            'years' => $this->incomeComparisonYears(),
+                            'year' => $incomeCompareYear,
+                            'result' => $this->incomeComparison,
+                        ]" />
                 </div>
 
                 {{-- Central "Documents on file" view: every uploaded document

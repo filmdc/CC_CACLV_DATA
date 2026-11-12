@@ -423,4 +423,25 @@ class PovertyGuideline extends Model
             ->where('period', $period)
             ->max('year');
     }
+
+    /**
+     * Every guideline year loaded for a region, newest first.
+     *
+     * Lets a caller offer a determination against a year other than the
+     * one it was taken against without guessing which years exist —
+     * only one is loaded per region in a fresh install, and HHS/HUD
+     * years arrive at different times.
+     *
+     * @return array<int, int>
+     */
+    public static function yearsFor($region = '48_contiguous', $period = 'annual'): array
+    {
+        return static::where('region', $region)
+            ->where('period', $period)
+            ->distinct()
+            ->orderByDesc('year')
+            ->pluck('year')
+            ->map(fn ($year) => (int) $year)
+            ->all();
+    }
 }

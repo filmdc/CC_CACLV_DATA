@@ -44,6 +44,18 @@ trait ManagesIncomeEligibility
 
     public array $incomeDocFiles = [];
 
+    /**
+     * A guideline year the determination of record is being held up
+     * against. Read-only and request-scoped: it changes what is on
+     * screen, never what is stored.
+     */
+    public ?int $incomeCompareYear = null;
+
+    /** Per-request memo for currentIncomeAssessment(). */
+    private ?IntakeIncomeAssessment $loadedIncomeAssessment = null;
+
+    private bool $incomeAssessmentLoaded = false;
+
     /** The intake this calculator is operating on. */
     abstract protected function incomeEligibilityLog(): ?CommunicationLog;
 
@@ -83,7 +95,7 @@ trait ManagesIncomeEligibility
         }
 
         $calc = app(IncomeEligibilityCalculator::class);
-        $assessment = $log->incomeAssessment()->first();
+        $assessment = $this->currentIncomeAssessment();
 
         if ($assessment !== null) {
             $this->incomeForm = [
@@ -163,7 +175,12 @@ trait ManagesIncomeEligibility
             $this->incomeForm['entry_period'] ?? 'annual'
         );
 
-        return $calc->assess($annual, $this->incomeForm['household_size'] ?? null, null, $this->incomeGuidelineRegion());
+        return $calc->assess(
+            $annual,
+            $this->incomeForm['household_size'] ?? null,
+            $this->incomePinnedYear(),
+            $this->incomeGuidelineRegion()
+        );
     }
 
     // ── Persistence ───────────────────────────────────────────────
@@ -207,34 +224,56 @@ trait ManagesIncomeEligibility
             return;
         }
 
-        $assessed = $calc->assess($annual, $this->incomeForm['household_size'], null, $this->incomeGuidelineRegion());
+        // A saved determination is re-run against the year it was taken
+        // against, never silently against the newest table loaded —
+        // see incomePinnedYear().
+        $pinnedYear = $this->incomePinnedYear();
+
+        $assessed = $calc->assess(
+            $annual,
+            $this->incomeForm['household_size'],
+            $pinnedYear,
+            $this->incomeGuidelineRegion()
+        );
         $requirement = $this->incomeRequirement();
         $actor = Auth::user();
 
-        $assessment = IntakeIncomeAssessment::updateOrCreate(
-            ['communication_log_id' => $log->id],
-            [
-                'intake_requirement_id' => $requirement?->id,
-                'household_size' => (int) $this->incomeForm['household_size'],
-                'entry_period' => $period,
-                'income_sources' => $sources,
-                // Only meaningful when nothing was itemized; kept so
-                // reopening the form shows what she actually typed.
-                'entered_amount' => empty($sources) && is_numeric($entered) ? round((float) $entered, 2) : null,
-                'monthly_income' => $assessed['monthly_income'],
-                'annual_income' => $assessed['annual_income'],
-                'guideline_year' => $assessed['guideline_year'],
-                'guideline_region' => $assessed['guideline_region'],
-                'poverty_threshold' => $assessed['threshold'],
-                'area_median_income' => $assessed['ami'],
-                'poverty_percentage' => $assessed['percentage'],
-                'poverty_bracket' => $assessed['bracket'],
-                'calculated_at' => now(),
-                'notes' => trim((string) $this->incomeForm['notes']) ?: null,
-                'created_by_user_id' => $actor?->id,
-                'updated_by_user_id' => $actor?->id,
-            ]
-        );
+        $assessment = $this->currentIncomeAssessment()
+            ?? new IntakeIncomeAssessment(['communication_log_id' => $log->id]);
+        $isNew = ! $assessment->exists;
+
+        $assessment->fill([
+            'intake_requirement_id' => $requirement?->id,
+            'household_size' => (int) $this->incomeForm['household_size'],
+            'entry_period' => $period,
+            'income_sources' => $sources,
+            // Only meaningful when nothing was itemized; kept so
+            // reopening the form shows what she actually typed.
+            'entered_amount' => empty($sources) && is_numeric($entered) ? round((float) $entered, 2) : null,
+            'monthly_income' => $assessed['monthly_income'],
+            'annual_income' => $assessed['annual_income'],
+            'guideline_year' => $assessed['guideline_year'],
+            'guideline_region' => $assessed['guideline_region'],
+            'poverty_threshold' => $assessed['threshold'],
+            'area_median_income' => $assessed['ami'],
+            'poverty_percentage' => $assessed['percentage'],
+            'poverty_bracket' => $assessed['bracket'],
+            'calculated_at' => now(),
+            'notes' => trim((string) $this->incomeForm['notes']) ?: null,
+            'updated_by_user_id' => $actor?->id,
+        ]);
+
+        // The original author stays the original author; only the
+        // editor moves. Rewriting created_by on every edit would make
+        // the record claim the last person to touch it took the
+        // determination.
+        if ($isNew) {
+            $assessment->created_by_user_id = $actor?->id;
+        }
+
+        $assessment->save();
+        $this->forgetIncomeAssessment();
+        $this->incomeCompareYear = null;
 
         // Capturing the figures is what satisfies the requirement; the
         // proof documents are collected on the same row and can lag.
@@ -251,12 +290,22 @@ trait ManagesIncomeEligibility
         $this->showIncomeModal = false;
         $this->incomeDocFiles = [];
 
-        session()->flash(
-            $this->incomeFlashKey(),
-            $assessed['available']
-                ? 'Income eligibility saved — '.$assessed['label'].'.'
-                : 'Income eligibility saved. No income guidelines are loaded for this household size yet, so no percentage was calculated.'
-        );
+        $message = $assessed['available']
+            ? 'Income eligibility saved — '.$assessed['label'].'.'
+            : 'Income eligibility saved. No income guidelines are loaded for this household size yet, so no percentage was calculated.';
+
+        // Editing the figures must not quietly move a household onto a
+        // newer table, so say plainly that it did not.
+        if ($pinnedYear !== null && $assessed['available']) {
+            $newest = PovertyGuideline::latestYear($assessed['guideline_region']);
+
+            if ($newest !== null && (int) $newest !== (int) $assessed['guideline_year']) {
+                $message .= ' Kept on the '.$assessed['guideline_year']
+                    .' guidelines it was originally determined against.';
+            }
+        }
+
+        session()->flash($this->incomeFlashKey(), $message);
     }
 
     // ── Proof documents (pay stubs / tax return / benefit letters) ──
@@ -332,10 +381,124 @@ trait ManagesIncomeEligibility
         return $groups;
     }
 
-    /** The saved assessment for the current intake, if any. */
+    /**
+     * The saved assessment for the current intake, if any. Memoized for
+     * the request — the live preview re-reads it on every keystroke.
+     */
     public function currentIncomeAssessment(): ?IntakeIncomeAssessment
     {
-        return $this->incomeEligibilityLog()?->incomeAssessment()->first();
+        if (! $this->incomeAssessmentLoaded) {
+            $this->loadedIncomeAssessment = $this->incomeEligibilityLog()?->incomeAssessment()->first();
+            $this->incomeAssessmentLoaded = true;
+        }
+
+        return $this->loadedIncomeAssessment;
+    }
+
+    /** Drop the memo after a write. */
+    protected function forgetIncomeAssessment(): void
+    {
+        $this->loadedIncomeAssessment = null;
+        $this->incomeAssessmentLoaded = false;
+    }
+
+    /**
+     * The guideline year an existing determination is measured against.
+     *
+     * A determination is a SNAPSHOT: HHS republishes the poverty
+     * guidelines every January and HUD reissues the HOME limits every
+     * year, and a household qualified against FY2026 has to keep
+     * reading that way. So editing the figures on a saved
+     * determination re-runs them against the same year — correcting a
+     * pay stub must not silently restate what the household was
+     * qualified at. Moving a determination onto a newer year is a
+     * re-determination: a decision someone makes deliberately.
+     *
+     * Null for a first determination, which resolves to the newest year
+     * loaded. Null too when the row carries no year, and harmless when
+     * the dataset itself has changed underneath (a log that has since
+     * gained a housing service reads the HOME limits now) — the
+     * calculator falls forward to that region's newest year on its own.
+     */
+    protected function incomePinnedYear(): ?int
+    {
+        $year = $this->currentIncomeAssessment()?->guideline_year;
+
+        return $year ? (int) $year : null;
+    }
+
+    // ── Checking the figures against another guideline year ────────
+
+    /**
+     * Years this determination could be held up against: every year
+     * loaded for the dataset it was measured against, minus the one of
+     * record. Empty when there is nothing to compare to, so the control
+     * stays off the screen instead of offering a list of one.
+     *
+     * @return array<int, int>
+     */
+    public function incomeComparisonYears(): array
+    {
+        $assessment = $this->currentIncomeAssessment();
+
+        if ($assessment === null || ! $assessment->isComplete()) {
+            return [];
+        }
+
+        $ofRecord = (int) $assessment->guideline_year;
+
+        return array_values(array_filter(
+            PovertyGuideline::yearsFor($assessment->guideline_region),
+            fn (int $year) => $year !== $ofRecord
+        ));
+    }
+
+    /**
+     * Hold the recorded figures up against another year's guidelines.
+     *
+     * Deliberately READ-ONLY: nothing is written, the determination of
+     * record does not move, and the answer goes away when it is closed.
+     * It answers "what would this household look like under the FY2027
+     * limits?" without restating what they were qualified at.
+     */
+    public function compareIncomeYear($year): void
+    {
+        $this->authorizeAction('communications_log.view');
+
+        $year = (int) $year;
+
+        $this->incomeCompareYear = in_array($year, $this->incomeComparisonYears(), true)
+            ? $year
+            : null;
+    }
+
+    public function clearIncomeComparison(): void
+    {
+        $this->incomeCompareYear = null;
+    }
+
+    /**
+     * The recorded income and household size run against
+     * $incomeCompareYear — same figures, same dataset, different year.
+     *
+     * The region comes off the assessment rather than the live intake:
+     * moving the year and the dataset at once would answer a question
+     * nobody asked.
+     */
+    public function getIncomeComparisonProperty(): ?array
+    {
+        $assessment = $this->currentIncomeAssessment();
+
+        if ($this->incomeCompareYear === null || $assessment === null || ! $assessment->isComplete()) {
+            return null;
+        }
+
+        return app(IncomeEligibilityCalculator::class)->assess(
+            $assessment->annual_income,
+            $assessment->household_size,
+            $this->incomeCompareYear,
+            $assessment->guideline_region
+        );
     }
 
     /** The standing income-eligibility checklist row for this intake. */

@@ -289,6 +289,67 @@
                                             Annual income, household size, and proof — pay stubs, tax return, benefit letters.
                                         @endif
                                     </div>
+
+                                    {{-- Read-only check against another year's guidelines.
+                                         Shows only when a year other than the one of record
+                                         is loaded, and writes nothing — the determination
+                                         stays snapshotted where it was taken. Restating what
+                                         a household was qualified at is a re-determination,
+                                         not a lookup. --}}
+                                    @php
+                                        $cmpYears = $hasFigures ? $this->incomeComparisonYears() : [];
+                                        $cmp = $this->incomeComparison;
+                                        $yearLabel = fn ($y) => ($incomeAssessment->isHomeDetermination() ? 'FY' : '').$y;
+                                    @endphp
+                                    @if(count($cmpYears))
+                                        @if($cmp === null)
+                                            <div class="flex flex-wrap items-center gap-1 mt-1">
+                                                <span class="text-[10.5px]" style="color: var(--calv-slate-65);">Check against</span>
+                                                @foreach($cmpYears as $y)
+                                                    <button type="button" wire:click="compareIncomeYear({{ $y }})"
+                                                            class="calv-btn calv-btn--ghost calv-btn--sm"
+                                                            title="See these same figures under the {{ $yearLabel($y) }} guidelines — nothing is saved">
+                                                        {{ $yearLabel($y) }}
+                                                    </button>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <div class="mt-1 rounded-md px-2 py-1.5"
+                                                 style="background: var(--calv-sand-15); border: 1px dashed var(--calv-slate-35);">
+                                                <div class="flex items-center justify-between gap-2">
+                                                    <span class="calv-subhead text-[9px]" style="color: var(--calv-slate-65);">
+                                                        If measured against {{ $yearLabel($incomeCompareYear) }}
+                                                    </span>
+                                                    <button type="button" wire:click="clearIncomeComparison"
+                                                            class="text-[10px] underline" style="color: var(--calv-slate-65);">close</button>
+                                                </div>
+                                                @if($cmp['available'])
+                                                    @php $cmpPct = rtrim(rtrim(number_format((float) $cmp['percentage'], 1), '0'), '.'); @endphp
+                                                    <div class="flex flex-wrap items-center gap-1.5 mt-1">
+                                                        <span class="calv-badge">{{ $cmpPct }}% {{ $cmp['bracket_unit'] === 'AMI' ? 'of AMI' : 'FPL' }}</span>
+                                                        @if($cmp['tier_label'])
+                                                            <span class="calv-badge">{{ $cmp['tier_label'] }}</span>
+                                                        @endif
+                                                        @if($cmp['eligible'] === true)
+                                                            <span class="calv-badge calv-badge--sage">Would be income eligible</span>
+                                                        @elseif($cmp['eligible'] === false)
+                                                            <span class="calv-badge calv-badge--amber">Would be over income</span>
+                                                        @endif
+                                                    </div>
+                                                    <div class="text-[10.5px] mt-1" style="color: var(--calv-slate-65);">
+                                                        @if($cmp['bracket_unit'] === 'AMI' && $cmp['threshold'] !== null)
+                                                            {{ $yearLabel($incomeCompareYear) }} limit ${{ number_format((float) $cmp['threshold'], 0) }}@if($cmp['ami'] !== null) · area median ${{ number_format((float) $cmp['ami'], 0) }}@endif ·
+                                                        @endif
+                                                        Nothing saved — the determination of record is still {{ $yearLabel($incomeAssessment->guideline_year) }}.
+                                                    </div>
+                                                @else
+                                                    <div class="text-[10.5px] mt-1" style="color: var(--calv-slate-65);">
+                                                        No {{ $yearLabel($incomeCompareYear) }} guideline covers a household of {{ $incomeAssessment->household_size }}.
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        @endif
+                                    @endif
                                 </div>
                             @endif
                             @if($r['worker_note'])

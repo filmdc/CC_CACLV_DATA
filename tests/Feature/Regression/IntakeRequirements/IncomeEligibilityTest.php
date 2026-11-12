@@ -463,3 +463,267 @@ it('keeps the income requirement when the service that triggered it is detached'
     expect($req)->not->toBeNull()
         ->and($req->is_orphaned)->toBeFalse();
 })->group('regression');
+
+// -----------------------------------------------------------------
+// The snapshot holds: editing figures never restates the year
+// -----------------------------------------------------------------
+
+/**
+ * A second HOME year, as if HUD had reissued the limits — the 4-person
+ * ceiling of $88,000 derives a $110,000 median family income.
+ */
+function incomeLoadHome2027(): void
+{
+    $ceilings = [
+        1 => 61600, 2 => 70400, 3 => 79200, 4 => 88000,
+        5 => 95040, 6 => 102080, 7 => 109120, 8 => 116160,
+    ];
+
+    foreach ($ceilings as $size => $annual) {
+        PovertyGuideline::upsertHomeCeiling(2027, $size, (float) $annual);
+    }
+}
+
+/** A housing intake with the pivot attached, so it reads the HOME limits. */
+function incomeYearIntake(): CommunicationLog
+{
+    $log = CommunicationLog::factory()->create();
+    $svc = HousingService::factory()->create();
+    app(IntakeRequirementInstantiator::class)->forHousingService($log, $svc, RegressionHelpers::adminUser());
+    $log->housingServices()->attach($svc->id, [
+        'created_by_user_id' => RegressionHelpers::adminUser()->id,
+        'created_at' => now(),
+    ]);
+
+    return $log->fresh();
+}
+
+it('keeps an edited determination on the guideline year it was taken against', function () {
+    $log = incomeYearIntake();
+
+    $component = Livewire::actingAs(incomeUser())->test(CallDetail::class, ['log' => $log]);
+
+    $component->call('openIncomeEligibility')
+        ->set('incomeForm.household_size', 4)
+        ->set('incomeSources', [])
+        ->set('incomeForm.entered_amount', '24000')
+        ->call('saveIncomeEligibility')
+        ->assertHasNoErrors();
+
+    expect(IntakeIncomeAssessment::where('communication_log_id', $log->id)->value('guideline_year'))->toBe(2026);
+
+    // HUD reissues: FY2027 lands in the table.
+    incomeLoadHome2027();
+
+    // She corrects the income — a typo on a pay stub, not a new
+    // determination. The year, ceiling and median must not move.
+    $component->call('openIncomeEligibility')
+        ->set('incomeForm.entered_amount', '26000')
+        ->call('saveIncomeEligibility')
+        ->assertHasNoErrors();
+
+    $assessment = IntakeIncomeAssessment::where('communication_log_id', $log->id)->first();
+
+    expect($assessment->guideline_year)->toBe(2026)
+        ->and((float) $assessment->annual_income)->toBe(26000.0)
+        ->and((float) $assessment->poverty_threshold)->toBe(83500.0)
+        ->and((float) $assessment->area_median_income)->toBe(104375.0);
+})->group('regression');
+
+it('pins only an existing determination — a fresh intake resolves the year normally', function () {
+    // An older HOME year is on file alongside FY2026. A first
+    // determination carries no pin, so it resolves the way it always
+    // has (IncomeEligibilityCalculator::resolveYear: the current
+    // calendar year when loaded, otherwise the newest year) rather
+    // than inheriting a year from some other record.
+    foreach ([1 => 55000, 2 => 62800, 3 => 70650, 4 => 78500] as $size => $annual) {
+        PovertyGuideline::upsertHomeCeiling(2025, $size, (float) $annual);
+    }
+
+    $log = incomeYearIntake();
+
+    Livewire::actingAs(incomeUser())
+        ->test(CallDetail::class, ['log' => $log])
+        ->call('openIncomeEligibility')
+        ->set('incomeForm.household_size', 4)
+        ->set('incomeSources', [])
+        ->set('incomeForm.entered_amount', '24000')
+        ->call('saveIncomeEligibility')
+        ->assertHasNoErrors();
+
+    $assessment = IntakeIncomeAssessment::where('communication_log_id', $log->id)->first();
+
+    expect($assessment->guideline_year)->toBe(2026)
+        ->and((float) $assessment->poverty_threshold)->toBe(83500.0)
+        ->and((float) $assessment->area_median_income)->toBe(104375.0);
+})->group('regression');
+
+it('keeps the original author when someone else edits the figures', function () {
+    $log = incomeYearIntake();
+    $first = incomeUser();
+    $second = incomeUser();
+
+    Livewire::actingAs($first)->test(CallDetail::class, ['log' => $log])
+        ->call('openIncomeEligibility')
+        ->set('incomeForm.household_size', 2)
+        ->set('incomeSources', [])
+        ->set('incomeForm.entered_amount', '20000')
+        ->call('saveIncomeEligibility')
+        ->assertHasNoErrors();
+
+    Livewire::actingAs($second)->test(CallDetail::class, ['log' => $log])
+        ->call('openIncomeEligibility')
+        ->set('incomeForm.entered_amount', '21000')
+        ->call('saveIncomeEligibility')
+        ->assertHasNoErrors();
+
+    $assessment = IntakeIncomeAssessment::where('communication_log_id', $log->id)->first();
+
+    expect($assessment->created_by_user_id)->toBe($first->id)
+        ->and($assessment->updated_by_user_id)->toBe($second->id)
+        ->and((float) $assessment->annual_income)->toBe(21000.0);
+})->group('regression');
+
+// -----------------------------------------------------------------
+// Checking the figures against another year (read-only)
+// -----------------------------------------------------------------
+
+it('offers no year comparison when only one guideline year is loaded', function () {
+    $log = incomeYearIntake();
+
+    $component = Livewire::actingAs(incomeUser())->test(CallDetail::class, ['log' => $log])
+        ->call('openIncomeEligibility')
+        ->set('incomeForm.household_size', 4)
+        ->set('incomeSources', [])
+        ->set('incomeForm.entered_amount', '24000')
+        ->call('saveIncomeEligibility');
+
+    expect($component->instance()->incomeComparisonYears())->toBe([]);
+})->group('regression');
+
+it('offers the other year once HUD reissues the limits', function () {
+    $log = incomeYearIntake();
+
+    $component = Livewire::actingAs(incomeUser())->test(CallDetail::class, ['log' => $log])
+        ->call('openIncomeEligibility')
+        ->set('incomeForm.household_size', 4)
+        ->set('incomeSources', [])
+        ->set('incomeForm.entered_amount', '24000')
+        ->call('saveIncomeEligibility');
+
+    incomeLoadHome2027();
+
+    // The year of record is never offered as a comparison to itself.
+    expect($component->instance()->incomeComparisonYears())->toBe([2027]);
+})->group('regression');
+
+it('measures the recorded figures against another year without writing anything', function () {
+    $log = incomeYearIntake();
+
+    $component = Livewire::actingAs(incomeUser())->test(CallDetail::class, ['log' => $log])
+        ->call('openIncomeEligibility')
+        ->set('incomeForm.household_size', 4)
+        ->set('incomeSources', [])
+        ->set('incomeForm.entered_amount', '24000')
+        ->call('saveIncomeEligibility');
+
+    incomeLoadHome2027();
+
+    $before = IntakeIncomeAssessment::where('communication_log_id', $log->id)->first();
+
+    $component->call('compareIncomeYear', 2027);
+
+    $comparison = $component->instance()->getIncomeComparisonProperty();
+
+    // $24,000 against the FY2027 $110,000 four-person median.
+    expect($component->get('incomeCompareYear'))->toBe(2027)
+        ->and($comparison['available'])->toBeTrue()
+        ->and($comparison['guideline_year'])->toBe(2027)
+        ->and((float) $comparison['threshold'])->toBe(88000.0)
+        ->and((float) $comparison['ami'])->toBe(110000.0)
+        ->and((float) $comparison['percentage'])->toBe(21.82)
+        ->and($comparison['eligible'])->toBeTrue();
+
+    // Nothing moved: the determination of record is still FY2026.
+    $after = IntakeIncomeAssessment::where('communication_log_id', $log->id)->first();
+
+    expect($after->guideline_year)->toBe(2026)
+        ->and((float) $after->poverty_threshold)->toBe((float) $before->poverty_threshold)
+        ->and((float) $after->area_median_income)->toBe((float) $before->area_median_income)
+        ->and((float) $after->poverty_percentage)->toBe((float) $before->poverty_percentage)
+        ->and($after->updated_at->eq($before->updated_at))->toBeTrue();
+
+    $component->call('clearIncomeComparison');
+
+    expect($component->get('incomeCompareYear'))->toBeNull()
+        ->and($component->instance()->getIncomeComparisonProperty())->toBeNull();
+})->group('regression');
+
+it('ignores a comparison year that is not loaded', function () {
+    $log = incomeYearIntake();
+
+    $component = Livewire::actingAs(incomeUser())->test(CallDetail::class, ['log' => $log])
+        ->call('openIncomeEligibility')
+        ->set('incomeForm.household_size', 4)
+        ->set('incomeSources', [])
+        ->set('incomeForm.entered_amount', '24000')
+        ->call('saveIncomeEligibility');
+
+    $component->call('compareIncomeYear', 2099);
+
+    expect($component->get('incomeCompareYear'))->toBeNull()
+        ->and($component->instance()->getIncomeComparisonProperty())->toBeNull();
+})->group('regression');
+
+it('renders the year check on the portal card and names what is of record', function () {
+    $log = incomeYearIntake();
+
+    $component = Livewire::actingAs(incomeUser())->test(CallDetail::class, ['log' => $log])
+        ->call('openIncomeEligibility')
+        ->set('incomeForm.household_size', 4)
+        ->set('incomeSources', [])
+        ->set('incomeForm.entered_amount', '24000')
+        ->call('saveIncomeEligibility');
+
+    // Only one year loaded — the control stays off the screen rather
+    // than offering a list of one.
+    $component->assertOk()->assertDontSee('Check against');
+
+    incomeLoadHome2027();
+
+    $component->call('$refresh')->assertOk()->assertSee('Check against')->assertSee('FY2027');
+
+    $component->call('compareIncomeYear', 2027)
+        ->assertOk()
+        ->assertSee('If measured against FY2027')
+        ->assertSee('21.8% of AMI')
+        ->assertSee('Would be income eligible')
+        // The point of the whole control: it is a look, not a change.
+        ->assertSee('the determination of record is still FY2026');
+})->group('regression');
+
+it('renders the same year check in the main app comm log viewer', function () {
+    $log = incomeYearIntake();
+
+    $component = Livewire::actingAs(RegressionHelpers::adminUser())
+        ->test(\App\Livewire\CommunicationsLogManagement::class)
+        ->call('viewDetail', $log->id)
+        ->call('openIncomeEligibility')
+        ->set('incomeForm.household_size', 4)
+        ->set('incomeSources', [])
+        ->set('incomeForm.entered_amount', '24000')
+        ->call('saveIncomeEligibility')
+        ->assertHasNoErrors();
+
+    $component->assertOk()->assertDontSee('Check against');
+
+    incomeLoadHome2027();
+
+    $component->call('$refresh')->assertOk()->assertSee('Check against')->assertSee('FY2027');
+
+    $component->call('compareIncomeYear', 2027)
+        ->assertOk()
+        ->assertSee('If measured against FY2027')
+        ->assertSee('21.8% of AMI')
+        ->assertSee('the determination of record is still FY2026');
+})->group('regression');
