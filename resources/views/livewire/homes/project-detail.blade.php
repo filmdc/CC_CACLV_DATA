@@ -320,7 +320,7 @@
     {{-- Document completion modal --}}
     @if($completingRequirementId)
         <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 64px 16px;">
-            <div class="w-full" style="max-width: 460px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+            <div class="w-full" style="max-width: 460px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Mark received</h2>
                     <div class="text-xs mt-1" style="color: var(--calv-slate-65);">Attach the document — it lands on the requirement's file list.</div>
@@ -352,7 +352,7 @@
     {{-- Add expense modal --}}
     @if($showExpense)
         <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 64px 16px;">
-            <div class="w-full" style="max-width: 480px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+            <div class="w-full" style="max-width: 480px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Add expense</h2>
                     <div class="text-xs mt-1" style="color: var(--calv-slate-65);">{{ $who }}@if($where) · {{ $where }}@endif</div>
@@ -415,7 +415,7 @@
     {{-- Edit project modal --}}
     @if($showEditJob)
         <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 56px 16px;">
-            <div class="w-full" style="max-width: 540px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+            <div class="w-full" style="max-width: 540px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Edit project</h2>
                     <div class="text-xs mt-1" style="color: var(--calv-slate-65);">{{ $job->job_number }}</div>
@@ -471,7 +471,7 @@
     {{-- Add milestone modal --}}
     @if($showMilestoneForm)
         <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 64px 16px;">
-            <div class="w-full" style="max-width: 460px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+            <div class="w-full" style="max-width: 460px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Add milestone</h2>
                 </header>
@@ -504,7 +504,7 @@
     {{-- Add budget line modal --}}
     @if($showBudgetForm)
         <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 64px 16px;">
-            <div class="w-full" style="max-width: 460px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+            <div class="w-full" style="max-width: 460px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Add budget line</h2>
                     <div class="text-xs mt-1" style="color: var(--calv-slate-65);">A category of work funded from one of this project's funds.</div>
@@ -555,7 +555,7 @@
     {{-- Funding: narrow the project to the fund it is paid from. --}}
     @if($showFunding)
         <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 48px 16px;">
-            <div class="w-full" style="max-width: 640px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+            <div class="w-full" style="max-width: 640px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Funding</h2>
                     <div class="text-xs mt-1" style="color: var(--calv-slate-65);">
@@ -696,7 +696,7 @@
     {{-- Delete confirmation. Explicit Cancel only — no backdrop/Escape close. --}}
     @if($showDelete)
         <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 48px 16px;">
-            <div class="w-full" style="max-width: 480px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+            <div class="w-full" style="max-width: 480px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Delete this project?</h2>
                     <div class="text-xs mt-1" style="color: var(--calv-slate-65);">{{ $who }} · {{ $job->job_number }}</div>

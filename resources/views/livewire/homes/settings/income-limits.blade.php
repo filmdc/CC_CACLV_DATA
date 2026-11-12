@@ -188,7 +188,7 @@
     {{-- Add-year modal --}}
     @if($showAddYear)
         <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 56px 16px;">
-            <div class="w-full" style="max-width: 440px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+            <div class="w-full" style="max-width: 440px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Add a year</h2>
                 </header>

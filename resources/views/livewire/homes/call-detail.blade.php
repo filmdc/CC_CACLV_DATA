@@ -460,7 +460,7 @@
     {{-- Convert modal --}}
     @if($showConvert)
         <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 56px 16px;">
-            <div class="w-full" style="max-width: 560px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+            <div class="w-full" style="max-width: 560px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Convert to project</h2>
                     <div class="text-xs mt-1" style="color: var(--calv-slate-65);">{{ $who }}@if($where) · {{ $where }}@endif · step {{ $convertStep }} of 2</div>
@@ -591,7 +591,7 @@
     {{-- Edit entry modal --}}
     @if($showEdit)
         <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 48px 16px;">
-            <div class="w-full" style="max-width: 620px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+            <div class="w-full" style="max-width: 620px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Edit entry</h2>
                     <div class="text-xs mt-1" style="color: var(--calv-slate-65);">COMM-{{ $log->id }}</div>
@@ -710,7 +710,7 @@
          Explicit Cancel is the only close path (portal modal convention). --}}
     @if($actingOnRequirementId && $actingOn)
         <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 48px 16px;">
-            <div class="w-full" style="max-width: 520px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+            <div class="w-full" style="max-width: 520px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 19px;">{{ $actingOn['label'] }}</h2>
                     <div class="text-xs mt-1" style="color: var(--calv-slate-65);">
@@ -798,7 +798,7 @@
     {{-- Upload files onto a document requirement --}}
     @if($uploadingRequirementId)
         <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 64px 16px;">
-            <div class="w-full" style="max-width: 440px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+            <div class="w-full" style="max-width: 440px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Upload document</h2>
                     <div class="text-xs mt-1" style="color: var(--calv-slate-65);">Uploading marks the requirement received automatically.</div>
@@ -834,7 +834,7 @@
     {{-- Correct one timeline entry. Explicit Cancel only. --}}
     @if($editingEntryId)
         <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 48px 16px;">
-            <div class="w-full" style="max-width: 560px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+            <div class="w-full" style="max-width: 560px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Correct this entry</h2>
                     <div class="text-xs mt-1" style="color: var(--calv-slate-65);">{{ $who }} · COMM-{{ $log->id }}</div>
@@ -876,7 +876,7 @@
     {{-- Remove one timeline entry. Explicit Cancel only. --}}
     @if($removingEntryId && $removingEntry)
         <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 48px 16px;">
-            <div class="w-full" style="max-width: 480px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+            <div class="w-full" style="max-width: 480px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Remove this entry?</h2>
                     <div class="text-xs mt-1" style="color: var(--calv-slate-65);">{{ $removingEntry['kind'] }}{{ $removingEntry['on'] ? ' · '.$removingEntry['on']->isoFormat('MMM D, YYYY') : '' }}</div>
@@ -897,7 +897,7 @@
     {{-- Delete confirmation. Explicit Cancel only — no backdrop/Escape close. --}}
     @if($showDelete)
         <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 48px 16px;">
-            <div class="w-full" style="max-width: 480px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+            <div class="w-full" style="max-width: 480px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Delete this call?</h2>
                     <div class="text-xs mt-1" style="color: var(--calv-slate-65);">{{ $who }} · COMM-{{ $log->id }}</div>
