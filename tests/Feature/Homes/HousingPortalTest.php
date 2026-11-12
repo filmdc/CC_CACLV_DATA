@@ -246,3 +246,52 @@ it('labels a requirement-less log as "just a call"', function () {
 
     expect($stage['key'])->toBe('call');
 });
+
+it('suggests but does not link a participant on a partial quick-log name match', function () {
+    $this->actingAs(homesUser(['communications_log.create']));
+
+    $existing = \App\Models\Participant::factory()->create(['first_name' => 'Zebulon', 'last_name' => 'Quickmatch']);
+
+    Livewire::test(QuickLog::class)
+        ->call('open')
+        ->set('who', 'Zebulon')
+        ->assertSet('suggestedParticipantId', $existing->id)
+        ->assertSet('matchedParticipantId', null)
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $log = CommunicationLog::where('subject', 'Call with Zebulon')->first();
+
+    expect($log->participant_id)->toBeNull();
+    expect($log->contact_first_name)->toBe('Zebulon');
+    expect($log->contact_last_name)->toBeNull();
+});
+
+it('links a quick-logged call to a participant once the worker confirms the match', function () {
+    $this->actingAs(homesUser(['communications_log.create']));
+
+    $existing = \App\Models\Participant::factory()->create(['first_name' => 'Zebulon', 'last_name' => 'Quickmatch']);
+
+    Livewire::test(QuickLog::class)
+        ->call('open')
+        ->set('who', 'Zebulon Quickmatch')
+        ->call('linkSuggestedParticipant')
+        ->assertSet('matchedParticipantId', $existing->id)
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $log = CommunicationLog::where('subject', 'Call with Zebulon Quickmatch')->first();
+
+    expect($log->participant_id)->toBe($existing->id);
+});
+
+it('clears a quick-log follow-up when the selected option is clicked again', function () {
+    $this->actingAs(homesUser(['communications_log.create']));
+
+    Livewire::test(QuickLog::class)
+        ->call('open')
+        ->call('setFollowUp', 'Call back')
+        ->assertSet('followUp', 'Call back')
+        ->call('setFollowUp', 'Call back')
+        ->assertSet('followUp', 'No follow-up');
+});

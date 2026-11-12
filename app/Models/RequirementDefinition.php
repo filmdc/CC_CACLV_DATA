@@ -121,6 +121,20 @@ class RequirementDefinition extends Model
         )->withPivot('created_by_user_id', 'created_at');
     }
 
+    /**
+     * Counties (housing services) that stamp this atom onto an intake when
+     * the county is attached. Inverse of HousingService::requirementDefinitions().
+     */
+    public function housingServices(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            HousingService::class,
+            'housing_service_definitions',
+            'requirement_definition_id',
+            'housing_service_id'
+        )->withPivot('created_by_user_id', 'created_at');
+    }
+
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by_user_id');
