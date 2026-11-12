@@ -65,7 +65,10 @@ return [
 
     'temporary_file_upload' => [
         'disk' => null,        // Example: 'local', 's3'              | Default: 'default'
-        'rules' => null,       // Example: ['file', 'mimes:png,jpg']  | Default: ['required', 'file', 'max:12288'] (12MB)
+        // Must match the component-level rule (max:102400) and the Apache SAPI's
+        // upload_max_filesize. Left null, Livewire caps temp uploads at 12MB and the
+        // browser gets a bare 422 from /livewire/upload-file before any component runs.
+        'rules' => ['required', 'file', 'max:102400'], // 100MB
         'directory' => null,   // Example: 'tmp'                      | Default: 'livewire-tmp'
         'middleware' => null,  // Example: 'throttle:5,1'             | Default: 'throttle:60,1'
         'preview_mimes' => [   // Supported file types for temporary pre-signed file URLs...
