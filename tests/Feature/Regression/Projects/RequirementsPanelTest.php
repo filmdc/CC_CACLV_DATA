@@ -62,7 +62,10 @@ it('a fund-code-attached RequirementDefinition surfaces as a gating requirement 
         ->html();
 
     // The requirement title (from the atom's label) is on the page.
-    expect($html)->toContain($defs->first()->label);
+    // Escaped: one of the factory's labels contains an "&", which the page
+    // renders as "&amp;" — comparing against the raw label made this test
+    // fail about one run in eight.
+    expect($html)->toContain(e($defs->first()->label));
     // It's marked as fund-code-sourced.
     expect($html)->toContain('via fund code');
 })->group('regression');

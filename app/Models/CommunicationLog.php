@@ -89,6 +89,7 @@ class CommunicationLog extends Model
         'converted_at' => 'datetime',
         'subject_overridden_at' => 'datetime',
         'category_overridden_at' => 'datetime',
+        'merged_at' => 'datetime',
     ];
 
     protected $appends = [
@@ -305,6 +306,32 @@ class CommunicationLog extends Model
     public function convertedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'converted_by');
+    }
+
+    /**
+     * Duplicate merge. A record the project manager folded into another is
+     * soft-deleted and points at its survivor; the survivor can list what was
+     * folded into it. Not in $fillable on purpose — only
+     * App\Services\CommunicationLogMergeService writes these.
+     */
+    public function mergedInto(): BelongsTo
+    {
+        return $this->belongsTo(CommunicationLog::class, 'merged_into_id');
+    }
+
+    public function mergedFrom(): HasMany
+    {
+        return $this->hasMany(CommunicationLog::class, 'merged_into_id')->withTrashed();
+    }
+
+    public function mergedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'merged_by');
+    }
+
+    public function getIsMergedAttribute(): bool
+    {
+        return $this->merged_into_id !== null;
     }
 
     // Display Attributes

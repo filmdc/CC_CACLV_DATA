@@ -6,6 +6,7 @@ use App\Models\Contract;
 use App\Models\ContractReport;
 use App\Models\ContractReportDueDate;
 use App\Models\User;
+use App\Services\MediaValidationService;
 use App\Traits\WithPermissionChecks;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -320,7 +321,7 @@ class ContractReportDueDateManagement extends Component
             foreach ($this->report_files as $file) {
                 $report->addMedia($file->getRealPath())
                     ->usingName($file->getClientOriginalName())
-                    ->usingFileName($file->hashName())
+                    ->usingFileName(MediaValidationService::sanitizeFileName($file->getClientOriginalName()))
                     ->toMediaCollection('documents');
             }
 

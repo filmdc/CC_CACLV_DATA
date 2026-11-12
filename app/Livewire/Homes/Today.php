@@ -18,6 +18,17 @@ class Today extends Component
     use HasPins;
     use WithPermissionChecks;
 
+    /**
+     * Which fund group on the "Projects by fund" card is expanded. One at a
+     * time — the card is a dashboard tile, not a second Projects list.
+     */
+    public ?int $openFund = null;
+
+    public function toggleFund(int $fundCodeId): void
+    {
+        $this->openFund = $this->openFund === $fundCodeId ? null : $fundCodeId;
+    }
+
     /** Mark a follow-up done straight from the queue (reuses the model helper). */
     public function completeFollowUp(int $logId): void
     {
@@ -57,6 +68,8 @@ class Today extends Component
             'followUps' => $show['follow_ups'] && $canViewIntakes ? $data->followUpsDue() : collect(),
             'waiting' => $show['waiting'] && $canViewIntakes ? $data->waitingOnDocuments() : collect(),
             'ready' => $show['ready'] && $canViewIntakes ? $data->readyToConvert() : collect(),
+            'fundGroups' => $show['funds'] && $canViewProjects ? $data->projectsByFund() : collect(),
+            'fundsWithoutProjects' => $show['funds'] && $canViewProjects ? $data->fundsWithoutProjects() : collect(),
             'glance' => $show['glance'] ? $data->weekGlance() : null,
             // The greeting line normally counts follow-ups; with that card
             // hidden it would point at something she cannot see.

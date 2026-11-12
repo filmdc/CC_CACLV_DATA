@@ -3,8 +3,10 @@
 namespace App\Services;
 
 use App\Models\DonorPerfectSetting;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\HtmlString;
 
 class DonorPerfectApiService
 {
@@ -16,6 +18,55 @@ class DonorPerfectApiService
     public function __construct(DonorPerfectSetting $setting)
     {
         $this->setting = $setting;
+    }
+
+    public const UNAVAILABLE_MESSAGE = 'DonorPerfect is currently unavailable (their service is down, not CALV Data). Check status.donorperfect.com for updates and try again once it is restored.';
+
+    public const STATUS_PAGE_URL = 'https://status.donorperfect.com/';
+
+    /**
+     * Escape a message for display and turn any mention of DP's status page
+     * into a link, so staff watching an outage can click straight through.
+     * The text is escaped first; only the fixed anchor is unescaped HTML.
+     */
+    public static function linkifyStatusPage(?string $message): HtmlString
+    {
+        $link = '<a href="'.self::STATUS_PAGE_URL.'" target="_blank" rel="noopener noreferrer" class="font-medium underline hover:no-underline">status.donorperfect.com</a>';
+
+        return new HtmlString(str_replace('status.donorperfect.com', $link, e((string) $message)));
+    }
+
+    /**
+     * Recognise a DonorPerfect outage rather than letting it surface as a
+     * confusing HTTP or XML-parsing error. During an outage DP either fails at
+     * its gateway (502/503/504) or redirects the XML API to its HTML status
+     * page (status.donorperfect.com), which the XML parser chokes on.
+     */
+    private function isServiceUnavailable(Response $response): bool
+    {
+        if (in_array($response->status(), [502, 503, 504], true)) {
+            return true;
+        }
+
+        $apiHost = parse_url((string) $this->setting->api_url, PHP_URL_HOST);
+        $effectiveHost = $response->effectiveUri()?->getHost();
+        if ($apiHost && $effectiveHost && strcasecmp($apiHost, $effectiveHost) !== 0) {
+            return true;
+        }
+
+        $body = ltrim(substr($response->body(), 0, 512));
+
+        return str_contains(strtolower((string) $response->header('Content-Type')), 'text/html')
+            && (stripos($body, '<!doctype html') === 0 || stripos($body, '<html') === 0);
+    }
+
+    private function logUnavailable(string $context, Response $response): void
+    {
+        Log::warning('DonorPerfect API unavailable', [
+            'context' => $context,
+            'status' => $response->status(),
+            'effective_host' => $response->effectiveUri()?->getHost(),
+        ]);
     }
 
     /**
@@ -44,6 +95,15 @@ class DonorPerfectApiService
 
             // Make API call
             $response = Http::timeout(30)->get($url);
+
+            if ($this->isServiceUnavailable($response)) {
+                $this->logUnavailable('connection test', $response);
+
+                return [
+                    'success' => false,
+                    'message' => self::UNAVAILABLE_MESSAGE,
+                ];
+            }
 
             if (! $response->successful()) {
                 Log::error('DonorPerfect API connection test failed', [
@@ -164,6 +224,12 @@ class DonorPerfectApiService
                 ]);
 
                 $response = Http::timeout(60)->get($url);
+
+                if ($this->isServiceUnavailable($response)) {
+                    $this->logUnavailable('gifts page '.$page, $response);
+
+                    throw new \Exception(self::UNAVAILABLE_MESSAGE);
+                }
 
                 if (! $response->successful()) {
                     $statusCode = $response->status();
@@ -669,6 +735,12 @@ class DonorPerfectApiService
 
             // Make API call
             $response = Http::timeout(30)->get($url);
+
+            if ($this->isServiceUnavailable($response)) {
+                $this->logUnavailable('UDF update for gift '.$giftId, $response);
+
+                throw new \Exception(self::UNAVAILABLE_MESSAGE);
+            }
 
             if (! $response->successful()) {
                 $statusCode = $response->status();

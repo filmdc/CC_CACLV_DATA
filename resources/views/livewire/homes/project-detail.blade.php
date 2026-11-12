@@ -60,6 +60,12 @@
                         @if($fund->expiry_state === 'soon')<span style="color: var(--calv-red);">{{ $fund->days_to_expiry }}d</span>@endif
                     </span>
                 @endforeach
+                @if($canManageFunding)
+                    <button type="button" wire:click="openFunding" class="calv-link" style="font-size: 11.5px; background: none; border: none; cursor: pointer; padding: 2px 4px;"
+                            title="Narrow this project to the fund it is actually paid from">
+                        {{ $job->fundCodes->count() > 1 ? 'Narrow funding' : 'Change funding' }}
+                    </button>
+                @endif
             </div>
         </div>
         <div class="flex gap-2 shrink-0">
@@ -213,7 +219,12 @@
                         @if($job->fundCodes->count() > 0)
                             <button type="button" wire:click="openBudgetForm" class="calv-link text-left" style="background: none; border: none; cursor: pointer; font-size: 12px;">+ Add a budget line</button>
                         @else
-                            <span class="text-[11.5px]" style="color: var(--calv-slate-65);">Attach a fund code to this project (main app) before adding budget lines.</span>
+                            @if($canManageFunding)
+                                <button type="button" wire:click="openFunding" class="calv-link text-left" style="background: none; border: none; cursor: pointer; font-size: 12px;">Add a fund code to this project</button>
+                                <span class="text-[11.5px]" style="color: var(--calv-slate-65);">— budget lines spend from one.</span>
+                            @else
+                                <span class="text-[11.5px]" style="color: var(--calv-slate-65);">This project has no fund code yet, so there is nothing for a budget line to spend from.</span>
+                            @endif
                         @endif
                         @if($budgets->count() > 0)
                             <button type="button" wire:click="openExpense" class="calv-link text-left" style="background: none; border: none; cursor: pointer; font-size: 12px;">+ Add an expense</button>
@@ -236,6 +247,69 @@
                 </section>
             @endif
 
+            {{-- Income qualification — read-only. The determination is made
+                 during intake and frozen there; the project shows it so the
+                 household's qualification travels with the work. --}}
+            @if($origin)
+                @php
+                    $ia = $incomeAssessment;
+                    $iaPct = $ia && $ia->poverty_percentage !== null
+                        ? rtrim(rtrim(number_format((float) $ia->poverty_percentage, 1), '0'), '.')
+                        : null;
+                @endphp
+                <section class="calv-card overflow-hidden">
+                    <header class="px-4 py-3" style="border-bottom: 1px solid var(--calv-slate-15);">
+                        <h3 class="calv-subhead" style="font-size: 12px;">Income qualification</h3>
+                    </header>
+
+                    @if($ia && $iaPct !== null)
+                        <div class="px-4 py-3.5">
+                            <div class="flex flex-wrap items-center gap-1.5 mb-2">
+                                <span class="calv-badge calv-badge--teal">
+                                    {{ $iaPct }}% {{ $ia->isHomeDetermination() ? 'of AMI' : 'FPL' }}
+                                </span>
+                                @if($ia->tier_label)
+                                    <span class="calv-badge">{{ $ia->tier_label }}</span>
+                                @endif
+                                @if($ia->is_income_eligible === true)
+                                    <span class="calv-badge calv-badge--sage">Income eligible</span>
+                                @elseif($ia->is_income_eligible === false)
+                                    <span class="calv-badge calv-badge--amber">Over income</span>
+                                @endif
+                            </div>
+                            <div class="text-[12.5px] leading-relaxed" style="color: var(--calv-slate-65);">
+                                ${{ number_format((float) $ia->annual_income) }}/yr · household of {{ $ia->household_size }}
+                                @if($ia->isHomeDetermination() && $ia->poverty_threshold !== null)
+                                    <br>FY{{ $ia->guideline_year }} limit ${{ number_format((float) $ia->poverty_threshold) }}@if($ia->area_median_income !== null) · area median ${{ number_format((float) $ia->area_median_income) }}@endif
+                                @endif
+                                <br>
+                                <span style="color: var(--calv-slate-35);">
+                                    {{-- NB: a directive glued to a word char (intake@if) is not
+                                         compiled by Blade, so the date sits on its own branch. --}}
+                                    @if($ia->calculated_at)
+                                        Determined at intake on {{ $ia->calculated_at->format('M j, Y') }} ·
+                                    @else
+                                        Determined at intake ·
+                                    @endif
+                                    <a href="{{ route('homes.call', $origin->id) }}" wire:navigate class="calv-link">edit on the intake</a>
+                                </span>
+                            </div>
+                        </div>
+                    @elseif($ia)
+                        <div class="px-4 py-3 text-[12.5px] leading-relaxed" style="color: var(--calv-slate-65);">
+                            ${{ number_format((float) $ia->annual_income) }}/yr · household of {{ $ia->household_size }} —
+                            no income guidelines were loaded for that household size, so no percentage was recorded.
+                        </div>
+                    @else
+                        <div class="px-4 py-3 text-[12.5px] leading-relaxed" style="color: var(--calv-slate-65);">
+                            No income qualification was recorded on this intake.
+                            <a href="{{ route('homes.call', $origin->id) }}" wire:navigate class="calv-link">Record it on the intake</a>
+                            and it will show here.
+                        </div>
+                    @endif
+                </section>
+            @endif
+
             {{-- Next --}}
             <div class="px-4 py-3.5 text-[12.5px] leading-relaxed" style="background: #fff; border: 1px dashed var(--calv-slate-35); border-radius: 8px; color: var(--calv-slate-65);">
                 <strong style="color: var(--calv-slate);">Next:</strong> {{ $next['text'] }} @if($next['due'] !== '—')({{ $next['due'] }})@endif
@@ -246,7 +320,7 @@
     {{-- Document completion modal --}}
     @if($completingRequirementId)
         <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 64px 16px;">
-            <div class="w-full" style="max-width: 460px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+            <div class="w-full" style="max-width: 460px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Mark received</h2>
                     <div class="text-xs mt-1" style="color: var(--calv-slate-65);">Attach the document — it lands on the requirement's file list.</div>
@@ -278,7 +352,7 @@
     {{-- Add expense modal --}}
     @if($showExpense)
         <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 64px 16px;">
-            <div class="w-full" style="max-width: 480px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+            <div class="w-full" style="max-width: 480px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Add expense</h2>
                     <div class="text-xs mt-1" style="color: var(--calv-slate-65);">{{ $who }}@if($where) · {{ $where }}@endif</div>
@@ -341,7 +415,7 @@
     {{-- Edit project modal --}}
     @if($showEditJob)
         <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 56px 16px;">
-            <div class="w-full" style="max-width: 540px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+            <div class="w-full" style="max-width: 540px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Edit project</h2>
                     <div class="text-xs mt-1" style="color: var(--calv-slate-65);">{{ $job->job_number }}</div>
@@ -397,7 +471,7 @@
     {{-- Add milestone modal --}}
     @if($showMilestoneForm)
         <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 64px 16px;">
-            <div class="w-full" style="max-width: 460px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+            <div class="w-full" style="max-width: 460px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Add milestone</h2>
                 </header>
@@ -430,7 +504,7 @@
     {{-- Add budget line modal --}}
     @if($showBudgetForm)
         <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 64px 16px;">
-            <div class="w-full" style="max-width: 460px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+            <div class="w-full" style="max-width: 460px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Add budget line</h2>
                     <div class="text-xs mt-1" style="color: var(--calv-slate-65);">A category of work funded from one of this project's funds.</div>
@@ -478,10 +552,151 @@
         </div>
     @endif
 
+    {{-- Funding: narrow the project to the fund it is paid from. --}}
+    @if($showFunding)
+        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 48px 16px;">
+            <div class="w-full" style="max-width: 640px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
+                <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
+                    <h2 class="calv-h1" style="font-size: 20px;">Funding</h2>
+                    <div class="text-xs mt-1" style="color: var(--calv-slate-65);">
+                        {{ $job->job_number }}
+                        @if($job->housingServices->count() > 0)
+                            · {{ $job->housingServices->pluck('name')->implode(', ') }}
+                        @endif
+                    </div>
+                </header>
+
+                @if($fundingPreview)
+                    {{-- Step 2: exactly what dropping the rest would do. --}}
+                    <div class="px-6 py-5 text-[13.5px] leading-relaxed" style="color: var(--calv-slate);">
+                        @if($fundingPreview['blocked_reason'])
+                            <div class="px-3 py-2.5 rounded text-[12.5px]" style="background: var(--calv-red-15, #FBEAE8); border: 1px solid var(--calv-red); color: var(--calv-red);">
+                                {{ $fundingPreview['blocked_reason'] }}
+                            </div>
+                        @else
+                            <p>
+                                This project keeps
+                                {{-- NB: a directive glued to a word char is not parsed,
+                                     so these stay plain ternaries. --}}
+                                <strong>{{ $fundingPreview['keeping']->pluck('code')->implode(', ') }}</strong>{{ $fundingPreview['keeping']->count() === 1 ? ' and nothing else' : '' }}.
+                            </p>
+                            <p class="mt-2.5">
+                                Coming off: <strong>{{ $fundingPreview['dropping']->pluck('code')->implode(', ') }}</strong>.
+                                Budget lines can no longer be written against {{ $fundingPreview['dropping']->count() === 1 ? 'it' : 'them' }}.
+                            </p>
+
+                            @if($fundingPreview['with_progress']->count() > 0)
+                                <p class="mt-2.5" style="color: var(--calv-slate-65);">
+                                    {{ $fundingPreview['with_progress']->count() }}
+                                    {{ Str::plural('requirement', $fundingPreview['with_progress']->count()) }}
+                                    from {{ $fundingPreview['dropping']->count() === 1 ? 'that fund' : 'those funds' }}
+                                    {{ $fundingPreview['with_progress']->count() === 1 ? 'is' : 'are' }}
+                                    already done or {{ $fundingPreview['with_progress']->count() === 1 ? 'has' : 'have' }} a file on
+                                    {{ $fundingPreview['with_progress']->count() === 1 ? 'it' : 'them' }} —
+                                    {{ $fundingPreview['with_progress']->count() === 1 ? 'it stays' : 'they stay' }} on the project either way.
+                                </p>
+                            @endif
+
+                            @if($fundingPreview['untouched']->count() > 0)
+                                <label class="flex items-start gap-2.5 mt-3 text-[12.5px] cursor-pointer">
+                                    <input type="checkbox" wire:model="fundingRemoveUntouched" class="mt-0.5">
+                                    <span>
+                                        Also take off the
+                                        <strong>{{ $fundingPreview['untouched']->count() }}</strong>
+                                        {{ Str::plural('requirement', $fundingPreview['untouched']->count()) }}
+                                        that came from {{ $fundingPreview['dropping']->count() === 1 ? 'that fund' : 'those funds' }}
+                                        and {{ $fundingPreview['untouched']->count() === 1 ? 'has' : 'have' }} not been started
+                                        @php
+                                            $extra = $fundingPreview['untouched']->count() - 3;
+                                        @endphp
+                                        <span style="color: var(--calv-slate-65);">({{ $fundingPreview['untouched']->pluck('title')->take(3)->implode(', ') }}{{ $extra > 0 ? ' and '.$extra.' more' : '' }})</span>
+                                    </span>
+                                </label>
+                            @endif
+
+                            <p class="mt-3 text-[11.5px]" style="color: var(--calv-slate-65);">
+                                Reversible — the fund stays on this project's county, so you can add it back here and anything kept comes back with it.
+                            </p>
+                        @endif
+                    </div>
+                    <footer class="px-6 py-4 flex justify-end gap-2" style="border-top: 1px solid var(--calv-slate-15); background: var(--calv-sand-15);">
+                        <button type="button" wire:click="cancelStagedFunding" class="calv-btn calv-btn--quiet">Back</button>
+                        @unless($fundingPreview['blocked_reason'])
+                            <button type="button" wire:click="confirmFunding" class="calv-btn calv-btn--primary">
+                                {{ $fundingPreview['keeping']->count() === 1 ? 'Pay from '.$fundingPreview['keeping']->first()->code.' only' : 'Apply' }}
+                            </button>
+                        @endunless
+                    </footer>
+                @else
+                    {{-- Step 1: what is on the project, and what its county still offers. --}}
+                    <div class="px-6 py-5">
+                        <div class="calv-subhead" style="font-size: 11px;">On this project</div>
+                        <div class="mt-2 flex flex-col gap-2">
+                            @forelse($fundingRows as $row)
+                                <div class="flex items-center gap-2.5 px-3 py-2.5 rounded" style="border: 1px solid var(--calv-slate-15);">
+                                    <div class="flex-1 min-w-0">
+                                        <div class="text-[13px] font-semibold" style="color: var(--calv-slate);">{{ $row['code'] }}</div>
+                                        @if($row['description'])
+                                            <div class="text-[11.5px] mt-0.5" style="color: var(--calv-slate-65);">{{ $row['description'] }}</div>
+                                        @endif
+                                        @if(!empty($row['budget_categories']))
+                                            <div class="text-[11px] mt-1" style="color: var(--calv-slate-65);">
+                                                Budget: {{ implode(', ', $row['budget_categories']) }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                    <div class="shrink-0 inline-flex gap-1.5">
+                                        @if($fundingRows->count() > 1)
+                                            <button type="button" wire:click="stageOnlyFundCode({{ $row['id'] }})" class="calv-btn calv-btn--secondary calv-btn--sm"
+                                                    title="This project is paid from {{ $row['code'] }} and nothing else">Only this one</button>
+                                            <button type="button" wire:click="stageDropFundCode({{ $row['id'] }})" class="calv-btn calv-btn--ghost calv-btn--sm"
+                                                    style="color: var(--calv-red); border-color: var(--calv-slate-35);"
+                                                    title="Take {{ $row['code'] }} off this project">Drop</button>
+                                        @else
+                                            <span class="text-[11px]" style="color: var(--calv-slate-65);">the only fund</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="text-[12.5px]" style="color: var(--calv-slate-65);">No fund code on this project yet.</div>
+                            @endforelse
+                        </div>
+
+                        <div class="calv-subhead mt-5" style="font-size: 11px;">Also available</div>
+                        <div class="text-[11.5px] mt-0.5" style="color: var(--calv-slate-65);">
+                            What this project's county covers, and what its intake anticipated.
+                        </div>
+                        <div class="mt-2 flex flex-col gap-2">
+                            @forelse($fundingAvailable as $option)
+                                <div class="flex items-center gap-2.5 px-3 py-2.5 rounded" style="border: 1px dashed var(--calv-slate-35);">
+                                    <div class="flex-1 min-w-0">
+                                        <div class="text-[13px] font-semibold" style="color: var(--calv-slate-65);">{{ $option['code'] }}</div>
+                                        @if($option['description'])
+                                            <div class="text-[11.5px] mt-0.5" style="color: var(--calv-slate-65);">{{ $option['description'] }}</div>
+                                        @endif
+                                    </div>
+                                    <button type="button" wire:click="addFundCode({{ $option['id'] }})" class="calv-btn calv-btn--quiet calv-btn--sm shrink-0">Add</button>
+                                </div>
+                            @empty
+                                <div class="text-[12.5px]" style="color: var(--calv-slate-65);">
+                                    Nothing else — this project already has every fund its county covers.
+                                    To widen it, add the fund to the county under Settings.
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+                    <footer class="px-6 py-4 flex justify-end gap-2" style="border-top: 1px solid var(--calv-slate-15); background: var(--calv-sand-15);">
+                        <button type="button" wire:click="closeFunding" class="calv-btn calv-btn--quiet">Done</button>
+                    </footer>
+                @endif
+            </div>
+        </div>
+    @endif
+
     {{-- Delete confirmation. Explicit Cancel only — no backdrop/Escape close. --}}
     @if($showDelete)
         <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 48px 16px;">
-            <div class="w-full" style="max-width: 480px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+            <div class="w-full" style="max-width: 480px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Delete this project?</h2>
                     <div class="text-xs mt-1" style="color: var(--calv-slate-65);">{{ $who }} · {{ $job->job_number }}</div>

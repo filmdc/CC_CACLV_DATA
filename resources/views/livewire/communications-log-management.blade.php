@@ -361,7 +361,7 @@
                                                 <span class="inline-flex px-2 py-0.5 rounded-full text-[11px] bg-gray-100 text-gray-700 dark:bg-zinc-700 dark:text-gray-300">Open</span>
                                             @endif
                                         </td>
-                                        <td class="px-3 py-2 whitespace-nowrap align-top text-right" wire:click.stop>
+                                        <td class="px-3 py-2 whitespace-nowrap align-top text-right" @click.stop>
                                             <div class="inline-flex items-center gap-1.5">
                                                 <button wire:click="togglePin({{ $log->id }})"
                                                         title="{{ $isPinned ? 'Unpin from dashboard' : 'Pin to dashboard' }}"
@@ -546,7 +546,7 @@
                                 </div>
                             </div>
 
-                            <div class="flex items-start space-x-2 ml-4" wire:click.stop>
+                            <div class="flex items-start space-x-2 ml-4" @click.stop>
                                 {{-- Phase 12.3: pin / unpin for the current user. --}}
                                 @php $isPinned = $log->pinnedByUsers->where('id', auth()->id())->isNotEmpty(); @endphp
                                 <button wire:click="togglePin({{ $log->id }})"
@@ -981,7 +981,12 @@
                         ->values();
                 @endphp
                 <div class="mb-4">
-                    <x-comm.requirements-panel :items="$viewerReqs" title="Phase 1 · Eligibility &amp; Compliance" />
+                    <x-comm.requirements-panel :items="$viewerReqs" title="Phase 1 · Eligibility &amp; Compliance"
+                        :income-comparison="[
+                            'years' => $this->incomeComparisonYears(),
+                            'year' => $incomeCompareYear,
+                            'result' => $this->incomeComparison,
+                        ]" />
                 </div>
 
                 {{-- Central "Documents on file" view: every uploaded document

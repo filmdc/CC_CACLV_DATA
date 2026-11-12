@@ -136,7 +136,7 @@
                             @if($showTestResult && $testConnectionResult)
                                 <div class="mt-3 p-3 rounded-md {{ $testConnectionResult['success'] ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800' }}">
                                     <p class="text-sm {{ $testConnectionResult['success'] ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300' }}">
-                                        {{ $testConnectionResult['message'] }}
+                                        {{ \App\Services\DonorPerfectApiService::linkifyStatusPage($testConnectionResult['message']) }}
                                     </p>
                                 </div>
                             @endif

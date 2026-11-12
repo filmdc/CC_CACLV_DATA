@@ -3,6 +3,11 @@
     'title' => 'Application requirements',
     'hint' => null,
     'addAction' => true,      // show "+ ad-hoc requirement" affordance
+    // Read-only year check for the income row, supplied by the host
+    // component (ManagesIncomeEligibility): ['years' => int[],
+    // 'year' => ?int, 'result' => ?array]. Passed in rather than read
+    // off $this — this is an anonymous component with its own scope.
+    'incomeComparison' => null,
 ])
 
 @php
@@ -125,20 +130,113 @@
                     {{-- Income eligibility carries figures rather than just a
                          receipt, so the determination reads on the row itself. --}}
                     @if($item->key === IntakeRequirement::KEY_INCOME_ELIGIBILITY)
-                        @php $assessment = $item->incomeAssessment; @endphp
+                        @php
+                            $assessment = $item->incomeAssessment;
+                            $hasFigures = $assessment && $assessment->annual_income !== null;
+                            $pct = $hasFigures && $assessment->poverty_percentage !== null
+                                ? rtrim(rtrim(number_format((float) $assessment->poverty_percentage, 1), '0'), '.')
+                                : null;
+                        @endphp
+
+                        @if($hasFigures && $pct !== null)
+                            {{-- The determination reads as chips, not buried prose:
+                                 this is the answer the file is opened to find. --}}
+                            <div class="flex flex-wrap items-center gap-1 mt-1">
+                                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10.5px] font-semibold bg-indigo-600 text-white">
+                                    {{ $pct }}% {{ $assessment->isHomeDetermination() ? 'of AMI' : 'FPL' }}
+                                </span>
+                                @if($assessment->tier_label)
+                                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10.5px] font-semibold bg-gray-100 dark:bg-zinc-700 text-gray-800 dark:text-gray-100 border border-gray-300 dark:border-zinc-600">
+                                        {{ $assessment->tier_label }}
+                                    </span>
+                                @endif
+                                @if($assessment->is_income_eligible === true)
+                                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10.5px] font-semibold bg-emerald-600 text-white">Income eligible</span>
+                                @elseif($assessment->is_income_eligible === false)
+                                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10.5px] font-semibold bg-amber-600 text-white">Over income</span>
+                                @endif
+                            </div>
+                        @endif
+
                         <div class="text-[11.5px] text-calv-slate-65 mt-0.5">
-                            @if($assessment && $assessment->annual_income !== null)
+                            @if($hasFigures)
                                 ${{ number_format((float) $assessment->annual_income, 0) }}/yr ·
                                 household of {{ $assessment->household_size }}
-                                @if($assessment->poverty_percentage !== null)
-                                    · <span class="font-semibold text-calv-slate">{{ $assessment->determination_label }}</span>
-                                @else
-                                    · no poverty guideline loaded for this household size
+                                @if($pct === null)
+                                    · no income guideline loaded for this household size
+                                @elseif($assessment->isHomeDetermination() && $assessment->poverty_threshold !== null)
+                                    · FY{{ $assessment->guideline_year }} limit ${{ number_format((float) $assessment->poverty_threshold, 0) }}
+                                @elseif(! $assessment->isHomeDetermination())
+                                    · {{ $assessment->determination_label }}
                                 @endif
                             @else
                                 Annual income, household size, and proof — pay stubs, tax return, benefit letters.
                             @endif
                         </div>
+
+                        {{-- Read-only check against another year's guidelines.
+                             Shows only when a year other than the one of record is
+                             loaded, and writes nothing — the determination stays
+                             snapshotted where it was taken. Twin of the homes-portal
+                             control in resources/views/livewire/homes/call-detail.blade.php. --}}
+                        @php
+                            $cmpYears = $hasFigures ? ($incomeComparison['years'] ?? []) : [];
+                            $cmp = $incomeComparison['result'] ?? null;
+                            $cmpYear = $incomeComparison['year'] ?? null;
+                            $yearLabel = fn ($y) => ($assessment->isHomeDetermination() ? 'FY' : '').$y;
+                        @endphp
+                        @if(count($cmpYears))
+                            @if($cmp === null)
+                                <div class="flex flex-wrap items-center gap-1 mt-1">
+                                    <span class="text-[10.5px] text-gray-500 dark:text-gray-400">Check against</span>
+                                    @foreach($cmpYears as $y)
+                                        <button type="button" wire:click="compareIncomeYear({{ $y }})"
+                                                class="px-1.5 py-0.5 text-[10.5px] rounded border border-gray-300 dark:border-zinc-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-700"
+                                                title="See these same figures under the {{ $yearLabel($y) }} guidelines — nothing is saved">
+                                            {{ $yearLabel($y) }}
+                                        </button>
+                                    @endforeach
+                                </div>
+                            @else
+                                <div class="mt-1 rounded border border-dashed border-gray-300 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-900/40 px-2 py-1.5">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span class="text-[9px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                                            If measured against {{ $yearLabel($cmpYear) }}
+                                        </span>
+                                        <button type="button" wire:click="clearIncomeComparison"
+                                                class="text-[10px] underline text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">close</button>
+                                    </div>
+                                    @if($cmp['available'])
+                                        @php $cmpPct = rtrim(rtrim(number_format((float) $cmp['percentage'], 1), '0'), '.'); @endphp
+                                        <div class="flex flex-wrap items-center gap-1 mt-1">
+                                            <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10.5px] font-semibold bg-gray-200 dark:bg-zinc-700 text-gray-800 dark:text-gray-100">
+                                                {{ $cmpPct }}% {{ $cmp['bracket_unit'] === 'AMI' ? 'of AMI' : 'FPL' }}
+                                            </span>
+                                            @if($cmp['tier_label'])
+                                                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10.5px] font-semibold bg-gray-100 dark:bg-zinc-700 text-gray-800 dark:text-gray-100 border border-gray-300 dark:border-zinc-600">
+                                                    {{ $cmp['tier_label'] }}
+                                                </span>
+                                            @endif
+                                            @if($cmp['eligible'] === true)
+                                                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10.5px] font-semibold bg-emerald-700 text-white">Would be income eligible</span>
+                                            @elseif($cmp['eligible'] === false)
+                                                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10.5px] font-semibold bg-amber-700 text-white">Would be over income</span>
+                                            @endif
+                                        </div>
+                                        <div class="text-[10.5px] mt-1 text-gray-500 dark:text-gray-400">
+                                            @if($cmp['bracket_unit'] === 'AMI' && $cmp['threshold'] !== null)
+                                                {{ $yearLabel($cmpYear) }} limit ${{ number_format((float) $cmp['threshold'], 0) }}@if($cmp['ami'] !== null) · area median ${{ number_format((float) $cmp['ami'], 0) }}@endif ·
+                                            @endif
+                                            Nothing saved — the determination of record is still {{ $yearLabel($assessment->guideline_year) }}.
+                                        </div>
+                                    @else
+                                        <div class="text-[10.5px] mt-1 text-gray-500 dark:text-gray-400">
+                                            No {{ $yearLabel($cmpYear) }} guideline covers a household of {{ $assessment->household_size }}.
+                                        </div>
+                                    @endif
+                                </div>
+                            @endif
+                        @endif
                     @endif
 
                     @if(is_array($item->via) && count($item->via))

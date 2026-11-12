@@ -14,6 +14,7 @@ use App\Models\Program;
 use App\Models\Property;
 use App\Models\Service;
 use App\Models\Tag;
+use App\Services\MediaValidationService;
 use App\Support\AddressNormalizer;
 use App\Traits\WithPermissionChecks;
 use App\Traits\WithProgramAccess;
@@ -1198,7 +1199,7 @@ class CommunicationsLogManagement extends Component
         foreach ($this->requirementFiles as $file) {
             $req->addMedia($file->getRealPath())
                 ->usingName($file->getClientOriginalName())
-                ->usingFileName($file->hashName())
+                ->usingFileName(MediaValidationService::sanitizeFileName($file->getClientOriginalName()))
                 ->toMediaCollection('documents');
         }
 
@@ -1273,7 +1274,7 @@ class CommunicationsLogManagement extends Component
             $label = $req->label ?: ($req->source_label_snapshot ?? 'Requirement');
             foreach ($req->getMedia('documents') as $m) {
                 $rows[] = [
-                    'name' => $m->file_name,
+                    'name' => MediaValidationService::displayName($m),
                     'mime' => $m->mime_type,
                     'size' => $m->human_readable_size,
                     'source' => 'Requirement · '.$label,

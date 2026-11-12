@@ -7,6 +7,7 @@ use App\Models\ContractReport;
 use App\Models\ContractReportDueDate;
 use App\Models\DueDateEmail;
 use App\Models\User;
+use App\Services\MediaValidationService;
 use App\Traits\WithPermissionChecks;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -284,7 +285,7 @@ class ContractShow extends Component
                 foreach ($this->report_documents as $document) {
                     $report->addMedia($document->getRealPath())
                            ->usingName($document->getClientOriginalName())
-                           ->usingFileName($document->hashName())
+                           ->usingFileName(MediaValidationService::sanitizeFileName($document->getClientOriginalName()))
                            ->toMediaCollection('documents');
                 }
             }

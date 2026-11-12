@@ -10,7 +10,7 @@
 @endphp
 
 <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 48px 16px;">
-    <div class="w-full" style="max-width: 760px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+    <div class="w-full" style="max-width: 760px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
 
         <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
             <h2 class="calv-h1" style="font-size: 20px;">Income eligibility</h2>
@@ -84,21 +84,47 @@
             </div>
 
             {{-- Live determination --}}
-            <div class="px-4 py-3.5" style="border-radius: 8px; background: {{ $preview['available'] ? 'var(--calv-sage-15)' : 'var(--calv-sand-15)' }}; border: 1px solid {{ $preview['available'] ? 'var(--calv-sage)' : 'var(--calv-slate-15)' }};">
+            @php
+                // HOME determinations carry an AMI; FPL ones don't. An
+                // over-income household must not read as a green pass.
+                $isHome = ($preview['ami'] ?? null) !== null;
+                $overIncome = $isHome && ($preview['eligible'] ?? true) === false;
+                $toneOk = $preview['available'] && ! $overIncome;
+            @endphp
+            <div class="px-4 py-3.5" style="border-radius: 8px; background: {{ $toneOk ? 'var(--calv-sage-15)' : 'var(--calv-sand-15)' }}; border: 1px solid {{ $toneOk ? 'var(--calv-sage)' : ($overIncome ? 'var(--calv-amber, #C98A2E)' : 'var(--calv-slate-15)') }};">
                 @if($preview['available'])
-                    <div class="calv-h1" style="font-size: 26px; line-height: 1; color: #2F5A41;">
+                    <div class="calv-h1" style="font-size: 26px; line-height: 1; color: {{ $overIncome ? '#8A5A12' : '#2F5A41' }};">
                         {{ rtrim(rtrim(number_format($preview['percentage'], 1, '.', ''), '0'), '.') }}%
                         <span style="font-size: 13px; font-weight: normal; color: var(--calv-slate-65);">of {{ $preview['basis'] }}</span>
                     </div>
+
+                    @if($isHome)
+                        <div class="flex flex-wrap items-center gap-1.5 mt-2">
+                            @if($preview['tier_label'])
+                                <span class="calv-badge">{{ $preview['tier_label'] }} · at or under {{ $preview['bracket'] }}% AMI</span>
+                            @endif
+                            @if($preview['eligible'])
+                                <span class="calv-badge calv-badge--sage">Income eligible</span>
+                            @else
+                                <span class="calv-badge calv-badge--amber">Over income</span>
+                            @endif
+                        </div>
+                    @endif
+
                     <div class="text-[12px] mt-2" style="color: var(--calv-slate);">
                         ${{ number_format($preview['annual_income'], 2) }} a year
                         (${{ number_format($preview['monthly_income'], 2) }} a month)
                         · household of {{ $preview['household_size'] }}
-                        · {{ $preview['guideline_year'] }} guideline for that size is ${{ number_format($preview['threshold'], 2) }}
-                        @if($preview['bracket'])
-                            · at or under {{ $preview['bracket'] }}% {{ $preview['bracket_unit'] }}
+                        @if($isHome)
+                            · area median income for that size is ${{ number_format($preview['ami'], 2) }}
+                            · FY{{ $preview['guideline_year'] }} eligibility limit is ${{ number_format($preview['threshold'], 2) }}
                         @else
-                            · above the highest published bracket (500% {{ $preview['bracket_unit'] }})
+                            · {{ $preview['guideline_year'] }} guideline for that size is ${{ number_format($preview['threshold'], 2) }}
+                            @if($preview['bracket'])
+                                · at or under {{ $preview['bracket'] }}% {{ $preview['bracket_unit'] }}
+                            @else
+                                · above the highest published bracket (500% {{ $preview['bracket_unit'] }})
+                            @endif
                         @endif
                     </div>
                 @else

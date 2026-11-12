@@ -21,11 +21,18 @@ use App\Models\PovertyGuideline;
  * to the monthly table, because the monthly rows are rounded to whole
  * dollars and comparing against them drifts by a percent or two.
  *
- * The $region picks the dataset: the default is the HHS federal
- * poverty guidelines; housing intakes pass
- * PovertyGuideline::REGION_HOME_ABE to read the HUD HOME income limits
- * instead (same table, same arithmetic — only the rows and the label
- * change). See ManagesIncomeEligibility::incomeGuidelineRegion().
+ * The $region picks the dataset AND how the percentage is framed:
+ *
+ *  - HHS federal poverty guidelines (the default): the percentage is of
+ *    the poverty level, banded on the 50/75/100/125… FPL ladder.
+ *  - HUD HOME limits (PovertyGuideline::REGION_HOME_ABE, used by housing
+ *    intakes): the percentage is of AREA MEDIAN INCOME, banded on HUD's
+ *    30/50/60/80 tiers, because that is how HOME beneficiaries are
+ *    reported. The 80%-AMI ceiling stays the eligibility test and is
+ *    returned separately as `threshold`, with `eligible` saying whether
+ *    the household clears it.
+ *
+ * See ManagesIncomeEligibility::incomeGuidelineRegion().
  */
 class IncomeEligibilityCalculator
 {
@@ -69,7 +76,7 @@ class IncomeEligibilityCalculator
      * false when no guideline covers the requested year/region/size, so
      * callers can say "no guidelines loaded" instead of showing 0%.
      *
-     * @return array{annual_income: float|null, monthly_income: float|null, household_size: int|null, guideline_year: int|null, guideline_region: string, threshold: float|null, percentage: float|null, bracket: int|null, basis: string, bracket_unit: string, label: string|null, available: bool}
+     * @return array{annual_income: float|null, monthly_income: float|null, household_size: int|null, guideline_year: int|null, guideline_region: string, threshold: float|null, ami: float|null, percentage: float|null, bracket: int|null, tier_label: string|null, eligible: bool|null, basis: string, bracket_unit: string, label: string|null, available: bool}
      */
     public function assess($annualIncome, $householdSize, ?int $year = null, string $region = self::REGION_DEFAULT): array
     {
@@ -86,10 +93,13 @@ class IncomeEligibilityCalculator
             'guideline_year' => $resolvedYear,
             'guideline_region' => $region,
             'threshold' => null,
+            'ami' => null,
             'percentage' => null,
             'bracket' => null,
+            'tier_label' => null,
+            'eligible' => null,
             'basis' => $this->basisFor($resolvedYear, $region),
-            'bracket_unit' => $region === PovertyGuideline::REGION_HOME_ABE ? 'of the HOME limit' : 'FPL',
+            'bracket_unit' => $region === PovertyGuideline::REGION_HOME_ABE ? 'AMI' : 'FPL',
             'label' => null,
             'available' => false,
         ];
@@ -104,13 +114,34 @@ class IncomeEligibilityCalculator
             return $base;
         }
 
-        $percentage = round(($annualIncome / $threshold) * 100, 2);
-        $bracket = PovertyGuideline::bracketFor($percentage);
+        $isHome = $region === PovertyGuideline::REGION_HOME_ABE;
+
+        // What the percentage is a percentage OF. For HOME that is area
+        // median income — NOT the 80%-AMI ceiling in $threshold, which
+        // would report a household at 24% of AMI as "30.1%".
+        $measure = $isHome
+            ? PovertyGuideline::homeAmiFor($householdSize, $resolvedYear)
+            : $threshold;
+
+        if ($measure === null || $measure <= 0) {
+            return $base;
+        }
+
+        $percentage = round(($annualIncome / $measure) * 100, 2);
+        $bracket = $isHome
+            ? PovertyGuideline::homeTierFor($percentage)
+            : PovertyGuideline::bracketFor($percentage);
 
         return array_merge($base, [
             'threshold' => $threshold,
+            'ami' => $isHome ? $measure : null,
             'percentage' => $percentage,
             'bracket' => $bracket,
+            'tier_label' => $isHome ? PovertyGuideline::homeTierLabel($bracket) : null,
+            // Eligibility is the ceiling test, and always has been; it is
+            // stated outright now that the percentage is of AMI and "at
+            // or under 100%" no longer reads as "eligible".
+            'eligible' => $isHome ? $annualIncome <= $threshold : null,
             'label' => $this->format($percentage).'% of '.$base['basis'],
             'available' => true,
         ]);
@@ -119,14 +150,14 @@ class IncomeEligibilityCalculator
     /**
      * What the percentage is a percentage OF, worded for the dataset:
      * "the 2025 federal poverty level" or, for housing intakes,
-     * "the FY2026 HOME income limit (80% AMI)".
+     * "the FY2026 area median income".
      */
     public function basisFor(?int $year, string $region): string
     {
         if ($region === PovertyGuideline::REGION_HOME_ABE) {
             return $year === null
-                ? 'the HOME income limit (80% AMI)'
-                : 'the FY'.$year.' HOME income limit (80% AMI)';
+                ? 'area median income'
+                : 'the FY'.$year.' area median income';
         }
 
         return $year === null

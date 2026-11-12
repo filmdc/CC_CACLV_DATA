@@ -81,11 +81,21 @@ class HousingRecordDeleter
     }
 
     /**
-     * A note for the recycle bin: restoring this call log alone will not
-     * bring its project back. Null when there is nothing to warn about.
+     * A note for the recycle bin: what restoring this call log will and will
+     * not bring back. Null when there is nothing to warn about.
      */
     public function restoreCallNote(CommunicationLog $log): ?string
     {
+        // A record that was merged away is not an ordinary delete — its
+        // contents live on another log now, and restoring it brings back only
+        // the shell they were moved off of.
+        if ($log->merged_into_id !== null) {
+            return "Merged into COMM-{$log->merged_into_id}"
+                .($log->merged_at ? ' on '.$log->merged_at->isoFormat('MMM D, YYYY') : '')
+                .'. Its timeline, documents and requirements are on that record now — '
+                .'restoring this one brings back the empty entry, not its contents.';
+        }
+
         $jobId = $log->converted_to_job_id ?? $log->housing_job_id;
 
         if ($jobId === null) {

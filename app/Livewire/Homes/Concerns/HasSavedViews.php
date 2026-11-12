@@ -22,6 +22,10 @@ use Livewire\Attributes\Computed;
  *   - builtInDefaults(): array             ['columns' => [...], 'filters' => [...]]
  *   - applyViewState(array $columns, array $filters): void
  *   - currentFilters(): array              the screen's live filter state
+ *
+ * Screens that also use HasSortableColumns list 'sort' and 'sortDir' among
+ * their filters; sanitizeFilters() coerces them, so a view stored before
+ * sorting existed simply falls back to the screen's default ordering.
  */
 trait HasSavedViews
 {
@@ -267,6 +271,13 @@ trait HasSavedViews
             $value = $filters[$key] ?? $fallback;
             if ($key === 'pill') {
                 $value = array_key_exists($value, $this->pillOptions()) ? $value : $fallback;
+            } elseif ($key === 'sort') {
+                // '' is legal — it means the screen's own default ordering.
+                $value = ($value === '' || (method_exists($this, 'isSortable') && $this->isSortable((string) $value)))
+                    ? (string) $value
+                    : $fallback;
+            } elseif ($key === 'sortDir') {
+                $value = in_array($value, ['asc', 'desc'], true) ? $value : $fallback;
             } elseif (is_bool($fallback)) {
                 $value = (bool) $value;
             }

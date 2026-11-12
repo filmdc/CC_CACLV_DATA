@@ -45,6 +45,12 @@
                 @if($log->contact_role){{ ucfirst(str_replace('_',' ',$log->contact_role)) }} · @endif
                 <span class="calv-subhead" style="font-size: 11px; letter-spacing: .05em;">COMM-{{ $log->id }}</span>
             </div>
+            @if($mergedFrom->isNotEmpty())
+                <div class="text-[12px] mt-1.5" style="color: var(--calv-slate-65);">
+                    Includes {{ $mergedFrom->count() === 1 ? 'a duplicate entry' : $mergedFrom->count().' duplicate entries' }}
+                    merged in: {{ $mergedFrom->map(fn ($m) => 'COMM-'.$m->id)->join(', ') }}
+                </div>
+            @endif
             <div class="flex gap-4 mt-2 text-[12.5px] flex-wrap" style="color: var(--calv-slate);">
                 @if($log->contact_phone)<span>☏ {{ $log->contact_phone }}</span>@endif
                 @if($log->contact_email)<span>✉ {{ $log->contact_email }}</span>@endif
@@ -69,6 +75,15 @@
             @can('communications_log.create')
                 <button type="button" x-on:click="Livewire.dispatch('homes-open-quick-log')" class="calv-btn calv-btn--ghost">Log a call</button>
             @endcan
+            @if($canMerge)
+                <button
+                    type="button"
+                    wire:click="openMerge"
+                    class="calv-btn calv-btn--ghost"
+                    title="Logged this person twice? Fold the other entry into this one.">
+                    Merge duplicate
+                </button>
+            @endif
             @if($canConvert)
                 <button type="button" wire:click="openConvert" class="calv-btn calv-btn--secondary">Convert to project →</button>
             @endif
@@ -97,18 +112,80 @@
         <section class="calv-card overflow-hidden">
             <header class="flex items-center px-4 py-3" style="border-bottom: 1px solid var(--calv-slate-15);">
                 <h3 class="calv-subhead flex-1" style="font-size: 12px;">Every touch</h3>
-                <span class="text-[11.5px]" style="color: var(--calv-slate-65);">newest first · nothing is ever deleted</span>
+                <span class="text-[11.5px]" style="color: var(--calv-slate-65);">newest first · removed entries are kept</span>
             </header>
             @foreach($timeline as $t)
-                <div class="flex gap-3.5 px-4 py-3" style="border-bottom: 1px solid var(--calv-slate-15);">
+                <div class="group flex gap-3.5 px-4 py-3" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <div class="shrink-0" style="width: 96px;">
                         <div class="calv-subhead" style="font-size: 11px; letter-spacing: .05em;">{{ $t['on']?->isoFormat('MMM D') }}</div>
                         <div class="text-[10.5px] mt-0.5" style="color: var(--calv-slate-65);">{{ $t['kind'] }}</div>
                         @if($t['by'])<div class="text-[10px] mt-0.5" style="color: var(--calv-slate-65);">{{ $t['by'] }}</div>@endif
                     </div>
-                    <div class="flex-1 text-[13px] leading-relaxed" style="color: var(--calv-slate);">{{ $t['note'] }}</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-[13px] leading-relaxed whitespace-pre-wrap" style="color: var(--calv-slate);">{{ $t['note'] }}</div>
+                        @if($t['due'])
+                            <div class="text-[11px] mt-1 calv-subhead" style="color: var(--calv-teal);">Due {{ $t['due']->isoFormat('MMM D, YYYY') }}</div>
+                        @endif
+                        @if($t['edited_by'])
+                            <div class="text-[10.5px] mt-1" style="color: var(--calv-slate-65);">
+                                edited by {{ $t['edited_by'] }}{{ $t['edited_on'] ? ' · '.$t['edited_on']->isoFormat('MMM D') : '' }}
+                            </div>
+                        @endif
+                    </div>
+                    @if($t['can_edit'] || $t['can_remove'])
+                        <div class="shrink-0 inline-flex gap-1.5 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+                            @if($t['can_edit'])
+                                <button type="button"
+                                        wire:click="{{ $t['root'] ? 'openEdit' : 'openEditEntry('.$t['id'].')' }}"
+                                        class="calv-btn calv-btn--ghost calv-btn--sm"
+                                        title="{{ $t['root'] ? 'Correct the original call' : 'Correct this entry' }}">Edit</button>
+                            @endif
+                            @if($t['can_remove'])
+                                <button type="button" wire:click="confirmRemoveEntry({{ $t['id'] }})"
+                                        class="calv-btn calv-btn--ghost calv-btn--sm"
+                                        style="color: var(--calv-red); border-color: var(--calv-slate-35);"
+                                        title="Take this entry off the timeline — it stays on the record and can be put back">Remove</button>
+                            @endif
+                        </div>
+                    @elseif($t['system'])
+                        {{-- Says why there is no Edit here, rather than leaving a silent gap. --}}
+                        <div class="shrink-0 text-[10.5px] self-center opacity-0 group-hover:opacity-100 transition-opacity" style="color: var(--calv-slate-65);" title="The system wrote this when the record changed">system</div>
+                    @endif
                 </div>
             @endforeach
+
+            {{-- Entries taken off the timeline. Shown to anyone who can read the
+                 record — a removal is part of its history, not hidden from it. --}}
+            @if($removedCount > 0)
+                <div class="px-4 py-2.5" style="border-bottom: 1px solid var(--calv-slate-15); background: var(--calv-sand-15);">
+                    <button type="button" wire:click="toggleRemovedEntries" class="calv-link text-left" style="font-size: 11.5px; background: none; border: none; cursor: pointer;">
+                        {{ $showRemovedEntries ? 'Hide' : 'Show' }} {{ $removedCount }} removed {{ Str::plural('entry', $removedCount) }}
+                    </button>
+                </div>
+                @if($showRemovedEntries)
+                    @foreach($removedEntries as $r)
+                        <div class="flex gap-3.5 px-4 py-3" style="border-bottom: 1px solid var(--calv-slate-15); background: var(--calv-sand-15);">
+                            <div class="shrink-0" style="width: 96px;">
+                                <div class="calv-subhead" style="font-size: 11px; letter-spacing: .05em; color: var(--calv-slate-65);">{{ $r['on']?->isoFormat('MMM D') }}</div>
+                                <div class="text-[10.5px] mt-0.5" style="color: var(--calv-slate-65);">{{ $r['kind'] }}</div>
+                                @if($r['by'])<div class="text-[10px] mt-0.5" style="color: var(--calv-slate-65);">{{ $r['by'] }}</div>@endif
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-[13px] leading-relaxed whitespace-pre-wrap" style="color: var(--calv-slate-65); text-decoration: line-through;">{{ $r['note'] }}</div>
+                                <div class="text-[10.5px] mt-1" style="color: var(--calv-slate-65);">
+                                    removed{{ $r['removed_by'] ? ' by '.$r['removed_by'] : '' }}{{ $r['removed_on'] ? ' · '.$r['removed_on']->isoFormat('MMM D') : '' }}
+                                </div>
+                            </div>
+                            @if($canEdit)
+                                <div class="shrink-0">
+                                    <button type="button" wire:click="restoreEntry({{ $r['id'] }})" class="calv-btn calv-btn--quiet calv-btn--sm">Put back</button>
+                                </div>
+                            @endif
+                        </div>
+                    @endforeach
+                @endif
+            @endif
+
             @can('communications_log.create')
                 <div class="px-4 py-3">
                     <button type="button" x-on:click="Livewire.dispatch('homes-open-quick-log')" class="calv-link text-left" style="font-size: 12.5px; background: none; border: none; cursor: pointer;">
@@ -170,16 +247,108 @@
                                 @endif
                             </div>
                             @if($r['is_income'])
-                                <div class="text-[11px] -mt-1" style="color: var(--calv-slate-65); padding-left: 24px;">
-                                    @if($incomeAssessment && $incomeAssessment->annual_income !== null)
-                                        ${{ number_format((float) $incomeAssessment->annual_income, 0) }}/yr · household of {{ $incomeAssessment->household_size }}
-                                        @if($incomeAssessment->poverty_percentage !== null)
-                                            · <strong style="color: var(--calv-slate);">{{ $incomeAssessment->determination_label }}</strong>
+                                @php
+                                    $hasFigures = $incomeAssessment && $incomeAssessment->annual_income !== null;
+                                    $pct = $hasFigures && $incomeAssessment->poverty_percentage !== null
+                                        ? rtrim(rtrim(number_format((float) $incomeAssessment->poverty_percentage, 1), '0'), '.')
+                                        : null;
+                                @endphp
+                                <div class="-mt-1" style="padding-left: 24px;">
+                                    @if($hasFigures && $pct !== null)
+                                        {{-- The qualification itself, as chips — this is what
+                                             the PM opens the file to find, so it does not sit
+                                             buried in a grey sentence. --}}
+                                        <div class="flex flex-wrap items-center gap-1.5 mb-1">
+                                            <span class="calv-badge calv-badge--teal">
+                                                {{ $pct }}% {{ $incomeAssessment->isHomeDetermination() ? 'of AMI' : 'FPL' }}
+                                            </span>
+                                            @if($incomeAssessment->tier_label)
+                                                <span class="calv-badge">{{ $incomeAssessment->tier_label }}</span>
+                                            @endif
+                                            @if($incomeAssessment->is_income_eligible === true)
+                                                <span class="calv-badge calv-badge--sage">Income eligible</span>
+                                            @elseif($incomeAssessment->is_income_eligible === false)
+                                                <span class="calv-badge calv-badge--amber">Over income</span>
+                                            @endif
+                                        </div>
+                                    @endif
+                                    <div class="text-[11px]" style="color: var(--calv-slate-65);">
+                                        @if($hasFigures)
+                                            ${{ number_format((float) $incomeAssessment->annual_income, 0) }}/yr · household of {{ $incomeAssessment->household_size }}
+                                            @if($pct === null)
+                                                · no income guideline loaded for this household size
+                                            @elseif($incomeAssessment->isHomeDetermination() && $incomeAssessment->poverty_threshold !== null)
+                                                · FY{{ $incomeAssessment->guideline_year }} limit ${{ number_format((float) $incomeAssessment->poverty_threshold, 0) }}
+                                                @if($incomeAssessment->area_median_income !== null)
+                                                    · area median ${{ number_format((float) $incomeAssessment->area_median_income, 0) }}
+                                                @endif
+                                            @elseif(! $incomeAssessment->isHomeDetermination())
+                                                · {{ $incomeAssessment->determination_label }}
+                                            @endif
                                         @else
-                                            · no poverty guideline loaded for this household size
+                                            Annual income, household size, and proof — pay stubs, tax return, benefit letters.
                                         @endif
-                                    @else
-                                        Annual income, household size, and proof — pay stubs, tax return, benefit letters.
+                                    </div>
+
+                                    {{-- Read-only check against another year's guidelines.
+                                         Shows only when a year other than the one of record
+                                         is loaded, and writes nothing — the determination
+                                         stays snapshotted where it was taken. Restating what
+                                         a household was qualified at is a re-determination,
+                                         not a lookup. --}}
+                                    @php
+                                        $cmpYears = $hasFigures ? $this->incomeComparisonYears() : [];
+                                        $cmp = $this->incomeComparison;
+                                        $yearLabel = fn ($y) => ($incomeAssessment->isHomeDetermination() ? 'FY' : '').$y;
+                                    @endphp
+                                    @if(count($cmpYears))
+                                        @if($cmp === null)
+                                            <div class="flex flex-wrap items-center gap-1 mt-1">
+                                                <span class="text-[10.5px]" style="color: var(--calv-slate-65);">Check against</span>
+                                                @foreach($cmpYears as $y)
+                                                    <button type="button" wire:click="compareIncomeYear({{ $y }})"
+                                                            class="calv-btn calv-btn--ghost calv-btn--sm"
+                                                            title="See these same figures under the {{ $yearLabel($y) }} guidelines — nothing is saved">
+                                                        {{ $yearLabel($y) }}
+                                                    </button>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <div class="mt-1 rounded-md px-2 py-1.5"
+                                                 style="background: var(--calv-sand-15); border: 1px dashed var(--calv-slate-35);">
+                                                <div class="flex items-center justify-between gap-2">
+                                                    <span class="calv-subhead text-[9px]" style="color: var(--calv-slate-65);">
+                                                        If measured against {{ $yearLabel($incomeCompareYear) }}
+                                                    </span>
+                                                    <button type="button" wire:click="clearIncomeComparison"
+                                                            class="text-[10px] underline" style="color: var(--calv-slate-65);">close</button>
+                                                </div>
+                                                @if($cmp['available'])
+                                                    @php $cmpPct = rtrim(rtrim(number_format((float) $cmp['percentage'], 1), '0'), '.'); @endphp
+                                                    <div class="flex flex-wrap items-center gap-1.5 mt-1">
+                                                        <span class="calv-badge">{{ $cmpPct }}% {{ $cmp['bracket_unit'] === 'AMI' ? 'of AMI' : 'FPL' }}</span>
+                                                        @if($cmp['tier_label'])
+                                                            <span class="calv-badge">{{ $cmp['tier_label'] }}</span>
+                                                        @endif
+                                                        @if($cmp['eligible'] === true)
+                                                            <span class="calv-badge calv-badge--sage">Would be income eligible</span>
+                                                        @elseif($cmp['eligible'] === false)
+                                                            <span class="calv-badge calv-badge--amber">Would be over income</span>
+                                                        @endif
+                                                    </div>
+                                                    <div class="text-[10.5px] mt-1" style="color: var(--calv-slate-65);">
+                                                        @if($cmp['bracket_unit'] === 'AMI' && $cmp['threshold'] !== null)
+                                                            {{ $yearLabel($incomeCompareYear) }} limit ${{ number_format((float) $cmp['threshold'], 0) }}@if($cmp['ami'] !== null) · area median ${{ number_format((float) $cmp['ami'], 0) }}@endif ·
+                                                        @endif
+                                                        Nothing saved — the determination of record is still {{ $yearLabel($incomeAssessment->guideline_year) }}.
+                                                    </div>
+                                                @else
+                                                    <div class="text-[10.5px] mt-1" style="color: var(--calv-slate-65);">
+                                                        No {{ $yearLabel($incomeCompareYear) }} guideline covers a household of {{ $incomeAssessment->household_size }}.
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        @endif
                                     @endif
                                 </div>
                             @endif
@@ -352,7 +521,7 @@
     {{-- Convert modal --}}
     @if($showConvert)
         <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 56px 16px;">
-            <div class="w-full" style="max-width: 560px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+            <div class="w-full" style="max-width: 560px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Convert to project</h2>
                     <div class="text-xs mt-1" style="color: var(--calv-slate-65);">{{ $who }}@if($where) · {{ $where }}@endif · step {{ $convertStep }} of 2</div>
@@ -483,7 +652,7 @@
     {{-- Edit entry modal --}}
     @if($showEdit)
         <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 48px 16px;">
-            <div class="w-full" style="max-width: 620px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+            <div class="w-full" style="max-width: 620px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Edit entry</h2>
                     <div class="text-xs mt-1" style="color: var(--calv-slate-65);">COMM-{{ $log->id }}</div>
@@ -602,7 +771,7 @@
          Explicit Cancel is the only close path (portal modal convention). --}}
     @if($actingOnRequirementId && $actingOn)
         <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 48px 16px;">
-            <div class="w-full" style="max-width: 520px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+            <div class="w-full" style="max-width: 520px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 19px;">{{ $actingOn['label'] }}</h2>
                     <div class="text-xs mt-1" style="color: var(--calv-slate-65);">
@@ -690,7 +859,7 @@
     {{-- Upload files onto a document requirement --}}
     @if($uploadingRequirementId)
         <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 64px 16px;">
-            <div class="w-full" style="max-width: 440px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+            <div class="w-full" style="max-width: 440px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Upload document</h2>
                     <div class="text-xs mt-1" style="color: var(--calv-slate-65);">Uploading marks the requirement received automatically.</div>
@@ -718,10 +887,78 @@
         @include('livewire.homes.partials.income-eligibility')
     @endif
 
+    {{-- Merge a duplicate entry into this one --}}
+    @if($showMerge)
+        @include('livewire.homes.partials.merge-duplicate')
+    @endif
+
+    {{-- Correct one timeline entry. Explicit Cancel only. --}}
+    @if($editingEntryId)
+        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 48px 16px;">
+            <div class="w-full" style="max-width: 560px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
+                <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
+                    <h2 class="calv-h1" style="font-size: 20px;">Correct this entry</h2>
+                    <div class="text-xs mt-1" style="color: var(--calv-slate-65);">{{ $who }} · COMM-{{ $log->id }}</div>
+                </header>
+                <div class="px-6 py-5 grid gap-3.5">
+                    <div>
+                        <label class="calv-label">What happened</label>
+                        <textarea wire:model="entryContent" rows="5" class="calv-input" style="resize: vertical;"></textarea>
+                        @error('entryContent')<p class="mt-1 text-xs" style="color: var(--calv-red);">{{ $message }}</p>@enderror
+                    </div>
+                    <div class="grid gap-3.5" style="grid-template-columns: 1fr 1fr;">
+                        <div>
+                            <label class="calv-label">Kind</label>
+                            <select wire:model="entryType" class="calv-input">
+                                @foreach($entryTypes as $value => $label)
+                                    <option value="{{ $value }}">{{ $label }}</option>
+                                @endforeach
+                            </select>
+                            @error('entryType')<p class="mt-1 text-xs" style="color: var(--calv-red);">{{ $message }}</p>@enderror
+                        </div>
+                        <div>
+                            <label class="calv-label">Due date <span style="color: var(--calv-slate-65); font-weight: 400;">(optional)</span></label>
+                            <input wire:model="entryDate" type="date" class="calv-input">
+                            @error('entryDate')<p class="mt-1 text-xs" style="color: var(--calv-red);">{{ $message }}</p>@enderror
+                        </div>
+                    </div>
+                    <p class="text-[11.5px]" style="color: var(--calv-slate-65);">
+                        The entry keeps its original date and author. It will be marked as edited so the timeline still reads honestly.
+                    </p>
+                </div>
+                <footer class="px-6 py-4 flex justify-end gap-2" style="border-top: 1px solid var(--calv-slate-15); background: var(--calv-sand-15);">
+                    <button type="button" wire:click="closeEditEntry" class="calv-btn calv-btn--quiet">Cancel</button>
+                    <button type="button" wire:click="saveEntry" class="calv-btn calv-btn--primary">Save entry</button>
+                </footer>
+            </div>
+        </div>
+    @endif
+
+    {{-- Remove one timeline entry. Explicit Cancel only. --}}
+    @if($removingEntryId && $removingEntry)
+        <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 48px 16px;">
+            <div class="w-full" style="max-width: 480px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
+                <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
+                    <h2 class="calv-h1" style="font-size: 20px;">Remove this entry?</h2>
+                    <div class="text-xs mt-1" style="color: var(--calv-slate-65);">{{ $removingEntry['kind'] }}{{ $removingEntry['on'] ? ' · '.$removingEntry['on']->isoFormat('MMM D, YYYY') : '' }}</div>
+                </header>
+                <div class="px-6 py-5 text-[13.5px] leading-relaxed" style="color: var(--calv-slate);">
+                    <blockquote class="px-3 py-2 text-[12.5px] whitespace-pre-wrap" style="border-left: 3px solid var(--calv-slate-35); color: var(--calv-slate-65);">{{ Str::limit($removingEntry['note'], 400) }}</blockquote>
+                    <p class="mt-3">It comes off the timeline right away.</p>
+                    <p class="mt-2.5" style="color: var(--calv-slate-65);">Nothing is destroyed — it stays on this record under &ldquo;removed&rdquo; and you can put it back yourself.</p>
+                </div>
+                <footer class="px-6 py-4 flex justify-end gap-2" style="border-top: 1px solid var(--calv-slate-15); background: var(--calv-sand-15);">
+                    <button type="button" wire:click="cancelRemoveEntry" class="calv-btn calv-btn--quiet">Cancel</button>
+                    <button type="button" wire:click="removeEntry" class="calv-btn calv-btn--primary">Yes, remove it</button>
+                </footer>
+            </div>
+        </div>
+    @endif
+
     {{-- Delete confirmation. Explicit Cancel only — no backdrop/Escape close. --}}
     @if($showDelete)
         <div class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto" style="background: rgba(40,42,44,.55); padding: 48px 16px;">
-            <div class="w-full" style="max-width: 480px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" wire:click.stop>
+            <div class="w-full" style="max-width: 480px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-lg); overflow: hidden;" @click.stop>
                 <header class="px-6 py-4" style="border-bottom: 1px solid var(--calv-slate-15);">
                     <h2 class="calv-h1" style="font-size: 20px;">Delete this call?</h2>
                     <div class="text-xs mt-1" style="color: var(--calv-slate-65);">{{ $who }} · COMM-{{ $log->id }}</div>

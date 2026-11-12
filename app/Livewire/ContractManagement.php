@@ -9,6 +9,7 @@ use App\Models\DueDateEmail;
 use App\Models\Funder;
 use App\Models\Program;
 use App\Models\User;
+use App\Services\MediaValidationService;
 use App\Traits\WithPermissionChecks;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -889,7 +890,7 @@ class ContractManagement extends Component
                 foreach ($this->report_documents as $document) {
                     $report->addMedia($document->getRealPath())
                         ->usingName($document->getClientOriginalName())
-                        ->usingFileName($document->hashName())
+                        ->usingFileName(MediaValidationService::sanitizeFileName($document->getClientOriginalName()))
                         ->toMediaCollection('documents');
                 }
             }
