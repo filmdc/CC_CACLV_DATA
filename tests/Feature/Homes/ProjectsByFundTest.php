@@ -147,8 +147,6 @@ it('renders the card on Today and expands one fund at a time', function () {
     $this->actingAs(fundCardUser(['communications_log.view', 'projects.view']));
 
     $fund = FundCode::factory()->create(['code' => 'HOME-2026']);
-    // NB: Participant::full_name joins on the (empty) middle name, so the
-    // rendered string carries a double space — assert on the surname.
     $participant = Participant::factory()->create(['first_name' => 'Ada', 'last_name' => 'Riveramonte']);
     $job = fundCardJob('Ada roof', 'in_progress', now()->addMonth()->toDateString());
     $job->update(['participant_id' => $participant->id]);
@@ -162,7 +160,7 @@ it('renders the card on Today and expands one fund at a time', function () {
         ->assertDontSee('Riveramonte')
         ->call('toggleFund', $fund->id)
         ->assertSet('openFund', $fund->id)
-        ->assertSee('Riveramonte')
+        ->assertSee('Ada Riveramonte')
         // Clicking the same fund again closes it.
         ->call('toggleFund', $fund->id)
         ->assertSet('openFund', null)

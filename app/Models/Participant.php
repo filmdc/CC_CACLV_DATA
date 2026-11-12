@@ -87,9 +87,12 @@ class Participant extends Model
 
     public function getFullNameAttribute(): string
     {
-        $name = trim($this->first_name.' '.$this->middle_name.' '.$this->last_name);
-
-        return $this->suffix ? $name.' '.$this->suffix : $name;
+        // Join only the parts that are present, so a participant with no
+        // middle name reads "Ada Lovelace", not "Ada  Lovelace".
+        return collect([$this->first_name, $this->middle_name, $this->last_name, $this->suffix])
+            ->map(fn ($part) => trim((string) $part))
+            ->filter(fn ($part) => $part !== '')
+            ->implode(' ');
     }
 
     public function getAgeAttribute(): int
