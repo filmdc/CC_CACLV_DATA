@@ -228,3 +228,43 @@ it('sanitizes unknown columns and filters from a stored view', function () {
         ->assertSet('pill', 'all')
         ->assertSet('expanded', true);
 });
+
+// ── Optional record-ID columns ───────────────────────────────────────
+
+it('offers the comm log ID as an optional Calls & Intakes column', function () {
+    $this->actingAs(savedViewsUser());
+
+    $log = \App\Models\CommunicationLog::factory()->create();
+
+    Livewire::test(CallsIntakes::class)
+        ->assertSet('columns', ['who', 'where', 'stage', 'docs', 'last', 'next', 'type', 'direction'])
+        ->call('openCreateView')
+        ->call('toggleViewColumn', 'log_id')
+        ->set('viewName', 'With log IDs')
+        ->call('saveView')
+        ->assertHasNoErrors()
+        ->assertSet('columns', ['log_id', 'who', 'where', 'stage', 'docs', 'last', 'next', 'type', 'direction'])
+        ->assertSee('Log ID')
+        ->assertSee('COMM-'.$log->id);
+});
+
+it('offers the project number as an optional Projects column', function () {
+    $this->actingAs($user = savedViewsUser());
+
+    $job = HousingJob::factory()->create(['status' => 'completed', 'job_title' => 'Numbered roof job']);
+
+    // Not part of the built-in standard view.
+    Livewire::test(Projects::class)
+        ->assertSet('columns', ['who', 'status', 'progress', 'next']);
+
+    HomesSavedView::create([
+        'user_id' => $user->id, 'screen' => 'projects', 'name' => 'With project numbers',
+        'columns' => ['number', 'who'],
+        'filters' => ['pill' => 'all'],
+        'is_default' => true,
+    ]);
+
+    Livewire::test(Projects::class)
+        ->assertSet('columns', ['number', 'who'])
+        ->assertSee($job->job_number);
+});

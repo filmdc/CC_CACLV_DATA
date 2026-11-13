@@ -260,6 +260,7 @@ class HousingPortalData
 
         return [
             'id' => $job->id,
+            'number' => (string) $job->job_number,
             'who' => $job->participant?->full_name ?: $job->job_title,
             'where' => $job->property
                 ? trim($job->property->address_line_1.', '.$job->property->city, ', ')

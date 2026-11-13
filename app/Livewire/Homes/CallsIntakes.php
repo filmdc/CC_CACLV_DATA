@@ -96,6 +96,8 @@ class CallsIntakes extends Component
     public function columnOptions(): array
     {
         return [
+            // Optional — not in the built-in defaults.
+            'log_id' => 'Log ID',
             'who' => 'Contact',
             'where' => 'Address',
             'note' => 'Summary',
