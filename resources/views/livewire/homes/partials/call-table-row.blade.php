@@ -10,6 +10,9 @@
     </td>
     @foreach($visible as $key => $h)
         @switch($key)
+            @case('log_id')
+                <td class="px-3 py-2.5 text-[12.5px] whitespace-nowrap" style="color: var(--calv-slate-65); font-family: ui-monospace, Menlo, monospace;">COMM-{{ $row['id'] }}</td>
+                @break
             @case('who')
                 <td class="px-3 py-2.5 text-[12.5px] font-semibold" style="color: var(--calv-slate);">{{ $row['who'] }}</td>
                 @break
