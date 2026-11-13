@@ -11,6 +11,9 @@
     <a href="{{ route('homes.project', $r['id']) }}" wire:navigate
        class="flex items-center gap-4 px-4 py-3.5 flex-1 min-w-0"
        style="text-decoration: none;">
+        @if($this->showsColumn('number'))
+            <div class="text-[12px] whitespace-nowrap" style="flex: 0 0 auto; min-width: 96px; color: var(--calv-slate-65); font-family: ui-monospace, Menlo, monospace;">{{ $r['number'] }}</div>
+        @endif
         <div class="min-w-0" style="flex: 1 1 26%;">
             <div class="text-[14.5px] font-semibold" style="color: var(--calv-slate);">{{ $r['who'] }}</div>
             <div class="text-xs mt-0.5" style="color: var(--calv-slate-65);">{{ $r['where'] }}</div>
