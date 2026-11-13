@@ -54,6 +54,8 @@ class Projects extends Component
     public function columnOptions(): array
     {
         return [
+            // Optional — not in the built-in defaults.
+            'number' => 'Project number',
             'who' => 'Homeowner & address',
             'status' => 'Status & program',
             'progress' => 'Milestones & budget',
@@ -178,7 +180,7 @@ class Projects extends Component
             ->when($this->search !== '', function ($c) {
                 $needle = mb_strtolower($this->search);
 
-                return $c->filter(fn ($r) => str_contains(mb_strtolower($r['who'].' '.$r['where'].' '.$r['title']), $needle));
+                return $c->filter(fn ($r) => str_contains(mb_strtolower($r['who'].' '.$r['where'].' '.$r['title'].' '.$r['number']), $needle));
             })
             ->values();
 
